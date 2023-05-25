@@ -432,9 +432,6 @@ public class LearnerController {
 	activityJSON.put("name", activity.getTitle());
 	int status = activity.getActivityId().equals(currentActivityId) ? 0 : activity.getStatus();
 	activityJSON.put("status", status);
-	if (activity.getIconURL() != null) {
-	    activityJSON.put("iconURL", activity.getIconURL());
-	}
 
 	// URL in learner mode
 	String url = activity.getUrl();

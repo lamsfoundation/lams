@@ -21,24 +21,16 @@ function initLearnerPage(toolSessionId, userId) {
                 let supportBarItems = $('.component-page-wrapper .component-sidebar #support-bar').removeClass('d-none')
                     .find('#support-bar-items').empty();
                 $.each(result.support, function (activityIndex, activityData) {
-                    let activityItem = $('<li>').attr('role', 'presentation').addClass('support-bar-item progress-bar-item-openable'),
-                        activityIconUrl = getActivityIconUrl(activityData),
-                        activityIcon = null;
-
-                    if (activityIconUrl) {
-                        activityIcon = $('<img class="progress-bar-icon">').attr('src', LAMS_URL + activityIconUrl);
-                    } else {
-                        activityIcon = $('<i class="fa-solid fa-fw fa-up-right-from-square progress-bar-icon"></i>');
-                    }
-
+                    let activityItem = $('<li>').attr('role', 'presentation')
+                        .addClass('support-bar-item progress-bar-item-openable')
+                        .prepend('<i class="fa-solid fa-fw fa-up-right-from-square progress-bar-icon">').appendTo(supportBarItems);
                     let activityLink = $('<a>').text(activityData.name).attr({
                         'target': '_blank',
                         'href': activityData.url,
                         'role': 'menuitem',
                         'title': 'Open completed activity'
                     });
-                    activityItem.addClass('progress-bar-item-openable').append(activityIcon).append(activityLink)
-                        .appendTo(supportBarItems);
+                    activityItem.addClass('progress-bar-item-openable').append(activityLink);
                 });
             }
 
@@ -47,30 +39,26 @@ function initLearnerPage(toolSessionId, userId) {
             $.each(result.activities, function (activityIndex, activityData) {
                 let activityItem = $('<li>').attr('role', 'presentation').appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
-                    activityIconUrl = getActivityIconUrl(activityData),
-                    activityIcon = null;
-
-                if (activityIconUrl) {
-                    activityIcon = $('<img class="progress-bar-icon">').attr('src', LAMS_URL + activityIconUrl);
-                } else {
                     activityIcon = $('<i class="fa-solid fa-fw progress-bar-icon"></i>');
-                }
 
                 if (activityData.status === 0) {
-                    activityItem.addClass('progress-bar-item-current').append(activityIcon)
-                        .append($('<span class="progress-bar-activity-name">').text(activityName));
-                    if (!activityIconUrl) {
+                    activityItem.addClass('progress-bar-item-current').text(activityName).prepend(activityIcon);
+                    if (activityData.type === 'g') {
+                        activityIcon.addClass('fa-hourglass-half');
+                    } else {
                         activityIcon.addClass('fa-pen-to-square');
                     }
                 } else if (activityData.status === 1) {
                     completedActivityCount++;
 
                     activityItem.addClass('progress-bar-item-complete').prepend(activityIcon);
-                    if (!activityIconUrl) {
+                    if (activityData.type === 'g') {
+                        activityIcon.addClass('fa-hourglass-full');
+                    } else {
                         activityIcon.addClass('fa-square-check');
                     }
                     if (activityData.url) {
-                        let activityLink = $('<a class="progress-bar-activity-name">').text(activityName).attr({
+                        let activityLink = $('<a>').text(activityName).attr({
                             'target': '_blank',
                             'href': activityData.url,
                             'role': 'menuitem',
@@ -79,9 +67,10 @@ function initLearnerPage(toolSessionId, userId) {
                         activityItem.addClass('progress-bar-item-openable').append(activityLink);
                     }
                 } else {
-                    activityItem.addClass('progress-bar-item-incomplete').append(activityIcon)
-                        .append($('<span class="progress-bar-activity-name">').text(activityName));
-                    if (!activityIconUrl) {
+                    activityItem.addClass('progress-bar-item-incomplete').text(activityName).prepend(activityIcon);
+                    if (activityData.type === 'g') {
+                        activityIcon.addClass('fa-hourglass-start');
+                    } else {
                         activityIcon.addClass('fa-square');
                     }
                 }
@@ -118,23 +107,5 @@ function toggleProgressBar(forceClose) {
                 toggleProgressBar(true);
             }
         });
-    }
-}
-
-function getActivityIconUrl(activityData){
-    if (activityData.iconURL){
-        return activityData.iconURL;
-    }
-    if (activityData.type === 'g') {
-        return 'images/svg/gate' + (activityData.gateOpen ? 'Open' : 'Closed') + '.svg';
-    }
-    if (activityData.isGrouping) {
-        return 'images/svg/grouping.svg';
-    }
-    if (activityData.type === 'b') {
-        return 'images/svg/branchingStart.svg';
-    }
-    if (activityData.type === 'o') {
-        return 'images/svg/optional.svg';
     }
 }
