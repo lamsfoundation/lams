@@ -14,6 +14,53 @@
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
+.img-circle {
+    border-radius: 50%;
+}
+
+.jumbotron {
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    color: inherit;
+    background-color: #eee;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-radius: 6px
+}
+
+.jumbotron .h1,.jumbotron h1 {
+    color: inherit
+}
+
+.jumbotron p {
+    margin-bottom: 15px;
+    font-size: 21px;
+    font-weight: 200
+}
+
+.jumbotron>hr {
+    border-top-color: #d5d5d5
+}
+
+.jumbotron .container {
+    max-width: 100%
+}
+
+@media screen and (min-width: 768px) {
+    .jumbotron {
+        padding-top: 23px;
+        padding-bottom: 23px;
+		padding-right: 30px;
+		padding-left: 30px
+    }
+
+    .jumbotron .h1,.jumbotron h1 {
+        font-size: 63px
+    }
+
+}
+
 body.component {
 	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
 	background-color: var(--lams-background-gray);
