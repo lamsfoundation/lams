@@ -23,11 +23,6 @@
 
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -37,13 +32,20 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements AssessmentUserDAO {
 
-    private static final String FIND_BY_USER_ID_SESSION_ID = "from " + AssessmentUser.class.getName()
-	    + " as u where u.userId =? and u.session.sessionId=?";
-    private static final String FIND_BY_SESSION_ID = "from " + AssessmentUser.class.getName()
-	    + " as u where u.session.sessionId=?";
+    private static final String FIND_BY_USER_ID_SESSION_ID =
+	    "from " + AssessmentUser.class.getName() + " as u where u.userId =? and u.session.sessionId=?";
+    private static final String FIND_BY_SESSION_ID =
+	    "from " + AssessmentUser.class.getName() + " as u where u.session.sessionId=?";
+    private static final String FIND_LEARNERS_BY_CONTENT_ID = "FROM " + AssessmentUser.class.getName() + " user"
+	    + " WHERE user.session.assessment.contentId = :contentId ";
 
     private static final String LOAD_MARKS_FOR_SESSION = "SELECT grade FROM tl_laasse10_assessment_result "
 	    + " WHERE finish_date IS NOT NULL AND latest = 1 AND session_id = :sessionId";
@@ -56,6 +58,16 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     private static final String LOAD_MARKS_FOR_CONTENT = "SELECT r.grade FROM tl_laasse10_assessment_result r "
 	    + " JOIN tl_laasse10_assessment a ON r.assessment_uid = a.uid "
 	    + " WHERE r.finish_date IS NOT NULL AND r.latest = 1 AND a.content_id = :toolContentId";
+
+    private static final String FIND_LEARNERS_BY_CONTENT_ID_FOR_COMPLETION_CHART =
+	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, "
+		    + " CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
+		    + "	IF(a.use_select_leader_tool_ouput, s.session_name, NULL) AS group_name"
+		    + " FROM      tl_laasse10_assessment        AS a"
+		    + " JOIN      tl_laasse10_session           AS s    ON s.assessment_uid = a.uid"
+		    + " JOIN      tl_laasse10_user              AS au   ON au.session_uid = s.uid"
+		    + " JOIN      lams_user              	AS u	USING (user_id)"
+		    + "	WHERE   a.content_id = :toolContentId ORDER BY user_name";
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -70,8 +82,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     @SuppressWarnings("rawtypes")
     @Override
     public AssessmentUser getUserCreatedAssessment(Long userId, Long contentId) {
-	final String FIND_BY_USER_ID_CONTENT_ID = "from " + AssessmentUser.class.getName()
-		+ " as u where u.userId =? and u.assessment.contentId=?";
+	final String FIND_BY_USER_ID_CONTENT_ID =
+		"from " + AssessmentUser.class.getName() + " as u where u.userId =? and u.assessment.contentId=?";
 
 	List list = doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
 	if (list == null || list.size() == 0) {
@@ -194,30 +206,43 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
     }
 
     @Override
-    public int getCountUsersByContentId(Long contentId) {
-	final String LOAD_USERS_ORDERED_BY_NAME = "SELECT COUNT(*) FROM " + AssessmentUser.class.getName() + " user"
-		+ " WHERE user.session.assessment.contentId = :contentId ";
-
-	Query<Number> query = getSession().createQuery(LOAD_USERS_ORDERED_BY_NAME, Number.class);
+    public int getCountLearnersByContentId(Long contentId) {
+	Query<Number> query = getSession().createQuery("SELECT COUNT(*) " + FIND_LEARNERS_BY_CONTENT_ID, Number.class);
 	query.setParameter("contentId", contentId);
 	return query.uniqueResult().intValue();
     }
 
+    @Override
+    public List<AssessmentUser> getLearnersByContentId(Long contentId) {
+	Query<AssessmentUser> query = getSession().createQuery(
+		FIND_LEARNERS_BY_CONTENT_ID + " ORDER BY firstName, lastName", AssessmentUser.class);
+	query.setParameter("contentId", contentId);
+	return query.list();
+    }
+
+    @Override
+    public List<Object[]> getLearnersByContentIdForCompletionChart(Long contentId) {
+	return getSession().createNativeQuery(FIND_LEARNERS_BY_CONTENT_ID_FOR_COMPLETION_CHART)
+		.setParameter("toolContentId", contentId).getResultList();
+    }
+
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_SELECT = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark";
     private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_FROM = " FROM tl_laasse10_user user";
-    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_JOIN = " INNER JOIN tl_laasse10_session session"
-	    + " ON user.session_uid=session.uid" +
+    private static String LOAD_USERS_ORDERED_BY_SESSION_QUESTION_JOIN =
+	    " INNER JOIN tl_laasse10_session session" + " ON user.session_uid=session.uid" +
 
-	    " LEFT OUTER JOIN tl_laasse10_assessment_result result " + " ON result.user_uid = user.uid"
-	    + " 	AND result.finish_date IS NOT NULL" + " 	AND result.latest = 1" +
+		    " LEFT OUTER JOIN tl_laasse10_assessment_result result " + " ON result.user_uid = user.uid"
+		    + " 	AND result.finish_date IS NOT NULL" + " 	AND result.latest = 1" +
 
-	    " INNER JOIN lams_qb_tool_answer qbToolAnswer " + " ON qbToolAnswer.tool_question_uid = :questionUid " +
+		    " INNER JOIN lams_qb_tool_answer qbToolAnswer "
+		    + " ON qbToolAnswer.tool_question_uid = :questionUid " +
 
-	    " INNER JOIN tl_laasse10_question_result question_result " + " ON result.uid=question_result.result_uid"
-	    + " 	AND question_result.uid = qbToolAnswer.answer_uid" +
+		    " INNER JOIN tl_laasse10_question_result question_result "
+		    + " ON result.uid=question_result.result_uid"
+		    + " 	AND question_result.uid = qbToolAnswer.answer_uid" +
 
-	    " WHERE session.session_id = :sessionId "
-	    + " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) ";
+		    " WHERE session.session_id = :sessionId "
+		    + " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) ";
     private static String LOAD_USERS_ORDERED_ORDER_BY_RESULT = "ORDER BY question_result.mark ";
 
     @SuppressWarnings("unchecked")

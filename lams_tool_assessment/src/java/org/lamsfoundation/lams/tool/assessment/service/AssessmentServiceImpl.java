@@ -37,6 +37,7 @@ import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -316,26 +317,78 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public int getCountUsersByContentId(Long contentId) {
-	return assessmentUserDao.getCountUsersByContentId(contentId);
+    public int getCountLearnersByContentId(Long contentId) {
+	return assessmentUserDao.getCountLearnersByContentId(contentId);
+    }
+
+    @Override
+    public List<AssessmentUser> getLearnersByContentId(Long contentId) {
+	return assessmentUserDao.getLearnersByContentId(contentId);
+    }
+
+    @Override
+    public ArrayNode getLearnersByContentIdJson(Long contentId) {
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	List<Object[]> learnersDetails = assessmentUserDao.getLearnersByContentIdForCompletionChart(contentId);
+	for (Object[] learnerDetails : learnersDetails) {
+	    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+	    learner.put("id", learnerDetails[0].toString());
+	    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1].toString());
+	    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2].toString());
+	    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3].toString());
+	    result.add(learner);
+	}
+	return result;
     }
 
     /**
      * How many learners can possibly access this activity
      */
     @Override
-    public int getCountLessonLearnersByContentId(long contentId) {
+    public ArrayNode getLessonLearnersByContentIdJson(long contentId) {
 	long lessonId = lessonService.getLessonByToolContentId(contentId).getLessonId();
-	return lessonService.getCountLessonLearners(lessonId, null);
+	List<User> learners = lessonService.getLessonLearners(lessonId, null, null, null, true);
+
+	Grouping grouping = getGrouping(contentId);
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	for (User learner : learners) {
+	    ObjectNode learnerJson = JsonNodeFactory.instance.objectNode();
+	    learnerJson.put("id", learner.getUserId());
+	    learnerJson.put("name", learner.getFullName());
+	    learnerJson.put("portraitUuid",
+		    learner.getPortraitUuid() == null ? null : learner.getPortraitUuid().toString());
+	    if (grouping != null) {
+		Group group = grouping.getGroupBy(learner);
+		if (group != null) {
+		    learnerJson.put("group", group.getGroupName());
+		}
+	    }
+	    result.add(learnerJson);
+	}
+
+	return result;
+
     }
 
     /**
-     * How many learners have already finished answering questions. They are either on results page or left the activity
+     * Learners have already finished answering questions. They are either on results page or left the activity
      * completely.
      */
     @Override
-    public int getCountLearnersWithFinishedCurrentAttempt(long contentId) {
-	return assessmentResultDao.countLastFinishedAssessmentResults(contentId);
+    public ArrayNode getLearnersWithFinishedCurrentAttemptJson(long contentId) {
+	List<Object[]> learnersDetails = assessmentResultDao.getLearnersWithFinishedCurrentAttemptForCompletionChart(
+		contentId);
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	for (Object[] learnerDetails : learnersDetails) {
+	    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+	    learner.put("id", learnerDetails[0].toString());
+	    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1].toString());
+	    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2].toString());
+	    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3].toString());
+	    result.add(learner);
+	}
+
+	return result;
     }
 
     @Override
@@ -4018,21 +4071,36 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId) {
-	Map<Integer, List<String[]>> answeredQuestions = assessmentResultDao.getAnsweredQuestionsByUsers(toolContentId);
+    public Map<Integer, ArrayNode> getAnsweredQuestionsByUsersJson(long toolContentId) {
+	Map<Integer, List<String[]>> answeredQuestions = assessmentResultDao.getAnsweredQuestionsByUsersForCompletionChart(
+		toolContentId);
+	Map<Integer, ArrayNode> result = new TreeMap<>();
 	if (answeredQuestions.isEmpty()) {
-	    return answeredQuestions;
+	    return result;
 	}
 
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	int questionCount = assessment.getQuestions().size();
 
 	// list all question counts, from 0 to maximum possible questions
-	Map<Integer, List<String[]>> result = new TreeMap<>();
+
 	for (int i = 0; i <= questionCount; i++) {
-	    result.put(i, List.of());
+	    ArrayNode learnersJson = JsonNodeFactory.instance.arrayNode();
+	    result.put(i, learnersJson);
+
+	    List<String[]> learnersDetails = answeredQuestions.get(i);
+	    if (learnersDetails != null) {
+		for (String[] learnerDetails : learnersDetails) {
+		    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+		    learner.put("id", learnerDetails[0]);
+		    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1]);
+		    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2]);
+		    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3]);
+		    learner.put("answeredQuestionCount", learnerDetails[4]);
+		    learnersJson.add(learner);
+		}
+	    }
 	}
-	result.putAll(answeredQuestions);
 	return result;
     }
 

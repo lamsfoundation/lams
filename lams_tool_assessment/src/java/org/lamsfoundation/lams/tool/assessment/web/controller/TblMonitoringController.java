@@ -105,7 +105,7 @@ public class TblMonitoringController {
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 	request.setAttribute("vsaPresent", vsaPresent);
 
-	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
+	int totalNumberOfUsers = assessmentService.getCountLearnersByContentId(toolContentId);
 	if (totalNumberOfUsers > 0) {
 	    for (QuestionDTO questionDto : questionDtos) {
 
@@ -143,7 +143,7 @@ public class TblMonitoringController {
 
 	    TblAssessmentDTO assessmentDto = new TblAssessmentDTO();
 
-	    int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	    int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	    assessmentDto.setAttemptedLearnersNumber(attemptedLearnersNumber);
 	    assessmentDto.setActivityTitle(activityTitle);
 
@@ -189,7 +189,7 @@ public class TblMonitoringController {
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("allowDiscloseAnswers", assessment.isAllowDiscloseAnswers());
 
-	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	return "pages/tblmonitoring/assessment";

@@ -25,9 +25,9 @@ function drawCompletionCharts(toolContentId, useGroups,animate) {
 }
 
 function drawActivityCompletionChart(data, animate){
-	var newData = [ data.possibleLearners - data.startedLearners,
-		 			data.startedLearners - data.completedLearners,
-		 			data.completedLearners
+	var newData = [ data.possibleLearners.length - data.startedLearners.length,
+		 			data.startedLearners.length - data.completedLearners.length,
+		 			data.completedLearners.length
 	   			  ];
 	if (activityCompletionChart != null) {
 		// chart already exists, just update data
@@ -35,7 +35,10 @@ function drawActivityCompletionChart(data, animate){
 		activityCompletionChart.update();
 		return;
 	}
-	
+
+	// store current data for custom tooltip
+	$('#activity-completion-chart').data('tooltip-input', data);
+
 	let ctx = document.getElementById('activity-completion-chart').getContext('2d');
 	
 	activityCompletionChart = new Chart(ctx, {
@@ -206,14 +209,14 @@ function drawAnsweredQuestionsChart(data, useGroups, animate){
 							var counter = 0,
 								users = $('#answered-questions-chart').data('tooltip-input')[tooltipModel.dataPoints[0].label];
 							$(users).each(function(){
-								var portraitDiv = $(definePortrait(this[1], this[0], STYLE_SMALL, true, LAMS_URL)).css({
+								var portraitDiv = $(definePortrait(this.portraitUuid, this.id, STYLE_SMALL, true, LAMS_URL)).css({
 										'vertical-align' : 'middle'
 									}),
 									userDiv = $('<div />').append(portraitDiv).appendTo(tooltipEl).css({
 										'padding-bottom' : '5px'
 									});
 
-								$('<span />').text(this[3] ? this[3] + ' (' + this[2] + ')' : this[2]).appendTo(userDiv).css({
+								$('<span />').text(this.group ? this.group + ' (' + this.name + ')' : this.name).appendTo(userDiv).css({
 									'padding-left' : '10px'
 								});
 								

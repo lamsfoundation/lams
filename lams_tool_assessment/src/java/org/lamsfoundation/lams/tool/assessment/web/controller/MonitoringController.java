@@ -23,32 +23,10 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -63,34 +41,14 @@ import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
-import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
-import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.dto.*;
+import org.lamsfoundation.lams.tool.assessment.model.*;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -101,17 +59,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -229,7 +191,7 @@ public class MonitoringController {
 	if (displayStudentChoices) {
 	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
-	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
+	    int totalNumberOfUsers = service.getCountLearnersByContentId(contentId);
 
 	    Set<QuestionDTO> questionDtos = new TreeSet<>();
 	    for (AssessmentQuestion question : assessment.getQuestions()) {
@@ -264,12 +226,12 @@ public class MonitoringController {
 	    throws JsonProcessingException, IOException {
 	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
 
-	chartJson.put("possibleLearners", service.getCountLessonLearnersByContentId(toolContentId));
-	chartJson.put("startedLearners", service.getCountUsersByContentId(toolContentId));
-	chartJson.put("completedLearners", service.getCountLearnersWithFinishedCurrentAttempt(toolContentId));
+	chartJson.set("possibleLearners", service.getLessonLearnersByContentIdJson(toolContentId));
+	chartJson.set("startedLearners", service.getLearnersByContentIdJson(toolContentId));
+	chartJson.set("completedLearners", service.getLearnersWithFinishedCurrentAttemptJson(toolContentId));
 
 	chartJson.put("sessionCount", service.getSessionsByContentId(toolContentId).size());
-	Map<Integer, List<String[]>> answeredQuestionsByUsers = service.getAnsweredQuestionsByUsers(toolContentId);
+	Map<Integer, ArrayNode> answeredQuestionsByUsers = service.getAnsweredQuestionsByUsersJson(toolContentId);
 	if (!answeredQuestionsByUsers.isEmpty()) {
 	    chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
 	    Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
@@ -320,14 +282,14 @@ public class MonitoringController {
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
 
-	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
-		.getFirstLearnerInteractions(contentId, userId.intValue());
+	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService.getFirstLearnerInteractions(
+		contentId, userId.intValue());
 	request.setAttribute("learnerInteractions", learnerInteractions);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
-		&& assessment.isQuestionEtherpadEnabled()
-		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	boolean questionEtherpadEnabled =
+		assessment.isUseSelectLeaderToolOuput() && assessment.isQuestionEtherpadEnabled()
+			&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
 
@@ -349,8 +311,8 @@ public class MonitoringController {
     @ResponseBody
     public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 	String responseText = null;
-	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
-		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
+	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null) && !StringUtils.isEmpty(
+		request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -607,10 +569,11 @@ public class MonitoringController {
 			    + questionResult.getJustificationEscaped();
 		}
 		userData.add(response);
-		
+
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
-		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
+		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+			    ? -1
 			    : questionResult.getConfidenceLevel());
 		}
 
@@ -623,15 +586,17 @@ public class MonitoringController {
 			if (!ratings.isEmpty()) {
 			    int numberOfVotes = ratings.size();
 			    double ratingSum = ratings.stream().mapToDouble(Rating::getRating).sum();
-			    String averageRating = NumberUtil
-				    .formatLocalisedNumberForceDecimalPlaces(ratingSum / numberOfVotes, null, 2);
+			    String averageRating = NumberUtil.formatLocalisedNumberForceDecimalPlaces(
+				    ratingSum / numberOfVotes, null, 2);
 
 			    starString = "<div class='rating-stars-holder'>";
-			    starString += "<div class='rating-stars-disabled rating-stars-new' data-average='"
-				    + averageRating + "' data-id='" + ratingCriteriaId + "'>";
+			    starString +=
+				    "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+					    + "' data-id='" + ratingCriteriaId + "'>";
 			    starString += "</div>";
-			    starString += "<div class='rating-stars-caption' id='rating-stars-caption-"
-				    + ratingCriteriaId + "' >";
+			    starString +=
+				    "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId
+					    + "' >";
 			    String msg = service.getMessage("label.average.rating",
 				    new Object[] { averageRating, numberOfVotes });
 			    starString += msg;
@@ -641,16 +606,13 @@ public class MonitoringController {
 		    userData.add(starString);
 		}
 
-
 		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
 			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
-		userData.add(
-			questionResult.getMarkedBy() == null
-				? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
-					? service.getMessage("label.monitoring.user.summary.grade.required")
-					: "")
-				: questionResult.getMarkedBy().getFullName());
+		userData.add(questionResult.getMarkedBy() == null
+			? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY) ? service.getMessage(
+			"label.monitoring.user.summary.grade.required") : "")
+			: questionResult.getMarkedBy().getFullName());
 		userData.add(questionResult.getMarkerComment());
 	    } else {
 		userData.add("");
@@ -771,7 +733,8 @@ public class MonitoringController {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
 		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID, true);
-		results = sessionId == null ? service.getMarksArrayByContentId(contentId)
+		results = sessionId == null
+			? service.getMarksArrayByContentId(contentId)
 			: service.getMarksArray(sessionId);
 	    }
 	}
@@ -940,7 +903,8 @@ public class MonitoringController {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	assessment.setRelativeTimeLimit(relativeTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
+	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null
+		? null
 		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
     }
@@ -961,8 +925,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty()
-			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase()
+			.contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());
