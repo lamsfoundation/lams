@@ -39,10 +39,12 @@
         <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
 
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+        <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
         <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
         <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
+        <lams:JSImport src="includes/javascript/dialog5.js" />
 
         <script>
             var LAMS_URL = '<lams:LAMSURL/>';
@@ -56,7 +58,8 @@
     <div class="component-page-wrapper">
         <nav inert class="component-sidebar" role="navigation dialog"
              aria-label="Side menu" aria-expanded="false"  aria-modal="true">
-            <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
+            <button class="sidebar-toggle-button no-decor
+            ation" aria-labelledby="progress-bar-title">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <a href="/" title="Return to course page" class="lams-logo">
@@ -113,6 +116,7 @@
                 </c:if>
 
                 <jsp:doBody/>
+
             </main>
         </div>
     </div>

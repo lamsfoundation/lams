@@ -3,9 +3,6 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
 <lams:PageLearner toolSessionID="${nbLearnerForm.toolSessionID}" title="${nbLearnerForm.title}">
-    <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-    <lams:JSImport src="includes/javascript/dialog5.js" />
-
     <script>
         checkNextGateActivity('finishButton', '${nbLearnerForm.toolSessionID}', '', function(){
             submitForm('finish');
