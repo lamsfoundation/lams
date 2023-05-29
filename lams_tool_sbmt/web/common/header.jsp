@@ -15,7 +15,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
 
  	<!-- ********************  CSS ********************** -->
-	<lams:css />
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
@@ -23,6 +22,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+
 
 	

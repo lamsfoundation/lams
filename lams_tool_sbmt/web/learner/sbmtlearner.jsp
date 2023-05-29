@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<%@include file="/common/taglibs.jsp"%>
+<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
@@ -9,12 +9,9 @@
 <c:set var="isLeadershipEnabled" value="${sessionMap.useSelectLeaderToolOuput}"/>
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
-<lams:html>
-<lams:head>
-		
-	<title><fmt:message key="tool.display.name" /></title>
-	<%@ include file="/common/header.jsp"%>
-	
+
+	<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}" >
+
 	<link href="/lams/css/uppy.min.css"    rel="stylesheet" type="text/css" />
 	<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 	<style>
@@ -23,16 +20,16 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="${lams}/includes/javascript/uppy/uppy.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">
-			<script type="text/javascript" src="${lams}/includes/javascript/uppy/es_ES.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/es_ES.min.js"></script>
 		</c:when>
 		<c:when test="${language eq 'fr'}">
-			<script type="text/javascript" src="${lams}/includes/javascript/uppy/fr_FR.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/fr_FR.min.js"></script>
 		</c:when>
 		<c:when test="${language eq 'el'}">
-			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
@@ -128,12 +125,13 @@
 				  target: '#file-upload-area',
 				  inline: true,
 				  height: 300,
-				  width: '100%',
+				  width: '90%',
 				  showProgressDetails : true,
 				  hideRetryButton : true,
 				  hideCancelButton : true,
 				  showRemoveButtonAfterComplete: true,
-				  proudlyDisplayPoweredByUppy: false
+				  proudlyDisplayPoweredByUppy: false,
+				  note: 'Hello world!'
 			  });
 			  uppy.use(Uppy.Webcam, {
 				  target: Uppy.Dashboard,
@@ -270,33 +268,24 @@
 			}
 		}
 	</script>
-</lams:head>
-<body class="stripes">
-
-	<lams:Page type="learner" title="${sessionMap.title}" formID="learnerForm">
-		<div class="panel">
-			<c:out value="${sessionMap.instruction}" escapeXml="false" />
-		</div>
-
+	<div id="instructions" class="instructions">
+		<c:out value="${sessionMap.instruction}" escapeXml="false" />
+	</div>	
+	<div class="container-xxl">
+		<div class="text-primary">
+			<hr class="mx-5">
+		</div>		
 		<!-- notices and announcements -->
-		
 		<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
-			<c:if test="${sessionMap.lockOnFinish}">
+			<c:if test="${sessionMap.lockOnFinish} && ${sessionMap.userFinished}">
 				<!--  Lock when finished -->
-				<lams:Alert id="lockWhenFinished" type="info" close="true">
-					<c:choose>
-						<c:when test="${sessionMap.userFinished}">
+				<lams:Alert id="lockWhenFinished" type="info">
 							<fmt:message key="message.activityLocked" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="message.warnLockOnFinish" />
-						</c:otherwise>
-					</c:choose>
 				</lams:Alert>
 			</c:if>
 
 			<c:if test="${not empty sessionMap.submissionDeadline}">
-				<lams:Alert id="submissionDeadline" type="info" close="true">
+				<lams:Alert id="submissionDeadline" type="warning" >
 					<fmt:message key="authoring.info.teacher.set.restriction">
 						<fmt:param>
 							<lams:Date value="${sessionMap.submissionDeadline}" />
@@ -307,7 +296,7 @@
 
 			<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
 				<c:if test="${sessionMap.isMaxLimitUploadEnabled}">
-					<lams:Alert id="limitUploads" close="true" type="info">
+					<lams:Alert id="limitUploads" close="true" type="warning">
 						<fmt:message key="message.left.upload.limit">
 							<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
 						</fmt:message>
@@ -315,7 +304,7 @@
 				</c:if>
 				
 				<c:if test="${sessionMap.minLimitUploadNumber != null}">
-					<lams:Alert id="minLimitUploadNumber" close="true" type="info">
+					<lams:Alert id="minLimitUploadNumber" close="true" type="warning">
 						<fmt:message key="label.should.upload.another">
 							<fmt:param value="${sessionMap.minLimitUploadNumber}" />
 						</fmt:message>
@@ -333,34 +322,37 @@
 				<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
 				
 				<!--File path row -->
-				<div class="panel panel-default">
-					<div class="panel-heading panel-title">
+				<div class="card lcard lcard-no-borders shadow">
+					<div class="card-header lcard-header-lg lcard-header-button-border">
 						<fmt:message key="label.learner.upload" />
 					</div>
 					
-					<div class="panel-body bg-success">
-						<div class="form-group">
-							<label for="file-upload-area"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
+					<div class="card-body">
+						<div class="form-floating">
+							<label for="file-upload-area" class="d-none"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
 							
-							<div id="file-upload-area" class="voffset20"></div>
+							<div id="file-upload-area" name="file-upload-area" class="m-1"></div>
 						</div>
 						
 						<!--File Description -->
-						<div class="form-group">	
-							<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
-								style="color: red">*</span></label>
-							<form:textarea id="description" cssClass="form-control" path="description"></form:textarea>
+						<div class="form-floating">	
+							<form:textarea id="description" cssClass="form-control" path="description" placeholder="-"></form:textarea>
+							<label for="description"><fmt:message key="label.learner.fileDescription" /> <fmt:message key="errors.required"><fmt:param> </fmt:param></fmt:message></label>
 							<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
 						</div>
 						
-						<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
+						<div id="fileHelpBlock" class="form-text mb-4 mt-2" >
+							<c:if test="${sessionMap.lockOnFinish}">
+								<i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 1.2rem" aria-hidden="true"></i>&nbsp;<fmt:message key="message.warnLockOnFinish" />
+							</c:if>
+						</div>
 						
 							<c:if test="${hasEditRight}">
 								<div class="form-group text-center">
 									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
 										class="btn btn-default btn-success btn-disable-on-submit"
 										title='<fmt:message key="label.add.tip" />' >
-										<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
+										<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <fmt:message key="label.add" />
 									</button>
 								</div>
 							</c:if>
@@ -509,7 +501,7 @@
 		</c:if>
 		
 		<!-- submit buttons -->
-
+		<div class="activity-bottom-buttons">
 		<c:if test="${sessionMap.mode != 'teacher'}">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
@@ -536,8 +528,7 @@
 				</c:otherwise>
 			</c:choose>
 		</c:if>
-
-		<div id="footer"></div>
-	</lams:Page>
-</body>
-</lams:html>
+		</div>
+	</div>	
+	<div id="footer"></div>
+	</lams:PageLearner>
