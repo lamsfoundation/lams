@@ -58,8 +58,7 @@
     <div class="component-page-wrapper">
         <nav inert class="component-sidebar" role="navigation dialog"
              aria-label="Side menu" aria-expanded="false"  aria-modal="true">
-            <button class="sidebar-toggle-button no-decor
-            ation" aria-labelledby="progress-bar-title">
+            <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <a href="/" title="Return to course page" class="lams-logo">
