@@ -430,7 +430,6 @@ When true, hides the names and groups the comments.  -->
 			<c:when test="${rubricsPivotView}">
 				<div id="rubrics-row-panels" class="panel-group" role="tablist" aria-multiselectable="true">
 						<%-- It is sufficient to take user names and columns from the first row/criterion --%>
-					<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
 					<c:set var="columnHeaders" value="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" />
 					<c:set var="columnHeaderCount" value="${fn:length(columnHeaders)}" />
 
@@ -455,7 +454,7 @@ When true, hides the names and groups the comments.  -->
 									<tr>
 											<%-- Learner profile pictures and names --%>
 										<th></th>
-										<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+										<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}" varStatus="learnerOrderId">
 											<th>
 												<lams:Portrait userId="${ratingDto.itemId}" hover="false" /><br>
 												<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
@@ -474,7 +473,7 @@ When true, hides the names and groups the comments.  -->
 													<%-- Criterion "cell" --%>
 												<c:out value="${criteria.rubricsColumns[columnHeaderCount - columnStatus.count].name}" escapeXml="false" />
 											</td>
-											<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+											<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}" varStatus="learnerOrderId">
 
 												<td
 													<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
@@ -491,7 +490,7 @@ When true, hides the names and groups the comments.  -->
 												<td>
 													<i><fmt:message key="label.rating.rubrics.in.between" /></i>
 												</td>
-												<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+												<c:forEach var="ratingDto" items="${criteriaDto.ratingDtos}" varStatus="learnerOrderId">
 													<td
 															<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">
 																class="bg-success"
