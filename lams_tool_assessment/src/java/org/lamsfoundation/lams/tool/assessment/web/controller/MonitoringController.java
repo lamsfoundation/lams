@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -223,7 +222,7 @@ public class MonitoringController {
     @RequestMapping(path = "/getCompletionChartsData")
     @ResponseBody
     public String getCompletionChartsData(@RequestParam long toolContentId, HttpServletResponse response)
-	    throws JsonProcessingException, IOException {
+	    throws IOException {
 	ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
 
 	chartJson.set("possibleLearners", service.getLessonLearnersByContentIdJson(toolContentId));
@@ -238,6 +237,10 @@ public class MonitoringController {
 		    .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
 	    chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
 	}
+
+	Assessment assessment = service.getAssessmentByContentId(toolContentId);
+	chartJson.put("useLeader", assessment.isUseSelectLeaderToolOuput());
+	chartJson.put("isGrouped", service.isGroupedActivity(toolContentId));
 
 	response.setContentType("application/json;charset=utf-8");
 	return chartJson.toString();

@@ -52,7 +52,7 @@
 		COMPLETION_CHART_UPDATE_INTERVAL = 0;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, false);
+		drawCompletionCharts(${toolContentID}, false);
 
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});

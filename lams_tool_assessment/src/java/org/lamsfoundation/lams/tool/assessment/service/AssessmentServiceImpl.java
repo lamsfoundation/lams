@@ -4096,7 +4096,6 @@ public class AssessmentServiceImpl
 		    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1]);
 		    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2]);
 		    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3]);
-		    learner.put("answeredQuestionCount", learnerDetails[4]);
 		    learnersJson.add(learner);
 		}
 	    }
