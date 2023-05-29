@@ -223,3 +223,26 @@
     padding: 5% 0 12% 0;
     margin: -16px
 }
+
+.lcard, .lcard-no-borders {
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 0rem;
+    border-bottom-right-radius: 1.25rem;    
+}
+
+.lcard-no-borders {
+    border: 0px
+}
+
+.lcard .lcard-header-lg {
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 0rem;
+    font-size: 1.3rem;
+    padding: 1rem
+}
+
+.lcard .lcard-header-button-border {
+    border-bottom: 0.2rem solid var(--bs-primary)
+}
+
+
