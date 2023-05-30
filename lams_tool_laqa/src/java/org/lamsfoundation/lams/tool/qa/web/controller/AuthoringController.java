@@ -23,24 +23,8 @@
 
 package org.lamsfoundation.lams.tool.qa.web.controller;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
@@ -69,14 +53,16 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Q&A Tool's authoring methods. Additionally, there is one more method that initializes authoring and it's located in
@@ -483,6 +469,7 @@ public class AuthoringController implements QaAppConstants {
 	form.setContentFolderID(questionContentFolderID);
 	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 
+	request.setAttribute("isNewQuestion", true);
 	QbUtils.fillFormWithUserCollections(qbService, form, null);
 	return "authoring/newQuestionBox";
     }
@@ -515,7 +502,7 @@ public class AuthoringController implements QaAppConstants {
 	form.setContentFolderID(qbQuestion.getContentFolderId());
 	form.setSessionMapID(sessionMapID);
 	QbUtils.fillFormWithUserCollections(qbService, QaAppConstants.MY_SIGNATURE, form, qbQuestion.getUid());
-
+	request.setAttribute("isNewQuestion", false);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return "authoring/newQuestionBox";
     }

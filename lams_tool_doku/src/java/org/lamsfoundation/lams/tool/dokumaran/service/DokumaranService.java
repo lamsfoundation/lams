@@ -23,21 +23,9 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import net.gjerull.etherpad.client.EPLiteClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -62,13 +50,7 @@ import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.*;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranSessionDAO;
@@ -88,10 +70,13 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import net.gjerull.etherpad.client.EPLiteClient;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Dapeng.Ni
@@ -283,8 +268,9 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
 	if (DokumaranConstants.COMPLETED == session.getStatus()) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	DokumaranUser existingLeader = session.getGroupLeader();
@@ -327,16 +313,16 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    DokumaranSession session = user.getSession();
 	    Dokumaran dokumaran = session.getDokumaran();
 
-	    if (user.getTimeLimitLaunchedDate() == null) {
-		LocalDateTime launchedDate = LocalDateTime.now();
+	    LocalDateTime launchedDate = user.getTimeLimitLaunchedDate();
+	    if (launchedDate == null) {
+		launchedDate = LocalDateTime.now();
 		user.setTimeLimitLaunchedDate(launchedDate);
 		dokumaranUserDao.saveObject(user);
-
-		// if the user is not a leader, store his launch date, but return null so the leader's launch date is in use
-		if (!dokumaran.isUseSelectLeaderToolOuput() || (session.getGroupLeader() != null
-			&& session.getGroupLeader().getUserId().equals(Long.valueOf(userId)))) {
-		    return launchedDate;
-		}
+	    }
+	    // if the user is not a leader, store his launch date, but return null so the leader's launch date is in use
+	    if (!dokumaran.isUseSelectLeaderToolOuput() || (session.getGroupLeader() != null && session.getGroupLeader()
+		    .getUserId().equals(Long.valueOf(userId)))) {
+		return launchedDate;
 	    }
 	}
 	return null;
@@ -482,8 +468,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    group.setReadOnlyPadId(session.getEtherpadReadOnlyId());
 
 	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
-	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId())
-		    || StringUtils.isEmpty(session.getEtherpadGroupId())) {
+	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(
+		    session.getEtherpadGroupId())) {
 		group.setSessionFaulty(true);
 	    }
 
@@ -513,7 +499,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+		    Date postedDate = (entry.getLastModified() != null)
+			    ? entry.getLastModified()
 			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflections.add(ref);
@@ -555,8 +542,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public Grouping getGrouping(long toolContentId) {
-	ToolActivity toolActivity = (ToolActivity) userManagementService
-		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	ToolActivity toolActivity = (ToolActivity) userManagementService.findByProperty(ToolActivity.class,
+		"toolContentId", toolContentId).get(0);
 	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
     }
 
@@ -584,8 +571,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 
 	if (criteria.isEmpty()) {
-	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
-		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria.getRatingCriteriaInstance(
+		    RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
 	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
@@ -851,14 +838,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (DokumaranService.log.isDebugEnabled()) {
-	    DokumaranService.log
-		    .debug("Removing Dokumaran content for user ID " + userId + " and toolContentId " + toolContentId);
+	    DokumaranService.log.debug(
+		    "Removing Dokumaran content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Dokumaran dokumaran = dokumaranDao.getByContentId(toolContentId);
 	if (dokumaran == null) {
-	    DokumaranService.log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    DokumaranService.log.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -955,7 +942,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
@@ -1037,10 +1025,12 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    session.setStatus(DokumaranConstants.COMPLETED);
 	    dokumaranSessionDao.saveObject(session);
 	} else {
-	    DokumaranService.log.error("Fail to leave tool Session.Could not find shared dokumaran "
-		    + "session by given session id: " + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared dokumaran session by given session id: " + toolSessionId);
+	    DokumaranService.log.error(
+		    "Fail to leave tool Session.Could not find shared dokumaran " + "session by given session id: "
+			    + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared dokumaran session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }

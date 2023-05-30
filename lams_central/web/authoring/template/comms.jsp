@@ -136,7 +136,7 @@
 		// Triggers the import window. The saving is done in a method saveQTI(formHTML, formName, callerID) which should be defined in the main template jsp file.
 		// CallerID can be set to define which tab has triggered the QTI import, as TBL has import on both the RAT Questions and App Ex tabs.
 		function importQTI(callerID, limit, type){
-		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=true&callerID='+callerID;
+		 	var url = '<lams:LAMSURL/>questions/questionFile.jsp?collectionChoice=false&callerID='+callerID;
 		 	if ( limit ) {
 		 		url = url + '&limitType='+limit;
 		 	}
@@ -452,4 +452,3 @@
                 return 'Can not be empty!';
             }
         }
-		

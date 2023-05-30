@@ -700,6 +700,10 @@ public class SPEnrolmentServlet extends HttpServlet {
 		// get existing learners/staff members for given subcourse
 		Collection<User> subcourseMonitorsOrLearners = userManagementService.getUsersFromOrganisationByRole(
 			subcourseId, isStaffMode ? Role.MONITOR : Role.LEARNER, true);
+		// make sure that user has correct role also in parent course
+		Collection<User> courseMonitorsOrLearners = userManagementService.getUsersFromOrganisationByRole(
+			courseId, isStaffMode ? Role.MONITOR : Role.LEARNER, true);
+		subcourseMonitorsOrLearners.retainAll(courseMonitorsOrLearners);
 		Set<User> subcourseUsers = ConcurrentHashMap.newKeySet();
 		subcourseUsers.addAll(subcourseMonitorsOrLearners);
 		if (isStaffMode) {
@@ -740,6 +744,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 
 		    // the user is not a learner/staff member yet, so assign him the role and add him to lessons
 		    Map<Integer, Set<Integer>> existingSubcoursesRoles = allExistingRoles.get(login);
+		    User user = allExistingParsedUsers.get(login);
 		    Set<Integer> existingSubcourseRoles =
 			    existingSubcoursesRoles == null ? null : allExistingRoles.get(login).get(subcourseId);
 		    if (existingSubcourseRoles == null) {
@@ -751,7 +756,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    } else {
 			existingSubcourseRoles.add(Role.ROLE_LEARNER);
 		    }
-		    User user = allExistingParsedUsers.get(login);
+
 		    userManagementService.setRolesForUserOrganisation(user, subcourse,
 			    existingSubcourseRoles.stream().map(String::valueOf).collect(Collectors.toList()), false);
 
@@ -764,7 +769,7 @@ public class SPEnrolmentServlet extends HttpServlet {
 		    }
 
 		    String message = (isStaffMode ? "Teacher" : "Learner") + " \"" + login + "\" added to subcourse "
-			    + subcourseId + " and its lessons";
+			    + subcourseId + " and its lessons and parent course";
 		    logger.info(message);
 		    logEventService.logEvent(LogEvent.TYPE_USER_ORG_ADMIN, creatorId, null, null, null,
 			    "SPEnrolment: " + message);

@@ -22,33 +22,13 @@
  */
 package org.lamsfoundation.lams.authoring.template.web;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.authoring.template.AssessMCAnswer;
-import org.lamsfoundation.lams.authoring.template.Assessment;
-import org.lamsfoundation.lams.authoring.template.PeerReviewCriteria;
-import org.lamsfoundation.lams.authoring.template.TemplateData;
-import org.lamsfoundation.lams.authoring.template.TextUtil;
+import org.lamsfoundation.lams.authoring.template.*;
+import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -61,15 +41,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * A Team Based Learning template. There are two versions - the full blown one that is accessed from authoring
- * and one that allows just sections of a TBL sequence to be created for the LAMS TBL system. Which bits are created
- * are controlled by a series of checkboxes (set to true and hidden in the full authoring version). The LAMS TBL
- * version also has the option for timed gates, but the standard version uses permission gates.
+ * A Team Based Learning template. There are two versions - the full blown one that is accessed from authoring and one
+ * that allows just sections of a TBL sequence to be created for the LAMS TBL system. Which bits are created are
+ * controlled by a series of checkboxes (set to true and hidden in the full authoring version). The LAMS TBL version
+ * also has the option for timed gates, but the standard version uses permission gates.
  */
 @Controller
 @RequestMapping("authoring/template/tbl")
@@ -92,6 +80,13 @@ public class TBLTemplateController extends LdTemplateController {
 	if (sessionMapID != null) {
 	    request.setAttribute("sessionMapID", sessionMapID);
 	}
+	HttpSession session = request.getSession();
+	UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDTO != null) {
+	    List<QbCollection> qbCollections = qbService.getUserCollections(userDTO.getUserID());
+	    request.setAttribute("qbCollections", qbCollections);
+	}
+
 	if (isConfigurableVersion) {
 	    return super.init(request, "authoring/template/tbl/tbloptional");
 	} else {
@@ -118,7 +113,8 @@ public class TBLTemplateController extends LdTemplateController {
 	ArrayNode activities = JsonNodeFactory.instance.arrayNode();
 	ArrayNode groupings = JsonNodeFactory.instance.arrayNode();
 
-	Integer[] firstActivityInRowPosition = new Integer[] { 40, 40 }; // the very first activity, all other locations can be calculated from here if needed!
+	Integer[] firstActivityInRowPosition = new Integer[] { 40,
+		40 }; // the very first activity, all other locations can be calculated from here if needed!
 	String activityTitle = null;
 	Integer[] currentActivityPosition = null;
 	Integer groupingUIID = null;
@@ -144,6 +140,8 @@ public class TBLTemplateController extends LdTemplateController {
 	groupings.add(groupingJSONs[1]);
 	groupingUIID = groupingJSONs[1].get("groupingUIID").asInt();
 
+	Long qbCollectionUid = data.qbCollectionUid;
+
 	if (data.useIRATRA) {
 	    // Stop!
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
@@ -152,8 +150,9 @@ public class TBLTemplateController extends LdTemplateController {
 		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
 			activityTitle, null, data.iraStartOffset, true));
 	    } else {
-		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, activityTitle, true));
+		activities.add(
+			createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), activityTitle,
+				activityTitle, true));
 	    }
 
 	    // iRA Test - Assessment
@@ -163,7 +162,7 @@ public class TBLTemplateController extends LdTemplateController {
 
 	    Long iRAToolContentId = authoringService.createTblAssessmentToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.ira.instructions"), null, false, true, data.shuffleIRAT,
-		    data.confidenceLevelEnable, false, false, false, testQuestionsArray);
+		    data.confidenceLevelEnable, false, false, false, qbCollectionUid, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
 	    activities.add(iraActivityJSON);
@@ -184,19 +183,19 @@ public class TBLTemplateController extends LdTemplateController {
 		activities.add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
 			activityTitle, null, data.traStartOffset, true));
 	    } else {
-		activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-			activityTitle, activityTitle, true));
+		activities.add(
+			createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), activityTitle,
+				activityTitle, true));
 	    }
 
 	    // tRA Test
 	    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 	    activityTitle = data.getText("boilerplate.tra.title");
-	    Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable
-		    ? JsonUtil.optInt(iraActivityJSON, AuthoringJsonTags.ACTIVITY_UIID)
-		    : null;
+	    Integer confidenceLevelsActivityUIID = data.confidenceLevelEnable ? JsonUtil.optInt(iraActivityJSON,
+		    AuthoringJsonTags.ACTIVITY_UIID) : null;
 	    Long tRAToolContentId = createScratchieToolContent(userDTO, activityTitle,
 		    data.getText("boilerplate.tra.instructions"), false, true, confidenceLevelsActivityUIID,
-		    testQuestionsArray);
+		    qbCollectionUid, testQuestionsArray);
 	    activities.add(createScratchieActivity(maxUIID, order++, currentActivityPosition, tRAToolContentId,
 		    data.contentFolderID, groupingUIID, null, null, activityTitle));
 
@@ -218,8 +217,8 @@ public class TBLTemplateController extends LdTemplateController {
 		String gateTitleBeforeAppEx = data.getText("boilerplate.before.app.ex",
 			new String[] { applicationExercise.title });
 		if (data.useScheduledGates && data.aeStartOffset != null) {
-		    activities
-			    .add(createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
+		    activities.add(
+			    createScheduledGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
 				    gateTitleBeforeAppEx, null, data.aeStartOffset, true));
 		} else {
 		    activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
@@ -249,10 +248,9 @@ public class TBLTemplateController extends LdTemplateController {
 
 		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
 			    applicationExerciseTitle,
-			    StringUtils.isBlank(applicationExercise.description)
-				    ? data.getText("boilerplate.ae.instructions")
-				    : applicationExercise.description,
-			    null, true, true, false, false, true, true, true, questionsJSONArray);
+			    StringUtils.isBlank(applicationExercise.description) ? data.getText(
+				    "boilerplate.ae.instructions") : applicationExercise.description, null, true, true,
+			    false, false, true, true, true, qbCollectionUid, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		}
@@ -266,16 +264,18 @@ public class TBLTemplateController extends LdTemplateController {
 			currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 			String gateTitle = data.getText("boilerplate.before.app.ex.noticeboard",
 				new String[] { noticeboardCountAsString });
-			activities.add(createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition),
-				gateTitle, gateTitle, true));
+			activities.add(
+				createGateActivity(maxUIID, order++, calcGateOffset(currentActivityPosition), gateTitle,
+					gateTitle, true));
 		    }
 		    currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		    String notebookTitle = data.getText("boilerplate.grouped.ae.noticeboard.num",
 			    new String[] { noticeboardCountAsString });
 		    Long aeNoticeboardContentId = createNoticeboardToolContent(userDTO, notebookTitle,
 			    applicationExercise.noticeboardInstructions, null);
-		    activities.add(createNoticeboardActivity(maxUIID, order++, currentActivityPosition,
-			    aeNoticeboardContentId, data.contentFolderID, groupingUIID, null, null, notebookTitle));
+		    activities.add(
+			    createNoticeboardActivity(maxUIID, order++, currentActivityPosition, aeNoticeboardContentId,
+				    data.contentFolderID, groupingUIID, null, null, notebookTitle));
 		}
 	    }
 
@@ -360,18 +360,18 @@ public class TBLTemplateController extends LdTemplateController {
      */
     class TBLData extends TemplateData {
 
-	/* The error messages are to be sorted by tab, so store them separately and join together */
-	List<String> lessonDetailsErrors = new ArrayList<>();
+	/* The error messages are to be sorted by tab, so store them separately and join together */ List<String> lessonDetailsErrors = new ArrayList<>();
 	List<String> ratErrors = new ArrayList<>();
 	List<String> applicationExerciseErrors = new ArrayList<>();
 	List<String> peerReviewErrors = new ArrayList<>();
 
-	/* Fields from form */
-	String contentFolderID;
+	/* Fields from form */ String contentFolderID;
 	String sequenceTitle;
 	Integer groupingType;
 	Integer numLearners;
 	Integer numGroups;
+
+	Long qbCollectionUid;
 
 	Long iraGateStartOffset = null;
 	Long traGateStartOffset = null;
@@ -419,6 +419,8 @@ public class TBLTemplateController extends LdTemplateController {
 	    groupingType = WebUtil.readIntParam(request, "grouping");
 	    numLearners = WebUtil.readIntParam(request, "numLearners", true);
 	    numGroups = WebUtil.readIntParam(request, "numGroups", true);
+
+	    qbCollectionUid = WebUtil.readLongParam(request, "qbCollectionUid", true);
 
 	    testQuestions = new TreeMap<>();
 	    applicationExercises = new TreeMap<>();
@@ -468,8 +470,8 @@ public class TBLTemplateController extends LdTemplateController {
 				"question" + questionDisplayOrder + "markHedging", false);
 			String title = getTrimmedString(request, "question" + questionDisplayOrder + "title", false);
 			String text = getTrimmedString(request, "question" + questionDisplayOrder, true);
-			String[] learningOutcomes = request
-				.getParameterValues("question" + questionDisplayOrder + "learningOutcome");
+			String[] learningOutcomes = request.getParameterValues(
+				"question" + questionDisplayOrder + "learningOutcome");
 			Long collectionUid = WebUtil.readLongParam(request,
 				"question" + questionDisplayOrder + "collection", true);
 			String uuid = getTrimmedString(request, "question" + questionDisplayOrder + "uuid", false);
@@ -541,8 +543,9 @@ public class TBLTemplateController extends LdTemplateController {
 		String dateTimeString = WebUtil.readStrParam(request, dateField);
 		if (dateTimeString != null) {
 		    try {
-			long offset = TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString)
-				.getTime() - this.startTime;
+			long offset =
+				TBLTemplateController.LESSON_SCHEDULING_DATETIME_FORMAT.parse(dateTimeString).getTime()
+					- this.startTime;
 			return offset > 0 ? offset / 60000 : 0; // from ms to minutes
 		    } catch (ParseException e) {
 			log.error("Unable to parse date from " + dateField
@@ -576,10 +579,8 @@ public class TBLTemplateController extends LdTemplateController {
 		    newAppex.assessments = processAssessments(request, i, newAppex.title);
 		}
 
-		if (isDoku
-			? StringUtils.isNotBlank(newAppex.description)
-				|| StringUtils.isNotBlank(newAppex.dokuInstructions)
-			: newAppex.assessments != null) {
+		if (isDoku ? StringUtils.isNotBlank(newAppex.description) || StringUtils.isNotBlank(
+			newAppex.dokuInstructions) : newAppex.assessments != null) {
 		    newAppex.useNoticeboard = WebUtil.readBooleanParam(request, appexDiv + "NB", false);
 		    if (newAppex.useNoticeboard) {
 			newAppex.noticeboardInstructions = getTrimmedString(request, appexDiv + "NBEntry", true);
@@ -679,8 +680,8 @@ public class TBLTemplateController extends LdTemplateController {
 		fieldIndex = name.indexOf("MinWordsLimit");
 		if (fieldIndex > 0) {
 		    Integer criteriaNumber = Integer.valueOf(name.substring(10, fieldIndex));
-		    findCriteriaInMap(criteriaNumber)
-			    .setCommentsMinWordsLimit(WebUtil.readIntParam(request, name, true));
+		    findCriteriaInMap(criteriaNumber).setCommentsMinWordsLimit(
+			    WebUtil.readIntParam(request, name, true));
 		} else {
 		    Integer criteriaNumber = Integer.valueOf(name.substring(10));
 		    findCriteriaInMap(criteriaNumber).setTitle(getTrimmedString(request, name, true));
@@ -742,8 +743,8 @@ public class TBLTemplateController extends LdTemplateController {
 		    ArrayNode learningOutcomesJSON = JsonUtil.readArray(learningOutcomes);
 		    question.set(RestTags.LEARNING_OUTCOMES, learningOutcomesJSON);
 		} catch (IOException e) {
-		    log.error("Error while processing learning outcomes for question: "
-			    + question.get(RestTags.QUESTION_TITLE));
+		    log.error("Error while processing learning outcomes for question: " + question.get(
+			    RestTags.QUESTION_TITLE));
 		}
 	    }
 
@@ -766,7 +767,8 @@ public class TBLTemplateController extends LdTemplateController {
 
 		Integer correctAnswerDisplay = correctAnswers.get(entry.getKey());
 		if (correctAnswerDisplay == null) {
-		    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+		    Object param = question.has(RestTags.QUESTION_TITLE)
+			    ? question.get(RestTags.QUESTION_TITLE)
 			    : questionNumber;
 		    addValidationErrorMessage("authoring.error.question.correct.num", new Object[] { param },
 			    ratErrors);
@@ -774,7 +776,8 @@ public class TBLTemplateController extends LdTemplateController {
 
 		    ArrayNode answers = (ArrayNode) question.get(RestTags.ANSWERS);
 		    if (answers == null || answers.size() == 0) {
-			Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+			Object param = question.has(RestTags.QUESTION_TITLE)
+				? question.get(RestTags.QUESTION_TITLE)
 				: questionNumber;
 			addValidationErrorMessage("authoring.error.question.must.have.answer.num",
 				new Object[] { param }, ratErrors);
@@ -789,7 +792,8 @@ public class TBLTemplateController extends LdTemplateController {
 			    }
 			}
 			if (!correctAnswerFound) {
-			    Object param = question.has(RestTags.QUESTION_TITLE) ? question.get(RestTags.QUESTION_TITLE)
+			    Object param = question.has(RestTags.QUESTION_TITLE)
+				    ? question.get(RestTags.QUESTION_TITLE)
 				    : questionNumber;
 			    addValidationErrorMessage("authoring.error.question.correct.num", new Object[] { param },
 				    ratErrors);
@@ -824,14 +828,15 @@ public class TBLTemplateController extends LdTemplateController {
 	    }
 	    for (Map.Entry<Integer, AppExData> appExEntry : applicationExercises.entrySet()) {
 		AppExData appEx = appExEntry.getValue();
-		if (StringUtils.isBlank(appEx.description) && StringUtils.isBlank(appEx.dokuInstructions)
-			&& (appEx.assessments == null)) {
+		if (StringUtils.isBlank(appEx.description) && StringUtils.isBlank(appEx.dokuInstructions) && (
+			appEx.assessments == null)) {
 		    addValidationErrorMessage("authoring.error.application.exercise.num",
 			    new String[] { "\"" + appEx.title + "\"" }, applicationExerciseErrors);
 		} else if (appEx.assessments != null) {
 		    for (Map.Entry<Integer, Assessment> assessmentEntry : appEx.assessments.entrySet()) {
-			assessmentEntry.getValue().validate(applicationExerciseErrors, appBundle, formatter,
-				appExEntry.getKey(), "\"" + appEx.title + "\"", assessmentEntry.getKey());
+			assessmentEntry.getValue()
+				.validate(applicationExerciseErrors, appBundle, formatter, appExEntry.getKey(),
+					"\"" + appEx.title + "\"", assessmentEntry.getKey());
 		    }
 		}
 	    }
