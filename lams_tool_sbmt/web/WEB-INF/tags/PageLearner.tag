@@ -47,7 +47,9 @@
         <lams:JSImport src="includes/javascript/dialog5.js" />
 
         <script>
-            var LAMS_URL = '<lams:LAMSURL/>';
+            const LAMS_URL = '<lams:LAMSURL/>',
+                decoderDiv = $('<div />');
+
             $(document).ready(function (){
                 initLearnerPage(${toolSessionID});
             });

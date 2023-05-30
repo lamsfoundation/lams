@@ -27,18 +27,19 @@
 	</c:when>
 </c:choose>
 
-<div class="row justify-content-md-center">
-	<div class="col-md-auto">
-		<div id="${idName}" class="alert alert-${alertType} alert-dismissible fade show shadow-sm" role="alert">
-			<c:if test="${not empty title}">
-				<span class="fa fa-${iconType} "></span> <span class="alert-heading font-weight-bold">${title}</span>
-				<hr>
-			</c:if>
-			<c:if test="${close}">
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</c:if>
-			<div class="my-0">
-			<jsp:doBody />
+<div class="row no-gutter">
+	<div class="col-12 col-xs-12 col-sm-offset-2 col-sm-8">
+		<div id="${idName}" class="alert alert-${alertType}" style="margin-bottom: 10px; padding: 8px">
+			<div class="media">
+				<div class="media-left">
+					<i class="fa fa-lg fa-${iconType} text-muted"></i>
+				</div>
+				<div class="media-body">
+					<c:if test="${close}">
+						<a href="#" class="close pull-right" data-dismiss="alert" aria-label="close">&times;</a>
+					</c:if>
+					<jsp:doBody />
+				</div>
 			</div>
 		</div>
 	</div>
