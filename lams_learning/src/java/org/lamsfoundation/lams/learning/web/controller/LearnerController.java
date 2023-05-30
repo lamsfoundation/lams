@@ -327,6 +327,7 @@ public class LearnerController {
 	    return null;
 	}
 	Lesson lesson = lessonService.getLesson(lessonId);
+	responseJSON.put("lessonID", lessonId);
 	responseJSON.put("lessonName", lesson.getLessonName());
 	responseJSON.set("messages", getProgressBarMessages());
 
