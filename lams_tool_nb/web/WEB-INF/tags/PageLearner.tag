@@ -64,7 +64,7 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <a href="/" title="Return to course page" class="lams-logo">
-                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="true"/>
+                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="false"/>
             </a>
 
             <div id="support-bar" class="d-none pb-4 w-100">
