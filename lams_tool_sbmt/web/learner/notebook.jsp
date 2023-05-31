@@ -3,68 +3,63 @@
 
 <c:set var="sessionMapID" value="${param.sessionMapID}" />
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
-	
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+<fmt:message key="title.reflection" var="reflectionLabel"/>
+
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}" >
 	<script type="text/javascript">
-		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', function(){
-			$('#refForm').submit();
-		});
-		
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
-		}
-	</script>
-</lams:head>
-
-<body class="stripes">
-
-	<lams:Page type="learner" title="${sessionMap.title}" formID="refForm">
-
-		<lams:errors/>
-
-		<div class="panel">
-			<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-		</div>
-
-		<div class="form-group">
-			<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
-				<form:hidden path="userID" />
-				<form:hidden path="sessionMapID" />
-				<form:textarea path="entryText" cssClass="form-control" id="focused" rows="5"></form:textarea>
-
-
-				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="button">
-
-					<c:choose>
-						<c:when test="${isLastActivity}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-
-				</button>
-
-			</form:form>
-
-		</div>
-
-		<div id="footer"></div>
-
-
-	</lams:Page>
-
-	<script type="text/javascript">
-		window.onload = function() {
-			document.getElementById("focused").focus();
-		}
+		}		
 	</script>
 
-</body>
-</lams:html>
+	<lams:errors5/>
+
+	<div id="instructions" class="instructions">
+		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
+	</div>
+	<div class="row">
+		<div class="col-12 text-primary">
+			<hr class="mx-5">
+		</div>
+	</div>
+	<div class="container-xxl">
+	<div class="row">
+		<div class="col-12">
+
+			<div class="card lcard lcard-no-borders shadow mb-3">
+				<div class="card-header lcard-header-button-border">
+					<fmt:message key="title.reflection" />
+				</div>
+				<div class="card-body mb-2">
+
+					<div class="form-group">
+						<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
+							<form:hidden path="userID" />
+							<form:hidden path="sessionMapID" />
+							<form:textarea aria-label="${reflectionLabel}" aria-multiline="true" aria-required="true" required="true" path="entryText" cssClass="form-control" id="focused" rows="5"></form:textarea>
+						</form:form>
+					</div>	
+				</div>	
+			</div>
+		</div>
+	</div>
+	</div>	
+	<div class="activity-bottom-buttons">
+		<button class="btn btn-primary" id="finishButton" type="button">
+
+			<c:choose>
+				<c:when test="${isLastActivity}">
+					<fmt:message key="button.submit" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="button.finish" />
+				</c:otherwise>
+			</c:choose>
+
+		</button>
+	</div>
+	<div id="footer"></div>
+
+
+</lams:PageLearner>
+

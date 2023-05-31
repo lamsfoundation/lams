@@ -2,13 +2,53 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
 
-	<lams:css />
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}" >
 
+	<div id="instructions" class="instructions">
+		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
+	</div>
+	<div class="row">
+		<div class="col-12 text-primary">
+			<hr class="mx-5">
+		</div>
+	</div>
+	<div class="container-xxl">
+		<div class="row">
+			<div class="col-12">
+				<div class="card lcard lcard-no-borders shadow mb-3">
+					<div class="card-header lcard-header-button-border">
+						<fmt:message key="${waitingMessageKey}" />
+					</div>
+					<div class="card-body mb-3">
+						<c:if test="${not empty groupUsers}">
+		
+							<div class="mb-2">
+								<fmt:message key="label.users.from.group" />
+							</div>
+							
+							<div id="usersInGroup" class="row mt-2" role="list">
+								<c:forEach var="user" items="${groupUsers}">
+									<div role="listitem" class="col-md-4 my-2 text-md-start">
+										<lams:Portrait userId="${user.userID}"/>
+										<span>
+											<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+										</span>
+									</div>
+								</c:forEach>
+							</div>
+							
+						</c:if>
+					</div>
+				</div>
+				<div class="activity-bottom-buttons">
+					<button id="finishButton" name="refreshButton" onclick="refresh();" class="btn btn-primary">
+						<fmt:message key="label.refresh" />
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>				
 	<script type="text/javascript">
 		function refresh() {
 			location.reload(true);
@@ -16,56 +56,7 @@
 		
 		//refresh page every 30 sec
 		setTimeout("refresh();",30000);
-
-		$(document).ready(function(){
-			<%-- Connect to command websocket only if it is learner UI --%>
-			<c:if test="${sessionMap.mode == 'learner'}">
-				// command websocket stuff for refreshing
-				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
-				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
-				// if the trigger is recognised, the following action occurs
-				commandWebsocketHook = function() {
-					location.reload();
-				};
-			</c:if>
-		});
-    </script>
-</lams:head>
-<body class="stripes">
-
-	<lams:Page type="learner" title="${sessionMap.title}">
 	
-		<div class="panel">
-			<c:out value="${sessionMap.instruction}" escapeXml="false" />
-		</div>
+	</script>
+</lams:PageLearner>
 
-		<h4>
-			<fmt:message key="${waitingMessageKey}" />
-		</h4>
-		
-		<c:if test="${not empty groupUsers}">
-		
-			<div class="voffset5">
-				<fmt:message key="label.users.from.group" />
-			</div>
-		
-			<div id="usersInGroup">
-				<c:forEach var="user" items="${groupUsers}">
-					<div class="voffset10 loffset10">
-						<lams:Portrait userId="${user.userID}"/>
-						<span>
-							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-						</span>
-					</div>
-				</c:forEach>
-			</div>
-		</c:if>
-		
-		<button name="refreshButton" onclick="refresh();" class="btn btn-sm btn-primary pull-right">
-			<fmt:message key="label.refresh" />
-		</button>
-
-	</lams:Page>
-
-</body>
-</lams:html>

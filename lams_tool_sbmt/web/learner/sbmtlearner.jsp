@@ -3,7 +3,6 @@
 
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
-
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
@@ -11,6 +10,7 @@
 <c:set var="isLeadershipEnabled" value="${sessionMap.useSelectLeaderToolOuput}"/>
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
+
 
 <lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}" >
 
@@ -37,337 +37,133 @@
 		</c:when>
 	</c:choose>
 
-	<script>
-		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finish);
-
-		var UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
-				// convert Java syntax to JSON
-				EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-				<fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-				EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
-
-
-		$(document).ready(function() {
-			$("time.timeago").timeago();
-
-			if ($('#file-upload-area').length == 1) {
-				initFileUpload('${learnerForm.tmpFileUploadId}', '${language}');
-			}
-
-			<c:if test="${sessionMap.mode != 'author' and sessionMap.minLimitUploadNumber != null}">
-			var uploadedFilesNumber = +${learner.filesUploaded.size()};
-			if (uploadedFilesNumber >= ${sessionMap.minLimitUploadNumber}) {
-				$('.btn-hide-on-min-not-met').removeClass('btn-hide-on-min-not-met');
-			}
-			</c:if>
-
-			<%-- Connect to command websocket only if it is learner UI --%>
-			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
-			// command websocket stuff for refreshing
-			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
-			commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
-			// if the trigger is recognised, the following action occurs
-			commandWebsocketHook = function() {
-				// in case in the address bar there is refresh.do, direct to the main learner URL
-				location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
-			};
-			</c:if>
-		});
-
-		/**
-		 * Initialise Uppy as the file upload widget
-		 */
-		function initFileUpload(tmpFileUploadId, language) {
-			var uppyProperties = {
-				// upload immediately
-				autoProceed: true,
-				allowMultipleUploads: true,
-				debug: false,
-				restrictions: {
-					// taken from LAMS configuration
-					maxFileSize: +UPLOAD_FILE_MAX_SIZE,
-					maxNumberOfFiles: ${sessionMap.isMaxLimitUploadEnabled ? sessionMap.maxLimitUploadNumber - learner.filesUploaded.size() : 10}
-				},
-				meta: {
-					// all uploaded files go to this subdir in LAMS tmp dir
-					// its format is: upload_<userId>_<timestamp>
-					'tmpFileUploadId' : tmpFileUploadId,
-					'largeFilesAllowed' : false
-				},
-				onBeforeFileAdded: function(currentFile, files) {
-					var name = currentFile.data.name || currentFile.name,
-							extensionIndex = name.lastIndexOf('.'),
-							valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim().toLowerCase());
-					if (!valid) {
-						uppy.info(EXE_FILE_ERROR, 'error', 10000);
-					}
-
-					return valid;
-				}
-			};
-
-			switch(language) {
-				case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break;
-				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break;
-				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break;
-			}
-
-
-			var uppy = Uppy.Core(uppyProperties);
-			// upload using Ajax
-			uppy.use(Uppy.XHRUpload, {
-				endpoint: LAMS_URL + 'tmpFileUpload',
-				fieldName : 'file',
-				// files are uploaded one by one
-				limit : 1
-			});
-
-			uppy.use(Uppy.Dashboard, {
-				target: '#file-upload-area',
-				inline: true,
-				height: 300,
-				width: '90%',
-				showProgressDetails : true,
-				hideRetryButton : true,
-				hideCancelButton : true,
-				showRemoveButtonAfterComplete: true,
-				proudlyDisplayPoweredByUppy: false,
-				note: 'Hello world!'
-			});
-			uppy.use(Uppy.Webcam, {
-				target: Uppy.Dashboard,
-				modes: ['picture']
-			});
-
-			uppy.on('upload-success', (file, response) => {
-				// if file name was modified by server, reflect it in Uppy
-				file.meta.name = response.body.name;
-			});
-
-			uppy.on('file-removed', (file, reason) => {
-				if (reason === 'removed-by-user') {
-					// delete file from temporary folder on server
-					$.ajax({
-						url :  LAMS_URL + 'tmpFileUploadDelete',
-						data : {
-							'tmpFileUploadId' : tmpFileUploadId,
-							'name' : file.meta.name
-						}
-					})
-				}
-			})
-		}
-
-		function finish() {
-			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
-			return validateFinish(finishUrl);
-		}
-		function notebook() {
-			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
-			return validateFinish(continueUrl);
-		}
-		function validateFinish(tUrl) {
-			var uploadedFilesNumber = +${learner.filesUploaded.size()};
-
-			//enforce min files upload limit
-			<c:if test="${sessionMap.minLimitUploadNumber != null}">
-			if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
-				if (${sessionMap.mode eq 'author'}) {
-					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
-							'\n<fmt:message key="label.min.limit.preview"/>');
-				} else {
-					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
-					return false;
-				}
-			}
-			</c:if>
-
-			let finishFunction = function(){
-				disableButtons();
-				location.href = tUrl;
-			};
-
-			//let user confirm zero files upload
-			if (uploadedFilesNumber == 0) {
-				if (${sessionMap.lockOnFinish}) {
-					showConfirm("<fmt:message key='learner.finish.without.upload'/>", finishFunction);
-				} else {
-					showConfirm("<fmt:message key='messsage.learner.finish.confirm'/>", finishFunction);
-				}
-			} else {
-				finishFunction();
-			}
-
-		}
-
-		function clearFileError(errDivId) {
-			if ( ! errDivId || errDivId.length == 0 ) {
-				errDivId = 'file-error-msg';
-			}
-			var errDiv = $('#'+errDivId);
-			errDiv.empty();
-			errDiv.css( "display", "none" );
-		}
-
-		function showFileError(error, errDivId) {
-			if ( ! errDivId || errDivId.length == 0 ) {
-				errDivId = 'file-error-msg';
-			}
-			var errDiv = $('#'+errDivId);
-			if ( errDiv.length > 0 ) {
-				errDiv.append(error);
-				errDiv.css( "display", "block" );
-			} else {
-				showToast(error);
-			}
-		}
-
-		function validateFileUpload() {
-			var valid = true;
-
-			// check description
-			clearFileError("desc-error-msg");
-			if ( $('#description').val().trim().length == 0 ) {
-				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="label.learner.fileDescription"/></fmt:param></fmt:message>';
-				showFileError(requiredMsg, "desc-error-msg");
-				valid = false;
-			}
-
-			if ( valid ) {
-				disableButtons();
-			}
-			return valid;
-		}
-
-		function disableButtons() {
-			// do not disable the file button or the file will be missing on the upload.
-			$('.btn-disable-on-submit').prop('disabled', true);
-			$('a.btn-disable-on-submit').hide(); // links must be hidden, cannot be disabled
-
-			// show the waiting area during the upload
-			var div = document.getElementById("attachmentArea_Busy");
-			if(div != null){
-				div.style.display = '';
-			}
-		}
-
-		function deleteLearnerFile(detailId, filename) {
-			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
-			msg = msg.replace('{0}', filename);
-			showConfirm(msg, function (){
-				$.ajax({
-					url: '<c:url value="/learning/deleteLearnerFile.do"/>',
-					data: 'detailId=' + detailId,
-					success: function () {
-						document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
-					},
-					error: function(error){
-						showToast("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
-						showToast("responseText: "+xhr.responseText);
-					}
-				});
-			});
-		}
-	</script>
-
-	<div id="instructions" class="instructions">
+	<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
 	<div class="container-xxl">
-		<div class="text-primary">
-			<hr class="mx-5">
-		</div>
-		<!-- notices and announcements -->
-		<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
-			<c:if test="${sessionMap.lockOnFinish} && ${sessionMap.userFinished}">
-				<!--  Lock when finished -->
-				<lams:Alert5 id="lockWhenFinished" type="info">
-					<fmt:message key="message.activityLocked" />
-				</lams:Alert5>
-			</c:if>
+		<div class="row">
+			<div class="col-12 text-primary">
+				<hr class="mx-5">
+				<!-- notices and announcements -->
+				<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
+					<c:if test="${sessionMap.lockOnFinish} && ${sessionMap.userFinished}">
+						<!--  Lock when finished -->
+						<lams:Alert5 id="lockWhenFinished" type="info">
+							<fmt:message key="message.activityLocked" />
+						</lams:Alert5>
+					</c:if>
 
-			<c:if test="${not empty sessionMap.submissionDeadline}">
-				<lams:Alert5 id="submissionDeadline" type="warning" >
-					<fmt:message key="authoring.info.teacher.set.restriction">
-						<fmt:param>
-							<lams:Date value="${sessionMap.submissionDeadline}" />
-						</fmt:param>
-					</fmt:message>
-				</lams:Alert5>
-			</c:if>
+					<c:if test="${not empty sessionMap.submissionDeadline}">
+						<lams:Alert5 id="submissionDeadline" type="warning" >
+							<fmt:message key="authoring.info.teacher.set.restriction">
+								<fmt:param>
+									<lams:Date value="${sessionMap.submissionDeadline}" />
+								</fmt:param>
+							</fmt:message>
+						</lams:Alert5>
+					</c:if>
 
-			<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
-				<c:if test="${sessionMap.isMaxLimitUploadEnabled}">
-					<lams:Alert5 id="limitUploads" close="true" type="warning">
-						<fmt:message key="message.left.upload.limit">
-							<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
-						</fmt:message>
-					</lams:Alert5>
-				</c:if>
-
-				<c:if test="${sessionMap.minLimitUploadNumber != null}">
-					<lams:Alert5 id="minLimitUploadNumber" close="true" type="warning">
-						<fmt:message key="label.should.upload.another">
-							<fmt:param value="${sessionMap.minLimitUploadNumber}" />
-						</fmt:message>
-					</lams:Alert5>
-				</c:if>
-			</c:if>
-		</c:if>
-		<lams:errors/>
-
-		<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
-		<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
-			<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
-				<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-				<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
-				<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
-
-				<!--File path row -->
-				<div class="card lcard lcard-no-borders shadow">
-					<div class="card-header lcard-header-lg lcard-header-button-border">
-						<fmt:message key="label.learner.upload" />
-					</div>
-
-					<div class="card-body">
-						<div class="form-floating">
-							<label for="file-upload-area" class="d-none"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
-
-							<div id="file-upload-area" name="file-upload-area" class="m-1"></div>
-						</div>
-
-						<!--File Description -->
-						<div class="form-floating">
-							<form:textarea id="description" cssClass="form-control" path="description" placeholder="-"></form:textarea>
-							<label for="description"><fmt:message key="label.learner.fileDescription" /> <fmt:message key="errors.required"><fmt:param> </fmt:param></fmt:message></label>
-							<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
-						</div>
-
-						<div id="fileHelpBlock" class="form-text mb-4 mt-2" >
-							<c:if test="${sessionMap.lockOnFinish}">
-								<i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 1.2rem" aria-hidden="true"></i>&nbsp;<fmt:message key="message.warnLockOnFinish" />
-							</c:if>
-						</div>
-
-						<c:if test="${hasEditRight}">
-							<div class="form-group text-center">
-								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-										class="btn btn-default btn-success btn-disable-on-submit"
-										title='<fmt:message key="label.add.tip" />' >
-									<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <fmt:message key="label.add" />
-								</button>
-							</div>
+					<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
+						<c:choose>
+							<c:when test="${sessionMap.minLimitUploadNumber != null && sessionMap.isMaxLimitUploadEnabled}">
+								<c:set var="fileRestrictions">
+									<fmt:message key="label.learner.upload.restrictions"/>: 
+									<fmt:message key="label.should.upload.another">
+										<fmt:param value="${sessionMap.minLimitUploadNumber}" />
+									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.and"/>&nbsp;<fmt:message key="message.left.upload.limit">
+										<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
+									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+								</c:set>
+							</c:when>
+							<c:when test="${sessionMap.minLimitUploadNumber != null}">
+								<c:set var="fileRestrictions">
+									<fmt:message key="label.learner.upload.restrictions"/>: 
+									<fmt:message key="label.should.upload.another">
+										<fmt:param value="${sessionMap.minLimitUploadNumber}" />
+									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+								</c:set>
+							</c:when>
+							<c:when test="${sessionMap.isMaxLimitUploadEnabled}">
+								<c:set var="fileRestrictions">
+									<fmt:message key="label.learner.upload.restrictions"/>: 
+									<fmt:message key="message.left.upload.limit">
+										<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
+									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+								</c:set>
+							</c:when>						
+						</c:choose>
+						<c:if test="${not empty fileRestrictions}">
+							<lams:Alert5 id="minLimitUploadNumber" close="true" type="warning">
+								<c:out value="${fileRestrictions}" escapeXml="false" /> 
+							</lams:Alert5>	
 						</c:if>
 
+					</c:if>
+				</c:if>
+				<lams:errors5/>
+
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+			<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
+			<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
+				<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
+					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+					<input type="hidden" name="toolSessionID" value="${toolSessionID}" />
+					<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
+
+					<!--File path row -->
+					<div class="card lcard lcard-no-borders shadow">
+						<div class="card-header lcard-header-lg lcard-header-button-border">
+							<fmt:message key="label.learner.upload" />
+						</div>
+
+						<div class="card-body">
+							<div class="form-floating">
+								<label for="file-upload-area" class="d-none"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
+
+								<div id="file-upload-area" name="file-upload-area" class="m-1"></div>
+							</div>
+
+							<!--File Description -->
+							<div class="form-floating m-3">
+								<form:textarea id="description" aria-multiline="true" aria-required="true" required="true" cssClass="form-control" path="description" placeholder="-"></form:textarea>
+								<label for="description"><fmt:message key="label.learner.fileDescription" /></label>
+								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
+							</div>
+
+							<div id="fileHelpBlock" class="form-text mx-3 mb-4 mt-2" >
+								<c:if test="${sessionMap.lockOnFinish}">
+									<i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 1.2rem" aria-hidden="true"></i>&nbsp;<fmt:message key="message.warnLockOnFinish" />
+								</c:if>
+							</div>
+
+							<c:if test="${hasEditRight}">
+								<div class="form-group text-center">
+									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
+											class="btn btn-default btn-success btn-disable-on-submit"
+											title='<fmt:message key="label.add.tip" />' >
+										<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <fmt:message key="label.add" />
+									</button>
+								</div>
+							</c:if>
+
+						</div>
 					</div>
-				</div>
-			</form:form>
+				</form:form>
 
-			<lams:WaitingSpinner id="attachmentArea_Busy"/>
+				<lams:WaitingSpinner id="attachmentArea_Busy"/>
 
-			<hr/>
-		</c:if>
+				<hr/>
+			</c:if>
+			<!-- end div uppy form-->
+			</div>
+		</div>
+
+
 
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<c:choose>
@@ -378,7 +174,7 @@
 			</c:when>
 
 			<c:otherwise>
-				<div class="voffset10">
+				<div class="mt-5">
 					<fmt:message key="monitoring.user.submittedFiles" />: <c:out value="${fn:length(learner.filesUploaded)}" />
 				</div>
 
@@ -535,4 +331,237 @@
 	</div>
 	<div id="footer"></div>
 
+	<script>
+		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finish);
+	
+		var UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
+				// convert Java syntax to JSON
+				EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+				<fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
+				EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+	
+	
+		$(document).ready(function() {
+			$("time.timeago").timeago();
+	
+			if ($('#file-upload-area').length == 1) {
+				initFileUpload('${learnerForm.tmpFileUploadId}', '${language}');
+			}
+	
+			<c:if test="${sessionMap.mode != 'author' and sessionMap.minLimitUploadNumber != null}">
+			var uploadedFilesNumber = +${learner.filesUploaded.size()};
+			if (uploadedFilesNumber >= ${sessionMap.minLimitUploadNumber}) {
+				$('.btn-hide-on-min-not-met').removeClass('btn-hide-on-min-not-met');
+			}
+			</c:if>
+	
+			<%-- Connect to command websocket only if it is learner UI --%>
+			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
+			// command websocket stuff for refreshing
+			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+			commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+			// if the trigger is recognised, the following action occurs
+			commandWebsocketHook = function() {
+				// in case in the address bar there is refresh.do, direct to the main learner URL
+				location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
+			};
+			</c:if>
+		});
+	
+		/**
+		 * Initialise Uppy as the file upload widget
+		 */
+		function initFileUpload(tmpFileUploadId, language) {
+			var uppyProperties = {
+				// upload immediately
+				autoProceed: true,
+				allowMultipleUploads: true,
+				debug: false,
+				restrictions: {
+					// taken from LAMS configuration
+					maxFileSize: +UPLOAD_FILE_MAX_SIZE,
+					maxNumberOfFiles: ${sessionMap.isMaxLimitUploadEnabled ? sessionMap.maxLimitUploadNumber - learner.filesUploaded.size() : 10}
+				},
+				meta: {
+					// all uploaded files go to this subdir in LAMS tmp dir
+					// its format is: upload_<userId>_<timestamp>
+					'tmpFileUploadId' : tmpFileUploadId,
+					'largeFilesAllowed' : false
+				},
+				onBeforeFileAdded: function(currentFile, files) {
+					var name = currentFile.data.name || currentFile.name,
+							extensionIndex = name.lastIndexOf('.'),
+							valid = extensionIndex < 0 || !EXE_FILE_TYPES.includes(name.substring(extensionIndex).trim().toLowerCase());
+					if (!valid) {
+						uppy.info(EXE_FILE_ERROR, 'error', 10000);
+					}
+	
+					return valid;
+				}
+			};
+	
+			switch(language) {
+				case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break;
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break;
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break;
+			}
+	
+	
+			var uppy = Uppy.Core(uppyProperties);
+			// upload using Ajax
+			uppy.use(Uppy.XHRUpload, {
+				endpoint: LAMS_URL + 'tmpFileUpload',
+				fieldName : 'file',
+				// files are uploaded one by one
+				limit : 1
+			});
+	
+			uppy.use(Uppy.Dashboard, {
+				target: '#file-upload-area',
+				inline: true,
+				height: '410px',
+				width: '100%',
+				showProgressDetails : true,
+				hideRetryButton : true,
+				hideCancelButton : true,
+				showRemoveButtonAfterComplete: true,
+				proudlyDisplayPoweredByUppy: false
+			});
+			uppy.use(Uppy.Webcam, {
+				target: Uppy.Dashboard,
+				modes: ['picture']
+			});
+			uppy.use(ScreenCapture, { target: Uppy.Dashboard });
+	
+			uppy.on('upload-success', (file, response) => {
+				// if file name was modified by server, reflect it in Uppy
+				file.meta.name = response.body.name;
+			});
+	
+			uppy.on('file-removed', (file, reason) => {
+				if (reason === 'removed-by-user') {
+					// delete file from temporary folder on server
+					$.ajax({
+						url :  LAMS_URL + 'tmpFileUploadDelete',
+						data : {
+							'tmpFileUploadId' : tmpFileUploadId,
+							'name' : file.meta.name
+						}
+					})
+				}
+			})
+		}
+	
+		function finish() {
+			var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
+			return validateFinish(finishUrl);
+		}
+		function notebook() {
+			var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
+			return validateFinish(continueUrl);
+		}
+		function validateFinish(tUrl) {
+			var uploadedFilesNumber = +${learner.filesUploaded.size()};
+	
+			//enforce min files upload limit
+			<c:if test="${sessionMap.minLimitUploadNumber != null}">
+			if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
+				if (${sessionMap.mode eq 'author'}) {
+					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
+							'\n<fmt:message key="label.min.limit.preview"/>');
+				} else {
+					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+					return false;
+				}
+			}
+			</c:if>
+	
+			//let user confirm zero files upload
+			if (uploadedFilesNumber == 0) {
+				if (${sessionMap.lockOnFinish}) {
+					if (!confirm("<fmt:message key='learner.finish.without.upload'/>")) {
+						return false;
+					}
+				} else {
+					if (!confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
+						return false;
+					}
+				}
+			}
+	
+			disableButtons();
+			location.href = tUrl;
+		}
+	
+		function clearFileError(errDivId) {
+			if ( ! errDivId || errDivId.length == 0 ) {
+				errDivId = 'file-error-msg';
+			}
+			var errDiv = $('#'+errDivId);
+			errDiv.empty();
+			errDiv.css( "display", "none" );
+		}
+	
+		function showFileError(error, errDivId) {
+			if ( ! errDivId || errDivId.length == 0 ) {
+				errDivId = 'file-error-msg';
+			}
+			var errDiv = $('#'+errDivId);
+			if ( errDiv.length > 0 ) {
+				errDiv.append(error);
+				errDiv.css( "display", "block" );
+			} else {
+				alert(error);
+			}
+		}
+	
+		function validateFileUpload() {
+			var valid = true;
+	
+			// check description
+			clearFileError("desc-error-msg");
+			if ( $('#description').val().trim().length == 0 ) {
+				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="label.learner.fileDescription"/></fmt:param></fmt:message>';
+				showFileError(requiredMsg, "desc-error-msg");
+				valid = false;
+			}
+	
+			if ( valid ) {
+				disableButtons();
+			}
+			return valid;
+		}
+	
+		function disableButtons() {
+			// do not disable the file button or the file will be missing on the upload.
+			$('.btn-disable-on-submit').prop('disabled', true);
+			$('a.btn-disable-on-submit').hide(); // links must be hidden, cannot be disabled
+	
+			// show the waiting area during the upload
+			var div = document.getElementById("attachmentArea_Busy");
+			if(div != null){
+				div.style.display = '';
+			}
+		}
+	
+		function deleteLearnerFile(detailId, filename) {
+			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			msg = msg.replace('{0}', filename);
+			var answer = confirm(msg);
+			if (answer) {
+				$.ajax({
+					url: '<c:url value="/learning/deleteLearnerFile.do"/>',
+					data: 'detailId=' + detailId,
+					success: function () {
+						document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
+					},
+					error: function(error){
+						alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+						alert("responseText: "+xhr.responseText);
+					}
+				});
+			}
+		}
+	</script>	
 </lams:PageLearner>
+
