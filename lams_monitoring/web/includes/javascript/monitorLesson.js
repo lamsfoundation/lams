@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿// ********** GLOBAL VARIABLES **********
 
 // current tab that should be displayed after a refresh, defaults to Sequence tab
 var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence',
@@ -3063,13 +3063,6 @@ function togglePagingCells(parent, pageNumber, maxPageNumber) {
 	} else {
 		$('td.pageCell', parent).css('visibility', 'visible').text(pageNumber + ' / ' + maxPageNumber);
 	}
-}
-
-function showToast(text) {
-	let toast = $('#toast-template').clone().attr('id', null).appendTo('#toast-container');
-	toast.find('.toast-body', toast).text(text);
-	toast = new bootstrap.Toast(toast[0]);
-    toast.show();
 }
 
 /**

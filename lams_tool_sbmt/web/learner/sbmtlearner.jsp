@@ -173,30 +173,31 @@
 			<c:if test="${sessionMap.minLimitUploadNumber != null}">
 			if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
 				if (${sessionMap.mode eq 'author'}) {
-					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
+					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
 							'\n<fmt:message key="label.min.limit.preview"/>');
 				} else {
-					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
 					return false;
 				}
 			}
 			</c:if>
 
+			let finishFunction = function(){
+				disableButtons();
+				location.href = tUrl;
+			};
+
 			//let user confirm zero files upload
 			if (uploadedFilesNumber == 0) {
 				if (${sessionMap.lockOnFinish}) {
-					if (!confirm("<fmt:message key='learner.finish.without.upload'/>")) {
-						return false;
-					}
+					showConfirm("<fmt:message key='learner.finish.without.upload'/>", finishFunction);
 				} else {
-					if (!confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
-						return false;
-					}
+					showConfirm("<fmt:message key='messsage.learner.finish.confirm'/>", finishFunction);
 				}
+			} else {
+				finishFunction();
 			}
 
-			disableButtons();
-			location.href = tUrl;
 		}
 
 		function clearFileError(errDivId) {
@@ -217,7 +218,7 @@
 				errDiv.append(error);
 				errDiv.css( "display", "block" );
 			} else {
-				alert(error);
+				showToast(error);
 			}
 		}
 
@@ -253,8 +254,7 @@
 		function deleteLearnerFile(detailId, filename) {
 			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
 			msg = msg.replace('{0}', filename);
-			var answer = confirm(msg);
-			if (answer) {
+			showConfirm(msg, function (){
 				$.ajax({
 					url: '<c:url value="/learning/deleteLearnerFile.do"/>',
 					data: 'detailId=' + detailId,
@@ -262,11 +262,11 @@
 						document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
 					},
 					error: function(error){
-						alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
-						alert("responseText: "+xhr.responseText);
+						showToast("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+						showToast("responseText: "+xhr.responseText);
 					}
 				});
-			}
+			});
 		}
 	</script>
 

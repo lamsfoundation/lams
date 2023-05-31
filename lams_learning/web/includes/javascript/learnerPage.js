@@ -145,7 +145,7 @@ function initCommandWebsocket(lessonId) {
                     learnerAutosave(true);
                 }
             } else {
-                alert(command.message);
+                showToast(command.message);
             }
         }
 

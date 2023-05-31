@@ -121,6 +121,30 @@
             </main>
         </div>
     </div>
+
+    <div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">
+    </div>
+
+    <div id="toast-template" class="toast align-items-center bg-white" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
     </body>
 
 </lams:html>
