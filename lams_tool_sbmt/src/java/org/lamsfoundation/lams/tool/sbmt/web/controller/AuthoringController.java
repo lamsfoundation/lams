@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.tool.sbmt.web.controller;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -50,6 +43,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 /**
  * @author Manpreet Minhas
@@ -181,6 +180,7 @@ public class AuthoringController {
     // ***********************************************************
     // Private/protected methods
     // ***********************************************************
+
     /**
      * The private method to get content from ActionForm parameters (web page).
      */
@@ -196,7 +196,8 @@ public class AuthoringController {
 	content.setReflectOnActivity(authoringForm.isReflectOnActivity());
 	content.setLimitUpload(authoringForm.isLimitUpload());
 	content.setLimitUploadNumber(authoringForm.getLimitUploadNumber());
-	content.setMinLimitUploadNumber(authoringForm.getMinLimitUploadNumber());
+	content.setMinLimitUploadNumber(
+		authoringForm.isMinLimitUpload() ? authoringForm.getMinLimitUploadNumber() : null);
 	content.setUseSelectLeaderToolOuput(authoringForm.isUseSelectLeaderToolOuput());
 	content.setNotifyTeachersOnFileSubmit(authoringForm.isNotifyTeachersOnFileSubmit());
 	return content;
