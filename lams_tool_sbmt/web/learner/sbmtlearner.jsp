@@ -174,90 +174,84 @@
 			</c:when>
 
 			<c:otherwise>
-				<div class="mt-5">
-					<fmt:message key="monitoring.user.submittedFiles" />: <c:out value="${fn:length(learner.filesUploaded)}" />
-				</div>
+				<h4 id="submittedFiles" class="mt-5">
+					<fmt:message key="monitoring.user.submittedFiles" />
+				</h4>
+				<small class="text-muted"><c:out value="${fn:length(learner.filesUploaded)}" />&nbsp;<fmt:message key="label.files" /></small>
 
-				<table class="table table-condensed voffset20">
+				<div role="list" class="mt-2 px-4" aria-labelledby="submittedFiles">
 					<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
-
+						<div role="listitem" class="card my-3">
 						<!--The name of the File -->
-						<tr class="active">
-							<td colspan="${file.currentLearner ? 2 : 3}">
-								<c:out value="${status.count}" />) <c:out value="${file.filePath}" />
+							<c:if test="${file.currentLearner}">
+								<div class="card-header">
+									<c:set var="downloadURL">
+										<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
+									</c:set>
+									<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;<a class="fw-bold" href="${downloadURL}" aria-label="<fmt:message key="label.download" />"><c:out value="${file.filePath}" /></a>
+									<div class="float-end">
+										<c:if test="${empty file.marks && hasEditRight}">
+											<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-primary btn-disable-on-submit">
+												<i class="fa fa-trash" aria-label="<fmt:message key="label.monitoring.original.learner.file.delete"/>"></i>
+											</a>
+										</c:if>
 
-								<c:if test="${file.currentLearner}">
-								<c:set var="downloadURL">
-									<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
-								</c:set>
-							</td>
-
-							<td>
-								<c:if test="${empty file.marks && hasEditRight}">
-									<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-default btn-disable-on-submit pull-right">
-										<i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"></span>
-									</a>
-								</c:if>
-
-								<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
-									<i class="fa fa-download" ></i>
-								</a>
-							</td>
-							</c:if>
-							</td>
-						</tr>
-
-						<!--The description of the File -->
-						<tr>
-							<td colspan="3">
-								<lams:out value="${file.fileDescription}" escapeHtml="true" />
-
-								<div class="text-muted voffset10">
-									<fmt:message key="label.learner.time" />&nbsp;
-									<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
+										<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit ">
+											<i class="fa fa-download" title="<fmt:message key="label.download" />" aria-label="<fmt:message key="label.download" />"></i>
+										</a>
+									</div>
+									<br>
+									<small class="text-muted">
+										<fmt:message key="label.learner.time" />&nbsp;<lams:Date value="${file.dateOfSubmission}" timeago="true"/>									
+									</small>
 								</div>
-							</td>
-						</tr>
-
-						<!--Comments -->
-						<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
-							<tr>
-								<td colspan="3">
-									<fmt:message key="label.learner.comments" />:
-									<c:out value="${file.comments}" escapeXml="false" />
-								</td>
-							</tr>
-						</c:if>
+							</c:if>
+						<div class="card-body">
+						<!--The description of the File -->
+							<div class="my-2" id="fileDescription">
+								<lams:out value="${file.fileDescription}" escapeHtml="true" />
+							</div>
 
 						<!--Marks-->
 						<c:if test="${sessionMap.isMarksReleased and not empty file.marks}">
-							<tr>
-								<td colspan="3">
-									<fmt:message key="label.learner.marks" />:
+							<div class="my-2" id="fileMarks">
+								<hr>
+
+									<span class="fw-bold"><fmt:message key="label.learner.marks" />:</span>
 									<c:out value="${file.marks}" escapeXml="true" />
-								</td>
-							</tr>
+							</div>		
+
+						</c:if>
+
+						<!--Comments -->
+						<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
+							<div class="my-2" id="teacherComments">
+
+									<span class="fw-bold"><fmt:message key="label.learner.comments" />:</span>
+									<br/>
+									<c:out value="${file.comments}" escapeXml="false" />
+							</div>
 						</c:if>
 
 						<!--Marked file-->
 						<c:if  test="${sessionMap.isMarksReleased and not empty file.markFileUUID}">
-							<tr>
-								<td><fmt:message key="label.monitor.mark.markedFile" /></td>
-								<td>
-									<c:out value="${file.markFileName}" />
-								</td>
-								<td>
+							<fmt:message key="label.monitor.mark.markedFile" />: <i class="fa fa-download" aria-hidden="true"></i>&nbsp;
+								
+									
+
 									<c:set var="markFileDownloadURL">
 										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
 									</c:set>
-									<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default btn-disable-on-submit pull-right">
-										<i class="fa fa-download"></i>
+									<a id="markedFile" href="${markFileDownloadURL}" title="<fmt:message key='label.monitor.mark.markedFile' />, <fmt:message key='label.download' />" class="">
+										<c:out value="${file.markFileName}" />
 									</a>
-								</td>
-							</tr>
+
 						</c:if>
+						</div>
+						</div>
 					</c:forEach>
-				</table>
+				</div>				
+
 			</c:otherwise>
 		</c:choose>
 
@@ -291,7 +285,7 @@
 
 					<c:if test="${sessionMap.mode != 'teacher'}">
 						<button id="notebookButton" name="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
-								class="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
+								class="btn btn-sm btn-primary btn-disable-on-submit" >
 							<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -305,14 +299,14 @@
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
 						<button id="notebookButton" onclick="javascript:notebook();"
-								class="btn btn-primary btn-disable-on-submit pull-right
+								class="btn btn-primary btn-disable-on-submit 
 								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
 						<button type="button"
-								class="btn btn-primary btn-disable-on-submit pull-right na
+								class="btn btn-primary btn-disable-on-submit na
 								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}"
 								id="finishButton">
 							<c:choose>
