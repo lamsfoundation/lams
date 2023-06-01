@@ -23,59 +23,18 @@
 
 package org.lamsfoundation.lams.authoring.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.Vector;
-
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IObjectExtractor;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.Competence;
-import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.FloatingActivity;
-import org.lamsfoundation.lams.learningdesign.GateActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.learningdesign.GroupingActivity;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
+import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess.LearningDesignAccessPrimaryKey;
-import org.lamsfoundation.lams.learningdesign.License;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.learningdesign.dao.IBranchActivityEntryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ICompetenceDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ICompetenceMappingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
-import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ILicenseDAO;
-import org.lamsfoundation.lams.learningdesign.dao.ITransitionDAO;
+import org.lamsfoundation.lams.learningdesign.dao.*;
 import org.lamsfoundation.lams.learningdesign.dto.LicenseDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
@@ -107,12 +66,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
-import org.lamsfoundation.lams.util.AuthoringJsonTags;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
@@ -120,9 +74,11 @@ import org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
 
 /**
  * @author Manpreet Minhas
@@ -196,7 +152,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param groupDAO
-     *            The groupDAO to set.
+     * 	The groupDAO to set.
      */
     public void setGroupDAO(IGroupDAO groupDAO) {
 	this.groupDAO = groupDAO;
@@ -220,7 +176,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param transitionDAO
-     *            The transitionDAO to set
+     * 	The transitionDAO to set
      */
     public void setTransitionDAO(ITransitionDAO transitionDAO) {
 	this.transitionDAO = transitionDAO;
@@ -228,7 +184,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param learningDesignDAO
-     *            The learningDesignDAO to set.
+     * 	The learningDesignDAO to set.
      */
     public void setLearningDesignDAO(ILearningDesignDAO learningDesignDAO) {
 	this.learningDesignDAO = learningDesignDAO;
@@ -236,7 +192,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param learningLibraryDAO
-     *            The learningLibraryDAO to set.
+     * 	The learningLibraryDAO to set.
      */
     public void setLearningLibraryDAO(ILearningLibraryDAO learningLibraryDAO) {
 	this.learningLibraryDAO = learningLibraryDAO;
@@ -244,7 +200,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param baseDAO
-     *            The baseDAO to set.
+     * 	The baseDAO to set.
      */
     public void setBaseDAO(IBaseDAO baseDAO) {
 	this.baseDAO = baseDAO;
@@ -252,7 +208,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param activityDAO
-     *            The activityDAO to set.
+     * 	The activityDAO to set.
      */
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
@@ -260,7 +216,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param toolDAO
-     *            The toolDAO to set
+     * 	The toolDAO to set
      */
     public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
@@ -268,7 +224,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param toolDAO
-     *            The toolDAO to set
+     * 	The toolDAO to set
      */
     public void setSystemToolDAO(ISystemToolDAO systemToolDAO) {
 	this.systemToolDAO = systemToolDAO;
@@ -276,7 +232,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param licenseDAO
-     *            The licenseDAO to set
+     * 	The licenseDAO to set
      */
     public void setLicenseDAO(ILicenseDAO licenseDAO) {
 	this.licenseDAO = licenseDAO;
@@ -288,7 +244,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param learningDesignService
-     *            The Learning Design Validator Service
+     * 	The Learning Design Validator Service
      */
     public void setLearningDesignService(ILearningDesignService learningDesignService) {
 	this.learningDesignService = learningDesignService;
@@ -320,7 +276,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @param contentIDGenerator
-     *            The contentIDGenerator to set.
+     * 	The contentIDGenerator to set.
      */
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator) {
 	this.contentIDGenerator = contentIDGenerator;
@@ -339,7 +295,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Returns a populated LearningDesign object corresponding to the given learningDesignID
      *
      * @param learningDesignID
-     *            The learning_design_id of the design which has to be fetched
+     * 	The learning_design_id of the design which has to be fetched
      * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
      */
     private LearningDesign getLearningDesign(Long learningDesignID) {
@@ -359,7 +315,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#getToolOutputDefinitions(java.lang.Long,
-     *      int)
+     *        int)
      */
     @Override
     public List<ToolOutputDefinitionDTO> getToolOutputDefinitions(Long toolContentID, int definitionType) {
@@ -377,7 +333,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#setupEditOnFlyLock(LearningDesign,
-     *      java.lang.Integer)
+     *        java.lang.Integer)
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -394,9 +350,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    throw new LearningDesignException("Learning Design was not found, ID: " + learningDesignID);
 	}
 
-	boolean learningDesignAvailable = (design.getEditOverrideUser() == null)
-		|| (design.getEditOverrideLock() == null) || design.getEditOverrideUser().getUserId().equals(userID)
-		|| !design.getEditOverrideLock();
+	boolean learningDesignAvailable =
+		(design.getEditOverrideUser() == null) || (design.getEditOverrideLock() == null)
+			|| design.getEditOverrideUser().getUserId().equals(userID) || !design.getEditOverrideLock();
 
 	if (learningDesignAvailable) {
 	    if (design.getLessons().isEmpty()) {
@@ -430,7 +386,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#setupEditOnFlyGate(java.lang.Long,
-     *      java.lang.Integer)
+     *        java.lang.Integer)
      */
 
     @Override
@@ -466,8 +422,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    throw new IOException("User not found, ID: " + userID);
 	}
 
-	LearningDesign design = learningDesignID == null ? null
-		: learningDesignDAO.getLearningDesignById(learningDesignID);
+	LearningDesign design =
+		learningDesignID == null ? null : learningDesignDAO.getLearningDesignById(learningDesignID);
 
 	if (design == null) {
 	    throw new IOException("Learning Design not found, ID: " + learningDesignID);
@@ -485,8 +441,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    processor.parseLearningDesign();
 
 	    Activity lastReadOnlyActivity = processor.lastReadOnlyActivity;
-	    Long firstAddedActivityId = processor.firstAddedActivity == null ? null
-		    : processor.firstAddedActivity.getActivityId();
+	    Long firstAddedActivityId =
+		    processor.firstAddedActivity == null ? null : processor.firstAddedActivity.getActivityId();
 
 	    // open and release waiting list on system gate
 	    if ((lastReadOnlyActivity != null) && lastReadOnlyActivity.isGateActivity()
@@ -498,8 +454,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    for (Lesson lesson : design.getLessons()) {
 		lesson.setLockedForEdit(false);
 
-		String message = messageService.getMessage("audit.live.edit.end", new Object[] { design.getTitle(),
-			design.getLearningDesignId(), lesson.getLessonId(), user.getLogin(), user.getUserId() });
+		String message = messageService.getMessage("audit.live.edit.end",
+			new Object[] { design.getTitle(), design.getLearningDesignId(), lesson.getLessonId(),
+				user.getLogin(), user.getUserId() });
 		logEventService.logEvent(LogEvent.TYPE_LIVE_EDIT, user.getUserId(), null, lesson.getLessonId(), null,
 			message);
 
@@ -622,7 +579,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    // set x / y position for Gate
 	    Integer x1 = toActivity.getXcoord() == null ? 0 : toActivity.getXcoord();
 
-	    Integer x2 = toActivity.getTransitionFrom() == null ? null
+	    Integer x2 = toActivity.getTransitionFrom() == null
+		    ? null
 		    : toActivity.getTransitionFrom().getToActivity().getXcoord();
 
 	    if ((x1 != null) && (x2 != null)) {
@@ -646,7 +604,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		activity.setTransitionFrom(newTransition);
 		gate.setTransitionTo(newTransition);
 
-		Integer x1 = activity.getTransitionTo() == null ? 0
+		Integer x1 = activity.getTransitionTo() == null
+			? 0
 			: activity.getTransitionTo().getFromActivity().getXcoord(); /* set x/y position for Gate */
 		Integer x2 = activity.getXcoord() == null ? null : activity.getXcoord();
 
@@ -692,8 +651,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
 		if (toActivity.isBranchingActivity()) {
 		    // get real instance instead of lazy loaded proxy
-		    BranchingActivity branchingActivity = (BranchingActivity) activityDAO
-			    .getActivityByActivityId(toActivity.getActivityId());
+		    BranchingActivity branchingActivity = (BranchingActivity) activityDAO.getActivityByActivityId(
+			    toActivity.getActivityId());
 		    x2 = branchingActivity.getEndXcoord();
 		    y2 = branchingActivity.getEndYcoord();
 		} else {
@@ -748,8 +707,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		// a content record, then shortcomings in the createToolSession
 		// code may throw exceptions.
 		if (activity.isToolActivity()) {
-		    ToolActivity toolActivity = (ToolActivity) activityDAO
-			    .getActivityByActivityId(activity.getActivityId());
+		    ToolActivity toolActivity = (ToolActivity) activityDAO.getActivityByActivityId(
+			    activity.getActivityId());
 		    Long newContentId = lamsCoreToolService.notifyToolToCopyContent(toolActivity, null);
 		    toolActivity.setToolContentId(newContentId);
 
@@ -804,8 +763,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#copyLearningDesign(org.lamsfoundation.lams.learningdesign.LearningDesign,
-     *      java.lang.Integer, org.lamsfoundation.lams.usermanagement.User,
-     *      org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
+     *        java.lang.Integer, org.lamsfoundation.lams.usermanagement.User,
+     *        org.lamsfoundation.lams.usermanagement.WorkspaceFolder, java.lang.Boolean, java.lang.String)
      */
     @Override
     public LearningDesign copyLearningDesign(LearningDesign originalLearningDesign, Integer copyType, User user,
@@ -843,7 +802,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		    LearningDesignService.getLearningDesignSVGPath(originalLearningDesign.getLearningDesignId()));
 	    if (sourceSVG.canRead()) {
 		FileUtils.copyFile(sourceSVG, new File(
-			LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
+				LearningDesignService.getLearningDesignSVGPath(newLearningDesign.getLearningDesignId())),
 			false);
 	    }
 	} catch (IOException e) {
@@ -855,12 +814,12 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringFullService#copyLearningDesignToolContent(org.lamsfoundation.lams.learningdesign.LearningDesign,
-     *      org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
+     *        org.lamsfoundation.lams.learningdesign.LearningDesign, java.lang.Integer)
      */
     private LearningDesign copyLearningDesignToolContent(LearningDesign design, LearningDesign originalLearningDesign,
 	    Integer copyType, String customCSV) throws LearningDesignException {
 
-	for (Iterator i = design.getActivities().iterator(); i.hasNext();) {
+	for (Iterator i = design.getActivities().iterator(); i.hasNext(); ) {
 	    Activity currentActivity = (Activity) i.next();
 	    if (currentActivity.isToolActivity()) {
 		copyActivityToolContent(currentActivity, design.getCopyTypeID(),
@@ -896,9 +855,10 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    log.error(error, e);
 	    throw new LearningDesignException(error, e);
 	} catch (ToolException e) {
-	    String error = "Unable to copy a design / initialise the lesson. Tool encountered an error copying the data is missing for activity "
-		    + activity.getActivityUIID() + " in learning design " + originalLearningDesignId
-		    + " default content may be missing for the tool. Error was " + e.getMessage();
+	    String error =
+		    "Unable to copy a design / initialise the lesson. Tool encountered an error copying the data is missing for activity "
+			    + activity.getActivityUIID() + " in learning design " + originalLearningDesignId
+			    + " default content may be missing for the tool. Error was " + e.getMessage();
 	    log.error(error, e);
 	    throw new LearningDesignException(error, e);
 	}
@@ -914,11 +874,11 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * doesn't matter).
      *
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     * 	The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     * 	The copy of the originalLearningDesign
      * @return Map of all the new activities, where the key is the UIID value. This is used as an input to
-     *         updateDesignTransitions
+     * 	updateDesignTransitions
      */
     private HashMap<Integer, Activity> updateDesignActivities(LearningDesign originalLearningDesign,
 	    LearningDesign newLearningDesign, int uiidOffset, String customCSV) {
@@ -962,8 +922,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		ComplexActivity newComplex = (ComplexActivity) activity;
 		Activity oldDefaultActivity = newComplex.getDefaultActivity();
 		if (oldDefaultActivity != null) {
-		    Activity newDefaultActivity = newActivities
-			    .get(LearningDesign.addOffset(oldDefaultActivity.getActivityUIID(), uiidOffset));
+		    Activity newDefaultActivity = newActivities.get(
+			    LearningDesign.addOffset(oldDefaultActivity.getActivityUIID(), uiidOffset));
 		    newComplex.setDefaultActivity(newDefaultActivity);
 		}
 	    }
@@ -973,8 +933,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		// Need to check if the sets are not null as these are new
 		// objects and Hibernate may not have backed them with
 		// collections yet.
-		if ((newSequenceActivity.getBranchEntries() != null)
-			&& (newSequenceActivity.getBranchEntries().size() > 0)) {
+		if ((newSequenceActivity.getBranchEntries() != null) && (newSequenceActivity.getBranchEntries().size()
+			> 0)) {
 
 		    Activity parentActivity = newSequenceActivity.getParentActivity();
 		    if (parentActivity.isChosenBranchingActivity()) {
@@ -991,16 +951,16 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 			    // copy
 			    BranchActivityEntry entry = (BranchActivityEntry) beIter.next();
 			    BranchingActivity oldBranchingActivity = (BranchingActivity) entry.getBranchingActivity();
-			    entry.setBranchingActivity(newActivities
-				    .get(LearningDesign.addOffset(oldBranchingActivity.getActivityUIID(), uiidOffset)));
+			    entry.setBranchingActivity(newActivities.get(
+				    LearningDesign.addOffset(oldBranchingActivity.getActivityUIID(), uiidOffset)));
 			    Group oldGroup = entry.getGroup();
 			    if (oldGroup != null) {
 				Grouping oldGrouping = oldGroup.getGrouping();
-				Grouping newGrouping = newGroupings
-					.get(LearningDesign.addOffset(oldGrouping.getGroupingUIID(), uiidOffset));
+				Grouping newGrouping = newGroupings.get(
+					LearningDesign.addOffset(oldGrouping.getGroupingUIID(), uiidOffset));
 				if (newGrouping != null) {
-				    entry.setGroup(newGrouping
-					    .getGroup(LearningDesign.addOffset(oldGroup.getGroupUIID(), uiidOffset)));
+				    entry.setGroup(newGrouping.getGroup(
+					    LearningDesign.addOffset(oldGroup.getGroupUIID(), uiidOffset)));
 				}
 			    }
 			}
@@ -1014,8 +974,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 		Iterator inputIter = activity.getInputActivities().iterator();
 		while (inputIter.hasNext()) {
 		    Activity elem = (Activity) inputIter.next();
-		    newInputActivities
-			    .add(newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(), uiidOffset)));
+		    newInputActivities.add(
+			    newActivities.get(LearningDesign.addOffset(elem.getActivityUIID(), uiidOffset)));
 		}
 		activity.getInputActivities().clear();
 		activity.getInputActivities().addAll(newInputActivities);
@@ -1060,16 +1020,15 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * with their new groupings at the end. Also copies the tool content.
      *
      * @param activity
-     *            Activity to process. May not be null.
+     * 	Activity to process. May not be null.
      * @param newLearningDesign
-     *            The new learning design. May not be null.
+     * 	The new learning design. May not be null.
      * @param newActivities
-     *            Temporary set of new activities - as activities are processed they are added to the set. May not be
-     *            null.
+     * 	Temporary set of new activities - as activities are processed they are added to the set. May not be null.
      * @param newGroupings
-     *            Temporary set of new groupings. Key is the grouping UUID. May not be null.
+     * 	Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @param parentActivity
-     *            This activity's parent activity (if one exists). May be null.
+     * 	This activity's parent activity (if one exists). May be null.
      */
     private void processActivity(Activity activity, LearningDesign newLearningDesign,
 	    Map<Integer, Activity> newActivities, Map<Integer, Grouping> newGroupings, Activity parentActivity,
@@ -1129,9 +1088,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Updates the Transition information in the newLearningDesign based on the originalLearningDesign
      *
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     * 	The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     * 	The copy of the originalLearningDesign
      */
     private void updateDesignTransitions(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    HashMap<Integer, Activity> newActivities, int uiidOffset) {
@@ -1185,9 +1144,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Updates the competence information in the newLearningDesign based on the originalLearningDesign
      *
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     * 	The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     * 	The copy of the originalLearningDesign
      */
     private void updateDesignCompetences(LearningDesign originalLearningDesign, LearningDesign newLearningDesign,
 	    boolean insert) {
@@ -1236,9 +1195,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Updates the competence information in the newLearningDesign based on the originalLearningDesign
      *
      * @param originalLearningDesign
-     *            The LearningDesign to be copied
+     * 	The LearningDesign to be copied
      * @param newLearningDesign
-     *            The copy of the originalLearningDesign
+     * 	The copy of the originalLearningDesign
      */
     private void updateCompetenceMappings(Set<Competence> newCompetences, HashMap<Integer, Activity> newActivities) {
 	for (Integer activityKey : newActivities.keySet()) {
@@ -1271,9 +1230,9 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Determines the type of activity and returns a deep-copy of the same
      *
      * @param activity
-     *            The object to be deep-copied
+     * 	The object to be deep-copied
      * @param newGroupings
-     *            Temporary set of new groupings. Key is the grouping UUID. May not be null.
+     * 	Temporary set of new groupings. Key is the grouping UUID. May not be null.
      * @return Activity The new deep-copied Activity object
      */
     private Activity getActivityCopy(final Activity activity, Map<Integer, Grouping> newGroupings, int uiidOffset) {
@@ -1298,7 +1257,7 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
      * Returns a set of child activities for the given parent activity
      *
      * @param parentActivity
-     *            The parent activity
+     * 	The parent activity
      * @return HashSet Set of the activities that belong to the parentActivity
      */
     private HashSet getChildActivities(Activity parentActivity) {
@@ -1331,15 +1290,16 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	}
 
 	Long learningDesignId = JsonUtil.optLong(ldJSON, AttributeNames.PARAM_LEARNINGDESIGN_ID);
-	LearningDesign existingLearningDesign = learningDesignId == null ? null
-		: learningDesignDAO.getLearningDesignById(learningDesignId);
-	if (!authorised && (existingLearningDesign != null)
-		&& Boolean.TRUE.equals(existingLearningDesign.getEditOverrideLock())) {
+	LearningDesign existingLearningDesign =
+		learningDesignId == null ? null : learningDesignDAO.getLearningDesignById(learningDesignId);
+	if (!authorised && (existingLearningDesign != null) && Boolean.TRUE.equals(
+		existingLearningDesign.getEditOverrideLock())) {
 	    authorised = userID.equals(existingLearningDesign.getEditOverrideUser().getUserId());
 	}
 	if (!authorised) {
-	    throw new UserException("User with ID " + userID
-		    + " is not authorized to store a design in this workspace folder " + workspaceFolderID);
+	    throw new UserException(
+		    "User with ID " + userID + " is not authorized to store a design in this workspace folder "
+			    + workspaceFolderID);
 	}
 	if (existingLearningDesign == null) {
 	    // check the user has given it a unique name in this folder, and make it unique if needed
@@ -1352,8 +1312,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 	    ldJSON.put(AuthoringJsonTags.TITLE, title);
 	}
 
-	IObjectExtractor extractor = (IObjectExtractor) beanFactory
-		.getBean(IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
+	IObjectExtractor extractor = (IObjectExtractor) beanFactory.getBean(
+		IObjectExtractor.OBJECT_EXTRACTOR_SPRING_BEANNAME);
 	LearningDesign design = extractor.extractSaveLearningDesign(ldJSON, existingLearningDesign, workspaceFolder,
 		user);
 
@@ -1387,8 +1347,8 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
     @Override
     public Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId) {
 	LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(learningDesignId);
-	Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService
-		.validateLearningDesign(learningDesign);
+	Vector<ValidationErrorDTO> listOfValidationErrorDTOs = learningDesignService.validateLearningDesign(
+		learningDesign);
 	Boolean valid = listOfValidationErrorDTOs.size() > 0 ? Boolean.FALSE : Boolean.TRUE;
 	learningDesign.setValidDesign(valid);
 	learningDesignDAO.insertOrUpdate(learningDesign);
@@ -1607,36 +1567,30 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 
     /**
      * Helper method to create a Assessment tool content. Assessment is one of the unusuals tool in that it caches
-     * user's login names and
-     * first/last names Mandatory fields in toolContentJSON: title, instructions, resources, user fields firstName,
-     * lastName and loginName.
+     * user's login names and first/last names Mandatory fields in toolContentJSON: title, instructions, resources, user
+     * fields firstName, lastName and loginName.
      *
      * Required fields in toolContentJSON: "title", "instructions", "questions", "firstName", "lastName", "lastName",
      * "questions" and "references".
      *
-     * The questions entry should be ArrayNode containing JSON objects, which in turn must contain
-     * "questionTitle", "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice,
-     * Numerical or Matching Pairs
-     * then a ArrayNode "answers" is required.
+     * The questions entry should be ArrayNode containing JSON objects, which in turn must contain "questionTitle",
+     * "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice, Numerical or Matching
+     * Pairs then a ArrayNode "answers" is required.
      *
-     * The answers entry should be ArrayNode
-     * containing JSON objects, which in turn must contain "answerText" or "answerFloat", "displayOrder" (Integer),
-     * "grade" (Integer).
+     * The answers entry should be ArrayNode containing JSON objects, which in turn must contain "answerText" or
+     * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
      *
      * For the templates, all the questions that are created will be set up as references, therefore the questions in
-     * the assessment == the bank of questions.
-     * So references entry will be a ArrayNode containing JSON objects, which in turn must contain "displayOrder"
-     * (Integer),
-     * "questionDisplayOrder" (Integer - to match to the question). If default grade or random questions are needed then
-     * this method needs
-     * to be expanded.
+     * the assessment == the bank of questions. So references entry will be a ArrayNode containing JSON objects, which
+     * in turn must contain "displayOrder" (Integer), "questionDisplayOrder" (Integer - to match to the question). If
+     * default grade or random questions are needed then this method needs to be expanded.
      */
     @Override
     public Long createTblAssessmentToolContent(UserDTO user, String title, String instructions,
 	    String reflectionInstructions, boolean selectLeaderToolOutput, boolean enableNumbering,
 	    boolean shuffleQuestions, boolean enableConfidenceLevels, boolean allowDiscloseAnswers,
-	    boolean allowAnswerJustification, boolean enableDiscussionSentiment, ArrayNode questions)
-	    throws IOException {
+	    boolean allowAnswerJustification, boolean enableDiscussionSentiment, Long qbCollectionUid,
+	    ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions,
 		reflectionInstructions, null, null, user);
@@ -1664,6 +1618,10 @@ public class AuthoringService implements IAuthoringFullService, BeanFactoryAware
 			.put("questionDisplayOrder", questionDisplayOrder).put("maxMark", defaultGrade));
 	    }
 	    toolContentJSON.set("references", references);
+
+	    if (qbCollectionUid != null) {
+		toolContentJSON.put(RestTags.COLLECTION_UID, qbCollectionUid);
+	    }
 	}
 
 	return createToolContent(user, "laasse10", toolContentJSON);

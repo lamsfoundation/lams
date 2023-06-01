@@ -33,6 +33,11 @@
         </property>
     </bean>
 
+    <!-- OutputFactory -->
+    <bean id="peerreviewOutputFactory" class="org.lamsfoundation.lams.tool.peerreview.service.PeerreviewOutputFactory">
+        <property name="toolMessageService"><ref bean="peerreviewMessageService"/></property>
+    </bean>
+
     <!-- Managers -->
 	<bean id="peerreviewToolContentHandler" class="org.lamsfoundation.lams.contentrepository.client.ToolContentHandler">
 		<property name="repositoryService"><ref bean="repositoryService"/></property>
@@ -53,6 +58,9 @@
         </property>
         <property name="peerreviewToolContentHandler">
             <ref bean="peerreviewToolContentHandler"/>
+        </property>
+        <property name="peerreviewOutputFactory">
+            <ref bean="peerreviewOutputFactory"/>
         </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
@@ -109,4 +117,3 @@
         </property>
     </bean>
 </beans>
-

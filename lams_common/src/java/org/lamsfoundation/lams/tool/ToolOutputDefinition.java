@@ -22,13 +22,13 @@
 
 package org.lamsfoundation.lams.tool;
 
-import java.util.List;
-
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
+
+import java.util.List;
 
 /**
  * Each tool that has outputs will define a set of output definitions. Some definitions will be "predefined" for a tool,
@@ -62,6 +62,8 @@ public class ToolOutputDefinition implements Comparable<ToolOutputDefinition> {
     private Object complexDefinition;
     private Boolean showConditionNameOnly;
     private Boolean isDefaultGradebookMark;
+    // whether if changing this output will impact other learners' outputs, for example in Peer Review
+    private Boolean impactsOtherLearners = false;
     private List<BranchCondition> conditions;
     // we need it to filter definitions which other tools can not process; it must be set in the definition, otherwise
     // unsupported values can be passed to the receiving end of the data flow; most methods for creating Output
@@ -208,6 +210,14 @@ public class ToolOutputDefinition implements Comparable<ToolOutputDefinition> {
 
     public void setIsDefaultGradebookMark(Boolean isDefaultGradebookMark) {
 	this.isDefaultGradebookMark = isDefaultGradebookMark;
+    }
+
+    public Boolean getImpactsOtherLearners() {
+	return impactsOtherLearners;
+    }
+
+    public void setImpactsOtherLearners(Boolean impactsOtherLearners) {
+	this.impactsOtherLearners = impactsOtherLearners;
     }
 
     public Class getValueClass() {

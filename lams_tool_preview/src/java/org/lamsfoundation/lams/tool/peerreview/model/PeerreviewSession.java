@@ -23,25 +23,13 @@
 
 package org.lamsfoundation.lams.tool.peerreview.model;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 /**
  * Peerreview Session
  *
  * @author Dapeng Ni
- *
- *
- *
  */
 @Entity
 @Table(name = "tl_laprev11_session")
@@ -72,11 +60,14 @@ public class PeerreviewSession {
     @Column
     private int status;
 
+    @Column(name = "emails_sent")
+    private boolean emailsSent;
+
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+
     /**
-     *
      * @return Returns the learnerID.
      */
     public Long getUid() {
@@ -88,7 +79,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @return
      */
     public Date getSessionEndDate() {
@@ -100,8 +90,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
-     *
      * @return
      */
     public Date getSessionStartDate() {
@@ -113,7 +101,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @return
      */
     public int getStatus() {
@@ -125,7 +112,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @return
      */
     public Peerreview getPeerreview() {
@@ -137,7 +123,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @return
      */
     public Long getSessionId() {
@@ -149,7 +134,6 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @return Returns the session name
      */
     public String getSessionName() {
@@ -157,12 +141,18 @@ public class PeerreviewSession {
     }
 
     /**
-     *
      * @param sessionName
-     *            The session name to set.
+     * 	The session name to set.
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
     }
 
+    public boolean isEmailsSent() {
+	return emailsSent;
+    }
+
+    public void setEmailsSent(boolean emailsSent) {
+	this.emailsSent = emailsSent;
+    }
 }

@@ -142,5 +142,5 @@ public class PeerreviewConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.peerreview";
+    public static final String OUTPUT_NAME_LEARNER_RATING_AVERAGE = "learner.rating.average";
 }

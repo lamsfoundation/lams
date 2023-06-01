@@ -191,7 +191,7 @@ ActivityDefs = {
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.title = title || LABELS.DEFAULT_GROUPING_TITLE;
 		this.readOnly = readOnly;
-		this.groupingType = groupingType || 'random';
+		this.groupingType = groupingType || 'monitor';
 		this.groupDivide = groupDivide || 'groups';
 		this.groupCount = +groupCount || layout.conf.defaultGroupingGroupCount;
 		if (groups && groups.length > this.groupCount) {

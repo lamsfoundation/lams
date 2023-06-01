@@ -23,28 +23,6 @@
 
 package org.lamsfoundation.lams.usermanagement.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.UUID;
-import java.util.Vector;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
@@ -54,19 +32,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
-import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
-import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
-import org.lamsfoundation.lams.usermanagement.IUserDAO;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
-import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.UserOrganisation;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationCollapsed;
-import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.*;
 import org.lamsfoundation.lams.usermanagement.dao.IFavoriteOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
@@ -74,12 +40,7 @@ import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
-import org.lamsfoundation.lams.util.CommonConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
-import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
 import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -87,6 +48,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import java.io.*;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -288,8 +254,9 @@ public class UserManagementService implements IUserManagementService, Initializi
 	}
 
 	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
-	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
-		+ organisationID + " AND r.role.name= '" + roleName + "'";
+	String query =
+		"SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
+			+ organisationID + " AND r.role.name= '" + roleName + "'";
 	List<User> queryResult = baseDAO.find(query);
 
 	for (User user : queryResult) {
@@ -604,8 +571,9 @@ public class UserManagementService implements IUserManagementService, Initializi
 	// get i18n'd message according to server locale
 	String[] tokenisedLocale = LanguageUtil.getDefaultLangCountry();
 	Locale serverLocale = new Locale(tokenisedLocale[0], tokenisedLocale[1]);
-	String runSeqName = messageService.getMessageSource().getMessage(
-		UserManagementService.SEQUENCES_FOLDER_NAME_KEY, new Object[] { workspaceName }, serverLocale);
+	String runSeqName = messageService.getMessageSource()
+		.getMessage(UserManagementService.SEQUENCES_FOLDER_NAME_KEY, new Object[] { workspaceName },
+			serverLocale);
 
 	if ((runSeqName != null) && runSeqName.startsWith("???")) {
 	    log.warn("Problem in the language file - can't find an entry for "
@@ -757,13 +725,6 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    log.debug("added " + user.getLogin() + " to " + org.getName());
 	}
 
-	// if user is to be added to a class, make user a member of parent
-	// course also if not already
-	if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)
-		&& (getUserOrganisation(user.getUserId(), org.getParentOrganisation().getOrganisationId()) == null)) {
-	    setRolesForUserOrganisation(user, org.getParentOrganisation(), rolesList, checkGroupManagerRoles);
-	}
-
 	List<String> rolesCopy = new ArrayList<>();
 	rolesCopy.addAll(rolesList);
 	log.debug("rolesList.size: " + rolesList.size());
@@ -822,6 +783,17 @@ public class UserManagementService implements IUserManagementService, Initializi
 	    // make sure group managers have monitor in each subgroup
 	    checkGroupManager(user, org);
 	}
+
+	// if user is to be added to a class, make user a member of parent
+	// course also if not already
+	if (org.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+	    Set<String> parentOrganisationRoleSet = getUserOrganisationRoles(
+		    org.getParentOrganisation().getOrganisationId(), user.getLogin()).stream()
+		    .map(uor -> uor.getRole().getRoleId().toString()).collect(Collectors.toSet());
+	    parentOrganisationRoleSet.addAll(rolesList);
+	    setRolesForUserOrganisation(user, org.getParentOrganisation(), new ArrayList<>(parentOrganisationRoleSet),
+		    checkGroupManagerRoles);
+	}
     }
 
     private void checkGroupManager(User user, Organisation org) {
@@ -876,8 +848,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 	UserOrganisationRole uor = new UserOrganisationRole(uo, role);
 	save(uor);
 	uo.addUserOrganisationRole(uor);
-	log.debug("setting role: " + uor.getRole().getName() + " in organisation: "
-		+ uor.getUserOrganisation().getOrganisation().getName());
+	log.debug("setting role: " + uor.getRole().getName() + " in organisation: " + uor.getUserOrganisation()
+		.getOrganisation().getName());
 	return uo;
     }
 
@@ -1164,16 +1136,14 @@ public class UserManagementService implements IUserManagementService, Initializi
      * at the same time as retrieving the tool data, rather than making a separate lookup.
      *
      * The return values are the entry for the select clause (will always have a leading space but no trailing comma and
-     * an
-     * alias of luser) and the sql join clause, which should go with any other join clauses.
+     * an alias of luser) and the sql join clause, which should go with any other join clauses.
      *
-     * To convert the portrait id set up the sql -> java object translation using
-     * addScalar("portraitId", IntegerType.INSTANCE)
+     * To convert the portrait id set up the sql -> java object translation using addScalar("portraitId",
+     * IntegerType.INSTANCE)
      *
      * @param userIdString
-     *            User identifier field string e.g. user.user_id
+     * 	User identifier field string e.g. user.user_id
      * @return String[] { partial select string, join clause }
-     *
      */
     @Override
     public String[] getPortraitSQL(String userIdString) {
@@ -1331,8 +1301,8 @@ public class UserManagementService implements IUserManagementService, Initializi
 
     private ILogEventService getLogEventService() {
 	if (UserManagementService.logEventService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
 	    UserManagementService.logEventService = (ILogEventService) ctx.getBean("logEventService");
 	}
 	return UserManagementService.logEventService;
