@@ -208,7 +208,7 @@
 							</c:if>
 						<div class="card-body">
 						<!--The description of the File -->
-							<div class="my-2" id="fileDescription">
+							<div id="fileDescription" aria-label="<fmt:message key='label.learner.fileDescription' />">
 								<lams:out value="${file.fileDescription}" escapeHtml="true" />
 							</div>
 
@@ -225,7 +225,7 @@
 
 						<!--Comments -->
 						<c:if test="${sessionMap.isMarksReleased and not empty file.comments}">
-							<div class="my-2" id="teacherComments">
+							<div class="" id="teacherComments">
 
 									<span class="fw-bold"><fmt:message key="label.learner.comments" />:</span>
 									<br/>
@@ -235,9 +235,8 @@
 
 						<!--Marked file-->
 						<c:if  test="${sessionMap.isMarksReleased and not empty file.markFileUUID}">
+							<div class="mt-2" id="markedFile">
 							<fmt:message key="label.monitor.mark.markedFile" />: <i class="fa fa-download" aria-hidden="true"></i>&nbsp;
-								
-									
 
 									<c:set var="markFileDownloadURL">
 										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
@@ -245,6 +244,7 @@
 									<a id="markedFile" href="${markFileDownloadURL}" title="<fmt:message key='label.monitor.mark.markedFile' />, <fmt:message key='label.download' />" class="">
 										<c:out value="${file.markFileName}" />
 									</a>
+							</div>
 
 						</c:if>
 						</div>
@@ -425,7 +425,6 @@
 				target: Uppy.Dashboard,
 				modes: ['picture']
 			});
-			uppy.use(ScreenCapture, { target: Uppy.Dashboard });
 	
 			uppy.on('upload-success', (file, response) => {
 				// if file name was modified by server, reflect it in Uppy
@@ -461,31 +460,35 @@
 			<c:if test="${sessionMap.minLimitUploadNumber != null}">
 			if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
 				if (${sessionMap.mode eq 'author'}) {
-					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
+					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' +
 							'\n<fmt:message key="label.min.limit.preview"/>');
 				} else {
-					alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+					showToast('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
 					return false;
 				}
 			}
 			</c:if>
+
+			let finishFunction = function(){
+				disableButtons();
+				location.href = tUrl;
+			};			
 	
 			//let user confirm zero files upload
 			if (uploadedFilesNumber == 0) {
 				if (${sessionMap.lockOnFinish}) {
-					if (!confirm("<fmt:message key='learner.finish.without.upload'/>")) {
-						return false;
-					}
+					showConfirm("<fmt:message key='learner.finish.without.upload'/>", finishFunction);
+
 				} else {
-					if (!confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
-						return false;
-					}
-				}
+					showConfirm("<fmt:message key='messsage.learner.finish.confirm'/>", finishFunction);
+
+				}	
+			} else {
+				finishFunction();
 			}
-	
-			disableButtons();
-			location.href = tUrl;
 		}
+
+		
 	
 		function clearFileError(errDivId) {
 			if ( ! errDivId || errDivId.length == 0 ) {
@@ -505,7 +508,7 @@
 				errDiv.append(error);
 				errDiv.css( "display", "block" );
 			} else {
-				alert(error);
+				showToast(error);
 			}
 		}
 	
@@ -541,8 +544,8 @@
 		function deleteLearnerFile(detailId, filename) {
 			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
 			msg = msg.replace('{0}', filename);
-			var answer = confirm(msg);
-			if (answer) {
+			showConfirm(msg, function (){
+
 				$.ajax({
 					url: '<c:url value="/learning/deleteLearnerFile.do"/>',
 					data: 'detailId=' + detailId,
@@ -550,11 +553,12 @@
 						document.location.href = "<lams:WebAppURL />learning/${sessionMap.mode}.do?toolSessionID=${sessionMap.toolSessionID}";
 					},
 					error: function(error){
-						alert("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
-						alert("responseText: "+xhr.responseText);
+						showToast("readyState: "+xhr.readyState+"\nstatus: "+xhr.status);
+						showToast("responseText: "+xhr.responseText);
 					}
 				});
-			}
+			});
+			
 		}
 	</script>	
 </lams:PageLearner>
