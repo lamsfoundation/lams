@@ -258,16 +258,17 @@
 		<!-- reflection -->
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
+			<div class="card shadow-sm">
+				<div class="card-header">
 					<fmt:message key="title.reflection" />
 				</div>
-				<div class="panel-body">
-					<div class="panel">
+				<div class="card-body">
+					<div class="m-2" aria-label="<fmt:message key='monitor.summary.td.notebookInstructions'/>">
 						<lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}" />
 					</div>
+					<hr/>
 
-					<div class="bg-warning" style="padding: 5px">
+					<div class="m-2">
 						<c:choose>
 							<c:when test="${empty learner.reflect}">
 								<p>
@@ -323,7 +324,6 @@
 			</c:if>
 		</div>
 	</div>
-	<div id="footer"></div>
 
 	<script>
 		checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', finish);

@@ -60,7 +60,4 @@
 		</div>
 	</form:form>
 
-	<div id="footer"></div>
-
-
 </lams:PageLearner>
