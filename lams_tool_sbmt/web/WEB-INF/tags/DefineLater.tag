@@ -49,18 +49,12 @@
 	<c:set var="buttonTryAgainKey" value="button.try.again" />
 </c:if>
 
-<div class="row no-gutter">
-	<div
-		class="col-12 col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
-		<div class="alert alert-info">
-			<fmt:message key="${defineLaterMessageKey}" />
-		</div>
-	</div>
+<div class="alert alert-info shadow">
+	<fmt:message key="${defineLaterMessageKey}" />
 </div>
-<div class="row no-gutter">
-	<div class="col-12 col-xs-12">
-		<a href="javascript:location.reload(true);"
-			class="btn btn-primary pull-right voffset5"><fmt:message
-				key="${buttonTryAgainKey}" /></a>
-	</div>
+
+<div class="activity-bottom-buttons">
+	<a id="finishButton" href="javascript:location.reload(true);" class="btn btn-primary mt-3">
+		<fmt:message key="${buttonTryAgainKey}" />
+	</a>
 </div>

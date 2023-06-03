@@ -131,7 +131,7 @@
     flex-direction: row-reverse;
 }
 
-.component-page-wrapper #finishButton {
+.activity-bottom-buttons button, .activity-bottom-buttons a  {
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 

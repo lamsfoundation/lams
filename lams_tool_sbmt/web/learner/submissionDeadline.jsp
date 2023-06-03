@@ -15,7 +15,7 @@
 		}
 	</script>
 
-	<div class="container-xxl">
+	<div class="container-lg">
 		<lams:Alert5 id="submissionDeadline" close="false" type="danger">
 			<fmt:message key="authoring.info.teacher.set.restriction">
 				<fmt:param>

@@ -13,7 +13,7 @@
 			<hr class="mx-5">
 		</div>
 	</div>
-	<div class="container-xxl">
+	<div class="container-lg">
 		<div class="row">
 			<div class="col-12">
 				<div class="card lcard lcard-no-borders shadow mb-3">

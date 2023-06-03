@@ -41,7 +41,7 @@
 		<c:out value="${sessionMap.instruction}" escapeXml="false" />
 	</div>
 
-	<div class="container-xxl">
+	<div class="container-lg">
 		<div class="row">
 			<div class="col-12 text-primary">
 				<hr class="mx-5">
@@ -130,7 +130,7 @@
 
 							<!--File Description -->
 							<div class="form-floating m-3">
-								<form:textarea id="description" aria-multiline="true" aria-required="true" required="true" cssClass="form-control" path="description" placeholder="-"></form:textarea>
+								<form:textarea style="height: 80px" id="description" aria-multiline="true" aria-required="true" required="true" cssClass="form-control" path="description" placeholder="-"></form:textarea>
 								<label for="description"><fmt:message key="label.learner.fileDescription" /></label>
 								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
 							</div>
