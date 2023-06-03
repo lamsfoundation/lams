@@ -24,7 +24,7 @@
 	</div>
 	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
 
-		<div class="container-xxl">
+		<div class="container-lg">
 			<div class="row">
 				<div class="col-12">
 
