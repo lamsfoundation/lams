@@ -42,72 +42,71 @@
 	</div>
 
 	<div class="container-lg">
-		<div class="row">
-			<div class="col-12 text-primary">
-				<hr class="mx-5">
-				<!-- notices and announcements -->
-				<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
-					<c:if test="${sessionMap.lockOnFinish} && ${sessionMap.userFinished}">
-						<!--  Lock when finished -->
-						<lams:Alert5 id="lockWhenFinished" type="info">
-							<fmt:message key="message.activityLocked" />
-						</lams:Alert5>
-					</c:if>
-
-					<c:if test="${not empty sessionMap.submissionDeadline}">
-						<lams:Alert5 id="submissionDeadline" type="warning" >
-							<fmt:message key="authoring.info.teacher.set.restriction">
-								<fmt:param>
-									<lams:Date value="${sessionMap.submissionDeadline}" />
-								</fmt:param>
-							</fmt:message>
-						</lams:Alert5>
-					</c:if>
-
-					<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
-						<c:choose>
-							<c:when test="${sessionMap.minLimitUploadNumber != null && sessionMap.isMaxLimitUploadEnabled}">
-								<c:set var="fileRestrictions">
-									<fmt:message key="label.learner.upload.restrictions"/>: 
-									<fmt:message key="label.should.upload.another">
-										<fmt:param value="${sessionMap.minLimitUploadNumber}" />
-									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.and"/>&nbsp;<fmt:message key="message.left.upload.limit">
-										<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
-									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
-								</c:set>
-							</c:when>
-							<c:when test="${sessionMap.minLimitUploadNumber != null}">
-								<c:set var="fileRestrictions">
-									<fmt:message key="label.learner.upload.restrictions"/>: 
-									<fmt:message key="label.should.upload.another">
-										<fmt:param value="${sessionMap.minLimitUploadNumber}" />
-									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
-								</c:set>
-							</c:when>
-							<c:when test="${sessionMap.isMaxLimitUploadEnabled}">
-								<c:set var="fileRestrictions">
-									<fmt:message key="label.learner.upload.restrictions"/>: 
-									<fmt:message key="message.left.upload.limit">
-										<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
-									</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
-								</c:set>
-							</c:when>						
-						</c:choose>
-						<c:if test="${not empty fileRestrictions}">
-							<lams:Alert5 id="minLimitUploadNumber" close="true" type="warning">
-								<c:out value="${fileRestrictions}" escapeXml="false" /> 
-							</lams:Alert5>	
-						</c:if>
-
-					</c:if>
+		<hr class="mx-5 text-primary">
+		<div id="notices">
+		<!-- notices and announcements -->
+			<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
+				<c:if test="${sessionMap.lockOnFinish} && ${sessionMap.userFinished}">
+					<!--  Lock when finished -->
+					<lams:Alert5 id="lockWhenFinished" type="info">
+						<fmt:message key="message.activityLocked" />
+					</lams:Alert5>
 				</c:if>
-				<lams:errors5/>
 
-			</div>
+				<c:if test="${not empty sessionMap.submissionDeadline}">
+					<lams:Alert5 id="submissionDeadline" type="warning" >
+						<fmt:message key="authoring.info.teacher.set.restriction">
+							<fmt:param>
+								<lams:Date value="${sessionMap.submissionDeadline}" />
+							</fmt:param>
+						</fmt:message>
+					</lams:Alert5>
+				</c:if>
+
+				<c:if test="${not sessionMap.userFinished || not sessionMap.lockOnFinish}">
+					<c:choose>
+						<c:when test="${sessionMap.minLimitUploadNumber != null && sessionMap.isMaxLimitUploadEnabled}">
+							<c:set var="fileRestrictions">
+								<fmt:message key="label.learner.upload.restrictions"/>: 
+								<fmt:message key="label.should.upload.another">
+									<fmt:param value="${sessionMap.minLimitUploadNumber}" />
+								</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.and"/>&nbsp;<fmt:message key="message.left.upload.limit">
+									<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
+								</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+							</c:set>
+						</c:when>
+						<c:when test="${sessionMap.minLimitUploadNumber != null}">
+							<c:set var="fileRestrictions">
+								<fmt:message key="label.learner.upload.restrictions"/>: 
+								<fmt:message key="label.should.upload.another">
+									<fmt:param value="${sessionMap.minLimitUploadNumber}" />
+								</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+							</c:set>
+						</c:when>
+						<c:when test="${sessionMap.isMaxLimitUploadEnabled}">
+							<c:set var="fileRestrictions">
+								<fmt:message key="label.learner.upload.restrictions"/>: 
+								<fmt:message key="message.left.upload.limit">
+									<fmt:param value="${sessionMap.maxLimitUploadNumber}" />
+								</fmt:message>&nbsp;<fmt:message key="label.learner.upload.restrictions.files"/>
+							</c:set>
+						</c:when>						
+					</c:choose>
+					<c:if test="${not empty fileRestrictions}">
+						<lams:Alert5 id="minLimitUploadNumber" close="true" type="warning">
+							<c:out value="${fileRestrictions}" escapeXml="false" /> 
+						</lams:Alert5>	
+					</c:if>
+
+				</c:if>
+			</c:if>
 		</div>
 
-		<div class="row">
-			<div class="col-12">
+		<div id="errors">
+			<lams:errors5/>
+		</div>
+
+		<div id="uploader">
 			<!-- upload form (we display it only if the user is not finished and lockedWhenFinished or no more files allowed) -->
 			<c:if test="${!sessionMap.finishLock && !sessionMap.maxLimitReached && hasEditRight && sessionMap.mode != 'teacher'}">
 				<form:form action="uploadFile.do" modelAttribute="learnerForm" id="learnerForm" method="post" enctype="multipart/form-data" onsubmit="return validateFileUpload();" >
@@ -160,12 +159,12 @@
 				<hr/>
 			</c:if>
 			<!-- end div uppy form-->
-			</div>
 		</div>
 
 
 
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
+		<div id="submittedFiles">
 		<c:choose>
 			<c:when test="${empty learner.filesUploaded && hasEditRight}">
 				<div class="alert">
@@ -174,7 +173,7 @@
 			</c:when>
 
 			<c:otherwise>
-				<h4 id="submittedFiles" class="mt-5">
+				<h4 class="mt-5">
 					<fmt:message key="monitoring.user.submittedFiles" />
 				</h4>
 				<small class="text-muted"><c:out value="${fn:length(learner.filesUploaded)}" />&nbsp;<fmt:message key="label.files" /></small>
@@ -191,17 +190,18 @@
 									<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;<a class="fw-bold" href="${downloadURL}" aria-label="<fmt:message key="label.download" />"><c:out value="${file.filePath}" /></a>
 									<div class="float-end">
 										<c:if test="${empty file.marks && hasEditRight}">
-											<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-primary btn-disable-on-submit">
+											<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-primary btn-disable-on-submit" 
+											title="<fmt:message key="label.monitoring.original.learner.file.delete"/>">
 												<i class="fa fa-trash" aria-label="<fmt:message key="label.monitoring.original.learner.file.delete"/>"></i>
 											</a>
 										</c:if>
 
-										<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit ">
-											<i class="fa fa-download" title="<fmt:message key="label.download" />" aria-label="<fmt:message key="label.download" />"></i>
+										<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit " title="<fmt:message key="label.download" />" >
+											<i class="fa fa-download" aria-label="<fmt:message key="label.download" />"></i>
 										</a>
 									</div>
 									<br>
-									<small class="text-muted">
+									<small>
 										<fmt:message key="label.learner.time" />&nbsp;<lams:Date value="${file.dateOfSubmission}" timeago="true"/>									
 									</small>
 								</div>
@@ -254,11 +254,13 @@
 
 			</c:otherwise>
 		</c:choose>
+		</div>
 
 		<!-- reflection -->
 
+		<div id="reflection">
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="card shadow-sm">
+			<div class="card shadow-sm mt-5">
 				<div class="card-header">
 					<fmt:message key="title.reflection" />
 				</div>
@@ -293,6 +295,7 @@
 				</div>
 			</div>
 		</c:if>
+		</div>
 
 		<!-- submit buttons -->
 		<div class="activity-bottom-buttons">

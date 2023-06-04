@@ -8,46 +8,40 @@
 	<div id="instructions" class="instructions">
 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 	</div>
-	<div class="row">
-		<div class="col-12 text-primary">
-			<hr class="mx-5">
-		</div>
-	</div>
+	<hr class="mx-5">
 	<div class="container-lg">
-		<div class="row">
-			<div class="col-12">
-				<div class="card lcard lcard-no-borders shadow mb-3">
-					<div class="card-header lcard-header-button-border">
-						<fmt:message key="${waitingMessageKey}" />
+
+		<div class="card lcard lcard-no-borders shadow mb-3">
+			<div class="card-header lcard-header-button-border">
+				<fmt:message key="${waitingMessageKey}" />
+			</div>
+			<div class="card-body mb-3">
+				<c:if test="${not empty groupUsers}">
+
+					<div class="mb-2">
+						<fmt:message key="label.users.from.group" />
 					</div>
-					<div class="card-body mb-3">
-						<c:if test="${not empty groupUsers}">
-		
-							<div class="mb-2">
-								<fmt:message key="label.users.from.group" />
+					
+					<div id="usersInGroup" class="row mt-2" role="list">
+						<c:forEach var="user" items="${groupUsers}">
+							<div role="listitem" class="col-md-4 my-2 text-md-start">
+								<lams:Portrait userId="${user.userID}"/>
+								<span>
+									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+								</span>
 							</div>
-							
-							<div id="usersInGroup" class="row mt-2" role="list">
-								<c:forEach var="user" items="${groupUsers}">
-									<div role="listitem" class="col-md-4 my-2 text-md-start">
-										<lams:Portrait userId="${user.userID}"/>
-										<span>
-											<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-										</span>
-									</div>
-								</c:forEach>
-							</div>
-							
-						</c:if>
+						</c:forEach>
 					</div>
-				</div>
-				<div class="activity-bottom-buttons">
-					<button id="finishButton" name="refreshButton" onclick="refresh();" class="btn btn-primary">
-						<fmt:message key="label.refresh" />
-					</button>
-				</div>
+					
+				</c:if>
 			</div>
 		</div>
+		<div class="activity-bottom-buttons">
+			<button id="finishButton" name="refreshButton" onclick="refresh();" class="btn btn-primary">
+				<fmt:message key="label.refresh" />
+			</button>
+		</div>
+
 	</div>				
 	<script type="text/javascript">
 		function refresh() {
