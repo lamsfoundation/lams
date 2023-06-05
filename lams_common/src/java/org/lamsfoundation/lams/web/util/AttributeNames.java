@@ -100,4 +100,7 @@ public class AttributeNames {
     public static final String ATTR_COUNT_RATED_ITEMS = "countRatedItems";
 
     public static final String PARAM_TOOL_CONTENT_HANDLER_NAME = "toolContentHandler";
+
+    // AI stuff
+    public static final String ATTR_IS_AI_ENABLED = "isAiEnabled";
 }

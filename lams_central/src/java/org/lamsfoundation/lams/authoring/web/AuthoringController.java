@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.exception.WorkspaceFolderException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -136,9 +137,12 @@ public class AuthoringController {
 	request.setAttribute("access", JsonUtil.toString(accessList));
 	request.setAttribute("licenses", authoringService.getAvailableLicenses());
 
-	boolean canSetReadOnly = userManagementService.isUserAppAdmin()
-		|| userManagementService.isUserGlobalGroupManager();
+	boolean canSetReadOnly =
+		userManagementService.isUserAppAdmin() || userManagementService.isUserGlobalGroupManager();
 	request.setAttribute("canSetReadOnly", canSetReadOnly);
+
+	boolean aiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	request.setAttribute(AttributeNames.ATTR_IS_AI_ENABLED, aiEnabled);
 
 	return "authoring/authoring";
     }
@@ -223,8 +227,8 @@ public class AuthoringController {
 	try {
 	    authoringService.finishEditOnFly(learningDesignID, getUserId(), cancelled);
 	} catch (Exception e) {
-	    String errorMsg = "Error occured ending EditOnFly" + e.getMessage() + " learning design id "
-		    + learningDesignID;
+	    String errorMsg =
+		    "Error occured ending EditOnFly" + e.getMessage() + " learning design id " + learningDesignID;
 	    log.error(errorMsg, e);
 	    throw new IOException(e);
 	}
@@ -320,8 +324,8 @@ public class AuthoringController {
 	    // if learning library ID is not set explicitly, derive it from tool
 	    learningLibraryID = tool.getLearningLibraryId();
 	}
-	WebApplicationContext wac = WebApplicationContextUtils
-		.getRequiredWebApplicationContext(applicationContext.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		applicationContext.getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
 	if (title == null || title.trim().length() == 0) {
@@ -419,8 +423,7 @@ public class AuthoringController {
     }
 
     /**
-     * Updates an existing activity coordinates.
-     * It is run when SVG gets recreated in Monitoring or Add Lesson dialog
+     * Updates an existing activity coordinates. It is run when SVG gets recreated in Monitoring or Add Lesson dialog
      * and activities need to be rearranged as one of them is a branching designed in the old Flash Authoring.
      */
     @ResponseBody
