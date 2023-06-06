@@ -586,7 +586,8 @@ var MenuLib = {
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog
-					$('iframe', dialog).attr('id','aiWizardModal').attr('src', LAMS_URL + 'ai/authoring/wizard.do').on('load', function(){
+					$('iframe', dialog).attr('id','aiWizardModal')
+						.attr('src', LAMS_URL + 'ai/authoring/lessonWizard.do').on('load', function(){
 						// override the close function so it works with the dialog, not window
 						this.contentWindow.closeWindow = function(){
 							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
