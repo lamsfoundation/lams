@@ -173,21 +173,21 @@
 			</c:when>
 
 			<c:otherwise>
-				<h4 class="mt-5">
+				<h3 class="mt-5">
 					<fmt:message key="monitoring.user.submittedFiles" />
-				</h4>
+				</h3>
 				<small class="text-muted"><c:out value="${fn:length(learner.filesUploaded)}" />&nbsp;<fmt:message key="label.files" /></small>
 
 				<div role="list" class="mt-2 px-4" aria-labelledby="submittedFiles">
 					<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
-						<div role="listitem" class="card my-3">
+						<div role="listitem" class="card lcard lcard-no-borders shadow mb-3 my-4">
 						<!--The name of the File -->
 							<c:if test="${file.currentLearner}">
-								<div class="card-header">
+								<div class="card-header ">
 									<c:set var="downloadURL">
 										<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
 									</c:set>
-									<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;<a class="fw-bold" href="${downloadURL}" aria-label="<fmt:message key="label.download" />"><c:out value="${file.filePath}" /></a>
+									<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;<a class="fw-bold" style="color: var(--bs-link-hover-color)" href="${downloadURL}" aria-label="<fmt:message key="label.download" />"><c:out value="${file.filePath}" /></a>
 									<div class="float-end">
 										<c:if test="${empty file.marks && hasEditRight}">
 											<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-primary btn-disable-on-submit" 
@@ -196,7 +196,7 @@
 											</a>
 										</c:if>
 
-										<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit " title="<fmt:message key="label.download" />" >
+										<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit" title="<fmt:message key="label.download" />" >
 											<i class="fa fa-download" aria-label="<fmt:message key="label.download" />"></i>
 										</a>
 									</div>
