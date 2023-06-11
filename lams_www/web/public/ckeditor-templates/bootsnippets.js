@@ -256,7 +256,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="container">' +
 		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
-		'		<img class="img-responsive" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
+		'		<img class="img-responsive" style="margin: auto" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
 		'		</div>' +
