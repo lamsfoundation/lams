@@ -387,7 +387,6 @@ function showConfirm(body, callback) {
 }
 
 function showToast(text) {
-	debugger
 	let toast = $('#toast-template').clone().attr('id', null).appendTo('#toast-container');
 	toast.find('.toast-body', toast).text(text);
 	toast = new bootstrap.Toast(toast[0]);

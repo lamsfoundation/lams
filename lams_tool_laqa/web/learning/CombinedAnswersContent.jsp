@@ -18,11 +18,11 @@
 							<c:out value="${questionEntry.value.description}" escapeXml="false" />
 						</div>
 					</c:if>
-				
+
 					<div class="answer-req text-end">
 						<c:if test="${questionEntry.value.required}">
 							<span class="badge text-bg-danger"><fmt:message key="label.required" /></span>
-						</c:if> 
+						</c:if>
 
 						<c:if test="${questionEntry.value.minWordsLimit != 0}">
 						<span class="badge text-bg-primary">
@@ -33,39 +33,39 @@
 					</div>
 
 					<div class="my-2" id="answerResponse">
-					<c:choose>
-						<c:when test="${hasEditRight}">
-							<label id="yourAnswer" class="d-none"><fmt:message key="label.learning.yourAnswer" /></label>
-							<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
-							<div data-sequence-id="${questionEntry.key}"
-								data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
-								data-min-words-limit="${questionEntry.value.minWordsLimit}"
-								<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
-								<c:choose>
-									<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
-										<lams:CKEditor id="answer${questionEntry.key}"
-											value="${answerEntry.value}" 
-											contentFolderID="${sessionMap.learnerContentFolder}"
-											toolbarSet="DefaultLearner">
-										</lams:CKEditor>
-									</c:when>
+						<c:choose>
+							<c:when test="${hasEditRight}">
+								<label id="yourAnswer" class="d-none"><fmt:message key="label.learning.yourAnswer" /></label>
+								<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
+								<div data-sequence-id="${questionEntry.key}"
+									 data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+									 data-min-words-limit="${questionEntry.value.minWordsLimit}"
+									 <c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
+									<c:choose>
+										<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
+											<lams:CKEditor id="answer${questionEntry.key}"
+														   value="${answerEntry.value}"
+														   contentFolderID="${sessionMap.learnerContentFolder}"
+														   toolbarSet="DefaultLearner">
+											</lams:CKEditor>
+										</c:when>
 
-									<c:otherwise>
-										<lams:textarea name="answer${questionEntry.key}"
-											id="answer${questionEntry.key}" rows="5" placeholder="${placeholder}" aria-labelledby="yourAnswer"
-											class="form-control"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
-									</c:otherwise>
-								</c:choose>
-							</div>
-						</c:when>
+										<c:otherwise>
+											<lams:textarea name="answer${questionEntry.key}"
+														   id="answer${questionEntry.key}" rows="5" placeholder="${placeholder}" aria-labelledby="yourAnswer"
+														   class="form-control"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
+										</c:otherwise>
+									</c:choose>
+								</div>
+							</c:when>
 
-						<c:otherwise>
-							<lams:textarea name="answer${questionEntry.key}" rows="5"
-								class="form-control" disabled="disabled">
-								<c:out value='${answerEntry.value}' escapeXml='false' />
-							</lams:textarea>
-						</c:otherwise>
-					</c:choose>
+							<c:otherwise>
+								<lams:textarea name="answer${questionEntry.key}" rows="5"
+											   class="form-control" disabled="disabled">
+									<c:out value='${answerEntry.value}' escapeXml='false' />
+								</lams:textarea>
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 			</div>
@@ -78,7 +78,7 @@
 <c:if test="${hasEditRight}">
 	<div class="activity-bottom-buttons">
 		<button name="btnCombined" type="button" class="btn btn-primary mt-2"
-			onclick="javascript:submitMethod('submitAnswersContent');">
+				onclick="javascript:submitMethod('submitAnswersContent');">
 			<fmt:message key="button.submitAllContent" />
 		</button>
 	</div>

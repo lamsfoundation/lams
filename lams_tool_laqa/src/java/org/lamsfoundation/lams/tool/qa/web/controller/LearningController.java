@@ -178,6 +178,7 @@ public class LearningController implements QaAppConstants {
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ATTR_CONTENT, qaContent);
 	sessionMap.put(AttributeNames.USER, user);
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
 	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
