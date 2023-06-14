@@ -224,7 +224,7 @@ public class MonitoringController {
 		displayStudentChoices = false;
 	    }
 
-	    if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		vsaPresent = true;
 	    }
 	}

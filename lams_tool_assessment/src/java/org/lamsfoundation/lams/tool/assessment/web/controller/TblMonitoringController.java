@@ -71,6 +71,13 @@ public class TblMonitoringController {
 	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		request.setAttribute("vsaPresent", true);
+		break;
+	    }
+	}
+
 	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
 
@@ -211,8 +218,8 @@ public class TblMonitoringController {
     @RequestMapping("aesStudentChoicesTable")
     public String aesStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController
-		.getTblAssessmentQuestionDtos(toolContentId, false, assessmentService);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController.getTblAssessmentQuestionDtos(
+		toolContentId, false, assessmentService);
 
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
@@ -235,8 +242,8 @@ public class TblMonitoringController {
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
 	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto
-		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+	    tblQuestionDto.setQuestionTypeLabel(
+		    AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
 	    tblQuestionDto.setCorrectAnswer(TblMonitoringController.getAssessmentCorrectAnswer(questionDto));
 
 	    tblQuestionDtos.add(tblQuestionDto);
@@ -267,8 +274,7 @@ public class TblMonitoringController {
 	    }
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
-	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
-		    .getQuestionResultsPerSession()) {
+	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary.getQuestionResultsPerSession()) {
 
 		TblAssessmentQuestionResultDTO tblQuestionResultDto = new TblAssessmentQuestionResultDTO();
 		String answer = "";
@@ -303,8 +309,8 @@ public class TblMonitoringController {
 				}
 			    }
 			} else {
-			    correct = questionResult.getPenalty() + questionResult.getMark() + 0.1 >= questionResult
-				    .getMaxMark();
+			    correct = questionResult.getPenalty() + questionResult.getMark() + 0.1
+				    >= questionResult.getMaxMark();
 			}
 		    }
 
