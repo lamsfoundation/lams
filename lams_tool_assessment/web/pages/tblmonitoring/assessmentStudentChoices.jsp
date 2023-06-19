@@ -55,7 +55,7 @@
 	COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
 	
 	$(document).ready(function(){
-		drawCompletionCharts(${toolContentID}, ${groupsInAnsweredQuestionsChart}, true);
+		drawCompletionCharts(${toolContentID}, true);
 
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});

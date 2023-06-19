@@ -1,33 +1,11 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionResultDTO;
-import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
-import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.dto.*;
+import org.lamsfoundation.lams.tool.assessment.model.*;
 import org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
@@ -40,6 +18,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Controller
 @RequestMapping("/tblmonitoring")
@@ -105,7 +86,7 @@ public class TblMonitoringController {
 	request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 	request.setAttribute("vsaPresent", vsaPresent);
 
-	int totalNumberOfUsers = assessmentService.getCountUsersByContentId(toolContentId);
+	int totalNumberOfUsers = assessmentService.getCountLearnersByContentId(toolContentId);
 	if (totalNumberOfUsers > 0) {
 	    for (QuestionDTO questionDto : questionDtos) {
 
@@ -122,7 +103,6 @@ public class TblMonitoringController {
 	request.setAttribute("questions", questionDtos);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
 
@@ -143,7 +123,7 @@ public class TblMonitoringController {
 
 	    TblAssessmentDTO assessmentDto = new TblAssessmentDTO();
 
-	    int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	    int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	    assessmentDto.setAttemptedLearnersNumber(attemptedLearnersNumber);
 	    assessmentDto.setActivityTitle(activityTitle);
 
@@ -189,7 +169,7 @@ public class TblMonitoringController {
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("allowDiscloseAnswers", assessment.isAllowDiscloseAnswers());
 
-	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	return "pages/tblmonitoring/assessment";
@@ -272,7 +252,6 @@ public class TblMonitoringController {
 	request.setAttribute("sessions", sessions);
 	request.setAttribute("questionDtos", tblQuestionDtos);
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
 	request.setAttribute("isTbl", true);
 

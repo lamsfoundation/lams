@@ -22,12 +22,12 @@
 
 package org.lamsfoundation.lams.tool.assessment.dao;
 
-import java.util.List;
-import java.util.Map;
-
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+
+import java.util.List;
+import java.util.Map;
 
 public interface AssessmentResultDAO extends DAO {
 
@@ -81,8 +81,6 @@ public interface AssessmentResultDAO extends DAO {
      */
     List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId);
 
-    int countLastFinishedAssessmentResults(long contentId);
-
     List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId);
 
     /**
@@ -107,5 +105,7 @@ public interface AssessmentResultDAO extends DAO {
      */
     int countAttemptsPerOption(Long toolContentId, Long optionUid, boolean finishedAttemptsOnly);
 
-    Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId);
+    Map<Integer, List<String[]>> getAnsweredQuestionsByUsersForCompletionChart(long toolContentId);
+
+    List<Object[]> getLearnersWithFinishedCurrentAttemptForCompletionChart(Long contentId);
 }
