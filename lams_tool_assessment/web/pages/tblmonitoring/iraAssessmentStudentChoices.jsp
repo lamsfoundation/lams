@@ -42,9 +42,7 @@
 
 			activityCompletionChart = null,
 			answeredQuestionsChart = null,
-			// do not refresh charts automatically
-			// they will be redrawn on page auto reload
-			COMPLETION_CHART_UPDATE_INTERVAL = 0;
+			pageInitialised = false;
 
 	$(document).ready(function(){
 		openEventSource('<lams:WebAppURL />monitoring/getCompletionChartsData.do?toolContentId=${toolContentID}', function(event) {
@@ -54,7 +52,7 @@
 
 			let data = JSON.parse(decodeURIComponent(event.data));
 			drawActivityCompletionChart(data, true);
-			drawAnsweredQuestionsChart(data, ${groupsInAnsweredQuestionsChart}, true);
+			drawAnsweredQuestionsChart(data, true);
 
 			// if in student choice table a question modal is open, postpone the table update until the modal is closed
 			let openQuestionModal = $('.iraQuestionModal.show');
@@ -134,7 +132,6 @@
 	<%-- Include student's choices part --%>
 	<div class="row">
 		<div class="col-10 offset-1" id="student-choices-table">
-			<%@ include file="/pages/monitoring/parts/mcqStudentChoices5.jsp" %>
 		</div>
 	</div>
 

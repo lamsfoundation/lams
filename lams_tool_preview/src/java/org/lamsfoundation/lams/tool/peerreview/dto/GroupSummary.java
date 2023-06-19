@@ -57,7 +57,7 @@ public class GroupSummary implements Comparable<GroupSummary> {
 	String name1 = this.sessionName.replaceAll("\\D+", "");
 	String name2 = o.sessionName.replaceAll("\\D+", "");
 	if (name1.length() == 0 || name2.length() == 0) {
-	    return name1.compareTo(name2);
+	    return this.sessionName.compareTo(o.sessionName);
 	}
 	Long num1 = Long.parseLong(name1);
 	Long num2 = Long.parseLong(name2);
