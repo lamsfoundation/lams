@@ -152,6 +152,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import reactor.core.publisher.Flux;
 
+import javax.swing.text.AbstractDocument;
+
 /**
  * @author Andrey Balan
  */
@@ -207,9 +209,13 @@ public class AssessmentServiceImpl
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, null,
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null,
 		(Long toolContentId) -> UriUtils.encode(getCompletionChartsData(toolContentId),
 			StandardCharsets.UTF_8.toString()), FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.bindSink(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME,
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
+	FluxRegistry.bindSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
     }
 
     // *******************************************************************************
@@ -1343,6 +1349,9 @@ public class AssessmentServiceImpl
 	} catch (ToolException e) {
 	    throw new AssessmentApplicationException(e);
 	}
+
+	FluxRegistry.emit(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME, assessment.getContentId());
+
 	return nextUrl;
     }
 

@@ -153,7 +153,6 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		    + "         JOIN      lams_user              	AS u	USING (user_id)"
 		    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
 		    + "	WHERE ar.latest = 1 AND ar.finish_date IS NOT NULL"
-		    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
 		    + "		AND   a.content_id = :toolContentId"
 		    + "	ORDER BY user_name";
 
