@@ -145,31 +145,17 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
 
     private static final String FINISHED_LEARNERS_FOR_COMPLETION_CHART =
-	    "SELECT user_id, portrait_uuid, user_name, group_name, SUM(IF((type = 1 AND answer_boolean = 1) OR"
-		    + "			(type = 2 AND answer_int <> -1) OR"
-		    + "			((type BETWEEN 3 AND 6) AND (answer IS NOT NULL AND TRIM(answer) <> '')) OR"
-		    + "			(type = 7 AND mark > 0) OR          "
-		    + "			(type = 8 AND answer_int > 0)"
-		    + "			,1, 0)) AS answered_question_count FROM"
-		    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
-		    + "		 	s.session_name AS group_name, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
+	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name, "
+		    + "  s.session_name AS group_name"
 		    + "         FROM      tl_laasse10_assessment        AS a"
 		    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
 		    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
 		    + "         JOIN      lams_user              	AS u	USING (user_id)"
 		    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
-		    + "		JOIN      tl_laasse10_question_result   AS qr   ON ar.uid = qr.result_uid"
-		    + "		LEFT JOIN lams_qb_tool_answer           AS qbta ON qbta.answer_uid = qr.uid"
-		    + "		LEFT JOIN lams_qb_tool_question         AS qbtq USING (tool_question_uid)"
-		    + "		LEFT JOIN lams_qb_question              AS qbq  ON qbq.uid = qbtq.qb_question_uid"
-		    + "		LEFT JOIN tl_laasse10_option_answer     AS oa"
-		    + "			ON oa.question_result_uid = qr.uid"
-		    + "			AND  ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '')"
-		    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR (qbq.type = 2 AND answer_int <> -1))"
-		    + "		WHERE ar.latest = 1"
+		    + "	WHERE ar.latest = 1 AND ar.finish_date IS NOT NULL"
 		    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
 		    + "		AND   a.content_id = :toolContentId"
-		    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
+		    + "	ORDER BY user_name";
 
     @Override
     @SuppressWarnings("unchecked")
