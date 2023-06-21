@@ -925,7 +925,7 @@ public class MonitoringController {
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	assessment.setRelativeTimeLimit(relativeTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null
+	assessment.setAbsoluteTimeLimitFinish(absoluteTimeLimit == null
 		? null
 		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);

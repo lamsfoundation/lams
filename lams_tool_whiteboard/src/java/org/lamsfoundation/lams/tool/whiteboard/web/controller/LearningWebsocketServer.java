@@ -49,7 +49,7 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
 
-	existingTimeSettings.absoluteTimeLimit = whiteboard.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = whiteboard.getAbsoluteTimeLimit();
 	existingTimeSettings.relativeTimeLimit = whiteboard.getRelativeTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = whiteboard.getTimeLimitAdjustments();
 

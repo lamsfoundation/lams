@@ -8,7 +8,7 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${assessment.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${assessment.absoluteTimeLimitSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
 	<c:param name="isTbl" value="false" />
 	<c:param name="controllerContext" value="tool/laasse10/monitoring" />

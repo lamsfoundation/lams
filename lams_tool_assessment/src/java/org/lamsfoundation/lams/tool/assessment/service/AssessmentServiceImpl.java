@@ -63,7 +63,6 @@ import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -151,8 +150,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import reactor.core.publisher.Flux;
-
-import javax.swing.text.AbstractDocument;
 
 /**
  * @author Andrey Balan
@@ -351,6 +348,12 @@ public class AssessmentServiceImpl
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
+	int learnersStarted = assessmentUserDao.getCountLearnersByContentId(toolContentId, null);
+	if (learnersStarted == 1 && assessment.getRelativeTimeLimit() == 0 && assessment.getAbsoluteTimeLimit() > 0
+		&& assessment.getAbsoluteTimeLimitFinish() == null) {
+	    assessment.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(assessment.getAbsoluteTimeLimit()));
+	    assessmentDao.saveObject(assessment);
+	}
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), Long.valueOf(userId));
 	if (lastResult == null) {
 	    return null;
@@ -3170,7 +3173,7 @@ public class AssessmentServiceImpl
 	}
 	// do not export time limits if the LD gets exported from a running sequence
 	toolContentObj.setTimeLimitAdjustments(null);
-	toolContentObj.setAbsoluteTimeLimit(null);
+	toolContentObj.setAbsoluteTimeLimitFinish(null);
 
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,

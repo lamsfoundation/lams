@@ -37,18 +37,16 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Controls activity time limits.
- * Can be used in tools to set relative and absolute time limits for learners.
+ * Controls activity time limits. Can be used in tools to set relative and absolute time limits for learners.
  *
  * @author Marcin Cieslak
  */
 public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointConfig.Configurator {
 
     /**
-     * By default Endpoint instances are created for each request.
-     * We need persistent data to cache time settings.
-     * We can not use static fields as each subclass needs to have own set of fields.
-     * This class registers and retrieves Endpoints as singletons.
+     * By default Endpoint instances are created for each request. We need persistent data to cache time settings. We
+     * can not use static fields as each subclass needs to have own set of fields. This class registers and retrieves
+     * Endpoints as singletons.
      */
     public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
 	private static final Map<String, AbstractTimeLimitWebsocketServer> TIME_LIMIT_ENDPOINT_INSTANCES = new ConcurrentHashMap<>();
@@ -58,8 +56,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
 
 	    // is there an instance already
-	    AbstractTimeLimitWebsocketServer instance = AbstractTimeLimitWebsocketServer
-		    .getInstance(endpointClass.getName());
+	    AbstractTimeLimitWebsocketServer instance = AbstractTimeLimitWebsocketServer.getInstance(
+		    endpointClass.getName());
 	    if (instance == null) {
 		// every subclass must have a static getInstance() method
 		try {
@@ -77,7 +75,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 
     protected static class TimeCache {
 	public int relativeTimeLimit;
-	public LocalDateTime absoluteTimeLimit;
+	public int absoluteTimeLimit;
+	public LocalDateTime absoluteTimeLimitFinish;
 	// mapping of user ID (not UID) and when the learner entered the activity
 	public final Map<Integer, LocalDateTime> timeLimitLaunchedDate = new ConcurrentHashMap<>();
 	public Map<Integer, Integer> timeLimitAdjustment = new HashMap<>();
@@ -142,8 +141,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	executor.scheduleAtFixedRate(sendWorker, 0, CHECK_INTERVAL, TimeUnit.SECONDS);
 
 	if (userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    userManagementService = (IUserManagementService) wac.getBean("userManagementService");
 	}
     }
@@ -160,8 +159,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     protected static void registerInstance(AbstractTimeLimitWebsocketServer instance) {
 	String endpointClassName = instance.getClass().getName();
-	AbstractTimeLimitWebsocketServer existingInstance = EndpointConfigurator.TIME_LIMIT_ENDPOINT_INSTANCES
-		.get(endpointClassName);
+	AbstractTimeLimitWebsocketServer existingInstance = EndpointConfigurator.TIME_LIMIT_ENDPOINT_INSTANCES.get(
+		endpointClassName);
 	if (existingInstance != null) {
 	    throw new IllegalStateException("Endpoint " + endpointClassName + " already existing in the pool.");
 	}
@@ -198,9 +197,15 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    timeCache.relativeTimeLimit = existingTimeSettings.relativeTimeLimit;
 	    updateAllUsers = true;
 	}
-	if (timeCache.absoluteTimeLimit == null ? existingTimeSettings.absoluteTimeLimit != null
-		: !timeCache.absoluteTimeLimit.equals(existingTimeSettings.absoluteTimeLimit)) {
+	if (timeCache.absoluteTimeLimit != existingTimeSettings.absoluteTimeLimit) {
 	    timeCache.absoluteTimeLimit = existingTimeSettings.absoluteTimeLimit;
+	    updateAllUsers = true;
+	}
+
+	if (timeCache.absoluteTimeLimitFinish == null
+		? existingTimeSettings.absoluteTimeLimitFinish != null
+		: !timeCache.absoluteTimeLimitFinish.equals(existingTimeSettings.absoluteTimeLimitFinish)) {
+	    timeCache.absoluteTimeLimitFinish = existingTimeSettings.absoluteTimeLimitFinish;
 	    updateAllUsers = true;
 	}
 
@@ -220,7 +225,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    boolean updateUser = updateAllUsers;
 
 	    // check if there is a point in updating learner launch date
-	    if (timeCache.relativeTimeLimit > 0 || timeCache.absoluteTimeLimit != null) {
+	    if (timeCache.relativeTimeLimit > 0 || timeCache.absoluteTimeLimit > 0
+		    || timeCache.absoluteTimeLimitFinish != null) {
 		LocalDateTime existingLaunchDate = existingTimeSettings.timeLimitLaunchedDate.get(userId);
 
 		if (existingLaunchDate == null) {
@@ -255,8 +261,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     @OnOpen
     public void registerUser(Session websocket) throws IOException {
-	Long toolContentId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	Long toolContentId = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	String login = websocket.getUserPrincipal().getName();
 	Integer userId = getUserId(login);
 	if (userId == null) {
@@ -289,8 +295,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     @OnClose
     public void unregisterUser(Session websocket, CloseReason reason) {
-	Long toolContentID = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	Long toolContentID = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	Set<Session> sessionWebsockets = websockets.get(toolContentID);
 	if (sessionWebsockets != null) {
 	    websockets.get(toolContentID).remove(websocket);
@@ -298,12 +304,9 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    if (log.isDebugEnabled()) {
 		// If there was something wrong with the connection, put it into logs.
 		log.debug("User " + websocket.getUserPrincipal().getName() + " left activity with tool content ID: "
-			+ toolContentID
-			+ (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-				|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-					? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-						+ reason.getReasonPhrase()
-					: ""));
+			+ toolContentID + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+			|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE)) ? ". Abnormal close. Code: "
+			+ reason.getCloseCode() + ". Reason: " + reason.getReasonPhrase() : ""));
 	    }
 	}
     }
@@ -327,7 +330,7 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
     }
 
     protected Long getSecondsLeft(TimeCache timeCache, int userId) {
-	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
+	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimitFinish == null) {
 	    // no time limit is set at all
 	    return null;
 	}
@@ -336,9 +339,9 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);
 	// what is the time limit for him
 	LocalDateTime finish = null;
-	if (timeCache.absoluteTimeLimit != null) {
+	if (timeCache.absoluteTimeLimitFinish != null) {
 	    // the limit is same for everyone
-	    finish = timeCache.absoluteTimeLimit;
+	    finish = timeCache.absoluteTimeLimitFinish;
 	} else if (launchedDate == null) {
 	    return null;
 	} else {

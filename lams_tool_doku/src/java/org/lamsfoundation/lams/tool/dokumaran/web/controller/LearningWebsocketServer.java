@@ -49,7 +49,7 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
 
-	existingTimeSettings.absoluteTimeLimit = dokumaran.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = dokumaran.getAbsoluteTimeLimit();
 	existingTimeSettings.relativeTimeLimit = dokumaran.getRelativeTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = dokumaran.getTimeLimitAdjustments();
 

@@ -58,7 +58,7 @@
 // in minutes since learner entered the activity
 var relativeTimeLimit = <c:out value="${param.relativeTimeLimit}" />,
 	// in seconds since epoch started
-	absoluteTimeLimit = <c:out value="${empty param.absoluteTimeLimit ? 'null' : param.absoluteTimeLimit}" />;
+	absoluteTimeLimitFinish = <c:out value="${empty param.absoluteTimeLimitFinish ? 'null' : param.absoluteTimeLimitFinish}" />;
 
 $(document).ready(function(){
 	let timeLimitWidget = $('#time-limit-widget'),
@@ -103,13 +103,13 @@ $(document).ready(function(){
 	});
 	
 	// create counter if absolute time limit is set
-	if (absoluteTimeLimit) {
+	if (absoluteTimeLimitFinish) {
 		let timeLimitWidgetOpen = sessionStorage.getItem('lams-time-limit-widget-open') === "true";
 		showTimeLimitWidget(timeLimitWidgetOpen, timeLimitWidgetOpen);
 		updateAbsoluteTimeLimitCounter();
 		
 		// expand time limit panel if absolute time limit is set and not expired
-		if (absoluteTimeLimit > new Date().getTime() / 1000) {
+		if (absoluteTimeLimitFinish > new Date().getTime() / 1000) {
 			$('#time-limit-collapse').collapse('show');
 		}
 	}
@@ -137,7 +137,7 @@ function updateTimeLimit(type, toggle, adjust) {
 			if (toggle === true && displayedRelativeTimeLimit > 0) {
 				relativeTimeLimit = displayedRelativeTimeLimit;
 				// when teacher enables relative time limit, absolute one gets disabled
-				absoluteTimeLimit = null;
+				absoluteTimeLimitFinish = null;
 				updateTimeLimitOnServer();
 			}
 			return;
@@ -182,7 +182,7 @@ function updateTimeLimit(type, toggle, adjust) {
 			
 			// start/stop
 			if (toggle === false) {
-				absoluteTimeLimit = null;
+				absoluteTimeLimitFinish = null;
 				updateAbsoluteTimeLimitCounter();
 				return;
 			} 
@@ -194,7 +194,7 @@ function updateTimeLimit(type, toggle, adjust) {
 			}
 			
 			if (toggle === 'stop') {
-				absoluteTimeLimit =  Math.round(new Date().getTime() / 1000);
+				absoluteTimeLimitFinish =  Math.round(new Date().getTime() / 1000);
 				updateAbsoluteTimeLimitCounter();
 			}
 			return;
@@ -243,7 +243,7 @@ function updateTimeLimit(type, toggle, adjust) {
 function updateTimeLimitOnServer() {
 	
 	// absolute time limit has higher priority
-	if (absoluteTimeLimit != null) {
+	if (absoluteTimeLimitFinish != null) {
 		relativeTimeLimit = 0;
 	}
 	
@@ -254,7 +254,7 @@ function updateTimeLimitOnServer() {
 		'data': {
 			'toolContentID' : '<c:out value="${param.toolContentId}" />',
 			'relativeTimeLimit' : relativeTimeLimit,
-			'absoluteTimeLimit' : absoluteTimeLimit,
+			'absoluteTimeLimitFinish' : absoluteTimeLimitFinish,
 			'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 		},
 		success : function(){
@@ -273,7 +273,7 @@ function updateTimeLimitOnServer() {
 				$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
 			}
 			
-			if (absoluteTimeLimit === null) {
+			if (absoluteTimeLimitFinish === null) {
 				// no absolute time limit? destroy the counter
 				$('.absolute-time-limit-counter').countdown('destroy');
 				$('.absolute-time-limit-value').empty();
@@ -291,7 +291,7 @@ function updateTimeLimitOnServer() {
 				$('#absolute-time-limit-cancel').removeClass('hidden');
 				$('#absolute-time-limit-enabled').removeClass('hidden');
 				$('#absolute-time-limit-start').addClass('hidden');
-				$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimit <= Math.round(new Date().getTime() / 1000));
+				$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimitFinish <= Math.round(new Date().getTime() / 1000));
 			}
 		}
 	});
@@ -300,22 +300,22 @@ function updateTimeLimitOnServer() {
 function updateAbsoluteTimeLimitCounter(secondsLeft, start) {
 	var now = Math.round(new Date().getTime() / 1000),
 		// preset means that counter is set just on screen and the time limit is not enforced for learners
-		preset = start !== true && absoluteTimeLimit == null;
+		preset = start !== true && absoluteTimeLimitFinish == null;
 	
 	if (secondsLeft) {
 		if (!preset) {
 			// time limit is already enforced on server, so update it there now
-			absoluteTimeLimit = now + secondsLeft;
+			absoluteTimeLimitFinish = now + secondsLeft;
 			updateTimeLimitOnServer();
 		}
 	} else {
-		if (absoluteTimeLimit == null) {
+		if (absoluteTimeLimitFinish == null) {
 			// disable the counter
 			updateTimeLimitOnServer();
 			return;
 		}
 		// counter initialisation on page load or "finish now"
-		secondsLeft = absoluteTimeLimit - now;
+		secondsLeft = absoluteTimeLimitFinish - now;
 		if (secondsLeft <= 0) {
 			// finish now
 			updateTimeLimitOnServer();
@@ -505,7 +505,7 @@ function scrollToTimeLimitPanel() {
 }
 </script>
 
-<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimit}" />
+<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish}" />
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 		
 <div class="panel panel-default ${param.isTbl ? 'voffset20' : ''}" id="time-limit-panel">

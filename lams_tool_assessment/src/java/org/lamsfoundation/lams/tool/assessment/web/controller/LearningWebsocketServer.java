@@ -31,8 +31,8 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
     public LearningWebsocketServer() {
 	if (assessmentService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    assessmentService = (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
 	}
     }
@@ -50,8 +50,9 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
 
-	existingTimeSettings.absoluteTimeLimit = assessment.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = assessment.getAbsoluteTimeLimitFinish();
 	existingTimeSettings.relativeTimeLimit = assessment.getRelativeTimeLimit() * 60;
+	existingTimeSettings.absoluteTimeLimit = assessment.getAbsoluteTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = assessment.getTimeLimitAdjustments();
 
 	for (Integer userId : userIds) {
@@ -81,8 +82,8 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
     }
 
     public static LearningWebsocketServer getInstance() {
-	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer
-		.getInstance(LearningWebsocketServer.class.getName());
+	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer.getInstance(
+		LearningWebsocketServer.class.getName());
 	if (result == null) {
 	    result = new LearningWebsocketServer();
 	    AbstractTimeLimitWebsocketServer.registerInstance(result);
