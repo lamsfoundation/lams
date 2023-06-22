@@ -262,6 +262,8 @@ public interface IAssessmentService extends ICommonToolService {
 
     Flux<String> getCompletionChartsDataFlux(long toolContentId);
 
+    Flux<String> getTimeLimitPanelUpdateFlux(long toolContentId);
+
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
     /**

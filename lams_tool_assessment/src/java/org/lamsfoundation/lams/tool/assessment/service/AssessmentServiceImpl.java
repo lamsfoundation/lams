@@ -102,15 +102,7 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
-import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
-import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
+import org.lamsfoundation.lams.tool.assessment.dto.*;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -134,14 +126,11 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.NumberUtil;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -213,6 +202,19 @@ public class AssessmentServiceImpl
 		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
 	FluxRegistry.bindSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
 		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
+
+	FluxRegistry.initFluxMap(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME,
+		AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+
+			ObjectNode timeLimitSettingsJson = getTimeLimitSettingsJson(toolContentId);
+			return timeLimitSettingsJson.toString();
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
@@ -352,8 +354,13 @@ public class AssessmentServiceImpl
 	if (learnersStarted == 1 && assessment.getRelativeTimeLimit() == 0 && assessment.getAbsoluteTimeLimit() > 0
 		&& assessment.getAbsoluteTimeLimitFinish() == null) {
 	    assessment.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(assessment.getAbsoluteTimeLimit()));
+	    assessment.setAbsoluteTimeLimit(0);
 	    assessmentDao.saveObject(assessment);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	    FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
 	}
+
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), Long.valueOf(userId));
 	if (lastResult == null) {
 	    return null;
@@ -905,6 +912,11 @@ public class AssessmentServiceImpl
     @Override
     public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
 	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
+    }
+
+    @Override
+    public Flux<String> getTimeLimitPanelUpdateFlux(long toolContentId) {
+	return FluxRegistry.get(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
     }
 
     /**
@@ -4267,6 +4279,15 @@ public class AssessmentServiceImpl
 	    return "";
 	}
 
+    }
+
+    private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
+	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	timeLimitSettings.put("relativeTimeLimit", assessment.getRelativeTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimit", assessment.getAbsoluteTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimitFinish", assessment.getAbsoluteTimeLimitFinishSeconds());
+	return timeLimitSettings;
     }
 
     private Map<Integer, ArrayNode> getAnsweredQuestionsByUsersJson(long toolContentId) {

@@ -228,9 +228,10 @@ public class AssessmentConstants {
 
     //flux management
     public static final String COMPLETION_CHARTS_UPDATE_SINK_NAME = "assessment completion chart updated";
-
     public static final String ANSWERS_UPDATED_SINK_NAME = "assessment learner answers updated";
     public static final String LEARNER_TRAVERSED_SINK_NAME = "assessment learner traversed";
-
     public static final String COMPLETION_CHARTS_UPDATE_FLUX_NAME = "assessment completion chart updated";
+
+    public static final String TIME_LIMIT_PANEL_UPDATE_SINK_NAME = "assessment time limit panel updated";
+    public static final String TIME_LIMIT_PANEL_UPDATE_FLUX_NAME = "assessment time limit panel updated";
 }

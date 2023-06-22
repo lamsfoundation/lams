@@ -90,7 +90,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -252,9 +251,15 @@ public class MonitoringController {
 
     @RequestMapping(path = "/getCompletionChartsData", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId)
-	    throws JsonProcessingException, IOException {
+    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId) {
 	return service.getCompletionChartsDataFlux(toolContentId);
+    }
+
+    @RequestMapping(path = "/getTimeLimitPanelUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitPanelUpdateFlux(@RequestParam long toolContentId, HttpServletResponse response) {
+	response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+	return service.getTimeLimitPanelUpdateFlux(toolContentId);
     }
 
     @RequestMapping("/userMasterDetail")
@@ -912,26 +917,33 @@ public class MonitoringController {
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish, @RequestParam(required = false) Long callId) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	assessment.setRelativeTimeLimit(relativeTimeLimit);
+	assessment.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	assessment.setAbsoluteTimeLimitFinish(absoluteTimeLimit == null
+	assessment.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
 		? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
 
 	// update monitoring UI where time limits are reflected on dashboard
 	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
     }
 
     @RequestMapping(path = "/getPossibleIndividualTimeLimits", method = RequestMethod.GET)
@@ -1063,6 +1075,9 @@ public class MonitoringController {
 	    }
 	}
 	service.saveOrUpdateAssessment(assessment);
+
+	FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
+
     }
 
     @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")

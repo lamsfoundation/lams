@@ -500,7 +500,7 @@ public class Assessment implements Cloneable {
 	return absoluteTimeLimitFinish;
     }
 
-    public Long getAbsoluteTimeLimitSeconds() {
+    public Long getAbsoluteTimeLimitFinishSeconds() {
 	return absoluteTimeLimitFinish == null
 		? null
 		: absoluteTimeLimitFinish.atZone(ZoneId.systemDefault()).toEpochSecond();
