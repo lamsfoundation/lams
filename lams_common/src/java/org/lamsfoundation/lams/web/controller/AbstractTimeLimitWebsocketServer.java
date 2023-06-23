@@ -68,7 +68,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 
     protected static class TimeCache {
 	public int relativeTimeLimit;
-	public LocalDateTime absoluteTimeLimit;
+	public int absoluteTimeLimit;
+	public LocalDateTime absoluteTimeLimitFinish;
 	// mapping of user ID (not UID) and when the learner entered the activity
 	public final Map<Integer, LocalDateTime> timeLimitLaunchedDate = new ConcurrentHashMap<>();
 	public Map<Integer, Integer> timeLimitAdjustment = new HashMap<>();
@@ -192,10 +193,15 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    timeCache.relativeTimeLimit = existingTimeSettings.relativeTimeLimit;
 	    updateAllUsers = true;
 	}
-	if (timeCache.absoluteTimeLimit == null
-		? existingTimeSettings.absoluteTimeLimit != null
-		: !timeCache.absoluteTimeLimit.equals(existingTimeSettings.absoluteTimeLimit)) {
+	if (timeCache.absoluteTimeLimit != existingTimeSettings.absoluteTimeLimit) {
 	    timeCache.absoluteTimeLimit = existingTimeSettings.absoluteTimeLimit;
+	    updateAllUsers = true;
+	}
+
+	if (timeCache.absoluteTimeLimitFinish == null
+		? existingTimeSettings.absoluteTimeLimitFinish != null
+		: !timeCache.absoluteTimeLimitFinish.equals(existingTimeSettings.absoluteTimeLimitFinish)) {
+	    timeCache.absoluteTimeLimitFinish = existingTimeSettings.absoluteTimeLimitFinish;
 	    updateAllUsers = true;
 	}
 
@@ -215,7 +221,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    boolean updateUser = updateAllUsers;
 
 	    // check if there is a point in updating learner launch date
-	    if (timeCache.relativeTimeLimit > 0 || timeCache.absoluteTimeLimit != null) {
+	    if (timeCache.relativeTimeLimit > 0 || timeCache.absoluteTimeLimit > 0
+		    || timeCache.absoluteTimeLimitFinish != null) {
 		LocalDateTime existingLaunchDate = existingTimeSettings.timeLimitLaunchedDate.get(userId);
 
 		if (existingLaunchDate == null) {
@@ -319,7 +326,7 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
     }
 
     protected Long getSecondsLeft(TimeCache timeCache, int userId) {
-	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimit == null) {
+	if (timeCache.relativeTimeLimit == 0 && timeCache.absoluteTimeLimitFinish == null) {
 	    // no time limit is set at all
 	    return null;
 	}
@@ -328,9 +335,9 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	LocalDateTime launchedDate = timeCache.timeLimitLaunchedDate.get(userId);
 	// what is the time limit for him
 	LocalDateTime finish = null;
-	if (timeCache.absoluteTimeLimit != null) {
+	if (timeCache.absoluteTimeLimitFinish != null) {
 	    // the limit is same for everyone
-	    finish = timeCache.absoluteTimeLimit;
+	    finish = timeCache.absoluteTimeLimitFinish;
 	} else if (launchedDate == null) {
 	    return null;
 	} else {

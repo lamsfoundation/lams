@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -64,11 +65,7 @@ import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -306,21 +303,31 @@ public class MonitoringController {
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(toolContentId);
 	whiteboard.setRelativeTimeLimit(relativeTimeLimit);
+	whiteboard.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	whiteboard.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	whiteboard.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
+		? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
+
+	// update monitoring UI where time limits are reflected on dashboard
+	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
 	whiteboardService.saveOrUpdate(whiteboard);
     }
 

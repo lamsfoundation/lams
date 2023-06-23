@@ -1,19 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit5.jsp</c:set>
-<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
-	<c:param name="toolContentId" value="${assessment.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="true" />
-	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
-</c:url>
-
-<style>
-
-</style>
-
 <lams:JSImport src="includes/javascript/chart5.js" relative="true" />
 
 <script>
@@ -45,6 +32,19 @@
 			pageInitialised = false;
 
 	$(document).ready(function(){
+		openEventSource('<lams:WebAppURL />monitoring/getTimeLimitPanelUpdateFlux.do?toolContentId=${toolContentID}', function(event) {
+			if (!event.data) {
+				return;
+			}
+
+			// destroy existing absolute time limit counter before refresh
+			$('.absolute-time-limit-counter').countdown('destroy');
+			let data = JSON.parse(event.data);
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
+					+ '&isTbl=true&controllerContext=tool/laasse10/monitoring');
+		});
+
 		openEventSource('<lams:WebAppURL />monitoring/getCompletionChartsData.do?toolContentId=${toolContentID}', function(event) {
 			if (!event.data) {
 				return;
@@ -64,10 +64,7 @@
 			openQuestionModal.one('hidden.bs.modal', function() {
 				$('#student-choices-table').load('<lams:WebAppURL />tblmonitoring/iraAssessmentStudentChoicesTable.do?toolContentID=${toolContentID}');
 			});
-
 		});
-
-		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
 	});
 
 	function exportExcel(){

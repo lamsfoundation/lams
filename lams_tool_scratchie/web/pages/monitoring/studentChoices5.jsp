@@ -1,15 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit5.jsp</c:set>
-<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
-	<c:param name="toolContentId" value="${scratchie.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
-	<c:param name="isTbl" value="true" />
-	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
-</c:url>
-
 <style>
 	/* show horizontal scroller for iPads */
 	body {
@@ -67,8 +58,19 @@
 		openEventSource('<lams:WebAppURL />tblmonitoring/traStudentChoicesFlux.do?toolContentId=${toolContentID}', function(event) {
 			$(tlbMonitorHorizontalScrollElement).load('<lams:WebAppURL />tblmonitoring/traStudentChoicesTable.do?toolContentID=${toolContentID}');
 		});
-		
-		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');
+
+		openEventSource('<lams:WebAppURL />tblmonitoring/getTimeLimitPanelUpdateFlux.do?toolContentId=${toolContentID}', function(event) {
+			if (!event.data) {
+				return;
+			}
+
+			// destroy existing absolute time limit counter before refresh
+			$('.absolute-time-limit-counter').countdown('destroy');
+			let data = JSON.parse(event.data);
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
+					+ '&isTbl=true&controllerContext=tool/lascrt11/monitoring');
+		});
 
 		<c:if test="${fn:length(sessionDtos) > 10}">
 			// Add sticky column headers to student choices table.

@@ -7,7 +7,8 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${dokumaran.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${dokumaran.absoluteTimeLimitFinishSeconds}"/>
+	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimit}"/>
 	<c:param name="relativeTimeLimit" value="${dokumaran.relativeTimeLimit}"/>
 	<c:param name="isTbl" value="${isTbl}" />
 	<c:param name="controllerContext" value="tool/ladoku11/monitoring" />
