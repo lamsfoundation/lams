@@ -1,29 +1,7 @@
 package org.lamsfoundation.lams.web.controller;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpointConfig;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -33,22 +11,35 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.OnClose;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpointConfig;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * Controls activity time limits.
- * Can be used in tools to set relative and absolute time limits for learners.
+ * Controls activity time limits. Can be used in tools to set relative and absolute time limits for learners.
  *
  * @author Marcin Cieslak
  */
 public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointConfig.Configurator {
 
     /**
-     * By default Endpoint instances are created for each request.
-     * We need persistent data to cache time settings.
-     * We can not use static fields as each subclass needs to have own set of fields.
-     * This class registers and retrieves Endpoints as singletons.
+     * By default Endpoint instances are created for each request. We need persistent data to cache time settings. We
+     * can not use static fields as each subclass needs to have own set of fields. This class registers and retrieves
+     * Endpoints as singletons.
      */
     public static class EndpointConfigurator extends ServerEndpointConfig.Configurator {
 	private static final Map<String, AbstractTimeLimitWebsocketServer> TIME_LIMIT_ENDPOINT_INSTANCES = new ConcurrentHashMap<>();
@@ -58,8 +49,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
 
 	    // is there an instance already
-	    AbstractTimeLimitWebsocketServer instance = AbstractTimeLimitWebsocketServer
-		    .getInstance(endpointClass.getName());
+	    AbstractTimeLimitWebsocketServer instance = AbstractTimeLimitWebsocketServer.getInstance(
+		    endpointClass.getName());
 	    if (instance == null) {
 		// every subclass must have a static getInstance() method
 		try {
@@ -110,7 +101,9 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 		// do nothing as server is probably shutting down and we could not obtain Hibernate session
 	    } catch (Exception e) {
 		// error caught, but carry on
-		log.error("Error in Assessment worker thread", e);
+		log.error("Error in time limit worker thread", e);
+		// extra details for debugging
+		e.printStackTrace();
 	    } finally {
 		HibernateSessionManager.closeSession();
 	    }
@@ -142,8 +135,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	executor.scheduleAtFixedRate(sendWorker, 0, CHECK_INTERVAL, TimeUnit.SECONDS);
 
 	if (userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    userManagementService = (IUserManagementService) wac.getBean("userManagementService");
 	}
     }
@@ -160,8 +153,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     protected static void registerInstance(AbstractTimeLimitWebsocketServer instance) {
 	String endpointClassName = instance.getClass().getName();
-	AbstractTimeLimitWebsocketServer existingInstance = EndpointConfigurator.TIME_LIMIT_ENDPOINT_INSTANCES
-		.get(endpointClassName);
+	AbstractTimeLimitWebsocketServer existingInstance = EndpointConfigurator.TIME_LIMIT_ENDPOINT_INSTANCES.get(
+		endpointClassName);
 	if (existingInstance != null) {
 	    throw new IllegalStateException("Endpoint " + endpointClassName + " already existing in the pool.");
 	}
@@ -173,7 +166,7 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     protected boolean processActivity(long toolContentId, Collection<Session> websockets) throws IOException {
 	// if all learners left the activity, remove the obsolete mapping
-	if (websockets.isEmpty()) {
+	if (websockets == null || websockets.isEmpty()) {
 	    timeCaches.remove(toolContentId);
 	    return false;
 	}
@@ -186,7 +179,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	}
 
 	// get only currently active users, not all activity participants
-	Collection<Integer> userIds = websockets.stream().filter(w -> w.getUserProperties() != null)
+	Collection<Integer> userIds = websockets.stream()
+		.filter(w -> w.getUserProperties() != null && w.getUserProperties().get("userId") != null)
 		.collect(Collectors.mapping(w -> (Integer) w.getUserProperties().get("userId"), Collectors.toSet()));
 	// get activity data from DB
 	TimeCache existingTimeSettings = getExistingTimeSettings(toolContentId, userIds);
@@ -198,7 +192,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    timeCache.relativeTimeLimit = existingTimeSettings.relativeTimeLimit;
 	    updateAllUsers = true;
 	}
-	if (timeCache.absoluteTimeLimit == null ? existingTimeSettings.absoluteTimeLimit != null
+	if (timeCache.absoluteTimeLimit == null
+		? existingTimeSettings.absoluteTimeLimit != null
 		: !timeCache.absoluteTimeLimit.equals(existingTimeSettings.absoluteTimeLimit)) {
 	    timeCache.absoluteTimeLimit = existingTimeSettings.absoluteTimeLimit;
 	    updateAllUsers = true;
@@ -255,8 +250,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     @OnOpen
     public void registerUser(Session websocket) throws IOException {
-	Long toolContentId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	Long toolContentId = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	String login = websocket.getUserPrincipal().getName();
 	Integer userId = getUserId(login);
 	if (userId == null) {
@@ -289,8 +284,8 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
      */
     @OnClose
     public void unregisterUser(Session websocket, CloseReason reason) {
-	Long toolContentID = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
+	Long toolContentID = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	Set<Session> sessionWebsockets = websockets.get(toolContentID);
 	if (sessionWebsockets != null) {
 	    websockets.get(toolContentID).remove(websocket);
@@ -298,12 +293,9 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	    if (log.isDebugEnabled()) {
 		// If there was something wrong with the connection, put it into logs.
 		log.debug("User " + websocket.getUserPrincipal().getName() + " left activity with tool content ID: "
-			+ toolContentID
-			+ (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
-				|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE))
-					? ". Abnormal close. Code: " + reason.getCloseCode() + ". Reason: "
-						+ reason.getReasonPhrase()
-					: ""));
+			+ toolContentID + (!(reason.getCloseCode().equals(CloseCodes.GOING_AWAY)
+			|| reason.getCloseCode().equals(CloseCodes.NORMAL_CLOSURE)) ? ". Abnormal close. Code: "
+			+ reason.getCloseCode() + ". Reason: " + reason.getReasonPhrase() : ""));
 	    }
 	}
     }
