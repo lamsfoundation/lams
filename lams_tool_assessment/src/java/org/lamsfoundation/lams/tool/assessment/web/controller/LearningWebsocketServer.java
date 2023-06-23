@@ -81,6 +81,9 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	return assessmentService.launchTimeLimit(toolContentId, userId);
     }
 
+    /**
+     * Fetches or creates a singleton of this websocket server.
+     */
     public static LearningWebsocketServer getInstance() {
 	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer.getInstance(
 		LearningWebsocketServer.class.getName());
@@ -91,9 +94,6 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	return result;
     }
 
-    /**
-     * Fetches or creates a singleton of this websocket server.
-     */
     public static Long getSecondsLeft(long toolContentId, int userId) {
 	LearningWebsocketServer instance = LearningWebsocketServer.getInstance();
 	return AbstractTimeLimitWebsocketServer.getSecondsLeft(instance, toolContentId, userId, true);

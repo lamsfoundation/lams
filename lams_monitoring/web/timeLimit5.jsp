@@ -504,7 +504,7 @@
 	}
 </script>
 
-<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish}" />
+<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish and param.absoluteTimeLimitFinish != 'null'}" />
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 
 <div class="card mt-4" id="time-limit-panel">

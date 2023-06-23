@@ -47,6 +47,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
@@ -64,13 +65,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.AlphanumComparator;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.JsonUtil;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -178,8 +173,8 @@ public class MonitoringController {
 	// escape JS sensitive characters in option descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (OptionDTO optionDto : summary.getOptionDtos()) {
-		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer()).replace("\\r\\n",
-			"<br>");
+		String escapedAnswer = StringEscapeUtils.escapeJavaScript(optionDto.getAnswer())
+			.replace("\\r\\n", "<br>");
 		optionDto.setAnswer(escapedAnswer);
 	    }
 	}
@@ -190,9 +185,9 @@ public class MonitoringController {
 
     @RequestMapping(path = "/saveUserMark", method = RequestMethod.POST)
     private String saveUserMark(HttpServletRequest request) {
-	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null)
-		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_USER_ID))
-		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
+	if ((request.getParameter(ScratchieConstants.PARAM_NOT_A_NUMBER) == null) && !StringUtils.isEmpty(
+		request.getParameter(ScratchieConstants.ATTR_USER_ID)) && !StringUtils.isEmpty(
+		request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
 
 	    Long userId = WebUtil.readLongParam(request, ScratchieConstants.ATTR_USER_ID);
 	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
@@ -309,21 +304,32 @@ public class MonitoringController {
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 	scratchie.setRelativeTimeLimit(relativeTimeLimit);
+	scratchie.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	scratchie.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	scratchie.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
+		? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
+
+	// update monitoring UI where time limits are reflected on dashboard
+	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	FluxRegistry.emit(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
 	scratchieService.saveOrUpdateScratchie(scratchie);
     }
 
@@ -376,6 +382,8 @@ public class MonitoringController {
 	ScratchieSession session = scratchieService.getScratchieSessionBySessionId(Long.valueOf(itemIdParts[1]));
 	session.setTimeLimitAdjustment(adjustment);
 	scratchieService.saveOrUpdateScratchieSession(session);
+
+	FluxRegistry.emit(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, session.getScratchie().getContentId());
     }
 
     @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")
@@ -412,8 +420,8 @@ public class MonitoringController {
 
 	    for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
 
-		String escapedBurningQuestion = StringEscapeUtils
-			.unescapeJavaScript(burningQuestionDto.getEscapedBurningQuestion());
+		String escapedBurningQuestion = StringEscapeUtils.unescapeJavaScript(
+			burningQuestionDto.getEscapedBurningQuestion());
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 
 		String sessionName = StringEscapeUtils.unescapeJavaScript(burningQuestionDto.getSessionName());

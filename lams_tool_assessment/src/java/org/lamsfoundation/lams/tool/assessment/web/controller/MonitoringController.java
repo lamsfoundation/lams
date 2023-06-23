@@ -918,7 +918,7 @@ public class MonitoringController {
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
-	    @RequestParam(required = false) Long absoluteTimeLimitFinish, @RequestParam(required = false) Long callId) {
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);

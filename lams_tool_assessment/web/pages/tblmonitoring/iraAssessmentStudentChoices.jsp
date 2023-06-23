@@ -1,20 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit5.jsp</c:set>
-<c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
-	<c:param name="toolContentId" value="${assessment.contentId}"/>
-	<c:param name="absoluteTimeLimitFinish" value="${assessment.absoluteTimeLimitFinishSeconds}"/>
-	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
-	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimit}"/>
-	<c:param name="isTbl" value="true" />
-	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
-</c:url>
-
-<style>
-
-</style>
-
 <lams:JSImport src="includes/javascript/chart5.js" relative="true" />
 
 <script>

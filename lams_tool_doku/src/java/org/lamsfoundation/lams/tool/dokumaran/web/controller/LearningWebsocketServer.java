@@ -30,8 +30,8 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
     public LearningWebsocketServer() {
 	if (dokumaranService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    dokumaranService = (IDokumaranService) wac.getBean(DokumaranConstants.DOKUMARAN_SERVICE);
 	}
     }
@@ -49,8 +49,9 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
 
-	existingTimeSettings.absoluteTimeLimitFinish = dokumaran.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = dokumaran.getAbsoluteTimeLimitFinish();
 	existingTimeSettings.relativeTimeLimit = dokumaran.getRelativeTimeLimit() * 60;
+	existingTimeSettings.absoluteTimeLimit = dokumaran.getAbsoluteTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = dokumaran.getTimeLimitAdjustments();
 
 	for (Integer userId : userIds) {
@@ -78,8 +79,8 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
      * Fetches or creates a singleton of this websocket server.
      */
     public static LearningWebsocketServer getInstance() {
-	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer
-		.getInstance(LearningWebsocketServer.class.getName());
+	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer.getInstance(
+		LearningWebsocketServer.class.getName());
 	if (result == null) {
 	    result = new LearningWebsocketServer();
 	    AbstractTimeLimitWebsocketServer.registerInstance(result);
