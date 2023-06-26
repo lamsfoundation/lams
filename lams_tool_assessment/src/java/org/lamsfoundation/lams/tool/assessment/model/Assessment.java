@@ -89,7 +89,10 @@ public class Assessment implements Cloneable {
     private int relativeTimeLimit;
 
     @Column(name = "absolute_time_limit")
-    private LocalDateTime absoluteTimeLimit;
+    private int absoluteTimeLimit;
+
+    @Column(name = "absolute_time_limit_finish")
+    private LocalDateTime absoluteTimeLimitFinish;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "tl_laasse10_time_limit", joinColumns = @JoinColumn(name = "assessment_uid"))
@@ -156,7 +159,7 @@ public class Assessment implements Cloneable {
 
     @Column(name = "display_max_mark")
     private boolean displayMaxMark;
-    
+
     @Column(name = "define_later")
     private boolean defineLater;
 
@@ -298,7 +301,7 @@ public class Assessment implements Cloneable {
 		assessment.setCreatedBy((AssessmentUser) createdBy.clone());
 	    }
 
-	    assessment.setAbsoluteTimeLimit(null);
+	    assessment.setAbsoluteTimeLimitFinish(null);
 	    assessment.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Assessment.class + " failed");
@@ -366,11 +369,11 @@ public class Assessment implements Cloneable {
     // **********************************************************
     // get/set methods
     // **********************************************************
+
     /**
      * Returns the object's creation date
      *
      * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -389,7 +392,6 @@ public class Assessment implements Cloneable {
      * Returns the object's date of last update
      *
      * @return date updated
-     *
      */
     public Date getUpdated() {
 	return updated;
@@ -408,7 +410,6 @@ public class Assessment implements Cloneable {
      * Returns deadline for learner's submission
      *
      * @return submissionDeadline
-     *
      */
     public Date getSubmissionDeadline() {
 	return submissionDeadline;
@@ -432,7 +433,7 @@ public class Assessment implements Cloneable {
 
     /**
      * @param createdBy
-     *            The userid of the user who created this Share assessment.
+     * 	The userid of the user who created this Share assessment.
      */
     public void setCreatedBy(AssessmentUser createdBy) {
 	this.createdBy = createdBy;
@@ -455,7 +456,7 @@ public class Assessment implements Cloneable {
 
     /**
      * @param title
-     *            The title to set.
+     * 	The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -481,22 +482,32 @@ public class Assessment implements Cloneable {
 
     /**
      * @param timeLimit
-     *            the time limitation, that students have to complete an attempt.
+     * 	the time limitation, that students have to complete an attempt.
      */
     public void setRelativeTimeLimit(int timeLimit) {
 	this.relativeTimeLimit = timeLimit;
     }
 
-    public LocalDateTime getAbsoluteTimeLimit() {
+    public int getAbsoluteTimeLimit() {
 	return absoluteTimeLimit;
     }
 
-    public Long getAbsoluteTimeLimitSeconds() {
-	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    public void setAbsoluteTimeLimit(int absoluteTimeLimit) {
+	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
-	this.absoluteTimeLimit = absoluteTimeLimit;
+    public LocalDateTime getAbsoluteTimeLimitFinish() {
+	return absoluteTimeLimitFinish;
+    }
+
+    public Long getAbsoluteTimeLimitFinishSeconds() {
+	return absoluteTimeLimitFinish == null
+		? null
+		: absoluteTimeLimitFinish.atZone(ZoneId.systemDefault()).toEpochSecond();
+    }
+
+    public void setAbsoluteTimeLimitFinish(LocalDateTime absoluteTimeLimitFinish) {
+	this.absoluteTimeLimitFinish = absoluteTimeLimitFinish;
     }
 
     public Map<Integer, Integer> getTimeLimitAdjustments() {

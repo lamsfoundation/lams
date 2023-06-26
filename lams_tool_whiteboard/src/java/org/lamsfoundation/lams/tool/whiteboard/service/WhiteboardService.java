@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -64,10 +65,7 @@ import org.lamsfoundation.lams.tool.whiteboard.web.controller.LearningWebsocketS
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -207,10 +205,29 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	int learnersStarted = 0;
+	Whiteboard whiteboard = null;
+	for (WhiteboardSession whiteboardSession : whiteboardSessionDao.getByContentId(toolContentId)) {
+	    if (whiteboard == null) {
+		whiteboard = whiteboardSession.getWhiteboard();
+	    }
+	    learnersStarted += whiteboardUserDao.getBySessionID(whiteboardSession.getSessionId()).size();
+	    if (learnersStarted > 1) {
+		break;
+	    }
+	}
+	if (learnersStarted == 1 && whiteboard.getRelativeTimeLimit() == 0 && whiteboard.getAbsoluteTimeLimit() > 0
+		&& whiteboard.getAbsoluteTimeLimitFinish() == null) {
+	    whiteboard.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(whiteboard.getAbsoluteTimeLimit()));
+	    whiteboard.setAbsoluteTimeLimit(0);
+	    whiteboardDao.update(whiteboard);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	}
+	
 	WhiteboardUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
 	    WhiteboardSession session = user.getSession();
-	    Whiteboard whiteboard = session.getWhiteboard();
 
 	    LocalDateTime launchedDate = user.getTimeLimitLaunchedDate();
 	    if (launchedDate == null) {

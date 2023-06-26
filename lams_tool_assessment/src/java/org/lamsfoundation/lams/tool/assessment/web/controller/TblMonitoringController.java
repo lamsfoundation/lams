@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+
 @Controller
 @RequestMapping("/tblmonitoring")
 public class TblMonitoringController {
@@ -68,8 +70,14 @@ public class TblMonitoringController {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
-	request.setAttribute("groupsInAnsweredQuestionsChart", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("assessment", assessment);
+
+	for (AssessmentQuestion question : assessment.getQuestions()) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+		request.setAttribute("vsaPresent", true);
+		break;
+	    }
+	}
 
 	return "pages/tblmonitoring/iraAssessmentStudentChoices";
     }
@@ -153,7 +161,7 @@ public class TblMonitoringController {
 
 	    TblAssessmentDTO assessmentDto = new TblAssessmentDTO();
 
-	    int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	    int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	    assessmentDto.setAttemptedLearnersNumber(attemptedLearnersNumber);
 	    assessmentDto.setActivityTitle(activityTitle);
 
@@ -199,7 +207,7 @@ public class TblMonitoringController {
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("allowDiscloseAnswers", assessment.isAllowDiscloseAnswers());
 
-	int attemptedLearnersNumber = assessmentService.getCountUsersByContentId(toolContentId);
+	int attemptedLearnersNumber = assessmentService.getCountLearnersByContentId(toolContentId);
 	model.addAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
 
 	return "pages/tblmonitoring/assessment";
@@ -211,8 +219,8 @@ public class TblMonitoringController {
     @RequestMapping("aesStudentChoicesTable")
     public String aesStudentChoicesTable(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController
-		.getTblAssessmentQuestionDtos(toolContentId, false, assessmentService);
+	List<TblAssessmentQuestionDTO> tblQuestionDtos = TblMonitoringController.getTblAssessmentQuestionDtos(
+		toolContentId, false, assessmentService);
 
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	SortedSet<AssessmentSession> sessions = new TreeSet<>(new AssessmentSessionComparator());
@@ -235,8 +243,8 @@ public class TblMonitoringController {
 
 	    TblAssessmentQuestionDTO tblQuestionDto = new TblAssessmentQuestionDTO();
 	    tblQuestionDto.setTitle(questionDto.getTitle());
-	    tblQuestionDto
-		    .setQuestionTypeLabel(AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
+	    tblQuestionDto.setQuestionTypeLabel(
+		    AssessmentServiceImpl.getQuestionTypeLanguageLabel(questionDto.getType()));
 	    tblQuestionDto.setCorrectAnswer(TblMonitoringController.getAssessmentCorrectAnswer(questionDto));
 
 	    tblQuestionDtos.add(tblQuestionDto);
@@ -267,8 +275,7 @@ public class TblMonitoringController {
 	    }
 
 	    List<TblAssessmentQuestionResultDTO> sessionQuestionResults = new ArrayList<>();
-	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary
-		    .getQuestionResultsPerSession()) {
+	    for (List<AssessmentQuestionResult> questionResultsPerSession : questionSummary.getQuestionResultsPerSession()) {
 
 		TblAssessmentQuestionResultDTO tblQuestionResultDto = new TblAssessmentQuestionResultDTO();
 		String answer = "";
@@ -303,8 +310,8 @@ public class TblMonitoringController {
 				}
 			    }
 			} else {
-			    correct = questionResult.getPenalty() + questionResult.getMark() + 0.1 >= questionResult
-				    .getMaxMark();
+			    correct = questionResult.getPenalty() + questionResult.getMark() + 0.1
+				    >= questionResult.getMaxMark();
 			}
 		    }
 

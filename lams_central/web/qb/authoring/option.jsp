@@ -9,9 +9,9 @@
 		placeholder="${OPTION_LABEL}&thinsp; ${status.index+1}" contentFolderID="${contentFolderID}" height="50px"/>
 </div>
 
-<div class="option-settings-hidden" style="display: none;">
-	<%@ include file="gradeselector.jsp"%>
+<%@ include file="gradeselector.jsp"%>
 
+<div class="option-settings-hidden" style="display: none;">
 	<div class="option-feedback voffset5-bottom">
     	<c:set var="FEEDBACK_LABEL"><fmt:message key="label.authoring.basic.option.feedback"/></c:set>
      	<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" 

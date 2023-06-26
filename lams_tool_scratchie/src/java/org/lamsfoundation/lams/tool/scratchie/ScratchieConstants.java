@@ -198,4 +198,7 @@ public class ScratchieConstants {
     
     public static final String BURNING_QUESTIONS_UPDATED_SINK_NAME = "scratchie burning questions updated";
     public static final String BURNING_QUESTIONS_UPDATED_FLUX_NAME = "scratchie burning questions updated";
+
+    public static final String TIME_LIMIT_PANEL_UPDATE_SINK_NAME = "scratchie time limit panel updated";
+    public static final String TIME_LIMIT_PANEL_UPDATE_FLUX_NAME = "scratchie time limit panel updated";
 }

@@ -33,6 +33,8 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.etherpad.service.IEtherpadService;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
+import org.lamsfoundation.lams.flux.FluxMap;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -67,8 +69,10 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -114,6 +118,22 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private IEtherpadService etherpadService;
 
     private DokumaranOutputFactory dokumaranOutputFactory;
+
+    public DokumaranService() {
+
+	FluxRegistry.initFluxMap(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME,
+		DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+
+			ObjectNode timeLimitSettingsJson = getTimeLimitSettingsJson(toolContentId);
+			return timeLimitSettingsJson.toString();
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+    }
 
     // *******************************************************************************
     // Service method
@@ -308,10 +328,30 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	int learnersStarted = 0;
+	Dokumaran dokumaran = null;
+	for (DokumaranSession dokumaranSession : dokumaranSessionDao.getByContentId(toolContentId)) {
+	    if (dokumaran == null) {
+		dokumaran = dokumaranSession.getDokumaran();
+	    }
+	    learnersStarted += dokumaranUserDao.getBySessionID(dokumaranSession.getSessionId()).size();
+	    if (learnersStarted > 1) {
+		break;
+	    }
+	}
+	if (learnersStarted == 1 && dokumaran.getRelativeTimeLimit() == 0 && dokumaran.getAbsoluteTimeLimit() > 0
+		&& dokumaran.getAbsoluteTimeLimitFinish() == null) {
+	    dokumaran.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(dokumaran.getAbsoluteTimeLimit()));
+	    dokumaran.setAbsoluteTimeLimit(0);
+	    dokumaranDao.saveObject(dokumaran);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	    FluxRegistry.emit(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
+	}
+
 	DokumaranUser user = getLearnerByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
 	    DokumaranSession session = user.getSession();
-	    Dokumaran dokumaran = session.getDokumaran();
 
 	    LocalDateTime launchedDate = user.getTimeLimitLaunchedDate();
 	    if (launchedDate == null) {
@@ -1007,6 +1047,16 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 
 	etherpadService.createCookie(etherpadSessionIds, response);
+    }
+
+
+    private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
+	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	timeLimitSettings.put("relativeTimeLimit", dokumaran.getRelativeTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimit", dokumaran.getAbsoluteTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimitFinish", dokumaran.getAbsoluteTimeLimitFinishSeconds());
+	return timeLimitSettings;
     }
 
     @Override

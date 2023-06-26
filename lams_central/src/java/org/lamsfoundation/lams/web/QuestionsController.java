@@ -1,17 +1,5 @@
 package org.lamsfoundation.lams.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.service.IQbService;
@@ -32,6 +20,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Runs extraction of the chosen IMS QTI zip file or .docx file. Prepares form for user to manually choose interesting
@@ -98,6 +97,11 @@ public class QuestionsController {
 	    request.setAttribute("tmpFileUploadId", tmpFileUploadId);
 	    request.setAttribute("errorMap", errorMap);
 	    return "questions/questionFile";
+	}
+
+	String questionSourceKey = request.getParameter("questionSourceKey");
+	if (StringUtils.isNotBlank(questionSourceKey)) {
+	    request.getSession().removeAttribute("questionSourceKey");
 	}
 
 	Question[] questions = null;
