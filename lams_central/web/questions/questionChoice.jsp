@@ -100,7 +100,7 @@
 					'type': 'post',
 					'dataType': 'json',
 					'data': {
-						'questionSourceKey': '${param.questionSourceKey}',
+						'questionSourceKey': '${param.questionSourceKey}'
 					},
 					'complete' : function(){
 						$('#generateQuestionsButton').prop('disabled', false).button('reset');
@@ -108,8 +108,9 @@
 					'error' : function () {
 						alert('<fmt:message key="label.questions.choice.generate.more.error" />');
 					},
-					'success': function (questions) {
-						let questionCount = +$('#questionCount').val();
+					'success': function (response) {
+						let questions = response.questions[0],
+								questionCount = +$('#questionCount').val();
 
 						$('#selectAll').attr('checked', false);
 
