@@ -14,8 +14,8 @@
 		<lams:headItems />
 		<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
+		<lams:JSImport src="includes/javascript/wikiCommon.js" relative="true" />
 		<script type="text/javascript" src="${tool}includes/javascript/validation.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -94,4 +94,3 @@
 		</form:form>
 	</body>
 </lams:html>
-

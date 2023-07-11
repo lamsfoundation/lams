@@ -10,5 +10,4 @@
 <lams:css/>
 
 <!-- ********************  javascript ********************** -->
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-
+<lams:JSImport src="includes/javascript/common.js" />

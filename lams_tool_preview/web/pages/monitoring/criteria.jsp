@@ -36,10 +36,10 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+	<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/rating.js" />
+	<lams:JSImport src="includes/javascript/portrait.js" />
 </lams:head>
 
 <body class="stripes">

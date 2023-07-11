@@ -59,10 +59,10 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
+		<lams:JSImport src="includes/javascript/rating.js" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>

@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 

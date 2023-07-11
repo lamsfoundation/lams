@@ -1,4 +1,4 @@
-﻿﻿// for user selecting and sorting purposes
+﻿// for user selecting and sorting purposes
 var sortOrderAscending = {};
 var lastSelectedUsers = {};
 

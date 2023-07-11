@@ -14,7 +14,7 @@
 
 	<title><fmt:message key="activity.title" /></title>
 
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>

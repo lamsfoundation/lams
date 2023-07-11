@@ -18,7 +18,7 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		var mustHaveUppercase = ${mustHaveUppercase},

@@ -14,7 +14,7 @@
 		<link href="<lams:LAMSURL/>/css/bootstrap-toggle.css" rel="stylesheet" type="text/css">
 		<link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>

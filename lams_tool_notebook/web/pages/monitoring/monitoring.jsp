@@ -9,7 +9,7 @@
 		
 		<lams:css/>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
@@ -24,7 +24,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+		<lams:JSImport src="includes/javascript/portrait.js" />
 		
 		<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 	</lams:head>

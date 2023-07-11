@@ -58,7 +58,7 @@
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.plugin.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script>
 	$(document).ready(function(){
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');

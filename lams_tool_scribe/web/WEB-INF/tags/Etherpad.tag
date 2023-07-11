@@ -34,7 +34,7 @@
 </style>
 
 <%-- THIS TAG REQUIRES JQUERY --%>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/etherpad.js"></script>
+<lams:JSImport src="includes/javascript/etherpad.js" />
 <script type="text/javascript">
 	var etherpadInitMethods = typeof etherpadInitMethods == 'undefined' ? {} : etherpadInitMethods;
 	etherpadInitMethods['${groupId}'] = function intialiseEtherpad() {

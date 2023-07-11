@@ -28,9 +28,9 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/addLesson.js"></script>	
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
+	<lams:JSImport src="includes/javascript/addLesson.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
@@ -248,4 +248,3 @@
 </body>
 	
 </lams:html>
- 

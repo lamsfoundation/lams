@@ -24,7 +24,7 @@
 		</style>
 		
 		<!-- ********************  javascript ********************** -->
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -32,7 +32,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+		<lams:JSImport src="includes/javascript/upload.js" />
 		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	
 		<script type="text/javascript">

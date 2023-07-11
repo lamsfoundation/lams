@@ -13,7 +13,7 @@
 	<link type="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 
  	<!-- ********************  javascript ********************** -->
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/rsrccommon.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 

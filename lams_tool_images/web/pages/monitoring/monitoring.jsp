@@ -83,11 +83,11 @@
 		</c:choose>
 	
 		<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
-    	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+    	<lams:JSImport src="includes/javascript/upload.js" />
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+		<lams:JSImport src="includes/javascript/rating.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script>
 			var initialTabId = "${initialTabId}";

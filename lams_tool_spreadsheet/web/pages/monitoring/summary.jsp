@@ -5,7 +5,7 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
 <script type="text/javascript">
 
 	function downloadMarks(sessionId){

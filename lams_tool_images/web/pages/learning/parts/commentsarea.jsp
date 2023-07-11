@@ -11,7 +11,7 @@
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <c:if test="${isImageSelected}">
 	<script type="text/javascript">
 		//var for jquery.jRating.js
@@ -31,7 +31,7 @@
 		ALLOW_RERATE = false,
 		SESSION_ID = ${toolSessionID};
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<lams:JSImport src="includes/javascript/rating.js" />
 </c:if>
 <lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>

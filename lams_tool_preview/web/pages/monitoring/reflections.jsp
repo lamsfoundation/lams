@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	<script type="text/javascript">
 	$(document).ready(function(){
 

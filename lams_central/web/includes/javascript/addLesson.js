@@ -1,4 +1,4 @@
-﻿﻿﻿// ********** MAIN FUNCTIONS **********
+﻿// ********** MAIN FUNCTIONS **********
 var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
