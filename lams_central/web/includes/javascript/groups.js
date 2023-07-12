@@ -109,9 +109,6 @@ function fillGroup(users, container) {
 		var userDivs = [],
 			userIds = [];
 		// create user DIVs
-		users = users.concat(users);
-		users = users.concat(users);
-		users = users.concat(users);
 		$.each(users, function(index, userJSON) {
 			var userDiv = $('<div />')
 				.attr('userId', userJSON.id)
