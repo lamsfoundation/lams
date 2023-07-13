@@ -342,7 +342,7 @@
 	</target>
 	
 	
-	<target name="_copy-jsp" depends="sass.compile, _js-minify">
+	<target name="_copy-jsp" depends="sass.compile">
 		<!-- Internal target: Copies JSP files. -->
 		<echo>${ant.project.name}: Copying JSP files</echo>
 
@@ -382,39 +382,14 @@
  	        </fileset>
             <mapper from="*.scss" to="*.css" type="glob"/>
         </apply>
-	    <ant target="_css.minify.copy"/>
-	    <ant target="_css.nominify.copy"/>
-	</target>
-	
-	<target name="_css.minify.copy"  if="${css.minify}">
-		<echo> Minifying Files </echo>
-	    <apply executable="java" parallel="false">
-	        <fileset dir="${basedir}/build/css">
-		        	<include name="*.css"/>
-		        	<exclude name="*-min.css"/>
-		    </fileset>
-	        <arg line="-jar"/>
-	        <arg path="${yuicompressor}"/>
-	         <srcfile/>
-	        <arg line="-o"/>
-	        <mapper type="glob" from="*.css" to="${basedir}/build/css/*-min.css"/>
-	        <targetfile/>
-	    </apply>
-    		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
-	 	<copy todir="${scss.css.dir}">
-			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
-				<include name="*.css"/>
-			</fileset>
-		    <mapper type="glob" from="*-min.css" to="*.css"/>
-	 	</copy>
+	    <ant target="_css.copy"/>
 	</target>
 
-	<target name="_css.nominify.copy" unless="${css.minify}">
+	<target name="_css.copy">
     		<echo>Copying css files from build area to web/css directory. The .map files are not copied. </echo>
 	 	<copy todir="${scss.css.dir}" verbose="true">
 			<fileset dir="${basedir}/build/css" erroronmissingdir="false">
 				<include name="*.css"/>
-		        	<exclude name="*-min.css"/>
 			</fileset>
 		    <mapper type="glob" from="*.css" to="*.css"/>
 	 	</copy>
@@ -442,34 +417,5 @@
 		<mkdir dir="${basedir}/build/css" />
 		<ant target="_sass.do.compile"/>
     </target>
-
-	<!-- Minify specific javascript files -->
-	<fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
-        	<include name="*.js"/>
-    </fileset>
-
-	<target name="_set-do.js.minify">
-		<condition property="do.js.minify">
-	    		<and>
-		      <istrue value="${js.minify}"/>
-		      <available file="${basedir}/web/includes/javascript" type="dir"/>
-		    </and>
-		</condition>
-	</target>
-	
-  	<!-- Must run before the general web copy or the minified files will not be included as the files are up to date. -->
-	<target name="_js-minify" depends="_set-do.js.minify" if="do.js.minify">
-		<echo>Minifying Javascript Files</echo>
-		<mkdir dir="${basedir}/build/war/includes/javascript" />
-	    <apply executable="java" parallel="false">
-	        <fileset refid="js.to.minify"/>
-	        <arg line="-jar"/>
-	        <arg path="${yuicompressor}"/>
-	        <srcfile/>
-	        <arg line="-o"/>
-	        <mapper type="glob" from="*.js" to="${basedir}/build/war/includes/javascript/*.js"/>
-	        <targetfile/>
-	    </apply>
-	</target>
 
 </project>

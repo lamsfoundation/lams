@@ -84,5 +84,3 @@ spring            spring-core-5.3.18.jar				5.3.18				   Apache License 2.0			 V
 urlrewritefilter urlrewritefilter-4.0.3.jar             4.0.3                  BSD License              	 tuckey.org         			  Java Web Filter which allows rewriting URLs
 
 xstream           xstream-1.4.11.jar            		1.4.11																				  XML serializer
-
-yuicompressor	  yuicompressor-2.4.9					2.4.9				   BSD License					YUI								  CSS and JS minifier 
