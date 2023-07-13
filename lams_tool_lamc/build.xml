@@ -4,9 +4,4 @@
 	
 	<import file="../lams_build/build_tools_base.xml"/>
 
-    <fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
-        	<include name="*.js"/>
-    		<exclude name="fastclick.js"/>
-    </fileset>
-	
 </project>
