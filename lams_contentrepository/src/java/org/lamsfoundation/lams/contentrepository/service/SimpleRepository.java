@@ -23,49 +23,11 @@
 
 package org.lamsfoundation.lams.contentrepository.service;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.UUID;
-
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.CrCredential;
-import org.lamsfoundation.lams.contentrepository.CrNode;
-import org.lamsfoundation.lams.contentrepository.CrWorkspace;
-import org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IValue;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.IVersionedNodeAdmin;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.NodeType;
-import org.lamsfoundation.lams.contentrepository.PropertyName;
+import org.lamsfoundation.lams.contentrepository.*;
 import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
-import org.lamsfoundation.lams.contentrepository.exception.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.exception.FileException;
-import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.exception.ItemExistsException;
-import org.lamsfoundation.lams.contentrepository.exception.ItemNotFoundException;
-import org.lamsfoundation.lams.contentrepository.exception.LoginException;
-import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.exception.RepositoryRuntimeException;
-import org.lamsfoundation.lams.contentrepository.exception.ValidationException;
-import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
-import org.lamsfoundation.lams.contentrepository.exception.WorkspaceNotFoundException;
+import org.lamsfoundation.lams.contentrepository.exception.*;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
@@ -74,30 +36,26 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
+import javax.servlet.http.HttpSession;
+import java.io.*;
+import java.util.*;
+
 /**
- * Many methods in this class will throw a RepositoryRuntimeException
- * if the internal data is missing. This is not indicated
- * on the method signatures.
+ * Many methods in this class will throw a RepositoryRuntimeException if the internal data is missing. This is not
+ * indicated on the method signatures.
  *
- * The methods in this class do not explicitly check that a credential
- * or ticket has been supplied. This is checked by the
- * checkCredentialTicketBeforeAdvice advisor, for all transactioned
- * calls (see the application context file). Therefore this
- * class must be used in the Spring framework - if it is ever
- * run separately and without suitable AOP support then
- * each transaction method must check that the credential is okay
- * or that the ticket is a known ticket (isTicketOkay() method).
+ * The methods in this class do not explicitly check that a credential or ticket has been supplied. This is checked by
+ * the checkCredentialTicketBeforeAdvice advisor, for all transactioned calls (see the application context file).
+ * Therefore this class must be used in the Spring framework - if it is ever run separately and without suitable AOP
+ * support then each transaction method must check that the credential is okay or that the ticket is a known ticket
+ * (isTicketOkay() method).
  *
- * This class also depends on the transactions defined in the
- * application context for the hibernate sessions to work properly.
- * If the method isn't transactioned, then there won't be a proper
- * hibernate session in the DAO and all sorts of errors will occur
- * on lazy loading (even lazy loading withing the DAO) and when we
- * write out nodes.
+ * This class also depends on the transactions defined in the application context for the hibernate sessions to work
+ * properly. If the method isn't transactioned, then there won't be a proper hibernate session in the DAO and all sorts
+ * of errors will occur on lazy loading (even lazy loading withing the DAO) and when we write out nodes.
  *
- * So while the only footprint you see here of Spring is the beanfactory,
- * the use of this as a singleton (generated by Spring) affects
- * more than just how the object is created.
+ * So while the only footprint you see here of Spring is the beanfactory, the use of this as a singleton (generated by
+ * Spring) affects more than just how the object is created.
  *
  * @author Fiona Malikoff
  */
@@ -118,10 +76,9 @@ public class SimpleRepository implements IRepositoryAdmin {
     /* ********** Whole of repository methods - login, logout, addWorkspace, etc ****/
 
     /**
-     * Get the current user from the user's session. This is used to record the user
-     * who creates piece of content in the content repository. By doing it here, the
-     * tools do not have to be modified nor do we rely on other web-apps to tell
-     * us the correct user.
+     * Get the current user from the user's session. This is used to record the user who creates piece of content in the
+     * content repository. By doing it here, the tools do not have to be modified nor do we rely on other web-apps to
+     * tell us the correct user.
      */
     private Integer getCurrentUserId() throws AccessDeniedException {
 	HttpSession ss = SessionManager.getSession();
@@ -189,18 +146,18 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Add a workspace, giving the credentials as the user of this workspace.
-     * It does not clear the password in the credentials
+     * Add a workspace, giving the credentials as the user of this workspace. It does not clear the password in the
+     * credentials
      *
      * @param credentials
-     *            this user/password must already exist in the repository. Password will be checked.
+     * 	this user/password must already exist in the repository. Password will be checked.
      * @param workspaceName
      * @throws LoginException
-     *             if credentials are not authorised to add/access the new workspace.
+     * 	if credentials are not authorised to add/access the new workspace.
      * @throws ItemExistsException
-     *             if the workspace already exists.
+     * 	if the workspace already exists.
      * @throws RepositoryCheckedException
-     *             if parameters are missing.
+     * 	if parameters are missing.
      */
     @Override
     public CrWorkspace addWorkspace(ICredentials credentials, String workspaceName)
@@ -231,11 +188,9 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Create a new repository "user" - usually a tool.
-     * The password must be at least 6 chars.
-     * This method will not wipe out the password in the newCredential object.
-     * Possibly this should only be available to an internal management tool
-     * *** Security Risk - I'm converting two passwords to a string... ***
+     * Create a new repository "user" - usually a tool. The password must be at least 6 chars. This method will not wipe
+     * out the password in the newCredential object. Possibly this should only be available to an internal management
+     * tool *** Security Risk - I'm converting two passwords to a string... ***
      */
     @Override
     public void createCredentials(ICredentials newCredential)
@@ -262,17 +217,16 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Update a credential. Name cannot change, so really only the password changes
-     * The password must be at least 6 chars.
-     * Possibly this should only be available to an internal management tool
-     * *** Security Risk - I'm converting the password to a string... ***
+     * Update a credential. Name cannot change, so really only the password changes The password must be at least 6
+     * chars. Possibly this should only be available to an internal management tool *** Security Risk - I'm converting
+     * the password to a string... ***
      *
      * @throws LoginException
-     *             if the oldCredential fails login test (e.g. wrong password)
+     * 	if the oldCredential fails login test (e.g. wrong password)
      * @throws RepositoryCheckedException
-     *             if one of the credentials objects are missing
+     * 	if one of the credentials objects are missing
      * @throws RepositoryRuntimeException
-     *             if an internal error occurs.
+     * 	if an internal error occurs.
      */
     @Override
     public void updateCredentials(ICredentials oldCredential, ICredentials newCredential)
@@ -302,14 +256,14 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Checks that a password meets our password criteria. This could be implemented
-     * as a Strategy, but that's overkill!
+     * Checks that a password meets our password criteria. This could be implemented as a Strategy, but that's
+     * overkill!
      *
      * Checks that the password is six or more characters.
      *
      * @param password
      * @throws RepositoryCheckedException
-     *             if
+     * 	if
      */
     private void verifyNewPassword(char[] password) throws RepositoryCheckedException {
 	if (password != null && password.length < 6) {
@@ -319,9 +273,8 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Assign credentials to a workspace.
-     * Will check the credentials to ensure they are in the database.
-     * Possibly this should only be available to an internal management tool
+     * Assign credentials to a workspace. Will check the credentials to ensure they are in the database. Possibly this
+     * should only be available to an internal management tool
      */
     @Override
     public void assignCredentials(ICredentials credentials, String workspaceName)
@@ -349,10 +302,9 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Assign credentials to a workspace. Assume credentials are already checked.
-     * Possibly this should only be available to an internal management tool. Workspace
-     * is expected to be attached to a session.
-     * *** Security Risk - I'm converting the password to a string by reading it in from the database... ***
+     * Assign credentials to a workspace. Assume credentials are already checked. Possibly this should only be available
+     * to an internal management tool. Workspace is expected to be attached to a session. *** Security Risk - I'm
+     * converting the password to a string by reading it in from the database... ***
      */
     private void assignCredentials(ICredentials credentials, CrWorkspace workspace) throws RepositoryCheckedException {
 
@@ -386,9 +338,8 @@ public class SimpleRepository implements IRepositoryAdmin {
 	    CrWorkspaceCredential found = null;
 	    while (iter.hasNext() && found == null) {
 		CrWorkspaceCredential item = (CrWorkspaceCredential) iter.next();
-		if (item.getCrCredential() != null
-			&& item.getCrCredential().getCredentialId().equals(crCredential.getCredentialId())
-			&& item.getCrWorkspace() != null
+		if (item.getCrCredential() != null && item.getCrCredential().getCredentialId()
+			.equals(crCredential.getCredentialId()) && item.getCrWorkspace() != null
 			&& item.getCrWorkspace().getWorkspaceId().equals(workspace.getWorkspaceId())) {
 		    found = item;
 		}
@@ -503,20 +454,14 @@ public class SimpleRepository implements IRepositoryAdmin {
 	return nodeFactory.getNode(ticket.getWorkspaceId(), UUID.fromString(uuid), version);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.contentrepository.IRepository#getFileItem(org.lamsfoundation.lams.contentrepository.
-     * ITicket, java.lang.Long, java.lang.Long, java.lang.String)
-     */
     @Override
-    public IVersionedNode getFileItem(ITicket ticket, Long nodeId, Long version, String relPath)
+    public IVersionedNode getFileItem(ITicket ticket, String nodeId, Long version, String relPath)
 	    throws AccessDeniedException, ItemNotFoundException, FileException {
 
 	long start = System.currentTimeMillis();
 	String key = "getFileItem " + nodeId;
 
-	IVersionedNode latestNodeVersion = nodeFactory.getNode(ticket.getWorkspaceId(), nodeId, version);
+	IVersionedNode latestNodeVersion = getFileItem(ticket, nodeId, version);
 	log.error(key + " latestNodeVersion " + (System.currentTimeMillis() - start));
 
 	if (relPath == null) {
@@ -671,18 +616,17 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /**
-     * Sets the property to a value, based on the specified type. Removes the property if the value is null.
-     * Use this for custom properties only - change the filename or mimetype at your own risk.
+     * Sets the property to a value, based on the specified type. Removes the property if the value is null. Use this
+     * for custom properties only - change the filename or mimetype at your own risk.
      *
      * @param name
-     *            The name of a property of this node
+     * 	The name of a property of this node
      * @param value
-     *            The value to be assigned
+     * 	The value to be assigned
      * @param type
-     *            The type of the property
+     * 	The type of the property
      * @throws ValidationException
-     *             if the call has made the node invalid. This would occur if the
-     *             call had set the filename to blank.
+     * 	if the call has made the node invalid. This would occur if the call had set the filename to blank.
      */
     @Override
     public void setProperty(ITicket ticket, Long uuid, Long versionId, String name, Object value, int type)
@@ -886,6 +830,7 @@ public class SimpleRepository implements IRepositoryAdmin {
     }
 
     /* ********** setters and getters for DAOs *******************/
+
     /**
      * @return Returns the workspaceDAO.
      */
@@ -895,7 +840,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /**
      * @param workspaceDAO
-     *            The workspaceDAO to set.
+     * 	The workspaceDAO to set.
      */
     public void setWorkspaceDAO(IWorkspaceDAO workspaceDAO) {
 	this.workspaceDAO = workspaceDAO;
@@ -910,7 +855,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 
     /**
      * @param credentialDAO
-     *            The credentialDAO to set.
+     * 	The credentialDAO to set.
      */
     public void setCredentialDAO(ICredentialDAO credentialDAO) {
 	this.credentialDAO = credentialDAO;

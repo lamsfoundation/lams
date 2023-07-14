@@ -23,29 +23,24 @@
 
 package org.lamsfoundation.lams.contentrepository.client;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IValue;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.NodeType;
-import org.lamsfoundation.lams.contentrepository.PropertyName;
+import org.lamsfoundation.lams.contentrepository.*;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This is a specialised servlet that supports the downloading of single files and the rendering of packages.
@@ -218,7 +213,7 @@ public abstract class Download extends HttpServlet {
 		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
 	    }
 
-	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version);
+	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version, relPathString);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
 		throw new RepositoryCheckedException(
 			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);
