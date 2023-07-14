@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedExce
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 import javax.servlet.ServletException;
@@ -91,9 +92,10 @@ public abstract class Download extends HttpServlet {
     public static final String PREFER_DOWNLOAD = "preferDownload";
     protected static Logger log = Logger.getLogger(Download.class);
 
-    private static final String expectedFormat = "Expected format /download?" + Download.UUID_NAME + "<num>&"
-	    + Download.VERSION_NAME + "=<num>" + Download.PREFER_DOWNLOAD
-	    + "=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
+    private static final String expectedFormat =
+	    "Expected format /download?" + Download.UUID_NAME + "<num>&" + Download.VERSION_NAME + "=<num>"
+		    + Download.PREFER_DOWNLOAD
+		    + "=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
 
     /**
      * Get the ticket that may be used to access the repository.
@@ -110,13 +112,13 @@ public abstract class Download extends HttpServlet {
      * This method is called when a form has its tag value method equals to get.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -178,8 +180,9 @@ public abstract class Download extends HttpServlet {
 		// prepend with servlet and id - initial call doesn't include the id
 		// and depending on "/"s, the servlet name is sometimes lost by the redirect.
 		// make sure it displays the file - rather than trying to download it.
-		initialPage = request.getRequestURL() + "/" + uuid + "/" + version + "/" + initialPage
-			+ "?preferDownload=false";
+		initialPage =
+			WebUtil.getBaseServerURL() + request.getRequestURI() + uuid + "/" + version + "/" + initialPage
+				+ "?preferDownload=false";
 		Download.log.debug("Attempting to redirect to initial page " + initialPage);
 		response.sendRedirect(initialPage);
 
@@ -324,13 +327,13 @@ public abstract class Download extends HttpServlet {
      * This method is called when a form has its tag value method equals to post.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
