@@ -39,9 +39,13 @@
 		#gallery-walk-preview-info {
 			margin-bottom: 20px;
 		}
+
+		.comment-textarea {
+			height: 100px !important;
+		}
 	</style>
 
-	<lams:JSImport src="includes/javascript/etherpad.js" />
+	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
@@ -51,6 +55,9 @@
 			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip" />',
+			WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
 			ALLOW_RERATE = true,
@@ -94,7 +101,7 @@
 	<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 	
 	<c:if test="${not empty dokumaran.galleryWalkInstructions}">
-		<hr>
+		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.instructions.header" /></h4>
 		<p><c:out value="${dokumaran.galleryWalkInstructions}" escapeXml="false" /></p>
 	</c:if>
 		
@@ -158,7 +165,7 @@
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	    <c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
-		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
+		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" showComments="true"
 								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 

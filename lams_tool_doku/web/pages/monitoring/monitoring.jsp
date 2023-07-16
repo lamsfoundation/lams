@@ -2,8 +2,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
 
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
+
 <lams:html>
 	<lams:head>
+		<title>${title}</title>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
 		<style type="text/css">
@@ -46,7 +49,6 @@
 	</lams:head>
 	<body class="stripes" onLoad="init()">
 
-	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
 	
 		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= DokumaranConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
