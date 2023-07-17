@@ -15,7 +15,7 @@
 	}
 </style>
 
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 <script type="text/javascript">
 	//var for jquery.jRating.js
@@ -32,13 +32,13 @@
 			WARN_COMMENTS_IS_BLANK_LABEL = '',
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';

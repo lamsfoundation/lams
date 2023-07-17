@@ -2,28 +2,9 @@
 
 <project name="LAMS Central" basedir="." default="print-usage">
 	
-	<import file="../lams_build/build_base.xml"/> 
-
-    <fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
-        	<include name="addLesson.js"/>
-        	<include name="chart.js"/>
-  	  	<include name="common.js"/>
-		<include name="comments.js"/>
-  	  	<include name="dialog.js"/>
-  	  	<include name="download.js"/>
-        	<include name="main.js"/>
-        	<include name="openUrls.js"/>
-        	<include name="groups.js"/>
-        	<include name="orgGrouping.js"/>
-        	<include name="progressBar.js"/>
- 	   	<include name="portrait.js"/>
-   	 	<include name="rating.js"/>
-   	 	<include name="upload.js"/>
-  	  	<include name="authoring/*.js"/>
-    </fileset>
+	<import file="../lams_build/build_base.xml"/>
 	
 	<target name="_copy-war-resources">
-		<!-- authoring directory needed for the minify -->
 		<mkdir dir="${basedir}/build/war/includes/javascript/authoring" />
 		<!-- Internal target: Adds additional web content to WAR -->
 		<echo>${ant.project.name}: Copying favicon</echo>
@@ -41,7 +22,7 @@
 	 	</copy>
 	</target>
 	
-	<target name="_copy-jsp" depends="sass.compile, _js-minify">
+	<target name="_copy-jsp" depends="sass.compile">
 			<!-- Internal target: Copies JSP files. -->
 			<echo>${ant.project.name}: Copying JSP files</echo>
 

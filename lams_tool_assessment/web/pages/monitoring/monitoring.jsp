@@ -39,7 +39,7 @@
 			}
  		</style>
  		
-		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+		<lams:JSImport src="includes/javascript/portrait.js" />
 		<script>
 	        // avoid name clash between bootstrap and jQuery UI
 	        $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
@@ -87,7 +87,7 @@
 					LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
 				};
 		</script>
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
  		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -102,7 +102,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
+ 		<lams:JSImport src="includes/javascript/portrait.js" />
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
  		
 		<c:if test="${not empty codeStyles}">

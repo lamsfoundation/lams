@@ -23,15 +23,6 @@
 
 package org.lamsfoundation.lams.lesson.dao.hibernate;
 
-import java.math.BigInteger;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
@@ -50,6 +41,10 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigInteger;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * Hibernate implementation of ILessonDAO
@@ -105,8 +100,8 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + " AS lesson WHERE lesson.organisation.organisationId = :organisationId";
 
     private final static String FIND_ABSOLUTE_TIME_LIMITS = "SELECT a.tool_content_id AS toolContentId, a.title AS activityTitle, "
-	    + "(SELECT absolute_time_limit FROM tl_lascrt11_scratchie WHERE content_id = tool_content_id UNION "
-	    + "	SELECT absolute_time_limit FROM tl_laasse10_assessment WHERE content_id = tool_content_id "
+	    + "(SELECT absolute_time_limit_finish FROM tl_lascrt11_scratchie WHERE content_id = tool_content_id UNION "
+	    + "	SELECT absolute_time_limit_finish FROM tl_laasse10_assessment WHERE content_id = tool_content_id "
 	    + "<ADDITIONAL_TOOLS_PLACEHOLDER>) AS absolute_time_limit "
 	    + "FROM lams_lesson AS l JOIN lams_learning_activity AS a USING (learning_design_id) "
 	    + "WHERE l.lesson_id = :lessonId AND a.tool_content_id IS NOT NULL    "
@@ -456,14 +451,14 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 		.isEmpty();
 	if (toolAvailable) {
 	    additionalToolsBuilder.append(
-		    "UNION SELECT absolute_time_limit FROM tl_ladoku11_dokumaran WHERE content_id = tool_content_id ");
+		    "UNION SELECT absolute_time_limit_finish FROM tl_ladoku11_dokumaran WHERE content_id = tool_content_id ");
 	}
 
 	toolAvailable = !findByProperty(Tool.class, "toolSignature", CommonConstants.TOOL_SIGNATURE_WHITEBOARD, true)
 		.isEmpty();
 	if (toolAvailable) {
 	    additionalToolsBuilder.append(
-		    "UNION SELECT absolute_time_limit FROM tl_lawhiteboard11_whiteboard WHERE content_id = tool_content_id");
+		    "UNION SELECT absolute_time_limit_finish FROM tl_lawhiteboard11_whiteboard WHERE content_id = tool_content_id");
 	}
 
 	String queryText = FIND_ABSOLUTE_TIME_LIMITS.replace("<ADDITIONAL_TOOLS_PLACEHOLDER>", additionalToolsBuilder);

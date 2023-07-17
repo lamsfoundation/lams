@@ -41,7 +41,7 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
+	<lams:JSImport src="includes/javascript/etherpad.js" />
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
@@ -80,7 +80,7 @@
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	
 	<%@ include file="websocket.jsp"%>	

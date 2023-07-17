@@ -61,7 +61,7 @@
 		</script>
 		<lams:JSImport src="includes/javascript/dialog.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/progressBar.js"></script>
+		<lams:JSImport src="includes/javascript/progressBar.js" />
 		
 		<c:if test="${empty lessonID}">
 			<c:set var="lessonID" value="${param.lessonID}" />

@@ -10,7 +10,7 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+	<lams:JSImport src="includes/javascript/upload.js" />
 	<lams:JSImport src="includes/javascript/commonCartridgeItem.js" relative="true" />
 	
 	<script type="text/javascript">

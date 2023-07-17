@@ -21,7 +21,7 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
@@ -29,14 +29,14 @@
 		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
 		const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
 	</script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
+	<lams:JSImport src="includes/javascript/qb-question.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
+	<lams:JSImport src="includes/javascript/qb-search.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
     <script  type="text/javascript">
 		$(document).ready(function(){

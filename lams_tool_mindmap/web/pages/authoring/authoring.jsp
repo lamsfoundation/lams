@@ -11,7 +11,7 @@
 			<fmt:message key="activity.title" />
 		</title>
 		<lams:headItems />
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 
 		<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/jquery.minicolors.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>

@@ -155,9 +155,9 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
 <script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/",
@@ -459,7 +459,7 @@
 	}
 
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->

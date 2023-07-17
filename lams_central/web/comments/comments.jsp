@@ -19,7 +19,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.jscroll.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.treetable.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/comments.js"></script>		
+		<lams:JSImport src="includes/javascript/comments.js" />
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.timeago.js"></script>		
 
 		<script type="text/javascript">

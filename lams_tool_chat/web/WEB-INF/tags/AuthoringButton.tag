@@ -66,7 +66,7 @@
 	<c:set var="notifyCloseURL" value="${param.notifyCloseURL}" scope="session"/>
 </c:if>
 
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 
 <!-- begin tab content -->
 <script type="text/javascript">

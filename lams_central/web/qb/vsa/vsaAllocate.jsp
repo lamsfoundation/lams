@@ -36,11 +36,11 @@
 			}
 		</style>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
   	    <script>
 			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",

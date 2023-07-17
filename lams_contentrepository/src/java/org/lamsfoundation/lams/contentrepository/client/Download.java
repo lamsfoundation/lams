@@ -23,29 +23,25 @@
 
 package org.lamsfoundation.lams.contentrepository.client;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IValue;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.NodeType;
-import org.lamsfoundation.lams.contentrepository.PropertyName;
+import org.lamsfoundation.lams.contentrepository.*;
 import org.lamsfoundation.lams.contentrepository.exception.FileException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.exception.ValueFormatException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This is a specialised servlet that supports the downloading of single files and the rendering of packages.
@@ -96,9 +92,10 @@ public abstract class Download extends HttpServlet {
     public static final String PREFER_DOWNLOAD = "preferDownload";
     protected static Logger log = Logger.getLogger(Download.class);
 
-    private static final String expectedFormat = "Expected format /download?" + Download.UUID_NAME + "<num>&"
-	    + Download.VERSION_NAME + "=<num>" + Download.PREFER_DOWNLOAD
-	    + "=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
+    private static final String expectedFormat =
+	    "Expected format /download?" + Download.UUID_NAME + "<num>&" + Download.VERSION_NAME + "=<num>"
+		    + Download.PREFER_DOWNLOAD
+		    + "=<true|false> (version number optional) or /download/<uuid>/<version>/<relPath>";
 
     /**
      * Get the ticket that may be used to access the repository.
@@ -115,13 +112,13 @@ public abstract class Download extends HttpServlet {
      * This method is called when a form has its tag value method equals to get.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -183,8 +180,9 @@ public abstract class Download extends HttpServlet {
 		// prepend with servlet and id - initial call doesn't include the id
 		// and depending on "/"s, the servlet name is sometimes lost by the redirect.
 		// make sure it displays the file - rather than trying to download it.
-		initialPage = request.getRequestURL() + "/" + uuid + "/" + version + "/" + initialPage
-			+ "?preferDownload=false";
+		initialPage =
+			WebUtil.getBaseServerURL() + request.getRequestURI() + uuid + "/" + version + "/" + initialPage
+				+ "?preferDownload=false";
 		Download.log.debug("Attempting to redirect to initial page " + initialPage);
 		response.sendRedirect(initialPage);
 
@@ -218,7 +216,7 @@ public abstract class Download extends HttpServlet {
 		throw new RepositoryCheckedException("Filename is missing. " + Download.expectedFormat);
 	    }
 
-	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version);
+	    IVersionedNode node = getRepositoryService().getFileItem(ticket, uuid, version, relPathString);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
 		throw new RepositoryCheckedException(
 			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);
@@ -329,13 +327,13 @@ public abstract class Download extends HttpServlet {
      * This method is called when a form has its tag value method equals to post.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

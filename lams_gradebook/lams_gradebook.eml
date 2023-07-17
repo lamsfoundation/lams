@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component inheritJdk="true">
-	<contentEntry url="file://$MODULE_DIR$"/>
+	<contentEntry url="file://$MODULE_DIR$">
+		<excludeFolder url="file://$MODULE_DIR$/build"/>
+		<excludeFolder url="file://$MODULE_DIR$/bin"/>
+	</contentEntry>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/commons-lang"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/commons-lang"/>
 	</lib>
 	<lib name="jackson-core-2.9.5.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="jackson-databind-2.9.5.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/jackson"/>
 	</lib>
 	<lib name="javax.persistence-api-2.2.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/persistence-api"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/persistence-api"/>
 	</lib>
 	<lib name="hibernate-core-5.3.6.Final.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/hibernate-core"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/hibernate-core"/>
 	</lib>
 	<lib name="jboss-servlet-api_4.0_spec-1.0.0.Final.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_47$/servlet-api"/>
+		<relative-module-src project-related="file://$3RDPARTY_SOURCES_PROJECT_47$/servlet-api"/>
 	</lib>
 	<levels>
 		<level name="3rdParty" value="project"/>

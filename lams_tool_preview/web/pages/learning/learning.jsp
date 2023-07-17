@@ -36,7 +36,7 @@
 	<lams:css/>
 	<link rel="stylesheet" href="<lams:WebAppURL/>/includes/css/learning.css">
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	
