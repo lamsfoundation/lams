@@ -419,6 +419,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return dokumaranSessionDao.getSessionBySessionId(sessionId);
     }
 
+    public List<DokumaranSession> getDokumaranSessionsByToolContentId(long toolContentId) {
+	return  dokumaranSessionDao.getByContentId(toolContentId);
+    }
+
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws DokumaranApplicationException {
 	DokumaranUser user = dokumaranUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
@@ -506,7 +510,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    }
 	}
 
-	Collections.sort(sessionList, DokumaranSession.SESSION_NAME_COMPARATOR);
+	Collections.sort(sessionList, DokumaranSession.SESSION_COMPARATOR);
 
 	for (DokumaranSession session : sessionList) {
 	    // one new group for one session.
@@ -530,7 +534,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	    if (!session.getGalleryWalkCluster().isEmpty()) {
 		List<DokumaranSession> cluster = new ArrayList<>(session.getGalleryWalkCluster());
-		Collections.sort(cluster, DokumaranSession.SESSION_NAME_COMPARATOR);
+		Collections.sort(cluster, DokumaranSession.SESSION_COMPARATOR);
 		for (DokumaranSession clusterMember : cluster) {
 		    group.getGalleryWalkClusterMembers()
 			    .put(clusterMember.getSessionId(), clusterMember.getSessionName());

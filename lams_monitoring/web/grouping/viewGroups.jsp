@@ -93,5 +93,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<div id="footer">
 		</div><!--closes footer-->
 
-    </body5>
+    </body>
 </lams:html>

@@ -51,6 +51,10 @@
 		width: 100%;
 	}
 
+	.doku-monitoring-summary #gallery-walk-show-clusters {
+		margin-top: 20px;
+	}
+
 	.doku-monitoring-summary #gallery-walk-learner-edit {
 		margin-top: 20px;
 		margin-bottom: 20px;
@@ -392,6 +396,9 @@
 		});
 	}
 
+	function openGalleryWalkClusters(){
+		window.open('<lams:WebAppURL/>monitoring/showGalleryWalkClusters.do?toolContentID=${dokumaran.contentId}', '_blank');
+	}
 
 	function enableGalleryWalkLearnerEdit(){
 		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
@@ -532,8 +539,18 @@
 
 				<br>
 
+				<button id="gallery-walk-show-clusters" type="button"
+						class="btn btn-default
+							${dokumaran.galleryWalkClusterSize > 0 and dokumaran.galleryWalkStarted ? '' : 'hidden'}"
+						onClick="javascript:openGalleryWalkClusters()">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					<fmt:message key="monitoring.summary.gallery.walk.cluster.view.button" />
+				</button>
+
+				<br>
+
 				<button id="gallery-walk-learner-edit" type="button"
-						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
+						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and dokumaran.galleryWalkStarted? '' : 'hidden'}"
 						onClick="javascript:enableGalleryWalkLearnerEdit()">
 					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" />
 				</button>

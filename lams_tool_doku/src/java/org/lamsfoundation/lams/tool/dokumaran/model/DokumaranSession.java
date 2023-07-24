@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.dokumaran.model;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranSessionComparator;
+import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranSessionNameComparator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -42,7 +43,8 @@ import java.util.TreeSet;
 @Table(name = "tl_ladoku11_session")
 public class DokumaranSession {
 
-    public static final DokumaranSessionComparator SESSION_NAME_COMPARATOR = new DokumaranSessionComparator();
+    public static final DokumaranSessionComparator SESSION_COMPARATOR = new DokumaranSessionComparator();
+    public static final DokumaranSessionNameComparator SESSION_NAME_COMPARATOR = new DokumaranSessionNameComparator();
 
     @Id
     @Column
@@ -84,7 +86,7 @@ public class DokumaranSession {
 	    @JoinColumn(name = "source_session_uid") }, inverseJoinColumns = {
 	    @JoinColumn(name = "target_session_uid") })
     @SortComparator(DokumaranSessionComparator.class)
-    private Set<DokumaranSession> galleryWalkCluster = new TreeSet<>(SESSION_NAME_COMPARATOR);
+    private Set<DokumaranSession> galleryWalkCluster = new TreeSet<>(SESSION_COMPARATOR);
 
     // **********************************************************
     // Get/Set methods

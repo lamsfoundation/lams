@@ -177,6 +177,8 @@ public interface IDokumaranService extends ICommonToolService {
      */
     DokumaranSession getDokumaranSessionBySessionId(Long sessionId);
 
+    List<DokumaranSession> getDokumaranSessionsByToolContentId(long toolContentId);
+
     /**
      * If success return next activity's url, otherwise return null.
      */
