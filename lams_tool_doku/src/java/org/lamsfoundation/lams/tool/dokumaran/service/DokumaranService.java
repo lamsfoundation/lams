@@ -722,71 +722,26 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	// focus only on sessions that are not assigned to any cluster yet
 	List<DokumaranSession> allSessions = dokumaranSessionDao.getByContentId(toolContentId);
-	List<DokumaranSession> nonAssignedSessions = allSessions.stream()
-		.filter(session -> session.getGalleryWalkCluster().isEmpty()).collect(Collectors.toList());
-	if (nonAssignedSessions.isEmpty()) {
-	    return;
-	}
+	TreeMap<String, Set<String>> sessionClusters = allSessions.stream().collect(
+		Collectors.toMap(session -> session.getSessionName(),
+			session -> session.getGalleryWalkCluster().stream()
+				.collect(Collectors.mapping(DokumaranSession::getSessionName, Collectors.toSet())),
+			(existing, replacement) -> {
+			    existing.addAll(replacement);
+			    return existing;
+			}, TreeMap::new));
 
-	Random random = new Random();
-	List<DokumaranSession> nonFullClusterSessions = allSessions.stream()
-		.filter(session -> session.getGalleryWalkCluster().size() < clusterSize).collect(Collectors.toList());
-	// to each session from nonAssignedSessions assign random sessions from nonFullClusterSessions up to at least clusterSize
-	for (DokumaranSession nonAssignedSession : nonAssignedSessions) {
-	    nonFullClusterSessions.remove(nonAssignedSession);
-	    List<DokumaranSession> nonFullClusterSessionsCopy = nonFullClusterSessions.stream()
-		    .filter(session -> !session.getGalleryWalkCluster().contains(nonAssignedSession))
-		    .collect(Collectors.toList());
+	toolService.assignGroupsForGalleryWalk(sessionClusters, clusterSize);
 
-	    // first try to find sessions which are not full yet
-	    while (nonAssignedSession.getGalleryWalkCluster().size() < clusterSize
-		    && !nonFullClusterSessionsCopy.isEmpty()) {
-		DokumaranSession targetSession = nonFullClusterSessionsCopy.get(
-			random.nextInt(nonFullClusterSessionsCopy.size()));
+	Map<String, DokumaranSession> sessionsByName = allSessions.stream()
+		.collect(Collectors.toMap(session -> session.getSessionName(), Function.identity()));
 
-		// create a new collection with all cluster members and assign it to each member
-		Set<DokumaranSession> cluster = new HashSet<>();
-		cluster.add(nonAssignedSession);
-		cluster.addAll(nonAssignedSession.getGalleryWalkCluster());
-		cluster.add(targetSession);
-		cluster.addAll(targetSession.getGalleryWalkCluster());
-
-		for (DokumaranSession clusterMember : cluster) {
-		    // do not participate in further cluster assignments for this nonAssignedSession
-		    nonFullClusterSessionsCopy.remove(clusterMember);
-		    clusterMember.getGalleryWalkCluster().addAll(cluster);
-		    // do not assign itself as a cluster member
-		    clusterMember.getGalleryWalkCluster().remove(clusterMember);
-		    if (clusterMember.getGalleryWalkCluster().size() >= clusterSize) {
-			// make is unavailable for further cluster assignments for any next nonAssignedSession
-			nonFullClusterSessions.remove(clusterMember);
-		    }
-		}
-	    }
-
-	    // if cluster is not full but we run out of sessions which are not full yet, assign to random cluster
-	    // this will make some clusters bigger than clusterSize
-	    if (nonAssignedSession.getGalleryWalkCluster().size() < clusterSize) {
-		// assign to random cluster
-		List<DokumaranSession> otherSessions = allSessions.stream()
-			.filter(session -> !session.equals(nonAssignedSession) && !session.getGalleryWalkCluster()
-				.contains(nonAssignedSession)).collect(Collectors.toList());
-		while (nonAssignedSession.getGalleryWalkCluster().size() < clusterSize && !otherSessions.isEmpty()) {
-		    DokumaranSession targetSession = otherSessions.get(random.nextInt(otherSessions.size()));
-
-		    Set<DokumaranSession> cluster = new HashSet<>();
-		    cluster.add(nonAssignedSession);
-		    cluster.addAll(nonAssignedSession.getGalleryWalkCluster());
-		    cluster.add(targetSession);
-		    cluster.addAll(targetSession.getGalleryWalkCluster());
-
-		    for (DokumaranSession clusterMember : cluster) {
-			otherSessions.remove(clusterMember);
-			clusterMember.getGalleryWalkCluster().addAll(cluster);
-			clusterMember.getGalleryWalkCluster().remove(clusterMember);
-		    }
-		}
-	    }
+	for (Map.Entry<String, Set<String>> sessionClusterEntry : sessionClusters.entrySet()) {
+	    DokumaranSession session = sessionsByName.get(sessionClusterEntry.getKey());
+	    Set<DokumaranSession> cluster = sessionClusterEntry.getValue().stream()
+		    .map(sessionName -> sessionsByName.get(sessionName)).collect(Collectors.toSet());
+	    session.getGalleryWalkCluster().clear();
+	    session.getGalleryWalkCluster().addAll(cluster);
 	}
 
 	for (DokumaranSession session : allSessions) {
@@ -1160,7 +1115,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	etherpadService.createCookie(etherpadSessionIds, response);
     }
-
 
     private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
 	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
