@@ -39,9 +39,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs/chart.umd.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>

@@ -95,8 +95,6 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
  		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-   		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/chartjs/chart.umd.js"></script>
  		<lams:JSImport src="includes/javascript/chart.js" relative="true" />
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>

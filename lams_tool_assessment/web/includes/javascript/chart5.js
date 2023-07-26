@@ -55,12 +55,6 @@ function drawActivityCompletionChart(data, animate){
 	activityCompletionChart = new Chart(ctx, {
 		type : 'doughnut',
 		data : {
-			elements : {
-				arc : {
-					borderWidth : 0,
-					fontSize : 0,
-				}
-			},
 			datasets : [ {
 				data : newData,
 				backgroundColor : [

@@ -1173,6 +1173,13 @@ public class MonitoringController {
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	notStartedJSON.put("raw", notCompletedLearnersCount);
+	responseJSON.withArray("data").add(notStartedJSON);
+
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
@@ -1185,11 +1192,7 @@ public class MonitoringController {
 	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
 
-	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
-	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	notStartedJSON.put("raw", notCompletedLearnersCount);
-	responseJSON.withArray("data").add(notStartedJSON);
+
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
