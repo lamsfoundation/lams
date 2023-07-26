@@ -1,7 +1,8 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿// ********** GLOBAL VARIABLES **********
 
 // current tab that should be displayed after a refresh, defaults to Sequence tab
 var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence',
+// copy of lesson SVG so it does no need to be fetched every time
 // copy of lesson SVG so it does no need to be fetched every time
 	originalSequenceCanvas = null,
 // DIV container for lesson SVG

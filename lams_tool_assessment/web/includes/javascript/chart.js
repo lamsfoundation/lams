@@ -61,7 +61,6 @@ function drawActivityCompletionChart(data, animate){
 
 	activityCompletionChart = new Chart(ctx, {
 		type : 'doughnut',
-		borderWidth : 0,
 		data : {
 			elements : {
 				arc : {
@@ -74,61 +73,59 @@ function drawActivityCompletionChart(data, animate){
 				backgroundColor : [ 'rgba(5, 204, 214, 1)',
 					'rgba(255, 195, 55, 1)',
 					'rgba(253, 60, 165, 1)',
-				],
-				borderWidth : 0,
+				]
 			} ],
 			labels : [ LABELS.ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS,
 				LABELS.ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS,
 				LABELS.ACTIVITY_COMPLETION_CHART_COMPLETED_LEARNERS ]
 		},
 		options : {
-			layout : {
-				padding : {
-					top: 10
-				}
-			},
-			legend : {
-				position: 'left',
-				labels : {
-					generateLabels : function(chart) {
-						var data = chart.data;
-						if (data.labels.length && data.datasets.length) {
-							return data.labels.map(function(label, i) {
-								var meta = chart.getDatasetMeta(0),
-									style = meta.controller.getStyle(i),
-									value = data.datasets[0].data[i];
-
-								return {
-									text: label + ": " + value,
-									fillStyle: style.backgroundColor,
-									strokeStyle: style.borderColor,
-									lineWidth: style.borderWidth,
-									hidden: isNaN(value) || meta.data[i].hidden,
-
-									// Extra data used for toggling the
-									// correct item
-									index: i
-								};
-							});
-						}
-						return [];
-					}
-				}
-			},
-			title : {
-				display: true,
-				fontSize : '15',
-				text : LABELS.ACTIVITY_COMPLETION_CHART_TITLE
-			},
 			animation : {
 				animateScale : true,
 				animateRotate : true,
 				duration : animate ? 1000 : 0
 			},
-			tooltips : {
-				enabled : false,
-				custom  : function(tooltipModel) {
-					listCompletionChartLearners.call(this, chartPlaceholder, tooltipModel)
+			plugins : {
+				title : {
+					display: true,
+					font : {
+						size : 15
+					},
+					text : LABELS.ACTIVITY_COMPLETION_CHART_TITLE
+				},
+				legend : {
+					position: 'bottom',
+					labels : {
+						generateLabels : function(chart) {
+							var data = chart.data;
+							if (data.labels.length && data.datasets.length) {
+								return data.labels.map(function(label, i) {
+									var meta = chart.getDatasetMeta(0),
+										style = meta.controller.getStyle(i),
+										value = data.datasets[0].data[i];
+
+									return {
+										text: label + ": " + value,
+										fillStyle: style.backgroundColor,
+										strokeStyle: style.borderColor,
+										lineWidth: style.borderWidth,
+										hidden: isNaN(value) || meta.data[i].hidden,
+
+										// Extra data used for toggling the
+										// correct item
+										index: i
+									};
+								});
+							}
+							return [];
+						}
+					}
+				},
+				tooltip : {
+					enabled : false,
+					external  : function(context) {
+						listCompletionChartLearners.call(this, chartPlaceholder)
+					}
 				}
 			}
 		}
@@ -168,59 +165,61 @@ function drawAnsweredQuestionsChart(data, animate){
 			datasets : [ {
 				data :  Object.values(data.answeredQuestionsByUsersCount),
 				backgroundColor : 'rgba(255, 195, 55, 1)'
-
-			} ],
+			}],
 			labels :  Object.keys(data.answeredQuestionsByUsersCount),
 		},
 		options : {
-			layout : {
-				paddint : {
-					top : 30
-				}
-			},
-			legend : {
-				display : false
-			},
-			title : {
-				display: true,
-				fontSize : '15',
-				lineHeight: 3,
-				text : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
-			},
 			animation : {
 				duration : animate ? 1000 : 0
 			},
 			scales : {
-				xAxes : [{
-					scaleLabel : {
-						display : true,
-						labelString : LABELS.ANSWERED_QUESTIONS_CHART_X_AXIS
-					}
-				}
-				],
-				yAxes : [
-					{
-						ticks : {
-							beginAtZero   : true,
-							stepSize      : 1,
-							maxTicksLimit : 5,
-							// prevent scale to change on each update
-							// set suggested max number of students to 3/4
-							// of all possible learners
-							suggestedMax  : Math.max(2, Math.floor(3 * (useGroupsAsNames ? data.sessionCount : data.possibleLearners.length) / 4))
-						},
-						scaleLabel : {
-							display : true,
-							labelString : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS,
-							fontSize : 14
+				x : {
+					title: {
+						display: true,
+						text: LABELS.ANSWERED_QUESTIONS_CHART_X_AXIS,
+						font : {
+							size : 14
 						}
 					}
-				]
+				},
+				y :
+					{
+						beginAtZero   : true,
+						// prevent scale to change on each update
+						// set suggested max number of students to 3/4
+						// of all possible learners
+						suggestedMax  : Math.max(2, Math.floor(3 * (useGroupsAsNames ? data.sessionCount : data.possibleLearners.length) / 4)),
+						ticks : {
+							stepSize      : 1,
+							maxTicksLimit : 5,
+						},
+						title : {
+							display : true,
+							text : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS,
+							font : {
+								size : 14
+							}
+						}
+					}
 			},
-			tooltips : {
-				enabled : false,
-				custom  : function(tooltipModel) {
-					listCompletionChartLearners.call(this, chartPlaceholder, tooltipModel)
+			plugins : {
+				title : {
+					display: true,
+					font : {
+						size : 15,
+						lineHeight: 3
+					},
+					text : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
+
+				},
+				legend : {
+					display: false
+				},
+				tooltip : {
+					enabled : false,
+					external  : function(context) {
+						listCompletionChartLearners.call(this, chartPlaceholder)
+					}
 				}
 			}
 		}
@@ -228,9 +227,9 @@ function drawAnsweredQuestionsChart(data, animate){
 }
 
 
-function listCompletionChartLearners(chartPlaceholder, tooltipModel) {
-
-	let tooltipClassName = chartPlaceholder.attr('id') + '-tooltip';
+function listCompletionChartLearners(chartPlaceholder) {
+	let tooltipModel = this.$context.tooltip,
+		tooltipClassName = chartPlaceholder.attr('id') + '-tooltip';
 	// always remove the tooltip at the beginning
 	$('.' + tooltipClassName).remove();
 	if (tooltipModel.opacity === 0) {
@@ -256,7 +255,7 @@ function listCompletionChartLearners(chartPlaceholder, tooltipModel) {
 		data = chartPlaceholder.data('tooltip-input'),
 		useGroupsAsNames = chartPlaceholder.data('useGroupsAsNames'),
 		isGrouped = chartPlaceholder.data('isGrouped'),
-		users = data[tooltipModel.dataPoints[0].index];
+		users = data[tooltipModel.dataPoints[0].dataIndex];
 	$(users).each(function(){
 		var portraitDiv = $(definePortrait(this.portraitUuid, this.id, STYLE_SMALL, true, LAMS_URL)).css({
 				'vertical-align' : 'middle'
@@ -290,7 +289,7 @@ function listCompletionChartLearners(chartPlaceholder, tooltipModel) {
 		'padding-bottom' : '0'
 	});
 
-	var position = this._chart.canvas.getBoundingClientRect();
+	var position = this.chart.canvas.getBoundingClientRect();
 	tooltipEl.css({
 		'left'  : position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60 + 'px',
 		'top'   : Math.max(10, position.top  + window.pageYOffset + tooltipModel.caretY - tooltipEl.height()/2) + 'px',
