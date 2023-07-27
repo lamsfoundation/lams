@@ -3,7 +3,7 @@ SET AUTOCOMMIT = 0;
 SET FOREIGN_KEY_CHECKS=0;
 -- Put all sql statements below here
 
---LDEV-5302 Rename SYSADMIN to APPADMIN, add new SYSADMIN role
+-- LDEV-5302 Rename SYSADMIN to APPADMIN, add new SYSADMIN role
 								   
 UPDATE lams_role SET name = 'APPADMIN', description = 'LAMS Application Adminstrator' WHERE name = 'SYSADMIN';
 
