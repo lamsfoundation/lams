@@ -205,3 +205,7 @@ function openCustom(url) {
 		}
 	}
 }
+
+function openTeamworkWindow (){
+	window.open('teamwork/show.do', '_blank');
+}
