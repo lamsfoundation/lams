@@ -123,7 +123,7 @@ public class DisplayGroupController {
 	boolean isSpTeamworkEnabled = Configuration.isLamsModuleAvailable(Configuration.TEAMWORK_MODULE_CLASS);
 	if (isSpTeamworkEnabled) {
 	    moreLinks.add(
-		    new IndexLinkBean("index.teamwork", "javascript:openTeamworkWindow()", "fa fa-fw fa-handshake",
+		    new IndexLinkBean("index.teamwork", "javascript:openTeamworkWindow(" + organisationId + ")", "fa fa-fw fa-handshake-o",
 			    null));
 	}
 
@@ -142,6 +142,9 @@ public class DisplayGroupController {
 
 	if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
+
+
+
 		if ((!isAppAdmin) && (roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(
 			    new IndexLinkBean("index.classman", "javascript:openOrgManagement(" + organisationId + ")",

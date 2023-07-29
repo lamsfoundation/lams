@@ -206,6 +206,6 @@ function openCustom(url) {
 	}
 }
 
-function openTeamworkWindow (){
-	window.open('teamwork/show.do', '_blank');
+function openTeamworkWindow (organisationId){
+	window.open('teamwork/organisation.do?organisationId=' + organisationId, '_blank');
 }
