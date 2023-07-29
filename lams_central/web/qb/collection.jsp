@@ -93,7 +93,7 @@
 			collectionGrid.jqGrid({
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
-				caption: '<fmt:message key="label.qb.collection.grid.title" />',
+				caption: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.title" /></spring:escapeBody>',
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />qb/collection/getCollectionGridData.do?view=single&collectionUid=${collection.uid}",
 			    height: "100%",
@@ -114,13 +114,13 @@
 			    recordpos: "left",
 			    hidegrid: false,
 			    colNames:[
-			    	'<fmt:message key="label.qb.collection.grid.id" />',
-			    	'<fmt:message key="label.qb.collection.grid.name" />',
+			    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.id" /></spring:escapeBody>',
+			    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.name" /></spring:escapeBody>',
 			    	"questionType",
 			    	"questionVersion",
-			    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
-			    	'<fmt:message key="label.qb.collection.grid.usage" />',
-			    	'<fmt:message key="label.qb.collection.grid.actions" />',
+			    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.outcomes" /></spring:escapeBody>',
+			    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.usage" /></spring:escapeBody>',
+			    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.actions" /></spring:escapeBody>',
 			    	"hasVersions"
 			    ],
 			    colModel:[
@@ -144,7 +144,7 @@
 			    },
 			    loadError: function(xhr,st,err) {
 			    	collectionGrid.clearGridData();
-				   	alert('<fmt:message key="label.qb.collection.grid.error" />');
+				   	alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.error" /></spring:escapeBody>');
 			    },
 				subGrid : true,
 				subGridOptions: {
@@ -169,13 +169,13 @@
 						     cellEdit:false,
 						     pager: false,
 						     colNames: [
-						    	'<fmt:message key="label.qb.collection.grid.id" />',
-						    	'<fmt:message key="label.qb.collection.grid.name" />',
+						    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.id" /></spring:escapeBody>',
+						    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.name" /></spring:escapeBody>',
 						    	"questionType",
 						    	"questionVersion",
-						    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
-						    	'<fmt:message key="label.qb.collection.grid.usage" />',
-						    	'<fmt:message key="label.qb.collection.grid.actions" />'
+						    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.outcomes" /></spring:escapeBody>',
+						    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.usage" /></spring:escapeBody>',
+						    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.actions" /></spring:escapeBody>'
 						     ],
 						     colModel: [
 						    	{name:'id', index:'question_id', sortable:false, hidden:true, width: 10},
@@ -189,7 +189,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert('<fmt:message key="label.qb.collection.grid.error" />');
+						    	alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.error" /></spring:escapeBody>');
 						     }
 					  	});
 					}
@@ -209,13 +209,13 @@
 					    //close editing area on validation failure
 			            if (!value.trim()) {
 			                $('.editable-open').editableContainer('hide', 'cancel');
-			                return '<fmt:message key="label.qb.collection.name.blank.error" />';
+			                return '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.name.blank.error" /></spring:escapeBody>';
 			            }
 			        },
 				    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
 				    success: function(response, newValue) {
 						if (response.created == 'false') {
-							alert('<fmt:message key="label.qb.collection.name.duplicate.error" />');
+							alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.name.duplicate.error" /></spring:escapeBody>');
 						}
 				    }
 			    //hide and show pencil on showing and hiding editing widget
@@ -258,9 +258,9 @@
 		// auxiliary formatter for jqGrid's question statistics column
 		function actionsFormatter(cellvalue){
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
-					+ "\", \"_blank\")' title='<fmt:message key='label.qb.collection.action.stats' />'></i>";
+					+ "\", \"_blank\")' title='<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.qb.collection.action.stats' /></spring:escapeBody>'></i>";
 
-			cellhtml += "<a  title='<fmt:message key='label.edit' />' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
+			cellhtml += "<a  title='<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.edit' /></spring:escapeBody>' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
 						+ cellvalue + "&oldCollectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true' class='thickbox'>"; 
 			cellhtml += 	"<i class='fa fa-pencil'></i>";
 			cellhtml += "</a>";
@@ -274,28 +274,28 @@
 	       	var questionType;
 	       	switch (questionTypeInt) {
 	        case '1':
-	        	questionType = "<fmt:message key="label.question.type.multiple.choice" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.multiple.choice" /></spring:escapeBody>";
 	          	break;
 	        case '2':
-	        	questionType = "<fmt:message key="label.question.type.matching.pairs" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.matching.pairs" /></spring:escapeBody>";
 	          	break;
 	        case '3':
-	        	questionType = "<fmt:message key="label.question.type.short.answer" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.short.answer" /></spring:escapeBody>";
 	          	break;
 	        case '4':
-	        	questionType = "<fmt:message key="label.question.type.numerical" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.numerical" /></spring:escapeBody>";
 	          	break;
 	        case '5':
-	        	questionType = "<fmt:message key="label.question.type.true.false" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.true.false" /></spring:escapeBody>";
 	          	break;
 	        case '6':
-	        	questionType = "<fmt:message key="label.question.type.essay" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.essay" /></spring:escapeBody>";
 	          	break;
 	        case '7':
-	        	questionType = "<fmt:message key="label.question.type.ordering" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.ordering" /></spring:escapeBody>";
 	          	break;
 	        case '8':
-	        	questionType = "<fmt:message key="label.question.type.mark.hedging" />";
+	        	questionType = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.type.mark.hedging" /></spring:escapeBody>";
 	          	break;
 	      	}
 
@@ -317,9 +317,9 @@
 		
 		// remove a collection
 		function removeCollection() {
-			<fmt:message key="label.qb.collection.remove.confirm" var="label.qb.collection.remove.confirm">
+			<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.remove.confirm" var="label.qb.collection.remove.confirm">
 				<fmt:param value="${collection.name}" />
-			</fmt:message>
+			</fmt:message></spring:escapeBody>
 			
 			if (confirm('${label.qb.collection.remove.confirm}')) {
 				$.ajax({
@@ -441,7 +441,7 @@
 			}).done(function(response){
 				if (response == 'fail') {
 					// not all questions were removed
-					alert('<fmt:message key="label.qb.collection.remove.questions.fail" />');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.remove.questions.fail"/></spring:escapeBody>');
 				}
 				document.location.reload();
 			});
