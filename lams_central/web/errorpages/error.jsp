@@ -19,11 +19,11 @@
 				var messageDetail = document.getElementById('messageDetail'),
 					showButt = document.getElementById('showButt');
 				if (messageDetail.style.display == 'none') {
-					showButt.innerHTML = "<fmt:message key='msg.hide.detail'/>";
+					showButt.innerHTML = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='msg.hide.detail'/></spring:escapeBody>";
 					messageDetail.style.display = 'inline';
 
 				} else {
-					showButt.innerHTML = "<fmt:message key='msg.show.detail'/>";
+					showButt.innerHTML = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='msg.show.detail'/></spring:escapeBody>";
 					messageDetail.style.display = 'none';
 				}
 			}

@@ -26,18 +26,18 @@
 			    	    }
 	    			   }
 		    	},
-	    		messages: {
-	    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    			maxMark: {
-	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-	    			},
-	    			penaltyFactor: {
-	    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-	    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-	    			},
-	    			hasOptionFilled: "<fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/>"
-	    		},
+				messages: {
+					title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+					maxMark: {
+						required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+						digits: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.integer'/></spring:escapeBody>"
+					},
+					penaltyFactor: {
+						required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+						number: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.float'/></spring:escapeBody>"
+					},
+					hasOptionFilled: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.matching.pairs.error.one.matching.pair'/></spring:escapeBody>"
+				},
    			    submitHandler: function(form) {
 	    			$("#optionList").val($("#optionForm").serialize(true));
 	    			$("#description").val(CKEDITOR.instances.description.getData());

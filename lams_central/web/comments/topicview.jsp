@@ -5,9 +5,9 @@
 <c:set var="messageTablename" value=""/>
 <c:set var="indent" value="10"/>
 
-<c:set var="show"><fmt:message key="label.show" /></c:set>
-<c:set var="hide"><fmt:message key="label.hide" /></c:set>
-<c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
+<c:set var="show"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show" /></spring:escapeBody></c:set>
+<c:set var="hide"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide" /></spring:escapeBody></c:set>
+<c:set var="prompt"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.showhide.prompt" /></spring:escapeBody></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
 	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
@@ -43,7 +43,7 @@
 	
 	function createReply(commentUid, url) {
 		if ( document.getElementById('reply') ) {
-			alert('<fmt:message key="message.complete.or.cancel.reply"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.complete.or.cancel.reply"/></spring:escapeBody>');
 		} else {
 			// set up the new reply area
 			var replyDiv = document.createElement("div");
@@ -60,7 +60,7 @@
 	
 	function createEdit(commentUid, url) {
 		if ( document.getElementById('edit') ) {
-			alert('<fmt:message key="message.complete.or.cancel.edit"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.complete.or.cancel.edit"/></spring:escapeBody>');
 		} else {
 			// set up the new edit area
 			// set up the new reply area
@@ -107,7 +107,7 @@
     		var serverCommentUid = response.commentUid;
        		
     		if ( ! commentUid || serverCommentUid != commentUid ) {
-				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>');
   			} else if ( response.status ) {
   				var currentCount = $('#msglikeCount'+commentUid).html();
   				currentCount = +currentCount + incValue;

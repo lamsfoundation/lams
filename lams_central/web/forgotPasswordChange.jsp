@@ -63,18 +63,18 @@
 				},
 
 				// Specify the validation error messages
-				messages : {
-					newPassword : {
-						required : "<fmt:message key='error.password.empty'/>",
-						minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-						maxlength : "<fmt:message key='label.password.max.length'/>",
-						charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
-						pwcheck : "<fmt:message key='label.password.restrictions'/>"
+				messages: {
+					newPassword: {
+						required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.password.empty'/></spring:escapeBody>",
+						minlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message></spring:escapeBody>",
+						maxlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.max.length'/></spring:escapeBody>",
+						charactersAllowed: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.symbols.allowed'/></spring:escapeBody> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \\ | : ; \" ' < > , . ? /",
+						pwcheck: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.restrictions'/></spring:escapeBody>"
 					},
-					confirmNewPassword : {
-						required : "<fmt:message key='error.password.empty'/>",
-						equalTo : "<fmt:message key='error.newpassword.mismatch'/>"
-					},
+					confirmNewPassword: {
+						required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.password.empty'/></spring:escapeBody>",
+						equalTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.newpassword.mismatch'/></spring:escapeBody>"
+					}
 				},
 
 				submitHandler : function(form) {

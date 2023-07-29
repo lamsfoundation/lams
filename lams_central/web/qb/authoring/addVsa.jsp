@@ -46,21 +46,21 @@
 			    		    }		    		    
 	    			    }
 		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			maxMark: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			},
-		    			penaltyFactor: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-		    			},
-		    			hasOptionFilled: "<fmt:message key='label.authoring.numerical.error.answer'/>",
-		    			hasOnePositiveMaxMark: {
-		    				required: "<fmt:message key='error.positive.grade.required'/>"
-		    			}
-		    		},
+					messages: {
+						title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+						maxMark: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							digits: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.integer'/></spring:escapeBody>"
+						},
+						penaltyFactor: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							number: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.float'/></spring:escapeBody>"
+						},
+						hasOptionFilled: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.numerical.error.answer'/></spring:escapeBody>",
+						hasOnePositiveMaxMark: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.positive.grade.required'/></spring:escapeBody>"
+						}
+					},
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();     			    
 		    			$("#optionList").val($("#optionForm").serialize(true));

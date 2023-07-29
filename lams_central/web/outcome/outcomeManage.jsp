@@ -20,14 +20,14 @@
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			
-			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="outcome.manage.add" var="ADD_OUTCOME_TITLE_VAR"/>
-				ADD_OUTCOME_TITLE : '<c:out value="${ADD_OUTCOME_TITLE_VAR}" />',
+				ADD_OUTCOME_TITLE : '<spring:escapeBody javaScriptEscape="true">${ADD_OUTCOME_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="outcome.manage.edit" var="EDIT_OUTCOME_TITLE_VAR"/>
-				EDIT_OUTCOME_TITLE : '<c:out value="${EDIT_OUTCOME_TITLE_VAR}" />',
+				EDIT_OUTCOME_TITLE : '<spring:escapeBody javaScriptEscape="true">${EDIT_OUTCOME_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="outcome.manage.remove.confirm" var="REMOVE_OUTCOME_CONFIRM_LABEL_VAR"/>
-				REMOVE_OUTCOME_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_OUTCOME_CONFIRM_LABEL_VAR}" />').text()
+				REMOVE_OUTCOME_CONFIRM_LABEL : '<spring:escapeBody javaScriptEscape="true">${REMOVE_OUTCOME_CONFIRM_LABEL_VAR}</spring:escapeBody>'
+
 			};
 	</script>
 </lams:head>

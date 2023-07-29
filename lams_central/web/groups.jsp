@@ -47,40 +47,57 @@
 				csrfTokenValue = '<csrf:tokenvalue/>',
 
 				LAMS_URL = '<lams:LAMSURL/>',
-				decoderDiv = $('<div />'),
 				LABELS = {
 					<fmt:message key="label.course.groups.prefix" var="GROUP_PREFIX_LABEL_VAR"/>
-					GROUP_PREFIX_LABEL : '<c:out value="${GROUP_PREFIX_LABEL_VAR}" />',
+					GROUP_PREFIX_LABEL : "<spring:escapeBody javaScriptEscape='true'>${GROUP_PREFIX_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.remove.confirm" var="GROUP_REMOVE_LABEL_VAR"/>
-					GROUP_REMOVE_LABEL : decoderDiv.html('<c:out value="${GROUP_REMOVE_LABEL_VAR}" />').text(),
+					GROUP_REMOVE_LABEL : "<spring:escapeBody javaScriptEscape='true'>${GROUP_REMOVE_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.remove.empty.confirm" var="EMPTY_GROUP_SAVE_LABEL_VAR"/>
-					EMPTY_GROUP_SAVE_LABEL : decoderDiv.html('<c:out value="${EMPTY_GROUP_SAVE_LABEL_VAR}" />').text(),
+					EMPTY_GROUP_SAVE_LABEL : "<spring:escapeBody javaScriptEscape='true'>${EMPTY_GROUP_SAVE_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.locked" var="GROUP_LOCK_LABEL_VAR"/>
-					GROUP_LOCK_LABEL : decoderDiv.html('<c:out value="${GROUP_LOCK_LABEL_VAR}" />').text(),
+					GROUP_LOCK_LABEL : "<spring:escapeBody javaScriptEscape='true'>${GROUP_LOCK_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.locked.transfer" var="TRANSFER_LOCKED_LABEL_VAR"/>
-					TRANSFER_LOCKED_LABEL : decoderDiv.html('<c:out value="${TRANSFER_LOCKED_LABEL_VAR}" />').text(),
+					TRANSFER_LOCKED_LABEL : "<spring:escapeBody javaScriptEscape='true'>${TRANSFER_LOCKED_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.save.as.course.grouping" var="SAVE_AS_COURSE_GROUPING_LABEL_VAR"/>
-					SAVE_AS_COURSE_GROUPING_LABEL : decoderDiv.html('<c:out value="${SAVE_AS_COURSE_GROUPING_LABEL_VAR}" />').text(),
+					SAVE_AS_COURSE_GROUPING_LABEL : "<spring:escapeBody javaScriptEscape='true'>${SAVE_AS_COURSE_GROUPING_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.name.blank" var="NAME_BLANK_LABEL_VAR"/>
-					NAME_BLANK_LABEL : decoderDiv.html('<c:out value="${NAME_BLANK_LABEL_VAR}" />').text(),
+					NAME_BLANK_LABEL : "<spring:escapeBody javaScriptEscape='true'>${NAME_BLANK_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.course.groups.name.not.unique" var="NAME_NOT_UNIQUE_LABEL_VAR"/>
-					NAME_NOT_UNIQUE_LABEL : decoderDiv.html('<c:out value="${NAME_NOT_UNIQUE_LABEL_VAR}" />').text(),
+					NAME_NOT_UNIQUE_LABEL : "<spring:escapeBody javaScriptEscape='true'>${NAME_NOT_UNIQUE_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.enter.course.grouping.name" var="ENTER_COURSE_GROUPING_NAME_LABEL_VAR"/>
-					ENTER_COURSE_GROUPING_NAME_LABEL : decoderDiv.html('<c:out value="${ENTER_COURSE_GROUPING_NAME_LABEL_VAR}" />').text(),
+					ENTER_COURSE_GROUPING_NAME_LABEL : "<spring:escapeBody javaScriptEscape='true'>${ENTER_COURSE_GROUPING_NAME_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="authoring.msg.save.success" var="SAVED_SUCCESSFULLY_LABEL_VAR"/>
-					SAVED_SUCCESSFULLY_LABEL : decoderDiv.html('<c:out value="${SAVED_SUCCESSFULLY_LABEL_VAR}" />').text(),
+					SAVED_SUCCESSFULLY_LABEL : "<spring:escapeBody javaScriptEscape='true'>${SAVED_SUCCESSFULLY_LABEL_VAR}</spring:escapeBody>",
+
 					<fmt:message key="label.import.warning.replace.groups" var="WARNING_REPLACE_GROUPS_VAR"/>
-					WARNING_REPLACE_GROUPS_LABEL : decoderDiv.html('<c:out value="${WARNING_REPLACE_GROUPS_VAR}" />').text(),
+					WARNING_REPLACE_GROUPS_LABEL : "<spring:escapeBody javaScriptEscape='true'>${WARNING_REPLACE_GROUPS_VAR}</spring:escapeBody>",
+
 					<fmt:message key="error.general.1" var="ERROR1_VAR"/>
 					<fmt:message key="error.general.2" var="ERROR2_VAR"/>
 					<fmt:message key="error.general.3" var="ERROR3_VAR"/>
-					GENERAL_ERROR_LABEL : decoderDiv.html('<c:out value="${ERROR1_VAR}" />\n<c:out value="${ERROR2_VAR}" />\n<c:out value="${ERROR3_VAR}" />').text(),
+					GENERAL_ERROR_LABEL : "<spring:escapeBody javaScriptEscape='true'>${ERROR1_VAR}</spring:escapeBody>\n<spring:escapeBody javaScriptEscape='true'>${ERROR2_VAR}</spring:escapeBody>\n<spring:escapeBody javaScriptEscape='true'>${ERROR3_VAR}</spring:escapeBody>",
+
 					<fmt:message key="error.file.required" var="ERROR_FILE_REQUIRED_VAR"/>
-					ERROR_FILE_REQUIRED_LABEL : decoderDiv.html('<c:out value="${ERROR_FILE_REQUIRED_VAR}" />').text(),
+					ERROR_FILE_REQUIRED_LABEL : "<spring:escapeBody javaScriptEscape='true'>${ERROR_FILE_REQUIRED_VAR}</spring:escapeBody>",
+
 					<fmt:message key="error.file.wrong.format" var="ERROR_FILE_WRONG_FORMAT_VAR"/>
-					ERROR_FILE_WRONG_FORMAT_LABEL : decoderDiv.html('<c:out value="${ERROR_FILE_WRONG_FORMAT_VAR}" />').text(),
-					<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR"><fmt:param value="%1"/><fmt:param value="%2"/></fmt:message>
-					LABEL_IMPORT_SUCCESSFUL_LABEL : decoderDiv.html('<c:out value="${LABEL_IMPORT_SUCCESSFUL_VAR}" />').text(),
+					ERROR_FILE_WRONG_FORMAT_LABEL : "<spring:escapeBody javaScriptEscape='true'>${ERROR_FILE_WRONG_FORMAT_VAR}</spring:escapeBody>",
+
+					<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR">
+					<fmt:param value="%1"/>
+					<fmt:param value="%2"/>
+					</fmt:message>
+					LABEL_IMPORT_SUCCESSFUL_LABEL : "<spring:escapeBody javaScriptEscape='true'>${LABEL_IMPORT_SUCCESSFUL_VAR}</spring:escapeBody>",
+
 				};
 
 		<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->

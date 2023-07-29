@@ -72,14 +72,14 @@
 				    rowList:[10,20,30,40,50,100],
 				    rowNum: 10,
 				    colNames:[
-				    	'<fmt:message key="label.qb.collection.grid.id" />',
-				    	'<fmt:message key="label.qb.collection.grid.name" />',
+				    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.id" /></spring:escapeBody>',
+				    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.name" /></spring:escapeBody>',
 				    	"questionType",
 				    	"questionVersion",
-				    	'<fmt:message key="label.qb.collection.grid.outcomes" />',
+				    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.outcomes" /></spring:escapeBody>',
 				    	// this column is hidden, so data coming from controller can be the same as for single collection view
 				    	'usage',
-				    	'<fmt:message key="label.qb.collection.grid.stats" />'
+				    	'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.stats" /></spring:escapeBody>'
 				    ],
 				    colModel:[
 				    	{name:'id', index:'question_id', sortable:true,  width: 10},
@@ -98,7 +98,7 @@
 					},
 				    loadError: function(xhr,st,err) {
 				    	collectionGrid.clearGridData();
-					   	alert('<fmt:message key="label.qb.collection.grid.error" />');
+					   	alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.error" /></spring:escapeBody>');
 				    }
 				}).jqGrid('filterToolbar');
 			});
@@ -119,12 +119,12 @@
 		// add a new collection
 		function addCollection() {
 			// get collection name from a pop up
-			var name = prompt('<fmt:message key="label.qb.collection.name.prompt" />'),
+			var name = prompt('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.name.prompt" /></spring:escapeBody>'),
 				lower = name.toLowerCase();
 			// check if a collection with same name already exists
 			$('.collection-grid').each(function(){
 				if (String($(this).data('collectionName')).trim().toLowerCase() == lower) {
-					alert('<fmt:message key="label.qb.collection.name.duplicate.error" />');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.name.duplicate.error" /></spring:escapeBody>');
 					name = null;
 					return false;
 				}

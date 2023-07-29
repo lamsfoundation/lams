@@ -13,7 +13,7 @@
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.all.my.lessons" />', '80%');
+			updateMyProfileDialogSettings('<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.all.my.lessons" /></spring:escapeBody>', '80%');
 		});
 	</script>
 </lams:head>

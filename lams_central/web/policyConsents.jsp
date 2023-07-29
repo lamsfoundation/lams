@@ -45,9 +45,9 @@
 		    $('.required-field').each(function() {
 		        $(this).rules('add', {
 		            required: true,
-		            messages: {
-		                required: "<fmt:message key='label.consent.required' />"
-		            }
+					messages: {
+						required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.consent.required' /></spring:escapeBody>"
+					}
 		        });
 		    });
 		}); 

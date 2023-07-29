@@ -21,9 +21,9 @@
 		<script type="text/javascript">
 			const CHECK_QUESTION_NEW_VERSION_URL = "/lams/qb/edit/checkQuestionNewVersion.do";
 			const SAVE_QUESTION_URL = "/lams/qb/edit/saveOrUpdateQuestion.do";
-			const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
-			const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
-			const ADD_COLLECTION_LABEL = '<fmt:message key="label.questions.choice.collection.new.prompt" />';
+			const VALIDATION_ERROR_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.error'/></spring:escapeBody>";
+			const VALIDATION_ERRORS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.errors'><fmt:param>{errors_counter}</fmt:param></fmt:message></spring:escapeBody>";
+			const ADD_COLLECTION_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.questions.choice.collection.new.prompt' /></spring:escapeBody>";
 			const LAMS_URL = '<lams:LAMSURL/>';
 
 			var isNewQuestion = ${isNewQuestion},
@@ -50,14 +50,14 @@
 						}
 					},
 					messages: {
-						title: "<fmt:message key='label.authoring.choice.field.required'/>",
+						title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
 						maxMark: {
-							required: "<fmt:message key='label.authoring.choice.field.required'/>",
-							digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							digits: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.integer'/></spring:escapeBody>"
 						},
 						penaltyFactor: {
-							required: "<fmt:message key='label.authoring.choice.field.required'/>",
-							number: "<fmt:message key='label.authoring.choice.enter.float'/>"
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							number: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.float'/></spring:escapeBody>"
 						}
 					},
 					submitHandler: function(form) {

@@ -31,7 +31,7 @@
 			
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
-				'<fmt:message key="title.profile.edit.screen" />',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.profile.edit.screen" /></spring:escapeBody>',
 				'100%'
 			);
 		});

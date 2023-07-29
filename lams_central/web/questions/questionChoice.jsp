@@ -106,7 +106,7 @@
 						$('#generateQuestionsButton').prop('disabled', false).button('reset');
 					},
 					'error' : function () {
-						alert('<fmt:message key="label.questions.choice.generate.more.error" />');
+						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.generate.more.error" /></spring:escapeBody>');
 					},
 					'success': function (questions) {
 						let questionCount = +$('#questionCount').val();
@@ -124,7 +124,7 @@
 							questionContainer.find('.questionCheckbox').attr('data-question-index', questionIndex)
 									.attr('id', 'question' + questionIndex + 'checkbox');
 							questionContainer.find('.questionTitleDisplay')
-									.text(questionIndex + '. (<fmt:message key="label.questions.choice.type.mc" />)');
+									.text(questionIndex + '. (<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.type.mc" /></spring:escapeBody>)');
 							questionContainer.find('.editableQuestionTitle').attr('id', 'question' + questionIndex)
 									.attr('name', 'question' + questionIndex).attr('value', question.title)
 									.val(question.title);
@@ -179,7 +179,7 @@
 													.attr('name', 'question' + questionIndex + 'answer' + answerIndex).attr('value', answer.text)
 													.val(answer.text);
 									if (answer.score == 1) {
-										$('<span class="answerCorrect" />').text(' (<fmt:message key="label.correct"/>)').insertAfter(answerText);
+										$('<span class="answerCorrect" />').text(' (<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.correct" /></spring:escapeBody>)').insertAfter(answerText);
 									}
 									answerContainer.find('.answerScore').attr('name', 'question' + questionIndex + 'answer' + answerIndex + 'score')
 											.val(answer.score);
@@ -261,7 +261,7 @@
 							previouslySelectedOption = $('option[selected]', collectionSelect);
 					if (newValue == -1) {
 						// create a new collection on the fly
-						let newCollectionName = prompt('<fmt:message key="label.questions.choice.collection.new.prompt" />'),
+						let newCollectionName = prompt('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.collection.new.prompt" /></spring:escapeBody>'),
 								newCollectionUid = -1;
 						if (newCollectionName) {
 							newCollectionName = newCollectionName.trim();
