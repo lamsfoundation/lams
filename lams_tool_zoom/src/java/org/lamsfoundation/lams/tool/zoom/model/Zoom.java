@@ -23,9 +23,7 @@
 
 package org.lamsfoundation.lams.tool.zoom.model;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.log4j.Logger;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,10 +35,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tl_lazoom10_zoom")
@@ -73,7 +70,7 @@ public class Zoom implements java.io.Serializable, Cloneable {
     private boolean startInMonitor;
 
     @Column
-    private Integer duration = 120;
+    private Integer duration = 40;
 
     @Column(name = "reflect_on_activity")
     private boolean reflectOnActivity;

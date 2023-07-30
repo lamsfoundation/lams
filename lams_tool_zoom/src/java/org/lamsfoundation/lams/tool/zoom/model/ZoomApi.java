@@ -23,17 +23,11 @@
 
 package org.lamsfoundation.lams.tool.zoom.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import org.lamsfoundation.lams.util.JsonUtil;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.lamsfoundation.lams.util.JsonUtil;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tl_lazoom10_api")
@@ -47,31 +41,26 @@ public class ZoomApi {
     @Column
     private String email;
 
-    @Column(name = "api_key")
-    private String key;
+    @Column(name = "account_id")
+    private String accountId;
 
-    @Column(name = "api_secret")
-    private String secret;
+    @Column(name = "client_id")
+    private String clientId;
+
+    @Column(name = "client_secret")
+    private String clientSecret;
 
     public ZoomApi() {
-    }
-
-    public ZoomApi(String email, String key, String value) {
-	this.email = email;
-	this.key = key;
-	this.secret = value;
     }
 
     public ZoomApi(ObjectNode apiJSON) {
 	this.uid = JsonUtil.optLong(apiJSON, "uid");
 	this.email = JsonUtil.optString(apiJSON, "email");
-	this.key = JsonUtil.optString(apiJSON, "key");
-	this.secret = JsonUtil.optString(apiJSON, "secret");
+	this.accountId = JsonUtil.optString(apiJSON, "accountId");
+	this.clientId = JsonUtil.optString(apiJSON, "clientId");
+	this.clientSecret = JsonUtil.optString(apiJSON, "clientSecret");
     }
 
-    /**
-     *
-     */
     public Long getUid() {
 	return uid;
     }
@@ -88,28 +77,37 @@ public class ZoomApi {
 	this.email = email;
     }
 
-    public String getKey() {
-	return key;
+    public String getAccountId() {
+	return accountId;
     }
 
-    public void setKey(String key) {
-	this.key = key;
+    public void setAccountId(String accountId) {
+	this.accountId = accountId;
     }
 
-    public String getSecret() {
-	return secret;
+    public String getClientId() {
+	return clientId;
     }
 
-    public void setSecret(String value) {
-	this.secret = value;
+    public void setClientId(String clientId) {
+	this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+	return clientSecret;
+    }
+
+    public void setClientSecret(String value) {
+	this.clientSecret = value;
     }
 
     public ObjectNode toJSON() {
 	ObjectNode result = JsonNodeFactory.instance.objectNode();
 	result.put("uid", uid);
 	result.put("email", email);
-	result.put("key", key);
-	result.put("secret", secret);
+	result.put("accountId", accountId);
+	result.put("clientId", clientId);
+	result.put("clientSecret", clientSecret);
 	return result;
     }
 }
