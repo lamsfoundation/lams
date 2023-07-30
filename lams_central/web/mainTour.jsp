@@ -57,7 +57,7 @@
 				placement: "top",
 				orphan: true
 			  }
-			]x,
+			],
 			  onEnd: resetCourses,
 			  debug: true,
 			  backdrop: false,
@@ -85,7 +85,3 @@
 		else
 			revealCourses(tour);
 	}
-	
-	
-
-	
