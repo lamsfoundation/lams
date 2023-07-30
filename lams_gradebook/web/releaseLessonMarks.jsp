@@ -96,7 +96,7 @@
 
 	// release/hide marks
 	function toggleMarksRelease() {
-		showConfirm(marksReleased ? "<fmt:message key="gradebook.monitor.releasemarks.check.hide"/>" : "<fmt:message key="gradebook.monitor.releasemarks.check.release"/>", function() {
+		showConfirm(marksReleased ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.monitor.releasemarks.check.hide"/></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.monitor.releasemarks.check.release"/></spring:escapeBody>", function() {
 			releaseMarksAlertBox.hide();
 			
 			$.ajax({
@@ -112,7 +112,7 @@
 				    	marksReleased = !marksReleased;
 				    	updateReleaseMarksDependantElements();
 			    	} else {
-						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<fmt:message key="error.releasemarks.fail"/>").show();
+						releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger').text("<spring:escapeBody javaScriptEscape='true'><fmt:message key="error.releasemarks.fail"/></spring:escapeBody>").show();
 			    	}
 		    	}
 			});
@@ -134,11 +134,11 @@
 
 		if (finalList.length == 0) {
 			releaseMarksAlertBox.removeClass('alert-success').addClass('alert-danger')
-								.text('<fmt:message key="gradebook.monitor.releasemarks.send.emails.no.learners" />').show();
+								.text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.monitor.releasemarks.send.emails.no.learners" /></spring:escapeBody>').show();
 			return;
 		}
 		
-		showConfirm('<fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" />'.replace('[COUNT_PLACEHOLDER]', finalList.length), function() {
+		showConfirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.monitor.releasemarks.send.emails.confirm" /></spring:escapeBody>'.replace('[COUNT_PLACEHOLDER]', finalList.length), function() {
 			$.ajax({
 				'url'      : '<lams:LAMSURL/>gradebook/gradebookMonitoring/sendReleaseMarksEmails.do',
 				'data'     : {
@@ -181,7 +181,7 @@
 			iconSet: 'fontAwesomeSolid',
 		   	url: "<lams:LAMSURL/>monitoring/emailNotifications/getUsers.do?searchType=4&lessonID=" + releaseMarksLessonID,
 			datatype: "json",
-		   	colNames:['<fmt:message key="gradebook.columntitle.learnerName"/>'],
+		   	colNames:['<spring:escapeBody javaScriptEscape="true">"<fmt:message key="gradebook.columntitle.learnerName"/></spring:escapeBody>'],
 		   	colModel:[
 		   		{name:'name',index:'name', sortable: false, sorttype: 'text'}
 		   	],

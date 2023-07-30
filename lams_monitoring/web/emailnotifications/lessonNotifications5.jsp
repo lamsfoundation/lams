@@ -42,7 +42,7 @@
 				iconSet: 'fontAwesomeSolid',
 			   	url: "<c:url value='/emailNotifications/getUsers.do?'/>" + getSearchParams(),
 				datatype: "json",
-			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
+				colNames:['<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.user.name"/></spring:escapeBody>'],
 			   	colModel:[
 			   		{name:'name',index:'name', width:260, firstsortorder:'desc', sorttype: 'text'}
 			   	],
@@ -86,8 +86,8 @@
     		
 			$('#accordion .accordion-collapse').on('show.bs.collapse', function () {
 				$("#emailButton").attr('value', 
-						$(this).is("#nowDiv") ? '<fmt:message key="email.notifications.send"/>'
-											  : '<fmt:message key="email.notifications.button.schedule"/>');
+						$(this).is("#nowDiv") ? '<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.send"/></spring:escapeBody>'
+											  : '<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.button.schedule"/></spring:escapeBody>');
 			});
 			
     		$('#emailButton').click(function() {
@@ -129,11 +129,11 @@
         	            let showToast = window.parent.showToast;
         	            
     		            if (json.isSuccessfullySent) {
-    		            	showToast("<fmt:message key="email.notifications.emails.successfully.sent" />");
+    		            	showToast("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.emails.successfully.sent" /></spring:escapeBody>");
     					} else if (json.isSuccessfullyScheduled) {
-    						showToast("<fmt:message key="email.notifications.emails.successfully.scheduled" />");
+    						showToast("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.emails.successfully.scheduled" /></spring:escapeBody>");
     					} else {
-    						showToast("<fmt:message key="email.notifications.problems.sending.emails" />");
+    						showToast("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.problems.sending.emails" /></spring:escapeBody>");
     					}
     	            }
     	       	});
