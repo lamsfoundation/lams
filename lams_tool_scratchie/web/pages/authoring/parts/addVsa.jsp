@@ -20,8 +20,8 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 		<script type="text/javascript">
 			const QUESTION_TYPE = 3;
-			const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
-			const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+			const VALIDATION_ERROR_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.error'/></spring:escapeBody>";
+			const VALIDATION_ERRORS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message></spring:escapeBody>";
 			const isNewQuestion = true;
 		</script>
 		<lams:JSImport src="includes/javascript/qb-question.js" />
@@ -43,8 +43,8 @@
 	    			    }
 		    		},
 		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			hasTwoOptionsFilled: "<fmt:message key='label.error.two.answers.required'/>"
+		    			title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+		    			hasTwoOptionsFilled: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error.two.answers.required'/></spring:escapeBody>"
 		    		},
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();     			    

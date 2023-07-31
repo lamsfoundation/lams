@@ -20,7 +20,7 @@
 					previouslySelectedOption = $('option[selected]', collectionSelect);
 			if (newValue == -1) {
 				// create a new collection on the fly
-				let newCollectionName = prompt('<fmt:message key="label.questions.choice.collection.new.prompt" />'),
+				let newCollectionName = prompt('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.collection.new.prompt" /></spring:escapeBody>'),
 						newCollectionUid = -1;
 				if (newCollectionName) {
 					newCollectionName = newCollectionName.trim();

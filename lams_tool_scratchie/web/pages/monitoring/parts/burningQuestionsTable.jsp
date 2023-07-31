@@ -26,7 +26,7 @@
 			}
 
 			//change button label
-			var newButtonLabel = isExpanded ? "<fmt:message key='label.expand.all' />" : "<fmt:message key='label.collapse.all' />";
+			var newButtonLabel = isExpanded ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.expand.all' /></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.collapse.all' /></spring:escapeBody>";
 			$(".hidden-xs", $(this)).text(newButtonLabel);
 
 			//change button icon
