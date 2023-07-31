@@ -85,7 +85,3 @@
 		else
 			revealCourses(tour);
 	}
-	
-	
-
-	
