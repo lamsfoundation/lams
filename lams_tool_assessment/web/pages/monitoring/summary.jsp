@@ -81,8 +81,8 @@
 		   	colNames:[
 			   	'userId',
 				'sessionId',
-				"<fmt:message key="label.monitoring.summary.user.name" />",
-				"<fmt:message key="label.monitoring.summary.total" />",
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.user.name" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.total" /></spring:escapeBody>',
 				'portraitId'
 			],
 		   	colModel:[
@@ -123,7 +123,7 @@
 		    loadError: function(xhr,st,err) {
 		    	var sessionId = $(this).data('sessionId');
 		    	jQuery("#list" + sessionId).clearGridData();
-		    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+		    	$.jgrid.info_dialog("<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.error"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.loaderror"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.ok"/></spring:escapeBody>");
 		    },
 		    loadComplete: function () {
 		   	 	initializePortraitPopover('<lams:LAMSURL/>');
@@ -147,18 +147,18 @@
 			shrinkToFit: false,
 			guiStyle: "bootstrap",
 			iconSet: 'fontAwesome',
-		   	colNames:[
-			   	'#',
+			colNames: [
+				'#',
 				'questionResultUid',
-					"<fmt:message key="label.monitoring.question.summary.question" />",
-  					"<fmt:message key="label.monitoring.user.summary.response" />",
-					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-						"<fmt:message key="label.confidence" />",
-					</c:if>
-  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
-  					"<fmt:message key="label.monitoring.user.summary.marker" />",
-  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
-				],
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.question.summary.question" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.response" /></spring:escapeBody>',
+				<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confidence" /></spring:escapeBody>',
+				</c:if>
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.authoring.basic.list.header.mark" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.marker" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.marker.comment" /></spring:escapeBody>'
+			],
 		   	colModel:[
   			   	{name:'id', index:'id', width:20, sorttype:"int"},
   			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
@@ -255,7 +255,7 @@
 
 	function exportSummary() {
 		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
-		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(url, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.summary.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
 	function showChangeLeaderModal(toolSessionId) {
@@ -277,16 +277,16 @@
     				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
     			},
     			success : function(){
-    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>");
     				location.reload();
     			},
     			error : function(){
-    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
         		}
             });
         	
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
 		}
 	}
 	
