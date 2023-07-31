@@ -317,11 +317,11 @@
 		
 		// remove a collection
 		function removeCollection() {
-			<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.remove.confirm" var="label.qb.collection.remove.confirm">
-				<fmt:param value="${collection.name}" />
-			</fmt:message></spring:escapeBody>
+			<fmt:message key="label.qb.collection.remove.confirm" var="REMOVECOLLVAR">
+			    <fmt:param>${collection.name}</fmt:param>
+            </fmt:message>
 			
-			if (confirm('${label.qb.collection.remove.confirm}')) {
+			if (confirm('<spring:escapeBody javaScriptEscape="true">${REMOVECOLLVAR}</spring:escapeBody>')) {
 				$.ajax({
 					'url'  : '<lams:LAMSURL />qb/collection/removeCollection.do',
 					'type' : 'POST',
