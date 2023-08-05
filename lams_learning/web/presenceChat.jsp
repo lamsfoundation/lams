@@ -28,10 +28,10 @@
 			presenceShown = ${param.presenceShown eq 'true' or presenceShown},
 			nickname = '<lams:user property="firstName"/>' + ' ' + '<lams:user property="lastName"/>',
 			// labels used in JS file
-			labelSend = '<fmt:message key="learner.im.send"/>',
-			labelUsers = '<fmt:message key="learner.im.users"/>',
+			labelSend = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="learner.im.send"/></spring:escapeBody>',
+			labelUsers = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="learner.im.users"/></spring:escapeBody>',
 			groupChatInfo = {
-							 nick : '<fmt:message key="learner.im.group.chat"/>',
+							 nick : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="learner.im.group.chat"/></spring:escapeBody>',
 							 tag  : "groupchat"
 							};
 	</script>
