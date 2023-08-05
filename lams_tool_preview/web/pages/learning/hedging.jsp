@@ -38,7 +38,7 @@
 				$("#editForm").submit();
 				}
 			} else {
-				alert('<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message></spring:escapeBody>');
 			}
 		}
 		
@@ -52,7 +52,7 @@
 					wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 				    
 			    if(wordCount < wordLimit){
-			    	var alertMessage = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>';
+			    	var alertMessage = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>';
 					alert( alertMessage.replace("{1}", wordCount));
 					return false;
 				}

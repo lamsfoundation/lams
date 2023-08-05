@@ -20,9 +20,9 @@
 		COUNT_RATED_ITEMS = 0, // only applies to stars
 		LAMS_URL = '${lams}',
 		COMMENTS_MIN_WORDS_LIMIT = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit},
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>",
+		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
+		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
 		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId}; 
 
@@ -194,7 +194,7 @@
 	function updatedComment(comment) {		
 		// if the data has been saved to the database, don't clear it!
 		if ( comment.value == '' && comment.defaultValue != '' ) {
-			alert('<fmt:message key="error.edit.not.remove"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.edit.not.remove"/></spring:escapeBody>');
 			comment.value = comment.defaultValue;
 			return;
 		}
@@ -215,7 +215,7 @@
 				});
 			}
 		}
-		$('#countRatedItemsSpan').html('<fmt:message key="label.rate.limits.topic.reminder"/>'.replace('{0}', numCommentsOnPage + commentsOnOtherPages));
+		$('#countRatedItemsSpan').html('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rate.limits.topic.reminder"/></spring:escapeBody>'.replace('{0}', numCommentsOnPage + commentsOnOtherPages));
 		checkButtons();
 		return true;
 	}
@@ -226,7 +226,7 @@
 
 		hideButtons();
 		if (!skipNumberValidation && (numCommentsOnPage + commentsOnOtherPages < ${minRates})) {
-			alert('<fmt:message key="label.rate.limits.reminder.min"/>'.replace('{0}',${minRates}) );
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rate.limits.reminder.min"/></spring:escapeBody>'.replace('{0}',${minRates}) );
 			return false;
 		}
 			
@@ -264,7 +264,7 @@
 		        success: function (response) {
 	    			var countCommentsSaved = response.countCommentsSaved;
 					if ( ! ( countCommentsSaved > 0 ) ) {
-	       				alert('<fmt:message key="error.unable.save.comments"/>');
+	       				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.unable.save.comments"/></spring:escapeBody>');
 	       				showButtons();
 	       				return false;
 					} else {

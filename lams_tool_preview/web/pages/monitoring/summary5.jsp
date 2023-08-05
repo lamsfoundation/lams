@@ -28,7 +28,7 @@
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
-		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.file.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	}
 
 	function getResultsElement(sessionId, selector) {
@@ -44,7 +44,7 @@
 	}
 	
 	function sendResults(sessionId) {
-		showConfirm('<fmt:message key="confirm.notify.user.of.results" />', function(){
+		showConfirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="confirm.notify.user.of.results" /></spring:escapeBody>', function(){
 			let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
 				messageArea = getResultsElement(sessionId, ".messageArea2"),
 				messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),

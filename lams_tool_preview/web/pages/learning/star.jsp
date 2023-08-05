@@ -20,9 +20,9 @@
 		LIMIT_BY_CRITERIA = "true";
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${criteriaRatings.countRatedItems},
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>",
+		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true">:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
+		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
 		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId};
 	</script>
@@ -35,7 +35,7 @@
 	
 	<script type="text/javascript">
 	
-	var YOUR_RATING_LABEL = '<fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message>',
+	var YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message></spring:escapeBody>',
 		IS_DISABLED =  ${sessionMap.isDisabled},
 		commentsSaved = true;
 	
@@ -108,7 +108,7 @@
 							rows += '</span>'
 								
 							if (isMaximumRatesPerUserReached) {
-								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <fmt:message key="label.cant.rate" /></div>';
+								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.cant.rate" /></spring:escapeBody></div>';
 							}
 
 							rows += '</td>';
@@ -221,7 +221,7 @@
 		        success: function (response) {
 	    			var countCommentsSaved = response.countCommentsSaved;
 					if ( ! ( countCommentsSaved >= 0 ) ) {
-	       				alert('<fmt:message key="error.unable.save.comments"/>');
+	       				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.unable.save.comments"/></spring:escapeBody>');
 	       				return false;
 					} else {
 						return moveOn(next);

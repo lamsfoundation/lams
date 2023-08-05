@@ -74,7 +74,7 @@
 				$("#next").val(next);
 				editForm.submit();
 			} else {
-				alert('<fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message></spring:escapeBody>');
 			}
 		}
 

@@ -39,8 +39,8 @@
 				iconSet: 'fontAwesome',
 			   	colNames:[
 					'userUid',
-			   		'<fmt:message key="label.user.hidden" />',
-					'<fmt:message key="label.user.name" />'
+			   		'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.user.hidden" /></spring:escapeBody>',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.user.name" /></spring:escapeBody>'
 				],
 			   	colModel:[
 			   		{name:'userUid', index:'userUid', width:0, hidden: true},
@@ -60,7 +60,7 @@
 				    $(":checkbox").on("click", function(event){
 				    	
 				    	//if teacher doesn't confirm - prevent checkbox from being unchecked and do not save to DB
-				    	if (!$(this).is(":checked") && !confirm('<fmt:message key="label.hide.user.confirmation" />')) {
+				    	if (!$(this).is(":checked") && !confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide.user.confirmation" /></spring:escapeBody>')) {
 					    	event.preventDefault();
 					    	event.stopPropagation();
 					    	return false;
