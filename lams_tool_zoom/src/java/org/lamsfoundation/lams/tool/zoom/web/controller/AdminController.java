@@ -23,11 +23,9 @@
 
 package org.lamsfoundation.lams.tool.zoom.web.controller;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
@@ -40,9 +38,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import java.util.LinkedList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -71,7 +69,7 @@ public class AdminController {
     public String save(HttpServletRequest request) throws Exception {
 	String apisJSONString = request.getParameter("apisJSON");
 	ArrayNode apisJSON = JsonUtil.readArray(apisJSONString);
-	List<ZoomApi> apis = new LinkedList<ZoomApi>();
+	List<ZoomApi> apis = new LinkedList<>();
 	for (int index = 0; index < apisJSON.size(); index++) {
 	    ObjectNode apiJSON = (ObjectNode) apisJSON.get(index);
 	    ZoomApi api = new ZoomApi(apiJSON);
@@ -87,7 +85,7 @@ public class AdminController {
 	apis = zoomService.getApis();
 	for (ZoomApi api : apis) {
 	    if (!zoomService.pingZoomApi(api.getUid())) {
-		errorMap.add("GLOBAL", messageService.getMessage("error.api.ping", new Object[] { api.getEmail() }));
+		errorMap.add("GLOBAL", messageService.getMessage("error.api.ping", new Object[] { api.getClientId() }));
 	    }
 	}
 	if (!errorMap.isEmpty()) {
