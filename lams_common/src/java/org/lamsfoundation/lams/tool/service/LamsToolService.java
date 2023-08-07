@@ -23,16 +23,6 @@
 
 package org.lamsfoundation.lams.tool.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -41,13 +31,7 @@ import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
-import org.lamsfoundation.lams.learningdesign.DataFlowObject;
-import org.lamsfoundation.lams.learningdesign.FloatingActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.Transition;
+import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
@@ -71,11 +55,14 @@ import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * @author Jacky Fang
- * @since 2005-3-17
- *
  * @author Ozgur Demirtas 24/06/2005
+ * @since 2005-3-17
  */
 public class LamsToolService implements ILamsToolService {
     private static final Logger log = Logger.getLogger(LamsToolService.class);
@@ -347,12 +334,12 @@ public class LamsToolService implements ILamsToolService {
 
 		if (completedActivity instanceof ToolActivity) {
 		    ToolActivity completedToolActivity = (ToolActivity) completedActivity;
-		    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
-			    .equals(completedToolActivity.getTool().getToolSignature())) {
+		    if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(
+			    completedToolActivity.getTool().getToolSignature())) {
 			Date finishDate = completedActivities.get(completedActivity).getFinishDate();
 
-			if ((leaderSelectActivityFinishDate == null)
-				|| (finishDate.compareTo(leaderSelectActivityFinishDate) < 0)) {
+			if ((leaderSelectActivityFinishDate == null) || (
+				finishDate.compareTo(leaderSelectActivityFinishDate) < 0)) {
 			    leaderSelectionActivity = completedToolActivity;
 			    leaderSelectActivityFinishDate = completedActivities.get(completedActivity).getFinishDate();
 			}
@@ -395,8 +382,8 @@ public class LamsToolService implements ILamsToolService {
 
 	Set<ToolActivity> confidenceProvidingActivities = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : confidenceProvidingActivityIds) {
-	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO
-		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
+	    ToolActivity confidenceProvidingActivity = (ToolActivity) activityDAO.getActivityByActivityId(
+		    confidenceProvidingActivityId, ToolActivity.class);
 	    confidenceProvidingActivities.add(confidenceProvidingActivity);
 	}
 
@@ -426,8 +413,8 @@ public class LamsToolService implements ILamsToolService {
 	    }
 
 	    String toolSignature = toolActivity.getTool().getToolSignature();
-	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(toolSignature)) {
+	    if (TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature) || isMcqIncluded && TOOL_SIGNATURE_MCQ.equals(
+		    toolSignature)) {
 		confidenceProvidingActivityIds.add(toolActivity.getActivityId());
 	    }
 
@@ -476,8 +463,8 @@ public class LamsToolService implements ILamsToolService {
 
 	Set<ToolActivity> activitiesProvidingVsaAnswers = new LinkedHashSet<>();
 	for (Long confidenceProvidingActivityId : providingVsaAnswersActivityIds) {
-	    ToolActivity activityProvidingVsaAnswers = (ToolActivity) activityDAO
-		    .getActivityByActivityId(confidenceProvidingActivityId, ToolActivity.class);
+	    ToolActivity activityProvidingVsaAnswers = (ToolActivity) activityDAO.getActivityByActivityId(
+		    confidenceProvidingActivityId, ToolActivity.class);
 	    activitiesProvidingVsaAnswers.add(activityProvidingVsaAnswers);
 	}
 
@@ -509,8 +496,8 @@ public class LamsToolService implements ILamsToolService {
 	    return new ArrayList<>();
 	}
 
-	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService
-		.getConfidenceLevelsByToolSession(confidenceLevelSession);
+	List<ConfidenceLevelDTO> confidenceLevelDtos = lamsCoreToolService.getConfidenceLevelsByToolSession(
+		confidenceLevelSession);
 	return confidenceLevelDtos;
     }
 
@@ -541,12 +528,12 @@ public class LamsToolService implements ILamsToolService {
 	ToolActivity specifiedActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
 	Tool tool = specifiedActivity.getTool();
 	if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_ASSESSMENT)) {
-	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
-		    .findToolService(tool);
+	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService.findToolService(
+		    tool);
 	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
 	} else if (tool.getToolSignature().equals(CommonConstants.TOOL_SIGNATURE_SCRATCHIE)) {
-	    ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
-		    .findToolService(tool);
+	    ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService.findToolService(
+		    tool);
 	    return sessionManager.getUnallocatedVSAnswers(toolContentId);
 	}
 	return null;
@@ -561,15 +548,15 @@ public class LamsToolService implements ILamsToolService {
 
     private boolean recalculateAssessmentMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool assessmentTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_ASSESSMENT);
-	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService
-		.findToolService(assessmentTool);
+	ICommonAssessmentService sessionManager = (ICommonAssessmentService) lamsCoreToolService.findToolService(
+		assessmentTool);
 	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
     private boolean recalculateScratchieMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	Tool scratchieTool = toolDAO.getToolBySignature(CommonConstants.TOOL_SIGNATURE_SCRATCHIE);
-	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService
-		.findToolService(scratchieTool);
+	ICommonScratchieService sessionManager = (ICommonScratchieService) lamsCoreToolService.findToolService(
+		scratchieTool);
 	return sessionManager.recalculateMarksForVsaQuestion(toolQuestionUid, answer);
     }
 
@@ -595,13 +582,90 @@ public class LamsToolService implements ILamsToolService {
 	return qbToolService.syncRatQuestions(matchingRATActivityId, newQuestionUids);
     }
 
+    @Override
+    public void assignGroupsForGalleryWalk(SortedMap<String, Set<String>> groups, int clusterSize) {
+	// focus only on groups that are not assigned to any cluster yet
+	List<String> nonAssignedGroups = groups.entrySet().stream()
+		.filter(groupEntry -> groupEntry.getValue().isEmpty())
+		.collect(Collectors.mapping(Map.Entry::getKey, Collectors.toList()));
+	if (nonAssignedGroups.isEmpty()) {
+	    return;
+	}
+
+	Random random = new Random();
+	Map<String, Set<String>> nonFullClusterGroups = groups.entrySet().stream()
+		.filter(groupEntry -> groupEntry.getValue().size() < clusterSize)
+		.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+	// to each session from nonAssignedGroups assign random sessions from nonFullClusterGroups up to at least clusterSize
+	for (Map.Entry<String, Set<String>> nonAssignedGroup : nonFullClusterGroups.entrySet()) {
+	    nonFullClusterGroups.remove(nonAssignedGroup);
+	    Map<String, Set<String>> nonFullClusterSessionsCopy = nonFullClusterGroups.entrySet().stream()
+		    .filter(groupEntry -> groupEntry.getValue().contains(nonAssignedGroup.getKey()))
+		    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+	    // first try to find sessions which are not full yet
+	    while (nonAssignedGroup.getValue().size() < clusterSize && !nonFullClusterSessionsCopy.isEmpty()) {
+		Map.Entry<String, Set<String>> targetGroup = nonFullClusterSessionsCopy.entrySet().stream()
+			.skip(random.nextInt(nonFullClusterSessionsCopy.size())).findFirst().get();
+
+		// create a new collection with all cluster members and assign it to each member
+		Set<String> cluster = new HashSet<>();
+		cluster.add(nonAssignedGroup.getKey());
+		cluster.addAll(nonAssignedGroup.getValue());
+		cluster.add(targetGroup.getKey());
+		cluster.addAll(targetGroup.getValue());
+
+		for (String clusterMember : cluster) {
+		    // do not participate in further cluster assignments for this nonAssignedSession
+		    nonFullClusterSessionsCopy.remove(clusterMember);
+		    Set<String> clusterMemberGroups = groups.get(clusterMember);
+		    clusterMemberGroups.addAll(cluster);
+		    // do not assign itself as a cluster member
+		    clusterMemberGroups.remove(clusterMember);
+		    if (clusterMemberGroups.size() >= clusterSize) {
+			// make is unavailable for further cluster assignments for any next nonAssignedSession
+			nonFullClusterGroups.remove(clusterMember);
+		    }
+		}
+	    }
+
+	    // if cluster is not full but we run out of sessions which are not full yet, assign to random cluster
+	    // this will make some clusters bigger than clusterSize
+	    if (nonAssignedGroup.getValue().size() < clusterSize) {
+		// assign to random cluster
+		Map<String, Set<String>> otherGroups = groups.entrySet().stream()
+			.filter(group -> !group.getKey().equals(nonAssignedGroup.getKey()) && !group.getValue()
+				.contains(nonAssignedGroup.getKey()))
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+		while (nonAssignedGroup.getValue().size() < clusterSize && !otherGroups.isEmpty()) {
+		    Map.Entry<String, Set<String>> targetGroup = otherGroups.entrySet().stream()
+			    .skip(random.nextInt(otherGroups.size())).findFirst().get();
+
+		    Set<String> cluster = new HashSet<>();
+		    cluster.add(nonAssignedGroup.getKey());
+		    cluster.addAll(nonAssignedGroup.getValue());
+		    cluster.add(targetGroup.getKey());
+		    cluster.addAll(targetGroup.getValue());
+
+		    for (String clusterMember : cluster) {
+			otherGroups.remove(clusterMember);
+			Set<String> clusterMemberGroups = groups.get(clusterMember);
+			clusterMemberGroups.addAll(cluster);
+			clusterMemberGroups.remove(clusterMember);
+		    }
+		}
+	    }
+	}
+    }
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
 
     /**
      * @param toolDAO
-     *            The toolDAO to set.
+     * 	The toolDAO to set.
      */
     public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
@@ -651,7 +715,7 @@ public class LamsToolService implements ILamsToolService {
 
     /**
      * @param userService
-     *            User Management Service
+     * 	User Management Service
      */
     public void setUserManagementService(IUserManagementService userService) {
 	this.userManagementService = userService;

@@ -22,12 +22,6 @@
 
 package org.lamsfoundation.lams.tool.service;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
@@ -38,6 +32,9 @@ import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.util.FileUtilException;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * This interface defines all the service available for self contained tool module from lams. Any service that would be
@@ -87,12 +84,12 @@ public interface ILamsToolService {
      * Do not change learnerId to Integer (to match the other calls) as all the tools expect this to be a Long.
      *
      * @param toolSessionId
-     *            , session ID for completed tool
+     * 	, session ID for completed tool
      * @param learnerId
-     *            the learner who is completing the tool session.
+     * 	the learner who is completing the tool session.
      * @return the URL for the next activity
      * @throws LearnerServiceException
-     *             in case of problems.
+     * 	in case of problems.
      */
     String completeToolSession(Long toolSessionId, Long learnerId);
 
@@ -163,9 +160,9 @@ public interface ILamsToolService {
      * if no Leader Selection Tools available.
      *
      * @param toolSessionId
-     *            sessionId of the specified activity
+     * 	sessionId of the specified activity
      * @param learnerId
-     *            userId (used to get appropriate Leader Selection Tool's session)
+     * 	userId (used to get appropriate Leader Selection Tool's session)
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
@@ -190,7 +187,7 @@ public interface ILamsToolService {
      * Returns all activities that precede specified activity and produce confidence levels.
      *
      * @param toolContentId
-     *            toolContentId of the specified activity
+     * 	toolContentId of the specified activity
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingConfidenceLevels(Long toolContentId);
@@ -199,7 +196,7 @@ public interface ILamsToolService {
      * Returns all activities that precede specified activity and can provide VSA answers.
      *
      * @param toolContentId
-     *            toolContentId of the specified activity
+     * 	toolContentId of the specified activity
      * @return
      */
     Set<ToolActivity> getActivitiesProvidingVsaAnswers(Long toolContentId);
@@ -208,11 +205,11 @@ public interface ILamsToolService {
      * Returns confidence levels from the specified activity.
      *
      * @param activityUiid
-     *            activityUiid of the activity with confidence levels
+     * 	activityUiid of the activity with confidence levels
      * @param requestorUserId
-     *            userId of the requesting user. we need it in order to get confidence level providing tool's sessionId
+     * 	userId of the requesting user. we need it in order to get confidence level providing tool's sessionId
      * @param requestorToolSessionId
-     *            toolSessionId of the activity that calls this method
+     * 	toolSessionId of the activity that calls this method
      * @return
      */
     List<ConfidenceLevelDTO> getConfidenceLevelsByActivity(Integer confidenceLevelActivityUiid, Integer requestorUserId,
@@ -222,11 +219,11 @@ public interface ILamsToolService {
      * Returns VSA answers from the specified activity.
      *
      * @param activityUiid
-     *            activityUiid of the activity providing VSA answers
+     * 	activityUiid of the activity providing VSA answers
      * @param requestorUserId
-     *            userId of the requesting user. we need it in order to get tool's sessionId providing VSA answers
+     * 	userId of the requesting user. we need it in order to get tool's sessionId providing VSA answers
      * @param requestorToolSessionId
-     *            toolSessionId of the activity that calls this method
+     * 	toolSessionId of the activity that calls this method
      * @return
      */
     Collection<VsaAnswerDTO> getVsaAnswersFromAssessment(Integer activityUiidProvidingVsaAnswers,
@@ -248,9 +245,11 @@ public interface ILamsToolService {
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
      */
     Integer getCountUsersForActivity(Long toolSessionId);
-    
+
     /**
      * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
      */
     boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids);
+
+    void assignGroupsForGalleryWalk(SortedMap<String, Set<String>> groups, int clusterSize);
 }

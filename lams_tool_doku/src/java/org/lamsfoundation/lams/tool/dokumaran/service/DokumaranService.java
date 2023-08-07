@@ -419,6 +419,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return dokumaranSessionDao.getSessionBySessionId(sessionId);
     }
 
+    public List<DokumaranSession> getDokumaranSessionsByToolContentId(long toolContentId) {
+	return  dokumaranSessionDao.getByContentId(toolContentId);
+    }
+
     @Override
     public String finishToolSession(Long toolSessionId, Long userId) throws DokumaranApplicationException {
 	DokumaranUser user = dokumaranUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
@@ -466,11 +470,12 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public List<SessionDTO> getSummary(Long contentId, Long ratingUserId) {
+    public List<SessionDTO> getSummary(Long contentId, Long ratingUserUid) {
 	// get all sessions in a dokumaran and retrieve all dokumaran items under this session
 	// plus initial dokumaran items by author creating (resItemList)
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	Dokumaran dokumaran = dokumaranDao.getByContentId(contentId);
+	DokumaranUser user = ratingUserUid == null ? null : dokumaranDao.find(DokumaranUser.class, ratingUserUid);
 
 	Map<Long, ItemRatingDTO> itemRatingDtoMap = null;
 	if (dokumaran.isGalleryWalkStarted()) {
@@ -489,14 +494,24 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    Set<Long> itemIds = sessionList.stream()
 		    .collect(Collectors.mapping(DokumaranSession::getSessionId, Collectors.toSet()));
 
-	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, false,
-		    ratingUserId);
+	    List<ItemRatingDTO> itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, null, itemIds, true,
+		    user == null ? null : user.getUserId());
 	    // Mapping of Item ID -> DTO
 	    itemRatingDtoMap = itemRatingDtos.stream()
 		    .collect(Collectors.toMap(ItemRatingDTO::getItemId, Function.identity()));
 	}
 
 	List<SessionDTO> groupList = new ArrayList<>();
+	if (user != null && dokumaran.getGalleryWalkClusterSize() > 0) {
+	    DokumaranSession session = user.getSession();
+	    if (!session.getGalleryWalkCluster().isEmpty()) {
+		sessionList = new ArrayList<>(session.getGalleryWalkCluster());
+		sessionList.add(session);
+	    }
+	}
+
+	Collections.sort(sessionList, DokumaranSession.SESSION_COMPARATOR);
+
 	for (DokumaranSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
@@ -515,6 +530,15 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	    if (itemRatingDtoMap != null) {
 		group.setItemRatingDto(itemRatingDtoMap.get(session.getSessionId()));
+	    }
+
+	    if (!session.getGalleryWalkCluster().isEmpty()) {
+		List<DokumaranSession> cluster = new ArrayList<>(session.getGalleryWalkCluster());
+		Collections.sort(cluster, DokumaranSession.SESSION_COMPARATOR);
+		for (DokumaranSession clusterMember : cluster) {
+		    group.getGalleryWalkClusterMembers()
+			    .put(clusterMember.getSessionId(), clusterMember.getSessionName());
+		}
 	    }
 
 	    groupList.add(group);
@@ -616,6 +640,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+	    criterion.setCommentsEnabled(true);
 	    criterion.setToolContentId(toolContentId);
 
 	    dokumaranDao.insert(criterion);
@@ -639,6 +664,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 	dokumaran.setGalleryWalkStarted(true);
 	dokumaranDao.saveObject(dokumaran);
+
+	assignSessionsForGalleryWalk(toolContentId);
 
 	sendGalleryWalkRefreshRequest(dokumaran);
     }
@@ -682,6 +709,65 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	learnerService.createCommandForLearners(dokumaran.getContentId(), userIds, jsonCommand.toString());
     }
 
+    /**
+     * If gallery walk is clustered, it assigns sessions to clusters.
+     */
+    @Override
+    public void assignSessionsForGalleryWalk(long toolContentId) {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	int clusterSize = dokumaran.getGalleryWalkClusterSize();
+	if (clusterSize == 0) {
+	    return;
+	}
+	boolean isGrouped = isGroupedActivity(toolContentId);
+	if (!isGrouped) {
+	    return;
+	}
+
+	// focus only on sessions that are not assigned to any cluster yet
+	List<DokumaranSession> allSessions = dokumaranSessionDao.getByContentId(toolContentId);
+	TreeMap<String, Set<String>> sessionClusters = allSessions.stream().collect(
+		Collectors.toMap(session -> session.getSessionName(),
+			session -> session.getGalleryWalkCluster().stream()
+				.collect(Collectors.mapping(DokumaranSession::getSessionName, Collectors.toSet())),
+			(existing, replacement) -> {
+			    existing.addAll(replacement);
+			    return existing;
+			}, TreeMap::new));
+
+	toolService.assignGroupsForGalleryWalk(sessionClusters, clusterSize);
+
+	Map<String, DokumaranSession> sessionsByName = allSessions.stream()
+		.collect(Collectors.toMap(session -> session.getSessionName(), Function.identity()));
+
+	for (Map.Entry<String, Set<String>> sessionClusterEntry : sessionClusters.entrySet()) {
+	    DokumaranSession session = sessionsByName.get(sessionClusterEntry.getKey());
+	    Set<DokumaranSession> cluster = sessionClusterEntry.getValue().stream()
+		    .map(sessionName -> sessionsByName.get(sessionName)).collect(Collectors.toSet());
+	    session.getGalleryWalkCluster().clear();
+	    session.getGalleryWalkCluster().addAll(cluster);
+	}
+
+	for (DokumaranSession session : allSessions) {
+	    dokumaranSessionDao.update(session);
+	}
+    }
+
+    @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
+
+    @Override
+    public boolean isLastActivity(Long toolSessionId) {
+	return toolService.isLastActivity(toolSessionId);
+    }
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -705,21 +791,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    throw new DokumaranApplicationException(error);
 	}
 	return contentId;
-    }
-
-    @Override
-    public boolean isGroupedActivity(long toolContentID) {
-	return toolService.isGroupedActivity(toolContentID);
-    }
-
-    @Override
-    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
-    }
-
-    @Override
-    public boolean isLastActivity(Long toolSessionId) {
-	return toolService.isLastActivity(toolSessionId);
     }
 
     // *******************************************************************************
@@ -1048,7 +1119,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	etherpadService.createCookie(etherpadSessionIds, response);
     }
-
 
     private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
 	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();

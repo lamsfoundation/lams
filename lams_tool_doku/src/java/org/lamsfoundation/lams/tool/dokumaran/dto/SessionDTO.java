@@ -24,6 +24,9 @@ package org.lamsfoundation.lams.tool.dokumaran.dto;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class SessionDTO {
 
     private Long sessionId;
@@ -34,6 +37,7 @@ public class SessionDTO {
     private ItemRatingDTO itemRatingDto;
     private int numberOfLearners;
     private boolean sessionFinished;
+    private final Map<Long, String> galleryWalkClusterMembers = new LinkedHashMap<>();
 
     public Long getSessionId() {
 	return sessionId;
@@ -84,18 +88,22 @@ public class SessionDTO {
     }
 
     public int getNumberOfLearners() {
-        return numberOfLearners;
+	return numberOfLearners;
     }
 
     public void setNumberOfLearners(int numberOfLearners) {
-        this.numberOfLearners = numberOfLearners;
+	this.numberOfLearners = numberOfLearners;
     }
 
     public boolean isSessionFinished() {
-        return sessionFinished;
+	return sessionFinished;
     }
 
     public void setSessionFinished(boolean sesssionFinished) {
-        this.sessionFinished = sesssionFinished;
+	this.sessionFinished = sesssionFinished;
+    }
+
+    public Map<Long, String> getGalleryWalkClusterMembers() {
+	return galleryWalkClusterMembers;
     }
 }
