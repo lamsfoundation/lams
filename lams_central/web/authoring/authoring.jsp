@@ -134,6 +134,8 @@
 				INPUT_DETACHED_ERROR : '<spring:escapeBody javaScriptEscape="true">${INPUT_DETACHED_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
 				TEMPLATES : '<spring:escapeBody javaScriptEscape="true">${TEMPLATES_VAR}</spring:escapeBody>',
+				<fmt:message key="authoring.learning.design.ai.wizard" var="AI_WIZARD_VAR"/>
+				AI_WIZARD : '<spring:escapeBody javaScriptEscape="true">${AI_WIZARD_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.page.menu.apply.changes" var="LIVE_EDIT_SAVE_VAR"/>
 				LIVE_EDIT_SAVE : '<spring:escapeBody javaScriptEscape="true">${LIVE_EDIT_SAVE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
@@ -311,6 +313,7 @@
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right desktopButton">
+				<li id="useAi" onClick="javascript:MenuLib.useAiToCreateLearningDesign()"><a href="#"><i class="fa fa-microchip text-primary"></i> <fmt:message key="authoring.fla.page.menu.new.ai" /></a></li>
 				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
 			</ul>
 		</div>

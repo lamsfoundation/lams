@@ -42,6 +42,10 @@
 				float: right;
 				margin-bottom: 30px;
 			}
+
+			.questionLabelBadge {
+				margin-bottom: 1rem;
+			}
 		</style>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
@@ -101,6 +105,7 @@
 					'dataType': 'json',
 					'data': {
 						'questionSourceKey': '${param.questionSourceKey}',
+						'ratQuestions' : JSON.stringify(${questionsJson})
 					},
 					'complete' : function(){
 						$('#generateQuestionsButton').prop('disabled', false).button('reset');
@@ -108,8 +113,9 @@
 					'error' : function () {
 						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.generate.more.error" /></spring:escapeBody>');
 					},
-					'success': function (questions) {
-						let questionCount = +$('#questionCount').val();
+					'success': function (response) {
+						let questions = response.questions[0],
+								questionCount = +$('#questionCount').val();
 
 						$('#selectAll').attr('checked', false);
 
@@ -407,10 +413,17 @@
 									   value="<c:out value='${question.resourcesFolderPath}' />"
 									   class="questionAttribute questionResourcesFolder" disabled="disabled" />
 									<%-- Answers, if required and exist --%>
-								<c:if test="${fn:length(question.answers) > 0}">
+								<c:if test="${fn:length(question.answers) > 0 or not empty question.label}">
 									<div id="question${questionStatus.index}answerDiv" class="answerDiv">
+										<c:if test="${not empty question.label}">
+											<span class="questionLabelBadge badge" title="<fmt:message key="label.questions.choice.taxonomy" />">
+												<c:out value="${question.label}" />
+											</span>
+										</c:if>
+
 										<input type="hidden" name="answerCount${questionStatus.index}"
 											   value="${fn:length(question.answers)}" class="answerCount" />
+
 										<c:forEach var="answer" items="${question.answers}" varStatus="answerStatus">
 											<div class="answerContainer">
 													<%-- Answer itself --%>

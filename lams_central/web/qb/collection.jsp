@@ -82,6 +82,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		<%-- Add jqGrid internationalisation snippet --%>
 		<%@ include file="/jqGrid.i18n.jsp"%>
@@ -260,7 +261,7 @@
 			var cellhtml = "<i class='fa fa-bar-chart' onClick='javascript:window.open(\"<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=" + cellvalue 
 					+ "\", \"_blank\")' title='<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.qb.collection.action.stats' /></spring:escapeBody>'></i>";
 
-			cellhtml += "<a  title='<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.edit' /></spring:escapeBody>' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid=" 
+			cellhtml += "<a  title='<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.edit' /></spring:escapeBody>' href='<c:url value='/qb/edit/editQuestion.do'/>?qbQuestionUid="
 						+ cellvalue + "&oldCollectionUid=${collection.uid}&KeepThis=true&TB_iframe=true&modal=true' class='thickbox'>"; 
 			cellhtml += 	"<i class='fa fa-pencil'></i>";
 			cellhtml += "</a>";
@@ -379,6 +380,13 @@
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp?importType=word',
 				'QuestionFile','width=500,height=370,scrollbars=yes');
 	    }
+
+			<c:if test="${isAiEnabled}">
+			function importOpenAi() {
+				launchPopup('<lams:LAMSURL/>ai/authoring/ratMcq.do', 'OpenAiForm');
+			}
+			</c:if>
+
 
 	    function importQTI(){
 	    	window.open('<lams:LAMSURL/>questions/questionFile.jsp',
@@ -549,6 +557,19 @@
 				</a>
 			</div>
 			
+				<c:if test="${isAiEnabled}">
+					<div class="btn-group btn-group-xs loffset10 pull-right" role="group">
+						<a class="btn btn-default btn-xs disabled" aria-disabled="true">
+							<fmt:message key='label.import.openai'/>
+						</a>
+
+						<a href="#nogo" onClick="javascript:importOpenAi()" class="btn btn-default"
+						   title="<fmt:message key='label.import.openai.hint'/>">
+							<i class="fa fa-microchip"></i>
+						</a>
+					</div>
+				</c:if>
+
 			<div class="btn-group-xs pull-right" style="display: flex;">
 				<select id="question-type" class="form-control btn-xs">
 					<option selected="selected"><fmt:message key="label.question.type.multiple.choice" /></option>
