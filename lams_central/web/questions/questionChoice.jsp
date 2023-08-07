@@ -104,7 +104,8 @@
 					'type': 'post',
 					'dataType': 'json',
 					'data': {
-						'questionSourceKey': '${param.questionSourceKey}'
+						'questionSourceKey': '${param.questionSourceKey}',
+						'ratQuestions' : JSON.stringify(${questionsJson})
 					},
 					'complete' : function(){
 						$('#generateQuestionsButton').prop('disabled', false).button('reset');

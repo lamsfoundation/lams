@@ -7,10 +7,7 @@ import org.lamsfoundation.lams.questions.Question;
 import org.lamsfoundation.lams.questions.QuestionParser;
 import org.lamsfoundation.lams.questions.QuestionWordParser;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,7 +85,8 @@ public class QuestionsController {
 	    request.setAttribute("collections", collections);
 	}
 	// user did not choose a file
-	if (!isTextBasedInput && (file == null || (isWordInput ? !packageName.endsWith(".docx")
+	if (!isTextBasedInput && (file == null || (isWordInput
+		? !packageName.endsWith(".docx")
 		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
 	}
@@ -110,7 +108,10 @@ public class QuestionsController {
 		Class clazz = Class.forName(Configuration.AI_MODULE_CLASS, false, Configuration.class.getClassLoader());
 		if (clazz != null) {
 		    Method method = clazz.getMethod("parseResponse", String.class);
-		    questions = (Question[]) method.invoke(null, request.getParameter("textInput"));
+		    String questionsJson = request.getParameter("textInput");
+		    questions = (Question[]) method.invoke(null, questionsJson);
+		    request.setAttribute("questionsJson",
+			    questions == null || questions.length == 0 ? "" : questionsJson);
 		    request.setAttribute("editingEnabled", true);
 		}
 	    } catch (Exception e) {
