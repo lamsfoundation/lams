@@ -18,7 +18,7 @@
 	<lams:css/>
 	
 	<%-- TODO is this the best place to import these scripts ?	--%>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 </lams:head>
@@ -54,8 +54,8 @@
 				<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-default">
 					<fmt:message key="button.enter" />
 				</a>
-				
-				<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
+
+				<lams:JSImport src="includes/javascript/getSysInfo.js" />
 				<script type="text/javascript">
 					if (isMac) {
 						$('#zoomJoinButton').show();

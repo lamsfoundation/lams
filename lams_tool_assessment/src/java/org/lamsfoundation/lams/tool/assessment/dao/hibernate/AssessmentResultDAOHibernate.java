@@ -22,11 +22,6 @@
 
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -45,18 +40,23 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Repository
 public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements AssessmentResultDAO {
 
-    private static final String FIND_LAST_BY_ASSESSMENT = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.assessment.uid=:assessmentUid AND r.latest=1";
+    private static final String FIND_LAST_BY_ASSESSMENT =
+	    "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.assessment.uid=:assessmentUid AND r.latest=1";
 
     private static final String FIND_LAST_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1";
 
-    private static final String FIND_WHETHER_LAST_RESULT_FINISHED = "SELECT COUNT(*) > 0 FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1 AND r.finishDate != null";
+    private static final String FIND_WHETHER_LAST_RESULT_FINISHED =
+	    "SELECT COUNT(*) > 0 FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId =:userId AND r.assessment.uid=:assessmentUid AND r.latest=1 AND r.finishDate != null";
 
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
@@ -64,8 +64,8 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = :userId AND r.assessment.uid=:assessmentUid AND (r.finishDate != null) AND r.latest=1";
 
-    private static final String FIND_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=?";
+    private static final String FIND_BY_SESSION_AND_USER =
+	    "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.user.userId = ? AND r.sessionId=?";
 
     private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
@@ -76,72 +76,85 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     private static final String FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.assessment.contentId = :contentId AND (r.finishDate != null) AND r.latest = 1";
 
-    private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
+    private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER =
+	    "select COUNT(*) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
 
-    private static final String IS_ASSESSMENT_RESULT_EXIST_BY_ASSESSMENT = "select COUNT(*) > 0 FROM "
-	    + AssessmentResult.class.getName() + " AS r WHERE r.assessment.uid=:assessmentUid";
+    private static final String IS_ASSESSMENT_RESULT_EXIST_BY_ASSESSMENT =
+	    "select COUNT(*) > 0 FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.assessment.uid=:assessmentUid";
 
     private static final String LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=:userId AND r.assessment.uid=:assessmentUid AND (r.finishDate != null) AND r.latest=1";
 
-    private static final String LAST_ASSESSMENT_RESULT_GRADES_BY_CONTENT_ID = "select r.user.userId, r.grade FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
+    private static final String LAST_ASSESSMENT_RESULT_GRADES_BY_CONTENT_ID =
+	    "select r.user.userId, r.grade FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
 
-    private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
+    private static final String BEST_SCORE_BY_SESSION_AND_USER =
+	    "SELECT MAX(r.grade) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
 
-    private static final String BEST_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, MAX(r.grade) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
+    private static final String BEST_SCORES_BY_CONTENT_ID =
+	    "SELECT r.user.userId, MAX(r.grade) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
 
-    private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null) ORDER BY r.startDate ASC";
+    private static final String FIRST_SCORE_BY_SESSION_AND_USER =
+	    "SELECT r.grade FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
+    private static final String AVERAGE_SCORE_BY_SESSION_AND_USER =
+	    "SELECT AVG(r.grade) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId = :userId AND r.sessionId=:sessionId AND (r.finishDate != null)";
 
-    private static final String AVERAGE_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, AVG(r.grade) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
+    private static final String AVERAGE_SCORES_BY_CONTENT_ID =
+	    "SELECT r.user.userId, AVG(r.grade) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
 
-    private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
-	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
+    private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN =
+	    "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM " + AssessmentResult.class.getName()
+		    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_UID = "FROM " + AssessmentResult.class.getName() + " AS r WHERE r.uid = ?";
 
-    private static final String ANSWERED_QUESTIONS_BY_USER = "SELECT user_id, portrait_uuid, user_name, group_name, SUM(IF("
-	    + "			(type = 1 AND answer_boolean = 1) OR"
-	    + "			(type = 2 AND answer_int <> -1) OR"
-	    + "			((type BETWEEN 3 AND 6) AND (answer IS NOT NULL AND TRIM(answer) <> '')) OR"
-	    + "			(type = 7 AND mark > 0) OR          "
-	    + "			(type = 8 AND answer_int > 0)"
-	    + "			,1, 0)) AS answered_question_count FROM"
-	    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
-	    + "		 	IF(a.use_select_leader_tool_ouput, s.session_name, NULL) AS group_name, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
-	    + "         FROM      tl_laasse10_assessment        AS a"
-	    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
-	    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
-	    + "         JOIN      lams_user              	AS u	USING (user_id)"
-	    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
-	    + "		JOIN      tl_laasse10_question_result   AS qr   ON ar.uid = qr.result_uid"
-	    + "		LEFT JOIN lams_qb_tool_answer           AS qbta ON qbta.answer_uid = qr.uid"
-	    + "		LEFT JOIN lams_qb_tool_question         AS qbtq USING (tool_question_uid)"
-	    + "		LEFT JOIN lams_qb_question              AS qbq  ON qbq.uid = qbtq.qb_question_uid"
-	    + "		LEFT JOIN tl_laasse10_option_answer     AS oa"
-	    + "			ON oa.question_result_uid = qr.uid"
-	    + "			AND  ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '')"
-	    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR (qbq.type = 2 AND answer_int <> -1))"
-	    + "		WHERE ar.latest = 1"
-	    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
-	    + "		AND   a.content_id = :toolContentId"
-	    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
+    private static final String ANSWERED_QUESTIONS_BY_USER =
+	    "SELECT user_id, portrait_uuid, user_name, group_name, SUM(IF((type = 1 AND answer_boolean = 1) OR"
+		    + "			(type = 2 AND answer_int <> -1) OR"
+		    + "			((type BETWEEN 3 AND 6) AND (answer IS NOT NULL AND TRIM(answer) <> '')) OR"
+		    + "			(type = 7 AND mark > 0) OR          "
+		    + "			(type = 8 AND answer_int > 0)"
+		    + "			,1, 0)) AS answered_question_count FROM"
+		    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name,"
+		    + "		 	s.session_name AS group_name, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
+		    + "         FROM      tl_laasse10_assessment        AS a"
+		    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
+		    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
+		    + "         JOIN      lams_user              	AS u	USING (user_id)"
+		    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
+		    + "		JOIN      tl_laasse10_question_result   AS qr   ON ar.uid = qr.result_uid"
+		    + "		LEFT JOIN lams_qb_tool_answer           AS qbta ON qbta.answer_uid = qr.uid"
+		    + "		LEFT JOIN lams_qb_tool_question         AS qbtq USING (tool_question_uid)"
+		    + "		LEFT JOIN lams_qb_question              AS qbq  ON qbq.uid = qbtq.qb_question_uid"
+		    + "		LEFT JOIN tl_laasse10_option_answer     AS oa"
+		    + "			ON oa.question_result_uid = qr.uid"
+		    + "			AND  ((qbq.type = 7 AND qr.mark > 0) OR (qbta.answer IS NOT NULL AND TRIM(qbta.answer) <> '')"
+		    + "                        OR oa.answer_boolean IS NULL OR oa.answer_boolean = 1 OR (qbq.type = 2 AND answer_int <> -1))"
+		    + "		WHERE ar.latest = 1"
+		    + "         AND   (a.use_select_leader_tool_ouput = 0 OR s.group_leader_uid = ar.user_uid)"
+		    + "		AND   a.content_id = :toolContentId"
+		    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
+
+    private static final String FINISHED_LEARNERS_FOR_COMPLETION_CHART =
+	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.first_name, ' ', u.last_name) AS user_name, "
+		    + "  s.session_name AS group_name"
+		    + "         FROM      tl_laasse10_assessment        AS a"
+		    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
+		    + "         JOIN      tl_laasse10_user              AS au   ON ar.user_uid = au.uid"
+		    + "         JOIN      lams_user              	AS u	USING (user_id)"
+		    + "         JOIN      tl_laasse10_session           AS s    USING (session_id)"
+		    + "	WHERE ar.latest = 1 AND ar.finish_date IS NOT NULL"
+		    + "		AND   a.content_id = :toolContentId"
+		    + "	ORDER BY user_name";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -170,13 +183,15 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		+ " AS a JOIN a.learningDesign.lessons AS l "
 		+ "WHERE qr.assessmentResult.uid = r.uid AND a.toolContentId = r.assessment.contentId "
 		+ "AND (l.organisation.organisationId = :organisationId OR "
-		+ "     l.organisation.parentOrganisation.organisationId = :organisationId"
-		+ (parentOrganisation == null ? ""
+		+ "     l.organisation.parentOrganisation.organisationId = :organisationId" + (
+		parentOrganisation == null
+			? ""
 			: " OR l.organisation.organisationId = :parentOrganisationId OR "
 				+ "l.organisation.parentOrganisation.organisationId = :parentOrganisationId")
-		+ ") AND qr.qbToolQuestion.qbQuestion.uid = :qbQuestionUid AND "
-		+ (qbToolQuestion.getQbQuestion().isExactMatch() ? "TRIM(qr.answer)"
-			: "REGEXP_REPLACE(qr.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
+		+ ") AND qr.qbToolQuestion.qbQuestion.uid = :qbQuestionUid AND " + (qbToolQuestion.getQbQuestion()
+		.isExactMatch()
+		? "TRIM(qr.answer)"
+		: "REGEXP_REPLACE(qr.answer, '" + QbUtils.VSA_ANSWER_NORMALISE_SQL_REG_EXP + "', '')")
 		+ " = :answer ORDER BY r.startDate ASC";
 
 	Query<AssessmentResult> q = getSession().createQuery(FIND_BY_QBQUESTION, AssessmentResult.class);
@@ -272,12 +287,12 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
-	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT user.user_id, res.grade "
-		+ "FROM tl_laasse10_assessment_result AS res "
-		+ "JOIN tl_laasse10_user AS user ON res.user_uid = user.uid "
-		+ "JOIN tl_laasse10_assessment AS assess ON res.assessment_uid = assess.uid AND assess.content_id = :contentId "
-		+ "INNER JOIN (SELECT user_uid, MIN(start_date) AS startDate FROM tl_laasse10_assessment_result WHERE finish_date IS NOT NULL GROUP BY user_uid) firstRes "
-		+ "ON (res.user_uid = firstRes.user_uid AND res.start_date = firstRes.startDate) GROUP BY res.user_uid";
+	final String FIRST_SCORES_BY_CONTENT_ID =
+		"SELECT user.user_id, res.grade " + "FROM tl_laasse10_assessment_result AS res "
+			+ "JOIN tl_laasse10_user AS user ON res.user_uid = user.uid "
+			+ "JOIN tl_laasse10_assessment AS assess ON res.assessment_uid = assess.uid AND assess.content_id = :contentId "
+			+ "INNER JOIN (SELECT user_uid, MIN(start_date) AS startDate FROM tl_laasse10_assessment_result WHERE finish_date IS NOT NULL GROUP BY user_uid) firstRes "
+			+ "ON (res.user_uid = firstRes.user_uid AND res.start_date = firstRes.startDate) GROUP BY res.user_uid";
 
 	NativeQuery<?> query = getSession().createNativeQuery(FIRST_SCORES_BY_CONTENT_ID);
 	query.setParameter("contentId", toolContentId);
@@ -328,25 +343,19 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
-    public int countLastFinishedAssessmentResults(long contentId) {
-	return ((Long) getSession().createQuery("SELECT COUNT(*) " + FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID)
-		.setParameter("contentId", contentId).uniqueResult()).intValue();
-    }
-
-    @Override
     public List<Object[]> getLastFinishedAssessmentResultsBySession(Long sessionId) {
-	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM "
-		+ AssessmentResult.class.getName() + " AS r, " + User.class.getName()
-		+ " as u WHERE r.sessionId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID =
+		"SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName() + " AS r, " + User.class.getName()
+			+ " as u WHERE r.sessionId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
 
 	return doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { sessionId });
     }
 
     @Override
     public List<Object[]> getLeadersLastFinishedAssessmentResults(Long contentId) {
-	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID = "SELECT r, u.portraitUuid FROM "
-		+ AssessmentResult.class.getName() + " AS r, " + User.class.getName()
-		+ " as u WHERE r.user=r.user.session.groupLeader AND r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
+	final String FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID =
+		"SELECT r, u.portraitUuid FROM " + AssessmentResult.class.getName() + " AS r, " + User.class.getName()
+			+ " as u WHERE r.user=r.user.session.groupLeader AND r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1 AND u.userId=r.user.userId";
 
 	return doFind(FIND_LAST_FINISHED_RESULTS_BY_SESSION_ID, new Object[] { contentId });
     }
@@ -359,6 +368,13 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	} else {
 	    return ((Number) list.get(0)).intValue();
 	}
+    }
+
+    @Override
+    public List<Object[]> getLearnersWithFinishedCurrentAttemptForCompletionChart(Long contentId) {
+	List<Object[]> results = getSession().createNativeQuery(FINISHED_LEARNERS_FOR_COMPLETION_CHART)
+		.setParameter("toolContentId", contentId).getResultList();
+	return results;
     }
 
     @Override
@@ -395,15 +411,13 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId) {
+    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsersForCompletionChart(long toolContentId) {
 	List<Object[]> results = getSession().createNativeQuery(ANSWERED_QUESTIONS_BY_USER)
 		.setParameter("toolContentId", toolContentId).getResultList();
-	return results.stream()
-		.collect(Collectors.groupingBy(r -> ((Number) r[4]).intValue(),
-			Collectors.mapping(
-				r -> new String[] { r[0].toString(), r[1] == null ? null : r[1].toString(),
-					r[2] == null ? "" : r[2].toString(), r[3] == null ? null : r[3].toString() },
-				Collectors.toList())));
+	return results.stream().collect(Collectors.groupingBy(r -> ((Number) r[4]).intValue(), Collectors.mapping(
+		r -> new String[] { r[0].toString(), r[1] == null ? null : r[1].toString(),
+			r[2] == null ? "" : r[2].toString(), r[3] == null ? null : r[3].toString() },
+		Collectors.toList())));
     }
 
     private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {

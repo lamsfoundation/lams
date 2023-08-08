@@ -10,11 +10,10 @@
 
 
  	<!-- ********************  javascript ********************** -->
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>    
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>   
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<lams:JSImport src="includes/javascript/taskListcommon.js" relative="true" />
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	

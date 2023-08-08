@@ -12,14 +12,20 @@
 		<link href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 		<link href="<lams:LAMSURL/>css/qb-question.css" rel="stylesheet" type="text/css">
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 		<script type="text/javascript">
-			const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
-			const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
-			const ADD_COLLECTION_LABEL = '<fmt:message key="label.questions.choice.collection.new.prompt" />';
+			const VALIDATION_ERROR_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key='error.form.validation.error'/></spring:escapeBody>";
+			const VALIDATION_ERRORS_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key='error.form.validation.errors'><fmt:param>{errors_counter}</fmt:param></fmt:message></spring:escapeBody>";
+			const ADD_COLLECTION_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.collection.new.prompt" /></spring:escapeBody>";
+
+			const VALIDATION_ERROR_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key='error.form.validation.error'/></spring:escapeBody>";
+			const VALIDATION_ERRORS_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key='error.form.validation.errors'><fmt:param>{errors_counter}</fmt:param></fmt:message></spring:escapeBody>";
+			const ADD_COLLECTION_LABEL = "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.collection.new.prompt" /></spring:escapeBody>";
+
+
 			const LAMS_URL = '<lams:LAMSURL/>';
 
 			var isNewQuestion = ${isNewQuestion},

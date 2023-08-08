@@ -484,7 +484,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	min-height: 100vh;
 	border-radius: 2.8rem;
 	overflow: hidden;
-	background-color: #fff;
+	background-color: var(--bs-white);
 }
 
 .component-page-wrapper button.no-decoration {

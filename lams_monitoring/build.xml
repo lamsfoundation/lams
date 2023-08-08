@@ -3,9 +3,5 @@
 <project name="LAMS Monitoring" basedir="." default="print-usage">
 	
 	<import file="../lams_build/build_base.xml"/> 
-	
-   <fileset id="js.to.minify" dir="${basedir}/web/includes/javascript">
-        	<include name="monitorLesson.js"/>
-    </fileset>
 
 </project>

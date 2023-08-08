@@ -116,6 +116,7 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -126,6 +127,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 /**
  * @author Andrey Balan
@@ -186,6 +188,19 @@ public class ScratchieServiceImpl
 	FluxRegistry.initFluxMap(ScratchieConstants.BURNING_QUESTIONS_UPDATED_FLUX_NAME,
 		ScratchieConstants.BURNING_QUESTIONS_UPDATED_SINK_NAME, null, toolContentId -> "doRefresh",
 		FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+
+	FluxRegistry.initFluxMap(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME,
+		ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+
+			ObjectNode timeLimitSettingsJson = getTimeLimitSettingsJson(toolContentId);
+			return timeLimitSettingsJson.toString();
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
@@ -376,6 +391,18 @@ public class ScratchieServiceImpl
 
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	int learnersStarted = scratchieUserDao.countUsersByContentId(toolContentId);
+	if (learnersStarted == 1 && scratchie.getRelativeTimeLimit() == 0 && scratchie.getAbsoluteTimeLimit() > 0
+		&& scratchie.getAbsoluteTimeLimitFinish() == null) {
+	    scratchie.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(scratchie.getAbsoluteTimeLimit()));
+	    scratchie.setAbsoluteTimeLimit(0);
+	    scratchieDao.saveObject(scratchie);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	    FluxRegistry.emit(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
+	}
+
 	ScratchieUser user = getUserByUserIDAndContentID(Integer.valueOf(userId).longValue(), toolContentId);
 	if (user == null) {
 	    return null;
@@ -2568,6 +2595,16 @@ public class ScratchieServiceImpl
 	jsonCommand.put("hookTrigger", "scratchie-leader-change-refresh-" + toolSessionId);
 	learnerService.createCommandForLearners(scratchie.getContentId(), userIds, jsonCommand.toString());
     }
+
+    private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
+	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	timeLimitSettings.put("relativeTimeLimit", scratchie.getRelativeTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimit", scratchie.getAbsoluteTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimitFinish", scratchie.getAbsoluteTimeLimitFinishSeconds());
+	return timeLimitSettings;
+    }
+
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************

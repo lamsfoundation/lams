@@ -51,7 +51,7 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
@@ -94,7 +94,7 @@
 			document.location.href='<c:url value="/learning/reflect.do?toolSessionID=${toolSessionID}&userUid=${userUid}"/>';
 		}
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	
 	<%@ include file="websocket.jsp"%>	

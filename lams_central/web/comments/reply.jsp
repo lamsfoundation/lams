@@ -31,7 +31,7 @@
 		
 		var theForm = $(replyForm);
 		if (validateBodyText($('#replyFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>,
-				"<fmt:message key="label.comment.body.validation" />")) {
+				"<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.body.validation" /></spring:escapeBody>")) {
 
 			$.ajax({ // create an AJAX call...
 				data : theForm.serialize(),
@@ -51,8 +51,8 @@
 				reloadThread(
 					response,
 					'<lams:LAMSURL />',
-					'<fmt:message key="error.cannot.redisplay.please.refresh"/>',
-					'<fmt:message key="error.please.refresh"/>'
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>'
 				);
 			});
 		} // end validateBodyText

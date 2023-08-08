@@ -11,7 +11,7 @@
 		qbMessage = null;
 	switch (qbQuestionModified) {
 		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
-			qbMessage = '<fmt:message key="message.qb.modified.update" />';
+			qbMessage = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.qb.modified.update" /></spring:escapeBody>';
 		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
 			let showMessage = true;
 		
@@ -28,12 +28,12 @@
 			}
 
 			if (showMessage) {
-				qbMessage = '<fmt:message key="message.qb.modified.version" />';
+				qbMessage = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.qb.modified.version" /></spring:escapeBody>';
 			}
 
 			break;
 		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
-			qbMessage = '<fmt:message key="message.qb.modified.new" />';
+			qbMessage = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.qb.modified.new" /></spring:escapeBody>';
 			break;
 	}
 	if (qbMessage) {

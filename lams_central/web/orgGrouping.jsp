@@ -40,16 +40,15 @@
 			csrfTokenName = '<csrf:tokenname/>',
 			csrfTokenValue = '<csrf:tokenvalue/>',
 			LAMS_URL = '<lams:LAMSURL/>',
-			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="label.course.groups.grouping.remove.confirm" var="REMOVE_GROUPING_CONFIRM_LABEL_VAR"/>
-				REMOVE_GROUPING_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_GROUPING_CONFIRM_LABEL_VAR}" />').text(),
+				REMOVE_GROUPING_CONFIRM_LABEL : '<spring:escapeBody javaScriptEscape="true">${REMOVE_GROUPING_CONFIRM_LABEL_VAR}</spring:escapeBody>',
 				<fmt:message key="label.course.groups.grouping.use.confirm" var="USE_GROUPING_CONFIRM_LABEL_VAR"/>
-				USE_GROUPING_CONFIRM_LABEL : decoderDiv.html('<c:out value="${USE_GROUPING_CONFIRM_LABEL_VAR}" />').text(),
+				USE_GROUPING_CONFIRM_LABEL : '<spring:escapeBody javaScriptEscape="true">${USE_GROUPING_CONFIRM_LABEL_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.course.groups.to.branches.match.dialog.title" var="COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR"/>
-				COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : '<c:out value="${COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR}" />',
+				COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${COURSE_GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.ok.button" var="OK_BUTTON_VAR"/>
-				OK_BUTTON : '<c:out value="${OK_BUTTON_VAR}" />'
+				OK_BUTTON : '<spring:escapeBody javaScriptEscape="true">${OK_BUTTON_VAR}</spring:escapeBody>'
 			};
 	</script>
 </lams:head>

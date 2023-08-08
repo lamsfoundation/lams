@@ -163,6 +163,13 @@ public class TblMonitorController {
 	return FluxRegistry.get(ScratchieConstants.BURNING_QUESTIONS_UPDATED_FLUX_NAME, toolContentId);
     }
 
+    @RequestMapping(path = "/getTimeLimitPanelUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitPanelUpdateFlux(@RequestParam long toolContentId, HttpServletResponse response) {
+	response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+	return FluxRegistry.get(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
+    }
+
     /**
      * Exports tool results into excel.
      *

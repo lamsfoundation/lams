@@ -29,7 +29,7 @@
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 
 	<!-- ********************  javascript ********************** -->
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
@@ -291,7 +291,7 @@
             var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
 			if (numberOfAvailableScratches > 0) {
 	            $('#finishButton').prop('disabled', true).css('pointer-events', 'none')
-	            				  .parent().attr('data-title', '<fmt:message key="label.learning.require.all.answers" />')
+	            				  .parent().attr('data-title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.require.all.answers" /></spring:escapeBody>')
 				  				  		   .tooltip();
 			} else {
 				$('#finishButton').prop('disabled', false)
@@ -357,7 +357,7 @@
 						}
 					},
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
 				        
 				        setTimeout(function() { 
 					        if (${isUserLeader}) {
@@ -367,7 +367,7 @@
 						    }
 				        }, 4000);
 					},
-					description: "<div id='countdown-label'><fmt:message key='label.countdown.time.left' /></div>"
+					description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody></div>"
 				});
 			}
 	
@@ -475,7 +475,7 @@
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 	                success: function() {
 		                $.jGrowl(
-		                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.burning.questions.autosaved" />",
+		                	"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions.autosaved' /></spring:escapeBody>",
 		                	{ life: 2000, closeTemplate: '' }
 		                );
 	                }
@@ -491,7 +491,7 @@
 			if (!isTimelimitExpired) {
 				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]:visible").length;
 				proceed = numberOfAvailableScratches == 0 || 
-						  confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>");	
+						  confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.one.or.more.questions.not.completed'/></spring:escapeBody>");	
 			}
 			
 			if (proceed) {

@@ -12,7 +12,7 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>	
+	<lams:JSImport src="includes/javascript/upload.js" />
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />	
 	
 	<c:if test="${not empty param.sessionMapID}">

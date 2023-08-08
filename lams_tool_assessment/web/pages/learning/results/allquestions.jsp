@@ -59,15 +59,15 @@
 	var pathToImageFolder = "${lams}images/css/",
 	
 	//vars for rating.js
-		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+		YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 		COMMENTS_MIN_WORDS_LIMIT = 0,
 		MAX_RATES = 0,
 		MIN_RATES = 0,
 		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = true,
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
+		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.image.comment.blank"/></spring:escapeBody>',
 		ALLOW_RERATE = false;
 	<%-- Do not allow rating if it is a teacher view --%>
 	<c:if test="${not empty toolSessionID}">
@@ -140,7 +140,7 @@
 		</c:if>
 	});
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	
 <c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">						

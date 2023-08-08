@@ -36,12 +36,12 @@
 			// pass settings to jquery.jqGrid.confidence-level-formattter.js
 			var confidenceLevelsSettings = {
 				type: "${assessment.confidenceLevelsType}",
-				LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
-				LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
-				LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
-				LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
-				LABEL_SURE : '<fmt:message key="label.sure" />',
-				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
+				LABEL_NOT_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.confident" /></spring:escapeBody>',
+				LABEL_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confident" /></spring:escapeBody>',
+				LABEL_VERY_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.confident" /></spring:escapeBody>',
+				LABEL_NOT_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.sure" /></spring:escapeBody>',
+				LABEL_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.sure" /></spring:escapeBody>',
+				LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
 			};
 			
 			//var for jquery.jRating.js
@@ -59,10 +59,10 @@
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 	
+		<lams:JSImport src="includes/javascript/rating.js" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
@@ -102,17 +102,17 @@
 	  				   	colNames:[
 		  				   	'questionResultUid',
 	  				   	    'maxMark',
-	  		  				"<fmt:message key="label.monitoring.summary.user.name" />",
-		  			   		"<fmt:message key="label.monitoring.user.summary.response" />",
+	  		  				"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.summary.user.name" /></spring:escapeBody>",
+		  			   		"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.response" /></spring:escapeBody>",
 		  			   		<c:if test="${assessment.enableConfidenceLevels and questionDto.type != 8}">
-		  			   			"<fmt:message key="label.confidence" />",
+		  			   			"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.confidence" /></spring:escapeBody>",
 		  			  		</c:if>
 			  			   	<c:if test="${questionDto.groupsAnswersDisclosed}">
-		  			   			"<fmt:message key="label.answer.rating.title" />",
+		  			   			"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.answer.rating.title" /></spring:escapeBody>",
 		  			  		</c:if>
-		  		  			"<fmt:message key="label.monitoring.user.summary.grade" />",
-		  					"<fmt:message key="label.monitoring.user.summary.marker" />",
-		  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />",
+		  		  			"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.grade" /></spring:escapeBody>",
+		  					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.marker" /></spring:escapeBody>",
+		  					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.marker.comment" /></spring:escapeBody>",
 		  			   		'userId',
 	  						'portraitId'
 	  					],
@@ -237,9 +237,9 @@
   									iconSet: 'fontAwesome',
   									colNames:[
   										'ratingId',
-  				  		  				'<fmt:message key="label.comment.name" />',
-  				  		  				'<fmt:message key="label.rating" />',
-  				  		  				'<fmt:message key="label.comment" />',
+  				  		  				'<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.comment.name" /></spring:escapeBody>',
+  				  		  				'<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.rating" /></spring:escapeBody>',
+  				  		  				'<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.comment" /></spring:escapeBody>',
   				  		  				'userId',
   				  		  				'portraitId'
   										],

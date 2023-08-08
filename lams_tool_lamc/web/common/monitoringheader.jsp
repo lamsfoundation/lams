@@ -10,7 +10,7 @@
 <lams:css/>
 
 <!-- ********************  javascript ********************** -->
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
@@ -25,4 +25,3 @@
 <!-- Marks Chart -->
 <script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
- 

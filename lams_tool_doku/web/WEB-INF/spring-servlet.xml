@@ -13,6 +13,7 @@
 
 	<!-- Initialise Spring MVC. Enforce path suffix use otherwise /start will be recognised but /start.do will not. -->
 	<mvc:annotation-driven>
+		<mvc:async-support default-timeout="10000" task-executor="serverTaskExecutor" />
 		<mvc:path-matching suffix-pattern="true" />
 	</mvc:annotation-driven>
 

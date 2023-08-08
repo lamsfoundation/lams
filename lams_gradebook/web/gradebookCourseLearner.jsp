@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 
@@ -37,16 +37,17 @@
 			    rowNum:10,
 			    colNames:[
 			    	'', 
-			    	"<fmt:message key="gradebook.columntitle.lessonName"/>", 
-			    	"<fmt:message key="gradebook.columntitle.subGroup"/>", 
-			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
-			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
-			    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
-			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    	"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
-			    	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-			    	"<fmt:message key="gradebook.columntitle.averageMark"/>", 
-			    	"<fmt:message key="gradebook.columntitle.mark"/>"],
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.lessonName' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.subGroup' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.progress' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.startDate' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.completeDate' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.lessonFeedback' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.averageTimeTaken' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.timeTaken' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.averageMark' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.columntitle.mark' /></spring:escapeBody>"
+				],
 			    colModel:[
 			    	{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			    	{name:'rowName',index:'rowName', sortable:true, editable:false},
@@ -62,7 +63,7 @@
 			    ],
  			    loadError: function(xhr,st,err) {
 			    	$("#organisationGrid").jqGrid('clearGridData');
-			    	alert("<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>");
+			    	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.error"/></spring:escapeBody>\n\n<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 			    },
  			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -84,13 +85,13 @@
 							 rowNum:10,
 						     colNames: [
 						     	'',
-						     	"<fmt:message key="gradebook.columntitle.activity"/>",
-						     	"<fmt:message key="gradebook.columntitle.progress"/>", 
-						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
-						     	"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
-						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-						     	"<fmt:message key="gradebook.columntitle.averageMark"/>", 
-						     	"<fmt:message key="gradebook.columntitle.mark"/>"
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.activity"/></spring:escapeBody>",
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.progress"/></spring:escapeBody>", 
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.activityFeedback"/></spring:escapeBody>", 
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageTimeTaken"/></spring:escapeBody>", 
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.timeTaken"/></spring:escapeBody>", 
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageMark"/></spring:escapeBody>", 
+						     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.mark"/></spring:escapeBody>"
 						     ],
 						     colModel: [
 						       	{name:'id', index:'id', sortable:false, hidden:true, hidedlg:true},
@@ -104,7 +105,7 @@
 						     ],
  						     loadError: function(xhr,st,err) {
 						    	$("#"+subgrid_table_id).jqGrid('clearGridData');
-						    	alert("<fmt:message key="label.error"/>\n\n<fmt:message key="gradebook.error.loaderror"/>");
+						    	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.error"/></spring:escapeBody>\n\n<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 						     },
  							 gridComplete: function(){
 							 	fixPagerInCenter(subgrid_table_id+"_pager", 1);

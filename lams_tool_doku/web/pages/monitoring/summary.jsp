@@ -7,7 +7,8 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${dokumaran.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${dokumaran.absoluteTimeLimitFinishSeconds}"/>
+	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimit}"/>
 	<c:param name="relativeTimeLimit" value="${dokumaran.relativeTimeLimit}"/>
 	<c:param name="isTbl" value="${isTbl}" />
 	<c:param name="controllerContext" value="tool/ladoku11/monitoring" />
@@ -48,6 +49,10 @@
 
 	.doku-monitoring-summary #gallery-walk-panel.gallery-walk-panel-ratings {
 		width: 100%;
+	}
+
+	.doku-monitoring-summary #gallery-walk-show-clusters {
+		margin-top: 20px;
 	}
 
 	.doku-monitoring-summary #gallery-walk-learner-edit {
@@ -128,9 +133,9 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/etherpad.js" />
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/",
@@ -258,8 +263,8 @@
 					type: 'post',
 					success : function (){
 						$this.closest('.marks-container').find('.copy-mark-button')
-						.data('mark', mark).show()
-						.find('.copy-mark-value').text(mark);
+								.data('mark', mark).show()
+								.find('.copy-mark-value').text(mark);
 					},
 					error: function (request, status, error) {
 						alert('<fmt:message key="messsage.monitoring.learner.marks.update.fail" />');
@@ -317,11 +322,11 @@
 					}
 				}
 			})
-			.bind('pagerInitialized pagerComplete', function(event, options){
-				if ( options.totalRows == 0 ) {
-					$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
-				}
-			});
+					.bind('pagerInitialized pagerComplete', function(event, options){
+						if ( options.totalRows == 0 ) {
+							$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
+						}
+					});
 		});
 
 
@@ -391,6 +396,9 @@
 		});
 	}
 
+	function openGalleryWalkClusters(){
+		window.open('<lams:WebAppURL/>monitoring/showGalleryWalkClusters.do?toolContentID=${dokumaran.contentId}', '_blank');
+	}
 
 	function enableGalleryWalkLearnerEdit(){
 		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
@@ -419,9 +427,9 @@
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
-		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
-			toolSessionID : toolSessionId
-		});
+				.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+					toolSessionID : toolSessionId
+				});
 	}
 
 	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
@@ -449,7 +457,7 @@
 	}
 
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
@@ -531,8 +539,18 @@
 
 				<br>
 
+				<button id="gallery-walk-show-clusters" type="button"
+						class="btn btn-default
+							${dokumaran.galleryWalkClusterSize > 0 and dokumaran.galleryWalkStarted ? '' : 'hidden'}"
+						onClick="javascript:openGalleryWalkClusters()">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					<fmt:message key="monitoring.summary.gallery.walk.cluster.view.button" />
+				</button>
+
+				<br>
+
 				<button id="gallery-walk-learner-edit" type="button"
-						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
+						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and dokumaran.galleryWalkStarted? '' : 'hidden'}"
 						onClick="javascript:enableGalleryWalkLearnerEdit()">
 					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" />
 				</button>
@@ -613,6 +631,17 @@
 
 				</c:when>
 				<c:otherwise>
+					<c:if test="${not empty groupSummary.galleryWalkClusterMembers}">
+						<c:set var="clusterMemberLinks" value="" />
+						<c:forEach var="clusterMember" items="${groupSummary.galleryWalkClusterMembers}" varStatus="status">
+							<c:set var="clusterMemberLinks">${clusterMemberLinks}${status.first ? "" : ",&nbsp;"}
+								<a href="#heading${clusterMember.key}"><c:out value="${clusterMember.value}" /></a></c:set>
+						</c:forEach>
+						<span class="loffset5">
+							<fmt:message key="monitoring.summary.gallery.walk.cluster.members" />&nbsp;${clusterMemberLinks}
+						</span>
+					</c:if>
+
 					<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
 						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
 					</c:if>

@@ -115,7 +115,7 @@
 						SESSION_ID = ${toolSessionID};
 
 			</script>
-			<script src="${lams}includes/javascript/rating.js"></script>
+			<lams:JSImport src="includes/javascript/rating.js" />
 			<script src="${lams}includes/javascript/jquery.jRating.js"></script>
 		</c:if>
 

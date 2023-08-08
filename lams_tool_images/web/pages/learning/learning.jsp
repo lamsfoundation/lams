@@ -68,7 +68,7 @@
 	</c:choose>
 	
 	<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
-    <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+    <lams:JSImport src="includes/javascript/upload.js" />
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<lams:JSImport src="includes/javascript/fotorama.js" relative="true" />
  	<lams:JSImport src="learning/includes/javascript/gate-check.js" />

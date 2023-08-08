@@ -26,13 +26,13 @@
 	    		    }
 		    	},
 		    	messages: {
-		    		title: "<fmt:message key='label.authoring.choice.field.required'/>",
+		    		title: "<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
 		    		maxMark: {
-		    			required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
+		    			required: "<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+		    			digits: "<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.authoring.choice.enter.integer'/></spring:escapeBody>"
 		    		},
 		    		hasOptionFilled: {
-		    			required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
+		    			required: "<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.authoring.numerical.error.answer'/></spring:escapeBody>"
 		    		}
 		    	},
      			submitHandler: function(form) {

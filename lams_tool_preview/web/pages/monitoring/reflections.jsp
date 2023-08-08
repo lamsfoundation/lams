@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	<script type="text/javascript">
 	$(document).ready(function(){
 
@@ -32,10 +32,10 @@
 				iconSet: 'fontAwesome',
 			   	colNames:[
 						'itemId',
-						'<fmt:message key="label.user.name" />',
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.user.name" /></spring:escapeBody>',
 						'timeago',
 						'portraitId',
-						'<fmt:message key="title.reflection" />'
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.reflection" /></spring:escapeBody>'
 				],
 			   	colModel:[
 			   		{name:'itemId', index:'itemId', width:0, hidden: true},

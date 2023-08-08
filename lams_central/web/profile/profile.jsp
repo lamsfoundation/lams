@@ -13,7 +13,7 @@
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
@@ -110,4 +110,3 @@
 
 </body>
 </lams:html>
-

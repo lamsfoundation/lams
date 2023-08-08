@@ -23,19 +23,16 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
-import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
+import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranSessionComparator;
+import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranSessionNameComparator;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Dokumaran session
@@ -45,6 +42,9 @@ import org.lamsfoundation.lams.etherpad.util.EtherpadUtil;
 @Entity
 @Table(name = "tl_ladoku11_session")
 public class DokumaranSession {
+
+    public static final DokumaranSessionComparator SESSION_COMPARATOR = new DokumaranSessionComparator();
+    public static final DokumaranSessionNameComparator SESSION_NAME_COMPARATOR = new DokumaranSessionNameComparator();
 
     @Id
     @Column
@@ -81,9 +81,17 @@ public class DokumaranSession {
     @Column(name = "etherpad_read_only_id")
     private String etherpadReadOnlyId;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "tl_ladoku11_gallery_walk_cluster", joinColumns = {
+	    @JoinColumn(name = "source_session_uid") }, inverseJoinColumns = {
+	    @JoinColumn(name = "target_session_uid") })
+    @SortComparator(DokumaranSessionComparator.class)
+    private Set<DokumaranSession> galleryWalkCluster = new TreeSet<>(SESSION_COMPARATOR);
+
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+
     /**
      * @return Returns the learnerID.
      */
@@ -144,7 +152,7 @@ public class DokumaranSession {
 
     /**
      * @param sessionName
-     *            The session name to set.
+     * 	The session name to set.
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
@@ -167,7 +175,7 @@ public class DokumaranSession {
 
     /**
      * @param etherpadReadOnlyId
-     *            The etherpadReadOnlyId to set.
+     * 	The etherpadReadOnlyId to set.
      */
     public void setEtherpadGroupId(String etherpadGroupId) {
 	this.etherpadGroupId = etherpadGroupId;
@@ -182,7 +190,7 @@ public class DokumaranSession {
 
     /**
      * @param etherpadReadOnlyId
-     *            The etherpadReadOnlyId to set.
+     * 	The etherpadReadOnlyId to set.
      */
     public void setEtherpadReadOnlyId(String etherpadReadOnlyId) {
 	this.etherpadReadOnlyId = etherpadReadOnlyId;
@@ -190,5 +198,28 @@ public class DokumaranSession {
 
     public String getPadId() {
 	return EtherpadUtil.getPadId(etherpadGroupId);
+    }
+
+    public Set<DokumaranSession> getGalleryWalkCluster() {
+	return galleryWalkCluster;
+    }
+
+    public void setGalleryWalkCluster(Set<DokumaranSession> galleryWalkCluster) {
+	this.galleryWalkCluster = galleryWalkCluster;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+	if (this == o)
+	    return true;
+	if (o == null || getClass() != o.getClass())
+	    return false;
+	DokumaranSession that = (DokumaranSession) o;
+	return Objects.equals(uid, that.uid);
+    }
+
+    @Override
+    public int hashCode() {
+	return Objects.hash(uid);
     }
 }

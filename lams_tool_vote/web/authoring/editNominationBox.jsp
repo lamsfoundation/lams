@@ -2,7 +2,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 	</lams:head>
 
 	<body>

@@ -73,7 +73,7 @@
 	$('#durationSwitch').change(function(){
 		var duration = $('#duration');
 		if ($(this).prop('checked')) {
-			duration.prop('disabled', false).val("120");
+			duration.prop('disabled', false).val("40");
 		} else {
 			duration.prop('disabled', true).val(null);
 		}

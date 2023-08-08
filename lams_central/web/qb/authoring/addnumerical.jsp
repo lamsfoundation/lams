@@ -58,32 +58,32 @@
 		    		    	}
     			    	}
 		    		},
-		    		messages: {
-		    			title: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    			maxMark: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				digits: "<fmt:message key='label.authoring.choice.enter.integer'/>"
-		    			},
-		    			penaltyFactor: {
-		    				required: "<fmt:message key='label.authoring.choice.field.required'/>",
-		    				number: "<fmt:message key='label.authoring.choice.enter.float'/>"
-		    			},
-		    			hasOptionFilled: {
-		    				required: "<fmt:message key='label.authoring.numerical.error.answer'/>"
-		    			},
-		    			hasOneHundredMaxMark: {
-		    				required: "<fmt:message key='error.form.validation.hundred.score'/>"
-		    			},		
-		    			allAcceptedErrorsPositive: {
-		    				required: "<fmt:message key='error.form.validation.positive.accepted.errors'/>"
-		    			}, 
-		    			unitList: {
-		    				required: ""
-		    			},
-		    			optionList: {
-		    				required: ""
-		    			}
-		    		},
+					messages: {
+						title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+						maxMark: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							digits: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.integer'/></spring:escapeBody>"
+						},
+						penaltyFactor: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.field.required'/></spring:escapeBody>",
+							number: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.choice.enter.float'/></spring:escapeBody>"
+						},
+						hasOptionFilled: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.numerical.error.answer'/></spring:escapeBody>"
+						},
+						hasOneHundredMaxMark: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.hundred.score'/></spring:escapeBody>"
+						},		
+						allAcceptedErrorsPositive: {
+							required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.positive.accepted.errors'/></spring:escapeBody>"
+						}, 
+						unitList: {
+							required: ""
+						},
+						optionList: {
+							required: ""
+						}
+					},
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();
 		    			$("#optionList").val($("#optionForm").serialize(true));

@@ -78,7 +78,10 @@ public class Whiteboard implements Cloneable {
     private int relativeTimeLimit;
 
     @Column(name = "absolute_time_limit")
-    private LocalDateTime absoluteTimeLimit;
+    private int absoluteTimeLimit;
+
+    @Column(name = "absolute_time_limit_finish")
+    private LocalDateTime absoluteTimeLimitFinish;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "tl_lawhiteboard11_time_limit", joinColumns = @JoinColumn(name = "whiteboard_uid"))
@@ -160,7 +163,7 @@ public class Whiteboard implements Cloneable {
 	    Whiteboard.log.error("When clone " + Whiteboard.class + " failed");
 	}
 
-	whiteboard.setAbsoluteTimeLimit(null);
+	whiteboard.setAbsoluteTimeLimitFinish(null);
 	whiteboard.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	whiteboard.setGalleryWalkStarted(false);
 	whiteboard.setGalleryWalkFinished(false);
@@ -194,11 +197,11 @@ public class Whiteboard implements Cloneable {
     // **********************************************************
     // get/set methods
     // **********************************************************
+
     /**
      * Returns the object's creation date
      *
      * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -206,7 +209,6 @@ public class Whiteboard implements Cloneable {
 
     /**
      * Sets the object's creation date
-     *
      */
     public void setCreated(Date created) {
 	this.created = created;
@@ -251,7 +253,7 @@ public class Whiteboard implements Cloneable {
 
     /**
      * @param title
-     *            The title to set.
+     * 	The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -266,7 +268,7 @@ public class Whiteboard implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *            Set to true to lock the whiteboard for finished users.
+     * 	Set to true to lock the whiteboard for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -324,22 +326,32 @@ public class Whiteboard implements Cloneable {
 
     /**
      * @param timeLimit
-     *            the time limitation, that students have to complete an attempt.
+     * 	the time limitation, that students have to complete an attempt.
      */
     public void setRelativeTimeLimit(int timeLimit) {
 	this.relativeTimeLimit = timeLimit;
     }
 
-    public LocalDateTime getAbsoluteTimeLimit() {
+    public int getAbsoluteTimeLimit() {
 	return absoluteTimeLimit;
     }
 
-    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+    public void setAbsoluteTimeLimit(int absoluteTimeLimit) {
 	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    public Long getAbsoluteTimeLimitSeconds() {
-	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    public LocalDateTime getAbsoluteTimeLimitFinish() {
+	return absoluteTimeLimitFinish;
+    }
+
+    public void setAbsoluteTimeLimitFinish(LocalDateTime absoluteTimeLimitFinish) {
+	this.absoluteTimeLimitFinish = absoluteTimeLimitFinish;
+    }
+
+    public Long getAbsoluteTimeLimitFinishSeconds() {
+	return absoluteTimeLimitFinish == null
+		? null
+		: absoluteTimeLimitFinish.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public Map<Integer, Integer> getTimeLimitAdjustments() {

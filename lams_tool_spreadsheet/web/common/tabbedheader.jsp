@@ -7,7 +7,7 @@
 <lams:css/>
 
 <!-- ********************  javascript ********************** -->
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <lams:JSImport src="includes/javascript/spreadsheetcommon.js" relative="true" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>

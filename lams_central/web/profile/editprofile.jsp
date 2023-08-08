@@ -22,7 +22,7 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready( function() {
 			if ('${submitted}' == true && $('#error').length == 0) {
@@ -31,7 +31,7 @@
 			
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
-				'<fmt:message key="title.profile.edit.screen" />',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.profile.edit.screen" /></spring:escapeBody>',
 				'100%'
 			);
 		});

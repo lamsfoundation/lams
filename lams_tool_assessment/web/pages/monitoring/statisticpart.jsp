@@ -11,7 +11,7 @@
 		$('#activity-evaluation').on('focus', function(){
 			$(this).data('previousValue', this.value);
 		}).on('change', function() {
-			if (!this.value && !confirm("<fmt:message key='warn.tool.output.change.none'/>")) {
+			if (!this.value && !confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warn.tool.output.change.none'/></spring:escapeBody>")) {
 				$(this).val($(this).data('previousValue'));
 				return;
 			}
@@ -26,11 +26,11 @@
 				method: 'post',
 				success: function (json) {
 					if (json.success == "true") {
-						alert("<fmt:message key='label.tool.output.has.been.changed'/>");
+						alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tool.output.has.been.changed'/></spring:escapeBody>");
 					}
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
-					alert("<fmt:message key='label.operation.failed'/>");
+					alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.operation.failed'/></spring:escapeBody>");
 				}
 			});
 			
@@ -42,17 +42,17 @@
 		<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput}">	
 			drawHistogram('chartDivLeader${sessionMap.toolContentID}', 
 					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
-					'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.groups.in.mark.range"/>');
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.groups.in.mark.range"/></spring:escapeBody>');
 		</c:when>
 		<c:otherwise>
 			drawHistogram('chartDivActivity${sessionMap.toolContentID}', 
 				'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
-				'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.learners.in.mark.range"/></spring:escapeBody>');
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}">
 			drawHistogram('chartDivSession${sessionDto.sessionId}', 
 					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}"/>', 
-					'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.learners.in.mark.range"/></spring:escapeBody>');
 			</c:forEach>	
 		</c:otherwise>
 		</c:choose>

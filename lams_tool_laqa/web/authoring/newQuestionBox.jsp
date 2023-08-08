@@ -22,7 +22,7 @@
 			}
 		</style>
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
@@ -36,7 +36,7 @@
 					csrfTokenName = '<csrf:tokenname/>',
 					csrfTokenValue = '<csrf:tokenvalue/>';
 		</script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
+		<lams:JSImport src="includes/javascript/qb-question.js" />
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>

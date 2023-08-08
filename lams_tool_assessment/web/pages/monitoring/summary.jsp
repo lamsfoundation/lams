@@ -8,8 +8,9 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${assessment.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${assessment.absoluteTimeLimitFinishSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${assessment.relativeTimeLimit}"/>
+	<c:param name="absoluteTimeLimit" value="${assessment.absoluteTimeLimit}"/>
 	<c:param name="isTbl" value="false" />
 	<c:param name="controllerContext" value="tool/laasse10/monitoring" />
 </c:url>
@@ -18,7 +19,7 @@
 	.question-title {
 	   	overflow: auto;
 	   	min-width: 150px;
-	} 
+	}
 </style>
 
 <%@ include file="parts/discloseAnswers.jsp"%>
@@ -43,7 +44,7 @@
 			buildJqgridLearnerTable('-all-learners');
 		</c:if>
 
-		
+
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
 			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
@@ -80,8 +81,8 @@
 		   	colNames:[
 			   	'userId',
 				'sessionId',
-				"<fmt:message key="label.monitoring.summary.user.name" />",
-				"<fmt:message key="label.monitoring.summary.total" />",
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.user.name" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.total" /></spring:escapeBody>',
 				'portraitId'
 			],
 		   	colModel:[
@@ -97,13 +98,13 @@
 		   		var sessionId = jQuery("#list" + sessionId).getCell(rowid, 'sessionId');
 				var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
 				var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&modal=true";
-				$("#userSummaryHref").attr("href", newUserSummaryHref);	
-				$("#userSummaryHref").click(); 		
+				$("#userSummaryHref").attr("href", newUserSummaryHref);
+				$("#userSummaryHref").click();
 		  	},
-		  	onSelectRow: function(rowid) { 
-		  	    if(rowid == null) { 
-		  	    	rowid=0; 
-		  	    } 
+		  	onSelectRow: function(rowid) {
+		  	    if(rowid == null) {
+		  	    	rowid=0;
+		  	    }
 		  	    var tableName = $(this).data('sessionId');
 		   		var sessionId = jQuery("#list" + tableName).getCell(rowid, 'sessionId');
 		   		var userId = jQuery("#list" + tableName).getCell(rowid, 'userId');
@@ -117,24 +118,24 @@
 	  	        		tableName: tableName,
 	  	        		sessionMapID: '${sessionMapID}'
 	  	       		}
-	  	       	);    
+	  	       	);
   	  		},
 		    loadError: function(xhr,st,err) {
 		    	var sessionId = $(this).data('sessionId');
 		    	jQuery("#list" + sessionId).clearGridData();
-		    	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+		    	$.jgrid.info_dialog("<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.error"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.loaderror"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.ok"/></spring:escapeBody>");
 		    },
 		    loadComplete: function () {
 		   	 	initializePortraitPopover('<lams:LAMSURL/>');
 			}
 		})
 		<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
-			.jqGrid('filterToolbar', { 
+			.jqGrid('filterToolbar', {
 				searchOnEnter: false
 			})
 		</c:if>
 		.navGrid("#listPager" + sessionId, {edit:false,add:false,del:false,search:false});
-        
+
         var oldValue = 0;
 		jQuery("#userSummary" + sessionId).jqGrid({
 			datatype: "local",
@@ -146,18 +147,18 @@
 			shrinkToFit: false,
 			guiStyle: "bootstrap",
 			iconSet: 'fontAwesome',
-		   	colNames:[
-			   	'#',
+			colNames: [
+				'#',
 				'questionResultUid',
-					"<fmt:message key="label.monitoring.question.summary.question" />",
-  					"<fmt:message key="label.monitoring.user.summary.response" />",
-					<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-						"<fmt:message key="label.confidence" />",
-					</c:if>
-  					"<fmt:message key="label.authoring.basic.list.header.mark" />",
-  					"<fmt:message key="label.monitoring.user.summary.marker" />",
-  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
-				], 
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.question.summary.question" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.response" /></spring:escapeBody>',
+				<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confidence" /></spring:escapeBody>',
+				</c:if>
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.authoring.basic.list.header.mark" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.marker" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.user.summary.marker.comment" /></spring:escapeBody>'
+			],
 		   	colModel:[
   			   	{name:'id', index:'id', width:20, sorttype:"int"},
   			   	{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
@@ -166,7 +167,7 @@
 	  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels}">
 	  			   		{name:'confidence', index:'confidence', width: 80, classes: 'vertical-align', formatter: gradientNumberFormatter},
 	  			  	</c:if>
-	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true, 
+	  			    {name:'grade', index:'grade', width:80, sorttype:"float", editable:true,
 		  			    editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
 		  			{name:'marker', index:'marker', width: 80, title: false},
 		  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
@@ -198,9 +199,9 @@
 				if (isNaN(val)) {
 						return null;
 					}
-				
+
 				// get maxGrade attribute which was set in masterDetailLoadUp.jsp
-				var maxGrade = jQuery("table#userSummary" + sessionId + " tr#" + iRow 
+				var maxGrade = jQuery("table#userSummary" + sessionId + " tr#" + iRow
 						              + " td[aria-describedby$='_" + name + "']").attr("maxGrade");
 				if (+val > +maxGrade) {
 					return maxGrade;
@@ -211,13 +212,13 @@
   	  	  				return;
   	  	  			}
 					if (isNaN(val)) {
-						jQuery("#userSummary" + sessionId).restoreCell(iRow,iCol); 
+						jQuery("#userSummary" + sessionId).restoreCell(iRow,iCol);
 					} else {
 						var parentSelectedRowId = jQuery("#list" + sessionId).getGridParam("selrow");
 						var previousTotal =  eval(jQuery("#list" + sessionId).getCell(parentSelectedRowId, 'total'));
 						jQuery("#list" + sessionId).setCell(parentSelectedRowId, 'total', previousTotal - oldValue + eval(val), {}, {});
 					}
-			},	  		
+			},
 				beforeSubmitCell : function (rowid,name,val,iRow,iCol){
   					if (name == "grade" && isNaN(val)) {
 						return {nan:true};
@@ -254,7 +255,7 @@
 
 	function exportSummary() {
 		var url = "<c:url value='/monitoring/exportSummary.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID="+(new Date()).getTime();
-		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(url, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.summary.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
 	function showChangeLeaderModal(toolSessionId) {
@@ -276,16 +277,16 @@
     				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
     			},
     			success : function(){
-    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>");
     				location.reload();
     			},
     			error : function(){
-    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
         		}
             });
         	
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
 		}
 	}
 	
@@ -354,7 +355,7 @@
 						</tr>
 					</thead>
 					<tbody>
-					
+
 						<tr role="row">
 							<th><b>Question type</b></th>
 							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
@@ -363,7 +364,7 @@
 								</td>
 							</c:forEach>
 						</tr>
-					
+
 						<tr>
 							<td><b>Correct answer</b></td>
 							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
@@ -372,26 +373,26 @@
 			 					</td>
 							</c:forEach>
 						</tr>
-						
+
 						<tr>
-							<td colspan="${fn:length(questionDtos) + 1}" style="font-weight: bold;"><fmt:message key="label.teams"/></td> 
+							<td colspan="${fn:length(questionDtos) + 1}" style="font-weight: bold;"><fmt:message key="label.teams"/></td>
 						</tr>
-						
+
 						<c:forEach var="session" items="${sessions}" varStatus="i">
 							<tr>
 								<td class="text-center">
 									${session.sessionName}
 								</td>
-								
+
 								<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="j">
 									<c:set var="questionResultDto" value="${tblQuestionDto.sessionQuestionResults[i.index]}"/>
 									<td class="text-center <c:if test="${questionResultDto.correct}">success</c:if>" >
 										${questionResultDto.answer}
 									</td>
 								</c:forEach>
-								
+
 							</tr>
-						</c:forEach>                                               
+						</c:forEach>
 					</tbody>
 				</table>
 			</div>
@@ -413,7 +414,7 @@
 	</div>
 
 	<div id="masterDetailArea" class="voffset10"></div>
-	
+
 	<a onclick="" href="return false;" class="thickbox initially-hidden" id="userSummaryHref"></a>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
@@ -470,20 +471,20 @@
 			<div class="panel panel-default" >
 		        <div class="panel-heading" id="heading-all-learners">
 		        	<span class="panel-title collapsable-icon-left">
-		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse-all-learners" 
+		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse-all-learners"
 						   aria-expanded="false" aria-controls="collapse-all-learners" >
 							<fmt:message key="monitoring.label.all.learners" />
 						</a>
 					</span>
 		        </div>
-				<div id="collapse-all-learners" class="panel-collapse collapse" 
+				<div id="collapse-all-learners" class="panel-collapse collapse"
 			         role="tabpanel" aria-labelledby="heading-all-learners">
-			         
+
 					<table id="list-all-learners"></table>
 					<div class="voffset10"></div>
 					<table id="userSummary-all-learners"></table>
 					<div id="listPager-all-learners"></div>
-					
+
 			    </div>
 		    </div>
 		</div> <!--  end panel group -->

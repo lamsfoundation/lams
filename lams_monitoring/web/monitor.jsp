@@ -95,174 +95,90 @@
 					csrfTokenName = '<csrf:tokenname/>',
 					csrfTokenValue = '<csrf:tokenvalue/>',
 
-					decoderDiv = $('<div />'),
 					LABELS = {
-						<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
-						EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
-						<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
-						FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
-						<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
-						FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
-						<fmt:message key="force.complete.end.lesson.confirm" var="FORCE_COMPLETE_END_LESSON_CONFIRM_VAR"/>
-						FORCE_COMPLETE_END_LESSON_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />').text(),
-						<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
-						FORCE_COMPLETE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR}" />').text(),
-						<fmt:message key="force.complete.remove.content" var="FORCE_COMPLETE_REMOVE_CONTENT_VAR"/>
-						FORCE_COMPLETE_REMOVE_CONTENT : decoderDiv.html('<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_VAR}" />').text(),
-						<fmt:message key="force.complete.drop.fail" var="FORCE_COMPLETE_DROP_FAIL_VAR"/>
-						FORCE_COMPLETE_DROP_FAIL : '<c:out value="${FORCE_COMPLETE_DROP_FAIL_VAR}" />',
-						<fmt:message key="learner.group.count" var="LEARNER_GROUP_COUNT_VAR"/>
-						LEARNER_GROUP_COUNT : '<c:out value="${LEARNER_GROUP_COUNT_VAR}" />',
-						<fmt:message key="learner.group.show" var="LEARNER_GROUP_SHOW_VAR"/>
-						LEARNER_GROUP_SHOW : '<c:out value="${LEARNER_GROUP_SHOW_VAR}" />',
-						<fmt:message key="learner.group.remove.progress" var="LEARNER_GROUP_REMOVE_PROGRESS_VAR"/>
-						LEARNER_GROUP_REMOVE_PROGRESS : decoderDiv.html('<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />').text(),
-						<fmt:message key="button.email" var="EMAIL_BUTTON_VAR"/>
-						EMAIL_BUTTON : '<c:out value="${EMAIL_BUTTON_VAR}" />',
-						<fmt:message key="email.notifications" var="NOTIFCATIONS_VAR"/>
-						NOTIFCATIONS : '<c:out value="${NOTIFCATIONS_VAR}" />',
-						<fmt:message key="button.save" var="SAVE_BUTTON_VAR"/>
-						SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
-						<fmt:message key="button.cancel" var="CANCEL_BUTTON_VAR"/>
-						CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
-						<fmt:message key="learner.finished.dialog.title" var="LEARNER_FINISHED_DIALOG_TITLE_VAR"/>
-						LEARNER_FINISHED_DIALOG_TITLE : '<c:out value="${LEARNER_FINISHED_DIALOG_TITLE_VAR}" />',
-						<fmt:message key="lesson.enable.presence.alert" var="LESSON_PRESENCE_ENABLE_ALERT_VAR"/>
-						LESSON_PRESENCE_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_PRESENCE_ENABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.disable.presence.alert" var="LESSON_PRESENCE_DISABLE_ALERT_VAR"/>
-						LESSON_PRESENCE_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_PRESENCE_DISABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.enable.im.alert" var="LESSON_IM_ENABLE_ALERT_VAR"/>
-						LESSON_IM_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_IM_ENABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.disable.im.alert" var="LESSON_IM_DISABLE_ALERT_VAR"/>
-						LESSON_IM_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_IM_DISABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.remove.alert" var="LESSON_REMOVE_ALERT_VAR"/>
-						LESSON_REMOVE_ALERT : decoderDiv.html('<c:out value="${LESSON_REMOVE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.remove.doublecheck.alert" var="LESSON_REMOVE_DOUBLECHECK_ALERT_VAR"/>
-						LESSON_REMOVE_DOUBLECHECK_ALERT : decoderDiv.html('<c:out value="${LESSON_REMOVE_DOUBLECHECK_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.state.created" var="LESSON_STATE_CREATED_VAR"/>
-						LESSON_STATE_CREATED : '<c:out value="${LESSON_STATE_CREATED_VAR}" />',
-						<fmt:message key="lesson.state.scheduled" var="LESSON_STATE_SCHEDULED_VAR"/>
-						LESSON_STATE_SCHEDULED : '<c:out value="${LESSON_STATE_SCHEDULED_VAR}" />',
-						<fmt:message key="lesson.state.started" var="LESSON_STATE_STARTED_VAR"/>
-						LESSON_STATE_STARTED : '<c:out value="${LESSON_STATE_STARTED_VAR}" />',
-						<fmt:message key="lesson.state.suspended" var="LESSON_STATE_SUSPENDED_VAR"/>
-						LESSON_STATE_SUSPENDED : '<c:out value="${LESSON_STATE_SUSPENDED_VAR}" />',
-						<fmt:message key="lesson.state.finished" var="LESSON_STATE_FINISHED_VAR"/>
-						LESSON_STATE_FINISHED : '<c:out value="${LESSON_STATE_FINISHED_VAR}" />',
-						<fmt:message key="lesson.state.archived" var="LESSON_STATE_ARCHIVED_VAR"/>
-						LESSON_STATE_ARCHIVED : '<c:out value="${LESSON_STATE_ARCHIVED_VAR}" />',
-						<fmt:message key="lesson.state.removed" var="LESSON_STATE_REMOVED_VAR"/>
-						LESSON_STATE_REMOVED : '<c:out value="${LESSON_STATE_REMOVED_VAR}" />',
-						<fmt:message key="lesson.state.action.disable" var="LESSON_STATE_ACTION_DISABLE_VAR"/>
-						LESSON_STATE_ACTION_DISABLE : '<c:out value="${LESSON_STATE_ACTION_DISABLE_VAR}" />',
-						<fmt:message key="lesson.state.action.activate" var="LESSON_STATE_ACTION_ACTIVATE_VAR"/>
-						LESSON_STATE_ACTION_ACTIVATE : '<c:out value="${LESSON_STATE_ACTION_ACTIVATE_VAR}" />',
-						<fmt:message key="lesson.state.action.remove" var="LESSON_STATE_ACTION_REMOVE_VAR"/>
-						LESSON_STATE_ACTION_REMOVE : '<c:out value="${LESSON_STATE_ACTION_REMOVE_VAR}" />',
-						<fmt:message key="lesson.state.action.archive" var="LESSON_STATE_ACTION_ARCHIVE_VAR"/>
-						LESSON_STATE_ACTION_ARCHIVE : '<c:out value="${LESSON_STATE_ACTION_ARCHIVE_VAR}" />',
-						<fmt:message key="error.lesson.schedule.date" var="LESSON_ERROR_SCHEDULE_DATE_VAR"/>
-						LESSON_ERROR_SCHEDULE_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_SCHEDULE_DATE_VAR}" />').text(),
-						<fmt:message key="button.edit.class" var="LESSON_EDIT_CLASS_VAR"/>
-						LESSON_EDIT_CLASS : '<c:out value="${LESSON_EDIT_CLASS_VAR}" />',
-						<fmt:message key="class.add.all.confirm" var="CLASS_ADD_ALL_CONFIRM_VAR"/>
-						CLASS_ADD_ALL_CONFIRM : '<c:out value="${CLASS_ADD_ALL_CONFIRM_VAR}" />',
-						<fmt:message key="class.add.all.success" var="CLASS_ADD_ALL_SUCCESS_VAR"/>
-						CLASS_ADD_ALL_SUCCESS : '<c:out value="${CLASS_ADD_ALL_SUCCESS_VAR}" />',
-						<fmt:message key="lesson.group.dialog.class" var="LESSON_GROUP_DIALOG_CLASS_VAR"/>
-						LESSON_GROUP_DIALOG_CLASS : '<c:out value="${LESSON_GROUP_DIALOG_CLASS_VAR}" />',
-						<fmt:message key="label.learner.progress.activity.current.tooltip" var="CURRENT_ACTIVITY_VAR"/>
-						CURRENT_ACTIVITY : '<c:out value="${CURRENT_ACTIVITY_VAR}" />',
-						<fmt:message key="label.learner.progress.activity.completed.tooltip" var="COMPLETED_ACTIVITY_VAR"/>
-						COMPLETED_ACTIVITY : '<c:out value="${COMPLETED_ACTIVITY_VAR}" />',
-						<fmt:message key="label.learner.progress.activity.attempted.tooltip" var="ATTEMPTED_ACTIVITY_VAR"/>
-						ATTEMPTED_ACTIVITY : '<c:out value="${ATTEMPTED_ACTIVITY_VAR}" />',
-						<fmt:message key="label.learner.progress.activity.tostart.tooltip" var="TOSTART_ACTIVITY_VAR"/>
-						TOSTART_ACTIVITY : '<c:out value="${TOSTART_ACTIVITY_VAR}" />',
-						<fmt:message key="label.learner.progress.activity.support.tooltip" var="SUPPORT_ACTIVITY_VAR"/>
-						SUPPORT_ACTIVITY : '<c:out value="${SUPPORT_ACTIVITY_VAR}" />',
-						<fmt:message key="label.learner.progress.not.started" var="PROGRESS_NOT_STARTED_VAR"/>
-						PROGRESS_NOT_STARTED : '<c:out value="${PROGRESS_NOT_STARTED_VAR}" />',
-						<fmt:message key="button.timechart" var="TIME_CHART_VAR"/>
-						TIME_CHART : '<c:out value="${TIME_CHART_VAR}" />',
-						<fmt:message key="button.timechart.tooltip" var="TIME_CHART_TOOLTIP_VAR"/>
-						TIME_CHART_TOOLTIP : '<c:out value="${TIME_CHART_TOOLTIP_VAR}" />',
-						<fmt:message key="button.live.edit.confirm" var="LIVE_EDIT_CONFIRM_VAR"/>
-						LIVE_EDIT_CONFIRM : decoderDiv.html('<c:out value="${LIVE_EDIT_CONFIRM_VAR}" />').text(),
-						<fmt:message key="lesson.task.gate" var="CONTRIBUTE_GATE_VAR"/>
-						CONTRIBUTE_GATE : '<c:out value="${CONTRIBUTE_GATE_VAR}" />',
-						<fmt:message key="lesson.task.gate.password" var="CONTRIBUTE_GATE_PASSWORD_VAR"/>
-						CONTRIBUTE_GATE_PASSWORD : '<c:out value="${CONTRIBUTE_GATE_PASSWORD_VAR}" />',
-						<fmt:message key="lesson.task.grouping" var="CONTRIBUTE_GROUPING_VAR"/>
-						CONTRIBUTE_GROUPING : '<c:out value="${CONTRIBUTE_GROUPING_VAR}" />',
-						<fmt:message key="lesson.task.branching" var="CONTRIBUTE_BRANCHING_VAR"/>
-						CONTRIBUTE_BRANCHING : '<c:out value="${CONTRIBUTE_BRANCHING_VAR}" />',
-						<fmt:message key="lesson.task.content.edited" var="CONTRIBUTE_CONTENT_EDITED_VAR"/>
-						CONTRIBUTE_CONTENT_EDITED : '<c:out value="${CONTRIBUTE_CONTENT_EDITED_VAR}" />',
-						<fmt:message key="lesson.task.tool" var="CONTRIBUTE_TOOL_VAR"/>
-						CONTRIBUTE_TOOL : '<c:out value="${CONTRIBUTE_TOOL_VAR}" />',
-						<fmt:message key="button.task.go.tooltip" var="CONTRIBUTE_TOOLTIP_VAR"/>
-						CONTRIBUTE_TOOLTIP : '<c:out value="${CONTRIBUTE_TOOLTIP_VAR}" />',
-						<fmt:message key="button.task.go" var="CONTRIBUTE_BUTTON_VAR"/>
-						CONTRIBUTE_BUTTON : '<c:out value="${CONTRIBUTE_BUTTON_VAR}" />',
-						<fmt:message key="button.task.gate.open.now" var="CONTRIBUTE_OPEN_GATE_NOW_BUTTON_VAR"/>
-						CONTRIBUTE_OPEN_GATE_NOW_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_NOW_BUTTON_VAR}" />',
-						<fmt:message key="button.task.gate.open.now.tooltip" var="CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP_VAR"/>
-						CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP_VAR}" />',
-						<fmt:message key="button.task.gate.open" var="CONTRIBUTE_OPEN_GATE_BUTTON_VAR"/>
-						CONTRIBUTE_OPEN_GATE_BUTTON : '<c:out value="${CONTRIBUTE_OPEN_GATE_BUTTON_VAR}" />',
-						<fmt:message key="button.task.gate.open.tooltip" var="CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR"/>
-						CONTRIBUTE_OPEN_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPEN_GATE_TOOLTIP_VAR}" />',
-						<fmt:message key="button.task.gate.opened" var="CONTRIBUTE_OPENED_GATE_VAR"/>
-						CONTRIBUTE_OPENED_GATE : '<c:out value="${CONTRIBUTE_OPENED_GATE_VAR}" />',
-						<fmt:message key="button.task.gate.opened.tooltip" var="CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR"/>
-						CONTRIBUTE_OPENED_GATE_TOOLTIP : '<c:out value="${CONTRIBUTE_OPENED_GATE_TOOLTIP_VAR}" />',
-						<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
-						CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
-						<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
-						HELP : '<c:out value="${BUTTON_HELP_VAR}" />',
-						<fmt:message key="label.lesson.introduction" var="LESSON_INTRODUCTION_VAR"/>
-						LESSON_INTRODUCTION : '<c:out value="${LESSON_INTRODUCTION_VAR}" />',
-						<fmt:message key="label.email" var="EMAIL_TITLE_VAR"/>
-						EMAIL_TITLE : '<c:out value="${EMAIL_TITLE_VAR}" />',
-						<fmt:message key="tour.this.is.disabled" var="TOUR_DISABLED_ELEMENT_VAR"/>
-						TOUR_DISABLED_ELEMENT : '<c:out value="${TOUR_DISABLED_ELEMENT_VAR}" />',
-						<fmt:message key="progress.email.sent.success" var="PROGRESS_EMAIL_SUCCESS_VAR"/>
-						PROGRESS_EMAIL_SUCCESS : '<c:out value="${PROGRESS_EMAIL_SUCCESS_VAR}" />',
-						<fmt:message key="progress.email.send.now.question" var="PROGRESS_EMAIL_SEND_NOW_QUESTION_VAR"/>
-						PROGRESS_EMAIL_SEND_NOW_QUESTION : '<c:out value="${PROGRESS_EMAIL_SEND_NOW_QUESTION_VAR}" />',
-						<fmt:message key="progress.email.send.failed" var="PROGRESS_EMAIL_SEND_FAILED_VAR"/>
-						PROGRESS_EMAIL_SEND_FAILED : '<c:out value="${PROGRESS_EMAIL_SEND_FAILED_VAR}" />',
-						<fmt:message key="progress.email.select.date.first" var="PROGRESS_EMAIL_SELECT_DATE_FIRST_VAR"/>
-						PROGRESS_SELECT_DATE_FIRST : '<c:out value="${PROGRESS_EMAIL_SELECT_DATE_FIRST_VAR}" />',
-						<fmt:message key="progress.email.enter.two.dates.first" var="PROGRESS_EMAIL_ENTER_TWO_DATES_FIRST_VAR"/>
-						PROGRESS_ENTER_TWO_DATES_FIRST : '<c:out value="${PROGRESS_EMAIL_ENTER_TWO_DATES_FIRST_VAR}" />',
-						<fmt:message key="progress.email.would.you.like.to.generate" var="PROGRESS_EMAIL_GENERATE_ONE_VAR"/>
-						PROGRESS_EMAIL_GENERATE_ONE : '<c:out value="${PROGRESS_EMAIL_GENERATE_ONE_VAR}" />',
-						<fmt:message key="progress.email.how.many.dates.to.generate" var="PROGRESS_EMAIL_GENERATE_TWO_VAR"/>
-						PROGRESS_EMAIL_GENERATE_TWO : '<c:out value="${PROGRESS_EMAIL_GENERATE_TWO_VAR}" />',
-						<fmt:message key="progress.email.title" var="PROGRESS_EMAIL_TITLE_VAR"/>
-						PROGRESS_EMAIL_TITLE : '<c:out value="${PROGRESS_EMAIL_TITLE_VAR}" />',
-						<fmt:message key="error.date.in.past" var="ERROR_DATE_IN_PAST_VAR"/>
-						ERROR_DATE_IN_PAST : '<c:out value="${ERROR_DATE_IN_PAST_VAR}" />',
-						<fmt:message key="label.lesson.starts" var="LESSON_START_VAR"><fmt:param value="%0"/></fmt:message>
-						LESSON_START : '<c:out value="${LESSON_START_VAR}"/>',
-						<fmt:message key="label.lesson.finishes" var="LESSON_FINISH_VAR"><fmt:param value="%0"/></fmt:message>
-						LESSON_FINISH : '<c:out value="${LESSON_FINISH_VAR}" />',
-						<fmt:message key="lesson.display.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR"/>
-						LESSON_ACTIVITY_SCORES_ENABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_ENABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="lesson.hide.activity.scores.alert" var="LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR"/>
-						LESSON_ACTIVITY_SCORES_DISABLE_ALERT : decoderDiv.html('<c:out value="${LESSON_ACTIVITY_SCORES_DISABLE_ALERT_VAR}" />').text(),
-						<fmt:message key="label.reschedule" var="RESCHEDULE_VAR"/>
-						RESCHEDULE : decoderDiv.html('<c:out value="${RESCHEDULE_VAR}" />').text(),
-						<fmt:message key="error.lesson.end.date.must.be.after.start.date" var="LESSON_ERROR_START_END_DATE_VAR"/>
-						LESSON_ERROR_START_END_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_START_END_DATE_VAR}" />').text(),
-						<fmt:message key="button.live.edit" var="LIVE_EDIT_BUTTON_VAR"/>
-						LIVE_EDIT_BUTTON: '<c:out value="${LIVE_EDIT_BUTTON_VAR}" />',
-						<fmt:message key="button.live.edit.tooltip" var="LIVE_EDIT_TOOLTIP_VAR"/>
-						LIVE_EDIT_TOOLTIP: '<c:out value="${LIVE_EDIT_TOOLTIP_VAR}" />',
-						<fmt:message key="label.person.editing.lesson" var="LIVE_EDIT_WARNING_VAR"><fmt:param value="%0"/></fmt:message>
-						LIVE_EDIT_WARNING: '<c:out value="${LIVE_EDIT_WARNING_VAR}" />'
+						EMAIL_NOTIFICATIONS_TITLE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='index.emailnotifications'/></spring:escapeBody>",
+						FORCE_COMPLETE_CLICK : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='force.complete.click'/></spring:escapeBody>",
+						FORCE_COMPLETE_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.force.complete'/></spring:escapeBody>",
+						FORCE_COMPLETE_END_LESSON_CONFIRM : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='force.complete.end.lesson.confirm'/></spring:escapeBody>",
+						FORCE_COMPLETE_ACTIVITY_CONFIRM : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='force.complete.activity.confirm'/></spring:escapeBody>",
+						FORCE_COMPLETE_REMOVE_CONTENT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='force.complete.remove.content'/></spring:escapeBody>",
+						FORCE_COMPLETE_DROP_FAIL : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='force.complete.drop.fail'/></spring:escapeBody>",
+						LEARNER_GROUP_COUNT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.group.count'/></spring:escapeBody>",
+						LEARNER_GROUP_SHOW : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.group.show'/></spring:escapeBody>",
+						LEARNER_GROUP_REMOVE_PROGRESS : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.group.remove.progress'/></spring:escapeBody>",
+						EMAIL_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.email'/></spring:escapeBody>",
+						NOTIFCATIONS : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='email.notifications'/></spring:escapeBody>",
+						SAVE_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.save'/></spring:escapeBody>",
+						CANCEL_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.cancel'/></spring:escapeBody>",
+						LEARNER_FINISHED_DIALOG_TITLE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.finished.dialog.title'/></spring:escapeBody>",
+						LESSON_PRESENCE_ENABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.enable.presence.alert'/></spring:escapeBody>",
+						LESSON_PRESENCE_DISABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.disable.presence.alert'/></spring:escapeBody>",
+						LESSON_IM_ENABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.enable.im.alert'/></spring:escapeBody>",
+						LESSON_IM_DISABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.disable.im.alert'/></spring:escapeBody>",
+						LESSON_REMOVE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.remove.alert'/></spring:escapeBody>",
+						LESSON_REMOVE_DOUBLECHECK_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.remove.doublecheck.alert'/></spring:escapeBody>",
+						LESSON_STATE_CREATED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.created'/></spring:escapeBody>",
+						LESSON_STATE_SCHEDULED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.scheduled'/></spring:escapeBody>",
+						LESSON_STATE_STARTED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.started'/></spring:escapeBody>",
+						LESSON_STATE_SUSPENDED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.suspended'/></spring:escapeBody>",
+						LESSON_STATE_FINISHED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.finished'/></spring:escapeBody>",
+						LESSON_STATE_ARCHIVED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.archived'/></spring:escapeBody>",
+						LESSON_STATE_REMOVED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.removed'/></spring:escapeBody>",
+						LESSON_STATE_ACTION_DISABLE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.action.disable'/></spring:escapeBody>",
+						LESSON_STATE_ACTION_ACTIVATE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.action.activate'/></spring:escapeBody>",
+						LESSON_STATE_ACTION_REMOVE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.action.remove'/></spring:escapeBody>",
+						LESSON_STATE_ACTION_ARCHIVE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.action.archive'/></spring:escapeBody>",
+						LESSON_ERROR_SCHEDULE_DATE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.lesson.schedule.date'/></spring:escapeBody>",
+						LESSON_EDIT_CLASS : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.edit.class'/></spring:escapeBody>",
+						CLASS_ADD_ALL_CONFIRM : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='class.add.all.confirm'/></spring:escapeBody>",
+						CLASS_ADD_ALL_SUCCESS : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='class.add.all.success'/></spring:escapeBody>",
+						LESSON_GROUP_DIALOG_CLASS : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.group.dialog.class'/></spring:escapeBody>",
+						CURRENT_ACTIVITY : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.activity.current.tooltip'/></spring:escapeBody>",
+						COMPLETED_ACTIVITY : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.activity.completed.tooltip'/></spring:escapeBody>",
+						ATTEMPTED_ACTIVITY : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.activity.attempted.tooltip'/></spring:escapeBody>",
+						TOSTART_ACTIVITY : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.activity.tostart.tooltip'/></spring:escapeBody>",
+						SUPPORT_ACTIVITY : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.activity.support.tooltip'/></spring:escapeBody>",
+						PROGRESS_NOT_STARTED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learner.progress.not.started'/></spring:escapeBody>",
+						TIME_CHART : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.timechart'/></spring:escapeBody>",
+						TIME_CHART_TOOLTIP : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.timechart.tooltip'/></spring:escapeBody>",
+						LIVE_EDIT_CONFIRM : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.live.edit.confirm'/></spring:escapeBody>",
+						CONTRIBUTE_GATE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.gate'/></spring:escapeBody>",
+						CONTRIBUTE_GATE_PASSWORD : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.gate.password'/></spring:escapeBody>",
+						CONTRIBUTE_GROUPING : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.grouping'/></spring:escapeBody>",
+						CONTRIBUTE_BRANCHING : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.branching'/></spring:escapeBody>",
+						CONTRIBUTE_CONTENT_EDITED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.content.edited'/></spring:escapeBody>",
+						CONTRIBUTE_TOOL : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.tool'/></spring:escapeBody>",
+						CONTRIBUTE_TOOLTIP : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.go.tooltip'/></spring:escapeBody>",
+						CONTRIBUTE_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.go'/></spring:escapeBody>",
+						CONTRIBUTE_OPEN_GATE_NOW_BUTTON: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.open.now'/></spring:escapeBody>",
+						CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.open.now.tooltip'/></spring:escapeBody>",
+						CONTRIBUTE_OPEN_GATE_BUTTON: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.open'/></spring:escapeBody>",
+						CONTRIBUTE_OPEN_GATE_TOOLTIP: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.open.tooltip'/></spring:escapeBody>",
+						CONTRIBUTE_OPENED_GATE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.opened'/></spring:escapeBody>",
+						CONTRIBUTE_OPENED_GATE_TOOLTIP: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.task.gate.opened.tooltip'/></spring:escapeBody>",
+						CONTRIBUTE_ATTENTION: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.task.attention'/></spring:escapeBody>",
+						HELP: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.help'/></spring:escapeBody>",
+						LESSON_INTRODUCTION: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lesson.introduction'/></spring:escapeBody>",
+						EMAIL_TITLE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.email'/></spring:escapeBody>",
+						TOUR_DISABLED_ELEMENT: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='tour.this.is.disabled'/></spring:escapeBody>",
+						PROGRESS_EMAIL_SUCCESS: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.sent.success'/></spring:escapeBody>",
+						PROGRESS_EMAIL_SEND_NOW_QUESTION: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.send.now.question'/></spring:escapeBody>",
+						PROGRESS_EMAIL_SEND_FAILED: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.send.failed'/></spring:escapeBody>",
+						PROGRESS_SELECT_DATE_FIRST: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.select.date.first'/></spring:escapeBody>",
+						PROGRESS_ENTER_TWO_DATES_FIRST: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.enter.two.dates.first'/></spring:escapeBody>",
+						PROGRESS_EMAIL_GENERATE_ONE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.would.you.like.to.generate'/></spring:escapeBody>",
+						PROGRESS_EMAIL_GENERATE_TWO: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.how.many.dates.to.generate'/></spring:escapeBody>",
+						PROGRESS_EMAIL_TITLE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='progress.email.title'/></spring:escapeBody>",
+						ERROR_DATE_IN_PAST: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.date.in.past'/></spring:escapeBody>",
+						LESSON_START: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lesson.starts'><fmt:param value='%0'/></fmt:message></spring:escapeBody>",
+						LESSON_FINISH: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lesson.finishes'><fmt:param value='%0'/></fmt:message></spring:escapeBody>",
+						LESSON_ACTIVITY_SCORES_ENABLE_ALERT: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.display.activity.scores.alert'/></spring:escapeBody>",
+						LESSON_ACTIVITY_SCORES_DISABLE_ALERT: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.hide.activity.scores.alert'/></spring:escapeBody>",
+						RESCHEDULE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.reschedule'/></spring:escapeBody>",
+						LESSON_ERROR_START_END_DATE: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.lesson.end.date.must.be.after.start.date'/></spring:escapeBody>",
+						LIVE_EDIT_BUTTON: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.live.edit'/></spring:escapeBody>",
+						LIVE_EDIT_TOOLTIP: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.live.edit.tooltip'/></spring:escapeBody>",
+						LIVE_EDIT_WARNING: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.person.editing.lesson'><fmt:param value='%0'/></fmt:message></spring:escapeBody>"
 					};
 
 			<c:if test="${jqGridInternationalised}">
@@ -586,6 +502,13 @@
 							<i class="fa fa-sm fa-cog"></i>
 							<span class="hidden-xs"><fmt:message key="progress.email.configure"/></span>
 							</button>
+						</dd>
+
+						<dt class="text-muted mt-4"><small><fmt:message key="label.monitoring.learning.design.path"/></small></dt>
+						<dd class="text-muted">
+							<small class="text-break font-monospace">
+								<c:out value="${ldPath}" escapeXml="true"/>
+							</small>
 						</dd>
 					</dl>
 				</div>

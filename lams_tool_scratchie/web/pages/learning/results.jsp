@@ -141,10 +141,10 @@
 				   	colNames:[
 						'#',
 						'isUserAuthor',
-						"<fmt:message key='label.monitoring.summary.user.name' />",
-						"<fmt:message key='label.burning.questions' />",
-						"<fmt:message key='label.like' />",
-						"<fmt:message key='label.count' />"
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions' /></spring:escapeBody>",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like' /></spring:escapeBody>",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.count' /></spring:escapeBody>"
 					],
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
@@ -187,7 +187,7 @@
 									<c:choose>
 										<%-- If we hide titles, we just display a link for "Question 1)" --%>
 										<c:when test="${sessionMap.hideTitles}">
-										 	"<a href='#questionTitle${i.count}' class='bq-title'><fmt:message key='label.question'/>&nbsp;${i.count})</a>"
+										 	"<a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.question'/></spring:escapeBody>&nbsp;${i.count})</a>"
 										</c:when>
 										<%-- If we show titles, we display question number and then a link with question title --%>
 										<c:otherwise>
@@ -241,11 +241,11 @@
 				   				like:'',
 				   			</c:when>
 							<c:when test="${burningQuestionDto.userLiked}">
-								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
+								like:'<span class="fa fa-thumbs-up fa-2x" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.unlike'/></spring:escapeBody>"' +
 										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:when>
 							<c:otherwise>
-								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<fmt:message key="label.like"/>"' +
+								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like'/></spring:escapeBody>"' +
 										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:otherwise>
 						</c:choose>
@@ -267,15 +267,15 @@
 				iconSet: 'fontAwesome',
 			   	colNames:[
 				   	'#',
-					"<fmt:message key='label.monitoring.summary.user.name' />",
-					"<fmt:message key='label.learners.feedback' />"
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'groupName', index:'groupName', width:140},
 			   		{name:'feedback', index:'feedback', width:568}
 			   	],
-			   	caption: "<fmt:message key='label.other.groups' />"
+			   	caption: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.other.groups' /></spring:escapeBody>"
 			});
 		    <c:forEach var="reflectDTO" items="${reflections}" varStatus="i">
 		    		jQuery("#reflections").addRowData(${i.index + 1}, {
@@ -321,7 +321,7 @@
 				});
 
 				//change button label
-				var newButtonLabel = isExpanded ? "<fmt:message key='label.expand.all' />" : "<fmt:message key='label.collapse.all' />";
+				var newButtonLabel = isExpanded ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.expand.all' /></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.collapse.all' /></spring:escapeBody>";
 				$(".hidden-xs", $(this)).text(newButtonLabel);
 
 				//change button icon

@@ -8,7 +8,7 @@
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css/>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 </lams:head>
 <body class="stripes">
 

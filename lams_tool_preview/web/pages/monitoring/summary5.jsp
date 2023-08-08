@@ -21,14 +21,14 @@
 		WARN_COMMENTS_IS_BLANK_LABEL = '',
 		WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
-		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.file.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	}
 
 	function getResultsElement(sessionId, selector) {
@@ -44,7 +44,7 @@
 	}
 	
 	function sendResults(sessionId) {
-		showConfirm('<fmt:message key="confirm.notify.user.of.results" />', function(){
+		showConfirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="confirm.notify.user.of.results" /></spring:escapeBody>', function(){
 			let buttons = getResultsElement(sessionId, ".btn-disable-on-submit"),
 				messageArea = getResultsElement(sessionId, ".messageArea2"),
 				messageAreaBusy = getResultsElement(sessionId, ".messageArea2_Busy"),

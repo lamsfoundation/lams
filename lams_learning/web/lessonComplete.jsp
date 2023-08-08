@@ -61,7 +61,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		function restartLesson(){
-			if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
+			if (confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.learner.progress.restart.confirm"/></spring:escapeBody>')) {
 				window.location.href = "<lams:WebAppURL/>learner/restartLesson.do?lessonID=${lessonID}";
 			}
 		}
@@ -103,10 +103,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				    iconSet 		   : 'fontAwesome',
 				    autoencode		   : false,
 					colNames : [
-						'<fmt:message key="gradebook.columntitle.activity"/>',
-						'<fmt:message key="gradebook.columntitle.progress"/>',
-						'<fmt:message key="gradebook.columntitle.averageMark"/>',
-						'<fmt:message key="gradebook.columntitle.mark"/>'
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.columntitle.activity"/></spring:escapeBody>',
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.columntitle.progress"/></spring:escapeBody>',
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.columntitle.averageMark"/></spring:escapeBody>',
+						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.columntitle.mark"/></spring:escapeBody>'
 					],
 				    colModel : [
 				        {
@@ -152,9 +152,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					},
 				    loadError : function(xhr,st,err) {
 				    	$("#userGradebookGrid").clearGridData();
-				    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
-		    					'<fmt:message key="message.lesson.finished.report.load.error"/>',
-		    					'<fmt:message key="message.lesson.finished.ok"/>');
+				    	$.jgrid.info_dialog('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.title"/></spring:escapeBody>', 
+		    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.lesson.finished.report.load.error"/></spring:escapeBody>',
+		    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.lesson.finished.ok"/></spring:escapeBody>');
 				    }
 				});
 			});

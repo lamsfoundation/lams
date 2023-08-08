@@ -30,10 +30,10 @@
 				var filter = /^(.)+\@(.)+\.(.)+/;
 
 				if (email == null || email == "") {
-					alert("<fmt:message key="error.forgot.password.email" />");
+					alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.forgot.password.email' /></spring:escapeBody>");
 					return false;
 				} else if (!filter.test(email)) {
-					alert("<fmt:message key="error.valid.email.required" />");
+					alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.valid.email.required' /></spring:escapeBody>");
 					return false;
 				} else {
 					document.forms.forgotForm.submit();

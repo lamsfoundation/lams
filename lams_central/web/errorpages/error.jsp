@@ -10,24 +10,23 @@
 <lams:head>
 	<title><fmt:message key="heading.general.error" /></title>
 	<lams:css />
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript">
 		function closeWin() {
 			window.close();
 		}
 		<c:if test="${showErrorStack1}">
-		function showHide() {
-			var messageDetail = document.getElementById('messageDetail'),
-				showButt = document.getElementById('showButt');
-			if (messageDetail.style.display == 'none') {
-				showButt.innerHTML = "<fmt:message key='msg.hide.detail'/>";
-				messageDetail.style.display = 'inline';
+			function showHide() {
+				var messageDetail = document.getElementById('messageDetail'),
+					showButt = document.getElementById('showButt');
+				if (messageDetail.style.display == 'none') {
+					showButt.innerHTML = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='msg.hide.detail'/></spring:escapeBody>";
+					messageDetail.style.display = 'inline';
 
-			} else {
-				showButt.innerHTML = "<fmt:message key='msg.show.detail'/>";
-				messageDetail.style.display = 'none';
+				} else {
+					showButt.innerHTML = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='msg.show.detail'/></spring:escapeBody>";
+					messageDetail.style.display = 'none';
+				}
 			}
-		}
 		</c:if>
 	</script>
 </lams:head>
@@ -55,7 +54,7 @@
 				<c:if test="${not empty param.errorName}">
 
 					<c:out value="${param.errorName}" escapeXml="true" />:
-						<c:out value="${param.errorMessage}" escapeXml="true" />
+					<c:out value="${param.errorMessage}" escapeXml="true" />
 
 
 

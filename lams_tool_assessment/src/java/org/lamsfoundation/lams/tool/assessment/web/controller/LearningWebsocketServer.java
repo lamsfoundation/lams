@@ -1,10 +1,5 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.time.LocalDateTime;
-import java.util.Collection;
-
-import javax.websocket.server.ServerEndpoint;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -16,6 +11,10 @@ import org.lamsfoundation.lams.web.controller.AbstractTimeLimitWebsocketServer.E
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.websocket.server.ServerEndpoint;
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 /**
  * Controls Assessment time limits
@@ -31,8 +30,8 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 
     public LearningWebsocketServer() {
 	if (assessmentService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    assessmentService = (IAssessmentService) wac.getBean(AssessmentConstants.ASSESSMENT_SERVICE);
 	}
     }
@@ -47,28 +46,36 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
      */
     @Override
     protected TimeCache getExistingTimeSettings(long toolContentId, Collection<Integer> userIds) {
-	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
+	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	if (assessment == null) {
+	    return existingTimeSettings;
+	}
 
-	existingTimeSettings.absoluteTimeLimit = assessment.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = assessment.getAbsoluteTimeLimitFinish();
 	existingTimeSettings.relativeTimeLimit = assessment.getRelativeTimeLimit() * 60;
+	existingTimeSettings.absoluteTimeLimit = assessment.getAbsoluteTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = assessment.getTimeLimitAdjustments();
 
-	for (Integer userId : userIds) {
-	    AssessmentResult result = null;
-	    if (assessment.isUseSelectLeaderToolOuput()) {
-		AssessmentUser user = assessmentService.getUserByIdAndContent(userId.longValue(), toolContentId);
-		AssessmentUser leader = user.getSession().getGroupLeader();
-		if (leader != null) {
-		    // if team leader is enabled, show consistent timer for all group members
-		    result = assessmentService.getLastAssessmentResult(assessment.getUid(), leader.getUserId());
+	if (userIds != null) {
+	    for (Integer userId : userIds) {
+		AssessmentResult result = null;
+		if (assessment.isUseSelectLeaderToolOuput()) {
+		    AssessmentUser user = assessmentService.getUserByIdAndContent(userId.longValue(), toolContentId);
+		    if (user != null) {
+			AssessmentUser leader = user.getSession().getGroupLeader();
+			if (leader != null) {
+			    // if team leader is enabled, show consistent timer for all group members
+			    result = assessmentService.getLastAssessmentResult(assessment.getUid(), leader.getUserId());
+			}
+		    }
+		} else {
+		    result = assessmentService.getLastAssessmentResult(assessment.getUid(), userId.longValue());
 		}
-	    } else {
-		result = assessmentService.getLastAssessmentResult(assessment.getUid(), userId.longValue());
-	    }
 
-	    if (result != null && result.getTimeLimitLaunchedDate() != null) {
-		existingTimeSettings.timeLimitLaunchedDate.put(userId, result.getTimeLimitLaunchedDate());
+		if (result != null && result.getTimeLimitLaunchedDate() != null) {
+		    existingTimeSettings.timeLimitLaunchedDate.put(userId, result.getTimeLimitLaunchedDate());
+		}
 	    }
 	}
 
@@ -80,9 +87,12 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	return assessmentService.launchTimeLimit(toolContentId, userId);
     }
 
+    /**
+     * Fetches or creates a singleton of this websocket server.
+     */
     public static LearningWebsocketServer getInstance() {
-	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer
-		.getInstance(LearningWebsocketServer.class.getName());
+	LearningWebsocketServer result = (LearningWebsocketServer) AbstractTimeLimitWebsocketServer.getInstance(
+		LearningWebsocketServer.class.getName());
 	if (result == null) {
 	    result = new LearningWebsocketServer();
 	    AbstractTimeLimitWebsocketServer.registerInstance(result);
@@ -90,9 +100,6 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	return result;
     }
 
-    /**
-     * Fetches or creates a singleton of this websocket server.
-     */
     public static Long getSecondsLeft(long toolContentId, int userId) {
 	LearningWebsocketServer instance = LearningWebsocketServer.getInstance();
 	return AbstractTimeLimitWebsocketServer.getSecondsLeft(instance, toolContentId, userId, true);

@@ -20,9 +20,9 @@
 		<c:set var="tool">
 			<lams:WebAppURL />
 		</c:set>
-		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+		<lams:JSImport src="includes/javascript/authoring.js" relative="true" />
 		<script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+		<lams:JSImport src="includes/javascript/upload.js" />
 	</lams:head>
 
 	<body class="stripes" onload="init();">
@@ -101,4 +101,3 @@
 </lams:html>
 
 <%@ include file="/common/taglibs.jsp"%>
-

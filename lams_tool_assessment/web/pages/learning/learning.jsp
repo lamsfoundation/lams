@@ -305,14 +305,14 @@
 				},
 				<c:if test="${hasEditRight && (mode != 'teacher')}">
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.blockui.time.is.over" /></spring:escapeBody></h1>' }); 
 				        
 				        setTimeout(function() { 
 				        	submitAll(true);
 				        }, 4000); 
 					},
 				</c:if>
-				description: "<div id='countdown-label'><fmt:message key='label.learning.countdown.time.left' /></div>"
+				description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.countdown.time.left' /></spring:escapeBody></div>"
 			});
 		}
 			
@@ -359,7 +359,7 @@
 			            }
 			            
 		                $.jGrowl(
-		                	"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
+		                	"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.draft.autosaved' /></spring:escapeBody>",
 		                	{ life: 2000, closeTemplate: '' }
 		                );
 	                },
@@ -369,7 +369,7 @@
 			window.setInterval(learnerAutosave, autosaveInterval);
 
 			function onLearnerAutosaveError() {
-				alert('<fmt:message key="label.learning.draft.autosave.error" />');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.draft.autosave.error" /></spring:escapeBody>');
 				location.reload();
 			}
 		</c:if>
@@ -562,7 +562,7 @@
 			} else {
 				<c:if test="${mode == 'author'}">
 					if (!skipValidation) {
-						alert('<fmt:message key="label.authoring.preview.skip.validation" />');
+						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.authoring.preview.skip.validation" /></spring:escapeBody>');
 						skipValidation = true;
 					} else {
 						return true;

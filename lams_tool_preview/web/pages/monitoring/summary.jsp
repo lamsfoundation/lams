@@ -15,7 +15,7 @@
 	}
 </style>
 
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 <script type="text/javascript">
 	//var for jquery.jRating.js
@@ -32,17 +32,17 @@
 			WARN_COMMENTS_IS_BLANK_LABEL = '',
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
-		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.file.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	}
 
 	function getResultsElement(sessionId, selector) {
@@ -58,7 +58,7 @@
 	}
 
 	function sendResults(sessionId) {
-		if (!confirm('<fmt:message key="confirm.notify.user.of.results" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="confirm.notify.user.of.results" /></spring:escapeBody>')) {
 			return;
 		}
 		let buttons = sessionId ? getResultsElement(sessionId, ".btn-disable-on-submit") : $('.btn-disable-on-submit'),

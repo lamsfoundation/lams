@@ -16,7 +16,7 @@
 	<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css">
 	<lams:css suffix="chart"/>
 		
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
@@ -36,7 +36,7 @@
  	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 
- 	<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+ 	<lams:JSImport src="includes/javascript/portrait.js" />
  
 	 <script>
 			var initialTabId = "${initialTabId}";

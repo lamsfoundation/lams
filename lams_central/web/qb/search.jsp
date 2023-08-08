@@ -111,7 +111,7 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
+<lams:JSImport src="includes/javascript/qb-search.js" />
 <script type="text/javascript">
 	<%-- Add jqGrid internationalisation snippet --%>
 	<%@ include file="/jqGrid.i18n.jsp"%>
@@ -148,7 +148,7 @@
 				success: function(response, status, xhr) {
 					if (response.isDuplicated) {
 						//show not successfull notification
-	                	$.growlUI('<i class="fa fa-lg fa-ban" style="color:red"></i> <fmt:message key="label.question.not.added" />');
+	                	$.growlUI('<i class="fa fa-lg fa-ban" style="color:red"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.not.added" /></spring:escapeBody>');
 						
 					} else {
 						$("#itemArea").html(response);
@@ -159,7 +159,7 @@
 						}
 
 						//show successfull notification
-	                	$.growlUI('<i class="fa fa-lg fa-check" style="color:green"></i>&nbsp;<fmt:message key="label.question.successfully.imported" />');
+	                	$.growlUI('<i class="fa fa-lg fa-check" style="color:green"></i>&nbsp;<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.question.successfully.imported" /></spring:escapeBody>');
 					}
 				}
 			});
@@ -221,7 +221,7 @@
 			iconSet: 'fontAwesome',
 		   	colNames:[
 			   	'questionUid',
-				'<fmt:message key="label.qb.collection.grid.title"/>',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.collection.grid.title"/></spring:escapeBody>',
 				'questionDescription'
 			],
 		   	colModel:[
@@ -240,7 +240,7 @@
 		    	$("#question-detail-area").hide().html("");
 
 		    	//display warning message
-		    	$(this).jqGrid("displayErrorMessage", "<fmt:message key="error.loaderror"/>");
+		    	$(this).jqGrid("displayErrorMessage", "<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.loaderror"/></spring:escapeBody>");
 		    }
 		})
 		.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	

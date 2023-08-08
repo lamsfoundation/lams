@@ -119,7 +119,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 		'<span class="badge text-bg-success">Success</span>&nbsp;' +
 		'<span class="badge text-bg-info">Info</span>&nbsp;' +
 		'<span class="badge text-bg-warning">Warning</span>&nbsp;' +
-		'<span class="badge text-bg-danger">Danger</span>&nbsp;' 
+		'<span class="badge text-bg-danger">Danger</span>&nbsp;'
     },
 	{
 		title: 'textQuote',
@@ -254,7 +254,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		html: 
 		'<div class="container">' +
 		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
-		'		<img class="img-fluid" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
+		'		<img class="img-fluid" style="margin: auto" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
 		'		</div>' +

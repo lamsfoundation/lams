@@ -45,13 +45,13 @@
 					type : 'bar',
 					data : {
 						datasets : [ {
-							label: "<fmt:message key='label.ira' />",
+							label: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ira' /></spring:escapeBody>",
 							data : summaryChartIraDataset,
 							backgroundColor : 'rgba(249, 248, 113, 0.85)'
 											  
 						},
 						{
-							label: "<fmt:message key='label.tra' />",
+							label: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tra' /></spring:escapeBody>",
 							data : summaryChartTraDataset,
 							backgroundColor : 'rgba(1, 117, 226, 0.85)'
 											  
@@ -73,7 +73,7 @@
 									},
 									scaleLabel : {
 										display : true,
-										labelString : "<fmt:message key='label.ira.tra.correct.count'/>",
+										labelString : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ira.tra.correct.count'/></spring:escapeBody>",
 										fontSize : 16
 									}
 								}
@@ -104,7 +104,7 @@
 			//titles
 			var groupId = link.data('group-id');
 			var groupName = $("#group-name-" + groupId).html();
-			var title = groupName + ": <fmt:message key='label.ira.tra.correct.count'/>";
+			var title = groupName + ": <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ira.tra.correct.count'/></spring:escapeBody>";
 
 			var userNames = [];
 			$(".belong-to-group-" + groupId).each(function() { 
@@ -240,7 +240,7 @@
 
 	function onChangeLeaderCallback(response){
         if (response.isSuccessful) {
-        	alert("<fmt:message key='label.leader.successfully.changed'/>");
+        	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.leader.successfully.changed'/></spring:escapeBody>");
 			loadTab("teams");
 		} else {
 			alert("Leader was not changed.");

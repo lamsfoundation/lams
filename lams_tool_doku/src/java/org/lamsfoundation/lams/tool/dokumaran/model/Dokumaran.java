@@ -23,30 +23,18 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.model;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.Cascade;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Dokumaran
@@ -92,7 +80,10 @@ public class Dokumaran implements Cloneable {
     private int relativeTimeLimit;
 
     @Column(name = "absolute_time_limit")
-    private LocalDateTime absoluteTimeLimit;
+    private int absoluteTimeLimit;
+
+    @Column(name = "absolute_time_limit_finish")
+    private LocalDateTime absoluteTimeLimitFinish;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "tl_ladoku11_time_limit", joinColumns = @JoinColumn(name = "dokumaran_uid"))
@@ -129,6 +120,9 @@ public class Dokumaran implements Cloneable {
 
     @Column(name = "gallery_walk_read_only")
     private boolean galleryWalkReadOnly;
+
+    @Column(name = "gallery_walk_cluster_size")
+    private int galleryWalkClusterSize;
 
     @Column(name = "gallery_walk_started")
     private boolean galleryWalkStarted;
@@ -183,7 +177,7 @@ public class Dokumaran implements Cloneable {
 	    Dokumaran.log.error("When clone " + Dokumaran.class + " failed");
 	}
 
-	dokumaran.setAbsoluteTimeLimit(null);
+	dokumaran.setAbsoluteTimeLimitFinish(null);
 	dokumaran.setTimeLimitAdjustments(new HashMap<>(this.getTimeLimitAdjustments()));
 	dokumaran.setGalleryWalkStarted(false);
 	dokumaran.setGalleryWalkFinished(false);
@@ -230,11 +224,11 @@ public class Dokumaran implements Cloneable {
     // **********************************************************
     // get/set methods
     // **********************************************************
+
     /**
      * Returns the object's creation date
      *
      * @return date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -276,7 +270,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param createdBy
-     *            The userid of the user who created this Share dokumaran.
+     * 	The userid of the user who created this Share dokumaran.
      */
     public void setCreatedBy(DokumaranUser createdBy) {
 	this.createdBy = createdBy;
@@ -299,7 +293,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param title
-     *            The title to set.
+     * 	The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -322,7 +316,7 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *            Set to true to lock the dokumaran for finished users.
+     * 	Set to true to lock the dokumaran for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -380,22 +374,32 @@ public class Dokumaran implements Cloneable {
 
     /**
      * @param timeLimit
-     *            the time limitation, that students have to complete an attempt.
+     * 	the time limitation, that students have to complete an attempt.
      */
     public void setRelativeTimeLimit(int timeLimit) {
 	this.relativeTimeLimit = timeLimit;
     }
 
-    public LocalDateTime getAbsoluteTimeLimit() {
+    public int getAbsoluteTimeLimit() {
 	return absoluteTimeLimit;
     }
 
-    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+    public void setAbsoluteTimeLimit(int absoluteTimeLimit) {
 	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    public Long getAbsoluteTimeLimitSeconds() {
-	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    public LocalDateTime getAbsoluteTimeLimitFinish() {
+	return absoluteTimeLimitFinish;
+    }
+
+    public void setAbsoluteTimeLimitFinish(LocalDateTime absoluteTimeLimitFinish) {
+	this.absoluteTimeLimitFinish = absoluteTimeLimitFinish;
+    }
+
+    public Long getAbsoluteTimeLimitFinishSeconds() {
+	return absoluteTimeLimitFinish == null
+		? null
+		: absoluteTimeLimitFinish.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public Map<Integer, Integer> getTimeLimitAdjustments() {
@@ -488,6 +492,14 @@ public class Dokumaran implements Cloneable {
 
     public void setGalleryWalkReadOnly(boolean galleryWalkReadOnly) {
 	this.galleryWalkReadOnly = galleryWalkReadOnly;
+    }
+
+    public int getGalleryWalkClusterSize() {
+	return galleryWalkClusterSize;
+    }
+
+    public void setGalleryWalkClusterSize(int galleryWalkClusterSize) {
+	this.galleryWalkClusterSize = galleryWalkClusterSize;
     }
 
     public boolean isGalleryWalkStarted() {

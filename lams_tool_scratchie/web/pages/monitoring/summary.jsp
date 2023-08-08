@@ -73,9 +73,9 @@
 				   	'#',
 					'userId',
 					'sessionId',
-					"<fmt:message key="label.monitoring.summary.user.name" />",
-					"<fmt:message key="label.monitoring.summary.attempts" />",
-					"<fmt:message key="label.monitoring.summary.mark" />",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.attempts' /></spring:escapeBody>",
+					"<spring:escapeBody javaScriptEscape='true'><xage key='label.monitoring.summary.mark' /></spring:escapeBody>",
 					'portraitId',
 					'isLeader',
 					'reachedActivity'
@@ -163,9 +163,9 @@
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 			   	colNames:['#',
-						"<fmt:message key='label.team' />",
-					    "<fmt:message key='label.burning.questions' />",
-						"<fmt:message key='label.count' />"
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.team' /></spring:escapeBody>",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions' /></spring:escapeBody>",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.count' /></spring:escapeBody>"
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
@@ -196,15 +196,15 @@
 			autowidth: true,
 			shrinkToFit: false,
 		   	colNames:['#',
-					"<fmt:message key="label.monitoring.summary.user.name" />",
-				    "<fmt:message key='label.learners.feedback' />"
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
+				    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
 			],
 		   	colModel:[
 		   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 		   		{name:'groupName', index:'groupName', width:200},
 		   		{name:'feedback', index:'feedback', width:570}
 		   	],
-		   	//caption: "<fmt:message key='label.learners.feedback' />"
+		   	//caption: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
 		});
 	    <c:forEach var="reflectDTO" items="${sessionMap.reflections}" varStatus="i">
 	    	jQuery("#reflections").addRowData(${i.index + 1}, {
@@ -238,7 +238,7 @@
     		var icon = '';
     		
     		if (rowObject.isLeader == 'true') {
-    			icon = '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
+    			icon = '&nbsp;<i title="<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.team.leader"/></spring:escapeBody>" class="text-primary fa fa-star"></i>';
     		} else if (rowObject.reachedActivity == 'true') {
     			icon = '&nbsp;<i class="text-primary fa fa-check"></i>';
     		}
@@ -258,7 +258,7 @@
 			if (rdata.isLeader == 'true') {
 				return 'class="info"';
 			} else if (rdata.reachedActivity == 'true') {
-				return 'title="<fmt:message key="label.summary.reached.activity"/>"';
+				return 'title="<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.summary.reached.activity"/></spring:escapeBody>"';
 			}
 		}
     	
@@ -304,7 +304,7 @@
 	
 	function exportExcel(){
 		var url = "<c:url value='/monitoring/exportExcel.do'/>?<csrf:token/>&sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
-		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(url, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.summary.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	};
 
 	function showChangeLeaderModal(toolSessionId) {
@@ -326,16 +326,16 @@
     				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
     			},
     			success : function(){
-    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>");
     				location.reload();
     			},
     			error : function(){
-    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
         		}
             });
         	
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
 		}
 	}
 	
@@ -346,9 +346,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '${scratchie.contentId}',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 
 

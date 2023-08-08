@@ -61,9 +61,9 @@
 		
 		function updateAddLabel() {
 			if ( learners.children == undefined || learners.children.length == 0  ) {
-		    	$('#lastEntry').html('<fmt:message key="label.alllearnersadded"/>');
+		    	$('#lastEntry').html('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.alllearnersadded"/></spring:escapeBody>');
 			} else {
-				$('#lastEntry').html('<fmt:message key="label.addlearnerhere"/>');
+				$('#lastEntry').html('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.addlearnerhere"/></spring:escapeBody>');
 			}
 		}
 			
@@ -91,7 +91,7 @@
 			hideButtons();
 
 			if ( learners.children.length > 0 ) {
-				alert('<fmt:message key="error.assign.rankAll"/>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.assign.rankAll"/></spring:escapeBody>');
 				return false;
 			}
 

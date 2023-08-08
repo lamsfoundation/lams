@@ -107,7 +107,10 @@ public class Scratchie implements Cloneable {
     private int relativeTimeLimit;
 
     @Column(name = "absolute_time_limit")
-    private LocalDateTime absoluteTimeLimit;
+    private int absoluteTimeLimit;
+
+    @Column(name = "absolute_time_limit_finish")
+    private LocalDateTime absoluteTimeLimitFinish;
 
     @Column(name = "double_click")
     private boolean revealOnDoubleClick;
@@ -154,7 +157,7 @@ public class Scratchie implements Cloneable {
 	try {
 	    scratchie = (Scratchie) super.clone();
 	    scratchie.setUid(null);
-	    scratchie.setAbsoluteTimeLimit(null);
+	    scratchie.setAbsoluteTimeLimitFinish(null);
 	    if (scratchieItems != null) {
 		Iterator<ScratchieItem> iter = scratchieItems.iterator();
 		Set<ScratchieItem> set = new TreeSet<>();
@@ -166,8 +169,6 @@ public class Scratchie implements Cloneable {
 		}
 		scratchie.scratchieItems = set;
 	    }
-
-	    scratchie.setAbsoluteTimeLimit(null);
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + Scratchie.class + " failed");
 	}
@@ -212,9 +213,9 @@ public class Scratchie implements Cloneable {
     // **********************************************************
     // get/set methods
     // **********************************************************
+
     /**
      * Returns the object's creation date
-     *
      */
     public Date getCreated() {
 	return created;
@@ -231,7 +232,6 @@ public class Scratchie implements Cloneable {
      * Returns the object's date of last update
      *
      * @return date updated
-     *
      */
     public Date getUpdated() {
 	return updated;
@@ -281,7 +281,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * @param title
-     *            The title to set.
+     * 	The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -382,22 +382,32 @@ public class Scratchie implements Cloneable {
 
     /**
      * @param timeLimit
-     *            the time limitation, that students have to complete an attempt.
+     * 	the time limitation, that students have to complete an attempt.
      */
     public void setRelativeTimeLimit(int timeLimit) {
 	this.relativeTimeLimit = timeLimit;
     }
 
-    public LocalDateTime getAbsoluteTimeLimit() {
+    public int getAbsoluteTimeLimit() {
 	return absoluteTimeLimit;
     }
 
-    public void setAbsoluteTimeLimit(LocalDateTime absoluteTimeLimit) {
+    public void setAbsoluteTimeLimit(int absoluteTimeLimit) {
 	this.absoluteTimeLimit = absoluteTimeLimit;
     }
 
-    public Long getAbsoluteTimeLimitSeconds() {
-	return absoluteTimeLimit == null ? null : absoluteTimeLimit.atZone(ZoneId.systemDefault()).toEpochSecond();
+    public LocalDateTime getAbsoluteTimeLimitFinish() {
+	return absoluteTimeLimitFinish;
+    }
+
+    public void setAbsoluteTimeLimitFinish(LocalDateTime absoluteTimeLimitFinish) {
+	this.absoluteTimeLimitFinish = absoluteTimeLimitFinish;
+    }
+
+    public Long getAbsoluteTimeLimitFinishSeconds() {
+	return absoluteTimeLimitFinish == null
+		? null
+		: absoluteTimeLimitFinish.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
     public boolean isRevealOnDoubleClick() {
@@ -432,7 +442,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * @param confidenceLevelsActivityUiid
-     *            preceding activity that should be queried for confidence levels
+     * 	preceding activity that should be queried for confidence levels
      */
     public void setConfidenceLevelsActivityUiid(Integer confidenceLevelsActivityUiid) {
 	this.confidenceLevelsActivityUiid = confidenceLevelsActivityUiid;
@@ -459,7 +469,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * @param activityUiidProvidingVsaAnswers
-     *            preceding activity that should be queried for VSA answers
+     * 	preceding activity that should be queried for VSA answers
      */
     public void setActivityUiidProvidingVsaAnswers(Integer activityUiidProvidingVsaAnswers) {
 	this.activityUiidProvidingVsaAnswers = activityUiidProvidingVsaAnswers;

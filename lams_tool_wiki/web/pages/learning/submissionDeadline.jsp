@@ -17,8 +17,8 @@
 		</title>
 		<lams:css/>
 	
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
+		<lams:JSImport src="includes/javascript/wikiCommon.js" relative="true" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	</lams:head>
@@ -44,6 +44,3 @@
 		</div>					
 	</body>
 </lams:html>
-
-
-

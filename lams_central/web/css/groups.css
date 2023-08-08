@@ -17,8 +17,10 @@
   cursor: pointer;
 }
 
+
 #unassignedUserCell .userContainer {
   height: calc(100% - 10px);
+  max-height: 845px;
   overflow-x: auto;
 }
 
@@ -33,11 +35,11 @@
 }
 
 .draggableItem {
-	cursor: grab;
+  cursor: grab;
 }
 
 .draggableItem:hover {
-	background: var(--lams-background-gray);
+  background: var(--lams-background-gray);
 }
 
 .groupContainer input {
@@ -45,7 +47,7 @@
 }
 
 #newGroupPlaceholder > div {
-	margin: 128px 0;
+  margin: 128px 0;
 }
 
 .userContainer .ui-state-disabled {

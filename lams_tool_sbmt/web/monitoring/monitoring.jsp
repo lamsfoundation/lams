@@ -18,7 +18,7 @@
 	<link type="text/css" href="${lams}/css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
 	<link type="text/css" href="${lams}/css/jquery.tablesorter.pager.css" rel="stylesheet">
 
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>

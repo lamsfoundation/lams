@@ -124,4 +124,8 @@ public class DokumaranConstants {
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
+
+    public static final String TIME_LIMIT_PANEL_UPDATE_SINK_NAME = "dokumaran time limit panel updated";
+    public static final String TIME_LIMIT_PANEL_UPDATE_FLUX_NAME = "dokumaran time limit panel updated";
+
 }

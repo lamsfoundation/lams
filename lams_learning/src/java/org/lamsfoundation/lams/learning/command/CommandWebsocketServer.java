@@ -1,19 +1,5 @@
 package org.lamsfoundation.lams.learning.command;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
@@ -23,6 +9,15 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Receives, processes and sends messages and commands to Learners.
@@ -49,31 +44,25 @@ public class CommandWebsocketServer {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
 
-		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets
-			    .entrySet().iterator();
+		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets.entrySet()
+			    .iterator();
 
-		    Entry<Long, Map<String, Session>> entry = null;
 		    // go through lessons and update registered learners with messages
-		    do {
-			entry = entryIterator.hasNext() ? entryIterator.next() : null;
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Map<String, Session>> entry = entryIterator.next();
 			if (entry != null) {
 			    Long lessonId = entry.getKey();
-			    Long lastSendTime = lastSendTimes.get(lessonId);
-			    if ((lastSendTime == null) || ((System.currentTimeMillis()
-				    - lastSendTime) >= ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL)) {
-				send(lessonId);
-			    }
-
-			    // if all learners left the lesson, remove the obsolete mapping
 			    Map<String, Session> lessonWebsockets = entry.getValue();
-			    if (lessonWebsockets.isEmpty()) {
+			    // if all learners left the lesson, remove the obsolete mapping
+			    if (lessonWebsockets == null || lessonWebsockets.isEmpty()) {
 				entryIterator.remove();
 				lastSendTimes.remove(lessonId);
+				continue;
 			    }
+
+			    send(lessonId, lessonWebsockets);
 			}
-		    } while (entry != null);
-		} catch (IllegalStateException e) {
-		    // do nothing as server is probably shutting down and we could not obtain Hibernate session
+		    }
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    CommandWebsocketServer.log.error("Error in Command Websocket Server worker thread", e);
@@ -92,20 +81,25 @@ public class CommandWebsocketServer {
 	/**
 	 * Feeds opened websockets with commands.
 	 */
-	private void send(Long lessonId) throws IOException {
+	private void send(Long lessonId, Map<String, Session> lessonWebsockets) throws IOException {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
 	    if (lastSendTime == null) {
 		lastSendTime = System.currentTimeMillis() - ILearnerService.COMMAND_WEBSOCKET_CHECK_INTERVAL;
 	    }
 	    lastSendTimes.put(lessonId, System.currentTimeMillis());
 
-	    List<Command> commands = CommandWebsocketServer.getLearnerService().getCommandsForLesson(lessonId,
-		    new Date(lastSendTime));
-	    Map<String, Session> lessonWebsockets = CommandWebsocketServer.websockets.get(lessonId);
+	    List<Command> commands = CommandWebsocketServer.getLearnerService()
+		    .getCommandsForLesson(lessonId, new Date(lastSendTime));
 	    for (Command command : commands) {
-		Session websocket = lessonWebsockets.get(command.getUserName());
-		if (websocket != null && websocket.isOpen()) {
-		    websocket.getBasicRemote().sendText(command.getCommandText());
+		try {
+		    Session websocket = lessonWebsockets.get(command.getUserName());
+		    if (websocket != null && websocket.isOpen()) {
+			websocket.getBasicRemote().sendText(command.getCommandText());
+		    }
+		} catch (Exception e) {
+		    CommandWebsocketServer.log.error(
+			    "Error while sending command " + command.getCommandText() + "\" for \""
+				    + command.getUserName() + "\"", e);
 		}
 	    }
 	}
@@ -158,8 +152,8 @@ public class CommandWebsocketServer {
 
     private static ILearnerFullService getLearnerService() {
 	if (learnerService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
 	    learnerService = (ILearnerFullService) ctx.getBean("learnerService");
 	}
 	return learnerService;

@@ -34,7 +34,7 @@
 		
 		var theForm = $(editForm);			
 
-		if ( validateBodyText($('#editFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<fmt:message key="label.comment.body.validation" />") ) {
+		if ( validateBodyText($('#editFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.body.validation" /></spring:escapeBody>") ) {
 	    	$.ajax({ // create an AJAX call...
 		        data: theForm.serialize(), 
 	    	    processData: false, // tell jQuery not to process the data
@@ -48,7 +48,7 @@
 					// make sure the old edit form is gone, so the user won't try to submit it again
 					$('#edit').remove();
 				}
-				reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+				reloadThread(response,'<lams:LAMSURL />','<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>','<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>');
     		});
 		} // end validateBodyText
 		else {

@@ -17,14 +17,14 @@
 	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 
  	<!-- ********************  javascript ********************** -->
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/rsrccommon.js"></script>	
-	
+	<lams:JSImport src="includes/javascript/upload.js" />
+	<lams:JSImport src="includes/javascript/rsrccommon.js" relative="true" />
+
 	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">

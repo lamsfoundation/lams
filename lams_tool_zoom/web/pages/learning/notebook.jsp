@@ -17,7 +17,7 @@
 	
 	<lams:css/>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />

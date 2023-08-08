@@ -23,255 +23,255 @@
 		var LAMS_URL = '<lams:LAMSURL/>',
 			LD_THUMBNAIL_URL_BASE = LAMS_URL + 'home/getLearningDesignThumbnail.do?ldId=',
 
-			decoderDiv = $('<div />'),
 			LABELS = {
 				// ActivityLib
 				<fmt:message key="authoring.fla.default.group.title" var="DEFAULT_GROUPING_TITLE_VAR"/>
-				DEFAULT_GROUPING_TITLE : '<c:out value="${DEFAULT_GROUPING_TITLE_VAR}" />',
+				DEFAULT_GROUPING_TITLE : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_GROUPING_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.default.group.prefix" var="DEFAULT_GROUP_PREFIX_VAR"/>
-				DEFAULT_GROUP_PREFIX : '<c:out value="${DEFAULT_GROUP_PREFIX_VAR}" />',
+				DEFAULT_GROUP_PREFIX : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_GROUP_PREFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.default.branching.title" var="DEFAULT_BRANCHING_TITLE_VAR"/>
-				DEFAULT_BRANCHING_TITLE : '<c:out value="${DEFAULT_BRANCHING_TITLE_VAR}" />',
+				DEFAULT_BRANCHING_TITLE : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_BRANCHING_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.default.branch.prefix" var="DEFAULT_BRANCH_PREFIX_VAR"/>
-				DEFAULT_BRANCH_PREFIX : '<c:out value="${DEFAULT_BRANCH_PREFIX_VAR}" />',
+				DEFAULT_BRANCH_PREFIX : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_BRANCH_PREFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.default.optional.activity.title" var="DEFAULT_OPTIONAL_ACTIVITY_TITLE_VAR"/>
-				DEFAULT_OPTIONAL_ACTIVITY_TITLE : '<c:out value="${DEFAULT_OPTIONAL_ACTIVITY_TITLE_VAR}" />',
+				DEFAULT_OPTIONAL_ACTIVITY_TITLE : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_OPTIONAL_ACTIVITY_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.support.activity.title" var="SUPPORT_ACTIVITY_TITLE_VAR"/>
-				SUPPORT_ACTIVITY_TITLE : '<c:out value="${SUPPORT_ACTIVITY_TITLE_VAR}" />',
+				SUPPORT_ACTIVITY_TITLE : '<spring:escapeBody javaScriptEscape="true">${SUPPORT_ACTIVITY_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.gate.activity.label" var="GATE_ACTIVITY_LABEL_VAR"/>
-				GATE_ACTIVITY_LABEL : '<c:out value="${GATE_ACTIVITY_LABEL_VAR}" />',
+				GATE_ACTIVITY_LABEL : '<spring:escapeBody javaScriptEscape="true">${GATE_ACTIVITY_LABEL_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branching.start.suffix" var="BRANCHING_START_SUFFIX_VAR"/>
-				BRANCHING_START_SUFFIX : '<c:out value="${BRANCHING_START_SUFFIX_VAR}" />',
+				BRANCHING_START_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${BRANCHING_START_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branching.end.suffix" var="BRANCHING_END_SUFFIX_VAR"/>
-				BRANCHING_END_SUFFIX : '<c:out value="${BRANCHING_END_SUFFIX_VAR}" />',
+				BRANCHING_END_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${BRANCHING_END_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.dialog.title.suffix" var="ACTIVITY_DIALOG_TITLE_SUFFIX_VAR"/>
-				ACTIVITY_DIALOG_TITLE_SUFFIX : '<c:out value="${ACTIVITY_DIALOG_TITLE_SUFFIX_VAR}" />',
+				ACTIVITY_DIALOG_TITLE_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_DIALOG_TITLE_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.remove.activity.confirm" var="REMOVE_ACTIVITY_CONFIRM_VAR"/>
-				REMOVE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_ACTIVITY_CONFIRM_VAR}" />').text(),
+				REMOVE_ACTIVITY_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${REMOVE_ACTIVITY_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branching.create.confirm" var="BRANCHING_CREATE_CONFIRM_VAR"/>
-				BRANCHING_CREATE_CONFIRM : decoderDiv.html('<c:out value="${BRANCHING_CREATE_CONFIRM_VAR}" />').text(),
+				BRANCHING_CREATE_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${BRANCHING_CREATE_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.transition.to.exists.error" var="TRANSITION_TO_EXISTS_ERROR_VAR"/>
-				TRANSITION_TO_EXISTS_ERROR : decoderDiv.html('<c:out value="${TRANSITION_TO_EXISTS_ERROR_VAR}" />').text(),
+				TRANSITION_TO_EXISTS_ERROR : '<spring:escapeBody javaScriptEscape="true">${TRANSITION_TO_EXISTS_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.circular.sequence.error" var="CIRCULAR_SEQUENCE_ERROR_VAR"/>
-				CIRCULAR_SEQUENCE_ERROR : decoderDiv.html('<c:out value="${CIRCULAR_SEQUENCE_ERROR_VAR}" />').text(),
+				CIRCULAR_SEQUENCE_ERROR : '<spring:escapeBody javaScriptEscape="true">${CIRCULAR_SEQUENCE_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.in.container.error" var="ACTIVITY_IN_CONTAINER_ERROR_VAR"/>
-				ACTIVITY_IN_CONTAINER_ERROR : decoderDiv.html('<c:out value="${ACTIVITY_IN_CONTAINER_ERROR_VAR}" />').text(),
+				ACTIVITY_IN_CONTAINER_ERROR : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_IN_CONTAINER_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.activity.error" var="LIVEEDIT_READONLY_ACTIVITY_ERROR_VAR"/>
-				LIVEEDIT_READONLY_ACTIVITY_ERROR : '<c:out value="${LIVEEDIT_READONLY_ACTIVITY_ERROR_VAR}" />',
+				LIVEEDIT_READONLY_ACTIVITY_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_READONLY_ACTIVITY_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.move.parent.error" var="LIVEEDIT_READONLY_MOVE_PARENT_ERROR_VAR"/>
-				LIVEEDIT_READONLY_MOVE_PARENT_ERROR : '<c:out value="${LIVEEDIT_READONLY_MOVE_PARENT_ERROR_VAR}" />',
+				LIVEEDIT_READONLY_MOVE_PARENT_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_READONLY_MOVE_PARENT_ERROR_VAR}</spring:escapeBody>',
 				
 				
 				// DecorationLib
 				<fmt:message key="authoring.fla.default.annotation.label.title" var="DEFAULT_ANNOTATION_LABEL_TITLE_VAR"/>
-				DEFAULT_ANNOTATION_LABEL_TITLE : '<c:out value="${DEFAULT_ANNOTATION_LABEL_TITLE_VAR}" />',
+				DEFAULT_ANNOTATION_LABEL_TITLE : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_ANNOTATION_LABEL_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.region.fit.button.tooltip" var="REGION_FIT_BUTTON_TOOLTIP_VAR"/>
-				REGION_FIT_BUTTON_TOOLTIP : '<c:out value="${REGION_FIT_BUTTON_TOOLTIP_VAR}" />',
-				
+				REGION_FIT_BUTTON_TOOLTIP : '<spring:escapeBody javaScriptEscape="true">${REGION_FIT_BUTTON_TOOLTIP_VAR}</spring:escapeBody>',
+
 				// General
 				<fmt:message key="authoring.fla.folder" var="FOLDER_VAR"/>
-				FOLDER : '<c:out value="${FOLDER_VAR}" />',
+				FOLDER : '<spring:escapeBody javaScriptEscape="true">${FOLDER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence" var="SEQUENCE_VAR"/>
-				SEQUENCE : '<c:out value="${SEQUENCE_VAR}" />',
+				SEQUENCE : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.weights.title" var="WEIGHTS_TITLE_VAR"/>
-				WEIGHTS_TITLE : '<c:out value="${WEIGHTS_TITLE_VAR}" />',
+				WEIGHTS_TITLE : '<spring:escapeBody javaScriptEscape="true">${WEIGHTS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.not.valid" var="SEQUENCE_NOT_VALID_VAR"/>
-				SEQUENCE_NOT_VALID : decoderDiv.html('<c:out value="${SEQUENCE_NOT_VALID_VAR}" />').text(),
+				SEQUENCE_NOT_VALID : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_NOT_VALID_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.validation.issues" var="SEQUENCE_VALIDATION_ISSUES_VAR"/>
-				SEQUENCE_VALIDATION_ISSUES : '<c:out value="${SEQUENCE_VALIDATION_ISSUES_VAR}" />',
+				SEQUENCE_VALIDATION_ISSUES : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_VALIDATION_ISSUES_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.save.successful" var="SAVE_SUCCESSFUL_VAR"/>
-				SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_VAR}" />').text(),
+				SAVE_SUCCESSFUL : '<spring:escapeBody javaScriptEscape="true">${SAVE_SUCCESSFUL_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.save.successful.check.grouping" var="SAVE_SUCCESSFUL_CHECK_GROUPING_VAR"/>
-				SAVE_SUCCESSFUL_CHECK_GROUPING : decoderDiv.html('<c:out value="${SAVE_SUCCESSFUL_CHECK_GROUPING_VAR}" />').text(),
+				SAVE_SUCCESSFUL_CHECK_GROUPING : '<spring:escapeBody javaScriptEscape="true">${SAVE_SUCCESSFUL_CHECK_GROUPING_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.save.successful" var="LIVEEDIT_SAVE_SUCCESSFUL_VAR"/>
-				LIVEEDIT_SAVE_SUCCESSFUL : decoderDiv.html('<c:out value="${LIVEEDIT_SAVE_SUCCESSFUL_VAR}" />').text(),
+				LIVEEDIT_SAVE_SUCCESSFUL : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_SAVE_SUCCESSFUL_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.delete.node.confirm" var="DELETE_NODE_CONFIRM_VAR"/>
-				DELETE_NODE_CONFIRM : decoderDiv.html('<c:out value="${DELETE_NODE_CONFIRM_VAR}" />').text(),
+				DELETE_NODE_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${DELETE_NODE_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.overwrite.confirm" var="SEQUENCE_OVERWRITE_CONFIRM_VAR"/>
-				SEQUENCE_OVERWRITE_CONFIRM : decoderDiv.html('<c:out value="${SEQUENCE_OVERWRITE_CONFIRM_VAR}" />').text(),
+				SEQUENCE_OVERWRITE_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_OVERWRITE_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.new.folder.title.prompt" var="NEW_FOLDER_TITLE_PROMPT_VAR"/>
-				NEW_FOLDER_TITLE_PROMPT : decoderDiv.html('<c:out value="${NEW_FOLDER_TITLE_PROMPT_VAR}" />').text(),
+				NEW_FOLDER_TITLE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${NEW_FOLDER_TITLE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.rename.title.prompt" var="RENAME_TITLE_PROMPT_VAR"/>
-				RENAME_TITLE_PROMPT : decoderDiv.html('<c:out value="${RENAME_TITLE_PROMPT_VAR}" />').text(),
+				RENAME_TITLE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${RENAME_TITLE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.save.sequence.title.prompt" var="SAVE_SEQUENCE_TITLE_PROMPT_VAR"/>
-				SAVE_SEQUENCE_TITLE_PROMPT : decoderDiv.html('<c:out value="${SAVE_SEQUENCE_TITLE_PROMPT_VAR}" />').text(),
+				SAVE_SEQUENCE_TITLE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${SAVE_SEQUENCE_TITLE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.import.part.choose.prompt" var="IMPORT_PART_CHOOSE_PROMPT_VAR"/>
-				IMPORT_PART_CHOOSE_PROMPT : decoderDiv.html('<c:out value="${IMPORT_PART_CHOOSE_PROMPT_VAR}" />').text(),
+				IMPORT_PART_CHOOSE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${IMPORT_PART_CHOOSE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.cancel.confirm" var="LIVEEDIT_CANCEL_CONFIRM_VAR"/>
-				LIVEEDIT_CANCEL_CONFIRM : '<c:out value="${LIVEEDIT_CANCEL_CONFIRM_VAR}" />',
+				LIVEEDIT_CANCEL_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_CANCEL_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.replace.question.prompt" var="REPLACE_QUESTION_PROMPT_VAR"/>
-				REPLACE_QUESTION_PROMPT : decoderDiv.html('<c:out value="${REPLACE_QUESTION_PROMPT_VAR}" />').text(),
+				REPLACE_QUESTION_PROMPT : '<spring:escapeBody javaScriptEscape="true">${REPLACE_QUESTION_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.folder.not.selected.error" var="FOLDER_NOT_SELECTED_ERROR_VAR"/>
-				FOLDER_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />').text(),
+				FOLDER_NOT_SELECTED_ERROR : '<spring:escapeBody javaScriptEscape="true">${FOLDER_NOT_SELECTED_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.folder.can.not.save.error" var="FOLDER_CAN_NOT_SAVE_ERROR_VAR"/>
-				FOLDER_CAN_NOT_SAVE_ERROR : decoderDiv.html('<c:out value="${FOLDER_CAN_NOT_SAVE_ERROR_VAR}" />').text(),
+				FOLDER_CAN_NOT_SAVE_ERROR : '<spring:escapeBody javaScriptEscape="true">${FOLDER_CAN_NOT_SAVE_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.title.validation.error" var="TITLE_VALIDATION_ERROR_VAR"/>
-				TITLE_VALIDATION_ERROR : decoderDiv.html('<c:out value="${TITLE_VALIDATION_ERROR_VAR}" />').text(),
+				TITLE_VALIDATION_ERROR : '<spring:escapeBody javaScriptEscape="true">${TITLE_VALIDATION_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.folder.exists.error" var="FOLDER_EXISTS_ERROR_VAR"/>
-				FOLDER_EXISTS_ERROR : decoderDiv.html('<c:out value="${FOLDER_EXISTS_ERROR_VAR}" />').text(),
+				FOLDER_EXISTS_ERROR : '<spring:escapeBody javaScriptEscape="true">${FOLDER_EXISTS_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.exists.error" var="SEQUENCE_EXISTS_ERROR_VAR"/>
-				SEQUENCE_EXISTS_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_EXISTS_ERROR_VAR}" />').text(),
+				SEQUENCE_EXISTS_ERROR : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_EXISTS_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.save.error" var="SEQUENCE_SAVE_ERROR_VAR"/>
-				SEQUENCE_SAVE_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_SAVE_ERROR_VAR}" />').text(),
+				SEQUENCE_SAVE_ERROR : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_SAVE_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.readonly.forbidden" var="READONLY_FORBIDDEN_ERROR_VAR"/>
-				READONLY_FORBIDDEN_ERROR : decoderDiv.html('<c:out value="${READONLY_FORBIDDEN_ERROR_VAR}" />').text(),
+				READONLY_FORBIDDEN_ERROR : '<spring:escapeBody javaScriptEscape="true">${READONLY_FORBIDDEN_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.svg.save.error" var="SVG_SAVE_ERROR_VAR"/>
-				SVG_SAVE_ERROR : decoderDiv.html('<c:out value="${SVG_SAVE_ERROR_VAR}" />').text(),
+				SVG_SAVE_ERROR : '<spring:escapeBody javaScriptEscape="true">${SVG_SAVE_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.not.selected.error" var="SEQUENCE_NOT_SELECTED_ERROR_VAR"/>
-				SEQUENCE_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_NOT_SELECTED_ERROR_VAR}" />').text(),
+				SEQUENCE_NOT_SELECTED_ERROR : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_NOT_SELECTED_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.sequence.load.error" var="SEQUENCE_LOAD_ERROR_VAR"/>
-				SEQUENCE_LOAD_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_LOAD_ERROR_VAR}" />').text(),
+				SEQUENCE_LOAD_ERROR : '<spring:escapeBody javaScriptEscape="true">${SEQUENCE_LOAD_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.modify.error" var="RESOURCE_MODIFY_ERROR_VAR"/>
-				RESOURCE_MODIFY_ERROR : decoderDiv.html('<c:out value="${RESOURCE_MODIFY_ERROR_VAR}" />').text(),
+				RESOURCE_MODIFY_ERROR : '<spring:escapeBody javaScriptEscape="true">${RESOURCE_MODIFY_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.folder.move.to.child.error" var="FOLDER_MOVE_TO_CHILD_ERROR_VAR"/>
-				FOLDER_MOVE_TO_CHILD_ERROR : decoderDiv.html('<c:out value="${FOLDER_MOVE_TO_CHILD_ERROR_VAR}" />').text(),
+				FOLDER_MOVE_TO_CHILD_ERROR : '<spring:escapeBody javaScriptEscape="true">${FOLDER_MOVE_TO_CHILD_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.weights.sum.error" var="WEIGHTS_SUM_ERROR_VAR"/>
-				WEIGHTS_SUM_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_SUM_ERROR_VAR}" />').text(),
+				WEIGHTS_SUM_ERROR : '<spring:escapeBody javaScriptEscape="true">${WEIGHTS_SUM_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.weights.none" var="WEIGHTS_NONE_FOUND_ERROR_VAR"/>
-				WEIGHTS_NONE_FOUND_ERROR : decoderDiv.html('<c:out value="${WEIGHTS_NONE_FOUND_ERROR_VAR}" />').text(),
+				WEIGHTS_NONE_FOUND_ERROR : '<spring:escapeBody javaScriptEscape="true">${WEIGHTS_NONE_FOUND_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.grouping.detached.error" var="GROUPING_DETACHED_ERROR_VAR"/>
-				GROUPING_DETACHED_ERROR : decoderDiv.html('<c:out value="${GROUPING_DETACHED_ERROR_VAR}" />').text(),
+				GROUPING_DETACHED_ERROR : '<spring:escapeBody javaScriptEscape="true">${GROUPING_DETACHED_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.input.detached.error" var="INPUT_DETACHED_ERROR_VAR"/>
-				INPUT_DETACHED_ERROR : decoderDiv.html('<c:out value="${INPUT_DETACHED_ERROR_VAR}" />').text(),
+				INPUT_DETACHED_ERROR : '<spring:escapeBody javaScriptEscape="true">${INPUT_DETACHED_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.learning.design.templates" var="TEMPLATES_VAR"/>
-				TEMPLATES : decoderDiv.html('<c:out value="${TEMPLATES_VAR}" />').text(),
+				TEMPLATES : '<spring:escapeBody javaScriptEscape="true">${TEMPLATES_VAR}</spring:escapeBody>',
+				<fmt:message key="authoring.learning.design.ai.wizard" var="AI_WIZARD_VAR"/>
+				AI_WIZARD : '<spring:escapeBody javaScriptEscape="true">${AI_WIZARD_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.page.menu.apply.changes" var="LIVE_EDIT_SAVE_VAR"/>
-				LIVE_EDIT_SAVE : decoderDiv.html('<c:out value="${LIVE_EDIT_SAVE_VAR}" />').text(),
+				LIVE_EDIT_SAVE : '<spring:escapeBody javaScriptEscape="true">${LIVE_EDIT_SAVE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
-				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
+				NAVIGATE_AWAY_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${NAVIGATE_AWAY_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.remove.button.confirm" var="REMOVE_BUTTON_CONFIRM_VAR"/>
-				REMOVE_BUTTON_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_BUTTON_CONFIRM_VAR}" />').text(),
+				REMOVE_BUTTON_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${REMOVE_BUTTON_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.remove.button.tip" var="REMOVE_BUTTON_TOOLTIP_VAR"/>
-				REMOVE_BUTTON_TOOLTIP : decoderDiv.html('<c:out value="${REMOVE_BUTTON_TOOLTIP_VAR}" />').text(),
-				
+				REMOVE_BUTTON_TOOLTIP : '<spring:escapeBody javaScriptEscape="true">${REMOVE_BUTTON_TOOLTIP_VAR}</spring:escapeBody>',
+
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
-				TRANSITION_FROM_EXISTS_ERROR : decoderDiv.html('<c:out value="${TRANSITION_FROM_EXISTS_ERROR_VAR}" />').text(),
+				TRANSITION_FROM_EXISTS_ERROR : '<spring:escapeBody javaScriptEscape="true">${TRANSITION_FROM_EXISTS_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.remove.activity.error" var="LIVEEDIT_REMOVE_ACTIVITY_ERROR_VAR"/>
-				LIVEEDIT_REMOVE_ACTIVITY_ERROR : '<c:out value="${LIVEEDIT_REMOVE_ACTIVITY_ERROR_VAR}" />',
+				LIVEEDIT_REMOVE_ACTIVITY_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_REMOVE_ACTIVITY_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.remove.parent.error" var="LIVEEDIT_REMOVE_PARENT_ERROR_VAR"/>
-				LIVEEDIT_REMOVE_PARENT_ERROR : '<c:out value="${LIVEEDIT_REMOVE_PARENT_ERROR_VAR}" />',
+				LIVEEDIT_REMOVE_PARENT_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_REMOVE_PARENT_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.remove.child.error" var="LIVEEDIT_REMOVE_CHILD_ERROR_VAR"/>
-				LIVEEDIT_REMOVE_CHILD_ERROR : '<c:out value="${LIVEEDIT_REMOVE_CHILD_ERROR_VAR}" />',
+				LIVEEDIT_REMOVE_CHILD_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_REMOVE_CHILD_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.liveedit.readonly.remove.transition.error" var="LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR"/>
-				LIVEEDIT_REMOVE_TRANSITION_ERROR : '<c:out value="${LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR}" />',
-					
+				LIVEEDIT_REMOVE_TRANSITION_ERROR : '<spring:escapeBody javaScriptEscape="true">${LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR}</spring:escapeBody>',
+
 				// MenuLib
 				<fmt:message key="authoring.fla.export.sequence.dialog.title" var="EXPORT_SEQUENCE_DIALOG_TITLE_VAR"/>
-				EXPORT_SEQUENCE_DIALOG_TITLE : '<c:out value="${EXPORT_SEQUENCE_DIALOG_TITLE_VAR}" />',
+				EXPORT_SEQUENCE_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${EXPORT_SEQUENCE_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.copy.title.prefix" var="ACTIVITY_COPY_TITLE_PREFIX_VAR"/>
-				ACTIVITY_COPY_TITLE_PREFIX : '<c:out value="${ACTIVITY_COPY_TITLE_PREFIX_VAR}" />',
+				ACTIVITY_COPY_TITLE_PREFIX : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_COPY_TITLE_PREFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.preview.lesson.default.title" var="PREVIEW_LESSON_DEFAULT_TITLE_VAR"/>
-				PREVIEW_LESSON_DEFAULT_TITLE : '<c:out value="${PREVIEW_LESSON_DEFAULT_TITLE_VAR}" />',
+				PREVIEW_LESSON_DEFAULT_TITLE : '<spring:escapeBody javaScriptEscape="true">${PREVIEW_LESSON_DEFAULT_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.save.dialog.title" var="SAVE_DIALOG_TITLE_VAR"/>
-				SAVE_DIALOG_TITLE : '<c:out value="${SAVE_DIALOG_TITLE_VAR}" />',
+				SAVE_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${SAVE_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.open.dialog.title" var="OPEN_DIALOG_TITLE_VAR"/>
-				OPEN_DIALOG_TITLE : '<c:out value="${OPEN_DIALOG_TITLE_VAR}" />',
+				OPEN_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${OPEN_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.import.dialog.title" var="IMPORT_DIALOG_TITLE_VAR"/>
-				IMPORT_DIALOG_TITLE : '<c:out value="${IMPORT_DIALOG_TITLE_VAR}" />',
+				IMPORT_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${IMPORT_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.import.part.dialog.title" var="IMPORT_PART_DIALOG_TITLE_VAR"/>
-				IMPORT_PART_DIALOG_TITLE : '<c:out value="${IMPORT_PART_DIALOG_TITLE_VAR}" />',
+				IMPORT_PART_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${IMPORT_PART_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.tab.lesson.sequence.folder" var="RUN_SEQUENCES_FOLDER_VAR"/>
-				RUN_SEQUENCES_FOLDER : '<c:out value="${RUN_SEQUENCES_FOLDER_VAR}" />',
+				RUN_SEQUENCES_FOLDER : '<spring:escapeBody javaScriptEscape="true">${RUN_SEQUENCES_FOLDER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.arrange.confirm" var="ARRANGE_CONFIRM_VAR"/>
-				ARRANGE_CONFIRM : decoderDiv.html('<c:out value="${ARRANGE_CONFIRM_VAR}" />').text(),
+				ARRANGE_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${ARRANGE_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.clear.canvas.confirm" var="CLEAR_CANVAS_CONFIRM_VAR"/>
-				CLEAR_CANVAS_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_CANVAS_CONFIRM_VAR}" />').text(),
+				CLEAR_CANVAS_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${CLEAR_CANVAS_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.annotation.region.place.prompt" var="ANNOTATION_REGION_PLACE_PROMPT_VAR"/>
-				ANNOTATION_REGION_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_REGION_PLACE_PROMPT_VAR}" />').text(),
+				ANNOTATION_REGION_PLACE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${ANNOTATION_REGION_PLACE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.annotation.label.place.prompt" var="ANNOTATION_LABEL_PLACE_PROMPT_VAR"/>
-				ANNOTATION_LABEL_PLACE_PROMPT : decoderDiv.html('<c:out value="${ANNOTATION_LABEL_PLACE_PROMPT_VAR}" />').text(),
+				ANNOTATION_LABEL_PLACE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${ANNOTATION_LABEL_PLACE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.transition.place.prompt" var="TRANSITION_PLACE_PROMPT_VAR"/>
-				TRANSITION_PLACE_PROMPT : decoderDiv.html('<c:out value="${TRANSITION_PLACE_PROMPT_VAR}" />').text(),
+				TRANSITION_PLACE_PROMPT : '<spring:escapeBody javaScriptEscape="true">${TRANSITION_PLACE_PROMPT_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.paste.error" var="PASTE_ERROR_VAR"/>
-				PASTE_ERROR : decoderDiv.html('<c:out value="${PASTE_ERROR_VAR}" />').text(),
+				PASTE_ERROR : '<spring:escapeBody javaScriptEscape="true">${PASTE_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.preview.error" var="PREVIEW_ERROR_VAR"/>
-				PREVIEW_ERROR : decoderDiv.html('<c:out value="${PREVIEW_ERROR_VAR}" />').text(),
+				PREVIEW_ERROR : '<spring:escapeBody javaScriptEscape="true">${PREVIEW_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.cross.branching.error" var="CROSS_BRANCHING_ERROR_VAR"/>
-				CROSS_BRANCHING_ERROR : decoderDiv.html('<c:out value="${CROSS_BRANCHING_ERROR_VAR}" />').text(),
+				CROSS_BRANCHING_ERROR : '<spring:escapeBody javaScriptEscape="true">${CROSS_BRANCHING_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.support.transition.error" var="SUPPORT_TRANSITION_ERROR_VAR"/>
-				SUPPORT_TRANSITION_ERROR : decoderDiv.html('<c:out value="${SUPPORT_TRANSITION_ERROR_VAR}" />').text(),
+				SUPPORT_TRANSITION_ERROR : '<spring:escapeBody javaScriptEscape="true">${SUPPORT_TRANSITION_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.end.match.error" var="END_MATCH_ERROR_VAR"/>
-				END_MATCH_ERROR : decoderDiv.html('<c:out value="${END_MATCH_ERROR_VAR}" />').text(),
-				
-				
+				END_MATCH_ERROR : '<spring:escapeBody javaScriptEscape="true">${END_MATCH_ERROR_VAR}</spring:escapeBody>',
+
 				// PropertyLib
 				<fmt:message key="authoring.fla.properties.dialog.title" var="PROPERTIES_DIALOG_TITLE_VAR"/>
-				PROPERTIES_DIALOG_TITLE : '<c:out value="${PROPERTIES_DIALOG_TITLE_VAR}" />',
+				PROPERTIES_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${PROPERTIES_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.group.naming.dialog.title" var="GROUP_NAMING_DIALOG_TITLE_VAR"/>
-				GROUP_NAMING_DIALOG_TITLE : '<c:out value="${GROUP_NAMING_DIALOG_TITLE_VAR}" />',
+				GROUP_NAMING_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${GROUP_NAMING_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.groups.to.branches.match.dialog_title" var="GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR"/>
-				GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : '<c:out value="${GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR}" />',
+				GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${GROUPS_TO_BRANCHES_MATCH_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.groups.header" var="BRANCH_MAPPING_GROUPS_HEADER_VAR"/>
-				BRANCH_MAPPING_GROUPS_HEADER : '<c:out value="${BRANCH_MAPPING_GROUPS_HEADER_VAR}" />',
+				BRANCH_MAPPING_GROUPS_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_GROUPS_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.group.header" var="BRANCH_MAPPING_GROUP_HEADER_VAR"/>
-				BRANCH_MAPPING_GROUP_HEADER : '<c:out value="${BRANCH_MAPPING_GROUP_HEADER_VAR}" />',
+				BRANCH_MAPPING_GROUP_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_GROUP_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.conditions.dialog.title" var="CONDITIONS_DIALOG_TITLE_VAR"/>
-				CONDITIONS_DIALOG_TITLE : '<c:out value="${CONDITIONS_DIALOG_TITLE_VAR}" />',
+				CONDITIONS_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${CONDITIONS_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.conditions.header" var="BRANCH_MAPPING_CONDITIONS_HEADER_VAR"/>
-				BRANCH_MAPPING_CONDITIONS_HEADER : '<c:out value="${BRANCH_MAPPING_CONDITIONS_HEADER_VAR}" />',
+				BRANCH_MAPPING_CONDITIONS_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_CONDITIONS_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.condition.header" var="BRANCH_MAPPING_CONDITION_HEADER_VAR"/>
-				BRANCH_MAPPING_CONDITION_HEADER : '<c:out value="${BRANCH_MAPPING_CONDITION_HEADER_VAR}" />',
+				BRANCH_MAPPING_CONDITION_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_CONDITION_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.gate.header" var="BRANCH_MAPPING_GATE_HEADER_VAR"/>
-				BRANCH_MAPPING_GATE_HEADER : '<c:out value="${BRANCH_MAPPING_GATE_HEADER_VAR}" />',
+				BRANCH_MAPPING_GATE_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_GATE_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.branches.header" var="BRANCH_MAPPING_BRANCHES_HEADER_VAR"/>
-				BRANCH_MAPPING_BRANCHES_HEADER : '<c:out value="${BRANCH_MAPPING_BRANCHES_HEADER_VAR}" />',
+				BRANCH_MAPPING_BRANCHES_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_BRANCHES_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.branch.header" var="BRANCH_MAPPING_BRANCH_HEADER_VAR"/>
-				BRANCH_MAPPING_BRANCH_HEADER : '<c:out value="${BRANCH_MAPPING_BRANCH_HEADER_VAR}" />',
+				BRANCH_MAPPING_BRANCH_HEADER : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_BRANCH_HEADER_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.gate.state.mapping.dialog.title" var="GATE_STATE_MAPPING_DIALOG_TITLE_VAR"/>
-				GATE_STATE_MAPPING_DIALOG_TITLE : '<c:out value="${GATE_STATE_MAPPING_DIALOG_TITLE_VAR}" />',
+				GATE_STATE_MAPPING_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${GATE_STATE_MAPPING_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.dialog.title" var="BRANCH_MAPPING_DIALOG_TITLE_VAR"/>
-				BRANCH_MAPPING_DIALOG_TITLE : '<c:out value="${BRANCH_MAPPING_DIALOG_TITLE_VAR}" />',
+				BRANCH_MAPPING_DIALOG_TITLE : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_DIALOG_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.gate.state.open" var="GATE_STATE_OPEN_VAR"/>
-				GATE_STATE_OPEN : '<c:out value="${GATE_STATE_OPEN_VAR}" />',
+				GATE_STATE_OPEN : '<spring:escapeBody javaScriptEscape="true">${GATE_STATE_OPEN_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.gate.state.closed" var="GATE_STATE_CLOSED_VAR"/>
-				GATE_STATE_CLOSED : '<c:out value="${GATE_STATE_CLOSED_VAR}" />',
+				GATE_STATE_CLOSED : '<spring:escapeBody javaScriptEscape="true">${GATE_STATE_CLOSED_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.branch.mapping.default.branch.suffix" var="BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX_VAR"/>
-				BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : '<c:out value="${BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX_VAR}" />',
+				BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.complex.output.suffix" var="COMPLEX_OUTPUT_SUFFIX_VAR"/>
-				COMPLEX_OUTPUT_SUFFIX : '<c:out value="${COMPLEX_OUTPUT_SUFFIX_VAR}" />',
+				COMPLEX_OUTPUT_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${COMPLEX_OUTPUT_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.range.output.suffix" var="RANGE_OUTPUT_SUFFIX_VAR"/>
-				RANGE_OUTPUT_SUFFIX : '<c:out value="${RANGE_OUTPUT_SUFFIX_VAR}" />',
+				RANGE_OUTPUT_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${RANGE_OUTPUT_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.boolean.output.suffix" var="BOOLEAN_OUTPUT_SUFFIX_VAR"/>
-				BOOLEAN_OUTPUT_SUFFIX : '<c:out value="${BOOLEAN_OUTPUT_SUFFIX_VAR}" />',
+				BOOLEAN_OUTPUT_SUFFIX : '<spring:escapeBody javaScriptEscape="true">${BOOLEAN_OUTPUT_SUFFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.range.condition.description" var="RANGE_CONDITION_DESCRIPTION_VAR"/>
-				RANGE_CONDITION_DESCRIPTION : '<c:out value="${RANGE_CONDITION_DESCRIPTION_VAR}" />',
+				RANGE_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${RANGE_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.exact.condition.description" var="EXACT_CONDITION_DESCRIPTION_VAR"/>
-				EXACT_CONDITION_DESCRIPTION : '<c:out value="${EXACT_CONDITION_DESCRIPTION_VAR}" />',
-				<fmt:message key="authoring.fla.less.condition.description" var="LESS_CONDITION_DESCRIPTION_VAR"/>
-				LESS_CONDITION_DESCRIPTION : '<c:out value="${LESS_CONDITION_DESCRIPTION_VAR}" />',
+				EXACT_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${EXACT_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
+				<fmt:message key="authoring.fla.less.conditiondescription" var="LESS_CONDITION_DESCRIPTION_VAR"/>
+				LESS_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${LESS_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.greater.condition.description" var="GREATER_CONDITION_DESCRIPTION_VAR"/>
-				GREATER_CONDITION_DESCRIPTION : '<c:out value="${GREATER_CONDITION_DESCRIPTION_VAR}" />',
+				GREATER_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${GREATER_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.unnamed.description" var="ACTIVITY_UNNAMED_DESCRIPTION_VAR"/>
-				ACTIVITY_UNNAMED_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_UNNAMED_DESCRIPTION_VAR}" />').text(),
+				ACTIVITY_UNNAMED_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_UNNAMED_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.gate.description" var="ACTIVITY_GATE_DESCRIPTION_VAR"/>
-				ACTIVITY_GATE_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_GATE_DESCRIPTION_VAR}" />').text(),
+				ACTIVITY_GATE_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_GATE_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.activity.branching.description" var="ACTIVITY_BRANCHING_DESCRIPTION_VAR"/>
-				ACTIVITY_BRANCHING_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_BRANCHING_DESCRIPTION_VAR}" />').text(),
+				ACTIVITY_BRANCHING_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${ACTIVITY_BRANCHING_DESCRIPTION_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.default.range.condition.title.prefix" var="DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR"/>
-				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<c:out value="${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}" />',
+				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<spring:escapeBody javaScriptEscape="true">${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.page.prop.gradebook.none" var="GRADEBOOK_OUTPUT_NONE_VAR"/>
-				GRADEBOOK_OUTPUT_NONE : '<c:out value="${GRADEBOOK_OUTPUT_NONE_VAR}" />',
+				GRADEBOOK_OUTPUT_NONE : '<spring:escapeBody javaScriptEscape="true">${GRADEBOOK_OUTPUT_NONE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.clear.all.confirm" var="CLEAR_ALL_CONFIRM_VAR"/>
-				CLEAR_ALL_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />').text(),
+				CLEAR_ALL_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${CLEAR_ALL_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.remove.condition.confirm" var="REMOVE_CONDITION_CONFIRM_VAR"/>
-				REMOVE_CONDITION_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_CONDITION_CONFIRM_VAR}" />').text(),
+				REMOVE_CONDITION_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${REMOVE_CONDITION_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.conditions.to.default.gate.state.confirm" var="CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR"/>
-				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR}" />').text(),
+				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.conditions.to.default.branch.confirm" var="CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
-				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
+				CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.groups.to.default.branch.confirm" var="GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
-				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : decoderDiv.html('<c:out value="${GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR}" />').text(),
+				GROUPS_TO_DEFAULT_BRANCH_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${GROUPS_TO_DEFAULT_BRANCH_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.range.condition.add.start.greater.than.end.error" var="RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR_VAR"/>
-				RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR: decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR_VAR}" />').text(),
+				RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR : '<spring:escapeBody javaScriptEscape="true">${RANGE_CONDITION_ADD_START_GREATER_THAN_END_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.range.condition.add.start.error" var="RANGE_CONDITION_ADD_START_ERROR_VAR"/>
-				RANGE_CONDITION_ADD_START_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_START_ERROR_VAR}" />').text(),
+				RANGE_CONDITION_ADD_START_ERROR : '<spring:escapeBody javaScriptEscape="true">${RANGE_CONDITION_ADD_START_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.range.condition.add.end.error" var="RANGE_CONDITION_ADD_END_ERROR_VAR"/>
-				RANGE_CONDITION_ADD_END_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_END_ERROR_VAR}" />').text(),
+				RANGE_CONDITION_ADD_END_ERROR : '<spring:escapeBody javaScriptEscape="true">${RANGE_CONDITION_ADD_END_ERROR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.group.title.validation.erorr" var="GROUP_TITLE_VALIDATION_ERORR_VAR"/>
-				GROUP_TITLE_VALIDATION_ERORR : decoderDiv.html('<c:out value="${GROUP_TITLE_VALIDATION_ERORR_VAR}" />').text(),
+				GROUP_TITLE_VALIDATION_ERORR : '<spring:escapeBody javaScriptEscape="true">${GROUP_TITLE_VALIDATION_ERORR_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.conditions.mapping.broken" var="CONDITIONS_MAPPING_BROKEN_ERROR_VAR"/>
-				CONDITIONS_MAPPING_BROKEN_ERROR : decoderDiv.html('<c:out value="${CONDITIONS_MAPPING_BROKEN_ERROR_VAR}" />').text()
+				CONDITIONS_MAPPING_BROKEN_ERROR : '<spring:escapeBody javaScriptEscape="true">${CONDITIONS_MAPPING_BROKEN_ERROR_VAR}</spring:escapeBody>'
 			},
 
 			canSetReadOnly = ${canSetReadOnly},
@@ -313,6 +313,7 @@
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right desktopButton">
+				<li id="useAi" onClick="javascript:MenuLib.useAiToCreateLearningDesign()"><a href="#"><i class="fa fa-microchip text-primary"></i> <fmt:message key="authoring.fla.page.menu.new.ai" /></a></li>
 				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
 			</ul>
 		</div>

@@ -54,8 +54,8 @@ public final class ZoomConstants {
     public static final String TOOL_CONTRIBUTE_URL = "tool/" + TOOL_SIGNATURE
 	    + "/monitoring/startMeeting.do?toolContentID=";
 
-    public static final long JWT_EXPIRATION_MILISECONDS = 5000;
     public static final String ZOOM_API_URL = "https://api.zoom.us/v2/";
+    public static final String ZOOM_TOKEN_URL = "https://zoom.us/oauth/token";
 
     private ZoomConstants() {
 	// prevent construction

@@ -46,7 +46,7 @@
 	
 	function submitEntry(next) {
 		if (next && !rubricsRequireRatings && isRatingMissing() 
-				&& !confirm('<fmt:message key="message.rating.rubrics.selection.missing" />')){
+				&& !confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.rating.rubrics.selection.missing" /></spring:escapeBody>')){
 			return;
 		}
 		// answer saved when clicked so don't use next button to submit
@@ -65,7 +65,7 @@
     		},
     		success: function(data, textStatus) {
     			if (data.error) {
-        			alert('<fmt:message key="label.rating.rubrics.error.rate" />');
+        			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.error.rate" /></spring:escapeBody>');
     				return;
     			}
     			$(cell).addClass('bg-success').siblings('td').removeClass('bg-success');
@@ -75,7 +75,7 @@
             	}
     		},
 			onError : function(){
-    			alert('<fmt:message key="label.rating.rubrics.error.rate" />');
+    			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.error.rate" /></spring:escapeBody>');
  			}
     	});
 	}

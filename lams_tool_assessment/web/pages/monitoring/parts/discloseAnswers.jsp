@@ -24,15 +24,15 @@
 				
 				
 				button.click(function(event) {	
-					if (!confirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
-												: "<fmt:message key='message.disclose.groups.answers' />")) {
+					if (!confirm(isCorrectButton ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.answers' /></spring:escapeBody>"
+												: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.groups.answers' /></spring:escapeBody>")) {
 						return;
 					}
 		
 					// check if correct answers are disclosed before groups' answers
 					if (isCorrectButton &&
 						!button.closest('.disclose-button-group').find('.disclose-groups-button').is('[disabled]') &&
-						!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
+						!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.before.groups.answers' /></spring:escapeBody>")) {
 						return;
 					}
 					
@@ -47,13 +47,13 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allCorrectButton.click(function(){
-						if (!confirm("<fmt:message key='message.disclose.all.correct.answers' />")) {
+						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.all.correct.answers' /></spring:escapeBody>")) {
 							return;
 						}
 		
 						// check if correct answers are disclosed before groups' answers
 						if (!$('.disclose-all-groups-button', assessmentQuestionsPane).is('[disabled]') &&
-							!confirm("<fmt:message key='message.disclose.correct.before.groups.answers' />")) {
+							!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.before.groups.answers' /></spring:escapeBody>")) {
 							return;
 						}
 						
@@ -75,7 +75,7 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allGroupsButton.click(function(){
-						if (!confirm("<fmt:message key='message.disclose.all.groups.answers' />")) {
+						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.all.groups.answers' /></spring:escapeBody>")) {
 							return;
 						}
 		
