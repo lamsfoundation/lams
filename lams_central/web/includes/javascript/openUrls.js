@@ -207,5 +207,5 @@ function openCustom(url) {
 }
 
 function openTeamworkWindow (organisationId){
-	window.open('teamwork/organisation.do?organisationId=' + organisationId, '_blank');
+	location.href = '/lams/teamwork/organisation.do?organisationId=' + organisationId;
 }
