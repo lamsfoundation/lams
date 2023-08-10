@@ -1,7 +1,7 @@
 /* For Boostrap 3 & 5 compability */
 .img-responsive {
-    max-width: 100%;
-    height: auto;
+	max-width: 100%;
+	height: auto;
 }
 
 body.component {
@@ -11,7 +11,7 @@ body.component {
 
 body.component .btn-success,
 body.component .btn-success:hover {
-  color: #fff;
+	color: #fff;
 }
 
 body.component .form-select-sm,
@@ -54,27 +54,27 @@ body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
 }
 
 body.component .dialogContainer {
-  display: none;
-  -webkit-overflow-scrolling: touch !important;
-  overflow: auto;
+	display: none;
+	-webkit-overflow-scrolling: touch !important;
+	overflow: auto;
 }
 
 body.component .dialogContainer iframe {
-  width: 100%;
-  height: calc(100% - 10px);
-  border: none;
+	width: 100%;
+	height: calc(100% - 10px);
+	border: none;
 }
 
 body.component .dialogContainer .dialogTitle {
 	text-align: center;
-	font-weight: 500;	
+	font-weight: 500;
 }
 
 body.component .dialogContainer .modal-body {
-  height: 100%;
-  max-height: calc(100% - 56px);
-  padding: 10px;
-  overflow: auto;
+	height: 100%;
+	max-height: calc(100% - 56px);
+	padding: 10px;
+	overflow: auto;
 }
 
 body.component .dialogContainer .bottom-buttons {
@@ -222,47 +222,47 @@ body.component .portrait-generic-lg:before {
 }
 
 body.component .portrait-round {
-  border-radius: 50%;
+	border-radius: 50%;
 }
 
 body.component .cke_textarea_inline {
-  /* From bootstrap form-control */
-  display: block;
-  width: 100%;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #555;
-  background-color: var(--bs-white);
-  background-image: none;
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
-  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-  border: thin solid var(--bs-secondary);
-  overflow: hidden;
-  /* keeps floating objects within ckeditor area */
-  /* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields 
-   * are the right size and only the ones where the height is overridden does the size change.  */
-  min-height: 60px;
-  -webkit-appearance: textfield;
+	/* From bootstrap form-control */
+	display: block;
+	width: 100%;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: var(--bs-white);
+	background-image: none;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+	-o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+	border: thin solid var(--bs-secondary);
+	overflow: hidden;
+	/* keeps floating objects within ckeditor area */
+	/* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields
+     * are the right size and only the ones where the height is overridden does the size change.  */
+	min-height: 60px;
+	-webkit-appearance: textfield;
 }
 body.component .cke_textarea_inline:focus {
-  border-color: var(--bs-blue);
-  outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+	border-color: var(--bs-blue);
+	outline: 0;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 
 body.component .cke_float {
-  width: 70% !important;
+	width: 70% !important;
 }
 
 /** Overwrite CKEditor's default CSS, so that content in an editor is displayed the same way as in real life */
 body.component .cke_widget_inline {
-  display: block !important;
+	display: block !important;
 }
 
 body.component .btn {
@@ -273,13 +273,13 @@ body.component i.fa[role="button"] {
 	cursor: pointer;
 }
 
-body.component table.table thead th {
+body.component table.table:not(.table-bordered) thead th {
 	border: none;
 	border-bottom: 2px solid var(--bs-blue);
 }
 
-body.component table.table tbody td,
-body.component table.table tbody th,
+body.component table.table:not(.table-bordered) tbody td,
+body.component table.table:not(.table-bordered) tbody th,
 body.component .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
 	border: none;
 	border-bottom: 2px solid var(--bs-gray-200) !important;
@@ -443,7 +443,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	transition: all .3s ease;
 	transform: translateX(-7rem);
 	z-index: 1;
-	
+
 }
 
 .component-page-wrapper .component-sidebar.active {
@@ -451,7 +451,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 }
 
 .component-page-wrapper .component-sidebar .lams-logo {
-	width: 3.6rem;	
+	width: 3.6rem;
 	margin-bottom: 1.2rem;
 }
 
