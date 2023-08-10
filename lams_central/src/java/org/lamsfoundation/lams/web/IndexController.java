@@ -22,17 +22,9 @@
  */
 package org.lamsfoundation.lams.web;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.index.IndexLinkBean;
@@ -55,9 +47,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -82,6 +80,10 @@ public class IndexController {
 	setAdminLinks(request);
 	if (request.isUserInRole(Role.AUTHOR)) {
 	    request.setAttribute("showQbCollectionsLink", true);
+	}
+	boolean isSpTeamworkEnabled = Configuration.isLamsModuleAvailable(Configuration.TEAMWORK_MODULE_CLASS);
+	if (isSpTeamworkEnabled) {
+	    request.setAttribute("showTeamworkLink", true);
 	}
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be

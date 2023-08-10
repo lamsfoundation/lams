@@ -213,6 +213,14 @@
 						</a>
 					</li>
 					
+					<c:if test="${showTeamworkLink}">
+						<li>
+							<a href="#" id="showTeamworkButton" onclick="javascript:openTeamworkLearnerWindow(); return false;">
+								<i class="fa fa-handshake-o"></i> <fmt:message key="index.teamwork"/>
+							</a>
+						</li>
+					</c:if>
+
 					<c:if test="${showQbCollectionsLink}">
 						<li>
 							<a href="#" id="showQbCollectionsButton" onclick="javascript:openQbCollections(); return false;">
@@ -220,7 +228,7 @@
 							</a>
 						</li>
 					</c:if>
-					
+
 					<c:forEach var="adminlink" items="${adminLinks}">
 						
 						<c:choose>
