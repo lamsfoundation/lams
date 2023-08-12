@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <%@ attribute name="type" required="true" rtexprvalue="true"%>
 <%@ attribute name="formID" required="false" rtexprvalue="true"%>
