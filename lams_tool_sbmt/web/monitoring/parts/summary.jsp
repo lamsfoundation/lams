@@ -19,9 +19,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -40,7 +40,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});
@@ -71,11 +71,11 @@
 							
 							rows += '<td align="center">';
 							if ( userData["marked"] ) {
-								rows += '<fmt:message key="label.yes"/>';
+								rows += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.yes"/></spring:escapeBody>';
 							} else {
-								rows += '<fmt:message key="label.no"/>';
+								rows += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no"/></spring:escapeBody>';
 							}
-							rows += ' [<a href=\"javascript:viewMark('+userId+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.view.files" /></a>]';
+							rows += ' [<a href=\"javascript:viewMark('+userId+','+$(table).attr("data-session-id")+');\"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.view.files" /></spring:escapeBody></a>]';
 							rows += '</td>';
 
 							<c:if test="${reflectOn}">
@@ -152,7 +152,7 @@
 				reqID: (new Date()).getTime()
 			},
 			success: function(response) {
-				alert("<fmt:message key='label.monitoring.releaseMarks.notify.message'/>".replace('[0]', response));
+				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.releaseMarks.notify.message'/></spring:escapeBody>".replace('[0]', response));
 			}
 		});
 	}
@@ -176,15 +176,15 @@
     				'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
     			},
     			success : function(){
-    				alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>");
     			},
     			error : function(){
-    				alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+    				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
         		}
             });
         	
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>");
 		}
 	}
 </script>

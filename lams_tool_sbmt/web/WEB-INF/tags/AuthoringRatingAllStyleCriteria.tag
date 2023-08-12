@@ -148,8 +148,8 @@
 <script type="text/javascript">
 	var minimumWordsSpinnerArray  = new Array();
 	var maxOrderId;
-	var criteriaArrows = '<div class="arrow-up" title="<fmt:message key="${upLabel}"/>" />' + 
-	 					 '<div class="arrow-down" title="<fmt:message key="${downLabel}"/>" />';
+	var criteriaArrows = '<div class="arrow-up" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${upLabel}"/></spring:escapeBody>" />' + 
+	 					 '<div class="arrow-down" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${downLabel}"/></spring:escapeBody>" />';
 	  
 	var newGroupId = -1; // groups existing in DB have ID > 0; new, unsaved ones have ID < 0
 	const MAX_RUBRICS_COLUMNS = 5;
@@ -255,7 +255,7 @@
 		if ( validate ) {
 			str += ' onchange="validateRatingLimits('+validate+','+orderId+');" '
 		} 
-		str	+= '> <option value="-1" '+ ( -1 == currentValue ? ' selected="selected"' : '' ) + '><fmt:message key="${allLabel}"/></option>';
+		str	+= '> <option value="-1" '+ ( -1 == currentValue ? ' selected="selected"' : '' ) + '><spring:escapeBody javaScriptEscape="true"><fmt:message key="${allLabel}"/></spring:escapeBody></option>';
 		if ( zeroDescription ) {
 			str += '<option value="0" '+ ( 0 == currentValue ? ' selected="selected"' : '' ) + '>'+zeroDescription+'</option>';
 		}
@@ -320,16 +320,16 @@
 		if ( style == 0 ) {
 			var ratingLimitsStr = '';
 			if ( '${hasRatingLimits}' == 'true' ) {
-				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><fmt:message key="${minimumLabel}" /></label>&nbsp;'
-				+ generateSelect('minimumRates' + orderId, 'true', '<fmt:message key="${noMinimumLabel}"/>', orderId, minimumRates)
-	  			+ '<label for="maximumRates" class="loffset10"><fmt:message key="${maximumLabel}" /></label>&nbsp;'
-				+ generateSelect('maximumRates' + orderId, 'false', '<fmt:message key="${noMaximumLabel}"/>', orderId, maximumRates)
+				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${minimumLabel}" /></spring:escapeBody></label>&nbsp;'
+				+ generateSelect('minimumRates' + orderId, 'true', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${noMinimumLabel}"/></spring:escapeBody>', orderId, minimumRates)
+	  			+ '<label for="maximumRates" class="loffset10"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${maximumLabel}" /></spring:escapeBody></label>&nbsp;'
+				+ generateSelect('maximumRates' + orderId, 'false', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${noMaximumLabel}"/></spring:escapeBody>', orderId, maximumRates)
 				+ '<BR/>'
-			 	+ generateManadatorySpinner(orderId, '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit);
+			 	+ generateManadatorySpinner(orderId, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message></spring:escapeBody>', commentMinWordsLimit);
 			}
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleComment}" />:&nbsp;</div>'+ inputField + hiddenInputs + ratingLimitsStr
+			    html: '<div class="voffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${styleComment}" /></spring:escapeBody>:&nbsp;</div>'+ inputField + hiddenInputs + ratingLimitsStr
 			})).appendTo('#criterias-table-body');	
 			
 			activateSpinner(orderId, true);
@@ -337,35 +337,35 @@
 		} else if ( style == 1 ) {
 			var ratingLimitsStr = '';
 			if ( '${hasRatingLimits}' == 'true' ) {
-				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><fmt:message key="${minimumLabel}" /></label>&nbsp;'
-				+ generateSelect('minimumRates' + orderId, 'true', '<fmt:message key="${noMinimumLabel}"/>', orderId, minimumRates)
-	  			+ '<label for="maximumRates" class="loffset10"><fmt:message key="${maximumLabel}" /></label>&nbsp;'
-				+ generateSelect('maximumRates' + orderId, 'false', '<fmt:message key="${noMaximumLabel}"/>', orderId, maximumRates)
+				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${minimumLabel}" /></spring:escapeBody></label>&nbsp;'
+				+ generateSelect('minimumRates' + orderId, 'true', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${noMinimumLabel}"/></spring:escapeBody>', orderId, minimumRates)
+	  			+ '<label for="maximumRates" class="loffset10"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${maximumLabel}" /></spring:escapeBody></label>&nbsp;'
+				+ generateSelect('maximumRates' + orderId, 'false', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${noMaximumLabel}"/></spring:escapeBody>', orderId, maximumRates)
 				+ '<BR/>'
-			 	+ generateSpinner(orderId, justifyOrComment, '<fmt:message key="${allowCommentsLabel}" />', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit);
+			 	+ generateSpinner(orderId, justifyOrComment, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${allowCommentsLabel}" /></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message></spring:escapeBody>', commentMinWordsLimit);
 			}
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleStar}" />:&nbsp;</div>'+inputField + hiddenInputs + ratingLimitsStr
+			    html: '<div class="voffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${styleStar}" /></spring:escapeBody>:&nbsp;</div>'+inputField + hiddenInputs + ratingLimitsStr
 			})).appendTo('#criterias-table-body');
 				
 			activateSpinner(orderId, justifyOrComment);
 			
 		} else if ( style == 2 ) { 
-			var rankingStr = '<div class="voffset5"><label for="maxRating' + orderId + '"><fmt:message key="${rankLabel}"/></label>&nbsp;'
+			var rankingStr = '<div class="voffset5"><label for="maxRating' + orderId + '"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${rankLabel}"/></spring:escapeBody></label>&nbsp;'
 			  + generateSelect('maxRating' + orderId, null, null, orderId, maxRating);
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleRanking}" />:&nbsp;</div>'+ inputField + hiddenInputs + rankingStr 
+			    html: '<div class="voffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${styleRanking}" /></spring:escapeBody>:&nbsp;</div>'+ inputField + hiddenInputs + rankingStr 
 			})).appendTo('#criterias-table-body');
 	
 		} else if ( style == 3) {
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
-			    html: '<div class="voffset5"><fmt:message key="${styleHedging}" />:&nbsp;</div>' + inputField + hiddenInputs
-				 + '<div class="voffset5"><label for="maxRating'+ orderId + '"><fmt:message key="${hedgeRankLabel}"/>&nbsp;</label>'
+			    html: '<div class="voffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${styleHedging}" /></spring:escapeBody>:&nbsp;</div>' + inputField + hiddenInputs
+				 + '<div class="voffset5"><label for="maxRating'+ orderId + '"><spring:escapeBody javaScriptEscape="true"><fmt:message key="${hedgeRankLabel}"/></spring:escapeBody>&nbsp;</label>'
 			     + '<input type="text" name="maxRating' + orderId + '" id="maxRating' + orderId + '" value="'+maxRating+'" size="4">&nbsp;'
-				 + generateSpinner(orderId, justifyOrComment, '<fmt:message key="${justifyLabel}"/>', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit)
+				 + generateSpinner(orderId, justifyOrComment, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${justifyLabel}"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message></spring:escapeBody>', commentMinWordsLimit)
 			})).appendTo('#criterias-table-body');	
 			
 			activateSpinner(orderId, justifyOrComment);
@@ -417,7 +417,7 @@
 		// it deletes either whole criterion or a rubrics row (which is also a criterion)
 		row.append($('<td/>', {
 			width: '20px',
-			html: '<i class="fa fa-times delete-criteria" title="<fmt:message key="${deleteLabel}"/>"></i>'
+			html: '<i class="fa fa-times delete-criteria" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${deleteLabel}"/></spring:escapeBody>"></i>'
 		}));
 	}
 
@@ -433,7 +433,7 @@
 		var cell = $('<td />', {
 			'class': 'criteria-info',
 			// arrows to move whole rubrics table
-		    html: '<div class="voffset5"><fmt:message key="label.rating.style.rubrics" />:<div class="pull-right">' + criteriaArrows + '</div></div>'
+		    html: '<div class="voffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.style.rubrics" /></spring:escapeBody>:<div class="pull-right">' + criteriaArrows + '</div></div>'
 		}).attr('colspan', '3').appendTo(row);
 
 		var rubricsTable = $("<table />").addClass('table-striped table-condensed rubrics-table').attr('groupId', groupId).appendTo(cell)
@@ -443,7 +443,7 @@
 				$(this).closest('tr').find('textarea').height(height);
 			}),
 			addColumnButton = $('<button />').attr('type', 'button').addClass('btn btn-default pull-right voffset20 rubrics-add-column-button')
-										   	 .text('<fmt:message key="label.rating.rubrics.column.add" />').click(function(){
+										   	 .text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.column.add" /></spring:escapeBody>').click(function(){
 						var columns = $('.rubrics-columns-part .rubrics-column', rubricsTable);
 						// no more than X columns allowed
 						if (columns.length >= MAX_RUBRICS_COLUMNS) {
@@ -457,7 +457,7 @@
 
 						// add delete button
 						$('<i />').addClass('fa fa-times rubrics-delete-column-button')
-								  .attr('title', '<fmt:message key="${deleteLabel}"/>').appendTo(cell).click(function(){
+								  .attr('title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${deleteLabel}"/></spring:escapeBody>').appendTo(cell).click(function(){
 							deleteRubricsColumn($(this));
 						});
 
@@ -489,7 +489,7 @@
 		}
 		
 		$('<button />').attr('type', 'button').addClass('btn btn-default pull-right voffset20 roffset10')
-					   .text('<fmt:message key="label.rating.rubrics.row.add" />').click(function(){
+					   .text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.row.add" /></spring:escapeBody>').click(function(){
 			// this will add a row to the existing rubrics table with the given group ID
 			maxOrderId++;
 			$("#criteria-max-order-id").val(maxOrderId);
@@ -503,7 +503,7 @@
 		row.append('<th />');
 
 		$('<th />').attr('colspan', rubricsColumnsLength)
-				   .text('<fmt:message key="label.rating.rubrics.column.headers" />')
+				   .text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.column.headers" /></spring:escapeBody>')
 				   .appendTo(row);
 		// empty cell for action buttons
 		$('<th />').attr('colspan', 2).appendTo(row);
@@ -516,7 +516,7 @@
 		for (var i = 0; i < rubricsColumnsLength; i++) {
 			cell = $('<td />').appendTo(row);
 			$('<i />').addClass('fa fa-times rubrics-delete-column-button')
-					  .attr('title', '<fmt:message key="${deleteLabel}"/>').appendTo(cell).click(function(){
+					  .attr('title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="${deleteLabel}"/></spring:escapeBody>').appendTo(cell).click(function(){
 				deleteRubricsColumn($(this));
 			});
 			
@@ -528,9 +528,9 @@
 
 		// description of the rows part
 		row = $('<tr />').addClass('rubrics-rows-part').appendTo(rubricsTable);
-		$('<th />').addClass('rubrics-row-title').text('<fmt:message key="label.rating.rubrics.row.headers" />').appendTo(row);
+		$('<th />').addClass('rubrics-row-title').text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.row.headers" /></spring:escapeBody>').appendTo(row);
 		$('<th />').attr('colspan', rubricsColumnsLength)
-				   .text('<fmt:message key="label.rating.rubrics.column.content" />')
+				   .text('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.column.content" /></spring:escapeBody>')
 				   .appendTo(row);
 		$('<td />').attr('colspan', 2).appendTo(row);
 
@@ -624,7 +624,7 @@
 				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
 			}
 
-			alert('<fmt:message key="js.warning.max.min.limit"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.warning.max.min.limit"/></spring:escapeBody>');
 		}
 	}
 </script>

@@ -90,7 +90,7 @@
     	}
     }
     function doCancel() {
-    	if(confirm("<fmt:message key='${cancelConfirmMsgKey}'/>")){
+    	if(confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='${cancelConfirmMsgKey}'/></spring:escapeBody>")){
     		closeWindow("cancel");
     	}
     }
