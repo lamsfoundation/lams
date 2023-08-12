@@ -37,8 +37,8 @@
 
 			<textarea cols="60" id="notebookEntry" name="entryText" class="form-control" rows="5"></textarea>
 
-			<div class="voffset10">
-				<button type="button" class="btn btn-primary pull-right na" id="finishButton">
+			<div class="activity-bottom-buttons">
+				<button type="button" class="btn btn-primary na" id="finishButton">
 					<span class="nextActivity"> <c:choose>
 							<c:when test="${sessionMap.isLastActivity}">
 								<fmt:message key="label.submit" />

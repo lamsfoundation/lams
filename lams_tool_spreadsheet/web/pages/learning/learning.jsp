@@ -117,8 +117,8 @@
 						</iframe>
 				
 					<c:if test="${!userIsMarked && (mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
-						<div class="space-bottom-top align-right">
-							<button name="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" class="btn btn-primary voffset10 pull-right">
+						<div class="activity-bottom-buttons">
+							<button name="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" class="btn btn-primary">
 								<fmt:message key="label.save" />
 							</button>
 						</div>
@@ -145,7 +145,7 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<button name="forwardtoReflection" class="btn btn-default pull-left"
+								<button name="forwardtoReflection" class="btn btn-default float-start"
 									onclick="submitMethod('forwardtoReflection');">
 									<fmt:message key="label.edit" />
 								</button>
@@ -161,7 +161,7 @@
 							</c:choose>
 
 							<c:if test="${mode != 'teacher'}">
-								<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default voffset10 pull-left">
+								<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default voffset10 float-start">
 								<fmt:message key="label.edit" />
 								</button>
 							</c:if>
@@ -173,15 +173,15 @@
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
+			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">				
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary pull-right">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
+						<a href="#nogo" class="btn btn-primary na" id="finishButton">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">
 			 						<fmt:message key="label.submit" />

@@ -39,8 +39,8 @@
 			
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
-			<div class="space-bottom-top align-right">
-				<a href="#nogo" class="btn btn-primary voffset10 pull-right na" id="finishButton">
+			<div class="activity-bottom-buttons">
+				<a href="#nogo" class="btn btn-primary na" id="finishButton">
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">
 							<fmt:message key="label.finish" />

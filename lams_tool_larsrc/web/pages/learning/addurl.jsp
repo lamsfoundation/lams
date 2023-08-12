@@ -43,7 +43,7 @@
 				<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
 			</div>
 
-			<div id="buttons" class="pull-right" >
+			<div id="buttons" class="float-end" >
 				<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 					<fmt:message key="button.cancel" />
 				</button>&nbsp;

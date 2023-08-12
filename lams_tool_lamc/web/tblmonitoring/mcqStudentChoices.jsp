@@ -26,7 +26,7 @@
 	<div class="col-md-6 col-lg-4 ">
 	</div>
 	
-	<div class="col-xs-12 col-md-6 col-lg-4 col-lg-offset-2">
+	<div class="col-xs-12 col-md-6 col-lg-4 offset-lg-2">
 		<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 				onclick="javascript:loadTab('iraMcq'); return false;">
 			<i class="fa fa-undo"></i>

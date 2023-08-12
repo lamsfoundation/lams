@@ -36,9 +36,10 @@
 				<c:out value="${msg}"/>
 			</p>
 		
-		
-				<a href="javascript:location.reload(true);" class="btn btn-primary voffset10 pull-right"><fmt:message
-			key="button.try.again" /> </a>
+			<div class="activity-bottom-buttons">
+				<a href="javascript:location.reload(true);" class="btn btn-primary"><fmt:message
+					key="button.try.again" /> </a>
+			</div>
 		</lams:Page>
 	</body>
 </lams:html>

@@ -34,7 +34,7 @@
 		<div id="image-upload-area" class="voffset20"></div>
 		
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
-		<div id="buttons" class="pull-right voffset10">
+		<div id="buttons" class="float-end voffset10">
 	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
 				<fmt:message key="button.cancel" />
 			</button>&nbsp;

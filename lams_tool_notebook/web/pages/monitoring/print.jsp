@@ -33,7 +33,7 @@
 
 	<body>
 		<button class="btn btn-primary pull-right" onClick="javascript:window.print()">
-			<i class="fa fa-print"></i> <span class="hidden-xs"><fmt:message key="monitor.summary.print"/></span>
+			<i class="fa fa-print"></i> <span class="d-none d-sm-block"><fmt:message key="monitor.summary.print"/></span>
 		</button>
 		
 		<div id="section-to-print">

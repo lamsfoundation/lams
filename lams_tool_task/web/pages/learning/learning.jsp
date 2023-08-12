@@ -357,7 +357,7 @@
 
 									<c:if test="${mode != 'teacher'}">
 										<button type="submit" id="finishButton" onclick="return continueReflect()"
-											class="btn btn-sm btn-default pull-left voffset10 btn-disable-on-submit">
+											class="btn btn-sm btn-default float-start voffset10 btn-disable-on-submit">
 											<fmt:message key="label.edit" />
 										</button>
 									</c:if>
@@ -379,7 +379,7 @@
 		</c:forEach>
 
 		<c:if test="${(mode != 'teacher') && isRequiredTasksCompleted}">
-			<div class="space-bottom-top align-right">
+			<div class="activity-bottom-buttons">
 
 				<c:choose>
 					<c:when test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor && (mode != 'author')}">
@@ -388,14 +388,14 @@
 
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button type="submit" id="finishButton" onclick="return continueReflect()"
-							class="btn btn-primary btn-disable-on-submit voffset10 pull-right">
+							class="btn btn-primary btn-disable-on-submit">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 
 					<c:otherwise>
 						<button type="submit" id="finishButton"
-							class="btn btn-primary btn-disable-on-submit voffset10 pull-right na">
+							class="btn btn-primary btn-disable-on-submit na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="label.submit" />

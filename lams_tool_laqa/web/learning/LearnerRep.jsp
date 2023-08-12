@@ -139,7 +139,7 @@
 							<div class="${splitRow}">
 								<div class="sbox">
 									<div class="sbox-heading bg-warning">
-										<div class="pull-left roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
+										<div class="float-start roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
 										<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
 										<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
 									</div>
@@ -229,7 +229,7 @@
 					</div>
 
 					<c:if test="${hasEditRight && mode != 'teacher'}">
-						<button name="forwardtoReflection" type="button" class="btn btn-default pull-left"
+						<button name="forwardtoReflection" type="button" class="btn btn-default float-start"
 								onclick="submitMethod('forwardtoReflection');">
 							<fmt:message key="label.edit" />
 						</button>
@@ -241,16 +241,16 @@
 
 		<!-- buttons -->
 		<c:if test="${mode != 'teacher'}">
-			<div class="right-buttons voffset5" align="right" id="learner-submit">
+			<div class="activity-bottom-buttons" id="learner-submit">
 				<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">
-					<button type="button" class="btn btn-default voffset5 roffset5 pull-left"
+					<button type="button" class="btn btn-secondary roffset5 float-start"
 							onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
 						<fmt:message key="label.refresh" />
 					</button>
 				</c:if>
 
 				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
-					<button name="redoQuestions" type="button" class="btn btn-default voffset5  pull-left"
+					<button name="redoQuestions" type="button" class="btn btn-secondary float-start"
 							onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
 					</button>
@@ -259,13 +259,13 @@
 				<c:choose>
 					<c:when test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight && !generalLearnerFlowDTO.isLearnerFinished}">
 						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								class="btn btn-default">
+								class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 
 					<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
-						<button type="button" id="finishButton" class="btn btn-primary float-end na">
+						<button type="button" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="button.submit" />

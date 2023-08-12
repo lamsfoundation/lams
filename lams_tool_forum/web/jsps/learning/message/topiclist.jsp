@@ -10,7 +10,7 @@
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.topics" />
 
-		<div class="btn-group pull-right">
+		<div class="btn-group float-end">
 			<a href="javascript:location.href='${refresh}';" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-refresh"></i>
 				<fmt:message key="label.refresh" /></a>
 
@@ -29,8 +29,8 @@
 					<tr>
 						<th class="col-xs-6"><fmt:message key="lable.topic.title.subject" /></th>
 						<th class="col-xs-2"><fmt:message key="lable.topic.title.startedby" /></th>
-						<th class="col-xs-1 hidden-xs" class="hidden-xs"><fmt:message key="lable.topic.title.replies" /></th>
-						<th class="col-xs-1 hidden-xs"><fmt:message key="lable.topic.title.repliesnew" /></th>
+						<th class="col-xs-1 d-none d-sm-block"><fmt:message key="lable.topic.title.replies" /></th>
+						<th class="col-xs-1 d-none d-sm-block"><fmt:message key="lable.topic.title.repliesnew" /></th>
 						<th class="col-xs-2"><fmt:message key="lable.topic.title.update" /></th>
 						<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 							<th class="col-xs-2">&nbsp;</th>
@@ -89,9 +89,9 @@
 							<c:out value="${author}" escapeXml="true" />
 							</td>
 
-							<td class="text-center hidden-xs"><c:out value="${topic.message.replyNumber}" /></td>
+							<td class="text-center d-none d-sm-block"><c:out value="${topic.message.replyNumber}" /></td>
 
-							<td class="text-center hidden-xs"><c:out value="${topic.newPostingsNum}" /></td>
+							<td class="text-center d-none d-sm-block"><c:out value="${topic.newPostingsNum}" /></td>
 							
 							<c:set var="displayDate" value="${topic.message.updated > topic.message.lastReplyDate ? topic.message.updated : topic.message.lastReplyDate}"/>
 							<td><lams:Date value="${displayDate}" timeago="true"/></td>

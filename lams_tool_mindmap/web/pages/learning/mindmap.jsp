@@ -100,7 +100,7 @@
 				<%@ include file="/common/mapjs.jsp"%>
 		 		<%-- End MindMup -----------------------------------%>
 		 		
-				<div class="voffset10 pull-right">
+				<div class="activity-bottom-buttons">
 					<c:choose>
 						<c:when test="${isMonitor}">
 							<button class="btn btn-primary" name="backButton" onclick="history.go(-1)">
@@ -112,7 +112,7 @@
 							<c:choose>
 								<c:when test="${mindmapDTO.galleryWalkEnabled}">
 									<button data-toggle="tooltip" 
-											class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+											class="btn btn-default ${mode == 'author' ? '' : 'disabled'}"
 											<c:choose>
 												<c:when test="${mode == 'author'}">
 													title="<fmt:message key='label.gallery.walk.wait.start.preview' />"

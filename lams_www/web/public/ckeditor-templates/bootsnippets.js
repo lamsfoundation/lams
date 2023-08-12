@@ -145,7 +145,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
         '       <h3 class="card-title text-white">Card title</h3>' +
 		'    </div>' +
 		'    <div class="card-body">' +
-		'       <span class="pull-right" style="display:none;"><i class="fa fa-minus"></i></span>' +
+		'       <span class="float-end" style="display:none;"><i class="fa fa-minus"></i></span>' +
 		'       <div class="card-text">' +
 		'		  Card content' +
 		'       </div>' +
@@ -161,7 +161,7 @@ CKEDITOR.addSnippets( 'bootsnippets-text', {
 			'       <h3 class="card-title text-white">' +
 			'         Card title' +
 			'		</h3>' +
-			'       <span class="pull-right" style="display:none;"><i class="fa fa-minus"></i></span>' +
+			'       <span class="float-end" style="display:none;"><i class="fa fa-minus"></i></span>' +
 			'    </div>' +
 			'    <div class="card-body">' +
 			'		<div class="card-text">' +
@@ -253,7 +253,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="container">' +
-		'	<div class="col-xs-12 col-sm-9 col-sm-offset-1">' +
+		'	<div class="col-xs-12 col-sm-9 offset-sm-1">' +
 		'		<img class="img-fluid" style="margin: auto" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +

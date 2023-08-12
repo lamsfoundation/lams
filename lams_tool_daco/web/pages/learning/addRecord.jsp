@@ -250,7 +250,7 @@
 			<tr>
 				<td>
 					<c:if test="${mode != 'teacher'}">
-						<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
+						<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-secondary btn-disable-on-submit voffset5 float-start"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
 					</c:if>
 					<c:if test="${horizontal}">
 					</td><td style="vertical-align: middle;">
@@ -287,7 +287,7 @@
 			</div>
 
 			<c:if test="${mode != 'teacher'}">
-				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default pull-left">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default float-start">
 					<fmt:message key="label.common.edit" />
 				</button>
 			</c:if>

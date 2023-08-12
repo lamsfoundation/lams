@@ -160,7 +160,7 @@
 			
 						<c:if test="${(mode != 'teacher') && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-sm btn-default pull-left voffset10">
+									class="btn btn-sm btn-secondary float-start voffset10">
 								<fmt:message key="label.edit" />
 							</button>
 						</c:if>
@@ -171,7 +171,7 @@
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
+			<div class="activity-bottom-buttons">
 				<c:if test="${isResubmitAllowed && hasEditRight}">
 					<button type="submit" onclick="resubmit()" class="btn btn-default">
 						<fmt:message key="label.learning.resubmit" />
@@ -182,7 +182,7 @@
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-primary voffset10 pull-right na">
+									class="btn btn-primary na">
 								<fmt:message key="label.continue" />
 							</button>
 						</c:when>
@@ -190,7 +190,7 @@
 						<c:otherwise>
 							<button id="finishButton"
 							        name="FinishButton"
-									class="btn btn-primary voffset10 pull-right na">
+									class="btn btn-primary na">
 								<span class="nextActivity">
 									<c:choose>
 										<c:when test="${sessionMap.isLastActivity}">

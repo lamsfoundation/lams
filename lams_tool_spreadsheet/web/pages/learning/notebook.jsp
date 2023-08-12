@@ -39,16 +39,18 @@
 
 			<textarea id="focused" rows="5" name="entryText" class="form-control">${reflectionForm.entryText}</textarea>
 
-			<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
-				<c:choose>
-					<c:when test="${sessionMap.isLastActivity}">
-						<fmt:message key="label.submit" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.finished" />
-					</c:otherwise>
-				</c:choose>
-			</a>
+			<div class="activity-bottom-buttons">
+				<a href="#nogo" class="btn btn-primary na" id="finishButton">
+					<c:choose>
+						<c:when test="${sessionMap.isLastActivity}">
+							<fmt:message key="label.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="label.finished" />
+						</c:otherwise>
+					</c:choose>
+				</a>
+			</div>
 
 	</form:form>
 	

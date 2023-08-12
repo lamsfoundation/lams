@@ -44,16 +44,19 @@
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
 	
 			<form:hidden path="toolSessionID" />
-			<button type="button" class="btn btn-primary pull-right voffset10 na" id="finishButton">
-				<c:choose>
-					<c:when test="${isLastActivity}">
-						<fmt:message key="button.submit" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="button.finish" />
-					</c:otherwise>
-				</c:choose>
-			</button>
+			
+			<div class="activity-bottom-buttons">
+				<button type="button" class="btn btn-primary na" id="finishButton">
+					<c:choose>
+						<c:when test="${isLastActivity}">
+							<fmt:message key="button.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="button.finish" />
+						</c:otherwise>
+					</c:choose>
+				</button>
+			</div>
 		</form:form>
 		
 		<script type="text/javascript">

@@ -63,7 +63,7 @@
 </table>
 
 
-<div class="pull-right">
+<div class="float-end">
 	<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${VoteLearningForm.toolSessionID}" />
 	<a title="<fmt:message key='label.tip.displayPieChart'/>" class="fa fa-pie-chart text-primary btn btn-md btn-primary"
 		onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')"></a> <a

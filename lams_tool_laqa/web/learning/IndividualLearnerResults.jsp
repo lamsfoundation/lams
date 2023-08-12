@@ -100,32 +100,28 @@
 
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-						<div class="space-bottom-top align-right">
-							<button type="button" id="finishButton" class="btn btn-primary pull-right na">
-								<c:choose>
-									<c:when test="${sessionMap.isLastActivity}">
-										<fmt:message key="button.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="button.endLearning" />
-									</c:otherwise>
-								</c:choose>
-
+						<button type="button" id="finishButton" class="btn btn-primary na">
+							<c:choose>
+								<c:when test="${sessionMap.isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.endLearning" />
+								</c:otherwise>
+							</c:choose>
 							</button>
-						</div>
 					</c:if>
-
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
 						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
-								class="btn btn-primary pull-right">
+								class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:if>
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<button type="button" name="redoQuestions" class="btn btn-primary mx-2 float-start"
+					<button type="button" name="redoQuestions" class="btn btn-primary mx-2"
 							onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
 					</button>

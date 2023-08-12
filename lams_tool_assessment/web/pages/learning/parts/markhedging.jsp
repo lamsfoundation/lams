@@ -35,7 +35,7 @@
 <c:if test="${isLeadershipEnabled && isUserLeader}">
 	<div class="float-right">
 		<button type="button" name="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
-				class="btn pull-right">
+				class="btn float-end">
 			<fmt:message key="label.learning.submit" />
 		</button>
 	</div>

@@ -27,9 +27,9 @@
 <c:set var="backToForum">
 	<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
 </c:set>
-<input type="submit" value="<fmt:message key="button.submit" />" class="btn btn-primary voffset5 pull-right" id="submitButton"/>
+<input type="submit" value="<fmt:message key="button.submit" />" class="btn btn-primary voffset5 float-end" id="submitButton"/>
 
-<button name="goback" onclick="javascript:location.href='${backToForum}';" class="btn btn-default voffset5 pull-right" id="cancelButton">
+<button name="goback" onclick="javascript:location.href='${backToForum}';" class="btn btn-default voffset5 float-end" id="cancelButton">
 	<fmt:message key="button.cancel" />
 </button>&nbsp;
 

@@ -73,8 +73,8 @@
 		
 				<textarea id="focused" rows="5" name="entryText" class="form-control">${reflectionForm.entryText}</textarea>
 		
-				<div class="space-bottom-top align-right">
-					<a  href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
+				<div class="activity-bottom-buttons">
+					<a  href="#nogo" class="btn btn-primary na" id="finishButton">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">

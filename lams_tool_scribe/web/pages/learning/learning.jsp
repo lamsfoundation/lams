@@ -134,7 +134,7 @@
 			<%@include file="/pages/parts/voteDisplay.jsp"%>
 		
 			<h4>
-				<abbr class="pull-right hidden-xs"
+				<abbr class="float-end d-none d-sm-block"
 					title="<fmt:message key="message.learnerInstructions2" ><fmt:param value="${appointedScribe}"/></fmt:message>&nbsp;<fmt:message key="message.learnerInstructions3" />"><i
 					class="fa fa-question-circle text-info"></i></abbr>
 				<fmt:message key="heading.report" />
@@ -150,7 +150,7 @@
 									<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
 								</div>
 								<div class="panel-body">
-									<abbr class="pull-right hidden-xs" title="<fmt:message key="label.scribe.posted" />"><i
+									<abbr class="float-end d-none d-sm-block" title="<fmt:message key="label.scribe.posted" />"><i
 										class="fa fa-xs fa-question-circle text-info"></i></abbr>
 		
 									<c:set var="entry">
@@ -166,7 +166,7 @@
 		
 				<div class="row">
 					<div class="col-xs-12" id="agreeButton">
-						<button class="btn btn-success pull-left" onClick="javascript:submitApproval()">
+						<button class="btn btn-success float-start" onClick="javascript:submitApproval()">
 							<fmt:message key="button.agree" />
 						</button>
 					</div>

@@ -24,14 +24,18 @@
 		});
 	</script>
 
-	<lams:out value="${reflectInstructions}" escapeHtml="true" />
+	<div id="instructions" class="instructions">
+		<lams:out value="${reflectInstructions}" escapeHtml="true" />
+	</div>
+	<hr class="mx-5">
 
 	<form:form method="post" onsubmit="disableFinishButton();" modelAttribute="nbLearnerForm" id="nbLearnerForm">
-		<textarea rows="4" name="reflectionText" value="${reflectEntry}" class="form-control mt-2"
-				  id="focusedInput"></textarea>
-
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="mode" />
+		<lams:errors5/>
+		
+		<textarea rows="4" name="reflectionText" value="${reflectEntry}" class="form-control mt-2"
+				  id="focusedInput"></textarea>
 
 		<div class="activity-bottom-buttons">
 			<button type="button" class="btn btn-primary" id="finishButton">

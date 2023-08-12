@@ -43,7 +43,7 @@
 
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control" />
 
-			<div class="voffset10 pull-right">
+			<div class="voffset10 float-end">
 				<a href="#nogo" class="btn btn-primary " id="finishButton">
 					<span class="na">
 						<c:choose>

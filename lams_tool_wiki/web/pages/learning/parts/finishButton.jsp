@@ -52,16 +52,16 @@
   <form:form action="openNotebook.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
     <form:hidden path="toolSessionID" id="toolSessionID"/>
     <form:hidden path="mode" value="${mode}" />	
-    <div class="pull-right voffset5" id="finishButtonDiv">
+    
+    <div class="activity-bottom-buttons5" id="finishButtonDiv">
       <c:choose>
         <c:when test="${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-
-          <a href="javascript:continueOrFinish('openNotebook');" class="btn btn-primary"><fmt:message key="button.continue" /></a>
-
+          <a href="javascript:continueOrFinish('openNotebook');" class="btn btn-primary">
+          	<fmt:message key="button.continue" />
+          </a>
         </c:when>
+        
         <c:otherwise>
-
-          <div class="pull-right voffset5">
             <a href="#nogo" class="btn btn-primary na" id="finishButton">
               <c:choose>
                 <c:when test="${isLastActivity}">
@@ -72,7 +72,6 @@
                 </c:otherwise>
               </c:choose>
             </a>
-          </div>
         </c:otherwise>
       </c:choose>
     </div>

@@ -316,7 +316,7 @@
 				<form:hidden path="passMarkApplicable" />
 
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
-					<input type="submit" name="redoQuestions" class="btn btn-primary pull-left" value="<fmt:message key="label.redo.questions" />"/>
+					<input type="submit" name="redoQuestions" class="btn btn-primary float-start" value="<fmt:message key="label.redo.questions" />"/>
 				</c:if>
 				
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
@@ -325,7 +325,7 @@
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<form:hidden path="learnerFinished" value="Finished" />
 
-							<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
+							<a href="#nogo" class="btn btn-primary float-end na" id="finishButton">
 								<c:choose>
 									<c:when test="${isLastActivity}">
 										<fmt:message key="label.submit" />
@@ -338,7 +338,7 @@
 						</c:if>
 
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<input type="submit" name="forwardtoReflection" class="btn btn-primary pull-right" value="<fmt:message key="label.continue" />"/>
+							<input type="submit" name="forwardtoReflection" class="btn btn-primary float-end" value="<fmt:message key="label.continue" />"/>
 						</c:if>
 					</div>
 				</c:if>

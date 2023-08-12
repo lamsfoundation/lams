@@ -148,7 +148,7 @@
 
 				<button type="button" onclick="location.reload();" class="btn btn-secondary me-2">
 					<i class="fa fa-refresh"></i> 
-					<span class="hidden-xs">
+					<span class="d-none d-sm-block">
 						<fmt:message key="label.refresh" />
 					</span>
 				</button>

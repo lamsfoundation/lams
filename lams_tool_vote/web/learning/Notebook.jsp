@@ -48,10 +48,13 @@
 			</div>
 
 			<form:textarea rows="5" path="entryText" cssClass="form-control" styleId="focused" />
-			<button type="button"
-				class="btn btn-primary voffset10 pull-right na" id="finishButton">
-				<fmt:message key="button.endLearning" />
-			</button>
+			
+			<div class="activity-bottom-buttons">
+				<button type="button"
+					class="btn btn-primary na" id="finishButton">
+					<fmt:message key="button.endLearning" />
+				</button>
+			</div>
 
 		</lams:Page>
 

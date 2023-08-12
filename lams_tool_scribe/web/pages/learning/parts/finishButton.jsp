@@ -18,25 +18,24 @@
     }
 </script>
 
-<div class="voffset10">
+<div class="activity-bottom-buttons">
 	<form:form action="${(scribeUserDTO.finishedActivity == 'false' and scribeDTO.reflectOnActivity == 'true') ? '/lams/tool/lascrb11/learning/openNotebook.do' : '/lams/tool/lascrb11/learning/finishActivity.do'}" modelAttribute="learningForm" method="post" onsubmit="disableFinishButton()" id="learningForm">
 		<form:hidden path="scribeUserUID" value="${scribeUserDTO.uid}" />
 		<c:choose>
-			<c:when
-				test="${!scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
-
-				<button class="btn btn-primary pull-right">
+			<c:when test="${!scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
+				<button class="btn btn-primary">
 					<fmt:message key="button.continue" />
 				</button>
-
 			</c:when>
+			
 			<c:otherwise>
-				<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
+				<a href="#nogo" class="btn btn-primary na" id="finishButton">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${isLastActivity}">
 		 						<fmt:message key="button.submitActivity" />
 		 					</c:when>
+		 					
 		 					<c:otherwise>
 		 		 				<fmt:message key="button.finish" />
 		 					</c:otherwise>

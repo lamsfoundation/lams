@@ -279,7 +279,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-default voffset5">
+						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-secondary voffset5">
 						<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -289,11 +289,11 @@
 		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher'}">
-			<div>
+			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkEnabled}">
 						<button data-toggle="tooltip" id="continue-button"
-								class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+								class="btn btn-primary ${mode == 'author' ? '' : 'disabled'}"
 								<c:choose>
 									<c:when test="${mode == 'author'}">
 										title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
@@ -309,7 +309,7 @@
 					</c:when>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" id="continue-button"
-								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+								onclick="return continueReflect()" class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
@@ -318,7 +318,7 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finish-button"
-								class="btn btn-primary voffset5 pull-right na">
+								class="btn btn-primary na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

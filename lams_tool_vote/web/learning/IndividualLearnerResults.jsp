@@ -96,7 +96,7 @@
 							</c:if>
 
 							<c:if test="${hasEditRight}">
-								<input type="submit" name="redoQuestions" class="btn btn-sm btn-default pull-left voffset10"
+								<input type="submit" name="redoQuestions" class="btn btn-sm btn-default float-start voffset10"
 									onclick="submitMethod('redoQuestions');"
 									value='<fmt:message key="label.retake" />?' />
 							</c:if>
@@ -108,33 +108,35 @@
 			</div>
 
 
-			<c:choose>
-				<c:when test="${voteLearningForm.showResults=='true'}">
-					<input type="submit" name="viewAllResults" class="btn btn-primary pull-right"
-						onclick="submitMethod('viewAllResults');"
-						value='<fmt:message key="label.overAllResults" />' />
-				</c:when>
-
-				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<button type="button" name="learnerFinished" id="finishButton"
-						class="btn btn-primary voffset10 pull-right">
-							<c:choose>
-								<c:when test="${isLastActivity}">
-									<fmt:message key="button.submitActivity" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.endLearning" />
-								</c:otherwise>
-							</c:choose>
-					</button>
-				</c:when>
-
-				<c:otherwise>
-					<input type="submit" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-						class="btn btn-primary pull-right"
-						value='<fmt:message key="label.continue" />' />
-				</c:otherwise>
-			</c:choose>
+			<div class="activity-bottom-buttons">
+				<c:choose>
+					<c:when test="${voteLearningForm.showResults=='true'}">
+						<input type="submit" name="viewAllResults" class="btn btn-primary"
+							onclick="submitMethod('viewAllResults');"
+							value='<fmt:message key="label.overAllResults" />' />
+					</c:when>
+	
+					<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
+						<button type="button" name="learnerFinished" id="finishButton"
+							class="btn btn-primary">
+								<c:choose>
+									<c:when test="${isLastActivity}">
+										<fmt:message key="button.submitActivity" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.endLearning" />
+									</c:otherwise>
+								</c:choose>
+						</button>
+					</c:when>
+	
+					<c:otherwise>
+						<input type="submit" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
+							class="btn btn-primary"
+							value='<fmt:message key="label.continue" />' />
+					</c:otherwise>
+				</c:choose>
+			</div>
 
 		</lams:Page>
 	</form:form>

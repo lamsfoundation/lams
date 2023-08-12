@@ -23,19 +23,19 @@
 	
 	<lams:errors/>
 	
-	<div class="align-right space-bottom-top">
+	<div class="activity-bottom-buttons">
 		<form:form modelAttribute="messageForm" action="/learner.do" target="_self" onsubmit="disableFinishButton();" id="messageForm">
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mode" />
 			<form:hidden path="method" value="finish"/>
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
-					<button type="submit" name="method" class="btn">
+					<button type="submit" name="method" class="btn btn-primary">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" class="button" id="finishButton" onclick="submitForm('finish')">
+					<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finish')">
 						<span class="nextActivity">
 							<c:choose>
 								<c:when test="${isLastActivity}">

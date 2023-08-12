@@ -43,7 +43,7 @@
 					</c:otherwise>
 				</c:choose>
 				</p>
-				<button type="submit" class="btn btn-sm btn-default">
+				<button type="submit" class="btn btn-sm btn-secondary">
 					<fmt:message key="button.edit" />
 				</button>
 			</div>
@@ -54,7 +54,7 @@
 <form:form action="${!userDTO.finishedActivity and contentDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}"
 		   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="finishForm">
 	<form:hidden path="toolSessionID" />
-	<div class="pull-right voffset10">
+	<div class="activity-bottom-buttons">
 		<c:choose>
 			<c:when test="${!userDTO.finishedActivity and contentDTO.reflectOnActivity}">
 				<button type="submit" class="btn btn-primary"><fmt:message key="button.continue" /></button>

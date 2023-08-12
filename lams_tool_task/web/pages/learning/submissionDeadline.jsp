@@ -66,17 +66,17 @@
 
 		</c:if>
 
-		<div class="voffset10">
+		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 					<a href="#nogo" id="finishButton" onclick="return continueReflect()"
-						class="btn btn-primary pull-right ">
+						class="btn btn-primary ">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:otherwise>
 					<a href="#nogo" id="finishButton" onclick="return finishSession()"
-						class="btn btn-primary pull-right na">
+						class="btn btn-primary na">
 						<span class="nextActivity"> <c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />

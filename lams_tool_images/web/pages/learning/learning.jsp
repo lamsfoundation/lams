@@ -258,7 +258,7 @@
 					</div>
 
 					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default pull-left">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default float-start">
 							<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -274,12 +274,12 @@
 			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary pull-right" >
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary float-end" >
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary pull-right" >
+						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary float-end" >
 							<span class="na">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

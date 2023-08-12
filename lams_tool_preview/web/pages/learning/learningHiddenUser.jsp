@@ -24,27 +24,16 @@
 	</c:set>
 	<lams:Page type="learner" title="${title}">
 	
-		<div class="row no-gutter">
-			<div
-				class="col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
-				<div class="alert alert-info">
-					<fmt:message key="label.removed.user.warning" />
-				</div>
-			</div>
-		</div>
+		<lams:Alert5 type="info" id="removed-user-info" close="false">
+			<fmt:message key="label.removed.user.warning" />
+		</lams:Alert5>
 		
-		<div class="row no-gutter">
-			<div class="col-xs-12">
-				
-			</div>
-		</div>
+		<div class="activity-bottom-buttons">
+			<a href="javascript:location.reload(true);"	class="btn btn-default">
+				<fmt:message key="button.try.again" />
+			</a>
 		
-		<div>
-		<a href="javascript:location.reload(true);"	class="btn btn-default voffset5">
-					<fmt:message key="button.try.again" />
-				</a>
-		
-			<a href="#nogo" path="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+			<a href="#nogo" path="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary na">
 				<fmt:message key="label.finished" />
 			</a>
 		</div>

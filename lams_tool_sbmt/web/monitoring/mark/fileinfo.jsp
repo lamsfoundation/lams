@@ -28,7 +28,7 @@
 		<c:choose>
 		<c:when test="${fileInfo.removed and empty updateMode}">
 			<a href="javascript:restoreLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" class="btn btn-xs btn-default loffset10">
-				<i class="fa fa-life-saver" title="<fmt:message key="label.monitoring.original.learner.file.restore" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.original.learner.file.restore" /></span>
+				<i class="fa fa-life-saver" title="<fmt:message key="label.monitoring.original.learner.file.restore" />"></i> <span class="d-none d-sm-block"><fmt:message key="label.monitoring.original.learner.file.restore" /></span>
 			</a>
 		</c:when>
 	
@@ -37,17 +37,17 @@
 				<lams:WebAppURL/>download/?uuid=${fileInfo.displayUuid}&versionID=${fileInfo.versionID}&preferDownload=false
 			</c:set>
 			<a href="javascript:launchInstructionsPopup('${viewURL}')" class="btn btn-xs btn-default">
-				<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i> <span class="hidden-xs"><fmt:message key="label.view" /></span>
+				<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i> <span class="d-none d-sm-block"><fmt:message key="label.view" /></span>
 			</a>
 			<c:set var="downloadURL">
 				<lams:WebAppURL/>download/?uuid=${fileInfo.displayUuid}&versionID=${fileInfo.versionID}&preferDownload=true
 			</c:set>
 			<a href="${downloadURL}" class="btn btn-xs btn-default loffset10">
-				<i class="fa fa-download" title="<fmt:message key="label.download" />"></i> <span class="hidden-xs"><fmt:message key="label.download" /></span>
+				<i class="fa fa-download" title="<fmt:message key="label.download" />"></i> <span class="d-none d-sm-block"><fmt:message key="label.download" /></span>
 			</a>
 			<c:if test="${empty updateMode}">
 				<a href="javascript:removeLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" class="btn btn-xs btn-danger loffset10">
-					<i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.original.learner.file.delete" /></span>
+					<i class="fa fa-trash" title="<fmt:message key="label.monitoring.original.learner.file.delete" />"></i> <span class="d-none d-sm-block"><fmt:message key="label.monitoring.original.learner.file.delete" /></span>
 				</a>
 			</c:if>
 		</c:otherwise>

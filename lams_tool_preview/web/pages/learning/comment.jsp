@@ -103,7 +103,7 @@
 							
 							rows += '<tr>';
 
-							rows += '<td class="username" width="20%"><div class="pull-left roffset5">';
+							rows += '<td class="username" width="20%"><div class="float-start roffset5">';
 							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
 							rows += '</div><span class="portrait-sm-lineheight">';
 							rows += userData["itemDescription"];

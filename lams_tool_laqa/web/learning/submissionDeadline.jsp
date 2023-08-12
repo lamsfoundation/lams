@@ -39,7 +39,7 @@
 			<form:hidden path="totalQuestionCount" />
 
 
-			<lams:Alert type="danger" id="submission-deadline" close="false">
+			<lams:Alert5 type="danger" id="submission-deadline" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
 						<lams:Date value="${sessionMap.submissionDeadline}" />
@@ -47,11 +47,11 @@
 				</fmt:message>
 			</lams:Alert>
 
-			<div class="right-buttons">
+			<div class="activity-bottom-buttons">
 
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 					<a href="#nogo" name="endLearning" id="finishButton"
-						onclick="javascript:submitMethod('endLearning');return false" class="btn btn-primary pull-right">
+						onclick="javascript:submitMethod('endLearning');return false" class="btn btn-primary">
 						<span class="na"> <c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="button.submit" />
@@ -66,15 +66,13 @@
 
 				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
 					<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('forwardtoReflection');"
-						class="btn btn-primary pull-right">
+						class="btn btn-primary">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:if>
 
 			</div>
 		</form:form>
-
-		<div id="footer"></div>
 	</lams:Page>
 </body>
 </lams:html>

@@ -36,7 +36,7 @@
 				</textarea>
 
 
-				<a href="#" name="submitReflection" id="finishButton" class="btn btn-primary pull-right voffset10 na">
+				<a href="#" name="submitReflection" id="finishButton" class="btn btn-primary float-end voffset10 na">
 					<fmt:message key="button.endLearning" />
 				</a>
 

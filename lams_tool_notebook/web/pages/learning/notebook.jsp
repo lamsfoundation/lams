@@ -156,8 +156,8 @@
 			</c:if>
 
 			<c:if test="${mode != 'teacher'}">
-				<div class="right-buttons voffset5">
-					<button href="#nogo" class="btn btn-primary pull-right na" id="finishButton" type="button">
+				<div class="activity-bottom-buttons">
+					<button href="#nogo" class="btn btn-primary na" id="finishButton" type="button">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />

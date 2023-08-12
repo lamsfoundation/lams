@@ -56,7 +56,7 @@
 						${recordStatus.index+1}
 					</span>
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
-						<span class="pull-right roffset10">
+						<span class="float-end roffset10">
 						<%-- If the record can be edited, display these links. --%>
 						<i class="fa fa-pencil" title="<fmt:message key="label.common.edit" />"
 									onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>

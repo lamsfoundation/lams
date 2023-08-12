@@ -102,12 +102,12 @@
 <c:if test="${mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default btn-disable-on-submit voffset5 pull-right">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default btn-disable-on-submit voffset5 float-end">
 					<fmt:message key="label.learning.continue" />
 				</button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 float-end na">
 					<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />

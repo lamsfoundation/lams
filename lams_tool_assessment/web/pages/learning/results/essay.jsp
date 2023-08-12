@@ -29,7 +29,7 @@
 			<td colspan="2" class="text-center">
 				<b><fmt:message key="label.learning.summary.other.team.answers"/></b>
 				<c:if test="${question.groupsAnswersDisclosed and not empty toolSessionID}">
-					<button type="button" class="btn btn-xs btn-default pull-right" onClick="javascript:refreshToRating(${question.uid})">
+					<button type="button" class="btn btn-xs btn-default float-end" onClick="javascript:refreshToRating(${question.uid})">
 						<fmt:message key="label.refresh"/>
 					</button>
 				</c:if>

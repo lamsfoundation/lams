@@ -40,7 +40,7 @@
 
 			<form:textarea rows="5" path="entryText" cssClass="form-control" id="focused" />
 
-			<button type="submit" class="btn btn-primary voffset10 pull-right na" id="finishButton">
+			<button type="submit" class="btn btn-primary voffset10 float-end na" id="finishButton">
 				<c:choose>
 					<c:when test="${sessionMap.isLastActivity}">
 						<fmt:message key="label.submit" />

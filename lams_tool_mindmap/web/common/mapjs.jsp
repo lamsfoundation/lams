@@ -462,11 +462,11 @@
 			</div>
 			
 			<div style="display:inline-block" role="group">
-		 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
+		 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
 		<c:if test="${contentEditable}">
-			<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.add.idea'/></span></a>
-			<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
-			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
+			<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.add.idea'/></span></a>
+			<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
+			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
 	<%-- Not yet implemented in back end  --%> 
 	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
 	<%--  		<input type="button" class="insertRoot" value="add root node">  --%> 

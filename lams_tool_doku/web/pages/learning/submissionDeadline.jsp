@@ -55,7 +55,7 @@
 			</div>
 		</c:if>
 
-		<div class="voffset10 pull-right">
+		<div class="voffset10 float-end">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished) && empty sessionMap.submissionDeadline}">
 					<button name="FinishButton" onclick="return continueReflect()" class="button">

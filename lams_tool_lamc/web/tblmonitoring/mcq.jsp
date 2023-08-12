@@ -30,7 +30,7 @@
 	</div>
 	
 	<c:if test="${attemptedLearnersNumber != 0}">
-		<div class="col-xs-6 col-md-4 col-md-offset-4 col-lg-4 col-lg-offset-2">
+		<div class="col-xs-6 col-md-4 offset-md-4 col-lg-4 offset-lg-2">
 			<a href="#nogo" type="button" class="btn btn-sm btn-default buttons_column"
 					onclick="javascript:loadTab('mcqStudentChoices'); return false;">
 				<i class="fa fa-file"></i>

@@ -114,7 +114,7 @@
 									</c:otherwise>
 								</c:choose>
 											
-								<button	type="button" class="btn btn-default pull-left" >
+								<button	type="button" class="btn btn-default float-start" >
 									<fmt:message key="button.edit" />
 								</button>
 							</div>
@@ -129,7 +129,7 @@
 				<form:form action="learning/finishActivity.do" method="post" onsubmit="disableFinishButton();" id="learningForm" modelAttribute="learningForm">
 					<form:hidden path="toolSessionID" id="toolSessionID"/>
 					<form:hidden path="mode" value="${mode}" />	
-					<div class="voffset10 pull-right">
+					<div class="activity-bottom-buttons">
 						
 						<c:choose>
 							<c:when test="${pixlrDTO.allowViewOthersImages}">

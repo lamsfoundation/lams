@@ -89,7 +89,7 @@
 
 						<c:if
 							test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'false' && hasEditRight && voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
-							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-default voffset10 pull-left"
+							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-default voffset10 float-start"
 								onclick="submitMethod('forwardtoReflection');">
 								<fmt:message key="label.edit" />
 							</form:button>
@@ -100,20 +100,20 @@
 			</c:if>
 
 			<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
-				<button type="submit" class="btn btn-primary voffset10 pull-right na"
-					id="finishButton" onclick="submitMethod('learnerFinished')">
-					<c:choose>
-						<c:when test="${isLastActivity}">
-							<fmt:message key="button.submitActivity" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.endLearning" />
-						</c:otherwise>
-					</c:choose>
-
-				</button>
+				<div class="activity-bottom-buttons">
+					<button type="submit" class="btn btn-primary na"
+						id="finishButton" onclick="submitMethod('learnerFinished')">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submitActivity" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</button>
+				</div>
 			</c:if>
-			<div id="footer"></div>
 
 		</lams:Page>
 	</form:form>

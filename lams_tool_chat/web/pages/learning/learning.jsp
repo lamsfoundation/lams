@@ -67,7 +67,7 @@
 					<div id="messages"></div>
 				</div>
 				<div class="col-xs-12 col-sm-3 col-md-3 col-lg-4">
-					<div id="roster" class="hidden-xs"></div>
+					<div id="roster" class="d-none d-sm-block"></div>
 				</div>
 			</div>
 			<c:if test="${MODE == 'teacher'}">

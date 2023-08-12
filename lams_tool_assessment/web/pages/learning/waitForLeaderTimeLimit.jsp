@@ -25,9 +25,11 @@
 			<fmt:message key="${waitingMessageKey}" />
 		</h4>
 		
-		<button type="button" name="refreshButton" onclick="refresh();" class="btn btn-sm btn-primary pull-right">
-			<fmt:message key="label.refresh" />
-		</button>
+		<div class="activity-bottom-buttons">
+			<button type="button" name="refreshButton" onclick="refresh();" class="btn btn-primary">
+				<fmt:message key="label.refresh" />
+			</button>
+		</div>
 
 	</lams:Page>
 

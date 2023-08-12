@@ -139,13 +139,9 @@
 	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
 	
 	<c:if test="${mode == 'author'}">
-		<div class="row no-gutter" id="gallery-walk-preview-info">
-			<div class="col-xs-12 col-sm-offset-2 col-sm-8">
-				<div class="alert alert-info leader-display">
-					<fmt:message key="label.gallery.walk.preview" />
-				</div>
-			</div>
-		</div>
+		<lams:Alert5 type="info" id="gallery-walk-preview-info" close="false">
+			<fmt:message key="label.gallery.walk.preview" />
+		</lams:Alert5>
 	</c:if>
 	
 
@@ -185,11 +181,11 @@
 	</c:forEach>
 	
 	<c:if test="${mode != 'teacher'}">
-		<div>
+		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${not mindmapDTO.galleryWalkFinished}">
 					<button data-toggle="tooltip" 
-							class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+							class="btn btn-default ${mode == 'author' ? '' : 'disabled'}"
 							<c:choose>
 								<c:when test="${mode == 'author'}">
 									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
@@ -205,12 +201,12 @@
 				</c:when>
 				<c:when test="${reflectOnActivity and not finishedActivity}">
 					<button name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+							onclick="return continueReflect()" class="btn btn-default">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary voffset5 pull-right na">
+					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary na">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">

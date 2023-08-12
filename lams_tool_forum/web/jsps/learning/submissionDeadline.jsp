@@ -57,7 +57,7 @@
 				</fmt:message>
 			</lams:Alert>
 		
-			<div class="space-bottom-top align-right">
+			<div class="activity-bottom-buttons">
 				<c:set var="continue">
 					<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}
 				</c:set>
@@ -77,13 +77,13 @@
 						test="${sessionMap.reflectOn && (not sessionMap.finishedLock)}">
 						<button name="continue"
 							onclick="javascript:location.href='${continue}';"
-							class="btn btn-primary voffset5 pull-right">
+							class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
 						<a href="#nogo"  name="finish" id="finish"
-							onclick="submitFinish();" class="btn btn-primary voffset5 pull-right na">
+							onclick="submitFinish();" class="btn btn-primary na">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">
 				 						<fmt:message key="label.submit" />

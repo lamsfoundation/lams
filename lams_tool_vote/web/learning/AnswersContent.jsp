@@ -206,12 +206,11 @@
 				<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
 			</c:if>
 
-			<form:hidden path="donePreview" />
-
-			<input type="submit" name="continueOptionsCombined" class="btn btn-primary pull-right voffset10"
-				   value='<fmt:message key="label.submit.vote" />' />
-
-			<div id="footer"></div>
+			<div class="activity-bottom-buttons">
+				<form:hidden path="donePreview" />
+				<input type="submit" name="continueOptionsCombined" class="btn btn-primary"
+					   value='<fmt:message key="label.submit.vote" />' />
+			</div>
 
 		</lams:Page>
 

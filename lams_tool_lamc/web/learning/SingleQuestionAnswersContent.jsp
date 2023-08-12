@@ -91,24 +91,26 @@
 	</c:if>
 </c:forEach>
 
-<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
-	<button name="continueOptionsCombined" type="button" onclick="submitNextQuestionSelected();"
-			class="btn btn-sm btn-primary pull-right">
-		<fmt:message key="button.continue" />
-	</button>
-</c:if>
-
-<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
-	<button name="continueOptionsCombined" type="button" onclick="doSubmit();" class="btn btn-sm btn-primary pull-right">
-		<fmt:message key="button.continue" />
-	</button>
-</c:if>
-
-<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
-	<button name="continueOptionsCombined" type="button" onclick="submitAllAnswers();"
-			class="btn btn-sm btn-primary pull-right">
-		<fmt:message key="button.submit" />
-	</button>
-</c:if>
+<div class="activity-bottom-buttons">
+	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
+		<button name="continueOptionsCombined" type="button" onclick="submitNextQuestionSelected();"
+				class="btn btn-primary">
+			<fmt:message key="button.continue" />
+		</button>
+	</c:if>
+	
+	<c:if test="${mcGeneralLearnerFlowDTO.totalQuestionCount == '1'}">
+		<button name="continueOptionsCombined" type="button" onclick="doSubmit();" class="btn btn-primary">
+			<fmt:message key="button.continue" />
+		</button>
+	</c:if>
+	
+	<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
+		<button name="continueOptionsCombined" type="button" onclick="submitAllAnswers();"
+				class="btn btn-primary">
+			<fmt:message key="button.submit" />
+		</button>
+	</c:if>
+</div>
 
 <!--options content ends here-->

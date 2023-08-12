@@ -74,13 +74,15 @@
 		
 			</c:if>
 		
-			<form:form action="learning/startActivity.do" modelAttribute="learningForm">
-				<form:hidden path="toolSessionID" />
-				<form:hidden path="mode" value="${MODE}" />
-				<button class="btn btn-primary voffset10 pull-right">
-					<fmt:message key="button.continue" />
-				</button>
-			</form:form>
+			<div class="activity-bottom-buttons">
+				<form:form action="learning/startActivity.do" modelAttribute="learningForm">
+					<form:hidden path="toolSessionID" />
+					<form:hidden path="mode" value="${MODE}" />
+					<button class="btn btn-primary">
+						<fmt:message key="button.continue" />
+					</button>
+				</form:form>
+			</div>
 		
 		</lams:Page>
 	</body>

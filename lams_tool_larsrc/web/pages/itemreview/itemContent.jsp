@@ -55,7 +55,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    jsonpCallback: 'iframelyCallback${itemUid}',
 		    contentType: "application/json; charset=utf-8",
 		    error: function (xhr, status, error) {
-			    $('.embedded-open-button', panel).removeClass('btn-default hidden btn-sm pull-right').addClass('btn-primary');
+			    $('.embedded-open-button', panel).removeClass('btn-default hidden btn-sm float-end').addClass('btn-primary');
 		        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
 		    }
 		});
@@ -79,11 +79,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<a href="<c:url value='${resourceItemReviewUrl}' />&preferDownload=true" class="download-button hidden btn btn-primary">
 				<fmt:message key="label.download" />
 			</a>
-			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm pull-right">
+			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-default btn-sm float-end">
 				<i class="fa fa-external-link" aria-hidden="true"></i>
 				<fmt:message key="open.in.new.window" />
 			</a>
-			<a href="<c:url value='${resourceItemReviewUrl}'/>" target="_blank" class="iframe-open-button hidden btn btn-default btn-sm pull-right">
+			<a href="<c:url value='${resourceItemReviewUrl}'/>" target="_blank" class="iframe-open-button hidden btn btn-default btn-sm float-end">
 				<i class="fa fa-external-link" aria-hidden="true"></i>
 				<fmt:message key="open.in.new.window" />
 			</a>

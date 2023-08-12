@@ -26,11 +26,11 @@
 	
 		<lams:Page type="learner" title="${title}" hideProgressBar="true">
 			
-			<button type="button" class="btn btn-primary pull-right" onclick="javascript:window.close();">
-				<fmt:message key="button.close" />
-			</button>
-			
-			<div class="footer"></div>
+			<div class="activity-bottom-buttons">
+				<button type="button" class="btn btn-primary" onclick="javascript:window.close();">
+					<fmt:message key="button.close" />
+				</button>
+			</div> 
 			
 		</lams:Page>
 	</body>

@@ -72,47 +72,45 @@
 
 			<%-- Display button according to different situation --%>
 			<%--POSITION: 0=middle of survey, 1=first question, 2=last question, 3=Only one question available--%>
-			<c:choose>
-				<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
-					<div class="right-buttons voffset10">
+			<div class="activity-bottom-buttons">
+				<c:choose>
+					<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
 						<form:button onclick="submit" path="doSurvey" value="Done" disabled="${sessionMap.finishedLock}"
-							class="btn btn-sm btn-primary pull-right">
+							class="btn btn-primary">
 							<fmt:message key="label.submit.survey" />
 						</form:button>
-						
-					</div>
-				</c:when>
-				<c:otherwise>
-					<c:set var="preChecked" value="true" />
-					<c:if test="${position == 2 || position == 0}">
-						<c:set var="preChecked" value="false" />
-					</c:if>
-					<c:set var="nextChecked" value="true" />
-					<c:if test="${position == 1 || position == 0}">
-						<c:set var="nextChecked" value="false" />
-					</c:if>
-					<div class="pull-left voffset10"> 
-						<form:button path="PreviousButton" onclick="previousQuestion()"
-							class="btn btn-sm btn-default" disabled="${preChecked}">
-							<fmt:message key="label.previous" />
-						</form:button>
-					</div>
-					<div class="pull-right voffset10"> 
-					<c:if test="${position != 2}">
-						<form:button path="NextButton" onclick="nextQuestion()" class="btn btn-sm btn-default" disabled="${nextChecked}">
-							<fmt:message key="label.next" />
-						</form:button>
-					</c:if>
-					 <c:if test="${position == 2}">
-						<form:button onclick="submit" path="doSurvey" disabled="${sessionMap.finishedLock}" class="btn btn-sm btn-primary">
-							<fmt:message key="label.submit.survey" />
-						</form:button>
-					</c:if>
-					</div>
-				</c:otherwise>
-			</c:choose>
-			<div id="footer"></div>
-			<!--closes footer-->
+					</c:when>
+				
+					<c:otherwise>
+						<c:set var="preChecked" value="true" />
+						<c:if test="${position == 2 || position == 0}">
+							<c:set var="preChecked" value="false" />
+						</c:if>
+						<c:set var="nextChecked" value="true" />
+						<c:if test="${position == 1 || position == 0}">
+							<c:set var="nextChecked" value="false" />
+						</c:if>
+						<div class="float-start"> 
+							<form:button path="PreviousButton" onclick="previousQuestion()"
+								class="btn btn-secondary" disabled="${preChecked}">
+								<fmt:message key="label.previous" />
+							</form:button>
+						</div>
+
+						<c:if test="${position != 2}">
+							<form:button path="NextButton" onclick="nextQuestion()" class="btn btn-secondary" disabled="${nextChecked}">
+								<fmt:message key="label.next" />
+							</form:button>
+						</c:if>
+						 <c:if test="${position == 2}">
+							<form:button onclick="submit" path="doSurvey" disabled="${sessionMap.finishedLock}" class="btn btn-primary">
+								<fmt:message key="label.submit.survey" />
+							</form:button>
+						</c:if>
+					</c:otherwise>
+				</c:choose>
+			</div>
+
 		</lams:Page>
 	</form:form>
 </body>

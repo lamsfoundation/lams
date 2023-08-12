@@ -56,18 +56,20 @@
 				</c:otherwise>
 			</c:choose>
 			
-			<button type="button" class="btn btn-primary voffset5 pull-right" id="finishButton">
-				<span class="na">
-					<c:choose>
-						<c:when test="${isLastActivity}">
-							<fmt:message key="button.submit" />
-						</c:when>
-						<c:otherwise>
-							<fmt:message key="button.finish" />
-						</c:otherwise>
-					</c:choose>
-				</span>
-			</button>
+			<div class="activity-bottom-buttons">
+				<button type="button" class="btn btn-primary" id="finishButton">
+					<span class="na">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</span>
+				</button>
+			</div>
 	
 		</form:form>
 	</lams:Page>

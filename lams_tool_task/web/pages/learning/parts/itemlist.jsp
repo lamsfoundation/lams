@@ -12,7 +12,7 @@
 
 			<div class="panel panel-default">
 				<div class="panel-heading clearfix">
-					<div class="panel-title pull-left" data-toggle="collapse" data-target="#collapse${item.uid}">
+					<div class="panel-title float-start" data-toggle="collapse" data-target="#collapse${item.uid}">
 						<c:out value="${item.title}" escapeXml="true" /> 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
 							[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
@@ -22,7 +22,7 @@
 						</c:if>
 						</a>
 					</div>
-					<div class="pull-right">
+					<div class="float-end">
 						<c:choose>
 							<c:when test="${item.complete}">
 								<i title="<fmt:message key='label.completed' />" class="fa fa-lg fa-check text-success"></i>

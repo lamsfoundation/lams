@@ -123,8 +123,8 @@ table.alternative-color td:first-child {
 			<div class="sbox voffset10">
 				<div class="sbox-heading clearfix">
 					<c:if test="${not question.optional}">
-						<abbr class="pull-right" title="<fmt:message key='label.answer.required'/>"><i
-							class="fa fa-xs fa-asterisk text-danger pull-right"></i></abbr>
+						<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i
+							class="fa fa-xs fa-asterisk text-danger float-end"></i></abbr>
 					</c:if>
 
 					<c:set var="question" value="${element.value}" />
@@ -200,7 +200,7 @@ table.alternative-color td:first-child {
 						</c:otherwise>
 					</c:choose>
 
-					<button property="ContinueButton" onclick="return continueReflect()" class="btn btn-default btn-primary pull-right">
+					<button property="ContinueButton" onclick="return continueReflect()" class="btn btn-secondary float-end">
 						<fmt:message key="label.edit" />
 					</button>
 				</div>
@@ -227,7 +227,7 @@ table.alternative-color td:first-child {
 						<tr>
 							<th class="first" colspan="2"><c:out value="${question.shortTitle}" /> <%-- Only show pie/bar chart when question is single/multiple choics type --%>
 								<c:if test="${question.type != 3}">
-									<div class="pull-right">
+									<div class="float-end">
 										<c:set var="chartURL"
 											value="${tool}showChart.do?toolSessionID=${sessionMap.toolSessionID}&questionUid=${question.uid}" />
 										<a class="fa fa-lg fa-pie-chart text-primary btn btn-md btn-primary"
@@ -281,18 +281,17 @@ table.alternative-color td:first-child {
 		</c:if>
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
-			<div class="voffset10">
+			<div class="activity-bottom-buttons">
 				<c:choose>
-
 					<c:when test="${sessionMap.reflectOn}">
-						<button property="ContinueButton" onclick="return continueReflect()" class="btn btn-default btn-primary pull-right">
+						<button property="ContinueButton" onclick="return continueReflect()" class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 
 					<c:otherwise>
 						<button type="submit" id="finishButton" onclick="return finishSession()"
-							class="btn btn-primary pull-right na">
+							class="btn btn-primary na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="label.submit" />

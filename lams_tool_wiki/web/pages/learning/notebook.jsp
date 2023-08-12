@@ -48,16 +48,18 @@
 				<div class="form-group">
 					<textarea id="focused" rows="4" name="entryText" class="form-control">${learningForm.entryText}</textarea>
 		
-					<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
-					</a>
+					<div class="activity-bottom-buttons">
+						<a href="#nogo" class="btn btn-primary na" id="finishButton">
+							<c:choose>
+								<c:when test="${isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</a>
+					</div>
 				</div>
 			</form:form>
 		</lams:Page>

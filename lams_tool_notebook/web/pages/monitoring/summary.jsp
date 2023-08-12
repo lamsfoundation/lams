@@ -184,7 +184,7 @@
 <div class="panel">
 	<button class="btn btn-default pull-right"
 			onClick="javascript:window.open('${tool}monitoring/showPrintDialog.do?toolContentID=${param.toolContentID}', 'PrintNotebook',width=800,height=600,scrollbars)">
-		<i class="fa fa-print"></i> <span class="hidden-xs"><fmt:message key="monitor.summary.print"/></span>
+		<i class="fa fa-print"></i> <span class="d-none d-sm-block"><fmt:message key="monitor.summary.print"/></span>
 	</button>
 	
 	<h4>

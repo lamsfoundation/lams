@@ -155,26 +155,26 @@
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<a href="#nogo" class="btn btn-default voffset5 pull-left voffset20" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-default voffset5 float-start voffset20" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
 		</a>
 	</c:if>	
 
 	<c:if test="${mode != 'teacher'}">
-		<div>
+		<div class="activity-bottom-buttons">
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default voffset5 pull-right voffset20">
+					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>
 				<c:when test="${sessionMap.isLastActivity}">
-					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
+					<a href="#nogo" id="finishButton" class="btn btn-primary na">
 						<fmt:message key="label.finish" />
 					</a>
 				</c:when>		
 				<c:otherwise>
-					<a href="#nogo" id="finishButton" class="btn btn-primary voffset5 pull-right na voffset20">
+					<a href="#nogo" id="finishButton" class="btn btn-primary na">
 						<fmt:message key="label.finished" />
 					</a>
 				</c:otherwise>

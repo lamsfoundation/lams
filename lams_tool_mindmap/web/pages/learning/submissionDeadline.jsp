@@ -40,7 +40,7 @@
 			<form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
 				<form:hidden path="toolSessionID" />
 	
-				<div class="voffset10 pull-right">
+				<div class="activity-bottom-buttons">
 					<a href="#nogo" class="btn btn-primary na" id="finishButton" onclick="submitForm('finish')">
 						<span class="na">
 							<c:choose>

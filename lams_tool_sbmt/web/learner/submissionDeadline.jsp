@@ -27,14 +27,14 @@
 		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-					<button name="continueButton" onclick="javascript:notebook();" class="btn btn-primary pull-right">
+					<button name="continueButton" onclick="javascript:notebook();" class="btn btn-primary">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" name="finishButton" onclick="javascript:finish();"
-						class="btn btn-primary pull-right na" id="finishButton">
-						<span class="nextActivity"> <c:choose>
+					<a href="#nogo" name="finishButton" onclick="javascript:finish();" class="btn btn-primary na" id="finishButton">
+						<span class="nextActivity"> 
+							<c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submit" />
 								</c:when>
@@ -47,8 +47,6 @@
 				</c:otherwise>
 			</c:choose>
 		</div>
-	
 	</div>
-
 
 </lams:PageLearner>

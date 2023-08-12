@@ -18,8 +18,8 @@
 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 	</div>
 	<hr class="mx-5">
+	
 	<form:form action="submitReflection.do" method="post" onsubmit="disableFinishButton();" modelAttribute="refForm" id="refForm">
-
 		<div class="container-lg">
 
 			<div class="card lcard lcard-no-borders shadow mb-3">
@@ -34,7 +34,6 @@
 					</div>
 				</div>
 			</div>
-
 
 			<div class="activity-bottom-buttons">
 				<button class="btn btn-primary" id="finishButton">
@@ -51,7 +50,6 @@
 				</button>
 			</div>
 		</div>
-	
 	</form:form>
 
 </lams:PageLearner>

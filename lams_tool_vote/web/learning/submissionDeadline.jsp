@@ -42,11 +42,12 @@
 				</fmt:message>
 			</lams:Alert>
 			
+			<div class="activity-bottom-buttons">
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true'}">
 
 					<button type="submit"  id="finishButton" 
 				      onclick="javascript:submitMethod('learnerFinished')"
-				      class="btn btn-primary voffset10 pull-right na">
+				      class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submitActivity" />
@@ -62,9 +63,10 @@
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
 					<input type="submit" name="forwardtoReflection"
 						onclick="javascript:submitMethod('forwardtoReflection');"
-						class="btn btn-primary voffset10 pull-right"
+						class="btn btn-primary"
 						value='<fmt:message key="label.continue" />' />
 				</c:if>
+			</div>
 
 	</form:form>
 </lams:Page>

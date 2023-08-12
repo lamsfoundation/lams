@@ -120,7 +120,7 @@
 		<%--Finish buttons--------------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="voffset10 pull-right">
+			<div class="voffset10 float-end">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary">

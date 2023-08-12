@@ -27,7 +27,7 @@
 		</lams:Alert>
 	
 		<a href="#nogo" name="FinishButton" id="finishButton"
-				onclick="return finishSession()" class="btn btn-primary voffset10 pull-right na">
+				onclick="return finishSession()" class="btn btn-primary voffset10 float-end na">
 			<c:choose>
 				<c:when test="${sessionMap.isLastActivity}">
 					<fmt:message key="label.submit" />

@@ -3,7 +3,7 @@
 <div class="sbox voffset5">
 	<div class="sbox-heading clearfix">
 		<c:if test="${not question.optional}">
-			<abbr class="pull-right" title="<fmt:message key='label.answer.required'/>"><i class="fa fa-xs fa-asterisk text-danger pull-right"></i></abbr>
+			<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i class="fa fa-xs fa-asterisk text-danger pull-right"></i></abbr>
 		</c:if>
 
 		<c:out value="${question.description}" escapeXml="false" />

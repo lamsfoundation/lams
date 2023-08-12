@@ -276,7 +276,7 @@
 
 		<!--  Warnings -->
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher' and (resource.allowAddFiles or resource.allowAddUrls) }">
-			<lams:Alert type="danger" id="warn-lock" close="false">
+			<lams:Alert5 type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" />
@@ -285,11 +285,11 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
 		<c:if test="${resource.miniViewResourceNumber > 0}">
-			<lams:Alert type="info" id="warn-numResources" close="false">${resource.miniViewNumberStr}</lams:Alert>
+			<lams:Alert5 type="info" id="warn-numResources" close="false">${resource.miniViewNumberStr}</lams:Alert5>
 		</c:if>
 
 		<lams:errors/>
@@ -303,7 +303,7 @@
 				<fmt:message key="label.resoruce.to.review" />
 
 				<!--  Panel button bar controlling refresh and adding items -->
-				<div class="btn-group pull-right">
+				<div class="btn-group float-end">
 					<c:if test="${mode != 'teacher'}">
 						<a href="#" onclick="javascript:return checkNew()" type="button" class="btn btn-xs btn-default">
 							<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" /></a>
@@ -344,7 +344,7 @@
 								</c:if>
 							</a>
 						</span>
-						<div class="pull-right">
+						<div class="float-end">
 							<c:choose>
 								<c:when test="${item.complete}">
 									<i class="fa fa-check-circle icon-complete" style="font-size: 1.5em;color: green;" title='<fmt:message key="label.completed" />'></i>
@@ -415,16 +415,15 @@
 		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
-			<c:choose>
-				<c:when
-						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-					<button name="FinishButton"
-							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right btn-disable-on-submit">
-						<fmt:message key="label.continue" />
-					</button>
-				</c:when>
-				<c:otherwise>
-					<button type="submit" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+			<div class="activity-bottom-buttons">
+				<c:choose>
+					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default btn-disable-on-submit">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:when>
+					<c:otherwise>
+						<button type="submit" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
 							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
@@ -435,17 +434,11 @@
 									</c:otherwise>
 								</c:choose>
 							</span>
-					</button>
-				</c:otherwise>
-			</c:choose>
+						</button>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</c:if>
-
-		<!--closes content-->
-
-		<div id="footer">
-		</div>
-		<!--closes footer-->
 
 	</lams:Page>
 	</body>

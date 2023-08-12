@@ -37,15 +37,13 @@
 
 			<form:textarea rows="5" id="focused" path="entryText" cssClass="form-control" />
 
-			<div class="voffset10">
-				<button class="btn btn-primary pull-right na" id="finishButton" type="button">
+	
+			<div class="activity-bottom-buttons">
+				<button class="btn btn-primary na" id="finishButton" type="button">
 					<fmt:message key="label.finish" />
 				</button>
 			</div>
 
-
-			<div id="footer"></div>
-			<!--closes footer-->
 		</lams:Page>
 	</form:form>
 

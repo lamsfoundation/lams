@@ -19,8 +19,8 @@
 			<fmt:message key="label.waiting.for.teacher.launch.activity" />
 		</lams:Alert>
 
-		<div class="voffset10">
-			<button name="refreshButton" onclick="javascript:location.reload();" class="btn btn-sm btn-default pull-right">
+		<div class="activity-bottom-buttons">
+			<button name="refreshButton" onclick="javascript:location.reload();" class="btn btn-primary">
 				<fmt:message key="label.refresh" />
 			</button>
 		</div>

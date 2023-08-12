@@ -43,7 +43,7 @@
  	        </c:choose>
 
 			<c:if test='${(sessionMap.mode == "teacher") or not (anonymous or hidden)}'>
-			<div class="pull-right">
+			<div class="float-end">
 			    <lams:Portrait userId="${msgDto.authorUserId}"/>
 			</div>
 			</c:if>

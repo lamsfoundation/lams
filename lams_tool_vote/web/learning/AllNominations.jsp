@@ -131,7 +131,7 @@
 			</table>
 
 
-			<div class="pull-right">
+			<div class="float-end">
 				<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${voteLearningForm.toolSessionID}" />
 				<a title="<fmt:message key='label.tip.displayPieChart'/>"
 					class="fa fa-pie-chart text-primary btn btn-md btn-primary"
@@ -210,37 +210,38 @@
 
 			<div id="chartDiv" style="height: 220px; display: none;"></div>
 
-
 			<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
-				<button class="btn btn-sm btn-default voffset10 pull-left" onclick="submitMethod('viewAllResults');">
-					<fmt:message key="label.refresh" />
-				</button>
-
-				<c:if test="${voteLearningForm.lockOnFinish != 'true' && hasEditRight}">
-					<button class="btn btn-sm btn-default voffset10 pull-left " onclick="submitMethod('redoQuestionsOk');">
-						<fmt:message key="label.retake" />
+				<div class="activity-bottom-buttons">
+					<button class="btn btn-secondary float-start" onclick="submitMethod('viewAllResults');">
+						<fmt:message key="label.refresh" />
 					</button>
-				</c:if>
-
-				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<button type="button"
-						class="btn btn-primary pull-right voffset10 na" id="finishButton">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submitActivity" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.endLearning" />
-							</c:otherwise>
-						</c:choose>
-					</button>
-				</c:if>
-
-				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
-					<button onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary pull-right voffset10">
-						<fmt:message key="label.continue" />
-					</button>
-				</c:if>
+	
+					<c:if test="${voteLearningForm.lockOnFinish != 'true' && hasEditRight}">
+						<button class="btn btn-secondary float-start " onclick="submitMethod('redoQuestionsOk');">
+							<fmt:message key="label.retake" />
+						</button>
+					</c:if>
+	
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
+						<button type="button"
+							class="btn btn-primary na" id="finishButton">
+							<c:choose>
+								<c:when test="${isLastActivity}">
+									<fmt:message key="button.submitActivity" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.endLearning" />
+								</c:otherwise>
+							</c:choose>
+						</button>
+					</c:if>
+	
+					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
+						<button onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary">
+							<fmt:message key="label.continue" />
+						</button>
+					</c:if>
+				</div>
 			</c:if>
 			</div>
 			<div id="footer"></div>

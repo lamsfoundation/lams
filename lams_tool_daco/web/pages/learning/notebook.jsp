@@ -39,8 +39,8 @@
 
 			<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
-			<div class="space-bottom-top align-right">
-				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton">
+			<div class="activity-bottom-buttons">
+				<button type="submit" class="btn btn-primary na" id="finishButton">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">

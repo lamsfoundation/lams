@@ -1042,13 +1042,6 @@ $portrait-size-image-xl: 400px;
 	@include portrait-generic($portrait-size-image-xl, 400px);
 }
 
-.leader-display {
-	margin: 0px;
-	h4 {
-	    margin-bottom: 0px;
-	}
-}
-
 // Popovers used in Gradebook to display portraits
 // popover links forced to be the usual link color or jqgrid can interfere
 .popover-link {

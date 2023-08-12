@@ -93,8 +93,8 @@
 			<div class="sbox voffset5">
 				<div class="sbox-heading clearfix">
 					<c:if test="${not question.optional}">
-						<abbr class="pull-right" title="<fmt:message key='label.answer.required'/>"><i
-							class="fa fa-xs fa-asterisk text-danger pull-right"></i></abbr>
+						<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i
+							class="fa fa-xs fa-asterisk text-danger float-end"></i></abbr>
 					</c:if>
 
 					<c:set var="question" value="${element.value}" />
@@ -148,7 +148,7 @@
 
 		<c:if test="${not sessionMap.finishedLock}">
 			<div class="voffset5">
-				<button property="RetakeButton" onclick="return retakeSurvey(-1)" class="btn btn-sm btn-default pull-left">
+				<button property="RetakeButton" onclick="return retakeSurvey(-1)" class="btn btn-sm btn-default float-start">
 					<fmt:message key="label.retake.survey" />
 				</button>
 			</div>
@@ -180,7 +180,7 @@
 					</c:choose>
 
 					<button property="ContinueButton" onclick="return continueReflect()"
-						class="btn voffset5 btn-sm btn-default pull-left">
+						class="btn voffset5 btn-sm btn-default float-start">
 						<fmt:message key="label.edit" />
 					</button>
 				</div>
@@ -188,25 +188,25 @@
 		</c:if>
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
-			<div class="pull-right voffset10">
+			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
 						<button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
-							class="btn btn-sm btn-default">
+							class="btn btn-default">
 							<fmt:message key="label.view.all.responses" />
 						</button>
 					</c:when>
 
 					<c:when test="${sessionMap.reflectOn}">
 						<button property="ContinueButton" onclick="return continueReflect()"
-							class="btn btn-sm btn-primary pull-right">
+							class="btn btn-primary">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 
 					<c:otherwise>
 						<button type="submit" id="finishButton"
-							class="btn btn-sm btn-primary pull-right na">
+							class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />

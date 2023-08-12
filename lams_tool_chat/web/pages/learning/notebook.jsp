@@ -46,7 +46,7 @@
 					<form:textarea rows="5" path="entryText" cssClass="form-control" id="focused"></form:textarea>
 			
 					<form:hidden path="chatUserUID" />
-					<a href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton">
+					<a href="#nogo" class="btn btn-primary float-end voffset10 na" id="finishButton">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="button.submit" />

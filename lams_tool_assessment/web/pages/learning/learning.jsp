@@ -686,12 +686,10 @@
 		</div>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
-				<c:if test="${hasEditRight}">					
+			<div class="activity-bottom-buttons">
+				<c:if test="${hasEditRight}">
 					<button type="button" name="submitAll"
-							onclick="return submitAll(false);" 
-							class="btn btn-primary voffset10 pull-right na"
-							>
+						onclick="return submitAll(false);" class="btn btn-primary na">
 						<fmt:message key="label.learning.submit.all" />
 					</button>
 				</c:if>

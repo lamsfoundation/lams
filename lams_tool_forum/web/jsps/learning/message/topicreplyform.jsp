@@ -26,7 +26,7 @@
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 </c:if>
 
-<div class="btn-group-xs voffset5 pull-right">
+<div class="btn-group-xs voffset5 float-end">
 	<button name="goback" id="cancelButton" onclick="javascript:cancelReply();"
 		class="btn btn-default roffset5">
 		<fmt:message key="button.cancel" />

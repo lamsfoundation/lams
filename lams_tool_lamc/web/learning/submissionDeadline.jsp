@@ -48,7 +48,7 @@
 			<c:if test="${mcGeneralLearnerFlowDTO.reflection != 'true'}">
 				<form:hidden path="learnerFinished" value="Finished" />
 
-				<a href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton"
+				<a href="#nogo" class="btn btn-primary float-end voffset10 na" id="finishButton"
 					onclick="javascript:submitForm('finish');return false">
 					<c:choose>
 						<c:when test="${isLastActivity}">

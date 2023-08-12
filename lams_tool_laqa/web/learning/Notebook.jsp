@@ -35,20 +35,20 @@
 
 	<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"></form:textarea>
 
-	<button id="finishButton"  class="btn btn-primary voffset5 pull-right na">
-		<span class="nextActivity">
-			<c:choose>
-				<c:when test="${sessionMap.isLastActivity}">
-					<fmt:message key="button.submit" />
-				</c:when>
-				<c:otherwise>
-	 				<fmt:message key="button.endLearning" />
-				</c:otherwise>
-			</c:choose>
-		</span>
-	</button>
-		
-	<div id="footer"></div>
+	<div class="activity-bottom-buttons">
+		<button id="finishButton"  class="btn btn-primary na">
+			<span class="nextActivity">
+				<c:choose>
+					<c:when test="${sessionMap.isLastActivity}">
+						<fmt:message key="button.submit" />
+					</c:when>
+					<c:otherwise>
+		 				<fmt:message key="button.endLearning" />
+					</c:otherwise>
+				</c:choose>
+			</span>
+		</button>
+	</div>
 </lams:Page>
 </form:form>
 

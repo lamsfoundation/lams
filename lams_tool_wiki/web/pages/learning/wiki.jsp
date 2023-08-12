@@ -82,7 +82,7 @@
             <div class="panel panel-default">
               <div class="panel-heading panel-learner-title">
                 <c:if test="${currentWikiPage.title != mainWikiPage.title}">
-                  <a class="panel-title panel-learner-title pull-left" href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')"> ${fn:escapeXml(mainWikiPage.title)}</a>&nbsp;/&nbsp;
+                  <a class="panel-title panel-learner-title float-start" href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')"> ${fn:escapeXml(mainWikiPage.title)}</a>&nbsp;/&nbsp;
                 </c:if> 
                 <a class="panel-title panel-learner-title"  href="javascript:changeWikiPage('${fn:escapeXml(currentWikiPage.javaScriptTitle)}')">${fn:escapeXml(currentWikiPage.title)}</a>
 
@@ -93,7 +93,7 @@
 
                 <!-- begin wiki menu-->
 
-                <div class="btn-group pull-right">
+                <div class="btn-group float-end">
                   <c:if test="${contentEditable}">
 
                     <a href="javascript:refreshPage();" title="<fmt:message key='label.wiki.refresh.toolTip'/>" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.wiki.refresh"/></a>
@@ -233,7 +233,7 @@
                                 <c:set var="lastEditName"><fmt:message key="label.wiki.history.editor.author"/></c:set>
                             </c:when>
                             <c:otherwise>
-                                <c:set var="lastEditPortrait"><div class="pull-right"><lams:Portrait userId="${currentWikiPage.currentWikiContentDTO.editorDTO.userId}"/></div></c:set>
+                                <c:set var="lastEditPortrait"><div class="float-end"><lams:Portrait userId="${currentWikiPage.currentWikiContentDTO.editorDTO.userId}"/></div></c:set>
                                 <c:set var="lastEditName"><c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/></c:set>
                             </c:otherwise>
                         </c:choose>
@@ -389,7 +389,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="voffset5 pull-right">
+                          <div class="voffset5 float-end">
                             <a href="javascript:changeDiv('view');" class="btn btn-primary"><fmt:message key="button.cancel"/></a> 
                             <a href="javascript:doEditOrAdd('editPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
                           </div>
@@ -425,8 +425,8 @@
                                          contentFolderID="${contentFolderID}" toolbarSet="CustomWikiLearner">
                           </lams:CKEditor>
 
-                          <a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary pull-right voffset5"><fmt:message key="label.wiki.savechanges"></fmt:message></a> 
-                          <a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-primary pull-right voffset5 roffset5"><fmt:message key="button.cancel"></fmt:message></a>
+                          <a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary float-end voffset5"><fmt:message key="label.wiki.savechanges"></fmt:message></a> 
+                          <a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-primary float-end voffset5 roffset5"><fmt:message key="button.cancel"></fmt:message></a>
 
                         </div>
                       </div>

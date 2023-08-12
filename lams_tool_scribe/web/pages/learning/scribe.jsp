@@ -138,7 +138,7 @@
 			</div>
 		
 			<h4>
-				<abbr class="pull-right hidden-xs" title="<fmt:message key="message.scribeInstructions2" />&nbsp;<fmt:message key="message.scribeInstructions3" />"><i
+				<abbr class="float-end d-none d-sm-block" title="<fmt:message key="message.scribeInstructions2" />&nbsp;<fmt:message key="message.scribeInstructions3" />"><i
 											class="fa fa-question-circle text-info"></i></abbr>
 				<fmt:message key="heading.report" />
 			</h4>
@@ -152,7 +152,7 @@
 							<div class="panel-body">
 		
 								<div class="panel-warning panel-body bg-warning">
-									<abbr class="pull-right hidden-xs" title="<fmt:message key="label.what.others.see" />"><i
+									<abbr class="float-end d-none d-sm-block" title="<fmt:message key="label.what.others.see" />"><i
 										class="fa fa-xs fa-question-circle text-info"></i></abbr>
 		
 									<c:set var="entry">
@@ -194,7 +194,7 @@
 			</form:form>
 		
 			<div id="agreeButton">
-				<a id="agreeButton" class="btn btn-success pull-left" onclick="javascript:submitApproval();"> 
+				<a id="agreeButton" class="btn btn-success float-start" onclick="javascript:submitApproval();"> 
 					<fmt:message key="button.agree" />
 				</a>
 			</div>

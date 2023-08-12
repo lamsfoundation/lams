@@ -32,17 +32,19 @@
 				<form:form action="learning/finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="messageForm" id="messageForm">
 					<form:hidden path="toolSessionID" />
 		
-					<button href="#nogo" class="btn btn-primary pull-right voffset10 na" id="finishButton" type="button"
-						onclick="submitForm('finish')">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
-					</button>
+					<div class="activity-bottom-buttons">
+						<button href="#nogo" class="btn btn-primary na" id="finishButton" type="button"
+							onclick="submitForm('finish')">
+							<c:choose>
+								<c:when test="${isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</button>
+					</div>
 				</form:form>
 			</c:if>
 		</lams:Page>

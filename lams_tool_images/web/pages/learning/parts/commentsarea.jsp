@@ -101,19 +101,19 @@
 				
 			<div id="manage-image-buttons" class="btn-group" role="group">	
 				<c:if test="${imageGallery.allowShareImages}">
-					<button onclick="return checkNew()" class="btn btn-sm btn-default" id="check-for-new-button"> 
+					<button onclick="return checkNew()" class="btn btn-sm btn-secondary" id="check-for-new-button"> 
 						<i class="fa fa-refresh"></i> <fmt:message key="label.check.for.new" /> 
 					</button>
 								
 					<c:if test="${not finishedLock}">
 						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
-								class="btn btn-default btn-sm" id="add-new-image-button">  
+								class="btn btn-secondary btn-sm" id="add-new-image-button">  
 							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
 						</button>
 					</c:if>
 					
 					<c:if test="${sessionMap.isAuthor}">
-						<button href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-default btn-sm" id="delete-button"> 
+						<button href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-secondary btn-sm" id="delete-button"> 
 							<i class="fa fa-trash"></i> <fmt:message key="label.learning.delete.image" /> 
 						</button>
 					</c:if>
