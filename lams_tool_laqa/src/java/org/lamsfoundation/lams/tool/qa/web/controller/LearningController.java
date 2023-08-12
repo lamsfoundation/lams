@@ -181,6 +181,7 @@ public class LearningController implements QaAppConstants {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
+	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 	generalLearnerFlowDTO.setSessionMapID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
@@ -244,8 +245,6 @@ public class LearningController implements QaAppConstants {
 
 	generalLearnerFlowDTO.setRemainingQuestionCount(generalLearnerFlowDTO.getTotalQuestionCount().toString());
 	generalLearnerFlowDTO.setInitialScreen(Boolean.TRUE.toString());
-
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	/*
 	 * check if the mode is teacher

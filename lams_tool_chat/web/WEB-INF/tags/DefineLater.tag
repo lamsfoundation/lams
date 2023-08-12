@@ -35,11 +35,10 @@
 <%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%@ attribute name="defineLaterMessageKey" required="false"
-	rtexprvalue="true"%>
-<%@ attribute name="buttonTryAgainKey" required="false"
-	rtexprvalue="true"%>
+<%@ attribute name="defineLaterMessageKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="buttonTryAgainKey" required="false" rtexprvalue="true"%>
 
 <%-- Default value for I18N keys --%>
 <c:if test="${empty defineLaterMessageKey}">
@@ -49,18 +48,14 @@
 	<c:set var="buttonTryAgainKey" value="button.try.again" />
 </c:if>
 
-<div class="row no-gutter">
-	<div
-		class="col-12 col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
-		<div class="alert alert-info">
-			<fmt:message key="${defineLaterMessageKey}" />
-		</div>
-	</div>
-</div>
-<div class="row no-gutter">
-	<div class="col-12 col-xs-12">
-		<a href="javascript:location.reload(true);"
-			class="btn btn-primary pull-right voffset5"><fmt:message
-				key="${buttonTryAgainKey}" /></a>
+<div class="container-lg">
+	<lams:Alert5 type="info" id="define-later-info" close="false">
+		<fmt:message key="${defineLaterMessageKey}" />
+	</lams:Alert5>
+
+	<div class="activity-bottom-buttons">
+		<a id="finishButton" href="javascript:location.reload(true);" class="btn btn-primary mt-3"> 
+			<fmt:message key="${buttonTryAgainKey}" />
+		</a>
 	</div>
 </div>

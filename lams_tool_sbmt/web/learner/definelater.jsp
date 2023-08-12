@@ -1,15 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+
 <fmt:message key='activity.title' var="title"/>
 <lams:PageLearner title="${title}" toolSessionID="${sessionMap.toolSessionID}" >
-
-	<div class="container-lg ">
-
-		<div class="d-flex justify-content-center">
-			<div class="p-2"><lams:DefineLater /></div>
-		</div>
-
-	</div>
-
+	<lams:DefineLater />
 </lams:PageLearner>

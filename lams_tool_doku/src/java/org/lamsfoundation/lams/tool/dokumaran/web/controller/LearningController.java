@@ -97,16 +97,18 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
 	Long toolSessionId = WebUtil.readLongParam(request, DokumaranConstants.PARAM_TOOL_SESSION_ID);
 	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionId);
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
 	boolean isFirstTimeAccess = false;
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO currentUserDto = null;
@@ -150,11 +152,9 @@ public class LearningController {
 	boolean hasEditRight =
 		!dokumaran.isUseSelectLeaderToolOuput() || dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ON, dokumaran.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dokumaranService.isLastActivity(toolSessionId));
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// get the API key from the config table and add it to the session
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);

@@ -135,6 +135,8 @@ public class LearningController {
 	}
 
 	if (isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER)) {
+	    request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID, toolSessionID);
+	    request.setAttribute(NoticeboardConstants.TITLE, nbContent.getTitle());
 	    return "defineLater";
 	}
 
