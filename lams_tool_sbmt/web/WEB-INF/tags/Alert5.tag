@@ -30,17 +30,13 @@
 
 <div class="row justify-content-md-center">
 	<div class="col-md-auto">
-		<div id="${idName}" class="alert alert-${alertType} alert-dismissible shadow-sm" role="alert">
+		<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
 			<c:if test="${not empty title}">
 				<span class="fa fa-${iconType} "></span> <span class="alert-heading font-weight-bold">${title}</span>
 				<hr>
 			</c:if>
-			<c:if test="${close}">
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</c:if>
-
 			<p class="mb-0">
-				<jsp:doBody />
+			<jsp:doBody />
 			</p>
 		</div>
 	</div>

@@ -36,7 +36,7 @@
 				</div>
 				<div class="media-body">
 					<c:if test="${close}">
-						<a href="#" class="close pull-right" data-dismiss="alert" aria-label="close">&times;</a>
+							<a href="#" class="close pull-right" data-dismiss="alert" aria-label="close">&times;</a>
 					</c:if>
 					<jsp:doBody />
 				</div>
