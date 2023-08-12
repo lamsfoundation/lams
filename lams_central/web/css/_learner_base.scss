@@ -796,25 +796,6 @@ section{
 	left:0;
 }
 
-/* fontawesome icon x-small */
-.fa-xs {
-	font-size: smaller;
-}
-
-/* Growl functionality, jquery.blockUI (version: 2.38) */
-.growlUI {
-	width: auto;
-	padding: 0px;
-}
-
-div.growlUI h1,div.growlUI h2 {
-	color: white;
-	padding: 0px;
-	margin: 5px;
-	text-align: center;
-	font-size: medium;
-}
-
 // Tooltips used for learner progress and gradebook (large version)
 .progress-bar-tooltip {
 	display: none;
@@ -875,18 +856,6 @@ div.growlUI h1,div.growlUI h2 {
 	font-size: $font-size-small;
 }
 
-// Ratings
-.rating-comment{
-	background-image: none;
-	border: $border-thin-default-light;
-}
-
-.rating-comment-posted-by{
-	color: $brand-primary;
-	text-align: left;
-	font-size: x-small;
-}
-
 // Drag and Drop
 .droppableHighlight {
 	padding : 1px !important;
@@ -918,23 +887,6 @@ div.growlUI h1,div.growlUI h2 {
 
 .errorBorder {
 	border: $border-medium-danger;
-}
-
-// Assessment and Scratchie Countdown - growl settings need to be moved too
-#timelimit-start-dialog {
-	display:none; cursor: default; padding: 10px;
-}
-#timelimit-start-dialog h1{
-	padding-bottom: 10px;
-}
-#countdown {
-	width: 150px; position: absolute; font-size: 110%; font-style: italic; color: $brand-success;
-}
-#countdown-label {
-	font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color: $brand-success;
-}
-#timelimit-expired {
-	font-size: 145%; padding: 15px;
 }
 
 // nprogress bar used in learning for the Load Tool Activity page
@@ -1013,26 +965,6 @@ div.growlUI h1,div.growlUI h2 {
 // }
 
 // end nprogress bar
-
-// fotorama used for image gallery
-.fotorama__thumb {
-    background-color: $gray-base;
-}
-.fotorama__wrap {
-	margin: auto;
-}
-.fotorama__caption {
-	text-align: left;
-}
-.fotorama__thumb-border {
-	border-color: $a-link-default !important;
-}
-
-.fotorama-container {
-	text-align: center;
-	padding-top: 10px;
-}
-// end fotorama
 
 // User Photo / Avatar
 $portrait-size-image-sm: 35px;
