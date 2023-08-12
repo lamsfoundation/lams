@@ -348,10 +348,14 @@
        <name>Etherpad</name>
        <path>/WEB-INF/tags/Etherpad.tag</path>
    	</tag-file> 
-	<tag-file>
+   	<tag-file>
 	    <name>errors</name>
 		<path>/WEB-INF/tags/Errors.tag</path>
    	</tag-file> 
+   	<tag-file>
+	    <name>errors5</name>
+		<path>/WEB-INF/tags/Errors5.tag</path>
+   	</tag-file>    
    	<tag-file>
 	    <name>Widget</name>
 		<path>/WEB-INF/tags/Widget.tag</path>
@@ -361,9 +365,17 @@
 		<path>/WEB-INF/tags/Page5.tag</path>
    	</tag-file>
    	<tag-file>
+	    <name>PageLearner</name>
+		<path>/WEB-INF/tags/PageLearner.tag</path>
+   	</tag-file>
+   	<tag-file>
 	    <name>TSTable5</name>
 		<path>/WEB-INF/tags/TSTable5.tag</path>
-   	</tag-file>    
+   	</tag-file>  
+   	<tag-file>
+	    <name>WaitForLeader</name>
+		<path>/WEB-INF/tags/WaitForLeader.tag</path>
+   	</tag-file>  
    	<tag-file>
 	    <name>Alert5</name>
 		<path>/WEB-INF/tags/Alert5.tag</path>

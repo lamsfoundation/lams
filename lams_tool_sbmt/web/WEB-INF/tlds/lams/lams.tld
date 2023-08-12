@@ -371,7 +371,11 @@
    	<tag-file>
 	    <name>TSTable5</name>
 		<path>/WEB-INF/tags/TSTable5.tag</path>
-   	</tag-file>    
+   	</tag-file>  
+   	<tag-file>
+	    <name>WaitForLeader</name>
+		<path>/WEB-INF/tags/WaitForLeader.tag</path>
+   	</tag-file>  
    	<tag-file>
 	    <name>Alert5</name>
 		<path>/WEB-INF/tags/Alert5.tag</path>
