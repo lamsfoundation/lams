@@ -53,12 +53,12 @@
 				alertTooManyVotes(maxVotes);
 				return false;
 			} else if (numberOfVotes < minVotes) {
-				var msg = "<fmt:message key="error.minNominationCount.not.reached"/> "
-						+ minVotes + " <fmt:message key="label.nominations"/>";
+				var msg = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.minNominationCount.not.reached'/></spring:escapeBody> "
+						+ minVotes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.nominations'/></spring:escapeBody>";
 				alert(msg);
 				return false;
 			} else if (numberOfVotes == 0) {
-				alert("<fmt:message key="error.empty.selection"/>");
+				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.empty.selection'/></spring:escapeBody>");
 				return false;
 			} else {
 				$('.btn').prop('disabled', true);
@@ -67,8 +67,8 @@
 		}
 
 		function alertTooManyVotes(maxVotes) {
-			var msg = "<fmt:message key="error.maxNominationCount.reached"/> "
-					+ maxVotes + " <fmt:message key="label.nominations"/>";
+			var msg = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.maxNominationCount.reached'/></spring:escapeBody> "
+					+ maxVotes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.nominations'/></spring:escapeBody>";
 			alert(msg);
 		}
 
