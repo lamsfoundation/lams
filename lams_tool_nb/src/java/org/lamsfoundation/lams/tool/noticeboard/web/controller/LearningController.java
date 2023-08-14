@@ -299,10 +299,10 @@ public class LearningController {
 		if (entry == null) {
 		    // create new entry
 		    nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getReflectionText());
+			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getEntryText());
 		} else {
 		    // update existing entry
-		    entry.setEntry(nbLearnerForm.getReflectionText());
+		    entry.setEntry(nbLearnerForm.getEntryText());
 		    entry.setLastModified(new Date());
 		    nbService.updateEntry(entry);
 		}

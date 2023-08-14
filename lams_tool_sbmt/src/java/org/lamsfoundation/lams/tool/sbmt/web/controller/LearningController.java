@@ -533,7 +533,7 @@ public class LearningController implements SbmtConstants {
      * Display empty reflection form.
      */
     @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 //		ISubmitFilesService submitFilesService = getService();
@@ -571,7 +571,7 @@ public class LearningController implements SbmtConstants {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Integer userId = refForm.getUserID();
 

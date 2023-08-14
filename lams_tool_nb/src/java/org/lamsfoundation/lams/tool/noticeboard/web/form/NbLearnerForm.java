@@ -26,16 +26,6 @@ package org.lamsfoundation.lams.tool.noticeboard.web.form;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 
-/**
- * Creation Date: 19-05-05
- *
- *
- *
- *
- *
- *
- */
-
 public class NbLearnerForm {
 
     private static final long serialVersionUID = -669035956406254875L;
@@ -54,7 +44,7 @@ public class NbLearnerForm {
 
     private Boolean readOnly;
 
-    private String reflectionText;
+    private String entryText;
 
     /**
      * @return Returns the toolSessionID.
@@ -155,11 +145,11 @@ public class NbLearnerForm {
 	this.readOnly = readOnly;
     }
 
-    public String getReflectionText() {
-	return reflectionText;
+    public String getEntryText() {
+	return entryText;
     }
 
-    public void setReflectionText(String reflectionText) {
-	this.reflectionText = reflectionText;
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
     }
 }
