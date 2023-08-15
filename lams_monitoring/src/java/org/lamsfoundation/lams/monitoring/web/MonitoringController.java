@@ -1040,6 +1040,8 @@ public class MonitoringController {
 	}
 	request.setAttribute("ldPath", ldPathBuilder.toString());
 
+	request.setAttribute("isIntegrationLogin", ss.getAttribute("isIntegrationLogin"));
+
 	return "monitor";
     }
 
