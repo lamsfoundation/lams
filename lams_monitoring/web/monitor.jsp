@@ -190,13 +190,14 @@
 	<body class="component">
 	<div class="component-page-wrapper monitoring-page-wrapper ">
 		<div class="component-sidebar active">
-			
+
 			<c:if test="${not isIntegrationLogin}">
-				<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />" class="lams-logo">
-			</c:if>
-			<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
-			<c:if test="${not isIntegrationLogin}">
-				</a>
+			<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />">
+				</c:if>
+				<img class="lams-logo" src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg"
+					 alt="<fmt:message key='label.monitoring.logo' />" />
+				<c:if test="${not isIntegrationLogin}">
+			</a>
 			</c:if>
 
 
