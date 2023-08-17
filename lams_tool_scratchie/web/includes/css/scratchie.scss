@@ -1,9 +1,4 @@
 @import "_lams_variables.scss";
-	
-.fake-validation-input {
-	visibility: hidden;
-	height: 0px;	
-}
 
 label.error { 
 	float: none; 
@@ -11,8 +6,4 @@ label.error {
 	vertical-align: top; 
 	font-weight: bold; 
 	font-style: italic;
-}
-
-.bq-title {
-        text-decoration: underline;
 }

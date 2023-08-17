@@ -47,7 +47,7 @@
 </c:choose>
 </c:set>
 
-<div class="c100 p${confidenceLevelDto.level}0 small" data-toggle="tooltip" data-placement="top" title="${confidenceLevelsAnonymous ? '' : confidenceLevelDto.userName}">
+<div class="c100 p${confidenceLevelDto.level}0 small" data-bs-toggle="tooltip" data-bs-placement="top" title="${confidenceLevelsAnonymous ? '' : confidenceLevelDto.userName}">
 	<span>
 		<c:choose>
 			<c:when test="${confidenceLevelsAnonymous}">

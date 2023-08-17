@@ -12,10 +12,22 @@
 	border-bottom: none;
 }
 
+.scratches .row {
+	align-items: center;
+	border-top: 1px solid #ddd;
+	padding: 12px;
+}
+.scratches .row:hover{
+	background-color: var(--bs-gray-200);
+}
+.scratches .scartchie-image-col {
+	width: 100px;
+	margin-left: -1rem;
+}
+
 .scartchie-image {
 	border: 0;
 }
-
 
 .jGrowl {
   	font-size: 22px;
@@ -59,14 +71,11 @@ hr.hr-confidence-level {
     margin-top: 10px;
     margin-bottom: 15px;
 }
-.lead {
-	margin-top: 30px;
+[data-bs-toggle="collapse"].collapsed .if-not-collapsed {
+	display: none;
 }
-[data-toggle="collapse"].collapsed .if-not-collapsed {
-  display: none;
-}
-[data-toggle="collapse"]:not(.collapsed) .if-collapsed {
-  display: none;
+[data-bs-toggle="collapse"]:not(.collapsed) .if-collapsed {
+	display: none;
 }
 	
 /* confidence levels tooltips */
@@ -76,14 +85,14 @@ hr.hr-confidence-level {
     border:  1px solid #ddd;
 }
 .tooltip.top .tooltip-arrow {
-      border-top-color:grey;
-      color:black;
+	border-top-color:grey;
+	color:black;
 }
 .tooltip {
-background-color: transparent;
-border: none;
-color:black;
-box-shadow:none;
+	background-color: transparent;
+	border: none;
+	color:black;
+	box-shadow:none;
 }
 		
 .item-score {
@@ -104,4 +113,13 @@ box-shadow:none;
 	font-style: italic; 
 	color:#47bc23;
 	text-align: center;
+}
+
+.bq-title {
+	text-decoration: underline;
+}
+	
+.fake-validation-input {
+	visibility: hidden;
+	height: 0px;	
 }

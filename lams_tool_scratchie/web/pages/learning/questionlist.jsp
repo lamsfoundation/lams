@@ -1,7 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <!-- Used by TestHarness 
 	 isUserLeader=${isUserLeader}
@@ -12,15 +10,19 @@
 	
 	<%-- show general burning question --%>
 	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
-		<div class="form-group burning-question-container">
-			<a data-toggle="collapse" data-target="#burning-question-general" href="#bqg"
+		<div class="burning-question-container mb-3">
+			<a data-bs-toggle="collapse" data-bs-target="#burning-question-general" href="#bqg" role="button"
 					<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
-				<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
-	  			<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+				<span class="if-collapsed">
+					<i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i>
+				</span>
+	  			<span class="if-not-collapsed">
+	  				<i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i>
+	  			</span>
 				<fmt:message key="label.general.burning.question" />
 			</a>
 	
-			<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">in</c:if>">
+			<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">show</c:if>">
 				<textarea rows="5" name="generalBurningQuestion" class="form-control"
 					<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
 				>${sessionMap.generalBurningQuestion}</textarea>
@@ -30,17 +32,17 @@
 </form>
 
 <c:if test="${mode != 'teacher'}">
-	<div class="voffset10 pull-right">
+	<div class="activity-bottom-buttons">
 		<c:choose>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
-				<button nae="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-default">
+				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary">
 					<fmt:message key="label.continue" />
 				</button>
 			</c:when>
 			<c:otherwise>
 				<input type="hidden" name="method" id="method" value="showResults">
-				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-default">
+				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary">
 					<fmt:message key="label.submit" />
 				</button>
 			</c:otherwise>

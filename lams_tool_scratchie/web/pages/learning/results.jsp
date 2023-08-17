@@ -14,21 +14,18 @@
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<c:set var="title">
+	${scratchie.title} / <fmt:message key='label.score' />
+</c:set>
+<lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
 	
 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
 		#reflections-div {
 			padding-bottom: 20px;
-		}
-		.burning-question-dto {
-			padding-bottom: 5px; 
 		}
 	    
 	    /* when item is editable - show pencil icon on hover */
@@ -66,7 +63,6 @@
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 		
@@ -74,7 +70,7 @@
 			
 			var jqGrid = $("#burningQuestions" + scratchieItemUid);
 			var likeCell = jqGrid.jqGrid('getCell', rowid, 'like');
-			var isLike = likeCell.includes( 'fa-thumbs-o-up' );
+			var isLike = likeCell.includes( 'fa-regular' );
 
 			if (isLike) {
 				$.ajax({
@@ -91,7 +87,7 @@
 		  				jqGrid.jqGrid('setCell', rowid, 'count', currentCount + 1);
 		  				
 		  				//update 'like' column
-		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-thumbs-o-up", "fa-thumbs-up"));
+		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-regular", "fa-solid"));
 		  				
 					} else {
 						alert("Error");
@@ -113,7 +109,7 @@
 		  				jqGrid.jqGrid('setCell', rowid, 'count', currentCount - 1);
 		  				
 		  				//update 'like' column
-		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-thumbs-up", "fa-thumbs-o-up"));
+		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-solid", "fa-regular"));
 			       		
 		  			} else {
 						alert("Error");
@@ -136,8 +132,8 @@
 					height: 'auto',
 					autowidth: true,
 					shrinkToFit: false,
-					guiStyle: "bootstrap",
-					iconSet: 'fontAwesome',
+					guiStyle: "bootstrap4",
+					iconSet: 'fontAwesomeSolid',
 				   	colNames:[
 						'#',
 						'isUserAuthor',
@@ -208,8 +204,8 @@
 	  	                }
 
 	  	                //edit row on its selection, unless "thumbs up" button is pressed
-	  	                if (e.target.classList.contains("fa") && e.target.classList.contains("fa-2x") 
-	  		  	                && (e.target.classList.contains("fa-thumbs-o-up") || e.target.classList.contains("fa-thumbs-up"))) { 
+	  	                if (e.target.classList.contains("fa-thumbs-up") && e.target.classList.contains("fa-lg") 
+	  		  	                && (e.target.classList.contains("fa-regular") || e.target.classList.contains("fa-solid"))) { 
 	  	                	return;
 		  	            } else {
 		  	            	$self.jqGrid("editRow", rowid, { focusField: "burningQuestion" });
@@ -235,17 +231,17 @@
 				   	    burningQuestion:"${burningQuestionDto.escapedBurningQuestion}",
 				   	 	<c:choose>
 				   			<c:when test="${!isUserLeader && burningQuestionDto.userLiked}">
-				   				like:'<span class="fa fa-thumbs-up fa-2x"></span>',
+				   				like:'<span class="fa-solid fa-thumbs-up fa-lg"></span>',
 				   			</c:when>
 					   		<c:when test="${!isUserLeader}">
 				   				like:'',
 				   			</c:when>
 							<c:when test="${burningQuestionDto.userLiked}">
-								like:'<span class="fa fa-thumbs-up fa-2x" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.unlike'/></spring:escapeBody>"' +
+								like:'<span class="fa-solid fa-thumbs-up fa-lg" role="button" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.unlike'/></spring:escapeBody>" aria-label="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.unlike'/></spring:escapeBody>"' +
 										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:when>
 							<c:otherwise>
-								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like'/></spring:escapeBody>"' +
+								like:'<span class="fa-regular fa-thumbs-up fa-lg" role="button" title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like'/></spring:escapeBody>" aria-label="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like'/></spring:escapeBody>"' +
 										'onclick="javascript:likeEntry(${scratchieItemUid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:otherwise>
 						</c:choose>
@@ -263,8 +259,8 @@
 				height: 'auto',
 				autowidth: true,
 				shrinkToFit: false,
-				guiStyle: "bootstrap",
-				iconSet: 'fontAwesome',
+				guiStyle: "bootstrap4",
+				iconSet: 'fontAwesomeSolid',
 			   	colNames:[
 				   	'#',
 					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
@@ -310,7 +306,7 @@
 
 			//handler for expand/collapse all button
 			$("#toggle-burning-questions-button").click(function() {
-				var isExpanded = eval($(this).data("expanded"));
+				var isExpanded = eval($(this).data("bs-expanded"));
 				
 				//fire the actual buttons so burning questions can be closed/expanded
 				$(".ui-jqgrid-titlebar-close").each(function() {
@@ -322,17 +318,17 @@
 
 				//change button label
 				var newButtonLabel = isExpanded ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.expand.all' /></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.collapse.all' /></spring:escapeBody>";
-				$(".hidden-xs", $(this)).text(newButtonLabel);
+				$(".d-none.d-sm-block", $(this)).text(newButtonLabel);
 
 				//change button icon
 				if (isExpanded) {
-					$(".fa", $(this)).removeClass("fa-minus-square").addClass("fa-plus-circle");
+					$(".fa", $(this)).removeClass("fa-square-minus").addClass("fa-circle-plus");
 				} else {
-					$(".fa", $(this)).removeClass("fa-plus-circle").addClass("fa-minus-square");
+					$(".fa", $(this)).removeClass("fa-circle-plus").addClass("fa-square-minus");
 				}
 
-				//change button's data-expanded attribute
-				$(this).data("expanded", !isExpanded);
+				//change button's data-bs-expanded attribute
+				$(this).data("bs-expanded", !isExpanded);
 			});
 		    
 		})
@@ -351,33 +347,26 @@
 			return false;
 		}
     </script>
-</lams:head>
 
-<body class="stripes">
-
-	<c:set var="title">
-		${scratchie.title} / <fmt:message key='label.score' />
-	</c:set>
-	<lams:Page type="learner" title="${title}">
-
+	<div class="container-lg">
 		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<lams:Alert id="submissionDeadline">
+			<lams:Alert5 id="submissionDeadline">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
 						<lams:Date value="${sessionMap.submissionDeadline}" />
 					</fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
-		<lams:errors/>
+		<lams:errors5/>
 
-		<lams:Alert id="score" type="info" close="false">
+		<lams:Alert5 id="score" type="info" close="false">
 			<fmt:message key="label.you.ve.got">
 				<fmt:param>${score}</fmt:param>
 				<fmt:param>${scorePercentage}</fmt:param>
 			</fmt:message>
-		</lams:Alert>
+		</lams:Alert5>
 
 		<c:if test="${showResults}">
 			<%@ include file="scratchies.jsp"%>
@@ -385,30 +374,31 @@
 		
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled and not empty burningQuestionItemDtos}">
+            <div class="d-flex justify-content-end" id="burning-questions-buttons">
+	            <a class="btn btn-sm btn-secondary me-2 d-flex align-items-center" href="#" onclick="return refreshToBurningQuestions()" role="button">
+	            	<i class="fa-solid fa-refresh me-1"></i> 
+	            	<span class="d-none d-sm-block">
+	            		<fmt:message key="label.refresh" />
+	            	</span>
+	            </a>
+	
+	            <a id="toggle-burning-questions-button" class="btn btn-sm btn-secondary me-2 d-flex align-items-center" data-bs-expanded="true" href="#nogo" role="button">
+	            	<i class="fa-solid fa-minus-square me-1"></i> 
+	            	<span class="d-none d-sm-block">
+	            		<fmt:message key="label.collapse.all" />
+	            	</span>
+	            </a>
+            </div>
             
-            <a class="btn btn-sm btn-default pull-right roffset10" href="#" onclick="return refreshToBurningQuestions()">
-            	<i class="fa fa-refresh"></i> 
-            	<span class="hidden-xs">
-            		<fmt:message key="label.refresh" />
-            	</span>
-            </a>
-
-            <a id="toggle-burning-questions-button" class="btn btn-sm btn-default pull-right roffset10" data-expanded="true" href="#nogo">
-            	<i class="fa fa-minus-square"></i> 
-            	<span class="hidden-xs">
-            		<fmt:message key="label.collapse.all" />
-            	</span>
-            </a>
-            
-			<div id="burning-questions-container" class="voffset5">
-				<div class="lead">
+			<div id="burning-questions-container">
+				<div class="lead mb-2">
 					<fmt:message key="label.burning.questions" />
 				</div>
 
 				<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 					<c:if test="${not empty burningQuestionItemDto.burningQuestionDtos}">
 						<c:set var="scratchieItemUid" value="${empty burningQuestionItemDto.scratchieItem.uid ? 0 : burningQuestionItemDto.scratchieItem.uid}"/>
-						<div class="burning-question-dto">
+						<div class="burning-question-dto mb-2">
 							<table id="burningQuestions${scratchieItemUid}" class="scroll" cellpadding="0" cellspacing="0"></table>
 						</div>
 					</c:if>
@@ -418,30 +408,32 @@
 
 		<!-- Display reflections -->
 		<c:if test="${sessionMap.reflectOn}">
-			<div class="voffset20">
-				<div class="panel panel-default">
-					<div class="panel-heading-sm  bg-success">
-						<fmt:message key="monitor.summary.td.notebookInstructions" />
+			<div class="card shadow-sm mt-5">
+				<div class="card-header">
+					<fmt:message key="monitor.summary.td.notebookInstructions" />
+				</div>
+				
+				<div class="card-body">
+					<div class="m-2" aria-label="<fmt:message key='monitor.summary.td.notebookInstructions'/>">
+						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 					</div>
-					<div class="panel-body-sm">
-						<div class="panel">
-							<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-						</div>
-						<c:choose>
-							<c:when test="${empty sessionMap.reflectEntry}">
-								<p>
-									<fmt:message key="message.no.reflection.available" />
-								</p>
-							</c:when>
-							<c:otherwise>
-								<div class="panel-body-sm bg-warning">
+					<hr/>
+
+					<div class="m-2">
+						<p>
+							<c:choose>
+								<c:when test="${empty sessionMap.reflectEntry}">
+									<em><fmt:message key="message.no.reflection.available" /></em>
+								</c:when>
+								<c:otherwise>
 									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-								</div>
-							</c:otherwise>
-						</c:choose>
+								</c:otherwise>
+							</c:choose>
+						</p>
+						
 						<c:if test="${(mode != 'teacher') && isUserLeader}">
-							<div class="voffset5">
-								<button name="finishButton" onclick="return continueReflect()" class="btn btn-sm btn-default">
+							<div class="mt-2">
+								<button name="editNotebookButton" id="edit-notebook-button" onclick="return continueReflect()" class="btn btn-sm btn-secondary btn-disable-on-submit">
 									<fmt:message key="label.edit" />
 								</button>
 							</div>
@@ -459,9 +451,8 @@
 
 		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
-			<div class="voffset10 pull-right">
-				<a href="#nogo" name="finishButton" id="finishButton"
-					class="btn btn-primary na">
+			<div class="activity-bottom-buttons">
+				<a href="#nogo" name="finishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">
 							<fmt:message key="label.submit" />
@@ -473,8 +464,6 @@
 				</a>
 			</div>
 		</c:if>
-
-		<div id="footer"></div>
-	</lams:Page>
-</body>
-</lams:html>
+		
+	</div>
+</lams:PageLearner>

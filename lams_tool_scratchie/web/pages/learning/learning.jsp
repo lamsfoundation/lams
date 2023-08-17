@@ -15,29 +15,25 @@
 <c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
 <c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
+<fmt:message key="label.learning.title" var="titlr"/>
+<lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
 
 	<!-- ********************  CSS ********************** -->
-	<lams:css />
+	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
-	<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 
 	<!-- ********************  javascript ********************** -->
-	<lams:JSImport src="includes/javascript/common.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script>
 		//Resolve name collision between jQuery UI and Twitter Bootstrap
 		$.widget.bridge('uitooltip', $.ui.tooltip);
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
@@ -265,16 +261,16 @@
 
 		//add new VSA answer to the table (required in case user entered answer not present in the previous answers)
 		function paintNewVsaAnswer(itemUid, answer) {
-			var optionsLength = $("table#scratches-" + itemUid + " tr").length;
+			var optionsLength = $("#scratches #scratches-" + itemUid + " .row").length;
 			var idSuffix = '-' + itemUid + '-' + hashCode(answer);
 			
 			var trElem = 
-				'<tr id="tr' + idSuffix + '">' +
-					'<td style="width: 40px; border: none;">' +
+				'<div id="tr' + idSuffix + '" class="row mx-2">' +
+					'<div class="scartchie-image-col">' +
 						'<img src="<lams:WebAppURL/>includes/images/answer-' + optionsLength + '.png" class="scartchie-image" id="image' + idSuffix + '" />' +
-					'</td>' +
+					'</div>' +
 
-					'<td class="answer-with-confidence-level-portrait">' +
+					'<div class="col answer-with-confidence-level-portrait">' +
 						'<div class="answer-description">' +
 							xmlEscape(answer) +
 						'</div>' +
@@ -282,9 +278,9 @@
 						'<div style="padding-bottom: 10px;">' +
 							'<lams:Portrait userId="${sessionMap.groupLeaderUserId}"/>' +
 						'</div>' +
-					'</td>' +
-				'</tr>';
-			$("table#scratches-" + itemUid).append(trElem);
+					'</div>' +
+				'</div>';
+			$(".table#scratches-" + itemUid).append(trElem);
 		}
 
 		function checkAllCorrectMcqAnswersFound() {
@@ -296,7 +292,7 @@
 			} else {
 				$('#finishButton').prop('disabled', false)
 								  .css('pointer-events', 'auto')
-								  .parent().tooltip('destroy');
+								  .parent().tooltip('dispose');
 			}
 		}
 
@@ -326,7 +322,7 @@
 			// time limit feature
 			
 			function displayCountdown(secondsLeft){
-				var countdown = '<div id="countdown"></div>' 
+				var countdown = '<div id="countdown" role="timer"></div>' 
 				$.blockUI({
 					message: countdown, 
 					showOverlay: false,
@@ -357,7 +353,7 @@
 						}
 					},
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
+				        $.blockUI({ message: '<h1 id="timelimit-expired" role="alert"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
 				        
 				        setTimeout(function() { 
 					        if (${isUserLeader}) {
@@ -453,8 +449,7 @@
 				scratchieWebsocketPingFunc(true);
 			};
 		</c:if>
-			
-		
+
 		//autosave feature
 		<c:if test="${isUserLeader && (mode != 'teacher')}">
 			var autosaveInterval = "60000"; // 60 seconds interval
@@ -475,7 +470,7 @@
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 	                success: function() {
 		                $.jGrowl(
-		                	"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions.autosaved' /></spring:escapeBody>",
+		                	"<span aria-live='polite'><i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions.autosaved' /></spring:escapeBody><span>",
 		                	{ life: 2000, closeTemplate: '' }
 		                );
 	                }
@@ -505,51 +500,44 @@
 			return false;
 		}
     </script>
-</lams:head>
-<body class="stripes">
 
-	<lams:Page type="learner" title="${scratchie.title}">
-
+	<div class="container-lg">
 		<lams:LeaderDisplay username="${sessionMap.groupLeaderName}" userId="${sessionMap.groupLeaderUserId}"/>
 
 		<c:if test="${sessionMap.userFinished && (mode == 'teacher')}">
-			<div class="voffset10">
-				<lams:Alert id="score" type="info" close="false">
+			<div class="mt-3">
+				<lams:Alert5 id="score" type="info" close="false">
 					<fmt:message key="label.you.ve.got">
 						<fmt:param>${score}</fmt:param>
 						<fmt:param>${scorePercentage}</fmt:param>
 					</fmt:message>
-				</lams:Alert>
+				</lams:Alert5>
 			</div>
 		</c:if>
 		
 		<c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
-			<div class="row no-gutter voffset20">
-				<div class="col-xs-12 col-sm-offset-3 col-sm-6">
-					<div class="alert alert-warning">
-						<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> <fmt:message key="label.learning.reveal.double.click" />
-					</div>
-				</div>
-			</div>
+			<lams:Alert5 type="warning" id="reveal-double-click-warning" close="false">
+				<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> <fmt:message key="label.learning.reveal.double.click" />
+			</lams:Alert5>			
 		</c:if>
 
-		<div class="panel">
+		<div id="instructions" class="instructions">
 			<c:out value="${scratchie.instructions}" escapeXml="false" />
 		</div>
 
 		<c:if test="${not empty sessionMap.submissionDeadline}">
-			<lams:Alert id="submissionDeadline" close="true" type="info">
+			<lams:Alert5 id="submissionDeadline" close="true" type="info">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
 						<lams:Date value="${sessionMap.submissionDeadline}" />
 					</fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${mode != 'teacher'}">
-			<div id="timelimit-start-dialog"> 
-		        <h4>
+			<div id="timelimit-start-dialog" role="alertdialog" aria-labelledby="are-you-ready"> 
+		        <h4 id="are-you-ready">
 		        	<fmt:message key='label.are.you.ready' />
 		        </h4>
 		        <button name="ok" id="timelimit-start-ok" class="button">
@@ -558,13 +546,11 @@
 			</div>
 		</c:if>
 
-		<lams:errors/>
+		<lams:errors5/>
 
 		<div id="questionListArea">
 			<%@ include file="questionlist.jsp"%>
 		</div>
-
-		<div id="footer"></div>
-	</lams:Page>
-</body>
-</lams:html>
+		
+	</div>
+</lams:PageLearner>
