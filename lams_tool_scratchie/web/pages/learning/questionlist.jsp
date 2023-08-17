@@ -11,7 +11,7 @@
 	<%-- show general burning question --%>
 	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 		<div class="burning-question-container mb-3">
-			<a data-bs-toggle="collapse" data-bs-target="#burning-question-general" href="#bqg" role="button"
+			<a data-bs-toggle="collapse" data-bs-target="#burning-question-general" href="#" role="button"
 					<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
 				<span class="if-collapsed">
 					<i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i>

@@ -19,10 +19,10 @@
 <div class="row no-gutter">
 	<div class="col-12 col-xs-12 offset-sm-2 col-sm-8">
 		<div id="${idName}" class="alert alert-info leader-display">
-			<h4><fmt:message key="${messageKey}">
+			<span class="fs-5 fw-bold"><fmt:message key="${messageKey}">
 				<fmt:param><c:out value="${username}" escapeXml="true"/></fmt:param>
 			</fmt:message>&nbsp;
-			<lams:Portrait userId="${userId}"/></h4>
+			<lams:Portrait userId="${userId}"/></span>
 		</div>
 	</div>
 </div>

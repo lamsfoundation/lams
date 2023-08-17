@@ -176,7 +176,7 @@
 			<%--Display Etherpad for each question --%>
 			<c:if test="${isQuestionEtherpadEnabled}">
 				<div class="question-etherpad-container mb-3">
-					<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" href="#qe${item.uid}" class="collapsed" role="button">
+					<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" href="#" class="collapsed" role="button">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.etherpad.discussion" />
@@ -196,15 +196,15 @@
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 				<div class="burning-question-container mb-3">
 					<!-- LDEV-4532: href is needed for the collapsing to work on an ipad but do not make it the same as the data-target here or the screen will jump around. -->
-					<a data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}" href="#bqi${item.uid}" role="button"
+					<a id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}" href="#" role="button"
 							<c:if test="${empty item.burningQuestion}">class="collapsed"</c:if>>
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.burning.question" />
 					</a>
 					
-					<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">show</c:if>">
-						<textarea rows="5" name="burningQuestion${item.uid}" class="form-control"
+					<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">show</c:if> p-2">
+						<textarea rows="5" name="burningQuestion${item.uid}" class="form-control" aria-labelledby="questionTitle${questionNumber.count} bq${item.uid}" 
 							<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
 						>${item.burningQuestion}</textarea>
 					</div>
