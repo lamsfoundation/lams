@@ -146,8 +146,8 @@
 					</button>
 				</c:if>
 
-				<button type="button" onclick="location.reload();" class="btn btn-secondary me-2">
-					<i class="fa fa-refresh"></i> 
+				<button type="button" onclick="location.reload();" class="btn btn-secondary me-2 d-flex align-items-center">
+					<i class="fa fa-refresh me-1"></i> 
 					<span class="d-none d-sm-block">
 						<fmt:message key="label.refresh" />
 					</span>

@@ -53,8 +53,14 @@
 											 id="image-${item.uid}-${optionDto.qbOptionUid}">
 									</c:when>
 									<c:otherwise>
-										<a href="#" data-item-uid="${item.uid}" data-option-uid="${optionDto.qbOptionUid}" aria-labelledby="answer-description-${optionDto.qbOptionUid}" aria-controls="image-col-${item.uid}-${optionDto.qbOptionUid}"
-										    <c:choose>
+										<span class="visually-hidden" id="answer-description-intro-${optionDto.qbOptionUid}">
+											<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}: 
+										</span>
+										<a href="#" data-item-uid="${item.uid}"
+											data-option-uid="${optionDto.qbOptionUid}"
+											aria-labelledby="answer-description-intro-${optionDto.qbOptionUid} answer-description-${optionDto.qbOptionUid}"
+											aria-controls="image-col-${item.uid}-${optionDto.qbOptionUid}"
+											<c:choose>
 										    	<c:when test="${scratchie.revealOnDoubleClick}">
 										    		onDblClick=
 										    	</c:when>
@@ -64,10 +70,13 @@
 										    </c:choose>
 										    <%-- call this function either on click or double click --%>
 										    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
-										    
-											id="imageLink-${item.uid}-${optionDto.qbOptionUid}" class="scratchie-link">
-											<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
-												class="scartchie-image"	id="image-${item.uid}-${optionDto.qbOptionUid}" />
+											id="imageLink-${item.uid}-${optionDto.qbOptionUid}"
+											class="scratchie-link"> 
+												<img
+													src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png"
+													alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
+													class="scartchie-image"
+													id="image-${item.uid}-${optionDto.qbOptionUid}" />
 										</a>
 									</c:otherwise>
 								</c:choose> 

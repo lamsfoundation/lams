@@ -103,7 +103,7 @@
 				<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
 							&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
 					<div class="form-group answer-justification-container voffset20">
-						<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
+						<a data-bs-toggle="collapse" data-bs-target="#answer-justification-${question.uid}" role="button" class="collapsed">
 							<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
 				 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
 							<fmt:message key="label.answer.justification" />
@@ -126,7 +126,7 @@
 		<%--Display Etherpad for each question --%>
 		<c:if test="${isQuestionEtherpadEnabled}">
 			<div class="form-group question-etherpad-container">
-				<a data-toggle="collapse" data-target="#question-etherpad-${question.uid}" role="button" class="collapsed">
+				<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${question.uid}" role="button" class="collapsed">
 					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
 		 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
 					<fmt:message key="label.etherpad.discussion" />
