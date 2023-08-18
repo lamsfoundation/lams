@@ -238,7 +238,7 @@
 							<input type="hidden" name="lessonID" value='<c:out value="${lessonID}" />' />
 							<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
 											  uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"
+							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3 d-none"
 									onClick="javascript:importGroupsFromSpreadsheet()">
 								<i class="fa fa-upload"></i> <fmt:message key="button.import" />
 							</button>
