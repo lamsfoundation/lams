@@ -114,6 +114,11 @@
 
 	<body class="component my-2">
 	<lams:Page5 title="${title}" type="monitoring">
+		<c:if test="${param.displayReturnToMonitoringLink eq 'true'}">
+			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${param.lessonID}">
+				<i class="fa-solid fa-arrow-left"></i>&nbsp;<fmt:message key="label.grouping.return.to.monitoring"/>
+			</a>
+		</c:if>
 		<div class="card mb-2">
 			<div class="card-body">
 				<c:if test="${not empty description}">
