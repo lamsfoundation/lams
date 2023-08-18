@@ -176,7 +176,7 @@
 			<%--Display Etherpad for each question --%>
 			<c:if test="${isQuestionEtherpadEnabled}">
 				<div class="question-etherpad-container mb-3">
-					<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" href="#" class="collapsed" role="button">
+					<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" href="#" class="collapsed" role="button" >
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.etherpad.discussion" />
@@ -195,7 +195,6 @@
 			<%-- show burning questions --%>
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 				<div class="burning-question-container mb-3">
-					<!-- LDEV-4532: href is needed for the collapsing to work on an ipad but do not make it the same as the data-target here or the screen will jump around. -->
 					<a id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}" href="#" role="button"
 							<c:if test="${empty item.burningQuestion}">class="collapsed"</c:if>>
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>

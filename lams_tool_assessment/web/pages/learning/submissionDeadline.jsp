@@ -12,7 +12,6 @@
 		function finishSession() {
 			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-			return false;
 		}
     </script>
 </lams:head>
@@ -26,8 +25,8 @@
 			</fmt:message>
 		</lams:Alert>
 	
-		<a href="#nogo" name="FinishButton" id="finishButton"
-				onclick="return finishSession()" class="btn btn-primary voffset10 float-end na">
+		<button type="button" name="FinishButton" id="finishButton"
+				onclick="finishSession()" class="btn btn-primary voffset10 float-end na">
 			<c:choose>
 				<c:when test="${sessionMap.isLastActivity}">
 					<fmt:message key="label.submit" />
@@ -36,7 +35,7 @@
 					<fmt:message key="label.finished" />
 				</c:otherwise>
 			</c:choose>
-		</a>
+		</button>
 	
 	</lams:Page>
 </body>

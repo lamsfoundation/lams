@@ -35,7 +35,7 @@
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finish')">
+					<button type="button" class="btn btn-primary" id="finishButton" onclick="submitForm('finish')">
 						<span class="nextActivity">
 							<c:choose>
 								<c:when test="${isLastActivity}">
@@ -46,7 +46,7 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</a>
+					</button>
 				</c:otherwise>
 			</c:choose>
 		</form:form>

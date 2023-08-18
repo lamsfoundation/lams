@@ -133,7 +133,7 @@
 
 		<div id="actionbuttons" class="activity-bottom-buttons">
 				<c:if test="${!isSelectLeaderActive}">
-					<a href="#nogo" class="btn btn-primary na" id="finishButton">
+					<button type="button" class="btn btn-primary na" id="finishButton">
 						<span class="nextActivity"> <c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submit" />
@@ -143,7 +143,7 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</a>
+					</button>
 				</c:if>
 
 				<button type="button" onclick="location.reload();" class="btn btn-secondary me-2">

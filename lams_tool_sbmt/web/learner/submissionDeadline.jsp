@@ -32,7 +32,7 @@
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" name="finishButton" onclick="javascript:finish();" class="btn btn-primary na" id="finishButton">
+					<button name="finishButton" onclick="javascript:finish();" class="btn btn-primary na" id="finishButton">
 						<span class="nextActivity"> 
 							<c:choose>
 								<c:when test="${isLastActivity}">
@@ -43,7 +43,7 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</a>
+					</button>
 				</c:otherwise>
 			</c:choose>
 		</div>

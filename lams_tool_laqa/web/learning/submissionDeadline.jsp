@@ -50,8 +50,8 @@
 			<div class="activity-bottom-buttons">
 
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-					<a href="#nogo" name="endLearning" id="finishButton"
-						onclick="javascript:submitMethod('endLearning');return false" class="btn btn-primary">
+					<button type="button" name="endLearning" id="finishButton"
+						onclick="javascript:submitMethod('endLearning');" class="btn btn-primary">
 						<span class="na"> <c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="button.submit" />
@@ -61,7 +61,7 @@
 								</c:otherwise>
 							</c:choose>
 						</span>
-					</a>
+					</button>
 				</c:if>
 
 				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">

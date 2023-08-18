@@ -375,19 +375,18 @@
 		<!-- Display burningQuestionItemDtos -->
 		<c:if test="${sessionMap.isBurningQuestionsEnabled and not empty burningQuestionItemDtos}">
             <div class="d-flex justify-content-end" id="burning-questions-buttons">
-	            <a class="btn btn-sm btn-secondary me-2 d-flex align-items-center" href="#" onclick="return refreshToBurningQuestions()" role="button">
+	            <button type="button" class="btn btn-sm btn-secondary me-2 d-flex align-items-center" onclick="return refreshToBurningQuestions()">
 	            	<i class="fa-solid fa-refresh me-1"></i> 
 	            	<span class="d-none d-sm-block">
 	            		<fmt:message key="label.refresh" />
 	            	</span>
-	            </a>
+	            </button>
 	
-	            <a id="toggle-burning-questions-button" class="btn btn-sm btn-secondary me-2 d-flex align-items-center" data-bs-expanded="true" href="#nogo" role="button">
-	            	<i class="fa-solid fa-minus-square me-1"></i> 
+	            <button type="button" id="toggle-burning-questions-button" class="btn btn-sm btn-secondary me-2 " data-bs-expanded="true" >
 	            	<span class="d-none d-sm-block">
 	            		<fmt:message key="label.collapse.all" />
 	            	</span>
-	            </a>
+	            </button>
             </div>
             
 			<div id="burning-questions-container">
@@ -433,7 +432,7 @@
 						
 						<c:if test="${(mode != 'teacher') && isUserLeader}">
 							<div class="mt-2">
-								<button name="editNotebookButton" id="edit-notebook-button" onclick="return continueReflect()" class="btn btn-sm btn-secondary btn-disable-on-submit">
+								<button name="editNotebookButton" id="edit-notebook-button" onclick="return continueReflect()" class="btn btn-sm btn-secondary btn-disable-on-submit" type="button">
 									<fmt:message key="label.edit" />
 								</button>
 							</div>
@@ -452,7 +451,7 @@
 		<!-- Display finish buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
-				<a href="#nogo" name="finishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
+				<button name="finishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit na" type="button">
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">
 							<fmt:message key="label.submit" />
@@ -461,7 +460,7 @@
 							<fmt:message key="label.finished" />
 						</c:otherwise>
 					</c:choose>
-				</a>
+				</button>
 			</div>
 		</c:if>
 		
