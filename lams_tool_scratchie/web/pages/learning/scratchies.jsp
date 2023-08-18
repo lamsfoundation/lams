@@ -53,12 +53,9 @@
 											 id="image-${item.uid}-${optionDto.qbOptionUid}">
 									</c:when>
 									<c:otherwise>
-										<span class="visually-hidden" id="answer-description-intro-${optionDto.qbOptionUid}">
-											<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}: 
-										</span>
 										<a href="#" data-item-uid="${item.uid}"
 											data-option-uid="${optionDto.qbOptionUid}"
-											aria-labelledby="answer-description-intro-${optionDto.qbOptionUid} answer-description-${optionDto.qbOptionUid}"
+											aria-labelledby="answer-description-${optionDto.qbOptionUid}"
 											aria-controls="image-col-${item.uid}-${optionDto.qbOptionUid}"
 											<c:choose>
 										    	<c:when test="${scratchie.revealOnDoubleClick}">
@@ -92,6 +89,9 @@
 			
 							<div class="col <c:if test="${fn:length(optionDto.confidenceLevelDtos) > 0}">answer-with-confidence-level-portrait</c:if>">
 								<div id="answer-description-${optionDto.qbOptionUid}">
+									<span class="visually-hidden">
+										<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}: 
+									</span>
 									<c:out value="${optionDto.answer}" escapeXml="false" />
 								</div>
 								
