@@ -79,14 +79,14 @@
 		<div class="col-10 offset-1 text-right">
 			<!-- Notifications -->
 			<div class="float-end">
+				<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
+					<i class="fa-solid fa-circle-info"></i>
+					<fmt:message key="label.activity.monitoring"/>
+				</a>
 				<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
 				   onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
 					<i class="fa fa-clipboard-question"></i>
 					<fmt:message key="label.hide.students.choices"/>
-				</a>
-				<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
-					<i class="fa-solid fa-circle-info"></i>
-					<fmt:message key="label.activity.monitoring"/>
 				</a>
 				<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
 					<i class="fa fa-print"></i>
