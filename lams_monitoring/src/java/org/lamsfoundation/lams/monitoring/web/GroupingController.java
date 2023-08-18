@@ -23,21 +23,8 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -67,8 +54,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * The action servlet that provides the support for the
@@ -116,6 +114,8 @@ public class GroupingController {
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	boolean displayReturnToMonitoringLink = WebUtil.readBooleanParam(request, "displayReturnToMonitoringLink",
+		false);
 	Activity activity = monitoringService.getActivityById(activityID);
 
 	Grouping grouping = null;
@@ -128,7 +128,8 @@ public class GroupingController {
 
 	if (!forcePrintView) {
 	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "grouping/viewGroupings.do?lessonID="
-		    + lessonId + "&activityID=" + activityID;
+		    + lessonId + "&activityID=" + activityID + "&displayReturnToMonitoringLink="
+		    + displayReturnToMonitoringLink;
 	}
 
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);
@@ -186,7 +187,8 @@ public class GroupingController {
 	}
 
 	request.setAttribute(GroupingController.GROUPS, groups);
-	request.setAttribute("isCourseGrouping", true); // flag to page it is a course grouping so use the field names for OrganisationGroup
+	request.setAttribute("isCourseGrouping",
+		true); // flag to page it is a course grouping so use the field names for OrganisationGroup
 	return "grouping/viewGroups";
     }
 
@@ -207,7 +209,8 @@ public class GroupingController {
 	// remove users from current group
 	if (members != null) {
 	    Activity activity = monitoringService.getActivityById(activityID);
-	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
+	    Grouping grouping = activity.isChosenBranchingActivity()
+		    ? activity.getGrouping()
 		    : ((GroupingActivity) activity).getCreateGrouping();
 	    User exampleUser = (User) userManagementService.findById(User.class, Integer.valueOf(members[0]));
 	    Group group = grouping.getGroupBy(exampleUser);
@@ -304,7 +307,8 @@ public class GroupingController {
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Activity activity = monitoringService.getActivityById(activityID);
-	Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
+	Grouping grouping = activity.isChosenBranchingActivity()
+		? activity.getGrouping()
 		: ((GroupingActivity) activity).getCreateGrouping();
 
 	// iterate over groups
