@@ -76,6 +76,7 @@
 			var lessonId = ${lesson.lessonID},
 					userId = '<lams:user property="userID"/>',
 					ldId = ${lesson.learningDesignID},
+					contentFolderId = '${contentFolderID}',
 					lessonStateId = ${lesson.lessonStateID},
 					createDateTimeStr = '${lesson.createDateTimeStr}',
 					lessonStartDate = '${lesson.scheduleStartDate}',
