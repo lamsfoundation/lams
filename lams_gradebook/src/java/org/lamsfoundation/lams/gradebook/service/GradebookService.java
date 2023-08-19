@@ -2765,6 +2765,7 @@ public class GradebookService implements IGradebookFullService {
 		    learnerProgress.getAttemptedActivities().size() > 0)) {
 
 		String currentActivityTitle = learnerProgress.getCurrentActivity() == null
+			|| learnerProgress.getCurrentActivity().getTitle() == null
 			? ""
 			: HtmlUtils.htmlEscape(learnerProgress.getCurrentActivity().getTitle());
 		status = "<i class='fa fa-cog' title='" + currentActivityTitle + "'></i>";
