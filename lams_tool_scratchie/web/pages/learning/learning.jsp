@@ -93,8 +93,6 @@
 					scratchMcq(itemUid, optionUid);
 				});
 			</c:if>
-
-
 			
 			// hide Finish button for non-leaders until leader finishes
 			if (${hideFinishButton}) {
@@ -135,6 +133,8 @@
 	    		setTimeout(
 	    			function(){
 	    				image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
+	    				image.attr("alt", isCorrect ? '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.correct.answer" /></spring:escapeBody>' :
+	    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.incorrect.answer" /></spring:escapeBody>');
 	    			}, 
 	    			1300
 	    		);
@@ -160,18 +160,20 @@
 		            }
 		            	
 		            scratchImage(itemUid, optionUid, json.optionCorrect);
-		            	
+
+		            //disable scratching
+		            var imageLinkIds = json.optionCorrect ? "[id^=imageLink-" + itemUid + "]" : '#imageLink' + '-' + itemUid + '-' + optionUid;
+		            var imageLinks = $(imageLinkIds);
+		            imageLinks.removeAttr('onClick').removeAttr('onDblClick');
+		            imageLinks.css('cursor', 'default');
+		            imageLinks.attr('aria-disabled', 'true');
+		            
 		            if (json.optionCorrect) {
-		            	//disable scratching
-		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onClick').removeAttr('onDblClick'); 
-		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
+			            //fade all realted images
 		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
 
+			            //enable Finish button
 		            	checkAllCorrectMcqAnswersFound();
-		            } else {
-		            	var id = '-' + itemUid + '-' + optionUid;
-		            	$('#imageLink' + id).removeAttr('onclick');
-		            	$('#imageLink' + id).css('cursor','default');
 		            }
 
 	            },
@@ -286,13 +288,16 @@
 		function checkAllCorrectMcqAnswersFound() {
             var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
 			if (numberOfAvailableScratches > 0) {
-	            $('#finishButton').prop('disabled', true).css('pointer-events', 'none')
-	            				  .parent().attr('data-title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.require.all.answers" /></spring:escapeBody>')
-				  				  		   .tooltip();
+	            $('#finishButton')
+	            	.prop('disabled', true)
+	            	.css('pointer-events', 'none')
+					.parent().attr('data-title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.require.all.answers" /></spring:escapeBody>')
+				  	.tooltip();
 			} else {
-				$('#finishButton').prop('disabled', false)
-								  .css('pointer-events', 'auto')
-								  .parent().tooltip('dispose');
+				$('#finishButton')
+					.prop('disabled', false)
+					.css('pointer-events', 'auto')
+					.parent().tooltip('dispose');
 			}
 		}
 
@@ -318,11 +323,11 @@
 		    return hash;
 		}
 
+		// time limit feature
 		<c:if test="${mode != 'teacher'}">
-			// time limit feature
-			
 			function displayCountdown(secondsLeft){
-				var countdown = '<div id="countdown" role="timer"></div>' 
+				var countdown = '<div id="countdown" role="timer"></div>' + 
+							    '<div id="screenreader-countdown" aria-live="polite" class="visually-hidden" aria-atomic="true"></div>'; 
 				$.blockUI({
 					message: countdown, 
 					showOverlay: false,
@@ -351,11 +356,32 @@
 						} else {
 							$(this).removeClass('countdown-timeout');
 						}
+
+						//handle screenreaders
+						var screenCountdown = $("#screenreader-countdown");
+						var hours = $("#countdown").countdown('getTimes')[4];
+						var minutes = $("#countdown").countdown('getTimes')[5];
+						if (screenCountdown.data("hours") != hours || screenCountdown.data("minutes") != minutes) {
+							var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody> ";
+							if (hours > 0) {
+								timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.hours' /></spring:escapeBody> ";
+							}
+							timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.minutes' /></spring:escapeBody> ";
+							screenCountdown.html(timeLeftText);
+							
+							screenCountdown.data("hours", hours);
+							screenCountdown.data("minutes", minutes);
+						}
 					},
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired" role="alert"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
+				        $.blockUI({ 
+					        message: '<h1 id="timelimit-expired" role="alert">' +
+					        			'<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> ' +
+					        			'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody>' + 
+					        		 '</h1>' 
+						}); 
 				        
-				        setTimeout(function() { 
+				        setTimeout(function() {
 					        if (${isUserLeader}) {
 						    	finish(true);
 					        } else {

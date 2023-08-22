@@ -38,7 +38,7 @@
 				<div class="table div-hover scratches">
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 						<div id="tr${optionDto.qbOptionUid}" class="row mx-2">
-							<div class="scartchie-image-col" id="image-col-${item.uid}-${optionDto.qbOptionUid}" aria-live="polite">
+							<div class="scartchie-image-col">
 								<c:choose>
 									<c:when test="${optionDto.scratched && optionDto.correct}">
 										<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image" alt="<fmt:message key='label.correct'/>"
@@ -53,10 +53,12 @@
 											 id="image-${item.uid}-${optionDto.qbOptionUid}">
 									</c:when>
 									<c:otherwise>
-										<a href="#" data-item-uid="${item.uid}"
+										<a href="#" role="button" 
+											id="imageLink-${item.uid}-${optionDto.qbOptionUid}" class="scratchie-link"
+											data-item-uid="${item.uid}"
 											data-option-uid="${optionDto.qbOptionUid}"
 											aria-labelledby="answer-description-${optionDto.qbOptionUid}"
-											aria-controls="image-col-${item.uid}-${optionDto.qbOptionUid}"
+											aria-controls="image-${item.uid}-${optionDto.qbOptionUid}"
 											<c:choose>
 										    	<c:when test="${scratchie.revealOnDoubleClick}">
 										    		onDblClick=
@@ -66,10 +68,8 @@
 										    	</c:otherwise>
 										    </c:choose>
 										    <%-- call this function either on click or double click --%>
-										    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"
-											id="imageLink-${item.uid}-${optionDto.qbOptionUid}"
-											class="scratchie-link"> 
-												<img
+										    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"> 
+												<img aria-live="polite"
 													src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png"
 													alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
 													class="scartchie-image"
