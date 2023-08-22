@@ -33,6 +33,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <%@ attribute name="formID" required="true" rtexprvalue="true" %>
