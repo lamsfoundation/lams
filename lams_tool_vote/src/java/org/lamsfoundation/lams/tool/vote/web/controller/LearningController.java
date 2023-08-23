@@ -708,7 +708,6 @@ public class LearningController implements VoteAppConstants {
 
 	Map<String, String> mapQuestions = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 	VoteQueUsr user = null;
@@ -720,11 +719,12 @@ public class LearningController implements VoteAppConstants {
 	    user = getCurrentUser(toolSessionID);
 	}
 
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
+
 	// check if there is submission deadline
 	Date submissionDeadline = voteContent.getSubmissionDeadline();
-
 	if (submissionDeadline != null) {
-
 	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -739,12 +739,8 @@ public class LearningController implements VoteAppConstants {
 	    }
 	}
 
-	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-
 	/* find out if the content is being modified at the moment. */
 	if (voteContent.isDefineLater()) {
-
 	    return "/learning/defineLater";
 	}
 

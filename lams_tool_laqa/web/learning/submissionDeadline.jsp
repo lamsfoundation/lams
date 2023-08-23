@@ -1,78 +1,14 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<lams:html>
-<lams:head>
-	<lams:css />
 
-	<title><fmt:message key="activity.title" /></title>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) {
-			if (actionMethod == 'endLearning') {
-				document.getElementById("finishButton").disabled = true;
-			}
-			document.forms.qaLearningForm.action = actionMethod+".do";
-			document.forms.qaLearningForm.submit();
-		}
-
-		function submitMethod(actionMethod) {
-			submitLearningMethod(actionMethod);
-		}
-	</script>
-</lams:head>
-
-<body class="stripes">
-	<c:set scope="request" var="title">
-		<fmt:message key="activity.title" />
-	</c:set>
-
-	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
-
-		<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" id="qaLearningForm">
-			<form:hidden path="toolSessionID" />
-			<form:hidden path="userID" />
-			<form:hidden path="sessionMapID" />
-			<form:hidden path="totalQuestionCount" />
-
-
-			<lams:Alert5 type="danger" id="submission-deadline" close="false">
-				<fmt:message key="authoring.info.teacher.set.restriction">
-					<fmt:param>
-						<lams:Date value="${sessionMap.submissionDeadline}" />
-					</fmt:param>
-				</fmt:message>
-			</lams:Alert>
-
-			<div class="activity-bottom-buttons">
-
-				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-					<button type="button" name="endLearning" id="finishButton"
-						onclick="javascript:submitMethod('endLearning');" class="btn btn-primary">
-						<span class="na"> <c:choose>
-								<c:when test="${sessionMap.isLastActivity}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.endLearning" />
-								</c:otherwise>
-							</c:choose>
-						</span>
-					</button>
-				</c:if>
-
-				<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-					<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('forwardtoReflection');"
-						class="btn btn-primary">
-						<fmt:message key="label.continue" />
-					</button>
-				</c:if>
-
-			</div>
-		</form:form>
-	</lams:Page>
-</body>
-</lams:html>
+<lams:SubmissionDeadline title="${generalLearnerFlowDTO.activityTitle}"
+	toolSessionID="${qaLearningForm.toolSessionID}"
+	submissionDeadline="${sessionMap.submissionDeadline}"
+	finishSessionUrl="/learning/endLearning.do?toolSessionID=${qaLearningForm.toolSessionID}&userID=${qaLearningForm.userID}&sessionMapID=${qaLearningForm.sessionMapID}&totalQuestionCount=${qaLearningForm.totalQuestionCount}"
+	continueReflectUrl="/learning/forwardtoReflection.do?toolSessionID=${qaLearningForm.toolSessionID}&userID=${qaLearningForm.userID}&sessionMapID=${qaLearningForm.sessionMapID}&totalQuestionCount=${qaLearningForm.totalQuestionCount}"
+	isNotebookReeditEnabled="false"
+	isContinueReflectButtonEnabled="${generalLearnerFlowDTO.reflection == 'true'}"
+	isLastActivity="${sessionMap.isLastActivity}" 
+	finishButtonLastActivityLabelKey="button.submit"
+	finishButtonLabelKey="button.endLearning"/>
