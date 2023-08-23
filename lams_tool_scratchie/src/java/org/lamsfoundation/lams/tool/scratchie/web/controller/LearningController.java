@@ -199,6 +199,18 @@ public class LearningController {
 
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, scratchieService.isLastActivity(toolSessionID));
 
+	Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionID, scratchie, sessionMap,
+		mode.isTeacher());
+
+	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
+	// calculate max score
+	double maxScore = scratchieService.getMaxPossibleScore(scratchie);
+	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
+
+	boolean isScratchingFinished = toolSession.isScratchingFinished();
+	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
+	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook) && !mode.isTeacher();
+
 	// check if there is submission deadline
 	Date submissionDeadline = scratchie.getSubmissionDeadline();
 	if (submissionDeadline != null) {
@@ -216,18 +228,6 @@ public class LearningController {
 		return "pages/learning/submissionDeadline";
 	    }
 	}
-
-	Collection<ScratchieItem> items = storeItemsToSessionMap(toolSessionID, scratchie, sessionMap,
-		mode.isTeacher());
-
-	sessionMap.put(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
-	// calculate max score
-	double maxScore = scratchieService.getMaxPossibleScore(scratchie);
-	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
-
-	boolean isScratchingFinished = toolSession.isScratchingFinished();
-	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook) && !mode.isTeacher();
 
 	// show notebook page to the leader
 	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
