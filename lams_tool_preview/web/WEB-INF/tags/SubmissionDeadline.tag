@@ -39,10 +39,12 @@
 
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" >
 	<script type="text/javascript">
+		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
+		
 		function finishSession(){
-			document.getElementById("finish-button").disabled = true;
 			document.location.href ='<c:url value="${finishSessionUrl}"/>';
 		}
+		
 		function continueReflect(){
 			document.location.href='<c:url value="${continueReflectUrl}"/>';
 		}
@@ -100,7 +102,7 @@
 					</button>
 				</c:when>
 				<c:otherwise>
-					<button type="button" name="FinishButton" id="finish-button" onclick="finishSession()" class="btn btn-primary na">
+					<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
 						<c:choose>
 							<c:when test="${isLastActivity}">
 								<fmt:message key="${finishButtonLastActivityLabelKey}" />
