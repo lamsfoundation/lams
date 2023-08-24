@@ -24,25 +24,24 @@
 </c:if>
 
 <%@ attribute name="notebookLabelKey" required="false" rtexprvalue="true"%>
-<%@ attribute name="finishButtonLabelKey" required="false" rtexprvalue="true"%>
-<%@ attribute name="nextActivityButtonLabelKey" required="false" rtexprvalue="true"%>
-<%-- Default value for I18N keys --%> 
 <c:if test="${empty notebookLabelKey}">
 	<c:set var="notebookLabelKey" value="label.notebook" />
 </c:if>
+<%@ attribute name="finishButtonLabelKey" required="false" rtexprvalue="true"%>
 <c:if test="${empty finishButtonLabelKey}">
 	<c:set var="finishButtonLabelKey" value="label.submit" />
 </c:if>
+<%@ attribute name="nextActivityButtonLabelKey" required="false" rtexprvalue="true"%>
 <c:if test="${empty nextActivityButtonLabelKey}">
-	<c:set var="nextActivityButtonLabelKey" value="label.finish" />
+	<c:set var="nextActivityButtonLabelKey" value="label.finished" />
 </c:if>
 
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" >
 	<script type="text/javascript">
-		checkNextGateActivity('finishButton', '${toolSessionID}', '', submitForm);
+		checkNextGateActivity('finish-button', '${toolSessionID}', '', submitForm);
 		
 		function disableFinishButton() {
-			document.getElementById("finishButton").disabled = true;
+			document.getElementById("finish-button").disabled = true;
 		}
 		function submitForm() {
 			var f = document.getElementById('reflectionForm');
@@ -79,7 +78,7 @@
 			</div>
 	
 			<div class="activity-bottom-buttons">
-				<button name="finishButton" id="finishButton" class="btn btn-primary">
+				<button name="finishButton" id="finish-button" class="btn btn-primary na">
 					<c:choose>
 						<c:when test="${!isNextActivityButtonSupported || isLastActivity}">
 							<fmt:message key="${finishButtonLabelKey}" />
@@ -90,7 +89,6 @@
 					</c:choose>
 				</buttun>
 			</div>
-		
 		</div>
 	</form:form>
 	

@@ -300,3 +300,29 @@ div.growlUI h1,div.growlUI h2 {
 	text-align: center;
 	font-size: medium;
 }
+
+.na {
+  display: inline-block;
+}
+.na:after {
+  content: "\f0a9";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  margin-left: 5px;
+  color: inherit;
+  /*float: right;*/
+}
+
+.btn-refresh {
+  display: inline-block;
+}
+.btn-refresh:before {
+  content: "\f021";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  color: inherit;
+}
