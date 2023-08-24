@@ -80,11 +80,6 @@ public class LearningController {
 
 	Notebook notebook = notebookSession.getNotebook();
 
-	// check defineLater
-	if (notebook.isDefineLater()) {
-	    return "pages/learning/defineLater";
-	}
-
 	// set mode, toolSessionID and NotebookDTO
 	request.setAttribute("mode", mode.toString());
 	messageForm.setToolSessionID(toolSessionID);
@@ -95,8 +90,12 @@ public class LearningController {
 	notebookDTO.allowRichEditor = notebook.isAllowRichEditor();
 	notebookDTO.lockOnFinish = notebook.isLockOnFinished();
 	notebookDTO.forceResponse = notebook.isForceResponse();
-
 	request.setAttribute("notebookDTO", notebookDTO);
+
+	// check defineLater
+	if (notebook.isDefineLater()) {
+	    return "pages/learning/defineLater";
+	}
 
 	// Set the content in use flag.
 	if (!notebook.isContentInUse()) {

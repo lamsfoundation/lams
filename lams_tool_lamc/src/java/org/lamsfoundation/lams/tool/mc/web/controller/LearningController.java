@@ -173,6 +173,8 @@ public class LearningController {
 	String mode = request.getParameter(McAppConstants.MODE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mcService.isLastActivity(new Long(toolSessionID)));
+	request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
+	request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -249,8 +251,6 @@ public class LearningController {
 		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
 								     // Long(toolSessionID).longValue());
 		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
-		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
-		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 
 		return "learning/WaitForLeader";
 	    }
