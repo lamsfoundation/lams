@@ -67,7 +67,7 @@
 
 	<c:if test="${mode != teacher}">
 		<div class="activity-bottom-buttons">
-			<button name="refreshButton" id="refreshButton" onclick="refresh();" class="btn btn-primary">
+			<button name="refreshButton" id="refreshButton" onclick="refresh();" class="btn btn-primary btn-refresh">
 				<fmt:message key="${refreshKey}" />
 			</button>
 		</div>

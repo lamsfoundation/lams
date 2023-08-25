@@ -97,7 +97,7 @@
 		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${isContinueReflectButtonEnabled}">
-					<button type="button" name="FinishButton" onclick="continueReflect()" class="btn btn-primary">
+					<button type="button" name="FinishButton" onclick="continueReflect()" class="btn btn-primary na">
 						<fmt:message key="${continueReflectButtonLabelKey}" />
 					</button>
 				</c:when>
