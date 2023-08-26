@@ -6,8 +6,10 @@ function checkNextGateActivity(finishButtonId, toolSessionId, activityId, submit
 			return;
 		}
 
-		new bootstrap.Tooltip(finishButton[0],{
-			'trigger' : 'manual'
+		let tooltip = new bootstrap.Tooltip(finishButton[0],{
+			'trigger' : 'manual',
+			// apparently there has to be some title, otherwise the tooltip won't show
+			'title' : '-'
 		});
 
 		finishButton
@@ -41,13 +43,12 @@ function checkNextGateActivity(finishButtonId, toolSessionId, activityId, submit
 							let timeoutFunction = null;
 							if (response.message) {
 								// tooltips should say whatever we got in the response
-								finishButton.attr({
-									'title' : response.message,
-									'data-original-title' : response.message
-								}).bootstrapTooltip('show');
+								tooltip.setContent({'.tooltip-inner' : response.message});
+								tooltip.show();
 
 								timeoutFunction = function(){
-									finishButton.bootstrapTooltip('hide').prop('disabled', false).attr('disabled', false);
+									tooltip.hide();
+									finishButton.prop('disabled', false).attr('disabled', false);
 								};
 							} else {
 								timeoutFunction = function(){
