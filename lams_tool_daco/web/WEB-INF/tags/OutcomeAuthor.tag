@@ -11,6 +11,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <%@ taglib uri="csrfguard" prefix="csrf" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
 
 <%-- Optional attributes. Must provide at either lessonId or toolContentId --%>
@@ -53,10 +54,10 @@
 		outcomeMappingIds${outcomeTagId} = [],
 		outcomeAddEnabled = true,
 		
-		outcomeExistingNoneLabel = '<fmt:message key="outcome.authoring.existing.none" />',
-		outcomeCreateNewLabel = '<fmt:message key="outcome.authoring.create.new" />',
+		outcomeExistingNoneLabel = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="outcome.authoring.existing.none" /></spring:escapeBody>',
+		outcomeCreateNewLabel = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="outcome.authoring.create.new" /></spring:escapeBody>',
 		outcomeMappingRemoveButton = '<i class="fa fa-remove loffset5"></i>',
-		outcomeMappingRemoveConfirm = '<fmt:message key="outcome.authoring.remove.confirm" />';
+		outcomeMappingRemoveConfirm = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="outcome.authoring.remove.confirm" /></spring:escapeBody>';
 	
 	$(document).ready(function(){
 		$('#outcomeSearchInput${outcomeTagId}').autocomplete({

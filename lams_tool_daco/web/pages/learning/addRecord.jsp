@@ -10,7 +10,7 @@
 <%-- If the view is horizontal or vertical --%>
 <c:set var="horizontal" value="${sessionMap.learningView=='horizontal'}" />
 <%-- To display A) B) C) in answer options instead of 1) 2) 3) --%>
-<c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
+<c:set var="ordinal"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.authoring.basic.answeroption.ordinal"/></spring:escapeBody></c:set>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 <div class="voffset10">
