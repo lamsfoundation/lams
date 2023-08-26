@@ -50,6 +50,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
@@ -81,6 +82,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 /**
  * The action servlet that provides the support for the AJAX based Chosen Grouping upload from File
@@ -320,7 +322,7 @@ public class GroupingUploadController {
 	}
 
 	Map<String, Set<String>> groups = new HashMap<>();
-	int totalUsersSkipped = parseGroupSpreadsheet(fileElements, orgGroupingId, groups);
+	Set<String> usersSkipped = parseGroupSpreadsheet(fileElements, orgGroupingId, groups);
 	int totalUsersAdded = 0;
 
 	List<OrganisationGroup> orgGroups = new LinkedList<>();
@@ -328,19 +330,20 @@ public class GroupingUploadController {
 	    String groupName = groupEntry.getKey();
 	    // just overwrite existing groups; they will be updated if already exist
 	    Set<User> learners = new HashSet<>();
+
 	    for (String login : groupEntry.getValue()) {
 		User learner = userManagementService.getUserByLogin(login);
 		if (learner == null) {
 		    log.warn("Unable to add learner " + login + " for group in related to grouping " + orgGroupingId
 			    + " as learner cannot be found.");
-		    totalUsersSkipped++;
+		    usersSkipped.add(login);
 
 		    //Check user is a part of the organisation
 		} else if (!securityService.hasOrgRole(organisation.getOrganisationId(), learner.getUserId(),
 			new String[] { Role.GROUP_MANAGER, Role.LEARNER, Role.MONITOR, Role.AUTHOR },
 			"be added to grouping", true)) {
 
-		    totalUsersSkipped++;
+		    usersSkipped.add(login);
 
 		} else {
 		    totalUsersAdded++;
@@ -359,7 +362,7 @@ public class GroupingUploadController {
 	}
 
 	userManagementService.saveOrganisationGrouping(orgGrouping, orgGroups);
-	return createResponseJSON(false, null, true, orgGrouping.getGroupingId(), totalUsersAdded, totalUsersSkipped);
+	return createResponseJSON(false, null, true, orgGrouping.getGroupingId(), totalUsersAdded, usersSkipped);
 
     }
 
@@ -367,7 +370,6 @@ public class GroupingUploadController {
     private ObjectNode saveLessonGrouping(Long lessonId, Long activityId, MultipartFile fileElements)
 	    throws IOException {
 
-	int totalUsersSkipped = 0;
 	int totalUsersAdded = 0;
 
 	// Lesson grouping case so clean out and reuse any existing groups
@@ -382,12 +384,13 @@ public class GroupingUploadController {
 	    existingGroupNames.add(group.getGroupName());
 	    if (!group.mayBeDeleted()) {
 		String error = messageService.getMessage("error.groups.upload.locked");
-		return createResponseJSON(true, error, true, grouping.getGroupingId(), 0, 0);
+		return createResponseJSON(true, error, true, grouping.getGroupingId(), 0, null);
 	    }
 	}
 
 	Map<String, Set<String>> groups = new HashMap<>();
-	totalUsersSkipped = parseGroupSpreadsheet(fileElements, grouping.getGroupingId(), groups);
+	Set<String> usersSkipped = parseGroupSpreadsheet(fileElements, grouping.getGroupingId(), groups);
+	Set<String> allUsers = groups.values().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 	// if branching must use the already specified groups or cannot match to a branch!
 	if (activity.isChosenBranchingActivity()) {
@@ -399,7 +402,7 @@ public class GroupingUploadController {
 		    }
 		    String error = messageService.getMessage("error.branching.upload.must.use.existing.groups",
 			    new String[] { groupNamesStrBlder.toString() });
-		    return createResponseJSON(true, error.toString(), false, grouping.getGroupingId(), 0, 0);
+		    return createResponseJSON(true, error.toString(), false, grouping.getGroupingId(), 0, null);
 		}
 	    }
 	}
@@ -414,12 +417,10 @@ public class GroupingUploadController {
 		User learner = userManagementService.getUserByLogin(login);
 		if (learner == null) {
 		    log.warn("Unable to add learner " + login + " to lesson grouping as learner cannot be found.");
-		    totalUsersSkipped++;
 		    iter.remove();
 
 		} else if (!securityService.isLessonLearner(lessonId, learner.getUserId(), "be added to grouping",
 			true)) {
-		    totalUsersSkipped++;
 		    iter.remove();
 		}
 	    }
@@ -441,17 +442,19 @@ public class GroupingUploadController {
 
 	// Now put in the new users groupings
 	for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {
-	    int added = monitoringService.addUsersToGroupByLogins(activityId, groupEntry.getKey(),
-		    groupEntry.getValue(), true);
-	    totalUsersAdded += added;
-	    totalUsersSkipped += groupEntry.getValue().size() - added;
+	    Set<String> usersToAdd = groupEntry.getValue();
+	    List<User> addedUsers = monitoringService.addUsersToGroupByLogins(activityId, groupEntry.getKey(),
+		    usersToAdd, true);
+	    totalUsersAdded += addedUsers.size();
+	    allUsers.removeAll(addedUsers.stream().map(User::getLogin).collect(Collectors.toSet()));
 	}
+	usersSkipped.addAll(allUsers);
 
-	return createResponseJSON(false, null, true, grouping.getGroupingId(), totalUsersAdded, totalUsersSkipped);
+	return createResponseJSON(false, null, true, grouping.getGroupingId(), totalUsersAdded, usersSkipped);
     }
 
     private ObjectNode createResponseJSON(boolean isError, String errorMessage, boolean reload, Long groupingId,
-	    int totalUsersAdded, int totalUsersSkipped) {
+	    int totalUsersAdded, Collection<String> usersSkipped) throws IOException {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (isError) {
 	    responseJSON.put("result", "FAIL");
@@ -460,7 +463,9 @@ public class GroupingUploadController {
 	} else {
 	    responseJSON.put("result", "OK");
 	    responseJSON.put("added", totalUsersAdded);
-	    responseJSON.put("skipped", totalUsersSkipped);
+	    if (usersSkipped != null && !usersSkipped.isEmpty()) {
+		responseJSON.set("skipped", JsonUtil.readArray(usersSkipped));
+	    }
 	}
 	responseJSON.put("groupingId", groupingId);
 	return responseJSON;
@@ -477,7 +482,7 @@ public class GroupingUploadController {
 	return null;
     }
 
-    public int parseGroupSpreadsheet(MultipartFile fileItem, Long groupingID, Map<String, Set<String>> groups)
+    public Set<String> parseGroupSpreadsheet(MultipartFile fileItem, Long groupingID, Map<String, Set<String>> groups)
 	    throws IOException {
 	POIFSFileSystem fs = new POIFSFileSystem(fileItem.getInputStream());
 	HSSFWorkbook wb = new HSSFWorkbook(fs);
@@ -485,7 +490,7 @@ public class GroupingUploadController {
 
 	int startRow = sheet.getFirstRowNum();
 	int endRow = sheet.getLastRowNum();
-	int skipped = 0;
+	Set<String> usersSkipped = new TreeSet<>();
 	Set<String> allUsers = new HashSet<>();
 
 	for (int i = startRow + 1; i < (endRow + 1); i++) {
@@ -493,21 +498,19 @@ public class GroupingUploadController {
 	    String login = parseStringCell(row.getCell(0));
 
 	    if (StringUtils.isBlank(login)) {
-		skipped++;
 		GroupingUploadController.log.warn(
 			"Unable to add learner for group related to grouping " + groupingID + " as login is missing.");
 		continue;
 	    }
 	    boolean alreadyExists = !allUsers.add(login);
 	    if (alreadyExists) {
-		skipped++;
 		GroupingUploadController.log.warn(
 			"Skipping duplicate row for learner " + login + " for group related to grouping " + groupingID);
 		continue;
 	    }
 	    String groupName = row.getLastCellNum() > 3 ? parseStringCell(row.getCell(3)) : null;
 	    if (groupName == null || groupName.length() == 0) {
-		skipped++;
+		usersSkipped.add(login);
 		GroupingUploadController.log.warn(
 			"Unable to add learner " + login + " for group in related to grouping " + groupingID
 				+ " as group name is missing.");
@@ -520,7 +523,7 @@ public class GroupingUploadController {
 	    }
 	    users.add(login);
 	}
-	return skipped;
+	return usersSkipped;
     }
 
     private UserDTO getUserDTO() {

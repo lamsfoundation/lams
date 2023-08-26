@@ -662,7 +662,13 @@ function callImportURL(form, formDataUpload) {
 					alert(LABELS.GENERAL_ERROR_LABEL);
 				}
 			} else {
-				var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("%1", response.added).replace("%2", response.skipped);
+				var msg = LABELS.LABEL_IMPORT_SUCCESSFUL_LABEL.replace("{0}", response.added);
+				if (response.skipped) {
+					msg += '\n'+ LABELS.LABEL_IMPORT_SUCCESSFUL_SKIPPED_LABEL.replace("{0}", response.skipped.length);
+					for (let i = 0; i < response.skipped.length && i < 10; i++) {
+						msg += '\n' + response.skipped[i];
+					}
+				}
 				alert(msg);
 				reloadIframe(returnedGroupingId);
 			}

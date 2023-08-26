@@ -250,7 +250,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another
      * group.
      */
-    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins,
+    abstract List<User> addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins,
 	    boolean forceChosenGrouping) throws LessonServiceException;
 
     /**
