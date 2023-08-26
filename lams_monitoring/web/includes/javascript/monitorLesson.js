@@ -18,7 +18,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	tapTimeout = 500,
 	lastTapTime = 0,
 	lastTapTarget = null,
-	
+
 // popup window size
 	popupWidth = 1280,
 	popupHeight = 720,
@@ -26,9 +26,9 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 // cached gate icon data 
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
 	gateOpenIconData   = null,
-	
+
 	fileDownloadCheckTimer = null,
-	
+
 	tempusDominusDefaultOptions = {
 		restrictions: {
 			minDate : new Date()
@@ -47,11 +47,11 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	tempusDominusDateFormatter = function(date) {
 		return date ? date.year + '-' + date.monthFormatted + '-' + date.dateFormatted + ' ' + date.hoursFormatted + ':' + date.minutesFormatted : '';
 	}
-	dateFormatter = function(date) {
-		return ("0" + date.getDate()).slice(-2) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-			date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
-	},
-	
+dateFormatter = function(date) {
+	return ("0" + date.getDate()).slice(-2) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+		date.getFullYear() + " " + ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
+},
+
 // colours to use on the page
 	COLORS = {
 		blue: '#0175E2',
@@ -65,7 +65,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 		yellow: 'rgba(249, 248, 113, 0.85)',
 		green: 'rgba(0, 145, 74, 0.85)'
 	};
-	
+
 
 $(document).ready(function(){
 	initCommonElements();
@@ -83,24 +83,24 @@ function initCommonElements(){
 		},
 		titleButton : "btn btn-xs"
 	});
-	
+
 	//turn to inline mode for x-editable.js
 	$.fn.editable.defaults.mode = 'inline';
 	// do not cancel on clicking outside of box
 	$.fn.editable.defaults.onblur = 'ignore';
-	
+
 	// assign action to navigation buttons
 	$('#edit-lesson-btn').click(function(){
 		$('.lesson-properties').toggleClass('active');
 		$('.component-sidebar').toggleClass('expanded');
 	});
-	
+
 	$('.component-menu-btn a[data-tab-name]').click(function(){
 		loadTab($(this).data('tab-name'), this);
 	});
-	
+
 	// initialise dialogs
-	
+
 	// search for users with the term the Monitor entered
 	$("#sequenceSearchPhrase").autocomplete( {
 		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
@@ -143,7 +143,7 @@ function initCommonElements(){
 			return false;
 		}
 	});
-	
+
 	var learnerGroupDialogContents = $('#learnerGroupDialogContents');
 	$('#learnerGroupDialogForceCompleteButton, #learnerGroupDialogForceCompleteAllButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
@@ -154,25 +154,25 @@ function initCommonElements(){
 			activityId = dialog.data('ajaxProperties').data.activityID,
 			dropArea = sequenceCanvas.add('#completedLearnersContainer');
 		dropArea.css('cursor', 'pointer')
-				.one('click', function(event) {
-					dropArea.off('click').css('cursor', 'default');
-					if (moveAll) {
-						// setting learners as 'true' is a special switch meaning "move all"
-						forceComplete(activityId, true, event.pageX, event.pageY);
-					} else {
-						var learners = [];
-						selectedLearners.each(function(){
-							var learner = $(this);
-							learners.push({
-								'id'     : learner.attr('userId'),
-								'name'   : learner.text()
-							});
+			.one('click', function(event) {
+				dropArea.off('click').css('cursor', 'default');
+				if (moveAll) {
+					// setting learners as 'true' is a special switch meaning "move all"
+					forceComplete(activityId, true, event.pageX, event.pageY);
+				} else {
+					var learners = [];
+					selectedLearners.each(function(){
+						var learner = $(this);
+						learners.push({
+							'id'     : learner.attr('userId'),
+							'name'   : learner.text()
 						});
-						forceComplete(activityId, learners, event.pageX, event.pageY);
-					}
-				});
+					});
+					forceComplete(activityId, learners, event.pageX, event.pageY);
+				}
+			});
 		dialog.modal('hide');
-		
+
 		if (moveAll) {
 			showToast(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', ''));
 		} else {
@@ -184,7 +184,7 @@ function initCommonElements(){
 			showToast(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', '"' + learnerNames + '"'));
 		}
 	});
-	
+
 	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
 			selectedLearner = $('.dialogTable .dialogListItemSelected', dialog);
@@ -193,7 +193,7 @@ function initCommonElements(){
 			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", popupHeight, popupWidth, true);
 		}
 	});
-	
+
 	$('#learnerGroupDialogEmailButton', learnerGroupDialogContents).click(function() {
 		var dialog = $('#learnerGroupDialog'),
 			selectedLearner = $('.dialogTable .dialogListItemSelected', dialog);
@@ -201,48 +201,48 @@ function initCommonElements(){
 			showEmailDialog(selectedLearner.attr('userId'));
 		}
 	});
-	
+
 	$('#learnerGroupDialogCloseButton', learnerGroupDialogContents).click(function(){
 		$('#learnerGroupDialog').modal('hide');
 	});
 
-    // initialise lesson dialog
+	// initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
-			'autoOpen'  : false,
-			'height'	: 860,
-			'resizable' : true,
-			'open'      : function(){
-				// until operator selects an user, buttons remain disabled
-				$('button.learnerGroupDialogSelectableButton').blur().prop('disabled', true);
-			},
-			'close'		: function(){
-			}
-		}, false);
-	
+		'autoOpen'  : false,
+		'height'	: 860,
+		'resizable' : true,
+		'open'      : function(){
+			// until operator selects an user, buttons remain disabled
+			$('button.learnerGroupDialogSelectableButton').blur().prop('disabled', true);
+		},
+		'close'		: function(){
+		}
+	}, false);
+
 	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show()).closest('.modal-dialog').addClass('modal-xl');;
-	
+
 	// search for users with the term the Monitor entered
 	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
-			'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
-			'delay'  : 700,
-			'select' : function(event, ui){
-				var phraseField = $(this),
-					dialog = $('#learnerGroupDialog');
-			    // learner's ID in ui.item.value is not used here
-				phraseField.val(ui.item.label);
-				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
-				// reset to page 1
-				dialog.data('ajaxProperties').data.pageNumber = 1;
-				showLearnerGroupDialog();
-				return false;
-			}
-		})
+		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=lesson&lessonID=" + lessonId,
+		'delay'  : 700,
+		'select' : function(event, ui){
+			var phraseField = $(this),
+				dialog = $('#learnerGroupDialog');
+			// learner's ID in ui.item.value is not used here
+			phraseField.val(ui.item.label);
+			$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
+			// reset to page 1
+			dialog.data('ajaxProperties').data.pageNumber = 1;
+			showLearnerGroupDialog();
+			return false;
+		}
+	})
 		// run the real search when the Monitor presses Enter
 		.keypress(function(e){
 			if (e.which == 13) {
 				var phraseField = $(this),
 					dialog = $('#learnerGroupDialog');
-				
+
 				phraseField.autocomplete("close");
 				if (phraseField.val()) {
 					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
@@ -252,7 +252,7 @@ function initCommonElements(){
 				showLearnerGroupDialog();
 			}
 		});
-	
+
 	var forceBackwardsDialogContents = $('#forceBackwardsDialogContents');
 	showDialog('forceBackwardsDialog', {
 		'autoOpen'	: false,
@@ -265,34 +265,34 @@ function initCommonElements(){
 	}, false);
 	// only need to do this once as then it updates the msg field directly.
 	$('.modal-body', '#forceBackwardsDialog').empty().append($('#forceBackwardsDialogContents').show());
-	
+
 	$('#forceBackwardsRemoveContentNoButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog'),
 			learners = forceBackwardsDialog.data('learners'),
 			moveAll = learners === true;
 		forceCompleteExecute(moveAll ? null : learners,
-			 moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
-			 forceBackwardsDialog.data('activityId'),
-			 false);
+			moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
+			forceBackwardsDialog.data('activityId'),
+			false);
 		forceBackwardsDialog.modal('hide');
 	});
 
 	$('#forceBackwardsRemoveContentYesButton', forceBackwardsDialogContents).click(function(){
 		var forceBackwardsDialog = $('#forceBackwardsDialog');
-			learners = forceBackwardsDialog.data('learners'),
+		learners = forceBackwardsDialog.data('learners'),
 			moveAll = learners === true;
 		forceCompleteExecute(moveAll ? null : learners,
-			 moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
-			 forceBackwardsDialog.data('activityId'),
-			 true);
+			moveAll ? forceBackwardsDialog.data('currentActivityId') : null,
+			forceBackwardsDialog.data('activityId'),
+			true);
 		forceBackwardsDialog.modal('hide');
 	});
 
 	$('#forceBackwardsCloseButton', forceBackwardsDialogContents).click(function(){
 		$('#forceBackwardsDialog').modal('hide');
 	});
-	
-	
+
+
 	$('#presenceButton').change(function(){
 		var checked = $(this).prop('checked'),
 			data = {
@@ -304,7 +304,7 @@ function initCommonElements(){
 			url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
 			type : 'POST',
 			cache : false,
-			data : data, 
+			data : data,
 			success : function() {
 				// updatePresenceAvailableCount();
 				if (checked) {
@@ -318,7 +318,7 @@ function initCommonElements(){
 			}
 		});
 	});
-	
+
 	// sets instant messaging availability
 	$('#imButton').click(function(){
 		var checked = $(this).prop('checked'),
@@ -344,34 +344,34 @@ function initCommonElements(){
 			}
 		});
 	});
-	
+
 	$('#openImButton').click(openChatWindow);
 
 	//enable renaming of lesson title  
 	$('#lesson-name').editable({
-	    type: 'text',
-	    pk: lessonId,
-	    url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + csrfTokenName + '=' + csrfTokenValue,
-	    validate: function(value) {
-		    //close editing area on validation failure
-            if (!value.trim()) {
-                $('.editable-open').editableContainer('hide', 'cancel');
-                return 'Can not be empty!';
-            }
-        },
-	    //assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
-	    success: function(response, newValue) {
-	        if(response.status == 'error') {
-	        	return response.msg; //msg will be shown in editable form
-	        }
-	    }
+		type: 'text',
+		pk: lessonId,
+		url: LAMS_URL + 'monitoring/monitoring/renameLesson.do?' + csrfTokenName + '=' + csrfTokenValue,
+		validate: function(value) {
+			//close editing area on validation failure
+			if (!value.trim()) {
+				$('.editable-open').editableContainer('hide', 'cancel');
+				return 'Can not be empty!';
+			}
+		},
+		//assume server response: 200 Ok {status: 'error', msg: 'field cannot be empty!'}
+		success: function(response, newValue) {
+			if(response.status == 'error') {
+				return response.msg; //msg will be shown in editable form
+			}
+		}
 	})
-	
+
 	$('#editLessonNameButton').click(function(e) {
-	    e.stopPropagation();
-	    $('#lesson-name').editable('toggle');
+		e.stopPropagation();
+		$('#lesson-name').editable('toggle');
 	});
-	
+
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
@@ -383,36 +383,36 @@ function initCommonElements(){
 			loadTab();
 		}
 	}, false);
-	
+
 	$('.modal-body', classDialog).empty().append($('#classDialogContents').show()).closest('.modal-dialog').addClass('modal-xl');
-	
+
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({
-			'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=organisation&lessonID=" + lessonId,
-			'delay'  : 700,
-			'select' : function(event, ui){
-				var phraseField = $(this),
-					dialog = $('#classDialog');
-			    // learner's ID in ui.item.value is not used here
-				phraseField.val(ui.item.label);
-				// show the "clear search phrase" button
-				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
-				// reset to page 1
-				dialog.data('LearnerAjaxProperties').data.pageNumber = 1;
-				showClassDialog('Learner');
-				return false;
-		   }
-		})
+		'source' : LAMS_URL + "monitoring/monitoring/autocomplete.do?scope=organisation&lessonID=" + lessonId,
+		'delay'  : 700,
+		'select' : function(event, ui){
+			var phraseField = $(this),
+				dialog = $('#classDialog');
+			// learner's ID in ui.item.value is not used here
+			phraseField.val(ui.item.label);
+			// show the "clear search phrase" button
+			$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
+			// reset to page 1
+			dialog.data('LearnerAjaxProperties').data.pageNumber = 1;
+			showClassDialog('Learner');
+			return false;
+		}
+	})
 		// run the real search when the Monitor presses Enter
 		.keypress(function(e){
 			if (e.which == 13) {
 				var phraseField = $(this),
 					dialog = $('#classDialog');
-		            		
+
 				phraseField.autocomplete("close");
 				if (phraseField.val()) {
 					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
-		        }
+				}
 				// reset to page 1
 				dialog.data('LearnerAjaxProperties').pageNumber = 1;
 				showClassDialog('Learner');
@@ -420,23 +420,23 @@ function initCommonElements(){
 		});
 
 	var emailProgressDialog = showDialog('emailProgressDialog',{
-			'autoOpen'  : false,
-			'width'     : 510,
-			'height'	: 700,
-			'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
-			'resizable' : false,
-			'close'		: function(){}
-		}, false);
+		'autoOpen'  : false,
+		'width'     : 510,
+		'height'	: 700,
+		'title' 	: LABELS.PROGRESS_EMAIL_TITLE,
+		'resizable' : false,
+		'close'		: function(){}
+	}, false);
 	$('.modal-body', emailProgressDialog).empty().append($('#emailProgressDialogContents').show());
-	
-	
+
+
 	// sets gradebook on complete functionality
 	$('#gradebookOnCompleteButton').change(function(){
 		var checked = $(this).prop('checked'),
 			data = {
-			'gradebookOnComplete' : checked,
-			'lessonID'      : lessonId
-		};
+				'gradebookOnComplete' : checked,
+				'lessonID'      : lessonId
+			};
 		data[csrfTokenName] = csrfTokenValue;
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring/gradebookOnComplete.do',
@@ -452,8 +452,8 @@ function initCommonElements(){
 			}
 		});
 	});
-	
-	
+
+
 	// update lesson details
 	$.ajax({
 		dataType : 'json',
@@ -462,7 +462,7 @@ function initCommonElements(){
 		data : {
 			'lessonID'  : lessonId
 		},
-		
+
 		success : function(response) {
 			// update lesson state label
 			lessonStateId = +response.lessonStateID;
@@ -495,11 +495,11 @@ function initCommonElements(){
 					break;
 				case 7:
 					label = LABELS.LESSON_STATE_REMOVED;
-					labelColour = 'danger'; 
+					labelColour = 'danger';
 					break;
 			}
 			$('#lessonStateLabel').attr('class', 'btn btn-sm btn-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
-			
+
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');
 			// remove all except "Select status" option
@@ -524,7 +524,7 @@ function initCommonElements(){
 					$('<option />').attr('value', 7).text(LABELS.LESSON_STATE_ACTION_REMOVE).appendTo(selectField);
 					break;
 			}
-			
+
 			// show/remove widgets for lesson scheduling
 			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler, #scheduleDisableLessonButton, #disableLessonButton'),
 				startDateField = $('#lessonStartDateSpan'),
@@ -535,11 +535,11 @@ function initCommonElements(){
 				//created but not started lesson
 				case 1:
 					scheduleControls.css('display','inline');
-				 	if ( response.finishDate ) {
-				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+					if ( response.finishDate ) {
+						lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
 						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
 						$("#disableLessonButton").css('display', 'none');
-				 	}
+					}
 					startDateField.hide();
 					lessonFinishDateSpan.hide();
 					lessonStateChanger.hide();
@@ -549,49 +549,49 @@ function initCommonElements(){
 					scheduleControls.css('display','inline');
 					startDateField.text(LABELS.LESSON_START.replace("%0",response.startDate)).add('#startLessonButton').css('display','inline');
 					$("#scheduleLessonButton").html(LABELS.RESCHEDULE);
-				 	if ( response.finishDate ) {
-				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','block');
+					if ( response.finishDate ) {
+						lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','block');
 						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
 						$("#disableLessonButton").css('display', 'none');
-				 	} else {
-				 		lessonFinishDateSpan.css('display','none');
-				 	}
+					} else {
+						lessonFinishDateSpan.css('display','none');
+					}
 					lessonStateChanger.hide();
 					break;
 				//started lesson
-				default: 	
+				default:
 					startDateField.text("").css('display','none'); // we may have just started the lesson and needed to clear the scheduled date message
-				 	if ( response.finishDate ) {
+					if ( response.finishDate ) {
 						scheduleControls.css('display','inline');
 						$("#lessonStartApply").css('display','none');
-				 		lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
+						lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
 						$("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
-				 	} else {
+					} else {
 						scheduleControls.css('display','none');
 						$("#scheduleDisableLessonButton").html(LABELS.SCHEDULE);
-				 		lessonFinishDateSpan.text("").css('display','none');
-				 	}
+						lessonFinishDateSpan.text("").css('display','none');
+					}
 
-				 	lessonStateChanger.css('display','inline');
-				 	stateLabel.attr('title',response.startDate);
-				 	break;
+					lessonStateChanger.css('display','inline');
+					stateLabel.attr('title',response.startDate);
+					break;
 			}
-			
+
 			$('#lesson-name-strong').html(response.lessonName);
 			$('#lesson-instructions').html(response.lessonInstructions);
 		}
 	});
-	
+
 	//initialize datetimepickers
 	new tempusDominus.TempusDominus(document.getElementById('scheduleDatetimeField'), tempusDominusDefaultOptions)
 		.dates.formatInput = tempusDominusDateFormatter;
-		
+
 	new tempusDominus.TempusDominus(document.getElementById('disableDatetimeField'), tempusDominusDefaultOptions)
 		.dates.formatInput = tempusDominusDateFormatter;
 
 	let datePickerElement = $('#emaildatePicker'),
 		datePicker = new tempusDominus.TempusDominus(datePickerElement[0], tempusDominusDefaultOptions);
-		
+
 	datePicker.dates.formatInput = tempusDominusDateFormatter;
 	datePickerElement.data('datePicker', datePicker);
 }
@@ -605,28 +605,28 @@ function loadTab(tabName, button) {
 	} else {
 		tabName = currentTab;
 	}
-	
+
 	sessionStorage.setItem("lamsMonitoringCurrentTab", currentTab);
-	
+
 	$('.navigate-btn-container a.btn, .lesson-properties').removeClass('active');
 	$('.component-sidebar').removeClass('expanded');
 	if (button) {
 		$(button).addClass('active');
 	}
-	
+
 	clearEventSources();
-	
-	
+
+
 	let tabContent = $('.monitoring-page-content .tab-content'),
 		searchStudentWidget = $('#sequenceSearchPhraseContainer');
-		
+
 	$('.is-countdown', tabContent).countdown('destroy');
 	tabContent.empty();
-	
+
 	$('#sequenceSearchPhraseButton').prop('disabled', sequenceSearchedLearner == null);
 	$('#sequenceSearchPhraseIcon').toggle(sequenceSearchedLearner == null);
 	$('#sequenceSearchPhraseClearIcon').toggle(sequenceSearchedLearner != null);
-		
+
 	switch(tabName) {
 		case 'sequence': {
 			tabContent.load(LAMS_URL + 'monitoring/monitoring/displaySequenceTab.do', function(){
@@ -634,14 +634,14 @@ function loadTab(tabName, button) {
 					function (event) {
 						if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
 							updateSequenceTab();
-					}
-				});
+						}
+					});
 				$("#load-sequence-tab-btn").addClass('active');
 			});
 			searchStudentWidget.show();
 		}
-		break;
-		
+			break;
+
 		case 'learners': {
 			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayLearnersTab.do', function(){
 				$('#learnes-order-by-completion').change(function(){
@@ -651,92 +651,92 @@ function loadTab(tabName, button) {
 			});
 			searchStudentWidget.show();
 		}
-		break;
-		
+			break;
+
 		case 'gradebook': {
 			tabContent.load(LAMS_URL + 'monitoring/monitoring/displayGradebookTab.do', function(){
 				openEventSource(LAMS_URL + 'monitoring/monitoring/getGradebookUpdateFlux.do?lessonId=' +  lessonId,
 					function (event) {
 						if ("doRefresh" == event.data && $('#gradebookDiv').length === 1){
-						    let expandedGridIds = [],
+							let expandedGridIds = [],
 								userGrid = $('#userView'),
 								activityGrid = $('#activityView');
 							// do not update if grid is being edited by the teacher
 							if (userGrid.data('isCellEdited') === true || activityGrid.data('isCellEdited') === true) {
 								return;
 							}
-							
-						    $("tr:has(.sgexpanded)", userGrid).each(function () {
-						        let num = $(this).attr('id');
-						        expandedGridIds.push(num);
-						    });
+
+							$("tr:has(.sgexpanded)", userGrid).each(function () {
+								let num = $(this).attr('id');
+								expandedGridIds.push(num);
+							});
 							userGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
-							
+
 							expandedGridIds = [];
-						    $("tr:has(.sgexpanded)", activityGrid).each(function () {
-						        let num = $(this).attr('id');
-						        expandedGridIds.push(num);
-						    });
+							$("tr:has(.sgexpanded)", activityGrid).each(function () {
+								let num = $(this).attr('id');
+								expandedGridIds.push(num);
+							});
 							activityGrid.data('expandedGridIds', expandedGridIds).trigger("reloadGrid");
 						}
 					});
-				
+
 				updateGradebookTab();
 			});
 			searchStudentWidget.show();
 		}
-		break;
-		
+			break;
+
 		case 'teams': {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/teams.do?lessonID=' + lessonId);
 			searchStudentWidget.show();
 		}
-		break;
-		
+			break;
+
 		case 'irat': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessment.do?toolContentID=' + iraToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
-		
+			break;
+
 		case 'iratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/laasse10/tblmonitoring/iraAssessmentStudentChoices.do?toolContentID=' + iraToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
-		
+			break;
+
 		case 'trat': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/tra.do?toolContentID=' + traToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
-		
+			break;
+
 		case 'tratStudentChoices': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/traStudentChoices.do?toolContentID=' + traToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
-				
+			break;
+
 		case 'burningQuestions': {
 			tabContent.load(LAMS_URL + 'tool/lascrt11/tblmonitoring/burningQuestions.do?toolContentID=' + traToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
-		
+			break;
+
 		case 'aes': {
 			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?'
-			                + '&aeToolContentIds='+ aeToolContentIds 
-							+ '&aeToolTypes=' + aeToolTypes 
-							+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
+				+ '&aeToolContentIds='+ aeToolContentIds
+				+ '&aeToolTypes=' + aeToolTypes
+				+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
 			searchStudentWidget.hide();
 		}
-		break;
-		
+			break;
+
 		case 'peerReview': {
 			tabContent.load(LAMS_URL + 'tool/laprev11/tblmonitoring/peerreview.do?toolContentID=' + peerreviewToolContentId);
 			searchStudentWidget.hide();
 		}
-		break;
+			break;
 	}
 }
 
@@ -753,11 +753,11 @@ function showLessonLearnersDialog() {
 			'lessonID'  : lessonId
 		}
 	};
-	
+
 	showLearnerGroupDialog(ajaxProperties, LABELS.LESSON_GROUP_DIALOG_CLASS, true, false, false, true);
 }
 
-/** 
+/**
  * Lesson state field changed but the apply button not yet pressed
  */
 function lessonStateFieldChanged() {
@@ -766,7 +766,7 @@ function lessonStateFieldChanged() {
 	var state = +$('#lessonStateField').val();
 	switch (state) {
 		//'disable' is chosen
-		case 4: 
+		case 4:
 			$('#lessonScheduler').show();
 			$('#lessonStartApply').hide();
 			$('#lessonStateApply').hide();
@@ -777,7 +777,7 @@ function lessonStateFieldChanged() {
 			break;
 		default:
 			$('#lessonDisableApply').hide();
-			$('#lessonStateApply').show();		
+			$('#lessonStateApply').show();
 			break;
 	}
 }
@@ -787,11 +787,11 @@ function lessonStateFieldChanged() {
  */
 function changeLessonState(){
 	var method = null;
-	
+
 	//state chosen in the dropdown menu
 	var state = +$('#lessonStateField').val();
 	switch (state) {
-	
+
 		//'activate' is chosen
 		case 3:
 			switch (lessonStateId) {
@@ -803,18 +803,18 @@ function changeLessonState(){
 					break;
 			}
 			break;
-			
-			
+
+
 		//'disable' is handled by scheduleDisableLesson, disableLesson
 		// case 4:
 
 		//'archive' is chosen
-		case 6: 
+		case 6:
 			method = "archiveLesson";
 			break;
-			
+
 		//'remove' is chosen
-		case 7: 
+		case 7:
 			showConfirm(LABELS.LESSON_REMOVE_ALERT, function() {
 				showConfirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT, function() {
 					method = "removeLesson";
@@ -822,7 +822,7 @@ function changeLessonState(){
 			});
 			break;
 	}
-	
+
 	if (method) {
 		applyStateChange(state, method)
 	}
@@ -839,11 +839,11 @@ function scheduleDisableLesson() {
 	} else {
 		alert(LABELS.LESSON_ERROR_SCHEDULE_DATE);
 	}
-}			
+}
 
 function disableLesson() {
 	applyStateChange(4, "suspendLesson");
-}			
+}
 
 function applyStateChange(state, method, newLessonEndDate) {
 	var params = {
@@ -854,144 +854,140 @@ function applyStateChange(state, method, newLessonEndDate) {
 	if (newLessonEndDate) {
 		params.lessonEndDate = newLessonEndDate;
 	}
-	
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
 		data: params,
 		type: "POST",
 		cache : false,
-	    success: function() {
+		success: function() {
 			if (state == 7) {
-				// user chose to finish the lesson, close monitoring and refresh the lesson list
-				closeMonitorLessonDialog(true);
+				// user chose to finish the lesson, close monitoring
+				document.location.href = "/";
 			} else {
-				loadTab();
+				document.location.reload();
 			}
-			if ( state == 4 ) {
-				lessonEndDate = newLessonEndDate;
-			}
-	    }
+		}
 	});
 }
 
 function drawLessonCompletionChart(){
 	d3.json(LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-			function(error, response){
-				if (error) {
-					// forward error to browser
-					throw error;
-				}
-				
-				if (!response || $.isEmptyObject(response)) {
-					// if there is no data to display
-					return;
-				}
-				
-				let chartDiv = $('#completion-chart'),
-					lessonCompletionChart = chartDiv.data('chart'),
-					percent = [],
-					labels = [],
-					raw = [];
-					
-				$(response.data).each(function(){
-					labels.push(this.name);
-					percent.push(this.value);
-					raw.push(this.raw);
-				});
-				
-				if (lessonCompletionChart != null) {
-					// chart already exists, just update data
-					lessonCompletionChart.data.datasets[0].data = percent;
-					lessonCompletionChart.lessonCompletionChartRawData = raw;
-					lessonCompletionChart.update();
-					return;
-				}
-	
-				let ctx = chartDiv[0].getContext('2d');
-				lessonCompletionChart = new Chart(ctx, {
-						type : 'doughnut',
-						borderWidth : 0,
-						data : {
-							elements : {
-								arc : {
-									borderWidth : 0,
-									fontSize : 0,
-								}
-							},
-							datasets : [ {
-								data : percent,
-								backgroundColor : [
-													GRAPH_COLORS.yellow,
-													GRAPH_COLORS.green,
-													GRAPH_COLORS.blue
-												  ],
-								borderWidth : 1,
-								borderColor : COLORS.gray
-							} ],
-							labels : labels
-						},
-						options : {
-							responsive : false,
-							tooltips : {
-								enabled : true,
-								callbacks: {
-									label : function(tooltipItem, data) {
-										let index =  tooltipItem.index,
-										
-											rawData = this._chart.lessonCompletionChartRawData,
-											percent = data.datasets[0].data,
-											
-											label = labels[index],
-											value = percent[index],
-											rawValue = rawData[index];
-										
-										return label + ": " + rawValue + " (" + value + "%)";
-									}
-								}
-							},
-							legend : {
-								position: 'bottom',
-								align: 'start',
-								labels : {
-									fontSize : 16,
-									generateLabels : function(chart) {
-										var data = chart.data;
-										if (data.labels.length && data.datasets.length) {
-											return data.labels.map(function(label, i) {
-												let meta = chart.getDatasetMeta(0),
-													style = meta.controller.getStyle(i),
-													value = data.datasets[0].data[i],
-													rawData = chart.lessonCompletionChartRawData || raw,
-													rawValue = rawData[i];
-				
-												return {
-													text: label + ": " + rawValue + " (" + value + "%)",
-													fillStyle: style.backgroundColor,
-													strokeStyle: style.borderColor,
-													lineWidth: 0,
-													hidden: isNaN(value) || meta.data[i].hidden,
-				
-													// Extra data used for toggling the
-													// correct item
-													index: i
-												};
-											});
-										}
-										return [];
-									}
-								}
-							},
-							animation : {
-								animateScale : true,
-								animateRotate : true,
-								duration : 1000
+		function(error, response){
+			if (error) {
+				// forward error to browser
+				throw error;
+			}
+
+			if (!response || $.isEmptyObject(response)) {
+				// if there is no data to display
+				return;
+			}
+
+			let chartDiv = $('#completion-chart'),
+				lessonCompletionChart = chartDiv.data('chart'),
+				percent = [],
+				labels = [],
+				raw = [];
+
+			$(response.data).each(function(){
+				labels.push(this.name);
+				percent.push(this.value);
+				raw.push(this.raw);
+			});
+
+			if (lessonCompletionChart != null) {
+				// chart already exists, just update data
+				lessonCompletionChart.data.datasets[0].data = percent;
+				lessonCompletionChart.lessonCompletionChartRawData = raw;
+				lessonCompletionChart.update();
+				return;
+			}
+
+			let ctx = chartDiv[0].getContext('2d');
+			lessonCompletionChart = new Chart(ctx, {
+				type : 'doughnut',
+				borderWidth : 0,
+				data : {
+					elements : {
+						arc : {
+							borderWidth : 0,
+							fontSize : 0,
+						}
+					},
+					datasets : [ {
+						data : percent,
+						backgroundColor : [
+							GRAPH_COLORS.yellow,
+							GRAPH_COLORS.green,
+							GRAPH_COLORS.blue
+						],
+						borderWidth : 1,
+						borderColor : COLORS.gray
+					} ],
+					labels : labels
+				},
+				options : {
+					responsive : false,
+					tooltips : {
+						enabled : true,
+						callbacks: {
+							label : function(tooltipItem, data) {
+								let index =  tooltipItem.index,
+
+									rawData = this._chart.lessonCompletionChartRawData,
+									percent = data.datasets[0].data,
+
+									label = labels[index],
+									value = percent[index],
+									rawValue = rawData[index];
+
+								return label + ": " + rawValue + " (" + value + "%)";
 							}
 						}
-					});
-			
-				lessonCompletionChart.lessonCompletionChartRawData = raw;
-				chartDiv.data('chart', lessonCompletionChart);
+					},
+					legend : {
+						position: 'bottom',
+						align: 'start',
+						labels : {
+							fontSize : 16,
+							generateLabels : function(chart) {
+								var data = chart.data;
+								if (data.labels.length && data.datasets.length) {
+									return data.labels.map(function(label, i) {
+										let meta = chart.getDatasetMeta(0),
+											style = meta.controller.getStyle(i),
+											value = data.datasets[0].data[i],
+											rawData = chart.lessonCompletionChartRawData || raw,
+											rawValue = rawData[i];
+
+										return {
+											text: label + ": " + rawValue + " (" + value + "%)",
+											fillStyle: style.backgroundColor,
+											strokeStyle: style.borderColor,
+											lineWidth: 0,
+											hidden: isNaN(value) || meta.data[i].hidden,
+
+											// Extra data used for toggling the
+											// correct item
+											index: i
+										};
+									});
+								}
+								return [];
+							}
+						}
+					},
+					animation : {
+						animateScale : true,
+						animateRotate : true,
+						duration : 1000
+					}
+				}
 			});
+
+			lessonCompletionChart.lessonCompletionChartRawData = raw;
+			chartDiv.data('chart', lessonCompletionChart);
+		});
 }
 
 function checkScheduleDate(startDateString, endDateString) {
@@ -1012,8 +1008,7 @@ function scheduleLesson(){
 					'lessonStartDate' : date
 				},
 				success : function() {
-					lessonStartDate = date;
-					loadTab();
+					document.location.reload();
 				}
 			});
 		} else {
@@ -1044,7 +1039,7 @@ function startLesson(){
 
 
 /**
- * Stringifies user IDs who were selected in Edit Class dialog. 
+ * Stringifies user IDs who were selected in Edit Class dialog.
  */
 function getSelectedClassUserList(containerId) {
 	var list = [];
@@ -1059,20 +1054,20 @@ function getSelectedClassUserList(containerId) {
 
 function openChatWindow(){
 	// variables are set in JSP page
-	window.open(LAMS_URL + 'learning/presenceChat.jsp?lessonID=' + lessonId 
-			+ '&presenceEnabledPatch=true&presenceImEnabled=true&presenceShown=true&createDateTime='
-			+ createDateTimeStr
-			,'Chat'
-			,'width=650,height=350,resizable=no,scrollbars=no,status=no,menubar=no,toolbar=no');
+	window.open(LAMS_URL + 'learning/presenceChat.jsp?lessonID=' + lessonId
+		+ '&presenceEnabledPatch=true&presenceImEnabled=true&presenceShown=true&createDateTime='
+		+ createDateTimeStr
+		,'Chat'
+		,'width=650,height=350,resizable=no,scrollbars=no,status=no,menubar=no,toolbar=no');
 }
 
 function showEmailDialog(userId){
-	
+
 	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
 	//calculate width and height based on the dimensions of the window to which dialog is added
 	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
-	
+
 	showDialog("dialogEmail", {
 		'autoOpen'  : true,
 		'height'    : Math.max(380, Math.min(700, dialogWindow.height() - 30)),
@@ -1080,13 +1075,13 @@ function showEmailDialog(userId){
 		'resizable' : true,
 		'title'     : LABELS.EMAIL_TITLE,
 		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
-		"isCreateInParentWindow" : !isTopLevelWindow, 
+		"isCreateInParentWindow" : !isTopLevelWindow,
 		'open'      : function(){
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog).attr('src',
-					LAMS_URL + 'emailUser/composeMail.do?lessonID=' + lessonId
-					+ '&userID=' + userId);
+				LAMS_URL + 'emailUser/composeMail.do?lessonID=' + lessonId
+				+ '&userID=' + userId);
 		},
 		'close' : function(){
 			$(this).remove();
@@ -1119,14 +1114,14 @@ function updatePresenceAvailableCount(){
 function updateContributeActivities(contributeActivities) {
 	let requiredTasksPanel = $('#required-tasks'),
 		requiredTasksContent = $('#required-tasks-content', requiredTasksPanel);
-		
+
 	if (!contributeActivities || contributeActivities.length === 0) {
 		requiredTasksPanel.remove();
 		return;
 	}
-	
+
 	$('.contribute-row', requiredTasksContent).remove();
-	
+
 	/*
 	// special case - add a Live Edit option. This does not directly map to an activity
 	if ( lockedForEdit && lockedForEditUserId == userId) {
@@ -1134,7 +1129,7 @@ function updateContributeActivities(contributeActivities) {
 		// put it at the top of the contribution list
 		var cell = $('<div />').addClass('contributeActivityCell').text(LABELS.LIVE_EDIT_BUTTON);
 		var row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
-		var entryContent = LABELS.LIVE_EDIT_TOOLTIP 
+		var entryContent = LABELS.LIVE_EDIT_TOOLTIP
 			+ '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openLiveEdit()" title="' + LABELS.CONTRIBUTE_TOOLTIP
 			+ '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
@@ -1144,10 +1139,10 @@ function updateContributeActivities(contributeActivities) {
 	if (contributeActivities) {
 		$.each(contributeActivities, function(){
 			let contributeActivity = this;
-			
+
 			let row = $('<div />').addClass('row contribute-row' + (contributeActivity.title ? ' ml-1' : ''))
-								  .appendTo(requiredTasksContent);
-			
+				.appendTo(requiredTasksContent);
+
 			$.each(this.contributeEntries, function(){
 				var entryContent = '<div class="col label">' + (contributeActivity.title ? '<b>' + contributeActivity.title + '</b><br>(<small>' : '');
 				switch (this.contributionType) {
@@ -1155,47 +1150,47 @@ function updateContributeActivities(contributeActivities) {
 					case 6  : entryContent += LABELS.CONTRIBUTE_GROUPING; break;
 					case 7  : entryContent += LABELS.CONTRIBUTE_TOOL; break;
 					case 9  : entryContent += LABELS.CONTRIBUTE_BRANCHING; break;
-					case 11 : entryContent += LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
-					case 12 : entryContent += LABELS.CONTRIBUTE_GATE_PASSWORD; break; 
+					case 11 : entryContent += LABELS.CONTRIBUTE_CONTENT_EDITED; break;
+					case 12 : entryContent += LABELS.CONTRIBUTE_GATE_PASSWORD; break;
 				}
 				if (contributeActivity.title) {
 					entryContent += ')</small>';
 				}
 				entryContent += '</div><div class="col text-right">';
 				switch (this.contributionType) {
-					case 3  : 
+					case 3  :
 					case 12 : if (this.isComplete) {
-						 		entryContent += '<div class="pull-right"><button class="contribute-gate-opened-button btn btn-success" '
-						 					 + 'onClick="javascript:openGateSelectively(\'' + this.url  + '\')" '
-						 					 + 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
-						 					 + LABELS.CONTRIBUTE_OPENED_GATE 
-						 					 + '</button></div>';
-							} else {
-								entryContent += '<div class="btn-group dropdown-center"><button onClick="javascript:openGateNow('
-                                    + contributeActivity.activityID + ')" type="button" class="btn btn-primary" title="' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON 
-									+ '</button><button  class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" ' 
-									+ 'type="button" aria-haspopup="true" aria-expanded="false"></button>'
-									+ '<ul class="dropdown-menu"><li class="bg-primary rounded">'
-									+ '<a href="#" class="dropdown-item text-white" onClick="javascript:openGateSelectively(\'' + this.url + '\')" title="' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">' 
-									+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
-									
-							}
-							break;
+						entryContent += '<div class="pull-right"><button class="contribute-gate-opened-button btn btn-success" '
+							+ 'onClick="javascript:openGateSelectively(\'' + this.url  + '\')" '
+							+ 'title="' + LABELS.CONTRIBUTE_OPENED_GATE_TOOLTIP + '">'
+							+ LABELS.CONTRIBUTE_OPENED_GATE
+							+ '</button></div>';
+					} else {
+						entryContent += '<div class="btn-group dropdown-center"><button onClick="javascript:openGateNow('
+							+ contributeActivity.activityID + ')" type="button" class="btn btn-primary" title="'
+							+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_TOOLTIP + '">'
+							+ LABELS.CONTRIBUTE_OPEN_GATE_NOW_BUTTON
+							+ '</button><button  class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" '
+							+ 'type="button" aria-haspopup="true" aria-expanded="false"></button>'
+							+ '<ul class="dropdown-menu"><li class="bg-primary rounded">'
+							+ '<a href="#" class="dropdown-item text-white" onClick="javascript:openGateSelectively(\'' + this.url + '\')" title="'
+							+ LABELS.CONTRIBUTE_OPEN_GATE_TOOLTIP + '">'
+							+ LABELS.CONTRIBUTE_OPEN_GATE_BUTTON + '</a></li></ul></div>';
+
+					}
+						break;
 					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" target="_blank" href="'
-							 + this.url + '" title="' + LABELS.CONTRIBUTE_TOOLTIP + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
-							break;
+						+ this.url + '" title="' + LABELS.CONTRIBUTE_TOOLTIP + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
+						break;
 					default : entryContent += '<button type="button" class="btn btn-primary contribute-go-button" onClick="javascript:openPopUp(\''
-						 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
-						 + '">' + LABELS.CONTRIBUTE_BUTTON + '</button>';
+						+ this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
+						+ '">' + LABELS.CONTRIBUTE_BUTTON + '</button>';
 				}
 
 				row.html(entryContent + "</div>");
 			});
 		});
-		
+
 		requiredTasksPanel.show();
 	} else {
 		requiredTasksPanel.hide();
@@ -1217,10 +1212,10 @@ function editEmailProgressDate(dateCheckbox){
 	var dateid = dateCheckbox.closest('.dialogListItem').attr('dateid'),
 		add = dateCheckbox.is(':checked'),
 		data = {
-		'lessonID' : lessonId,
-		'id' : dateid,
-		'add' : add
-	};	
+			'lessonID' : lessonId,
+			'id' : dateid,
+			'add' : add
+		};
 	data[csrfTokenName] = csrfTokenValue;
 	$.ajax({
 		url : LAMS_URL + 'monitoring/emailProgress/updateEmailProgressDate.do',
@@ -1232,7 +1227,7 @@ function editEmailProgressDate(dateCheckbox){
 				dateCheckbox.closest('.dialogListItem')
 					.attr('dateid', dateObj.id)
 					.find('label').text(dateFormatter(new Date(dateObj.id)));
-			} 
+			}
 		}
 	});
 }
@@ -1245,19 +1240,19 @@ function fillEmailProgress() {
 		table = $('#emailProgressDialogTable', dialog),
 		list = $('.dialogTable', table).empty(),
 		dates = null;
-		ajaxProperties = dialog.data('ajaxProperties'),
+	ajaxProperties = dialog.data('ajaxProperties'),
 		dates = null;
-	
+
 	if (!ajaxProperties) {
 		// initialise ajax config
 		ajaxProperties = {
-		dataType : 'json',
-		url : LAMS_URL + 'monitoring/emailProgress/getEmailProgressDates.do',
-		cache : false,
-		async : false,
-		data : {
-			'lessonID'  : lessonId
-		}};
+			dataType : 'json',
+			url : LAMS_URL + 'monitoring/emailProgress/getEmailProgressDates.do',
+			cache : false,
+			async : false,
+			data : {
+				'lessonID'  : lessonId
+			}};
 		dialog.data('ajaxProperties', ajaxProperties);
 	}
 
@@ -1269,7 +1264,7 @@ function fillEmailProgress() {
 
 	$.each(dates, function(dateIndex, date) {
 		addUserCheckbox(date.id, list, true);
-	});	
+	});
 }
 
 function addUserCheckbox(dateId, list, checked) {
@@ -1281,32 +1276,32 @@ function addUserCheckbox(dateId, list, checked) {
 			alreadyExists = true;
 			return false;
 		}
-	});	
+	});
 	if ( alreadyExists )
 		return;
-		
+
 	// does not exist so add to list
 	var checkboxId = 'email-progress-date-' + dateId,
 		checkbox = $('<input />').attr({
-   	 	'type' : 'checkbox',
-		'id'   : checkboxId
-     }).addClass('form-check-input me-1')
-	   .change(function(){
-    		editEmailProgressDate($(this));
-       }),
+			'type' : 'checkbox',
+			'id'   : checkboxId
+		}).addClass('form-check-input me-1')
+			.change(function(){
+				editEmailProgressDate($(this));
+			}),
 
 
-     dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateFormatter(new Date(dateId))),
-   	
-	 dateRow = $('<tr />').attr({
-					'dateid'  : dateId
-				})
-	          .addClass('dialogListItem')
-			  .appendTo(list);
-		
-	 $('<td />').append(checkbox).appendTo(dateRow);
-	 $('<td />').append(dateString).appendTo(dateRow);
-	    	
+		dateString = $('<label />').addClass('form-check-label').attr('for', checkboxId).text(dateFormatter(new Date(dateId))),
+
+		dateRow = $('<tr />').attr({
+			'dateid'  : dateId
+		})
+			.addClass('dialogListItem')
+			.appendTo(list);
+
+	$('<td />').append(checkbox).appendTo(dateRow);
+	$('<td />').append(dateString).appendTo(dateRow);
+
 
 	checkbox.prop('checked', checked);
 	return checkbox;
@@ -1316,20 +1311,20 @@ function sendProgressEmail() {
 	showConfirm(LABELS.PROGRESS_EMAIL_SEND_NOW_QUESTION, function() {
 		$.ajax({
 			dataType : 'json',
-			type : 'post', 
+			type : 'post',
 			url : LAMS_URL + 'monitoring/emailProgress/sendLessonProgressEmail.do',
 			type: 'post',
 			cache : false,
 			data : {
 				'lessonID'  : lessonId
-				},		
+			},
 			success : function(response) {
 				if ( response.error || ! response.sent > 0 )
 					showToast(LABELS.PROGRESS_EMAIL_SEND_FAILED+"\n"+(response.error ? response.error : ""));
-				else 
+				else
 					showToast(LABELS.PROGRESS_EMAIL_SUCCESS.replace('[0]',response.sent));
 			}
-		});	
+		});
 	});
 }
 
@@ -1341,7 +1336,7 @@ function addEmailProgressDate() {
 		date = datePicker.viewDate;
 
 	datePickerElement.val('');
-		
+
 	if (date != null ) {
 		if (date.getTime() < Date.now()  ) {
 			alert(LABELS.ERROR_DATE_IN_PAST);
@@ -1358,39 +1353,39 @@ function addEmailProgressDate() {
 function addEmailProgressSeries(forceQuestion, table) {
 	if ( ! table ) {
 		table = $('#emailProgressDialogTable', '#emailProgressDialog');
-	} 
+	}
 	var list = $('.dialogTable', table),
 		items = $('.dialogListItem', list);
-	
+
 	if ( forceQuestion && items.length < 2 ) {
 		alert(LABELS.PROGRESS_ENTER_TWO_DATES_FIRST);
 	} else if ( items.length == 2 || forceQuestion ) {
-    	var numDates = prompt(LABELS.PROGRESS_EMAIL_GENERATE_ONE+"\n\n"+LABELS.PROGRESS_EMAIL_GENERATE_TWO);
-    	if ( numDates > 0 ) {
-    		var dates=[];
-    		var maxDate = 0;
-    		items.each( function() {
-    			var nextDate = $(this).attr('dateid');
-    			dates.push($(this).attr('dateid'));
-    			if ( maxDate < nextDate ) 
-    				maxDate = nextDate;
-    		});
-    		if ( dates[1] < dates[0] ) {
-    			var swap = dates[1];
-    			dates[1] = dates[0];
-    			dates[0] = swap;
-    		}
-    		var diff = dates[1] - dates[0];
-    		if ( diff > 0 ) {
+		var numDates = prompt(LABELS.PROGRESS_EMAIL_GENERATE_ONE+"\n\n"+LABELS.PROGRESS_EMAIL_GENERATE_TWO);
+		if ( numDates > 0 ) {
+			var dates=[];
+			var maxDate = 0;
+			items.each( function() {
+				var nextDate = $(this).attr('dateid');
+				dates.push($(this).attr('dateid'));
+				if ( maxDate < nextDate )
+					maxDate = nextDate;
+			});
+			if ( dates[1] < dates[0] ) {
+				var swap = dates[1];
+				dates[1] = dates[0];
+				dates[0] = swap;
+			}
+			var diff = dates[1] - dates[0];
+			if ( diff > 0 ) {
 				var genDateMS = maxDate;
-    			for (var i = 0; i < numDates; i++) {
-    				genDateMS = +genDateMS + +diff;
-    			    addUserCheckbox(genDateMS, list, false);
-    			}
-    		}
-    	}
-    }
-} 
+				for (var i = 0; i < numDates; i++) {
+					genDateMS = +genDateMS + +diff;
+					addUserCheckbox(genDateMS, list, false);
+				}
+			}
+		}
+	}
+}
 
 
 //********** SEQUENCE TAB FUNCTIONS **********
@@ -1429,7 +1424,7 @@ function openGateSelectively(url){
 }
 
 function showIntroductionDialog(lessonId) {
-	
+
 	showDialog('introductionDialog', {
 		'height'	: 450,
 		'width'  	: Math.max(380, Math.min(800, $(window).width() - 60)),
@@ -1437,14 +1432,14 @@ function showIntroductionDialog(lessonId) {
 		'title'		: LABELS.LESSON_INTRODUCTION,
 		'open'      : function(){
 			$('iframe', this).attr('src', LAMS_URL + 'editLessonIntro/edit.do?lessonID='+lessonId);
-			$('iframe', this).css('height', '360px'); 
+			$('iframe', this).css('height', '360px');
 		},
 		'close' 	: function(){
 			closeIntroductionDialog()
 		}
 	}, false);
-}	
-	
+}
+
 function closeIntroductionDialog() {
 	$('#introductionDialog').remove();
 }
@@ -1454,7 +1449,7 @@ function closeIntroductionDialog() {
  */
 function updateSequenceTab() {
 	drawLessonCompletionChart();
-	
+
 	sequenceCanvas = $('#sequenceCanvas');
 	sequenceCanvas.css('visibility', 'hidden');
 
@@ -1468,16 +1463,16 @@ function updateSequenceTab() {
 			return;
 		}
 	}
-	
+
 	// clear all learner icons
 	$('.learner-icon, .more-learner-icon', '#canvas-container').remove();
-	
+
 	let lessonInstructionsSource = $('#lesson-instructions-source');
 	if (lessonInstructionsSource.length === 1) {
 		$('#lesson-instructions-content').html(lessonInstructionsSource.html())
 			.closest('#lesson-instructions-panel').removeClass('d-none');
 	}
-	
+
 	$.ajax({
 		dataType : 'json',
 		url : LAMS_URL + 'monitoring/monitoring/getLessonProgress.do',
@@ -1485,7 +1480,7 @@ function updateSequenceTab() {
 		data : {
 			'lessonID'  : lessonId,
 			'searchedLearnerId' : sequenceSearchedLearner
-		},		
+		},
 		success : function(response) {
 			// activities have uiids but no ids, set it here
 			$.each(response.activities, function(){
@@ -1496,12 +1491,12 @@ function updateSequenceTab() {
 			$.each(response.activities, function(index, activity){
 				var activityGroup = $('g[id="' + activity.id + '"]', sequenceCanvas),
 					isGate = [3,4,5,14].indexOf(activity.type) > -1;
-					
+
 				learnerCount += activity.learnerCount;
-				
+
 				if (isGate) {
 					var gateClosedIcon = activityGroup.find('.gateClosed');
-					
+
 					if (activity.gateOpen && gateClosedIcon.length > 0) {
 						if (!gateOpenIconData) {
 							// if SVG is not cached, get it synchronously
@@ -1512,98 +1507,98 @@ function updateSequenceTab() {
 								success : function(response) {
 									gateOpenIconData = response;
 								}
-							});		
+							});
 						}
-						
-						 $(gateOpenIconData).clone().attr({
-								x : gateClosedIcon.attr('x'),
-								y : gateClosedIcon.attr('y'),
-								width : gateClosedIcon.attr('width'),
-								height : gateClosedIcon.attr('height'),
-							}).appendTo(activityGroup)
-							  .show();
-							
+
+						$(gateOpenIconData).clone().attr({
+							x : gateClosedIcon.attr('x'),
+							y : gateClosedIcon.attr('y'),
+							width : gateClosedIcon.attr('width'),
+							height : gateClosedIcon.attr('height'),
+						}).appendTo(activityGroup)
+							.show();
+
 						gateClosedIcon.remove();
 					} else {
 						gateClosedIcon.show();
 					}
 				}
-				
+
 				if (response.contributeActivities) {
 					$.each(response.contributeActivities, function(){
 						if (activity.id == this.activityID) {
 							$.each(this.contributeEntries, function(){
 								if (!this.isComplete) {
 									activity.requiresAttention = true;
-							 		return false;
+									return false;
 								}
 							});
 							return false;
 						}
 					});
 				}
-				
+
 				// put learner and attention icons on each activity shape
 				addActivityIcons(activity);
 			});
-			
+
 			// modyfing SVG in DOM does not render changes, so we need to reload it
 			sequenceCanvas.html(sequenceCanvas.html());
-			
+
 			// only now show SVG so there is no "jump" when resizing
 			sequenceCanvas.css('visibility', 'visible');
-			
+
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
 				sequenceClearSearchPhrase();
 				showToast(LABELS.PROGRESS_NOT_STARTED);
 			}
-			
+
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
 			$('#learner-started-count').text(learnerTotalCount);
 			$('#learner-total-count').text(response.numberPossibleLearners);
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
-			
+
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
-					
+
 				if (activity.url) {
 					let activityGroup = $('g[id="' + activity.id + '"]'),
 						isGrouping = activity.type == 2,
 						isGate = [3,4,5,14,16].indexOf(activity.type) > -1;
-						
+
 					activityGroup.css('cursor', 'pointer');
-					
+
 					// double click on activity shape to open Monitoring for this activity
 					if (isGate) {
-						dblTap(activityGroup, function(){  
+						dblTap(activityGroup, function(){
 							openGateSelectively(LAMS_URL + activity.url);
 						});
 					} else if (isGrouping) {
-						dblTap(activityGroup, function(){  
+						dblTap(activityGroup, function(){
 							window.open(LAMS_URL + activity.url, "_blank");
 						});
 					} else {
-						dblTap(activityGroup, function(){  
+						dblTap(activityGroup, function(){
 							openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
 						});
 					}
 				}
 			});
-			
+
 			// remove any existing popovers
 			$('.popover[role="tooltip"]').remove();
-			
+
 			initializePortraitPopover(LAMS_URL, 'large', 'right');
 
 			// update the cache global values so that the contributions & the Live Edit buttons will update
 			lockedForEdit = response.lockedForEdit;
 			lockedForEditUserId = response.lockedForEditUserId;
-			lockedForEditUsername = response.lockedForEditUsername; 
+			lockedForEditUsername = response.lockedForEditUsername;
 			updateLiveEdit();
-			
+
 			updateContributeActivities(response.contributeActivities);
-			
+
 			// set up flux for updating time limits on dashboard
 			if (response.timeLimits) {
 				let timeLimitFluxUrl = LAMS_URL + 'monitoring/monitoring/getTimeLimitUpdateFlux.do?';
@@ -1611,20 +1606,20 @@ function updateSequenceTab() {
 					// it is a list of tool content IDs to which the dashboard will react and update time limits
 					timeLimitFluxUrl += 'toolContentIds=' + this.toolContentId + '&';
 				});
-				
+
 				openEventSource(timeLimitFluxUrl,
 					function (event) {
 						if ("doRefresh" == event.data && $('#sequence-tab-content').length === 1){
 							updateTimeLimits();
 						}
-				});
+					});
 			}
 		}
 	});
 }
 
 /**
-	Gets running absolute time limits for the lesson and displays them as countdown timers
+ Gets running absolute time limits for the lesson and displays them as countdown timers
  */
 function updateTimeLimits(){
 	$.ajax({
@@ -1633,11 +1628,11 @@ function updateTimeLimits(){
 		cache : false,
 		data : {
 			'lessonID'  : lessonId
-		},		
+		},
 		success : function(timeLimits) {
 			let timeLimitsDiv = $('#lesson-time-limits').toggleClass('d-none', timeLimits.length === 0);
 			$('.is-countdown', timeLimitsDiv).countdown('destroy').closest('.row').remove();
-			
+
 			$.each(timeLimits, function(){
 				let timeLimit = this,
 					row = $('<div class="row mb-2" />').appendTo(timeLimitsDiv);
@@ -1662,8 +1657,8 @@ function updateTimeLimits(){
 			});
 		}
 	});
-	
-	
+
+
 }
 
 function updateLiveEdit() {
@@ -1690,7 +1685,7 @@ function updateLiveEdit() {
 		$("#liveEditWarning").hide();
 	}
 }
-	
+
 function loadLearningDesignSVG() {
 	var exit = false;
 	// fetch SVG just once, since it is immutable
@@ -1718,11 +1713,11 @@ function loadLearningDesignSVG() {
 			frame.on('load', function(){
 				// disable current onload handler as closing the dialog reloads the iframe
 				frame.off('load');
-				
+
 				// call svgGenerator.jsp code to store LD SVG on the server
 				var win = frame[0].contentWindow || frame[0].contentDocument;
 				$(win.document).ready(function(){
-				    // when LD opens, make a callback which save the thumbnail and displays it in current window
+					// when LD opens, make a callback which save the thumbnail and displays it in current window
 					win.GeneralLib.openLearningDesign(ldId, function(){
 						result = win.GeneralLib.saveLearningDesignImage();
 						frame.remove();
@@ -1737,7 +1732,7 @@ function loadLearningDesignSVG() {
 			frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 		}
 	});
-	
+
 	return exit;
 }
 
@@ -1756,9 +1751,9 @@ function forceComplete(currentActivityId, learners, x, y) {
 		// find which activity learner was dropped on
 		var act = $(this),
 			coord = {
-					'x' : act.offset().left,
-					'y' : act.offset().top
-				}
+				'x' : act.offset().left,
+				'y' : act.offset().top
+			}
 		if (act.is('g')) {
 			var box = act[0].getBBox();
 			coord.width = box.width;
@@ -1768,15 +1763,15 @@ function forceComplete(currentActivityId, learners, x, y) {
 			coord.width = act.width();
 			coord.height = act.height();
 		}
-		
+
 		coord.x2 = coord.x + coord.width;
 		coord.y2 = coord.y + coord.height;
-		
+
 		if (x >= coord.x && x <= coord.x2 && y >= coord.y && y <= coord.y2) {
 			foundActivities.push(act);
 		}
 	});
-	
+
 	$.each(foundActivities, function(){
 		if (this.hasClass('svg-activity-floating')) {
 			// no force complete to support activities
@@ -1788,15 +1783,15 @@ function forceComplete(currentActivityId, learners, x, y) {
 			targetActivity = this;
 		}
 	});
-	
+
 	if (!targetActivity) {
 		return;
 	}
-	
+
 	var targetActivityId = null,
 		isEndLesson = !targetActivity.is('g'),
 		learnerNames = '';
-	
+
 	if (!moveAll) {
 		$.each(learners, function(){
 			learnerNames += this.name + ', ';
@@ -1804,7 +1799,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 		learnerNames = '"' + learnerNames.slice(0, -2) + '"';
 	}
 
-	
+
 	if (isEndLesson) {
 		if (currentActivityId) {
 			showConfirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM.replace('[0]', learnerNames), function() {
@@ -1813,12 +1808,12 @@ function forceComplete(currentActivityId, learners, x, y) {
 		}
 		return;
 	}
-	
+
 	var targetActivityId = +targetActivity.attr('id');
 	if (currentActivityId != targetActivityId) {
 		var targetActivityName = targetActivity.hasClass('svg-activity-gate') ? "Gate" : targetActivity.find('.svg-activity-title-label').text(),
 			moveBackwards = currentActivityId == null;
-		
+
 		// check if target activity is before current activity
 		if (currentActivityId) {
 			$.ajax({
@@ -1835,21 +1830,21 @@ function forceComplete(currentActivityId, learners, x, y) {
 				}
 			});
 		}
-		
+
 		// check if the target activity was found or we are moving the learner from end of lesson
 		if (moveBackwards) {
 			// move the learner backwards
 			var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
-					.replace('[0]', learnerNames).replace('[1]', targetActivityName);
-			$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);				
+				.replace('[0]', learnerNames).replace('[1]', targetActivityName);
+			$('#forceBackwardsMsg', '#forceBackwardsDialog').html(msgString);
 			$('#forceBackwardsDialog').data({
 				'learners' : learners,
 				'currentActivityId' : currentActivityId,
 				'activityId': targetActivityId});
 			$('#forceBackwardsDialog').modal('show');
 			return;
-		} 
-		
+		}
+
 		// move the learner forward
 		showConfirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM.replace('[0]', learnerNames).replace('[1]', targetActivityName), function() {
 			forceCompleteExecute(moveAll ? null : learners, moveAll ? currentActivityId : null, targetActivityId, false);
@@ -1863,7 +1858,7 @@ function forceComplete(currentActivityId, learners, x, y) {
  */
 function forceCompleteExecute(learners, moveAllFromActivityId, activityId, removeContent) {
 	$('.svg-learner-draggable-area').addClass('force-completing');
-	
+
 	var learnerIds = '';
 	if (learners) {
 		$.each(learners, function() {
@@ -1871,7 +1866,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 		});
 		learnerIds = learnerIds.slice(0, -1);
 	}
-	
+
 	var data={
 		'lessonID'   		    : lessonId,
 		// either we list selected learners to move
@@ -1882,7 +1877,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 		'removeContent'		    : removeContent
 	};
 	data[csrfTokenName] = csrfTokenValue;
-	
+
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/forceComplete.do',
 		type : 'POST',
@@ -1892,7 +1887,7 @@ function forceCompleteExecute(learners, moveAllFromActivityId, activityId, remov
 		success : function(response) {
 			// inform user of result
 			showToast(response);
-									
+
 			// progress changed, show it to monitor
 			loadTab();
 		}
@@ -1907,13 +1902,13 @@ function addActivityIcons(activity) {
 	if (activity.learnerCount == 0 && !activity.requiresAttention) {
 		return;
 	}
-	
+
 	// fint the activity in SVG
 	var coord = getActivityCoordinates(activity);
 	if (!coord) {
 		return;
 	}
-	
+
 	// add group of users icon
 	var learningDesignSvg = $('svg.svg-learning-design', sequenceCanvas),
 		isTool = activity.type == 1,
@@ -1923,21 +1918,21 @@ function addActivityIcons(activity) {
 		isGate = [3,4,5,14,16].indexOf(activity.type) > -1,
 		isContainer = [6,7].indexOf(activity.type) > -1,
 		activityGroup = $('g[id="' + activity.id + '"]', learningDesignSvg),
-		requiresAttentionIcon = activity.requiresAttention ? 
-				$('<img />')
-					.attr({
-						'id'    : 'act' + activity.id + 'attention',
-						'src'   : LAMS_URL + 'images/exclamation.svg',
-						'title' : LABELS.CONTRIBUTE_ATTENTION
-					})
-					.addClass('activity-requires-attention')
-				: null,
+		requiresAttentionIcon = activity.requiresAttention ?
+			$('<img />')
+				.attr({
+					'id'    : 'act' + activity.id + 'attention',
+					'src'   : LAMS_URL + 'images/exclamation.svg',
+					'title' : LABELS.CONTRIBUTE_ATTENTION
+				})
+				.addClass('activity-requires-attention')
+			: null,
 		allLearnersIcon = activity.learnerCount > 0 ?
-				$('<div />')
-					.attr('id', 'act' + activity.id + 'learnerGroup')
-					.addClass('more-learner-icon')
-				: null;
-		
+			$('<div />')
+				.attr('id', 'act' + activity.id + 'learnerGroup')
+				.addClass('more-learner-icon')
+			: null;
+
 
 	if (isTool || isGrouping) {
 		if (activity.learnerCount > 0) {
@@ -1948,20 +1943,20 @@ function addActivityIcons(activity) {
 				'width' : '30px',
 				'height': '30px'
 			});
-			
+
 			// switch from wide banner to narrow one
 			$('.svg-tool-banner-narrow', activityGroup).show();
 			$('.svg-tool-banner-wide', activityGroup).hide();
-			
+
 			$('.svg-activity-title-label', activityGroup).parent('foreignObject').remove();
 			$('<text>').text(activity.title.length < 20 ? activity.title : activity.title.substring(0, 20) + '...')
-					   .attr({
-							'x' : coord.x + 55,
-							'y' : coord.y + 20
-						})
-						.addClass('svg-activity-title-label svg-activity-title-label-small')
-						.appendTo(activityGroup);
-						
+				.attr({
+					'x' : coord.x + 55,
+					'y' : coord.y + 20
+				})
+				.addClass('svg-activity-title-label svg-activity-title-label-small')
+				.appendTo(activityGroup);
+
 			var learnersContainer = $('<div />').addClass('learner-icon-container');
 			$('<foreignObject />').append(learnersContainer).appendTo(activityGroup).attr({
 				'x' : coord.x + 20,
@@ -1969,38 +1964,38 @@ function addActivityIcons(activity) {
 				'width'  : 184,
 				'height' : 40
 			});
-			
+
 			$.each(activity.learners, function(learnerIndex, learner){
 				if (learnerIndex >= 5) {
-					return false;					
+					return false;
 				}
 				$(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
-					  .css({
+					.css({
 						'left'        : learnerIndex * (activity.learnerCount < 5 ? 46 : 28)  + 'px',
 						'z-index'     : 100 + learnerIndex,
 						'padding-top' : '2px'
-					  })
-					  .addClass('new-popover learner-icon')
-					  .attr({
+					})
+					.addClass('new-popover learner-icon')
+					.attr({
 						'id'            : 'act' + activity.id + 'learner' + learner.id,
 						'data-id'       : 'popover-' + learner.id,
 						'data-toggle'   : 'popover',
 						'data-portrait' : learner.portraitId,
 						'data-fullname' : getLearnerDisplayName(learner)
-					  })
-					  .appendTo(learnersContainer);
+					})
+					.appendTo(learnersContainer);
 			});
-			
+
 			allLearnersIcon
-				  .css({
+				.css({
 					'left'     : '140px',
 					'z-index'  : 108,
 					'margin-top' : '1px'
-				  })
-				  .text(activity.learnerCount)
-				  .appendTo(learnersContainer);
+				})
+				.text(activity.learnerCount)
+				.appendTo(learnersContainer);
 		}
-		
+
 		if (requiresAttentionIcon) {
 			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
 				'x' : coord.x + 180,
@@ -2019,7 +2014,7 @@ function addActivityIcons(activity) {
 			});
 			allLearnersIcon.text(activity.learnerCount);
 		}
-		
+
 		if (requiresAttentionIcon) {
 			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
 				'x' : coord.x + 35,
@@ -2037,8 +2032,8 @@ function addActivityIcons(activity) {
 				'height' : 40
 			});
 			allLearnersIcon.text(activity.learnerCount);
-		}		
-		
+		}
+
 		if (requiresAttentionIcon) {
 			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
 				'x' : coord.x + 8,
@@ -2057,7 +2052,7 @@ function addActivityIcons(activity) {
 			});
 			allLearnersIcon.text(activity.learnerCount);
 		}
-		
+
 		if (requiresAttentionIcon) {
 			$('<foreignObject />').append(requiresAttentionIcon).appendTo(activityGroup).attr({
 				'x' : coord.x,
@@ -2080,38 +2075,38 @@ function addActivityIconsHandlers(activity) {
 
 	// gate activity does not allows users' view
 	var usersViewable = [3,4,5,14].indexOf(activity.type) == -1;
-	
+
 	if (activity.learners){
 		$.each(activity.learners, function(learnerIndex, learner){
 			let learnerIcon = $('div#act' + activity.id + 'learner' + learner.id, sequenceCanvas)
-							  .css('cursor', 'pointer')
-							  // drag learners to force complete activities
-							  .draggable({
-								'appendTo'    : '.svg-learner-draggable-area',
-								'containment' : '.svg-learner-draggable-area',
-							    'distance'    : 20,
-							    'scroll'      : false,
-							    'cursorAt'	  : {'left' : 10, 'top' : 15},
-							    'helper' : "clone",
-								'stop' : function(event, ui) {
-									var learners = [{
-										'id'   : learner.id,
-										'name' : getLearnerDisplayName(learner, true)
-									}];
-									// jQuery droppable does not work for SVG, so this is a workaround
-									forceComplete(activity.id, learners, ui.offset.left, ui.offset.top);
-								}
-							});
-			
+				.css('cursor', 'pointer')
+				// drag learners to force complete activities
+				.draggable({
+					'appendTo'    : '.svg-learner-draggable-area',
+					'containment' : '.svg-learner-draggable-area',
+					'distance'    : 20,
+					'scroll'      : false,
+					'cursorAt'	  : {'left' : 10, 'top' : 15},
+					'helper' : "clone",
+					'stop' : function(event, ui) {
+						var learners = [{
+							'id'   : learner.id,
+							'name' : getLearnerDisplayName(learner, true)
+						}];
+						// jQuery droppable does not work for SVG, so this is a workaround
+						forceComplete(activity.id, learners, ui.offset.left, ui.offset.top);
+					}
+				});
+
 			if (usersViewable) {
 				learnerIcon.click(function(event){
-					 // double click on learner icon to see activity from his perspective
-					var url = LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
-						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
+					// double click on learner icon to see activity from his perspective
+					var url = LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID='
+						+ learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
 					openPopUp(url, "LearnActivity", popupHeight, popupWidth, true);
 				});
 			}
-			
+
 			if (learner.id == sequenceSearchedLearner){
 				// do it here instead of addActivityIcons()
 				// as in that method the icons are added to the document yet
@@ -2120,17 +2115,17 @@ function addActivityIconsHandlers(activity) {
 			}
 		});
 	}
-		
+
 	if (activity.learnerCount > 0){
 		$('div#act' + activity.id + 'learnerGroup', sequenceCanvas)
-		   .click(function(){
-				 // double click on learner group icon to see list of learners
+			.click(function(){
+				// double click on learner group icon to see list of learners
 				var ajaxProperties = {
-						url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
-						data : {
-							'activityID' : activity.id
-						}
-					};
+					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
+					data : {
+						'activityID' : activity.id
+					}
+				};
 				showLearnerGroupDialog(ajaxProperties, activity.title, false, true, usersViewable, false);
 			});
 	}
@@ -2143,7 +2138,7 @@ function addActivityIconsHandlers(activity) {
 function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 	var iconsContainer = $('#completedLearnersContainer');
 	$('.learner-icon, .more-learner-icon', iconsContainer).remove();
-	
+
 	if (learners) {
 		// create learner icons, along with handlers
 		$.each(learners, function(learnerIndex, learner){
@@ -2151,23 +2146,23 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 				// display only first few learners, not all of them
 				return false;
 			}
-			
+
 			let icon = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
-				  .addClass('new-popover learner-icon')
-				  .attr({
+				.addClass('new-popover learner-icon')
+				.attr({
 					'id'            : 'learner-complete-' + learner.id,
 					'data-id'       : 'popover-' + learner.id,
 					'data-toggle'   : 'popover',
 					'data-portrait' : learner.portraitId,
 					'data-fullname' : getLearnerDisplayName(learner)
-				  })
+				})
 				// drag learners to force complete activities
-				  .draggable({
+				.draggable({
 					'appendTo'    : '.svg-learner-draggable-area',
 					'containment' : '.svg-learner-draggable-area',
-				    'distance'    : 20,
-				    'scroll'      : false,
-				    'cursorAt'	  : {'left' : 10, 'top' : 15},
+					'distance'    : 20,
+					'scroll'      : false,
+					'cursorAt'	  : {'left' : 10, 'top' : 15},
 					'helper'      : function(){
 						// copy of the icon for dragging
 						return icon.clone();
@@ -2182,26 +2177,26 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 					}
 				})
 				.appendTo(iconsContainer);
-			
+
 			if (learner.id == sequenceSearchedLearner){
 				highlightSearchedLearner(icon);
 			}
 		});
-		
-		
-	$('<div />')
-	  .addClass('more-learner-icon')
-	  .text(learnerCount + '/' + learnerTotalCount)
-	  .appendTo(iconsContainer)
-      .click(function(){
-			var ajaxProperties = {
+
+
+		$('<div />')
+			.addClass('more-learner-icon')
+			.text(learnerCount + '/' + learnerTotalCount)
+			.appendTo(iconsContainer)
+			.click(function(){
+				var ajaxProperties = {
 					url : LAMS_URL + 'monitoring/monitoring/getCurrentLearners.do',
 					data : {
 						'lessonID'   : lessonId
 					}
 				};
-			showLearnerGroupDialog(ajaxProperties, LABELS.LEARNER_FINISHED_DIALOG_TITLE, false, true, false, false);
-		});
+				showLearnerGroupDialog(ajaxProperties, LABELS.LEARNER_FINISHED_DIALOG_TITLE, false, true, false, false);
+			});
 	}
 }
 
@@ -2217,12 +2212,12 @@ function getActivityCoordinates(activity){
 	if (!activity.y) {
 		activity.y = 0;
 	}
-	
+
 	var group = $('g[id="' + activity.id + '"]', sequenceCanvas);
 	if (group.length == 0) {
 		return;
 	}
-	
+
 	return {
 		'x'     : +group.data('x'),
 		'y'     : +group.data('y'),
@@ -2231,7 +2226,7 @@ function getActivityCoordinates(activity){
 		'width' : +group.data('width'),
 		'height': +group.data('height'),
 	}
-	
+
 }
 
 
@@ -2241,11 +2236,11 @@ function getActivityCoordinates(activity){
 function highlightSearchedLearner(icon) {
 	// border and z-index are manipulated via CSS
 	icon.addClass('learner-searched');
-	
+
 	toggleInterval = setInterval(function(){
 		icon.toggle();
 	}, 500);
-	
+
 	setTimeout(function(){
 		clearInterval(toggleInterval);
 		icon.show();
@@ -2282,7 +2277,7 @@ function showClassDialog(role){
 		// first time show, fill both lists
 		fillClassList('Learner', false);
 		fillClassList('Monitor', true);
-	
+
 		$('#classDialog').modal('show');
 	} else {
 		// refresh after page shift or search
@@ -2302,22 +2297,22 @@ function fillClassList(role, disableCreator) {
 		ajaxProperties = dialog.data(role + 'AjaxProperties'),
 		users = null,
 		userCount = null;
-	
+
 	if (!ajaxProperties) {
 		// initialise ajax config
 		ajaxProperties = {
-		dataType : 'json',
-		url : LAMS_URL + 'monitoring/monitoring/getClassMembers.do',
-		cache : false,
-		async : false,
-		data : {
-			'lessonID'  : lessonId,
-					'role'      	 : role.toUpperCase(),
-					'pageNumber'	 : 1,
-					'orderAscending' : true
-		}
-			};
-	
+			dataType : 'json',
+			url : LAMS_URL + 'monitoring/monitoring/getClassMembers.do',
+			cache : false,
+			async : false,
+			data : {
+				'lessonID'  : lessonId,
+				'role'      	 : role.toUpperCase(),
+				'pageNumber'	 : 1,
+				'orderAscending' : true
+			}
+		};
+
 		dialog.data(role + 'AjaxProperties', ajaxProperties);
 	}
 
@@ -2329,33 +2324,33 @@ function fillClassList(role, disableCreator) {
 	ajaxProperties.success = function(response) {
 		users = response.users;
 		userCount = response.userCount;
-}
+	}
 
 	$.ajax(ajaxProperties);
 
 	// hide unnecessary controls
 	togglePagingCells(table, ajaxProperties.data.pageNumber, Math.ceil(userCount / 10));
-	
+
 	$.each(users, function(userIndex, user) {
 		var checkboxId = 'class-list-' + role + '-' + user.id,
 			checkbox = $('<input />').attr({
-	    	 'type' : 'checkbox',
-			 'id'   : checkboxId
-	      }).addClass('form-check-input me-1')
-			.change(function(){
-	    		editClassMember($(this));
-	      }),
-	    		
-	      userRow = $('<tr />').attr({
+				'type' : 'checkbox',
+				'id'   : checkboxId
+			}).addClass('form-check-input me-1')
+				.change(function(){
+					editClassMember($(this));
+				}),
+
+			userRow = $('<tr />').attr({
 				'userId'  : user.id
-				})
-	          .addClass('dialogListItem')
-			  .appendTo(list);
-		
+			})
+				.addClass('dialogListItem')
+				.appendTo(list);
+
 		$('<td />').append(checkbox).appendTo(userRow);
 		$('<td />').append($('<label />').addClass('form-check-label').attr('for', checkboxId).text(getLearnerDisplayName(user)))
-				   .appendTo(userRow);
-	    	
+			.appendTo(userRow);
+
 		if (user.classMember) {
 			checkbox.prop('checked', 'checked');
 			if (user.readonly) {
@@ -2363,22 +2358,22 @@ function fillClassList(role, disableCreator) {
 				checkbox.attr('disabled', 'disabled');
 			}
 		}
-		
+
 		if (disableCreator && user.lessonCreator) {
 			userRow.addClass('dialogListItemDisabled');
 		}
-	});	
+	});
 }
 
 /**
  * Adds/removes a Learner/Monitor to/from the class.
  */
 function editClassMember(userCheckbox){
-	var data = { 
+	var data = {
 		'lessonID' : lessonId,
 		'userID'   : userCheckbox.closest('.dialogListItem').attr('userId'),
 		'role'     : userCheckbox.parents('table.dialogTable')
-								 .parents('table.table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
+			.parents('table.table').is('#classMonitorTable') ? 'MONITOR' : 'LEARNER',
 		'add'      : userCheckbox.is(':checked')
 	};
 	data[csrfTokenName] = csrfTokenValue;
@@ -2431,7 +2426,7 @@ function openLiveEdit(){
 					openAuthoring(ldId, lessonId);
 				}
 			}
-		});	
+		});
 	});
 }
 
@@ -2440,16 +2435,16 @@ function openLiveEdit(){
  */
 function resizeSequenceCanvas(width, height){
 	var svg = $('svg.svg-learning-design', sequenceCanvas);
-	
+
 	if (svg.length === 0){
 		// skip resizing if the SVG has not loaded (yet)
 		return;
 	}
-	
+
 	var viewBoxParts = svg.attr('viewBox').split(' '),
 		svgHeight = +viewBoxParts[3],
 		sequenceCanvasHeight = Math.max(svgHeight + 10, height - 140);
-	
+
 	// By default sequenceCanvas div is as high as SVG, but for SVG vertical centering
 	// we want it to be as large as available space (iframe height minus toolbars)
 	// or if SVG is higher, then as high as SVG
@@ -2460,13 +2455,13 @@ function resizeSequenceCanvas(width, height){
 
 
 /**
- * Refreshes the existing progress bars. 
+ * Refreshes the existing progress bars.
  */
 function updateLearnersTab(){
 	let learnersAccordion = $('#learners-accordion').empty(),
 		itemTemplate = $('.learners-accordion-item-template').clone().removeClass('learners-accordion-item-template d-none'),
 		pager = $('#learners-pager');
-		
+
 	$.ajax({
 		'url' : LAMS_URL + 'monitoring/monitoring/getLearnerProgressPage.do',
 		'data': {
@@ -2489,13 +2484,13 @@ function updateLearnersTab(){
 					$('#learners-previous-page', pager).toggleClass('d-none', learnersTabPage < 2);
 					let pageCount = Math.ceil(learnersCount / 10);
 					$('#learners-next-page', pager).toggleClass('d-none', learnersTabPage >= pageCount);
-					
+
 					$('#learnes-order-by-completion', pager).prop('checked', learnersTabSortedByProgress);
 					$('#learners-page', pager).text(learnersTabPage + '/' + pageCount);
 				}
 				pager.removeClass('d-none');
 			}
-			
+
 			$(response.learners).each(function(){
 				let learner = this,
 					itemHeaderId = 'learners-accordion-heading-' + learner.id,
@@ -2504,40 +2499,40 @@ function updateLearnersTab(){
 					portraitSmall = $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL)).addClass('me-2'),
 					portraitLarge = learner.portraitId ? $(definePortrait(learner.portraitId, learner.id, STYLE_LARGE, false, LAMS_URL)) : null,
 					itemHeader = $('.accordion-header', item).attr('id', itemHeaderId);
-					
+
 				$('.accordion-button', itemHeader)
-						.attr('data-bs-target', '#' + itemCollapseId)
-						.attr('aria-controls', itemCollapseId)
-						.prepend('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
-						.prepend(portraitSmall);
+					.attr('data-bs-target', '#' + itemCollapseId)
+					.attr('aria-controls', itemCollapseId)
+					.prepend('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
+					.prepend(portraitSmall);
 				$('.accordion-completed-activity-count', itemHeader).text(learner.completedActivityCount).tooltip();
 				$('.accordion-completed-lesson', itemHeader).toggle(learner.completedLesson).tooltip();
-				
+
 				$('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
 				$('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
-				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">' 
-														  + learner.email + '</a>');
+				$('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">'
+					+ learner.email + '</a>');
 				if (portraitLarge) {
 					$('.learners-accordion-portrait', item).append(portraitLarge);
 				} else {
 					$('.learners-accordion-portrait', item).remove();
 				}
-				
+
 				$('.accordion-collapse', item).attr('id', itemCollapseId).attr('data-bs-parent', '#learners-accordion')
-					  .on('show.bs.collapse', function () {
+					.on('show.bs.collapse', function () {
 						clearEventSources();
-						
+
 						let learnerId = $(this).closest('.accordion-item').data('user-id');
 						openEventSource(LAMS_URL + 'learning/learner/getLearnerProgressUpdateFlux.do?lessonId='
-																		 +  lessonId + '&userId=' + learnerId,
+							+  lessonId + '&userId=' + learnerId,
 							function (event) {
 								if ($('#learners-accordion-item-' + learnerId).length === 1) {
 									drawLearnerTimeline(learnerId, decodeURIComponent(event.data));
 								}
-						});
-						
-					  });
-				});
+							});
+
+					});
+			});
 		}
 	});
 }
@@ -2547,7 +2542,7 @@ function drawLearnerTimeline(learnerId, data) {
 		timelineContainer = $('.vertical-timeline-container', item),
 		timeline = $('.vertical-timeline', timelineContainer).empty(),
 		noProgressLabel = $('.no-progress', item);
-	
+
 	if (!data) {
 		noProgressLabel.show();
 		return;
@@ -2555,7 +2550,7 @@ function drawLearnerTimeline(learnerId, data) {
 	noProgressLabel.hide();
 	data = JSON.parse(data);
 	let activityEntryTemplate = $('.learners-timeline-entry-template').clone().removeClass('learners-timeline-entry-template d-none');
-	
+
 	$(data.activities).each(function(){
 		let activity = this,
 			entry = activityEntryTemplate.clone().appendTo(timeline),
@@ -2564,18 +2559,18 @@ function drawLearnerTimeline(learnerId, data) {
 			activityBox = ('.timeline-label', entry),
 			durationCell = $('.timeline-activity-duration', activityBox),
 			markCell = $('.timeline-activity-mark', activityBox);
-			
+
 		$('.timeline-title', entry).text(activity.name);
-			
+
 		switch(activity.status){
 			case 0: entry.addClass('activity-current');
-					icon.addClass('border-primary');
-					break;
+				icon.addClass('border-primary');
+				break;
 			case 1: icon.addClass('border-success');
-			 		entry.addClass('activity-complete');
-					break;
+				entry.addClass('activity-complete');
+				break;
 		}
-		
+
 		if (activity.iconURL) {
 			iconURL = activity.iconURL;
 		} else if (activity.type === 'g') {
@@ -2585,23 +2580,23 @@ function drawLearnerTimeline(learnerId, data) {
 		} else if (activity.isGrouping) {
 			iconURL = 'images/svg/grouping.svg';
 		}
-		
+
 		if (iconURL) {
 			$('<img />').attr('src', LAMS_URL + iconURL).appendTo(icon);
 		}
-		
+
 		if (typeof activity.mark !== 'undefined') {
 			markCell.text(activity.mark + (activity.maxMark ? ' / ' + activity.maxMark : ''));
 		} else {
 			markCell.closest('tr').remove();
 		}
-		
+
 		if (activity.duration) {
 			durationCell.text(activity.duration);
 		} else {
 			durationCell.closest('tr').remove();
 		}
-		
+
 		if (activity.url && activity.type != 'g') {
 			activityBox.css('cursor', 'pointer');
 			dblTap(activityBox, function(){
@@ -2610,7 +2605,7 @@ function drawLearnerTimeline(learnerId, data) {
 			});
 		}
 	});
-	
+
 	timelineContainer.show();
 }
 
@@ -2654,10 +2649,10 @@ function learnerGroupClearSearchPhrase(){
 function updateGradebookTab() {
 	$("#gradebookLoading").show();
 	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isTab=true&lessonID=' + lessonId, function() {
-		  $("#gradebookLoading").hide();
+		$("#gradebookLoading").hide();
 	});
 }
-	
+
 function fixPagerInCenter(pagername, numcolshift) {
 	$('#'+pagername+'_right').css('display','inline');
 	if ( numcolshift > 0 ) {
@@ -2677,26 +2672,26 @@ function launchPopup(url,title) {
 	var top = ((screen.height / 2) - (popupHeight / 2));
 
 	wd = window.open(url,title,'resizable,width='+popupWidth+',height='+popupHeight
-			+',scrollbars'
-			+ ",top=" + top + ",left=" + left);
+		+',scrollbars'
+		+ ",top=" + top + ",left=" + left);
 	wd.window.focus();
 }
-	
-/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
+
+/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is
 -- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
--- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
+-- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well.
 */
 
 function resizeJqgrid(jqgrids) {
-    jqgrids.each(function(index) {
-        var gridId = $(this).attr('id');
-        var parent = jQuery('#gbox_' + gridId).parent();
-        var gridParentWidth = parent.width();
-        if ( parent.hasClass('grid-holder') ) {
-            	gridParentWidth = gridParentWidth - 2;
-        }
-        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-    });
+	jqgrids.each(function(index) {
+		var gridId = $(this).attr('id');
+		var parent = jQuery('#gbox_' + gridId).parent();
+		var gridParentWidth = parent.width();
+		if ( parent.hasClass('grid-holder') ) {
+			gridParentWidth = gridParentWidth - 2;
+		}
+		jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+	});
 }
 
 
@@ -2704,12 +2699,12 @@ function resizeJqgrid(jqgrids) {
 function displayCellErrorMessage(table, iRow, iCol, errorLabel, errorMessage, buttonText ) {
 	setTimeout(function () {
 		try {
-	    	var frozenRows = table.grid.fbRows,
-			tr = table.rows[iRow];
-	    	tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
-		    var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
-		    		rect = td[0].getBoundingClientRect();
-		    $.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
+			var frozenRows = table.grid.fbRows,
+				tr = table.rows[iRow];
+			tr = frozenRows != null && frozenRows[0].cells.length > iCol ? frozenRows[tr.rowIndex] : tr;
+			var td = tr != null && tr.cells != null ? $(tr.cells[iCol]) : $(),
+				rect = td[0].getBoundingClientRect();
+			$.jgrid.info_dialog.call(table, errorLabel, errorMessage, buttonText, {left:rect.left-200, top:rect.top});
 		} catch (e) {
 			alert(errorMessage);
 		}
@@ -2721,34 +2716,34 @@ function blockExportButton(areaToBlock, exportExcelUrl) {
 		area = $('#' + areaToBlock).css('cursor', 'wait'),
 		buttons = $('.btn', area).prop('disabled', true),
 		form = $('<form></form>');
-		    
+
 	fileDownloadCheckTimer = window.setInterval(function () {
 		var cookieValue = $.cookie('fileDownloadToken');
 		if (cookieValue == token) {
-		    //unBlock export button
+			//unBlock export button
 			window.clearInterval(fileDownloadCheckTimer);
 			$.cookie('fileDownloadToken', null); //clears this cookie value
-			
+
 			area.css('cursor', 'auto');
 			buttons.prop('disabled', false);
 			form.remove();
 		}
 	}, 1000);
-	
-	//dynamically create a form and submit it
-    form.attr("method", "post");
-    form.attr("action", exportExcelUrl);
-    
-    var hiddenField = $('<input></input>');
-    hiddenField.attr("type", "hidden");
-    hiddenField.attr("name", "downloadTokenValue");
-    hiddenField.attr("value", token);
-    form.append(hiddenField);
 
-    // The form needs to be a part of the document in order to be submitted
-    $(document.body).append(form);
-    form.submit();
-	
+	//dynamically create a form and submit it
+	form.attr("method", "post");
+	form.attr("action", exportExcelUrl);
+
+	var hiddenField = $('<input></input>');
+	hiddenField.attr("type", "hidden");
+	hiddenField.attr("name", "downloadTokenValue");
+	hiddenField.attr("value", token);
+	form.append(hiddenField);
+
+	// The form needs to be a part of the document in order to be submitted
+	$(document.body).append(form);
+	form.submit();
+
 	return false;
 }
 
@@ -2770,19 +2765,9 @@ function openPopUp(url, title, h, w, status, forceNewWindow) {
 	}
 
 	window.open(url, title, "HEIGHT=" + h + ",WIDTH=" + w
-			+ ",resizable=yes,scrollbars=yes,status=" + status
-			+ ",menubar=no, toolbar=no"
-			+ ",top=" + top + ",left=" + left);
-}
-
-/**
- * Tells parent document to close this Monitor dialog.
- */
-function closeMonitorLessonDialog(refresh) {
-	//check method is available in order to avoid JS errors (as it's not available from integrations)
-	if (typeof window.parent.closeDialog === "function") {
-		window.parent.closeDialog('dialogMonitorLesson' + lessonId, refresh);
-	}
+		+ ",resizable=yes,scrollbars=yes,status=" + status
+		+ ",menubar=no, toolbar=no"
+		+ ",top=" + top + ",left=" + left);
 }
 
 /**
@@ -2795,7 +2780,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 		isRefresh = ajaxProperties == null,
 		learners = null,
 		learnerCount = null;
-	
+
 	if (isRefresh) {
 		// ajax and other properties were saved when the dialog was opened
 		ajaxProperties = learnerGroupDialog.data('ajaxProperties');
@@ -2814,10 +2799,10 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 				'orderAscending' : true
 			}
 		});
-		
+
 		$('#learnerGroupSearchRow', learnerGroupDialog).css('display', allowSearch ? 'table-row' : 'none');
 	}
-	
+
 	var pageNumber = ajaxProperties.data.pageNumber;
 
 	// set values for current variable instances
@@ -2825,10 +2810,10 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 		learners = response.learners;
 		learnerCount = response.learnerCount;
 	};
-	
+
 	var searchPhrase = allowSearch ?  $('.dialogSearchPhrase', learnerGroupDialog).val().trim() : null;
-	ajaxProperties.data.searchPhrase = searchPhrase; 
-	
+	ajaxProperties.data.searchPhrase = searchPhrase;
+
 	// make the call
 	$.ajax(ajaxProperties);
 
@@ -2836,12 +2821,12 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	// close the dialog and refresh the main screen
 	if (!learnerCount && !searchPhrase) {
 		if (isRefresh) {
-			 learnerGroupDialog.modal('hide');
+			learnerGroupDialog.modal('hide');
 		}
 		updateSequenceTab();
 		return;
 	}
-	
+
 	// did some users already drift away to an another activity?
 	// move back until you get a page with any users
 	var maxPageNumber = Math.ceil(learnerCount / 10);
@@ -2849,39 +2834,39 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 		shiftLearnerGroupList(-1);
 		return;
 	}
-	
+
 	// hide unnecessary controls
 	togglePagingCells(learnerGroupDialog, pageNumber, maxPageNumber);
 
 	$.each(learners, function(learnerIndex, learner) {
-		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID=' 
-        				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
-        				        : null,
-				learnerRow = $('<tr />').attr({
-									'userId'  : learner.id,
-									'viewUrl'    : viewUrl
-									})
-			                      .addClass('dialogListItem')
-							      .appendTo(learnerGroupList),
-				learnerCell = $('<td />').appendTo(learnerRow),
-				portraitDiv = $('<div />').attr({
-						'id': 'user-'+learner.id,
-						})
-						.addClass('roffset5')
-						.appendTo(learnerCell);
-				addPortrait( portraitDiv, learner.portraitId, learner.id, 'small', true, LAMS_URL );
-				$('<span/>').html(getLearnerDisplayName(learner))
-					.addClass('portrait-sm-lineheight')
-					.appendTo(learnerCell);
+		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring/getLearnerActivityURL.do?userID='
+				+ learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
+				: null,
+			learnerRow = $('<tr />').attr({
+				'userId'  : learner.id,
+				'viewUrl'    : viewUrl
+			})
+				.addClass('dialogListItem')
+				.appendTo(learnerGroupList),
+			learnerCell = $('<td />').appendTo(learnerRow),
+			portraitDiv = $('<div />').attr({
+				'id': 'user-'+learner.id,
+			})
+				.addClass('roffset5')
+				.appendTo(learnerCell);
+		addPortrait( portraitDiv, learner.portraitId, learner.id, 'small', true, LAMS_URL );
+		$('<span/>').html(getLearnerDisplayName(learner))
+			.addClass('portrait-sm-lineheight')
+			.appendTo(learnerCell);
 
 		if (allowForceComplete || allowView || allowEmail) {
 			learnerRow.click(function(event){
 				// select the learner
 				var learnerRow = $(this),
 					selectedSiblings = learnerRow.siblings('tr.dialogListItem.dialogListItemSelected');
-				    	// enable buttons
-			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialog).prop('disabled', false);
-			    
+				// enable buttons
+				$('button.learnerGroupDialogSelectableButton', learnerGroupDialog).prop('disabled', false);
+
 				if (allowForceComplete && (event.metaKey || event.ctrlKey)) {
 					var isSelected = learnerRow.hasClass('dialogListItemSelected');
 					if (isSelected) {
@@ -2901,7 +2886,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 					// un-select other learners
 					selectedSiblings.removeClass('dialogListItemSelected');
 				}
-			    });
+			});
 			if (allowView){
 				dblTap(learnerRow, function(){
 					// same as clicking View Learner button
@@ -2910,7 +2895,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 			}
 		}
 	});
-	
+
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
 		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton, button#learnerGroupDialogForceCompleteAllButton', learnerGroupDialog)
@@ -2919,16 +2904,16 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 			.css('display', allowView ? 'inline' : 'none');
 		$('button#learnerGroupDialogEmailButton', learnerGroupDialog)
 			.css('display', allowEmail ? 'inline' : 'none');
-	
-	$('.modal-title', learnerGroupDialog).text(dialogTitle);
-	learnerGroupDialog.data({
-		 // save properties for refresh
-		 'ajaxProperties' : ajaxProperties,
-		 'allowForceComplete' : allowForceComplete,
-		 'allowView' : allowView,
-		 'allowEmail' : allowEmail
+
+		$('.modal-title', learnerGroupDialog).text(dialogTitle);
+		learnerGroupDialog.data({
+			// save properties for refresh
+			'ajaxProperties' : ajaxProperties,
+			'allowForceComplete' : allowForceComplete,
+			'allowView' : allowView,
+			'allowEmail' : allowEmail
 		})
-		.modal('show');	
+			.modal('show');
 	}
 }
 
@@ -2938,8 +2923,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
  */
 function getLearnerDisplayName(learner, raw) {
 	return raw ? learner.lastName + ', ' + learner.firstName + ' (' + learner.login + ')' + (learner.group ? ' - ' + learner.group : '')
-			   : escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')' 
-			   	 + (learner.group ? ' - ' + escapeHtml(learner.group) : '');
+		: escapeHtml(learner.lastName) + ', ' + escapeHtml(learner.firstName) + ' (' + escapeHtml(learner.login) + ')'
+		+ (learner.group ? ' - ' + escapeHtml(learner.group) : '');
 }
 
 
@@ -2950,13 +2935,13 @@ function escapeHtml(unsafe) {
 	if (unsafe == undefined) {
 		return "";
 	}
-	
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
 }
 
 
@@ -2969,17 +2954,17 @@ function sortLearnerGroupList() {
 		ajaxProperties = learnerGroupDialog.data('ajaxProperties'),
 		// reverse current order after click
 		orderAscending = !ajaxProperties.data.orderAscending;
-		
+
 	if (orderAscending) {
 		sortIcon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-n');
-		} else {
+	} else {
 		sortIcon.removeClass('ui-icon-triangle-1-n').addClass('ui-icon-triangle-1-s');
-		}
-	
+	}
+
 	ajaxProperties.data.orderAscending = orderAscending;
 	// refresh the list
 	showLearnerGroupDialog();
-	}
+}
 
 /**
  * Change order of learner sorting in Edit Class dialog.
@@ -2997,15 +2982,15 @@ function sortClassList(role) {
 	} else {
 		sortIcon.removeClass('ui-icon-triangle-1-n').addClass('ui-icon-triangle-1-s');
 	}
-	
+
 	ajaxProperties.data.orderAscending = orderAscending;
 	// refresh the list
 	showClassDialog(role);
 }
 
 /**
-* Change page in the group dialog.
-*/
+ * Change page in the group dialog.
+ */
 function shiftLearnerGroupList(shift) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
 		ajaxProperties = learnerGroupDialog.data('ajaxProperties'),
@@ -3019,8 +3004,8 @@ function shiftLearnerGroupList(shift) {
 }
 
 /**
-* Change page in the Edit Class dialog.
-*/
+ * Change page in the Edit Class dialog.
+ */
 function shiftClassList(role, shift) {
 	var classDialog = $('#classDialog'),
 		ajaxProperties = classDialog.data(role + 'AjaxProperties'),
@@ -3052,7 +3037,7 @@ function togglePagingCells(parent, pageNumber, maxPageNumber) {
 		$('td.pagePlus1Cell', parent).css('visibility', 'visible');
 	} else {
 		$('td.pagePlus1Cell', parent).css('visibility', 'hidden');
-	}		
+	}
 	if (pageNumber - 1 < 1) {
 		$('td.pageMinus1Cell', parent).css('visibility', 'hidden');
 	} else {
@@ -3069,27 +3054,27 @@ function showToast(text) {
 	let toast = $('#toast-template').clone().attr('id', null).appendTo('#toast-container');
 	toast.find('.toast-body', toast).text(text);
 	toast = new bootstrap.Toast(toast[0]);
-    toast.show();
+	toast.show();
 }
 
 /**
  * Works as dblclick for mobile devices.
  */
 function dblTap(elem, dblClickFunction) {
- 	 // double tap detection on mobile devices; it works also for mouse clicks
-	 // temporarly switched to click as jQuery mobile was removed for bootstrapping
-	 elem.click(function(event) {
+	// double tap detection on mobile devices; it works also for mouse clicks
+	// temporarly switched to click as jQuery mobile was removed for bootstrapping
+	elem.click(function(event) {
 		// was the second click quick enough after the first one?
 		var currentTime = new Date().getTime(),
 			tapLength = currentTime - lastTapTime;
 		lastTapTime = currentTime;
-		
+
 		if (lastTapTarget && lastTapTarget.classList.contains('learner-icon') && tapLength < 10) {
 			// after clicking learner icon there is a propagation to activity, which must be ignored
 			// we can not stop propagation completetly as force complete stops working
 			return;
 		}
-		
+
 		// is the second click on the same element as the first one?
 		if (event.currentTarget == lastTapTarget) {
 			if (tapLength < tapTimeout && tapLength > 0) {
@@ -3097,7 +3082,7 @@ function dblTap(elem, dblClickFunction) {
 				dblClickFunction(event);
 			}
 		}
-		
+
 		lastTapTarget = event.currentTarget;
 	});
 }
@@ -3120,44 +3105,44 @@ function clearEventSources() {
 }
 
 function copyLessonUrlToClipboard(){
-  var copyText = $('#lessonUrl').text();
-  navigator.clipboard.writeText(copyText);
+	var copyText = $('#lessonUrl').text();
+	navigator.clipboard.writeText(copyText);
 
-  $('#lessonUrlCopyToClipboardButton').removeClass('btn-primary').addClass('btn-success');
+	$('#lessonUrlCopyToClipboardButton').removeClass('btn-primary').addClass('btn-success');
 }
 
 function printTable() {
-    var title = document.title;
-    var divElements = document.getElementById('questions-data').outerHTML;
-    var printWindow = window.open("", "_blank", "");
-    //open the window
-    printWindow.document.open();
-    //write the html to the new window, link to css file
-    printWindow.document.write('<html><head><title>' + title + '</title>\n');
-    printWindow.document.write('<style type="text/css">\n');
-    printWindow.document.write('body {font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; -webkit-print-color-adjust: exact;}\n');
-    printWindow.document.write('.table > tbody > tr > td.success {background-color: #81c466;}\n');
-    printWindow.document.write('table { border: 1px solid #ddd; width: 100%; max-width: 100%; margin-bottom: 20px; background-color: transparent; border-spacing: 0; border-collapse: collapse; }\n');
-    printWindow.document.write('* { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; font-size: 16px; }\n');
-    printWindow.document.write('.table-striped > tbody > tr:nth-of-type(2n+1) {background-color: #f9f9f9; }\n');
-    printWindow.document.write('.table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {  border: 1px solid #ddd;  }\n');
-    printWindow.document.write('a { color: #337ab7; text-decoration: none; }\n');
-    printWindow.document.write('.text-center { text-align: center; }\n');
-    printWindow.document.write('</style>\n');
-    printWindow.document.write('</head><body>\n');
-    printWindow.document.write(divElements);
-    printWindow.document.write('\n</body></html>');
-    printWindow.document.close();
-    printWindow.focus();
-    //The Timeout is ONLY to make Safari work, but it still works with FF, IE & Chrome.
-    setTimeout(function() {
-        printWindow.print();
-        printWindow.close();
-    }, 100);
+	var title = document.title;
+	var divElements = document.getElementById('questions-data').outerHTML;
+	var printWindow = window.open("", "_blank", "");
+	//open the window
+	printWindow.document.open();
+	//write the html to the new window, link to css file
+	printWindow.document.write('<html><head><title>' + title + '</title>\n');
+	printWindow.document.write('<style type="text/css">\n');
+	printWindow.document.write('body {font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; -webkit-print-color-adjust: exact;}\n');
+	printWindow.document.write('.table > tbody > tr > td.success {background-color: #81c466;}\n');
+	printWindow.document.write('table { border: 1px solid #ddd; width: 100%; max-width: 100%; margin-bottom: 20px; background-color: transparent; border-spacing: 0; border-collapse: collapse; }\n');
+	printWindow.document.write('* { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; font-size: 16px; }\n');
+	printWindow.document.write('.table-striped > tbody > tr:nth-of-type(2n+1) {background-color: #f9f9f9; }\n');
+	printWindow.document.write('.table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {  border: 1px solid #ddd;  }\n');
+	printWindow.document.write('a { color: #337ab7; text-decoration: none; }\n');
+	printWindow.document.write('.text-center { text-align: center; }\n');
+	printWindow.document.write('</style>\n');
+	printWindow.document.write('</head><body>\n');
+	printWindow.document.write(divElements);
+	printWindow.document.write('\n</body></html>');
+	printWindow.document.close();
+	printWindow.focus();
+	//The Timeout is ONLY to make Safari work, but it still works with FF, IE & Chrome.
+	setTimeout(function() {
+		printWindow.print();
+		printWindow.close();
+	}, 100);
 }
 
 // Removes html tags from a string
 function removeHTMLTags(string) {
- 	var strTagStrippedText = string.replace(/<\/?[^>]+(>|$)/g, "");
- 	return strTagStrippedText;
+	var strTagStrippedText = string.replace(/<\/?[^>]+(>|$)/g, "");
+	return strTagStrippedText;
 }
