@@ -40,7 +40,6 @@
 
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-        <script src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
         <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
         <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
@@ -54,18 +53,18 @@
                 initLearnerPage(${toolSessionID});
             });
 
-			function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
-				let currentTime = new Date().getTime(),
-					lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
-				// check if autosave does not happen too often
-				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
-					// this label is required only in tool which implement autosave
-					alert('<fmt:message key="label.prevent.learner.autosave.mutliple.tabs" />');
-					return false;
-				}
-				localStorage.setItem('lamsAutosaveTimestamp', currentTime);
-				return true;
-			}
+            function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
+                let currentTime = new Date().getTime(),
+                    lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
+                // check if autosave does not happen too often
+                if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
+                    // this label is required only in tool which implement autosave
+                    alert('<fmt:message key="label.prevent.learner.autosave.mutliple.tabs" />');
+                    return false;
+                }
+                localStorage.setItem('lamsAutosaveTimestamp', currentTime);
+                return true;
+            }
         </script>
     </lams:head>
 
