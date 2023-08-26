@@ -1,12 +1,5 @@
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-
 import org.lamsfoundation.lams.events.EmailNotificationArchive;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -20,6 +13,13 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Contains methods intended for internal usage by lams_monitoring.
@@ -39,7 +39,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * @param userId
      * @param learnerPresenceAvailable
      * @return new value for learnerPresenceAvailable. Normally will be same as input parameter, will only be different
-     *         if the value cannot be updated for some reason.
+     * 	if the value cannot be updated for some reason.
      */
     Boolean togglePresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
 
@@ -51,7 +51,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * @param userId
      * @param learnerImPresenceAvailable
      * @return new value for learnerPresenceImAvailable. Normally will be same as input parameter, will only be
-     *         different if the value cannot be updated for some reason.
+     * 	different if the value cannot be updated for some reason.
      */
     Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
 
@@ -65,9 +65,9 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Archive the specified lesson. When archived, the data is retained but the learners cannot access the details.
      *
      * @param lessonId
-     *            the specified the lesson id.
+     * 	the specified the lesson id.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      */
     void archiveLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
@@ -75,23 +75,21 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Unarchive the specified the lesson. Reverts back to its previous state.
      *
      * @param lessonId
-     *            the specified the lesson id.
+     * 	the specified the lesson id.
      */
     void unarchiveLesson(long lessonId, Integer userId);
 
     /**
      * Suspend lesson now! A lesson can only be suspended if it is started. The purpose of suspending is to hide the
-     * lesson from learners
-     * temporarily.
+     * lesson from learners temporarily.
      *
      * @param lessonId
-     *            the lesson ID which will be suspended.
+     * 	the lesson ID which will be suspended.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      * @param clearScheduleDetails
-     *            should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if
-     *            user suspending right now,
-     *            false if this is being called by the trigger
+     * 	should it remove any triggers set up to suspend the lesson and clear the schedule date field. true if user
+     * 	suspending right now, false if this is being called by the trigger
      */
     void suspendLesson(long lessonId, Integer userId, boolean removeTriggers) throws UserAccessDeniedException;
 
@@ -101,7 +99,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      *
      * @param lessonId
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      */
     void unsuspendLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
 
@@ -111,7 +109,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * that the class can be returned to the web layer for proper handling.
      *
      * @param gate
-     *            the id of the gate we need to open.
+     * 	the id of the gate we need to open.
      */
     GateActivity openGate(Long gateId, Integer openerId);
 
@@ -133,7 +131,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Set the gate to closed.
      *
      * @param gate
-     *            the id of the gate we need to close.
+     * 	the id of the gate we need to close.
      */
     GateActivity closeGate(Long gateId);
 
@@ -144,7 +142,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Returns users by search type criteria. It's sorted by first and last user names.
      *
      * @param searchType
-     *            one of 11 constants from <code>MonitoringConstants</code> defining search type
+     * 	one of 11 constants from <code>MonitoringConstants</code> defining search type
      * @param lessonId
      * @param lessonIds
      * @param activityId
@@ -163,13 +161,13 @@ public interface IMonitoringFullService extends IMonitoringService {
      * This is also known as the learner progress url.
      *
      * @param lessonID
-     *            The lesson_id of the Lesson for which the information has to be fetched.
+     * 	The lesson_id of the Lesson for which the information has to be fetched.
      * @param activityID
-     *            The activity_id of the activity for which the URL is required
+     * 	The activity_id of the activity for which the URL is required
      * @param learnerID
-     *            The user_id of the Learner for whom the URL is being fetched
+     * 	The user_id of the Learner for whom the URL is being fetched
      * @param requesterID
-     *            The user_id of the user who is requesting the url
+     * 	The user_id of the user who is requesting the url
      * @throws IOException
      * @throws LamsToolServiceException
      */
@@ -180,17 +178,18 @@ public interface IMonitoringFullService extends IMonitoringService {
      * This method returns the monitor url for the given activity
      *
      * @param lessonID
-     *            The lesson_id of the Lesson for which the information has to be fetched.
+     * 	The lesson_id of the Lesson for which the information has to be fetched.
      * @param activityID
-     *            The activity_id of the Activity whose URL will be returned
+     * 	The activity_id of the Activity whose URL will be returned
      * @param userID
-     *            The user id of the user requesting the url.
+     * 	The user id of the user requesting the url.
      * @throws IOException
      */
     String getActivityMonitorURL(Long lessonID, Long activityID, String contentFolderID, Integer userID)
 	    throws IOException, LamsToolServiceException;
 
     /* Supports the Chosen Groupings and Branching */
+
     /**
      * Get all the active learners in the lesson who are not in a group or in a branch.
      *
@@ -201,7 +200,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * @param activityID
      * @param lessonID
      * @param useCreateGrouping
-     *            true/false for GroupingActivities, always false for non-GroupingActivities
+     * 	true/false for GroupingActivities, always false for non-GroupingActivities
      * @return Sorted set of Users, sorted by surname
      */
     SortedSet<User> getClassMembersNotGrouped(Long lessonID, Long activityID, boolean useCreateGrouping);
@@ -215,11 +214,11 @@ public interface IMonitoringFullService extends IMonitoringService {
      * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
      *
      * @param activityID
-     *            id of the grouping activity
+     * 	id of the grouping activity
      * @param name
-     *            group name
+     * 	group name
      * @throws LessonServiceException
-     *             , MonitoringServiceException
+     * 	, MonitoringServiceException
      */
     abstract Group addGroup(Long activityID, String name, boolean overrideMaxNumberOfGroups)
 	    throws LessonServiceException, MonitoringServiceException;
@@ -235,9 +234,9 @@ public interface IMonitoringFullService extends IMonitoringService {
      * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
      *
      * @param activityID
-     *            id of the grouping activity
+     * 	id of the grouping activity
      * @param name
-     *            group name
+     * 	group name
      * @throws LessonServiceException
      **/
     abstract void removeGroup(Long activityID, Long groupID) throws LessonServiceException;
@@ -248,10 +247,11 @@ public interface IMonitoringFullService extends IMonitoringService {
     abstract void addUsersToGroup(Long activityID, Long groupID, String learnerIDs[]) throws LessonServiceException;
 
     /**
-     * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another group.
+     * Add learners to a group based on their logins. Doesn't necessarily check if the user is already in another
+     * group.
      */
-    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins)
-	    throws LessonServiceException;
+    abstract int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins,
+	    boolean forceChosenGrouping) throws LessonServiceException;
 
     /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
@@ -277,9 +277,9 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Group Based Branching.
      *
      * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
+     * 	Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
-     *            the IDS of the learners to be added.
+     * 	the IDS of the learners to be added.
      */
     void addGroupToBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
 
@@ -288,9 +288,9 @@ public interface IMonitoringFullService extends IMonitoringService {
      * based branching in define later.
      *
      * @param sequenceActivityID
-     *            Activity id of the sequenceActivity representing this branch
+     * 	Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
-     *            the IDS of the learners to be added.
+     * 	the IDS of the learners to be added.
      */
     void removeGroupFromBranch(Long sequenceActivityID, String groupIDs[]) throws LessonServiceException;
 
@@ -298,7 +298,7 @@ public interface IMonitoringFullService extends IMonitoringService {
      * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
      *
      * @param branchingActivityID
-     *            Activity id of the branchingActivity
+     * 	Activity id of the branchingActivity
      */
     SortedSet<Group> getGroupsNotAssignedToBranch(Long branchingActivityID) throws LessonServiceException;
 

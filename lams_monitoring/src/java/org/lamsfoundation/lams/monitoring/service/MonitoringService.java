@@ -23,29 +23,8 @@
 
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
-
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -128,8 +107,27 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
 
 /**
  * <p>
@@ -2265,6 +2263,9 @@ public class MonitoringService implements IMonitoringFullService {
 	    grouping = activity.getGrouping();
 	}
 
+	// get real object and not proxy
+	grouping = groupingDAO.getGroupingById(grouping.getGroupingId());
+
 	if (grouping == null) {
 	    String error = methodName + ": Grouping activity missing grouping. Activity was " + activity;
 	    MonitoringService.log.error(error);
@@ -2318,7 +2319,7 @@ public class MonitoringService implements IMonitoringFullService {
 	Activity activity = getActivityById(activityID);
 	Grouping grouping = getGroupingForActivity(activity, !activity.isChosenBranchingActivity(), "addUsersToGroup");
 	ArrayList<User> learners = createUserList(activityID, learnerIDs, "add");
-	lessonService.performGrouping(grouping, groupId, learners);
+	lessonService.performGrouping(grouping, groupId, learners, false);
     }
 
     private ArrayList<User> createUserList(Long activityIDForErrorMessage, String[] learnerIDs,
@@ -2345,7 +2346,7 @@ public class MonitoringService implements IMonitoringFullService {
     }
 
     @Override
-    public int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins)
+    public int addUsersToGroupByLogins(Long activityID, String groupName, Set<String> logins, boolean forceChosenGrouping)
 	    throws LessonServiceException {
 
 	ArrayList<User> learners = new ArrayList<>();
@@ -2376,9 +2377,9 @@ public class MonitoringService implements IMonitoringFullService {
 
 	if (group == null) {
 	    // Leave performGrouping to create any new groups as addGroup returns a group without an id, so it could not be
-	    // used by performGrouping. Fix up name afterwards. Clumsy way to find to find the new group but how else?
+	    // used by performGrouping. Fix up name afterwards. Clumsy way to find the new group but how else?
 	    // It may not be the only new group and hence not the only group with no id.
-	    lessonService.performGrouping(grouping, (Long) null, learners);
+	    lessonService.performGrouping(grouping, (Long) null, learners, forceChosenGrouping);
 	    for (Group checkGroup : grouping.getGroups()) {
 		if (!otherGroupNames.contains(checkGroup.getGroupName())) {
 		    group = checkGroup;
@@ -2389,7 +2390,7 @@ public class MonitoringService implements IMonitoringFullService {
 		group.setGroupName(groupName);
 	    }
 	} else {
-	    lessonService.performGrouping(grouping, group.getGroupId(), learners);
+	    lessonService.performGrouping(grouping, group.getGroupId(), learners, forceChosenGrouping);
 	}
 
 	return learners.size();

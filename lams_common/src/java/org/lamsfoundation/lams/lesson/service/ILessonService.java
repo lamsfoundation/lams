@@ -23,11 +23,6 @@
 
 package org.lamsfoundation.lams.lesson.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -38,6 +33,11 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.ActivityTimeLimitDTO;
 import org.lamsfoundation.lams.lesson.dto.LessonDetailsDTO;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Access the general lesson details and access to grouping.
@@ -163,7 +163,7 @@ public interface ILessonService {
      * @param grouping
      *            the object on which to perform the grouing. (mandatory)
      */
-    void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException;
+    void performGrouping(Grouping grouping, Long groupId, List learners, boolean forceChosenGrouping) throws LessonServiceException;
 
     /**
      * Perform grouping for the given learner.

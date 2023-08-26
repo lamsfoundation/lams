@@ -23,21 +23,6 @@
 
 package org.lamsfoundation.lams.learning.service;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
@@ -98,6 +83,21 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+
+import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * This class is a facade over the Learning middle tier.
@@ -807,7 +807,7 @@ public class LearnerService implements ILearnerFullService {
 	    learnerList.add(learner);
 	    if (group != null) {
 		if (group.getGroupId() != null) {
-		    lessonService.performGrouping(grouping, group.getGroupId(), learnerList);
+		    lessonService.performGrouping(grouping, group.getGroupId(), learnerList, false);
 		} else {
 		    lessonService.performGrouping(grouping, group.getGroupName(), learnerList);
 		}
@@ -816,7 +816,7 @@ public class LearnerService implements ILearnerFullService {
 		    // if any group exists, put them in there.
 		    Group aGroup = grouping.getGroups().iterator().next();
 		    if (aGroup.getGroupId() != null) {
-			lessonService.performGrouping(grouping, aGroup.getGroupId(), learnerList);
+			lessonService.performGrouping(grouping, aGroup.getGroupId(), learnerList, false);
 		    } else {
 			lessonService.performGrouping(grouping, aGroup.getGroupName(), learnerList);
 		    }

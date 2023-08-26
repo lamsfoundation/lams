@@ -23,24 +23,8 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -81,8 +65,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
 /**
  * The action servlet that provides the support for the AJAX based Chosen Grouping upload from File
@@ -145,8 +143,9 @@ public class GroupingUploadController {
 	    return;
 	}
 
-	String fileName = new StringBuilder(messageService.getMessage("filename.create.grouping.template").trim())
-		.append(" ").append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
+	String fileName = new StringBuilder(
+		messageService.getMessage("filename.create.grouping.template").trim()).append(" ")
+		.append(lessonOrOrganisationName).append(".xls").toString().replaceAll(" ", "-");
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 
 	List<ExcelSheet> sheets;
@@ -155,7 +154,8 @@ public class GroupingUploadController {
 	    // check for any groups already exist in this grouping
 	    Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	    Activity activity = monitoringService.getActivityById(activityId);
-	    Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
+	    Grouping grouping = activity.isChosenBranchingActivity()
+		    ? activity.getGrouping()
 		    : ((GroupingActivity) activity).getCreateGrouping();
 	    sheets = exportLearnersForGrouping(learners, grouping.getGroups(), null);
 
@@ -163,8 +163,8 @@ public class GroupingUploadController {
 	    Long groupingId = WebUtil.readLongParam(request, "groupingId", true);
 	    Set<OrganisationGroup> groups = null;
 	    if (groupingId != null) {
-		OrganisationGrouping orgGrouping = (OrganisationGrouping) userManagementService
-			.findById(OrganisationGrouping.class, groupingId);
+		OrganisationGrouping orgGrouping = (OrganisationGrouping) userManagementService.findById(
+			OrganisationGrouping.class, groupingId);
 		if (orgGrouping != null) {
 		    groups = orgGrouping.getGroups();
 		}
@@ -290,7 +290,8 @@ public class GroupingUploadController {
 		    + " filename " + file);
 	}
 
-	ObjectNode responseJSON = isLessonMode ? saveLessonGrouping(lessonId, activityId, file)
+	ObjectNode responseJSON = isLessonMode
+		? saveLessonGrouping(lessonId, activityId, file)
 		: saveCourseGrouping(organisation, groupingId, name, file);
 
 	return responseJSON.toString();
@@ -371,7 +372,8 @@ public class GroupingUploadController {
 
 	// Lesson grouping case so clean out and reuse any existing groups
 	Activity activity = monitoringService.getActivityById(activityId);
-	Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
+	Grouping grouping = activity.isChosenBranchingActivity()
+		? activity.getGrouping()
 		: ((GroupingActivity) activity).getCreateGrouping();
 
 	Set<String> existingGroupNames = new HashSet<>();
@@ -440,7 +442,7 @@ public class GroupingUploadController {
 	// Now put in the new users groupings
 	for (Map.Entry<String, Set<String>> groupEntry : groups.entrySet()) {
 	    int added = monitoringService.addUsersToGroupByLogins(activityId, groupEntry.getKey(),
-		    groupEntry.getValue());
+		    groupEntry.getValue(), true);
 	    totalUsersAdded += added;
 	    totalUsersSkipped += groupEntry.getValue().size() - added;
 	}
@@ -506,8 +508,9 @@ public class GroupingUploadController {
 	    String groupName = row.getLastCellNum() > 3 ? parseStringCell(row.getCell(3)) : null;
 	    if (groupName == null || groupName.length() == 0) {
 		skipped++;
-		GroupingUploadController.log.warn("Unable to add learner " + login
-			+ " for group in related to grouping " + groupingID + " as group name is missing.");
+		GroupingUploadController.log.warn(
+			"Unable to add learner " + login + " for group in related to grouping " + groupingID
+				+ " as group name is missing.");
 		continue;
 	    }
 	    Set<String> users = groups.get(groupName);
