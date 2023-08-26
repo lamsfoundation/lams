@@ -27,9 +27,9 @@
 			function buildShowHideLink(currentUid, actionMethod) {
 				var str = '<a href="#" onclick="javascript:submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\');"  class="btn btn-primary btn-xs">';
 				if ( actionMethod == 'hideOpenVote' ) 
-					str += '<fmt:message key="label.hide"/></a>';
+					str += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide"/></spring:escapeBody></a>';
 				else
-					str += '<fmt:message key="label.show"/></a>';
+					str += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show"/></spring:escapeBody></a>';
 				return str;
 			}
 
@@ -46,7 +46,7 @@
 	            	resizable: true,
 	            	// include column filters 
 	                filter_columnFilters: true, 
-	                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+	                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
 	                filter_searchDelay: 700 
 	            }
 			});
@@ -78,7 +78,7 @@
 							rows += '<td>';
 							rows += userData["userEntry"]; 
 							if ( userData["visible"] == false )
-								rows += ' <span class="label label-danger pull-right"><fmt:message key="label.hidden"/></spam>';							
+								rows += ' <span class="label label-danger pull-right"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hidden"/></spring:escapeBody></spam>';							
 							rows += '</td>';
 
 							rows += '<td>';

@@ -22,7 +22,7 @@
 
 			$.validator.addMethod('requireFileCount', function (value, element, param) {
 				return $('#hasFile').val() === 'true' || uppy.getFiles().length >= +param
-			}, '<fmt:message key="error.resource.item.file.blank"/>');
+			}, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>');
 
 						
 	 		$( "#resourceItemForm" ).validate({
@@ -40,7 +40,7 @@
 	 			},
 				messages : {
 					title : {
-						required : '<fmt:message key="error.resource.item.title.blank"/> '
+						required : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.title.blank"/></spring:escapeBody> '
 					}
 				},
 				errorPlacement: function(error, element) {

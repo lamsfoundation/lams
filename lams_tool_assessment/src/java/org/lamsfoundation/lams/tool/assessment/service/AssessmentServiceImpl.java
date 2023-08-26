@@ -23,33 +23,10 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -80,38 +57,15 @@ import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.QbUtils;
-import org.lamsfoundation.lams.qb.model.QbCollection;
-import org.lamsfoundation.lams.qb.model.QbOption;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
-import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
-import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.qb.model.*;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.*;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentConfigDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
-import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.*;
 import org.lamsfoundation.lams.tool.assessment.dto.*;
-import org.lamsfoundation.lams.tool.assessment.model.Assessment;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
-import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
+import org.lamsfoundation.lams.tool.assessment.model.*;
 import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils.AssessmentExcelCell;
@@ -131,14 +85,20 @@ import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.util.UriUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -4254,6 +4214,8 @@ public class AssessmentServiceImpl
 
     private String getCompletionChartsData(long toolContentId) {
 	try {
+	    HibernateSessionManager.openSessionIfNecessary();
+
 	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
 
 	    chartJson.set("possibleLearners", getLessonLearnersByContentIdJson(toolContentId));
@@ -4277,6 +4239,8 @@ public class AssessmentServiceImpl
 	} catch (Exception e) {
 	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId, e);
 	    return "";
+	} finally {
+	    SessionManager.endSession();
 	}
 
     }

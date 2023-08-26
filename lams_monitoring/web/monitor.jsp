@@ -76,6 +76,7 @@
 			var lessonId = ${lesson.lessonID},
 					userId = '<lams:user property="userID"/>',
 					ldId = ${lesson.learningDesignID},
+					contentFolderId = '${contentFolderID}',
 					lessonStateId = ${lesson.lessonStateID},
 					createDateTimeStr = '${lesson.createDateTimeStr}',
 					lessonStartDate = '${lesson.scheduleStartDate}',
@@ -190,9 +191,16 @@
 	<body class="component">
 	<div class="component-page-wrapper monitoring-page-wrapper ">
 		<div class="component-sidebar active">
-			<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />" class="lams-logo">
-				<img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.monitoring.logo' />" />
+
+			<c:if test="${not isIntegrationLogin}">
+			<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />">
+				</c:if>
+				<img class="lams-logo" src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg"
+					 alt="<fmt:message key='label.monitoring.logo' />" />
+				<c:if test="${not isIntegrationLogin}">
 			</a>
+			</c:if>
+
 
 			<div class="component-menu">
 				<div class="component-menu-btn d-flex flex-column align-items-center">

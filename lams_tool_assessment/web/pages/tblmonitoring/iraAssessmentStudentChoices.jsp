@@ -60,19 +60,29 @@
 
 	function exportExcel(){
 		//dynamically create a form and submit it
-		var exportExcelUrl = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID=" + (new Date()).getTime();
+		var exportExcelUrl = "<lams:LAMSURL/>tool/laasse10/monitoring/exportSummary.do?toolContentID=${toolContentID}&downloadTokenValue=dummy&fileName=assessment_export.xlsx&reqID="
+				+ (new Date()).getTime();
 		var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
 		var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
 		form.append(hiddenInput);
 		$(document.body).append(form);
 		form.submit();
 	};
+
+	function openActivityMonitoring(){
+		openPopUp('<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&contentFolderID='
+				+ contentFolderId, "MonitorActivity", popupHeight, popupWidth, true, true);
+	}
 </script>
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-10 offset-1 text-right">
 			<!-- Notifications -->
 			<div class="float-end">
+				<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
+					<i class="fa-solid fa-circle-info"></i>
+					<fmt:message key="label.activity.monitoring"/>
+				</a>
 				<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
 				   onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
 					<i class="fa fa-clipboard-question"></i>

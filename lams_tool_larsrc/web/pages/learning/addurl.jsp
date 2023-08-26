@@ -57,7 +57,7 @@
 		<script type="text/javascript">
 			$(document).ready(function(){
 				$('#addresource #url').focus()
-				.attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />")
+				.attr("placeholder","<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.basic.resource.url.placeholder' /></spring:escapeBody>")
 				.blur(function(){
 					var url = $(this).val();
 					if (url.trim() != '') {
@@ -96,11 +96,11 @@
 				},
 				messages : {
 					url : {
-						required : '<fmt:message key="error.resource.item.url.blank"/> ',
-						url : '<fmt:message key="error.resource.item.invalid.url"/> '
+						required : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.url.blank"/></spring:escapeBody> ',
+						url : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.invalid.url"/></spring:escapeBody> '
 					},
 					title : {
-						required : '<fmt:message key="error.resource.item.title.blank"/> '
+						required : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.title.blank"/></spring:escapeBody> '
 					}
 				},
 			});

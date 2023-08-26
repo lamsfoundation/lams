@@ -15,9 +15,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 	
 	$(document).ready(function(){

@@ -114,6 +114,11 @@
 
 	<body class="component my-2">
 	<lams:Page5 title="${title}" type="monitoring">
+		<c:if test="${param.displayReturnToMonitoringLink eq 'true'}">
+			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${param.lessonID}">
+				<i class="fa-solid fa-arrow-left"></i>&nbsp;<fmt:message key="label.grouping.return.to.monitoring"/>
+			</a>
+		</c:if>
 		<div class="card mb-2">
 			<div class="card-body">
 				<c:if test="${not empty description}">
@@ -233,7 +238,7 @@
 							<input type="hidden" name="lessonID" value='<c:out value="${lessonID}" />' />
 							<lams:FileUpload5 fileFieldname="groupUploadFile" fileInputMessageKey="label.upload.group.spreadsheet"
 											  uploadInfoMessageKey="-" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3"
+							<button id="import" type="button" class="btn btn-primary btn-disable-on-downupload ms-3 d-none"
 									onClick="javascript:importGroupsFromSpreadsheet()">
 								<i class="fa fa-upload"></i> <fmt:message key="button.import" />
 							</button>

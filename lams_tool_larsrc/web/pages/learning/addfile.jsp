@@ -51,9 +51,7 @@
 			UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
 	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-		   decoderDiv = $('<div />'),
-	       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-	       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+		   EXE_FILE_ERROR = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>';
 
 		$(document).ready(function(){
 			$('#title').focus();
@@ -83,7 +81,7 @@
 				},
 				messages : {
 					title : {
-						required : '<fmt:message key="error.resource.item.title.blank"/> '
+						required : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.title.blank"/></spring:escapeBody> '
 					}
 				},
 				errorPlacement: function(error, element) {

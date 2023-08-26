@@ -39,6 +39,11 @@ $(document).ready(function(){
 		// the label is "Group X" where X is the top group number
 		addGroup(null, LABELS.GROUP_PREFIX_LABEL + ' ' + $('#groupsCell .groupContainer').length, null);
 	});
+
+	$('#groupUploadFile').change(function(){
+		let fileName = $(this).val();
+		$('#import').toggleClass('d-none', !fileName || !fileName.endsWith('.xls'));
+	});
 });
 
 
