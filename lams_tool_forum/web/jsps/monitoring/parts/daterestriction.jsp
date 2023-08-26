@@ -1,6 +1,6 @@
 <%@include file="/common/taglibs.jsp"%>
 
-<c:set var="ddTitle"><fmt:message key="monitor.summary.date.restriction" /></c:set>
+<c:set var="ddTitle"><spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction" /></spring:escapeBody></c:set>
 <lams:RestrictedUsageAccordian title="${ddTitle}">
 
 	<p><fmt:message key="monitor.summary.when.date.restriction.is.set" /></p>

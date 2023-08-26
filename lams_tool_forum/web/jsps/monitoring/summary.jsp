@@ -28,9 +28,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -70,7 +70,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});
@@ -118,12 +118,12 @@
 								rows += "-";
 								
 							} else {
-								var anyPostsMarked = (userData["anyPostsMarked"]) ? '<fmt:message key="label.yes"/>' : '<fmt:message key="label.no"/>';
+								var anyPostsMarked = (userData["anyPostsMarked"]) ? '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.yes"/></spring:escapeBody>' : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no"/></spring:escapeBody>';
 								rows += anyPostsMarked;	
 								
 								var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${sessionMapID}&userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
 								rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
-								rows += 		'<fmt:message key="lable.topic.title.mark" />';
+								rows += 		'<spring:escapeBody javaScriptEscape="true"><fmt:message key="lable.topic.title.mark" /></spring:escapeBody>';
 								rows += 	'</a>';
 							}
 							rows += '</td>';

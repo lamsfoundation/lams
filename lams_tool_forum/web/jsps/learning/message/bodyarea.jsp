@@ -152,11 +152,10 @@
 		</div>&nbsp;<a tabindex="0" role="button" data-toggle="popover"><i class="fa fa-info-circle"></i></a>
 	
 		<%-- Use c:out to escape any quotes in the I18N string. Then use html: true converts any escaped quotes back --%>
-		<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>	
-		<fmt:message key="label.anonymous.tooltip" var="ANONYMOUS_TOOLTIP_VAR"></fmt:message>		
+		<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>			
  		<script type="text/javascript">
 		$(document).ready(function() {
-			var ANONYMOUS_TOOLTIP = '<c:out value="${ANONYMOUS_TOOLTIP_VAR}" />';
+			var ANONYMOUS_TOOLTIP = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.anonymous.tooltip"/></spring:escapeBody>';
 	    		$('[data-toggle="popover"]').popover({title: "", content: ANONYMOUS_TOOLTIP, placement:"auto left", delay: 50, trigger:"hover focus", html: true});
 		});
 		</script>

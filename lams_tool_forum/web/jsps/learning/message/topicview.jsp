@@ -10,13 +10,13 @@
 <c:set var="indent" value="10" />
 
 <c:set var="show">
-	<fmt:message key="label.show.replies" />
+	<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show.replies" /></spring:escapeBody>
 </c:set>
 <c:set var="hide">
-	<fmt:message key="label.hide.replies" />
+	<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide.replies" /></spring:escapeBody>
 </c:set>
 <c:set var="prompt">
-	<fmt:message key="label.showhide.prompt" />
+	<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.showhide.prompt" /></spring:escapeBody>
 </c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
 	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
@@ -45,7 +45,7 @@
 
 	function createReply(messageUid, url, level) {
 		if ( document.getElementById('reply') ) {
-			alert('<fmt:message key="message.complete.or.cancel.reply"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.complete.or.cancel.reply"/></spring:escapeBody>');
 		} else {
 			// set up the new reply area
 			var replyDiv = document.createElement("div");
@@ -58,7 +58,7 @@
 
 	function createEdit(messageUid, url, level) {
 		if ( document.getElementById('edit') ) {
-			alert('<fmt:message key="message.complete.or.cancel.edit"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.complete.or.cancel.edit"/></spring:escapeBody>');
 		} else {
 			// set up the new edit area
 			var editDiv = document.createElement("div");

@@ -52,18 +52,16 @@
 		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
-			var warning = '<fmt:message key="warn.minimum.number.characters" />';
-			var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
-			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
+			var warning = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warn.minimum.number.characters" /></spring:escapeBody>';
+			var LABEL_MAX_FILE_SIZE = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message></spring:escapeBody>';
+			var LABEL_NOT_ALLOWED_FORMAT = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>';	
 			
    			var LAMS_URL = '${lams}',
    		 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
    		 		UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
    				// convert Java syntax to JSON
    		       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-   			   decoderDiv = $('<div />'),
-   		       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-   		       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+   		       EXE_FILE_ERROR = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>';
 
 		</script>
 		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
@@ -118,7 +116,7 @@
 								$('#reply').remove();
 		        			
 			        			if ( ! threadDiv) {
-			        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+			        				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>');
 		        				} else {
 			        				var loadString = "<lams:WebAppURL />learning/viewTopicThread.do?topicID=" + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
 			        				$.ajaxSetup({ cache: true });
