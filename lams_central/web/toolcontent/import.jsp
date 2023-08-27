@@ -15,18 +15,7 @@
 		<link href="/lams/css/uppy.min.css" rel="stylesheet" type="text/css" />
 		<link href="/lams/css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		
-		<script type="text/javascript" src="/lams/includes/javascript/uppy/uppy.min.js"></script>
-		<c:choose>
-			<c:when test="${language eq 'es'}">
-				<script type="text/javascript" src="/lams/includes/javascript/uppy/es_ES.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'fr'}">
-				<script type="text/javascript" src="/lams/includes/javascript/uppy/fr_FR.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'el'}">
-				<script type="text/javascript" src="/lams/includes/javascript/uppy/el_GR.min.js"></script>
-			</c:when>
-		</c:choose>
+		<%@ include file="/common/uppylang.jsp"%>
 		
 		<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
@@ -65,9 +54,10 @@
 					  };
 				  
 				  switch(language) {
-				  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
-					case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
-					case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+				  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break;
+					case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break;
+					case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break;
+					case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break;
 				  }
 				  
 				  
