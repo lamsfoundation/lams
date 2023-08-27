@@ -34,6 +34,9 @@
 		<c:when test="${language eq 'el'}">
 			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
+		<c:when test="${language eq 'it'}">
+			<script type="text/javascript" src="${lams}/includes/javascript/uppy/it_IT.min.js"></script>
+		</c:when>
 	</c:choose>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
@@ -110,6 +113,7 @@
 			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
 				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
 				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+				case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break;
 			  }
 			  
 			  
