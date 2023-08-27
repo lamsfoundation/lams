@@ -49,7 +49,7 @@
 			var pathToImageFolder = "${lams}images/css/";
 		
 			//vars for rating.js
-			var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '',
 			IS_DISABLED =  true,
 			COMMENTS_MIN_WORDS_LIMIT = 0,
@@ -65,7 +65,7 @@
 			var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_MAX_SIZE}";
 			// convert Java syntax to JSON
 			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
-			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+			var LABEL_ITEM_BLANK = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>';
 		</script>
 		<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 		
@@ -147,7 +147,7 @@
 				    		var isHidden = imageToggleLink.data("is-hidden");
 				    		imageToggleLink.data("is-hidden", !isHidden);
 				    		
-				    		var imageToggleLinkText = isHidden ? "<fmt:message key='monitoring.label.hide' />" : "<fmt:message key='monitoring.label.show' />";
+				    		var imageToggleLinkText = isHidden ? "<spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.hide' /></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.show' /></spring:escapeBody>";
 				    		imageToggleLink.html(imageToggleLinkText);
 				    	},
 				    	error: function(jqXHR, textStatus, errorMessage) {   		

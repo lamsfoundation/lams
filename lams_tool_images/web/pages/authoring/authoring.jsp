@@ -24,7 +24,7 @@
 		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_LARGE_MAX_SIZE}";
 		// convert Java syntax to JSON
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
-		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+		var LABEL_ITEM_BLANK = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>';
 	</script>
 	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 	

@@ -50,7 +50,7 @@
 		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_MAX_SIZE}";
 		// convert Java syntax to JSON
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
-		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+		var LABEL_ITEM_BLANK = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>';
 	</script>
 	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 	
@@ -139,7 +139,7 @@
 		}
 		
 		function deleteImage(imageUid) {
-			var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+			var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.do.you.want.to.delete'/></spring:escapeBody>");
 			
 			if (deletionConfirmed) {
 				document.location.href = "<c:url value="/learning/deleteImage.do"/>?sessionMapID=${sessionMapID}&imageUid=" + imageUid;
