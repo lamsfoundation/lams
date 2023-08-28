@@ -117,7 +117,7 @@
                     <named-formatter name="LAMSPATTERN" />
                 </formatter>
                 <file relative-to="jboss.server.log.dir" path="lams.log" />
-                <rotate-size value="5m" />
+                <rotate-size value="25m" />
                 <max-backup-index value="20" />
                 <append value="true" />
             </size-rotating-file-handler>
