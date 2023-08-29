@@ -122,7 +122,6 @@ import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.util.UriUtils;
-import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -206,9 +205,15 @@ public class AssessmentServiceImpl
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null,
-		(Long toolContentId) -> UriUtils.encode(getCompletionChartsData(toolContentId),
-			StandardCharsets.UTF_8.toString()), FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			HibernateSessionManager.openSession();
+			return UriUtils.encode(getCompletionChartsData(toolContentId),
+				StandardCharsets.UTF_8.toString());
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
 	FluxRegistry.bindSink(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME,
 		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
 	FluxRegistry.bindSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
@@ -918,16 +923,6 @@ public class AssessmentServiceImpl
 
 	questionResult.setAnswerModified(isAnswerModified);
 	return questionResult;
-    }
-
-    @Override
-    public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
-	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
-    }
-
-    @Override
-    public Flux<String> getTimeLimitPanelUpdateFlux(long toolContentId) {
-	return FluxRegistry.get(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
     }
 
     /**
@@ -4265,8 +4260,6 @@ public class AssessmentServiceImpl
 
     private String getCompletionChartsData(long toolContentId) {
 	try {
-	    HibernateSessionManager.openSession();
-
 	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
 
 	    chartJson.set("possibleLearners", getLessonLearnersByContentIdJson(toolContentId));
@@ -4290,10 +4283,7 @@ public class AssessmentServiceImpl
 	} catch (Exception e) {
 	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId, e);
 	    return "";
-	} finally {
-	    HibernateSessionManager.closeSession();
 	}
-
     }
 
     private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
