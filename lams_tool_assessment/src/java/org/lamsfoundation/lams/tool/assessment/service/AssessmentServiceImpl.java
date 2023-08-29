@@ -57,15 +57,46 @@ import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
 import org.lamsfoundation.lams.qb.QbUtils;
-import org.lamsfoundation.lams.qb.model.*;
+import org.lamsfoundation.lams.qb.model.QbCollection;
+import org.lamsfoundation.lams.qb.model.QbOption;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.*;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
-import org.lamsfoundation.lams.tool.assessment.dao.*;
-import org.lamsfoundation.lams.tool.assessment.dto.*;
-import org.lamsfoundation.lams.tool.assessment.model.*;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentConfigDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
+import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
+import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
+import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentEscapeUtils.AssessmentExcelCell;
@@ -80,12 +111,16 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.*;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 
@@ -95,7 +130,23 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -4214,7 +4265,7 @@ public class AssessmentServiceImpl
 
     private String getCompletionChartsData(long toolContentId) {
 	try {
-	    HibernateSessionManager.openSessionIfNecessary();
+	    HibernateSessionManager.openSession();
 
 	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
 
@@ -4240,7 +4291,7 @@ public class AssessmentServiceImpl
 	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId, e);
 	    return "";
 	} finally {
-	    SessionManager.endSession();
+	    HibernateSessionManager.closeSession();
 	}
 
     }
