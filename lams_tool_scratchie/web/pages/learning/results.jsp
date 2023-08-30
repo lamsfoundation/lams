@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -407,45 +404,11 @@
 
 		<!-- Display reflections -->
 		<c:if test="${sessionMap.reflectOn}">
-			<div class="card shadow-sm mt-5">
-				<div class="card-header">
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</div>
-				
-				<div class="card-body">
-					<div class="m-2" aria-label="<fmt:message key='monitor.summary.td.notebookInstructions'/>">
-						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-					</div>
-					<hr/>
-
-					<div class="m-2">
-						<p>
-							<c:choose>
-								<c:when test="${empty sessionMap.reflectEntry}">
-									<em><fmt:message key="message.no.reflection.available" /></em>
-								</c:when>
-								<c:otherwise>
-									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-								</c:otherwise>
-							</c:choose>
-						</p>
-						
-						<c:if test="${(mode != 'teacher') && isUserLeader}">
-							<div class="mt-2">
-								<button name="editNotebookButton" id="edit-notebook-button" onclick="return continueReflect()" class="btn btn-sm btn-secondary btn-disable-on-submit" type="button">
-									<fmt:message key="label.edit" />
-								</button>
-							</div>
-						</c:if>
-					</div>
-				</div>
-
-				<c:if test="${fn:length(reflections) > 0}">
-					<div id="reflections-div">
-						<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
-					</div>
-				</c:if>
-			</div>
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${sessionMap.reflectEntry}"
+				isEditButtonEnabled="${(mode != 'teacher') && isUserLeader}"
+				isReflectionsJqGridEnabled="${fn:length(reflections) > 0}" />
 		</c:if>
 
 		<!-- Display finish buttons -->
