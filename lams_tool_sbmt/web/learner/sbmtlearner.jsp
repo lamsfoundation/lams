@@ -115,8 +115,8 @@
 					<input type="hidden" name="tmpFileUploadId" value="${learnerForm.tmpFileUploadId}" />
 
 					<!--File path row -->
-					<div class="card lcard lcard-no-borders shadow">
-						<div class="card-header lcard-header-lg lcard-header-button-border">
+					<div class="card lcard">
+						<div class="card-header">
 							<fmt:message key="label.learner.upload" />
 						</div>
 
@@ -178,10 +178,10 @@
 
 					<div role="list" class="mt-2 mb-4" aria-labelledby="submittedFiles">
 						<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
-							<div role="listitem" class="card lcard lcard-no-borders shadow mb-3 mt-4">
+							<div role="listitem" class="card lcard mt-4">
 								<!--The name of the File -->
 								<c:if test="${file.currentLearner}">
-									<div class="card-header ">
+									<div class="card-header">
 										<c:set var="downloadURL">
 											<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
 										</c:set>

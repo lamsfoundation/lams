@@ -8,8 +8,8 @@
 
 	<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}">
 		
-		<div class="card lcard lcard-no-borders shadow my-4" id="question<c:out value='${questionEntry.key}' />" aria-label="question">
-			<div class="card-header lcard-header lcard-header-button-border">
+		<div class="card lcard mt-4" id="question<c:out value='${questionEntry.key}' />" aria-label="question">
+			<div class="card-header">
 				<div class="card-title">
 					<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}"><c:out value="${questionEntry.key}" />.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
 				</div>

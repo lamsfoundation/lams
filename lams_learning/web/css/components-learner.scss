@@ -230,17 +230,20 @@
     border-top-left-radius: 1.25rem;
     border-top-right-radius: 0rem;
     border-bottom-right-radius: 1.25rem;
-}
-
-.lcard-no-borders {
     border: 0;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);//copied from bootstrap .shadow class
+    margin-bottom: 1.5rem;//copied from bootstrap .mb-4 class
 }
 
-.lcard .lcard-header-lg {
+.lcard .card-header {
     border-top-left-radius: 1.25rem;
     border-top-right-radius: 0rem;
     font-size: 1.3rem;
     padding: 1rem;
+}
+
+.font-size-init {
+	font-size: initial;
 }
 
 /* coommented out for now by Andrey
@@ -312,7 +315,6 @@ div.growlUI h1,div.growlUI h2 {
   text-decoration: inherit;
   margin-left: 5px;
   color: inherit;
-  /*float: right;*/
 }
 
 .btn-refresh {
@@ -320,6 +322,30 @@ div.growlUI h1,div.growlUI h2 {
 }
 .btn-refresh:before {
   content: "\f021";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.btn-icon-pen {
+  display: inline-block;
+}
+.btn-icon-pen:before {
+  content: "\f044";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.btn-icon-return {
+  display: inline-block;
+}
+.btn-icon-return:before {
+  content: "\f2ea";
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;

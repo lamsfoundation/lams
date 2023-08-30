@@ -13,9 +13,9 @@
 </c:if>
 
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
-	<div class="card lcard lcard-no-borders shadow my-4" id="question${questionNumber.count}" aria-label="question">
+	<div class="card lcard mt-4" id="question${questionNumber.count}" aria-label="question">
 		
-		<div class="card-header lcard-header lcard-header-button-border lead" id="questionTitle${questionNumber.count}">
+		<div class="card-header" id="questionTitle${questionNumber.count}">
 	        ${questionNumber.count})&nbsp;
 	        <c:if test="${not sessionMap.hideTitles}">
 	        	<c:out value="${item.qbQuestion.name}" escapeXml="true" />

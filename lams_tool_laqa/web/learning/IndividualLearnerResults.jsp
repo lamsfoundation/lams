@@ -41,10 +41,8 @@
 			<form:hidden path="totalQuestionCount" />
 
 			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-
-
-				<div class="card lcard lcard-no-borders shadow mb-3 my-4" id="questions${questionEntry.key}">
-					<div class="card-header ">
+				<div class="card lcard mt-4" id="questions${questionEntry.key}">
+					<div class="card-header">
 						<strong>
 							<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">${questionEntry.key}.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
 						</strong>

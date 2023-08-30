@@ -36,16 +36,14 @@
 				</c:when>
 				<c:otherwise>
 					<button type="button" class="btn btn-primary" id="finishButton" onclick="submitForm('finish')">
-						<span class="nextActivity">
-							<c:choose>
-								<c:when test="${isLastActivity}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.finish" />
-								</c:otherwise>
-							</c:choose>
-						</span>
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
 					</button>
 				</c:otherwise>
 			</c:choose>

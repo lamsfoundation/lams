@@ -38,7 +38,7 @@
 		<fmt:message key="${waitingForLeaderKey}" />
 	</lams:Alert5>
 
-	<div class="card lcard lcard-no-borders shadow mb-3 mt-1">
+	<div class="card lcard mt-1">
 		<div class="card-header lcard-header-button-border">
 			<fmt:message key="label.users.from.group" />
 		</div>

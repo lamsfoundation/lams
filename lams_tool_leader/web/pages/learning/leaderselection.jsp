@@ -112,7 +112,7 @@
 			</c:otherwise>
 		</c:choose>
 
-		<div class="card lcard lcard-no-borders shadow my-3">
+		<div class="card lcard mt-3">
 			<div class="card-header">
 				<fmt:message key="label.users.from.group" />
 			</div>
@@ -132,28 +132,28 @@
 		</div>
 
 		<div id="actionbuttons" class="activity-bottom-buttons">
-				<c:if test="${!isSelectLeaderActive}">
-					<button type="button" class="btn btn-primary na" id="finishButton">
-						<span class="nextActivity"> <c:choose>
-								<c:when test="${isLastActivity}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.finish" />
-								</c:otherwise>
-							</c:choose>
-						</span>
-					</button>
-				</c:if>
-
-				<button type="button" onclick="location.reload();" class="btn btn-secondary me-2 d-flex align-items-center">
-					<i class="fa fa-refresh me-1"></i> 
-					<span class="d-none d-sm-block">
-						<fmt:message key="label.refresh" />
-					</span>
+			<c:if test="${!isSelectLeaderActive}">
+				<button type="button" class="btn btn-primary na" id="finishButton">
+					<c:choose>
+						<c:when test="${isLastActivity}">
+							<fmt:message key="button.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="button.finish" />
+						</c:otherwise>
+					</c:choose>
 				</button>
+			</c:if>
+
+			<button type="button" onclick="location.reload();"
+				class="btn btn-secondary me-2 d-flex align-items-center">
+				<i class="fa fa-refresh me-1"></i> 
+				<span class="d-none d-sm-block">
+					<fmt:message key="label.refresh" />
+				</span>
+			</button>
 		</div>
-			
+
 	</div>
 
 	<!-- leaderSelection dialog -->
@@ -173,7 +173,7 @@
 						<c:out value="${content.instructions}" escapeXml="false" />
 					</div>
 						
-					<div class="card lcard lcard-no-borders shadow mt-3 mb-3">
+					<div class="card lcard mt-3">
 						<div class="card-header">
 							<fmt:message key="label.users.from.group" />
 						</div>

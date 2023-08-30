@@ -65,7 +65,7 @@
 		<lams:errors5/>
 		
 		<div class="container-lg">
-			<div class="card lcard lcard-no-borders shadow mb-3">
+			<div class="card lcard">
 				<div class="card-header lcard-header-button-border">
 					<fmt:message key="${notebookLabelKey}" />
 				</div>
