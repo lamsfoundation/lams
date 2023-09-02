@@ -50,7 +50,7 @@ public class QuestionsController {
 	    @RequestParam(required = false) Boolean collectionChoice, HttpServletRequest request) throws Exception {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
-	boolean isTextBasedInput = "openAi".equals(importType);
+	boolean isAiBasedInput = "openAi".equals(importType);
 	String packageName = null;
 	File file = null;
 
@@ -63,7 +63,7 @@ public class QuestionsController {
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 
-	if (!isTextBasedInput) {
+	if (!isAiBasedInput) {
 	    File uploadDir = FileUtil.getTmpFileUploadDir(tmpFileUploadId);
 	    if (uploadDir.canRead()) {
 		File[] files = uploadDir.listFiles();
@@ -85,7 +85,7 @@ public class QuestionsController {
 	    request.setAttribute("collections", collections);
 	}
 	// user did not choose a file
-	if (!isTextBasedInput && (file == null || (isWordInput
+	if (!isAiBasedInput && (file == null || (isWordInput
 		? !packageName.endsWith(".docx")
 		: !(packageName.endsWith(".zip") || packageName.endsWith(".xml"))))) {
 	    errorMap.add("GLOBAL", messageService.getMessage("label.questions.file.missing"));
@@ -103,12 +103,12 @@ public class QuestionsController {
 	}
 
 	Question[] questions = null;
-	if (isTextBasedInput) {
+	if (isAiBasedInput) {
 	    try {
 		Class clazz = Class.forName(Configuration.AI_MODULE_CLASS, false, Configuration.class.getClassLoader());
 		if (clazz != null) {
 		    Method method = clazz.getMethod("parseResponse", String.class);
-		    String questionsJson = request.getParameter("textInput");
+		    String questionsJson = request.getParameter("questionsJson");
 		    questions = (Question[]) method.invoke(null, questionsJson);
 		    request.setAttribute("questionsJson",
 			    questions == null || questions.length == 0 ? "" : questionsJson);
