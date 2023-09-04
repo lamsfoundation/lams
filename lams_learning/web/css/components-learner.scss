@@ -304,11 +304,19 @@ div.growlUI h1,div.growlUI h2 {
 	font-size: medium;
 }
 
-.na {
+.div-hover .row {
+	align-items: center;
+	border-top: 1px solid #ddd;
+	padding: 12px;
+}
+.div-hover .row:hover{
+	background-color: var(--bs-gray-200);
+}
+
+.na, .btn-icon-refresh, .btn-icon-pen, .btn-icon-return, .btn-icon-previous, .btn-icon-next {
   display: inline-block;
 }
-.na:after {
-  content: "\f0a9";
+.na:after, .btn-icon-refresh:before, .btn-icon-pen:before, .btn-icon-return:before, .btn-icon-previous:before, .btn-icon-next:after {
   font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
@@ -316,39 +324,21 @@ div.growlUI h1,div.growlUI h2 {
   margin-left: 5px;
   color: inherit;
 }
-
-.btn-refresh {
-  display: inline-block;
+.na:after {
+  content: "\f0a9";
 }
-.btn-refresh:before {
+.btn-icon-refresh:before {
   content: "\f021";
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  color: inherit;
-}
-
-.btn-icon-pen {
-  display: inline-block;
 }
 .btn-icon-pen:before {
   content: "\f044";
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  color: inherit;
-}
-
-.btn-icon-return {
-  display: inline-block;
 }
 .btn-icon-return:before {
   content: "\f2ea";
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  color: inherit;
+}
+.btn-icon-previous:before {
+  content: "\f100";
+}
+.btn-icon-next:after {
+  content: "\f101";
 }

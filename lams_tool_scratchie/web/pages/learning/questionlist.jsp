@@ -11,8 +11,8 @@
 	<%-- show general burning question --%>
 	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 		<div class="burning-question-container mb-3">
-			<a data-bs-toggle="collapse" data-bs-target="#burning-question-general" href="#" role="button"
-					<c:if test="${empty sessionMap.generalBurningQuestion}">class="collapsed"</c:if>>
+			<button type="button" data-bs-toggle="collapse" data-bs-target="#burning-question-general"
+					class="btn btn-light btn-sm <c:if test="${empty sessionMap.generalBurningQuestion}">collapsed</c:if>">
 				<span class="if-collapsed">
 					<i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i>
 				</span>
@@ -20,9 +20,9 @@
 	  				<i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i>
 	  			</span>
 				<fmt:message key="label.general.burning.question" />
-			</a>
+			</button>
 	
-			<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">show</c:if>">
+			<div id="burning-question-general" class="collapse <c:if test="${not empty sessionMap.generalBurningQuestion}">show</c:if>" pt-2>
 				<textarea rows="5" name="generalBurningQuestion" class="form-control"
 					<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
 				>${sessionMap.generalBurningQuestion}</textarea>

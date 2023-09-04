@@ -185,11 +185,11 @@
 			<%--Display Etherpad for each question --%>
 			<c:if test="${isQuestionEtherpadEnabled}">
 				<div class="question-etherpad-container mb-3">
-					<a data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" href="#" class="collapsed" role="button" >
+					<button type="button" data-bs-toggle="collapse" data-bs-target="#question-etherpad-${item.uid}" class="collapsed">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.etherpad.discussion" />
-					</a>
+					</button>
 					
 					<div id="question-etherpad-${item.uid}" class="question-etherpad-collapse collapse">
 						<div class="card question-etherpad">
@@ -204,12 +204,12 @@
 			<%-- show burning questions --%>
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 				<div class="burning-question-container mb-3">
-					<a id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}" href="#" role="button"
-							<c:if test="${empty item.burningQuestion}">class="collapsed"</c:if>>
+					<button type="button" id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}"
+							class="btn btn-light btn-sm <c:if test="${empty item.burningQuestion}">collapsed</c:if>">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.burning.question" />
-					</a>
+					</button>
 					
 					<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">show</c:if> p-2">
 						<textarea rows="5" name="burningQuestion${item.uid}" class="form-control" aria-labelledby="questionTitle${questionNumber.count} bq${item.uid}" 

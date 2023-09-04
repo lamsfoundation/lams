@@ -243,7 +243,7 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons" id="learner-submit">
 				<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">
-					<button type="button" class="btn btn-secondary roffset5 float-start"
+					<button type="button" class="btn btn-secondary btn-icon-refresh float-start"
 							onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
 						<fmt:message key="label.refresh" />
 					</button>
