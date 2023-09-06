@@ -30,34 +30,63 @@ div.growlUI h1, div.growlUI h2 {
 	float: left; 
 	padding-right: 5px;
 }
-.ordering-option {
-	vertical-align: middle !important;
-} 
-.question-type {
+
+.card-subheader {
 	padding-bottom: 7px; 
-	font-style: italic;
+	//font-style: italic;
+	font-weight: 500;
+	color: rgba(5, 112, 213,1) !important;
 }
 .question-table {
 	width: 98%;
 }
-.has-radio-button {
-	padding:5px 0px 2px 15px; 
-	width: 5px;
-}
-.has-radio-button-prefix {
-	padding:5px 0px 5px 5px !important; 
-	width: 45px;
-}
-.has-radio-button-prefix-answer {
-	padding-left:0px !important; 
-}
 
 .complete-item-gif {
-	padding:5px 0px 2px 15px; 
-	width: 7px;
+	width: 30px;
 }
 .complete-item-gif img {
 	border:1px;
+}
+
+.feedback {
+	padding-bottom: 10px;
+}
+
+.selected-by-groups {
+	margin-left: 55px;
+}
+
+[data-bs-toggle="collapse"].collapsed .if-not-collapsed,
+[data-bs-toggle="collapse"]:not(.collapsed) .if-collapsed,
+.max-word-limit-exceeded {
+	display: none;
+}
+
+.countdown-timeout {
+	color: #FF3333 !important;
+}
+
+#leader-info {
+	margin-bottom: 10px;
+}
+
+.question-etherpad {
+	padding: 0;
+}
+
+@media (min-width: 0px) and (max-width: 767px) {
+	.discussion-sentiment-start-button {
+		padding: 1px 5px;
+	}
+}
+
+.discussion-sentiment-start-button .fa-comments {
+	color: black !important;
+}
+
+.monitor-question-buttons {
+	text-align: right;
+	float: right;
 }
 
 #pager {
@@ -70,13 +99,6 @@ div.growlUI h1, div.growlUI h2 {
 
 #warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total{
 	display: none;
-}
-
-.reg-info {
-	margin-top: 10px;
-	margin-left: 10px;
-	margin-bottom: 10px;
-	width: 80%;
 }
 
 .button-disabled {
@@ -102,6 +124,33 @@ table.table-row-spacing {
     padding-right: 2em;
     padding-left: 2em;
     border-radius: 10px
+}
+
+.div-hover .row {
+    padding: 12px 0 !important;
+}
+.div-table .row {
+	border-bottom: 2px solid var(--bs-gray-200) !important;
+	padding: 0.5rem;
+}
+
+/*----------slider----------------*/
+
+.bootstrap-slider input[type="range"] {
+  width: 210px;
+  margin: 0;
+}
+
+.bootstrap-slider datalist {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  writing-mode: vertical-lr;
+  width: 210px;
+}
+
+.bootstrap-slider option {
+  padding: 0;
 }
 
 /*----------countdown growl----------------*/

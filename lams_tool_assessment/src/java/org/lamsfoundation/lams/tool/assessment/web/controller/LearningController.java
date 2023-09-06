@@ -1344,9 +1344,8 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
 
-	return "pages/learning/results" + (embedded ? "/allquestions" + (newUI ? "5" : "") : "");
+	return "pages/learning/results" + (embedded ? "/allquestions" : "");
     }
 
     @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)

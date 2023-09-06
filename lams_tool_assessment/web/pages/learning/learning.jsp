@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -18,52 +18,21 @@
 <c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 <!-- hasEditRight=${hasEditRight} -->
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
-	
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
+<lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
+	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
-	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
 	</c:if>
-	<style>
-		.slider.slider-horizontal {
-			margin-left: 40px;
-		}
-		
-		.question-etherpad {
-			padding: 0;
-		}
-		
-		[data-bs-toggle="collapse"].collapsed .if-not-collapsed,
-		[data-bs-toggle="collapse"]:not(.collapsed) .if-collapsed,
-		.max-word-limit-exceeded {
-  			display: none;
-  		}
-  		
-  		.countdown-timeout {
-  			color: #FF3333 !important;
-  		}
-  		
-  		#leader-info {
-  			margin-bottom: 10px;
-  		}
-	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-	
 	<c:if test="${not empty codeStyles}">
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/codemirror.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/scroll/simplescrollbars.js"></script>
@@ -73,7 +42,6 @@
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/closebrackets.js"></script>
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/edit/matchbrackets.js"></script>
 		</c:if>
-
 		<script type="text/javascript">
 			CodeMirror.defaults.readOnly = ${!hasEditRight};
 			CodeMirror.defaults.lineNumbers = true;
@@ -98,7 +66,6 @@
 			</c:when>
 		</c:choose>
 	</c:forEach>
-	
 	<script type="text/javascript">
 		var skipValidation = false;
 		
@@ -123,12 +90,9 @@
 				}).trigger("change");
 			}
 
-			//initialize bootstrap-sliders if "Enable confidence level" option is ON
-			$('.bootstrap-slider').bootstrapSlider();
-
 			//init options sorting feature
 			if (${hasEditRight}) {
-				$("table.ordering-table tbody").each(function () {
+				$(".ordering-question-type").each(function () {
 					new Sortable($(this)[0], {
 					    animation: 150,
 					    ghostClass: 'sortable-placeholder',
@@ -136,9 +100,9 @@
 						store: {
 							set: function (sortable) {
 								//update all sequenceIds in order to later save it as options' order
-								for (var i = 0; i < sortable.el.rows.length; i++) {
-									var tr = sortable.el.rows[i];
-									var input = $("input", $(tr));
+								for (var i = 0; i < sortable.el.children.length; i++) {
+									var divContainingInput = sortable.el.children[i];
+									var input = $("input", $(divContainingInput));
 								    input.val(i);
 								}
 							}
@@ -272,7 +236,8 @@
 		}
 		
 		function displayCountdown(secondsLeft){
-			var countdown = '<div id="countdown"></div>';
+			var countdown = '<div id="countdown" role="timer"></div>' +
+				'<div id="screenreader-countdown" aria-live="polite" class="visually-hidden" aria-atomic="true"></div>';
 			
 			$.blockUI({
 				message: countdown, 
@@ -302,10 +267,31 @@
 					} else {
 						$(this).removeClass('countdown-timeout');
 					}
+
+					//handle screenreaders
+					var screenCountdown = $("#screenreader-countdown");
+					var hours = $("#countdown").countdown('getTimes')[4];
+					var minutes = $("#countdown").countdown('getTimes')[5];
+					if (screenCountdown.data("hours") != hours || screenCountdown.data("minutes") != minutes) {
+						var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody> ";
+						if (hours > 0) {
+							timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.hours' /></spring:escapeBody> ";
+						}
+						timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.minutes' /></spring:escapeBody> ";
+						screenCountdown.html(timeLeftText);
+						
+						screenCountdown.data("hours", hours);
+						screenCountdown.data("minutes", minutes);
+					}					
 				},
 				<c:if test="${hasEditRight && (mode != 'teacher')}">
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.blockui.time.is.over" /></spring:escapeBody></h1>' }); 
+				        $.blockUI({ 
+					        message: '<h1 id="timelimit-expired" role="alert">' +
+					        			'<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> ' +
+					        			'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.blockui.time.is.over" /></spring:escapeBody>' + 
+					        		 '</h1>' 
+						});  
 				        
 				        setTimeout(function() { 
 				        	submitAll(true);
@@ -315,7 +301,6 @@
 				description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.countdown.time.left' /></spring:escapeBody></div>"
 			});
 		}
-			
 		
 		//autosave feature
 		<c:if test="${hasEditRight && (mode != 'teacher')}">
@@ -344,8 +329,6 @@
 					this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;		
 				});
 
-				
-
 				// copy value from lams:textarea (only available in essay and mark hedging type of questions) to hidden input before ajax submit
 				$("textarea[name$=__textarea]").change();
 				
@@ -359,7 +342,10 @@
 			            }
 			            
 		                $.jGrowl(
-		                	"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.draft.autosaved' /></spring:escapeBody>",
+				            "<span aria-live='polite'>" +
+				            	"<i class='fa fa-lg fa-floppy-o'></i> " +
+				            	"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.draft.autosaved' /></spring:escapeBody>" +
+				            "</span>",
 		                	{ life: 2000, closeTemplate: '' }
 		                );
 	                },
@@ -628,16 +614,14 @@
 			});
 		}
     </script>
-</lams:head>
-<body class="stripes">
 
-	<lams:Page type="learner" title="${assessment.title}">
+	<div class="container-lg">
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
-			<lams:Alert id="submission-deadline" type="info" close="true">
+			<lams:Alert5 id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled}">
@@ -646,57 +630,49 @@
 		</c:if>
 		
 		<c:if test="${assessment.allowDiscloseAnswers}">
-			<lams:Alert type="info" close="true">
+			<lams:Alert5 type="info" close="true">
 				<fmt:message key="label.learning.disclose.tip" />
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${hasEditRight}">
-			<lams:Alert type="info" close="true">
+			<lams:Alert5 type="info" close="true">
 				<fmt:message key="label.learning.submit.all.tip" />
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
-		<div class="panel">
+		<div id="instructions" class="instructions my-3">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
 		</div>
 		
-		<lams:Alert id="warning-answers-required" type="warning" close="true">
+		<lams:Alert5 id="warning-answers-required" type="warning" close="true">
 			<fmt:message key="warn.answers.required" />
-		</lams:Alert>
+		</lams:Alert5>
 		
-		<lams:Alert id="warning-words-limit" type="warning" close="true">
+		<lams:Alert5 id="warning-words-limit" type="warning" close="true">
 			<fmt:message key="warn.answers.word.requirements.limit" />
-		</lams:Alert>
+		</lams:Alert5>
 		
-		<lams:Alert id="warning-mark-hedging-wrong-total" type="warning" close="true">
+		<lams:Alert5 id="warning-mark-hedging-wrong-total" type="warning" close="true">
 			<fmt:message key="warn.mark.hedging.wrong.total" />
-		</lams:Alert>
+		</lams:Alert5>
 		
 		<lams:errors/>
-		<br>
 		
-		<div class="form-group">
-			<%@ include file="parts/paging.jsp"%>
-			<br>
-			
+		<%@ include file="parts/paging.jsp"%>
+		
+		<div id="all-questions">	
 			<%@ include file="parts/allquestions.jsp"%>
-			
-			<%@ include file="parts/paging.jsp"%>
 		</div>
+			
+		<%@ include file="parts/paging.jsp"%>
 
-		<c:if test="${mode != 'teacher'}">
-			<div class="activity-bottom-buttons">
-				<c:if test="${hasEditRight}">
-					<button type="button" name="submitAll"
-						onclick="return submitAll(false);" class="btn btn-primary na">
-						<fmt:message key="label.learning.submit.all" />
-					</button>
-				</c:if>
-			</div>
-		</c:if>
-
-	</lams:Page>
-
-</body>
-</lams:html>
+		<div class="activity-bottom-buttons">
+			<c:if test="${mode != 'teacher' && hasEditRight}">
+				<button type="button" name="submitAll" onclick="return submitAll(false);" class="btn btn-primary na">
+					<fmt:message key="label.learning.submit.all" />
+				</button>
+			</c:if>
+		</div>
+	</div>
+</lams:PageLearner>

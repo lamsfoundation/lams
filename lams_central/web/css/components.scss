@@ -325,11 +325,6 @@ body.component i.fa[role="button"] {
 	cursor: pointer;
 }
 
-body.component table.table thead th {
-	border: none;
-	border-bottom: 2px solid var(--bs-blue);
-}
-
 body.component table.table tbody td,
 body.component table.table tbody th,
 body.component .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
@@ -483,6 +478,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	min-height: 100vh;
 	border-radius: 2.8rem;
 	overflow: hidden;
+	background-color: var(--bs-white);
 }
 
 .component-page-wrapper button.no-decoration {

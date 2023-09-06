@@ -1,56 +1,53 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
+<div class="card-subheader">
 	<fmt:message key="label.assign.hedging.mark">
 		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
 </div>
 
-<div class="table-responsive">
-	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.optionDtos}">
-			<tr>
-				<td class="complete-item-gif">
-					
+<div class="table table-sm table-responsive div-hover px-3">
+	<c:forEach var="option" items="${question.optionDtos}">
+		<div class="row">
+			<c:if test="${assessment.allowRightAnswersAfterQuestion || assessment.allowWrongAnswersAfterQuestion}">
+				<div class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && option.correct}">
 						<i class="fa fa-check text-success"></i>
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && !option.correct}">
 						<i class="fa fa-times text-danger"></i>
 					</c:if>
-							
-				</td>
+				</div>
+			</c:if>
 				
-				<td>
-					<c:out value="${option.name}" escapeXml="false" />
-				</td>
+			<div class="col">
+				<c:out value="${option.name}" escapeXml="false" />
+			</div>
 				
-				<td style="width: 100px;">
-					<c:if test="${not empty toolSessionID}">
-						<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
-								disabled="disabled">
-							
-							<c:forEach var="i" begin="0" end="${question.maxMark}">
-								<option
-									<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
-								>${i}</option>
-							</c:forEach>
-							
-						</select>
+			<c:if test="${assessment.allowQuestionFeedback}">
+				<div style="width:30%;">
+					<c:if test="${option.answerInt > 0}">
+						<c:out value="${option.feedback}" escapeXml="false" />
 					</c:if>
-				</td>
+				</div>
+			</c:if>
 				
-				<c:if test="${assessment.allowQuestionFeedback}">
-					<td width="30%">
-						<c:if test="${option.answerInt > 0}">
-							<c:out value="${option.feedback}" escapeXml="false" />
-						</c:if>
-					</td>
+			<div style="width:60px;">
+				<c:if test="${not empty toolSessionID}">
+					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
+							disabled="disabled">
+							
+						<c:forEach var="i" begin="0" end="${question.maxMark}">
+							<option
+								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
+							>${i}</option>
+						</c:forEach>
+							
+					</select>
 				</c:if>
-				
-			</tr>
-		</c:forEach>
-	</table>
+			</div>
+		</div>
+	</c:forEach>
 </div>
 
 <c:if test="${assessment.allowQuestionFeedback}">
@@ -76,7 +73,7 @@
 </c:if>
 
 <c:if test="${not empty toolSessionID and assessment.allowRightAnswersAfterQuestion}">
-	<div class="question-feedback" style="padding-bottom: 10px;">
+	<div class="feedback">
 		<fmt:message key="label.learning.marks" >
 			<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
 			<fmt:param>${question.maxMark}</fmt:param>

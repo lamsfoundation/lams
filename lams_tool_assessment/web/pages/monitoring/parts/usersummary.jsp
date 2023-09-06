@@ -15,10 +15,6 @@
 		</c:if>
 	
 		<style>
-			.question-etherpad {
-				padding: 0;
-			}
-			
 			[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
 	  			display: none;
 	  		}
