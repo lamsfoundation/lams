@@ -55,7 +55,6 @@
 	<div id="instructions" class="instructions">
 		<lams:out value="${instructions}" escapeHtml="true" />
 	</div>
-	<hr class="mx-5">
 
 	<form:form action="${formActionUrl}" modelAttribute="${formModelAttribute}" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
 		<c:forTokens items="${hiddenInputs}" delims="," var="hiddenInput"> 
@@ -65,7 +64,7 @@
 		<lams:errors5/>
 		
 		<div class="container-lg">
-			<div class="card lcard lcard-no-borders shadow mb-3">
+			<div class="card lcard">
 				<div class="card-header lcard-header-button-border">
 					<fmt:message key="${notebookLabelKey}" />
 				</div>

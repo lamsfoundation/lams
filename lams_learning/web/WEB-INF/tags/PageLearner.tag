@@ -44,6 +44,7 @@
         <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
         <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
         <lams:JSImport src="includes/javascript/dialog5.js" />
+        <lams:JSImport src="includes/javascript/common.js" />
 
         <script>
             const LAMS_URL = '<lams:LAMSURL/>',

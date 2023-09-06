@@ -197,17 +197,17 @@
 					</c:if>
 				
 					<div class="row">
-						<div class="col-xs-12 col-sm-10">
+						<div class="col-xs-12 col-sm-11">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control comment-textarea"
 									placeholder="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
 						</div>
-						<div class="col-xs-12 col-sm-2">
-							<button class="btn btn-primary add-comment add-comment-new"
+						<div class="col-xs-12 col-sm-1">
+							<button class="btn btn-success btn-sm add-comment add-comment-new"
 									data-item-id="${itemRatingDto.itemId}"
 									data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
 									data-show-all-comments="${showAllComments}"
 									data-refresh-on-submit="${refreshOnComment}">
-								<i class="fa fa-check"></i>
+								<i class="fa fa-check fa-lg"></i>
 							</button>
 						</div>
 					</div>

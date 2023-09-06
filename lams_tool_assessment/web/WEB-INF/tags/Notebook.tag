@@ -55,7 +55,6 @@
 	<div id="instructions" class="instructions">
 		<lams:out value="${instructions}" escapeHtml="true" />
 	</div>
-	<hr class="mx-5">
 
 	<form:form action="${formActionUrl}" modelAttribute="${formModelAttribute}" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
 		<c:forTokens items="${hiddenInputs}" delims="," var="hiddenInput"> 

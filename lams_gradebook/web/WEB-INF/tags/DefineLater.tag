@@ -54,7 +54,7 @@
 	</lams:Alert5>
 
 	<div class="activity-bottom-buttons">
-		<a id="finishButton" href="javascript:location.reload(true);" class="btn btn-primary btn-refresh mt-3"> 
+		<a id="finishButton" href="javascript:location.reload(true);" class="btn btn-primary btn-icon-refresh mt-3"> 
 			<fmt:message key="${buttonTryAgainKey}" />
 		</a>
 	</div>

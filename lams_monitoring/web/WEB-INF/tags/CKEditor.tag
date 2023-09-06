@@ -14,6 +14,9 @@
 <%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
 <%@ attribute name="method" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxWords" required="false" rtexprvalue="true"%>
+<%@ attribute name="ariaLabel" required="false" rtexprvalue="true"%>
+<%@ attribute name="ariaLabelledby" required="false" rtexprvalue="true"%>
+<%@ attribute name="ariaRequired" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty method}">
 	<c:set var="method" value="inline" />
@@ -47,7 +50,11 @@
 	<div class="cke-div">
 </c:if>
 
-<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${fixedValue}</textarea>
+<textarea id="${id}" name="${id}"
+	style="display: none; visibility: hidden; height: 0px;"
+	<c:if test="${not empty ariaLabel}">aria-label="${ariaLabel}"</c:if>
+	<c:if test="${not empty ariaLabelledby}">aria-labelledby="${ariaLabelledby}"</c:if>
+	aria-required="${ariaRequired}" aria-multiline="true">${fixedValue}</textarea>
 
 <c:if test="${not empty placeholder}">
 		<label for="${id}" class="cke-label-floating">${placeholder}</label>

@@ -38,7 +38,7 @@
 		<fmt:message key="${waitingForLeaderKey}" />
 	</lams:Alert5>
 
-	<div class="card lcard lcard-no-borders shadow mb-3 mt-1">
+	<div class="card lcard mt-1">
 		<div class="card-header lcard-header-button-border">
 			<fmt:message key="label.users.from.group" />
 		</div>
@@ -67,7 +67,7 @@
 
 	<c:if test="${mode != teacher}">
 		<div class="activity-bottom-buttons">
-			<button name="refreshButton" id="refreshButton" onclick="refresh();" class="btn btn-primary btn-refresh">
+			<button name="refreshButton" id="refreshButton" onclick="refresh();" class="btn btn-primary btn-icon-refresh">
 				<fmt:message key="${refreshKey}" />
 			</button>
 		</div>
