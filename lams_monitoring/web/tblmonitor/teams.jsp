@@ -271,7 +271,7 @@
 		<div class="col-10 offset-1">
 			<div class="float-end">
 				<c:if test="${not empty groupsSetupUrl}">
-					<a href="<lams:LAMSURL/>${groupsSetupUrl}&displayReturnToMonitoringLink=true" class="btn btn-secondary">
+					<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary">
 						<fmt:message key="label.teams.setup"/>
 					</a>
 				</c:if>

@@ -1179,7 +1179,7 @@ function updateContributeActivities(contributeActivities) {
 
 					}
 						break;
-					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" target="_blank" href="'
+					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" href="'
 						+ this.url + '" title="' + LABELS.CONTRIBUTE_TOOLTIP + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
 						break;
 					default : entryContent += '<button type="button" class="btn btn-primary contribute-go-button" onClick="javascript:openPopUp(\''
@@ -1576,7 +1576,7 @@ function updateSequenceTab() {
 						});
 					} else if (isGrouping) {
 						dblTap(activityGroup, function(){
-							window.open(LAMS_URL + activity.url, "_blank");
+							document.location.href = LAMS_URL + activity.url;
 						});
 					} else {
 						dblTap(activityGroup, function(){
