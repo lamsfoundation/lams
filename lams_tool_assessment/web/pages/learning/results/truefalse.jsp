@@ -4,7 +4,7 @@
 </c:set>
 
 <c:if test="${not empty toolSessionID}">
-	<div class="card-subheader">
+	<div class="card-subheader" id="instructions-${questionIndex}">
 		${truefalseInstructions}
 	</div>
 </c:if>
@@ -39,11 +39,12 @@
 						<input type="radio" name="question${status.index}" value="${true}"
 			 				<c:if test="${question.answerBoolean}">checked="checked"</c:if>
 							disabled="disabled"	
+							aria-labelledby="instructions-${questionIndex} option-name-true"
 						/>
 					</c:if>
 				</div>
 				
-				<div class="col">
+				<div class="col" id="option-name-true">
 					<fmt:message key="label.learning.true.false.true" />
 				</div>
 			</div>
@@ -70,11 +71,12 @@
 						<input type="radio" name="question${status.index}" value="${false}"
 			 				<c:if test="${(!question.answerBoolean) and (question.answer != null)}">checked="checked"</c:if>
 							disabled="disabled"
+							aria-labelledby="instructions-${questionIndex} option-name-false"
 						/>
 					</c:if>
 				</div>
 				
-				<div class="col">
+				<div class="col" id="option-name-false">
 					<fmt:message key="label.learning.true.false.false" />
 				</div>
 			</div>

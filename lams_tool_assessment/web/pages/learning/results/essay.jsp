@@ -20,8 +20,8 @@
 		<fmt:message key="label.learning.summary.other.team.answers"/>
 	</div>
 	
-	<div class="table-responsive table-sm div-table mt-2 w-75 mx-auto" id="rating-table-${question.uid}">
-		<div class="row fw-bold text-muted">
+	<div class="table-responsive table-sm div-table mt-2" id="rating-table-${question.uid}">
+		<div class="row">
 			<div class="w-25">
 				<fmt:message key="monitoring.label.group" />
 			</div>

@@ -110,6 +110,8 @@
 </script>
 	
 <c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
+	<c:set var="questionIndex" value="${status.index}"/>
+	
 	<div class="card lcard">
 		<div class="card-header">
 		
@@ -158,7 +160,7 @@
 			</c:if>
 
 			<c:if test="${assessment.displayMaxMark}">
-				<span class="float-end badge alert alert-info fw-normal m-1 p-2">
+				<span class="float-end badge alert alert-info fw-normal m-1 p-1">
 					<fmt:message key="label.learning.max.mark">
 						<fmt:param value="${question.maxMark}" />
 					</fmt:message>
@@ -175,7 +177,7 @@
 
 			<div class="card-title">
 				<c:if test="${assessment.numbered}">
-					${status.index + sessionMap.questionNumberingOffset}.
+					${questionIndex + sessionMap.questionNumberingOffset}.
 				</c:if>
 
 				<c:if test="${not sessionMap.hideTitles}">
@@ -188,7 +190,7 @@
 			</div>
 		</div>
 
-		<div class="card-body" id="question-area-${status.index}">
+		<div class="card-body" id="question-area-${questionIndex}">
 			<c:choose>
 				<c:when test="${question.type == 1}">
 					<c:set var="justificationEligible" value="true" />
@@ -220,7 +222,6 @@
 				</c:when>
 				<c:when test="${question.type == 8}">
 					<c:set var="justificationEligible" value="true" />
-					<c:set var="questionIndex" value="${status.index}" />
 					<%@ include file="markhedging.jsp"%>
 				</c:when>
 			</c:choose>
@@ -245,9 +246,8 @@
 							<fmt:message key="label.answer.justification" />
 						</div>
 
-						<div class="div-table table-responsive table-sm w-75 mx-auto">
-							<!-- 
-							<div class="row fw-bold text-muted">
+						<div class="div-table table-responsive table-sm mb-2">
+							<div class="row">
 								<div class="w-25">
 									<fmt:message key="monitoring.label.group" />
 								</div>
@@ -255,14 +255,13 @@
 									<fmt:message key="label.answer.justification" />
 								</div>
 							</div>
-							 -->
 							
 							<c:forEach var="session" items="${sessions}" varStatus="status">
 								<c:set var="sessionResults" value="" />
 
 								<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
 								<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
-								<c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[status.index]}" />
+								<c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[questionIndex]}" />
 								<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 
 								<c:if test="${not empty sessionResults.uid and not empty sessionResults.justification}">
@@ -296,7 +295,7 @@
 						<div class="card-subheader mt-2">
 							<fmt:message key="label.answer.justification" />
 						</div>
-						<p class="ms-4">
+						<p>
 							<c:out value="${question.justificationHtml}" escapeXml="false" />
 						</p>
 					</c:when>

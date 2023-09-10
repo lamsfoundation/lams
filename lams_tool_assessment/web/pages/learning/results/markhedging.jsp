@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="card-subheader">
+<div class="card-subheader" id="instructions-${questionIndex}">
 	<fmt:message key="label.assign.hedging.mark">
 		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
@@ -20,7 +20,7 @@
 				</div>
 			</c:if>
 				
-			<div class="col">
+			<div class="col" id="option-name-${option.uid}">
 				<c:out value="${option.name}" escapeXml="false" />
 			</div>
 				
@@ -35,6 +35,7 @@
 			<div style="width:60px;">
 				<c:if test="${not empty toolSessionID}">
 					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
+							aria-labelledby="instructions-${questionIndex} option-name-${option.uid}"
 							disabled="disabled">
 							
 						<c:forEach var="i" begin="0" end="${question.maxMark}">

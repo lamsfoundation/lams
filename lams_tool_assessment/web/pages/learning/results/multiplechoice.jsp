@@ -48,12 +48,14 @@
 									<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
 				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 										disabled="disabled"
+										aria-labelledby="option-name-${option.uid}"
 									/>
 								</c:when>
 								<c:otherwise>
 									<input type="radio" name="question${status.index}" value="${option.displayOrder}"
 				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 				 						disabled="disabled"
+				 						aria-labelledby="option-name-${option.uid}"
 									/>
 								</c:otherwise>
 							</c:choose>
@@ -64,7 +66,7 @@
 	 	                </c:if>	
 					</div>
 					
-					<div class="col">
+					<div class="col" id="option-name-${option.uid}">
 						<c:out value="${option.name}" escapeXml="false" />
 					</div>
 					

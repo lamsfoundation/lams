@@ -630,13 +630,13 @@
 		</c:if>
 		
 		<c:if test="${assessment.allowDiscloseAnswers}">
-			<lams:Alert5 type="info" close="true">
+			<lams:Alert5 id="learning-disclose-info" type="info" close="true">
 				<fmt:message key="label.learning.disclose.tip" />
 			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${hasEditRight}">
-			<lams:Alert5 type="info" close="true">
+			<lams:Alert5 id="learning-submit-all-info" type="info" close="true">
 				<fmt:message key="label.learning.submit.all.tip" />
 			</lams:Alert5>
 		</c:if>

@@ -31,7 +31,7 @@
 					</span>
 
 					<c:if test="${assessment.displayMaxMark}">
-						<span class="float-end badge alert alert-info fw-normal m-1 p-2">
+						<span class="float-end badge alert alert-info fw-normal m-1 p-1">
 							<fmt:message key="label.learning.max.mark">
 								<fmt:param value="${question.maxMark}" />
 							</fmt:message>
@@ -108,7 +108,7 @@
 				<%--Display jsutification for each question --%>
 				<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
 							&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
-					<div class="answer-justification-container mt-4 mb-3">
+					<div class="answer-justification-container mt-4 mb-2">
 						<button type="button" data-bs-toggle="collapse"
 							data-bs-target="#answer-justification-${questionIndex}"
 							class="btn btn-light btn-sm collapsed card-subheader"
