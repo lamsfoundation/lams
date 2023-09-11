@@ -23,6 +23,8 @@
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="starsRateLabel" required="false" rtexprvalue="true" %>
+<%@ attribute name="postCommentButtonLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="hideCriteriaTitle" required="false" rtexprvalue="true" %>
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
 <%@ attribute name="showAllComments" required="false" rtexprvalue="true" %>
@@ -51,6 +53,12 @@
 </c:if>
 <c:if test="${empty minNumberWordsLabel}">
 	<c:set var="minNumberWordsLabel" value="label.comment.minimum.number.words" scope="request"/>
+</c:if>
+<c:if test="${empty starsRateLabel}">
+	<c:set var="starsRateLabel" value="label.starts.rate" scope="request"/>
+</c:if>
+<c:if test="${empty postCommentButtonLabel}">
+	<c:set var="postCommentButtonLabel" value="button.post.comment" scope="request"/>
 </c:if>
 <c:if test="${empty hideCriteriaName}">
 	<c:set var="hideCriteriaTitle" value="false" scope="request"/>
@@ -104,9 +112,9 @@
 		</c:choose>
 			
 		<c:if test="${not hideCriteriaTitle}">
-			<strong>
+			<div class="text-muted fw-bold">
 				${criteriaDto.ratingCriteria.title}
-			</strong>
+			</div>
 		</c:if>
 			
 		<c:choose>
@@ -118,7 +126,7 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}">
+		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}" role="button" aria-label="<fmt:message key="${starsRateLabel}"/>">
 		</div>
 			
 		<c:choose>
@@ -199,14 +207,16 @@
 					<div class="row">
 						<div class="col-xs-12 col-sm-11">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control comment-textarea"
-									placeholder="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
+									placeholder="<fmt:message key="label.comment.textarea.tip"/>"
+									aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
 						</div>
-						<div class="col-xs-12 col-sm-1">
+						<div class="col-xs-12 col-sm-1 p-0">
 							<button class="btn btn-success btn-sm add-comment add-comment-new"
 									data-item-id="${itemRatingDto.itemId}"
 									data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
 									data-show-all-comments="${showAllComments}"
-									data-refresh-on-submit="${refreshOnComment}">
+									data-refresh-on-submit="${refreshOnComment}"
+									aria-label="<fmt:message key="${postCommentButtonLabel}"/>">
 								<i class="fa fa-check fa-lg"></i>
 							</button>
 						</div>

@@ -641,7 +641,7 @@
 			</lams:Alert5>
 		</c:if>
 		
-		<div id="instructions" class="instructions my-3">
+		<div id="instructions" class="instructions">
 			<c:out value="${assessment.instructions}" escapeXml="false"/>
 		</div>
 		

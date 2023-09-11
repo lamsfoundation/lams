@@ -35,7 +35,7 @@
 				</div>
 				
 				<c:if test="${not empty toolSessionID}">
-					<div style="width: 100px;">
+					<div style="width: 250px;">
 						<fmt:message key="label.learning.matching.pairs.chosen" /><br>
 						<c:forEach var="possibleOption" items="${question.matchingPairOptions}">
 							<c:if test="${option.answerInt == possibleOption.uid}">

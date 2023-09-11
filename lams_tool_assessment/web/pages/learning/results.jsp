@@ -108,7 +108,7 @@
 		</c:if>
 		
 		<c:if test="${assessment.displaySummary}">
-			<div id="instructions" class="instructions py-3">
+			<div id="instructions" class="instructions">
 				<c:out value="${assessment.instructions}" escapeXml="false"/>
 			</div>
 

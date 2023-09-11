@@ -134,7 +134,7 @@ button.btn{
 .div-hover {
     border-bottom: 1px solid #ddd;
 }
-.div-hover .row {
+.div-hover>.row {
     padding: 12px 0 !important;
 }
 
@@ -144,11 +144,11 @@ button.btn{
     font-style: italic;
     color: initial !important;
 }
-.div-table .row {
+.div-table>.row {
 	border-bottom: 2px solid var(--bs-gray-200);
 	padding: 0.5rem;
 }
-.div-table.table-sm .row {
+.div-table.table-sm>.row {
 	padding: 0.25rem;
 }
 
