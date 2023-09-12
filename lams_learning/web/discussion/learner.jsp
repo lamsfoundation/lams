@@ -1,7 +1,6 @@
 <%@include file="/common/taglibs.jsp"%>
 
 <style>
-	
 	#discussion-sentiment-widget {
 	  /* The main widget sticks to right browser edge */
 	  position: fixed;
@@ -11,7 +10,7 @@
 	  width: 40px;
 	}	
 	
-	#discussion-sentiment-widget .panel-title a {
+	#discussion-sentiment-widget .card-title a {
 		/* Underlining the link in title does not look nice*/
 		text-decoration: none !important;
 	}
@@ -21,14 +20,7 @@
 		display: none;
 	}
 	
-	#discussion-sentiment-widget th {
-		/* Table headers feels better this way */
-		text-align: center;
-		font-weight: bold;
-		font-style: normal;
-	}
-	
-	#discussion-sentiment-widget td {
+	#discussion-sentiment-widget .row:not(:first-child) {
 		/* Cells are clickable */
 		cursor: pointer;
 	}
@@ -38,7 +30,7 @@
 	// This method is called when monitor stops discussion via stopLearner.jsp and on server error
 	function stopDiscussionSentimentLearnerWidget(){
 		var discussionSentimentContent = $('#discussion-sentiment-widget-content');
-		if (discussionSentimentContent.hasClass('in')){
+		if (discussionSentimentContent.hasClass('show')){
 			// if the widget is expanded, collapse it and then remove it
 			discussionSentimentContent.data('remove', true).collapse('hide');
 		} else {
@@ -50,8 +42,8 @@
 	function selectDiscussionSentimentOption(selectedOption, autoExpand, autoCollapse) {
 		// clear other cells
 		var discussionSentimentContent = $('#discussion-sentiment-widget-content'),
-			isExpanded = discussionSentimentContent.hasClass('in');
-		$('td', discussionSentimentContent).removeClass('selected warning success');
+			isExpanded = discussionSentimentContent.hasClass('show');
+		$('.clickable', discussionSentimentContent).removeClass('selected text-bg-warning text-bg-success');
 
 		if (!selectedOption) {
 			if (autoExpand && !isExpanded) {
@@ -66,7 +58,7 @@
 		
 		// highlight the successfuly selected cell
 		var selectedCell = $('#discussion-sentiment-widget-option-cell-' + selectedOption, discussionSentimentContent).addClass('selected');
-		selectedCell.addClass(selectedCell.hasClass('discussion-sentiment-widget-option-stay') ? 'warning' : 'success');
+		selectedCell.addClass(selectedCell.hasClass('discussion-sentiment-widget-option-stay') ? 'text-bg-warning' : 'text-bg-success');
 		
 		if (!autoCollapse) {
 			return;
@@ -91,7 +83,7 @@
 				.on('hidden.bs.collapse', function () {
 					// leave just the discussion icon
 					$('#discussion-sentiment-widget-title', discussionSentimentWidget).hide();
-					$('.panel-heading', discussionSentimentWidget).removeClass('collapsable-icon-left');
+					$('.card-header', discussionSentimentWidget).removeClass('collapsable-icon-left');
 					
 					discussionSentimentWidget.animate({
 						width: '40px'
@@ -114,13 +106,13 @@
 						width: '300px'
 					}, function(){
 						$('#discussion-sentiment-widget-title', discussionSentimentWidget).show();
-						$('.panel-heading', discussionSentimentWidget).addClass('collapsable-icon-left');
+						$('.card-header', discussionSentimentWidget).addClass('collapsable-icon-left');
 						content.css('visibility', 'visible');
 					});
 				});
 
 		// cells are clickable
-		$('#discussion-sentiment-widget-content td', discussionSentimentWidget).click(function(){
+		$('#discussion-sentiment-widget-content .clickable', discussionSentimentWidget).click(function(){
 			var selectedCell = $(this),
 				selectedOption = selectedCell.data('optionNumber');
 			$.ajax({
@@ -150,42 +142,45 @@
 	});
 </script>
 
-<div class="panel panel-default" >
-	<div class="panel-heading"
-		 id="discussion-sentiment-widget-heading">
-       	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#discussion-sentiment-widget-content"
-	    	   aria-expanded="false" aria-controls="discussion-sentiment-widget-content" >
-	    	   <i class="fa fa-comments"></i>
-	    	   <span id="discussion-sentiment-widget-title"><fmt:message key="label.discussion.header" /></span>
-	       	</a>
-     	</span>
-    </div>
+<div class="card lcard" >
+	<div class="card-header text-bg-secondary" id="discussion-sentiment-widget-heading">
+		<span class="card-title">
+			<button type="button" data-bs-toggle="collapse" 
+				class="btn btn-light collapsed"
+				data-bs-target="#discussion-sentiment-widget-content"> 
+				<i class="fa fa-comments"></i> 
+				<span id="discussion-sentiment-widget-title"> 
+					<fmt:message key="label.discussion.header" />
+				</span>
+			</button>
+		</span>
+	</div>
 
-    <div id="discussion-sentiment-widget-content" class="panel-collapse collapse" role="tabpanel"
+	<div id="discussion-sentiment-widget-content" class="collapse" role="tabpanel"
        	 aria-labelledby="discussion-sentiment-widget-heading">
-       	 <table class="table table-bordered table-condensed">
-	       	 <tr>
-	       	 	<th class="discussion-sentiment-widget-option-stay warning">
+       	 <div class="ltable table-responsive">
+	       	 <div class="row">
+	       	 	<div class="discussion-sentiment-widget-option-stay text-bg-warning col">
 	       	 		<fmt:message key="label.discussion.stay.header" />
-	       	 	</th>
-	       	 	<th class="discussion-sentiment-widget-option-move success">
+	       	 	</div>
+	       	 	<div class="discussion-sentiment-widget-option-move text-bg-success col">
 	       	 		<fmt:message key="label.discussion.move.header" />
-	       	 	</th>
-	       	 </tr>
+	       	 	</div>
+	       	 </div>
+	       	 
 	       	 <c:forEach begin="1" end="4" var="optionNumber">
-		       	 <tr>
-		       	 	<td id="discussion-sentiment-widget-option-cell-${optionNumber}" class="discussion-sentiment-widget-option-stay"
+		       	 <div class="row">
+		       	 	<div id="discussion-sentiment-widget-option-cell-${optionNumber}" class="discussion-sentiment-widget-option-stay col clickable"
 		       	 		data-option-number="${optionNumber}">
 		       	 		<fmt:message key="label.discussion.stay.option.${optionNumber}" />
-		       	 	</td>
+		       	 	</div>
 		       	 	<%-- Stay options start from 1, Move options start from 11 --%>
-		       	 	<td id="discussion-sentiment-widget-option-cell-${10 + optionNumber}" class="discussion-sentiment-widget-option-move"
+		       	 	<div id="discussion-sentiment-widget-option-cell-${10 + optionNumber}" class="discussion-sentiment-widget-option-move col clickable"
 		       	 		data-option-number="${10 + optionNumber}">
 		       	 		<fmt:message key="label.discussion.move.option.${10 + optionNumber}" />
-		       	 	</td>
-		       	 </tr>
+		       	 	</div>
+		       	 </div>
 	       	 </c:forEach>
-       	 </table>
+       	 </div>
 	</div>
 </div>

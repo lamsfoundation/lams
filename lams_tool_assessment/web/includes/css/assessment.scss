@@ -138,20 +138,6 @@ button.btn{
     padding: 12px 0 !important;
 }
 
-.div-table>div:first-child {
-	border-top: 1px solid #ddd;
-    background-color: rgba(var(--bs-light-rgb), 1);
-    font-style: italic;
-    color: initial !important;
-}
-.div-table>.row {
-	border-bottom: 2px solid var(--bs-gray-200);
-	padding: 0.5rem;
-}
-.div-table.table-sm>.row {
-	padding: 0.25rem;
-}
-
 /*----------slider----------------*/
 
 .bootstrap-slider input[type="range"] {

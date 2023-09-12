@@ -563,6 +563,20 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border: 0;
 }
 
+.ltable>div:first-child {
+	border-top: 1px solid #ddd;
+    background-color: rgba(var(--bs-light-rgb), 1);
+    font-style: italic;
+    color: initial !important;
+}
+.ltable>.row {
+	border-bottom: 2px solid var(--bs-gray-200);
+	padding: 0.5rem;
+}
+.ltable.table-sm>.row {
+	padding: 0.25rem;
+}
+
 /* jqGrid text wrapping */
 .ui-jqgrid tr.jqgrow td, .ui-jqgrid tr.ui-subgrid td {
 	white-space:normal !important;
