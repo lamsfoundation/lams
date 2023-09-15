@@ -121,7 +121,7 @@ public class DisplayGroupController {
 	List<IndexLinkBean> moreLinks = new ArrayList<>();
 
 	boolean isSpTeamworkEnabled = Configuration.isLamsModuleAvailable(Configuration.TEAMWORK_MODULE_CLASS);
-	if (isSpTeamworkEnabled) {
+	if (isSpTeamworkEnabled && (roles.contains(Role.ROLE_MONITOR) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
 	    moreLinks.add(
 		    new IndexLinkBean("index.teamwork", "javascript:openTeamworkMonitorWindow(" + organisationId + ")",
 			    "fa fa-fw fa-handshake-o", null));

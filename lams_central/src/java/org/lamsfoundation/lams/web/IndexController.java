@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 @Controller
@@ -81,10 +80,9 @@ public class IndexController {
 	if (request.isUserInRole(Role.AUTHOR)) {
 	    request.setAttribute("showQbCollectionsLink", true);
 	}
+
 	boolean isSpTeamworkEnabled = Configuration.isLamsModuleAvailable(Configuration.TEAMWORK_MODULE_CLASS);
-	if (isSpTeamworkEnabled) {
-	    request.setAttribute("showTeamworkLink", true);
-	}
+	request.setAttribute("showTeamworkLink", isSpTeamworkEnabled && request.isUserInRole(Role.LEARNER));
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
 	// taken based on that parameter; immediatelly, the value in DB is updated
@@ -152,8 +150,8 @@ public class IndexController {
 	}
 
 	// This test also appears in LoginAsAction
-	Boolean allowDirectAccessIntegrationLearner = Configuration
-		.getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+	Boolean allowDirectAccessIntegrationLearner = Configuration.getAsBoolean(
+		ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
 	if (!allowDirectAccessIntegrationLearner) {
 	    boolean isIntegrationUser = integrationService.isIntegrationUser(userDTO.getUserID());
 	    //prevent integration users with mere learner rights from accessing index.do
@@ -178,8 +176,8 @@ public class IndexController {
 	    }
 	}
 
-	List<Organisation> favoriteOrganisations = userManagementService
-		.getFavoriteOrganisationsByUser(userDTO.getUserID());
+	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(
+		userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	Integer targetOrgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	request.setAttribute("activeOrgId", targetOrgId == null ? user.getLastVisitedOrganisationId() : targetOrgId);
@@ -208,10 +206,11 @@ public class IndexController {
 
     private void setAdminLinks(HttpServletRequest request) {
 	List<IndexLinkBean> adminLinks = new ArrayList<>();
-	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
-		|| request.isUserInRole(Role.GROUP_MANAGER)) {
-	    adminLinks.add(new IndexLinkBean("index.courseman", "javascript:openOrgManagement("
-		    + userManagementService.getRootOrganisation().getOrganisationId() + ')'));
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN) || request.isUserInRole(
+		Role.GROUP_MANAGER)) {
+	    adminLinks.add(new IndexLinkBean("index.courseman",
+		    "javascript:openOrgManagement(" + userManagementService.getRootOrganisation().getOrganisationId()
+			    + ')'));
 	}
 	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
 		|| userManagementService.isUserGlobalGroupManager()) {
