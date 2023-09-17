@@ -94,7 +94,7 @@
 	<c:if test="${isNbTool}">
 		<!-- Comments: the extra div counteracts the float -->
 		<c:if test="${allowComments}">
-			<div class="row no-gutter"><div class="col-xs-12"></div></div>
+			<div class="row g-0"><div class="col-12"></div></div>
 			<lams:Comments toolSessionId="${toolSessionID}"
 						   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
 						   pageSize="10" sortBy="1" />

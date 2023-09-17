@@ -287,7 +287,7 @@ When true, hides the names and groups the comments.  -->
 								</th>
 							</c:if>
 						</c:forEach>
-						<th class="col-xs-1 text-center"><fmt:message key="label.average" /></th>
+						<th class="col-1 text-center"><fmt:message key="label.average" /></th>
 					</tr>
 					<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
 						<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />

@@ -1,14 +1,14 @@
-<% 
- /**
-  * Rating.tag
-  *	Author: Andrey Balan
-  *	Description: Shows rating stars widget
-  */
- %>
+<%
+	/**
+	 * Rating.tag
+	 *	Author: Andrey Balan
+	 *	Description: Shows rating stars widget
+	 */
+%>
 <%@ tag body-content="scriptless" %>
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -82,86 +82,86 @@
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
-<div class="rating-stars-holder text-center center-block">
+	<div class="rating-stars-holder text-center center-block">
 
-	<c:set var="hasStartedRating" value="false"/>
-	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
-		<c:set var="hasStartedRating" value='${hasStartedRating || criteriaDto.userRating != ""}'/>
-	</c:forEach>
-	<c:set var="hasStartedRating" value='${hasStartedRating || not empty commentLeftByUser}'/>
-	
-	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}" varStatus="status">
-		<c:set var="objectId" value="${criteriaDto.ratingCriteria.ratingCriteriaId}-${itemRatingDto.itemId}"/>
-		<c:set var="isCriteriaNotRatedByUser" value='${criteriaDto.userRating == ""}'/>
-	
-		<c:choose>
-			<c:when test='${disabled || isItemAuthoredByUser || ((maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating) || !(isCriteriaNotRatedByUser || allowRetries)}'>
-				<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="ratingStarsClass" value="rating-stars"/>
-			</c:otherwise>
-		</c:choose>
-			
-		<c:if test="${not hideCriteriaTitle}">
-			<strong>
-				${criteriaDto.ratingCriteria.title}
-			</strong>
-		</c:if>
-			
-		<c:choose>
-			<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>
-				<c:set var="ratingDataAverage" value="${criteriaDto.averageRating}"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="ratingDataAverage" value="0"/>
-			</c:otherwise>
-		</c:choose>
-		
-		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}">
-		</div>
-			
-		<c:choose>
-			<c:when test="${isItemAuthoredByUser}">
-				<div class="rating-stars-caption">
-					<fmt:message key="${averageRatingLabel}" >
-						<fmt:param>
-							<fmt:formatNumber value="${criteriaDto.averageRating}" type="number" maxFractionDigits="1" />
-						</fmt:param>
-						<fmt:param>
-							${criteriaDto.numberOfVotes}
-						</fmt:param>
-					</fmt:message>
-				</div>
-			</c:when>
-				
-			<c:otherwise>
-				<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
-					<c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
-				>
-					<fmt:message key="${yourRatingLabel}" >
-						<fmt:param>
+		<c:set var="hasStartedRating" value="false"/>
+		<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
+			<c:set var="hasStartedRating" value='${hasStartedRating || criteriaDto.userRating != ""}'/>
+		</c:forEach>
+		<c:set var="hasStartedRating" value='${hasStartedRating || not empty commentLeftByUser}'/>
+
+		<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}" varStatus="status">
+			<c:set var="objectId" value="${criteriaDto.ratingCriteria.ratingCriteriaId}-${itemRatingDto.itemId}"/>
+			<c:set var="isCriteriaNotRatedByUser" value='${criteriaDto.userRating == ""}'/>
+
+			<c:choose>
+				<c:when test='${disabled || isItemAuthoredByUser || ((maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating) || !(isCriteriaNotRatedByUser || allowRetries)}'>
+					<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="ratingStarsClass" value="rating-stars"/>
+				</c:otherwise>
+			</c:choose>
+
+			<c:if test="${not hideCriteriaTitle}">
+				<strong>
+						${criteriaDto.ratingCriteria.title}
+				</strong>
+			</c:if>
+
+			<c:choose>
+				<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>
+					<c:set var="ratingDataAverage" value="${criteriaDto.averageRating}"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="ratingDataAverage" value="0"/>
+				</c:otherwise>
+			</c:choose>
+
+			<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}">
+			</div>
+
+			<c:choose>
+				<c:when test="${isItemAuthoredByUser}">
+					<div class="rating-stars-caption">
+						<fmt:message key="${averageRatingLabel}" >
+							<fmt:param>
+								<fmt:formatNumber value="${criteriaDto.averageRating}" type="number" maxFractionDigits="1" />
+							</fmt:param>
+							<fmt:param>
+								${criteriaDto.numberOfVotes}
+							</fmt:param>
+						</fmt:message>
+					</div>
+				</c:when>
+
+				<c:otherwise>
+					<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
+						 <c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
+					>
+						<fmt:message key="${yourRatingLabel}" >
+							<fmt:param>
 							<span id="user-rating-${objectId}">
 								<fmt:formatNumber value="${criteriaDto.userRating}" type="number" maxFractionDigits="1" />
 							</span>
-						</fmt:param>			
-						<fmt:param>
+							</fmt:param>
+							<fmt:param>
 							<span id="average-rating-${objectId}">
 								<fmt:formatNumber value="${criteriaDto.averageRating}" type="number" maxFractionDigits="1" />
 							</span>
-						</fmt:param>
-						<fmt:param>
-							<span id="number-of-votes-${objectId}">${criteriaDto.numberOfVotes}</span>
-						</fmt:param>
-					</fmt:message>
-				</div>
-				
-			</c:otherwise>
-		</c:choose>
-			
-	</c:forEach>
+							</fmt:param>
+							<fmt:param>
+								<span id="number-of-votes-${objectId}">${criteriaDto.numberOfVotes}</span>
+							</fmt:param>
+						</fmt:message>
+					</div>
 
-</div>
+				</c:otherwise>
+			</c:choose>
+
+		</c:forEach>
+
+	</div>
 
 </div>
 
@@ -176,45 +176,46 @@
 					</div>
 				</c:forEach>
 			</c:when>
-			
+
 			<c:when test='${not empty commentLeftByUser}'>
 				<div class="rating-comment">
 					<c:out value="${commentLeftByUser.comment}" escapeXml="false" />
 				</div>
 			</c:when>
-			
+
 			<c:when test='${not ( disabled || (maxRates > 0) && (countRatedItems >= maxRates) && !hasStartedRating )}'>
 				<div id="add-comment-area-${itemRatingDto.itemId}">
-			
+
 					<!-- Comment min words limit -->
 					<c:if test="${itemRatingDto.commentsMinWordsLimit ne 0}">
-					
+
 						<lams:Alert type="info" id="comment-limit-${itemRatingDto.itemId}" close="false">
 							<fmt:message key="${minNumberWordsLabel}">
 								: <fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/>
 							</fmt:message>
 						</lams:Alert>
 					</c:if>
-				
+
 					<div class="row">
-						<div class="col-xs-12 col-sm-11">
-							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control comment-textarea"
-									placeholder="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
+						<div class="col-xs-12 col-sm-10">
+							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}"
+									  class="form-control comment-textarea"
+									  placeholder="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
 						</div>
-						<div class="col-xs-12 col-sm-1">
-							<button class="btn btn-success btn-sm add-comment add-comment-new"
+						<div class="col-xs-12 col-sm-2">
+							<button class="btn btn-primary add-comment add-comment-new" style=""
 									data-item-id="${itemRatingDto.itemId}"
 									data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
 									data-show-all-comments="${showAllComments}"
 									data-refresh-on-submit="${refreshOnComment}">
-								<i class="fa fa-check fa-lg"></i>
+								<i class="fa fa-check"></i>
 							</button>
 						</div>
 					</div>
-						
-				</div>			
+
+				</div>
 			</c:when>
 		</c:choose>
-			
-	</div>	
+
+	</div>
 </c:if>

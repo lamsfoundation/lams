@@ -34,7 +34,7 @@
 	        <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
 	        <button type="button" class="btn btn-secondary btn-sm rounded next" title="Next"><i class="fa fa-forward"></i></button>
 	        <button type="button" class="btn btn-secondary btn-sm rounded last" title="Last"><i class="fa fa-step-forward"></i></button>
-	        <select class="pagesize" title="Select page size">
+	        <select class="pagesize form-select" title="Select page size">
 	      		<c:if test="${not empty test}"><option value="2">2</option></c:if>
 	      		<option selected="selected" value="10">10</option>
 	      		<option value="20">20</option>

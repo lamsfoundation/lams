@@ -32,7 +32,7 @@
 	<div class="col-md-auto">
 		<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
 			<c:if test="${not empty title}">
-				<span class="fa fa-${iconType} "></span> <span class="alert-heading font-weight-bold">${title}</span>
+				<span class="fa fa-${iconType} "></span> <span class="alert-heading fw-bold">${title}</span>
 				<hr>
 			</c:if>
 			<p class="mb-0">
