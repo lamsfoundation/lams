@@ -83,7 +83,7 @@
 				<br />
 				<c:choose>
 					<c:when test="${contentEditable}">
-						<a class="btn btn-default" href="javascript:openPixlr('${pixlrURL}');">
+						<a class="btn btn-secondary" href="javascript:openPixlr('${pixlrURL}');">
 							<fmt:message key="learner.edit.image" />
 						</a>
 					</c:when>
@@ -98,7 +98,7 @@
 						<form:hidden path="mode" value="${mode}" />	
 						<form:hidden path="toolSessionID" id="toolSessionID"/>
 						
-						<div class="panel panel-default voffset10">
+						<div class="panel panel-default mt-2">
 							<div class="panel-heading panel-title">
 								${pixlrDTO.reflectInstructions}
 							</div>
@@ -114,7 +114,7 @@
 									</c:otherwise>
 								</c:choose>
 											
-								<button	type="button" class="btn btn-default float-start" >
+								<button	type="button" class="btn btn-secondary float-start" >
 									<fmt:message key="button.edit" />
 								</button>
 							</div>

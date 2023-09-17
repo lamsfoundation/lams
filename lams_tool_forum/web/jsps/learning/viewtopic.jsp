@@ -130,16 +130,16 @@
 		<c:set var="buttonPanel">
 			<c:set var="refreshTopicURL"></c:set>
 				<!--  Button Panel -->
-				<div class="row no-gutter">
-					<div class="col-xs-12">
-						<a href="javascript:refreshTopic();" class="btn btn-sm btn-secondary voffset5  float-start" role="button"> <fmt:message
+				<div class="row g-0">
+					<div class="col-12">
+						<a href="javascript:refreshTopic();" class="btn btn-sm btn-secondary mt-2  float-start" role="button"> <fmt:message
 								key="label.refresh" />
 						</a>
 						<c:set var="backToForum">
 							<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
 						</c:set>
 						<button name="backToForum" onclick="javascript:location.href='${backToForum}';"
-							class="btn btn-sm btn-primary voffset5 float-end">
+							class="btn btn-sm btn-primary mt-2 float-end">
 							<fmt:message key="label.back.to.forum" />
 						</button>
 					</div>

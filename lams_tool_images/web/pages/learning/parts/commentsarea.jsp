@@ -63,7 +63,7 @@
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
 		
-		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
 				minNumberWordsLabel="label.minimum.number.words" />
 		<br><br>
@@ -77,13 +77,14 @@
 				<form:form action="vote.do" method="post" modelAttribute="imageRatingForm" id="voting-form">
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
-								
-					<p class="voffset5" style="margin-right: 0px">
-						<input type="checkbox" name="vote" class="noBorder" id="voting-form-checkbox" 
+
+					<div class="form-check mt-2 me-0">
+						<input type="checkbox" name="vote" class="form-check-input" id="voting-form-checkbox" 
 								<c:if test="${finishedLock}">disabled="disabled"</c:if>	
 								<c:if test="${sessionMap.isVoted}">checked="checked"</c:if>	
 						/>
-						<label for="voting-form-checkbox" id="voting-form-label">
+						
+						<label for="voting-form-checkbox" id="voting-form-label" class="form-check-label">
 							<c:choose>
 								<c:when test="${sessionMap.isVoted}">
 									<fmt:message key='label.learning.unvote'/>
@@ -93,7 +94,7 @@
 								</c:otherwise>
 							</c:choose>
 						</label>
-					</p>
+					</div>
 				</form:form>							
 			</c:if>
 			
@@ -122,6 +123,6 @@
 	</div>
 							
 	<c:if test="${imageGallery.allowShareImages && !finishedLock}">
-		<div id="new-image-input-area" class="voffset20"></div>
+		<div id="new-image-input-area" class="mt-4"></div>
 	</c:if>	
 </c:if>

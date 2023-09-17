@@ -78,7 +78,7 @@
 						</c:if>
 
 						<c:if test="${hasEditRight}">
-							<input type="submit" name="redoQuestionsOk" class="btn btn-sm btn-default voffset10 float-start"
+							<input type="submit" name="redoQuestionsOk" class="btn btn-sm btn-secondary mt-2 float-start"
 								onclick="submitMethod('redoQuestionsOk');"
 								value='<fmt:message key="label.retake" />' />
 						</c:if>
@@ -96,12 +96,12 @@
 
 						<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 
-						<div class="panel-body voffset5 bg-warning">
+						<div class="panel-body mt-2 bg-warning">
 							<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 						</div>
 
 						<c:if test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'false' && hasEditRight}">
-							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-default voffset10 float-start"
+							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-secondary mt-2 float-start"
 								onclick="submitMethod('forwardtoReflection');">
 								<fmt:message key="label.edit" />
 							</form:button>

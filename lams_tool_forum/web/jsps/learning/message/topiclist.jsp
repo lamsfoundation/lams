@@ -11,11 +11,11 @@
 		<fmt:message key="label.topics" />
 
 		<div class="btn-group float-end">
-			<a href="javascript:location.href='${refresh}';" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-refresh"></i>
+			<a href="javascript:location.href='${refresh}';" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-refresh"></i>
 				<fmt:message key="label.refresh" /></a>
 
 			<c:if test='${(not sessionMap.finishedLock) && (sessionMap.allowNewTopics)}'>
-				<a href="javascript:location.href='${newtopic}';" type="button" class="btn btn-xs btn-default"> <i
+				<a href="javascript:location.href='${newtopic}';" type="button" class="btn btn-sm btn-secondary"> <i
 					class="fa fa-xm fa-plus"></i> <fmt:message key="label.newtopic" /></a>
 			</c:if>
 		</div>
@@ -24,16 +24,16 @@
 	</div>
 	<div class="panel-body">
 		<div class="table-responsive">
-			<table id="topicTable" class="table table-hover table-condensed">
+			<table id="topicTable" class="table table-hover table-sm">
 				<thead>
 					<tr>
-						<th class="col-xs-6"><fmt:message key="lable.topic.title.subject" /></th>
-						<th class="col-xs-2"><fmt:message key="lable.topic.title.startedby" /></th>
-						<th class="col-xs-1 d-none d-sm-block"><fmt:message key="lable.topic.title.replies" /></th>
-						<th class="col-xs-1 d-none d-sm-block"><fmt:message key="lable.topic.title.repliesnew" /></th>
-						<th class="col-xs-2"><fmt:message key="lable.topic.title.update" /></th>
+						<th class="col-6"><fmt:message key="lable.topic.title.subject" /></th>
+						<th class="col-2"><fmt:message key="lable.topic.title.startedby" /></th>
+						<th class="col-1 d-none d-sm-block"><fmt:message key="lable.topic.title.replies" /></th>
+						<th class="col-1 d-none d-sm-block"><fmt:message key="lable.topic.title.repliesnew" /></th>
+						<th class="col-2"><fmt:message key="lable.topic.title.update" /></th>
 						<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
-							<th class="col-xs-2">&nbsp;</th>
+							<th class="col-2">&nbsp;</th>
 						</c:if>
 					</tr>
 				</thead>
@@ -52,7 +52,7 @@
 										</c:otherwise>
 									</c:choose>
 								</a> <c:if test="${topic.hasAttachment}">
-									<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
+									<i class="fa fa-paperclip ms-1" title="<fmt:message key='message.label.attachment'/>"></i>
 								</c:if></td>
 							<td><%-- Author Name --%>
 							<c:set var="msgAuthor" value="${topic.author}" />

@@ -152,7 +152,7 @@
 		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
 		<input type="hidden" name="next" id="next" value=""/>
 
-		<div class="row voffset10" id="drag-area">
+		<div class="row mt-2" id="drag-area">
 			<div class="col-sm-6">
 				<strong><fmt:message key="label.ranked"></fmt:message></strong>
 				<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">

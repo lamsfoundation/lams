@@ -48,7 +48,7 @@
 		</div>
 
 		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
-			<div class="voffset5">
+			<div class="mt-2">
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
 						<c:set var="buttonLabel">
@@ -90,7 +90,7 @@
 		</c:if>
 
 		<c:forEach var="element" items="${sessionMap.questionList}">
-			<div class="sbox voffset5">
+			<div class="sbox mt-2">
 				<div class="sbox-heading clearfix">
 					<c:if test="${not question.optional}">
 						<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i
@@ -147,17 +147,17 @@
 		</c:forEach>
 
 		<c:if test="${not sessionMap.finishedLock}">
-			<div class="voffset5">
-				<button property="RetakeButton" onclick="return retakeSurvey(-1)" class="btn btn-sm btn-default float-start">
+			<div class="mt-2">
+				<button property="RetakeButton" onclick="return retakeSurvey(-1)" class="btn btn-sm btn-secondary float-start">
 					<fmt:message key="label.retake.survey" />
 				</button>
 			</div>
 		</c:if>
 
-		<div class="voffset10">&nbsp;</div>
+		<div class="mt-2">&nbsp;</div>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.showOtherUsersAnswers}">
-			<div class="panel panel-default voffset10">
+			<div class="panel panel-default mt-2">
 				<div class="panel-heading panel-title">
 					<fmt:message key="title.reflection" />
 				</div>
@@ -173,14 +173,14 @@
 							</p>
 						</c:when>
 						<c:otherwise>
-							<div class="panel-body bg-warning voffset5">
+							<div class="panel-body bg-warning mt-2">
 								<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
 							</div>
 						</c:otherwise>
 					</c:choose>
 
 					<button property="ContinueButton" onclick="return continueReflect()"
-						class="btn voffset5 btn-sm btn-default float-start">
+						class="btn mt-2 btn-sm btn-secondary float-start">
 						<fmt:message key="label.edit" />
 					</button>
 				</div>
@@ -192,7 +192,7 @@
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
 						<button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
-							class="btn btn-default">
+							class="btn btn-primary">
 							<fmt:message key="label.view.all.responses" />
 						</button>
 					</c:when>
@@ -205,8 +205,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton"
-							class="btn btn-primary na">
+						<button type="submit" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />

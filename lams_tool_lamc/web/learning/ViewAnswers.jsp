@@ -101,8 +101,8 @@
 		<c:forEach var="question" varStatus="status" items="${mcGeneralLearnerFlowDTO.questions}">
 			<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
-			<div class="row no-gutter">
-				<div class="col-xs-12">
+			<div class="row g-0">
+				<div class="col-12">
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<table>
@@ -132,7 +132,7 @@
 									<!-- list of candidate answers -->
 				                     <c:choose>
 				                     <c:when test="${isPrefixAnswersWithLetters}">
-										<table class="table table-hover table-condensed table-no-border table-top">
+										<table class="table table-hover table-sm table-no-border table-top">
 										<c:forEach var="subEntry" items="${mainEntry.value}">
 										<tr><td>${subEntry.key}
 										</td>
@@ -153,7 +153,7 @@
 
 									<!-- display students answers -->
 									<div class="table-responsive">
-										<table class="table table-condensed">
+										<table class="table table-sm">
 											<thead>
 												<tr>
 													<th colspan="2"><fmt:message key="label.yourAnswers" /></th>
@@ -201,7 +201,7 @@
 															<fmt:message key="label.what.is.your.confidence.level" />
 														</div>
 														
-														<div class="loffset10">
+														<div class="ms-2">
 															<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 																<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
 																	<input class="bootstrap-slider" type="text" 
@@ -264,22 +264,22 @@
 				<fmt:message key="label.group.results" />
 			</h4>
 
-			<table class="table table-condensed">
+			<table class="table table-sm">
 				<tr>
-					<td class="active" width="30%"><fmt:message key="label.topMark" /></td>
+					<td class="table-active" width="30%"><fmt:message key="label.topMark" /></td>
 					<td><c:out value="${mcGeneralLearnerFlowDTO.topMark}" /></td>
 				</tr>
 
 				<tr>
-					<td class="active"><fmt:message key="label.avMark" /></td>
+					<td class="table-active"><fmt:message key="label.avMark" /></td>
 					<td><c:out value="${mcGeneralLearnerFlowDTO.averageMark}" /></td>
 				</tr>
 			</table>
 		</c:if>
 
 		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
-			<div class="row no-gutter">
-				<div class="col-xs-12">
+			<div class="row g-0">
+				<div class="col-12">
 					<h4>
 						<fmt:message key="label.reflection" />
 					</h4>
@@ -307,7 +307,7 @@
 		</c:if>
 
 		<!--  now really start the form -->
-		<div class="form-group">
+		<div class="mb-3">
 				<form:hidden path="toolContentID" />
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="httpSessionID" />
@@ -321,7 +321,7 @@
 				
 				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
 						|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
-					<div class="voffset5">
+					<div class="mt-2">
 						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
 							<form:hidden path="learnerFinished" value="Finished" />
 

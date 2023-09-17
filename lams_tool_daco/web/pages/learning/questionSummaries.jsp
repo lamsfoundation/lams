@@ -23,7 +23,7 @@
 
 
 <c:if test='${includeMode=="learning"}'>
-<div class="voffset10">
+<div class="mt-2">
 <div class="panel">
 	<c:out value="${daco.instructions}" escapeXml="false"/>
 </div>
@@ -36,12 +36,12 @@
 	<fmt:message key="label.learning.tableheader.questions" />
 </div>
 
-<table class="table table-striped table-condensed" id="summaryTable">
-	<tr class="active">
+<table class="table table-striped table-sm" id="summaryTable">
+	<tr class="table-active">
 		<th></th>
 		<th colspan="2" class="singleSummaryCell"><fmt:message key="label.learning.tableheader.summary" /></th>
 	</tr>
-	<tr class="active">
+	<tr class="table-active">
 		<th></th>
 		<th class="singleSummaryCell">
 		<c:choose>
@@ -55,7 +55,7 @@
 		</th>
 		<th class="singleSummaryCell"><fmt:message key="label.learning.tableheader.summary.group" /></th>
 	</tr>
-	<tr class="active">
+	<tr class="table-active">
 		<td>
 			<fmt:message key="label.learning.heading.recordcount" />
 		</td>
@@ -227,6 +227,8 @@
 </div> <!--  end summary panel -->
 
 <c:if test='${includeMode=="learning"}'>
-	<button class="btn btn-default btn-disable-on-submit" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
+	<button class="btn btn-secondary btn-disable-on-submit" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')">
+		<fmt:message key="label.common.summary.refresh" />
+	</button>
 </c:if>
 </div>

@@ -48,7 +48,7 @@
 		</c:otherwise>
 	</c:choose>
 
-	<table id="horizontalListTable" class="table table-striped table-bordered table-condensed">
+	<table id="horizontalListTable" class="table table-striped table-bordered table-sm">
 		<tr>
  			<c:forEach var="record" items="${recordList}" varStatus="recordStatus">
 				<td style="height:50px">
@@ -56,7 +56,7 @@
 						${recordStatus.index+1}
 					</span>
 					<c:if test='${includeMode=="learning" and not finishedLock}'>
-						<span class="float-end roffset10">
+						<span class="float-end me-2">
 						<%-- If the record can be edited, display these links. --%>
 						<i class="fa fa-pencil" title="<fmt:message key="label.common.edit" />"
 									onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
@@ -105,13 +105,15 @@
 									</script>
 								</c:if>
 							</c:when>
+							
 							<c:otherwise>
 								<c:set var="generated" value="true" />
-										<td class="fixedCellHeight ${questionStatus.first ? 'border-thick' : ''}">
+								<td class="fixedCellHeight ${questionStatus.first ? 'border-thick' : ''}">
 										<c:choose>
 											<c:when test="${question.type==1}">
 												<input type="text" size="45" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 											</c:when>
+											
 											<c:when test="${question.type==2}">
 												<textarea cols="35" 
 													<c:choose>
@@ -124,12 +126,15 @@
 													</c:choose>
 												 readonly="readonly">${answer.answer}</textarea>
 											</c:when>
+											
 											<c:when test="${question.type==3}">
 												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 											</c:when>
+											
  											<c:when test="${question.type==4}">
 												<input type="text" size="20" readonly="readonly" value="${answer.answer}">
 											</c:when>
+											
 											<c:when test="${question.type==5 || question.type==6}">
 												<c:choose>
 													<c:when test="${empty answer.fileName}">
@@ -141,8 +146,9 @@
 													</c:otherwise>
 												</c:choose>
 											</c:when>
+											
 											<c:when test="${question.type==7}">
-												<table class="table table-condensed table-no-border table-nonfluid">
+												<table class="table table-sm table-no-border table-nonfluid">
 													<tr>
 														<td>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
@@ -150,17 +156,25 @@
 																	</td>
 																	<td>
 																</c:if>
-																<input type="radio" readonly="readonly" 
-																	<c:if test="${answer.answer==status.index+1}">
-																		checked="checked"
-																	</c:if>>
-																&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																
+																<div class="form-check">
+																	<input type="radio" readonly="readonly" id="answerOption-${questionStatus.index}-${status.index}" class="form-check-input"
+																		<c:if test="${answer.answer==status.index+1}">
+																			checked="checked"
+																		</c:if>
+																	>
+																	&nbsp;
+																	<label for="answerOption-${questionStatus.index}-${status.index}" class="form-check-label">
+																		<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																	</label>
+																</div>
 																<br />
 															</c:forEach>
 														</td>
 													</tr>
 												</table>
 											</c:when>
+											
 											<c:when test="${question.type==8}">
 												<c:choose>
 													<c:when test="${empty answer.answer}">
@@ -175,8 +189,9 @@
 													</c:otherwise>
 												</c:choose>
 											</c:when>
+											
 											<c:when test="${question.type==9}">
-												<table class="table table-condensed table-no-border table-nonfluid">
+												<table class="table table-sm table-no-border table-nonfluid">
 													<tr>
 														<td>
 															<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
@@ -184,16 +199,24 @@
 																	</td>
 																	<td>
 																</c:if>
-																<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">
-																&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																
+																<div class="form-check">
+																	<input type="checkbox" disabled="disabled" id="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}" class="form-check-input">
+																	&nbsp;
+																	
+																	<label for="checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}" class="form-check-label">
+																		<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+																	</label>
+																</div>
 																<br />
 															</c:forEach>
 														</td>
 													</tr>
 												</table>
 											</c:when>
+											
 											<c:when test="${question.type==10}">
-												<table class="table table-condensed table-no-border table-nonfluid">
+												<table class="table table-sm table-no-border table-nonfluid">
 													<tr>
 														<td width="80px">
 														<label><fmt:message key="label.learning.longlat.longitude" /></label>
@@ -219,7 +242,7 @@
 												</c:if>										
 											</c:when>
 										</c:choose>
-										</td>
+								</td>
 							</c:otherwise>
 						</c:choose>
 						

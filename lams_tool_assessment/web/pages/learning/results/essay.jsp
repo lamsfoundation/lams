@@ -30,7 +30,7 @@
 			</div>
 		</div>
 
-		<c:forEach var="session" items="${sessions}" varStatus="status">
+		<c:forEach var="session" items="${sessions}" varStatus="sessionStatus">
 			<%-- Default answer value, when answers are not disclosed yet --%>
 			<c:set var="answer"><i><fmt:message key="label.not.yet.disclosed"/></i></c:set>
 			
@@ -41,7 +41,7 @@
 			<c:if test="${question.groupsAnswersDisclosed}">
 				<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
 				<c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
-				<c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[status.index]}" />
+				<c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[sessionStatus.index]}" />
 				<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 				<c:choose>
 					<%-- If uid is NULL then it is a dummy session result, for a group that has not provided answers
@@ -92,7 +92,7 @@
 				
 						<c:if test="${showRating}">
 							<%-- Do not allow voting for own answer, and for non-leaders if leader is enabled --%>
-							<lams:Rating itemRatingDto="${itemRatingDto}"
+							<lams:Rating5 itemRatingDto="${itemRatingDto}"
 										 isItemAuthoredByUser="${not canRate}"
 										 showAllComments="true"
 										 refreshOnComment="rating-table-${question.uid}" />

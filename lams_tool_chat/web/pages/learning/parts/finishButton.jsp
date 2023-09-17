@@ -52,7 +52,7 @@
 			<form:form action="openNotebook.do" method="post"
 			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
 			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-			<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary float-end voffset10"/>
+			<input type="submit" value="<fmt:message key="button.continue" />" class="btn btn-responsive btn-primary float-end mt-2"/>
 			</form:form>
 		
 		</c:when>
@@ -61,7 +61,7 @@
 			<form:form action="finishActivity.do" method="post"
 			onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
 			<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-			<a href="#nogo" type="button" class="btn btn-primary float-end voffset10 na btn-autoresize" id="finishButton">
+			<a href="#nogo" type="button" class="btn btn-primary float-end mt-2 na btn-autoresize" id="finishButton">
 						 <span class="nextActivity">
 							 <c:choose>
 							 	<c:when test="${isLastActivity}">

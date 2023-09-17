@@ -144,7 +144,7 @@
 			</h4>
 			<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 				<div class="row">
-					<div class="col-xs-12">
+					<div class="col-12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
@@ -163,7 +163,7 @@
 		
 								<c:if test="${not scribeUserDTO.finishedActivity}">
 									<textarea id="report-${reportDTO.uid}" rows="6"
-										class="form-control voffset5">${reportDTO.entryText}</textarea>
+										class="form-control mt-2">${reportDTO.entryText}</textarea>
 								</c:if>
 							</div>
 						</div>
@@ -173,8 +173,8 @@
 		
 			<c:if test="${not scribeUserDTO.finishedActivity}">
 				<div class="row">
-					<div class="col-xs-12" id="submitReportBtn">
-						<button class="btn btn-sm btn-default pull-right" onClick="javascript:submitReport()">
+					<div class="col-12" id="submitReportBtn">
+						<button class="btn btn-sm btn-secondary float-end" onClick="javascript:submitReport()">
 							<fmt:message key="button.submitReport" />
 						</button>
 					</div>
@@ -187,7 +187,7 @@
 				<form:hidden path="mode" />
 		
 				<div id="forceCompleteBtn">
-					<button class="btn btn-primary pull-right">
+					<button class="btn btn-primary float-end">
 						<fmt:message key="button.forceComplete" />
 					</button>
 				</div>

@@ -184,7 +184,7 @@
 						<c:if test='${sessionMap.mode != "teacher"}'>
 							<button name="continue"
 								onclick="javascript:location.href='${continue}';"
-								class="btn btn-default float-start" id="editReflection">
+								class="btn btn-secondary float-start" id="editReflection">
 								<fmt:message key="label.edit" />
 							</button>
 						</c:if>
@@ -198,13 +198,13 @@
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="continue"
 							onclick="javascript:location.href='${continue}';"
-							class="btn btn-primary voffset5 float-end">
+							class="btn btn-primary mt-2 float-end">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 		
 					<c:otherwise>
-						<a href="#nogo" name="finish" id="finishButton" class="btn btn-primary voffset5 float-end na">
+						<a href="#nogo" name="finish" id="finishButton" class="btn btn-primary mt-2 float-end na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.isLastActivity}">

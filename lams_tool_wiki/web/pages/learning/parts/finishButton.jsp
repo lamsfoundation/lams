@@ -24,7 +24,7 @@
     <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
       <form:hidden path="mode" value="${mode}" />	
       <form:hidden path="toolSessionID" id="toolSessionID"/>
-      <div class="panel panel-default voffset10">
+      <div class="panel panel-default mt-2">
         <div class="panel-heading">
           <h4 class="panel-title">
             <lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true"/>

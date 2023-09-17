@@ -17,9 +17,9 @@
 	</c:choose>
  
 	<c:if test="${sessionMap.allowAnonym || sessionMap.maxCharacters > 0 || sessionMap.minCharacters > 0}">
-	<div class="row voffset10">
+	<div class="row mt-2">
 
-	<div class="col-xs-12 col-sm-6">
+	<div class="col-12 col-sm-6">
 	
 	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
 	<c:if test="${sessionMap.maxCharacters > 0}">
@@ -143,24 +143,31 @@
 	</c:if>
 	</div>
 	
-	<div class="col-xs-12 col-sm-6 text-right ">
-	<c:if test="${sessionMap.allowAnonym}">
-		<div class="checkbox form-control-inline">
-		<label for="isAnonymous"><form:checkbox
-				path="message.isAnonymous" id="isAnonymous" /> <fmt:message
-				key="label.post.anonomously" /></label>
-		</div>&nbsp;<a tabindex="0" role="button" data-toggle="popover"><i class="fa fa-info-circle"></i></a>
-	
-		<%-- Use c:out to escape any quotes in the I18N string. Then use html: true converts any escaped quotes back --%>
-		<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>	
-		<fmt:message key="label.anonymous.tooltip" var="ANONYMOUS_TOOLTIP_VAR"></fmt:message>		
- 		<script type="text/javascript">
-		$(document).ready(function() {
-			var ANONYMOUS_TOOLTIP = '<c:out value="${ANONYMOUS_TOOLTIP_VAR}" />';
-	    		$('[data-toggle="popover"]').popover({title: "", content: ANONYMOUS_TOOLTIP, placement:"auto left", delay: 50, trigger:"hover focus", html: true});
-		});
-		</script>
- 	</c:if>
+	<div class="col-12 col-sm-6 text-end">
+		<c:if test="${sessionMap.allowAnonym}">
+			<div class="checkbox form-control-inline form-check">
+				<form:checkbox path="message.isAnonymous" id="isAnonymous" cssClass="form-check-input"/> 
+				
+				<label for="isAnonymous" class="form-check-label">	
+					<fmt:message key="label.post.anonomously" />
+				</label>
+			</div>
+			&nbsp;
+			<a tabindex="0" role="button" data-bs-toggle="popover">
+				<i class="fa fa-info-circle"></i>
+			</a>
+		
+			<%-- Use c:out to escape any quotes in the I18N string. Then use html: true converts any escaped quotes back --%>
+			<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>	
+			<fmt:message key="label.anonymous.tooltip" var="ANONYMOUS_TOOLTIP_VAR"></fmt:message>
+					
+	 		<script type="text/javascript">
+			$(document).ready(function() {
+				var ANONYMOUS_TOOLTIP = '<c:out value="${ANONYMOUS_TOOLTIP_VAR}" />';
+		    		$('[data-bs-toggle="popover"]').popover({title: "", content: ANONYMOUS_TOOLTIP, placement:"auto left", delay: 50, trigger:"hover focus", html: true});
+			});
+			</script>
+	 	</c:if>
 	</div>
 
 	</div> <!-- end row -->

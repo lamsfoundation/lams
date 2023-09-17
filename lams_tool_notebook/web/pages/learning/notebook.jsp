@@ -121,7 +121,7 @@
 		<!-- End Notifications and warnings -->
 
 		<!-- Form -->
-		<div class="form-group">
+		<div class="mb-3">
 			<c:choose>
 				<c:when test="${contentEditable}">
 					<c:choose>
@@ -138,14 +138,14 @@
 				</c:when>
 
 				<c:otherwise>
-					<div class="sbox sbox-body voffset10 bg-warning">
+					<div class="sbox sbox-body mt-2 bg-warning">
 						<lams:out value="${messageForm.entryText}" />
 					</div>
 				</c:otherwise>
 			</c:choose>
 
 			<c:if test="${not empty teachersComment}">
-				<div class="panel panel-default voffset5 roffset10">
+				<div class="panel panel-default mt-2 me-2">
 					<div class="panel-heading">
 						<fmt:message key="label.reply.comment" />
 					</div>

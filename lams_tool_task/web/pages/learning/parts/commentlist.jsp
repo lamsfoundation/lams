@@ -14,8 +14,8 @@
 
 <c:forEach var="comment" items="${itemDTO.comments}">
 	<c:if test="${(sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
-		<div class="row voffset5">
-			<div class="col-xs-12">
+		<div class="row mt-2">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-heading-sm panel-title bg-warning">
 						<c:if test="${not empty comment.createBy.userId}">
@@ -57,14 +57,14 @@
 		</lams:Alert>
 	</c:if>
 
-	<div class="form-group voffset5">
+	<div class="mb-3 mt-2">
 		<label for="comment-${itemUid}">
 			<fmt:message key="label.preview.add.comment" />
 		</label>
 		<textarea name="comment-${itemUid}" id="comment-${itemUid}" class="form-control" rows="2"></textarea>
 
 		<input type="submit" value='<fmt:message key="label.preview.post" />'
-				class="btn btn-default btn-disable-on-submit voffset5" onclick="addNewComment(${itemUid})"/>
+				class="btn btn-secondary btn-disable-on-submit mt-2" onclick="addNewComment(${itemUid})"/>
 	</div>
 	
 </c:if>

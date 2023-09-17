@@ -47,7 +47,7 @@
 </c:if>
 
 <c:if test='${includeMode=="learning"}'>
-<div class="voffset10">
+<div class="mt-2">
 <div class="panel">
 	<c:out value="${daco.instructions}" escapeXml="false"/>
 </div>
@@ -67,20 +67,20 @@
 			<c:choose>
 			<c:when test="${horizontal}">
 
-				<div class="container-fluid no-gutter">
+				<div class="container-fluid g-0">
 					<div class="row">
-						<div class="col-xs-2" style="padding:0">
+						<div class="col-2" style="padding:0">
 							<strong><fmt:message key="label.learning.tableheader.questions" /></strong>
 						</div>
-						<div class="col-xs-9" style="padding-left:0">
+						<div class="col-9" style="padding-left:0">
 						<strong><fmt:message key="label.learning.tableheader.records" /></strong>
 						<c:if test="${fn:length(recordList) > 1}"></c:if>						
 						</div>
 					</div>
 
 					<div class="row">
-						<div class="col-xs-2" style="padding:0">
-							<table id="recordListTable" class="table table-striped table-bordered table-condensed">
+						<div class="col-2" style="padding:0">
+							<table id="recordListTable" class="table table-striped table-bordered table-sm">
 								<tr>
 								<td style="height:50px" style="padding-right:0"><fmt:message key="label.learning.tableheader.recordnumber" /></td>
 								</tr>
@@ -104,7 +104,7 @@
 							<c:param name="includeMode" value="${includeMode}" />
 						</c:url>
 
-						<div class="col-xs-10" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
+						<div class="col-10" style="padding-left:0;overflow: scroll" id="${elementIdPrefix}horizontalRecordListFrame"></div>
 						<script type="text/javascript">
 							$("#${elementIdPrefix}horizontalRecordListFrame").load("${showRecordsUrl}");
 					    </script>
@@ -122,13 +122,13 @@
 						<fmt:message key="label.learning.heading.recordnumber" />&nbsp;${recordStatus.index+1}
 						<c:if test='${includeMode=="learning" and not finishedLock}'>
 						<%-- If the record can be edited, display these links. --%>
-							<i class="fa fa-pencil float-end roffset10" title="<fmt:message key="label.common.edit" />"
+							<i class="fa fa-pencil float-end me-2" title="<fmt:message key="label.common.edit" />"
 										onclick="javascript:editRecord('${sessionMapID}',${recordStatus.index+1})"></i>
-							<i class="fa fa-times  float-end roffset10" title="<fmt:message key="label.common.delete" />"
+							<i class="fa fa-times  float-end me-2" title="<fmt:message key="label.common.delete" />"
 										onclick="javascript:removeRecord('${sessionMapID}',${recordStatus.index+1})"></i>
 						</c:if>
 					</div>
-					<table class="table table-striped table-condensed">
+					<table class="table table-striped table-sm">
 						<c:forEach var="question" items="${daco.dacoQuestions}" varStatus="questionStatus">
 							<%-- "Generated" means that the table for a long/lat question was already generated
 								 and the current answer only needs to be filled in in the existing textfield.
@@ -191,6 +191,7 @@
 												<c:when test="${question.type==4}">
 													<input type="text" size="20" readonly="readonly" value="<c:out  value='${answer.answer}'/>">
 												</c:when>
+												
 												<c:when test="${question.type==5 || question.type==6}">
 													<c:choose>
 														<c:when test="${empty answer.fileName}">
@@ -202,16 +203,24 @@
 														</c:otherwise>
 													</c:choose>
 												</c:when>
+												
 												<c:when test="${question.type==7}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<input type="radio" readonly="readonly" 
-																<c:if test="${answer.answer==status.index+1}">
-																	checked="checked"
-																</c:if>>
-														&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+														<div class="form-check">
+															<input type="radio" readonly="readonly" id="answerOption-${questionStatus.index}-${status.index}" class="form-check-input"
+																	<c:if test="${answer.answer==status.index+1}">
+																		checked="checked"
+																	</c:if>
+															>
+															&nbsp;
+															<label for="answerOption-${questionStatus.index}-${status.index}" class="form-check-label">
+																<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+															</label>
+														</div>
 														<br />
 													</c:forEach>
 												</c:when>
+												
 												<c:when test="${question.type==8}">
 													<c:choose>
 														<c:when test="${empty answer.answer}">
@@ -226,15 +235,24 @@
 														</c:otherwise>
 													</c:choose>
 												</c:when>
+												
 												<c:when test="${question.type==9}">
 													<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-														<input type="checkbox" disabled="disabled" id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}">
-														&nbsp;<label for="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></label>
+														<div class="form-check">
+															<input type="checkbox" disabled="disabled" class="form-check-input" 
+																id="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}"
+															>
+															&nbsp;
+															<label for="${elementIdPrefix}checkbox-record${recordStatus.index+1}-question${questionStatus.index+1}-${status.index+1}" class="form-check-label">
+																<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+															</label>
+														</div>
 														<br />
 													</c:forEach>
 												</c:when>
+												
 												<c:when test="${question.type==10}">
-													<table class="table table-condensed table-no-border table-nonfluid">
+													<table class="table table-sm table-no-border table-nonfluid">
 														<tr>
 															<td width="80px">
 																<label><fmt:message key="label.learning.longlat.longitude" /></label>

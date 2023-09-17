@@ -4,8 +4,8 @@
 
   <c:forEach var="answerDto" items="${requestScope.learnerAnswerDtos}">
 
-    <div class="row no-gutter">
-      <div class="col-xs-12">
+    <div class="row g-0">
+      <div class="col-12">
         <div class="panel panel-default">
           <div class="panel-heading">
             <table>
@@ -36,30 +36,30 @@
           <div class="panel-body">
             <!-- Answer options begin -->
             <div class="table-responsive">
-              <table class="table table-hover table-condensed">
+              <table class="table table-hover table-sm">
                 <tbody>
                 
                   <c:forEach var="option" items="${answerDto.options}" varStatus="status">
                     <tr>
                     
-                      <td class="text-nowrap" style="vertical-align: top;">
-                      	<input type="radio" id="${answerDto.questionUid}-${option.qbOption.uid}" name="checkedCa${answerDto.questionUid}" class="noBorder" 
-                         		value="${answerDto.questionUid}-${option.qbOption.uid}" 
-                           		<c:if test="${option.selected}">checked="checked"</c:if>
-                            		<c:if test="${!hasEditRight}">disabled="disabled"</c:if> 
-                      	>
-                              
-	                     <c:if test="${isPrefixAnswersWithLetters}">
-	                     	<c:set var="seqLetter" value="${status.index}"/>
-	                     	<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
-	                     </c:if>
-                       </td>
-                       
-	                   <td width="100%">
-	                       <label for="${answerDto.questionUid}-${option.qbOption.uid}">
-	                           <c:out value="${option.qbOption.name}" escapeXml="false" />
-	                       </label>
-	                    </td>
+                      <td class="text-nowrap" width="100%">
+                      	<div class="form-check">
+	                      	<input type="radio" id="${answerDto.questionUid}-${option.qbOption.uid}" name="checkedCa${answerDto.questionUid}" class="form-check-input" 
+	                         		value="${answerDto.questionUid}-${option.qbOption.uid}" 
+	                           		<c:if test="${option.selected}">checked="checked"</c:if>
+	                            	<c:if test="${!hasEditRight}">disabled="disabled"</c:if> 
+	                      	>
+
+	                       	<label for="${answerDto.questionUid}-${option.qbOption.uid}" class="form-check-label">
+		                     	<c:if test="${isPrefixAnswersWithLetters}">
+		                     		<c:set var="seqLetter" value="${status.index}"/>
+		                     		<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)
+		                     	</c:if>
+	                     	
+	                           	<c:out value="${option.qbOption.name}" escapeXml="false" />
+	                       	</label>
+	                   </div>
+	                 </td>
                     </tr>
                   </c:forEach>
               </tbody>

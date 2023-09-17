@@ -1,7 +1,7 @@
 function iframelyCallback(itemUid, response) {
 	let panel = $('#item-content-' + itemUid);
 	if (!response) {
-		 $('.embedded-open-button', panel).removeClass('btn-default btn-sm pull-right').addClass('btn-primary');
+		 $('.embedded-open-button', panel).removeClass('btn-secondary btn-sm float-end').addClass('btn-primary');
 		return;
 	}
 	

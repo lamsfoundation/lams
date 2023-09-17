@@ -17,7 +17,7 @@
 	<div class="table-responsive">
 		<div class="table div-hover table-sm">
 			<div class="row">
-				<div class="complete-item-gif"><i class="fa fa-check text-success"></i>
+				<div class="complete-item-gif">
 					<c:if test="${(question.answer != null) 
 							&& (assessment.allowRightAnswersAfterQuestion && (question.answerBoolean == question.correctAnswer) 
 							|| assessment.allowWrongAnswersAfterQuestion && (question.answerBoolean != question.correctAnswer)) }">
@@ -29,23 +29,25 @@
 							<c:otherwise>
 								<i class="fa fa-times text-danger"></i>	
 							</c:otherwise>		
-						</c:choose>					
-						
+						</c:choose>
 					</c:if>	
 				</div>
-						
-				<div class="complete-item-gif">
-					<c:if test="${not empty toolSessionID}">
-						<input type="radio" name="question${status.index}" value="${true}"
-			 				<c:if test="${question.answerBoolean}">checked="checked"</c:if>
-							disabled="disabled"	
-							aria-labelledby="instructions-${questionIndex} option-name-true"
-						/>
-					</c:if>
-				</div>
 				
-				<div class="col" id="option-name-true">
-					<fmt:message key="label.learning.true.false.true" />
+				<div class="col">
+					<div class="form-check ms-3">
+						<c:if test="${not empty toolSessionID}">
+							<input type="radio" name="question${questionIndex}" id="option-${questionIndex}-true" class="form-check-input me-2"
+								value="${true}"
+				 				<c:if test="${question.answerBoolean}">checked="checked"</c:if>
+								disabled="disabled"	
+								aria-labelledby="instructions-${questionIndex} label-${questionIndex}-true"
+							/>
+						</c:if>
+					
+						<label for="option-${questionIndex}-true" id="label-${questionIndex}-true" class="form-check-label">
+							<fmt:message key="label.learning.true.false.true" />
+						</label>
+					</div>
 				</div>
 			</div>
 			
@@ -65,19 +67,22 @@
 						</c:choose>					
 					</c:if>		
 				</div>
-							
-				<div class="complete-item-gif">
-					<c:if test="${not empty toolSessionID}">
-						<input type="radio" name="question${status.index}" value="${false}"
-			 				<c:if test="${(!question.answerBoolean) and (question.answer != null)}">checked="checked"</c:if>
-							disabled="disabled"
-							aria-labelledby="instructions-${questionIndex} option-name-false"
-						/>
-					</c:if>
-				</div>
 				
-				<div class="col" id="option-name-false">
-					<fmt:message key="label.learning.true.false.false" />
+				<div class="col">
+					<div class="form-check ms-3">
+						<c:if test="${not empty toolSessionID}">
+							<input type="radio" name="question${questionIndex}" id="option-${questionIndex}-false" class="form-check-input me-2"
+								value="${false}"
+				 				<c:if test="${(!question.answerBoolean) and (question.answer != null)}">checked="checked"</c:if>
+								disabled="disabled"
+								aria-labelledby="instructions-${questionIndex} label-${questionIndex}-false"
+							/>
+						</c:if>
+						
+						<label for="option-${questionIndex}-false" id="label-${questionIndex}-false" class="form-check-label">
+							<fmt:message key="label.learning.true.false.false" />
+						</label>
+					</div>
 				</div>
 			</div>
 		</div>

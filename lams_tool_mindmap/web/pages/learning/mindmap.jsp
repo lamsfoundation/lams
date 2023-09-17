@@ -50,7 +50,7 @@
 			}
 
 			$(document).ready(function(){
-				$('[data-toggle="tooltip"]').bootstrapTooltip();
+				$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
 			});
 		</script>
 		
@@ -111,8 +111,8 @@
 						<c:otherwise>
 							<c:choose>
 								<c:when test="${mindmapDTO.galleryWalkEnabled}">
-									<button data-toggle="tooltip" 
-											class="btn btn-default ${mode == 'author' ? '' : 'disabled'}"
+									<button data-bs-toggle="tooltip" 
+											class="btn btn-primary ${mode == 'author' ? '' : 'disabled'}"
 											<c:choose>
 												<c:when test="${mode == 'author'}">
 													title="<fmt:message key='label.gallery.walk.wait.start.preview' />"

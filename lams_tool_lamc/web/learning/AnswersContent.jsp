@@ -152,7 +152,7 @@
 		</c:if>
 		<!-- End announcements and advanced settings -->
 
-		<div class="form-group">
+		<div class="mb-3">
 			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="displayMc.do" enctype="multipart/form-data"
 				method="POST" target="_self">
 				<form:hidden path="toolContentID" />

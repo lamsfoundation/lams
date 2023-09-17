@@ -74,7 +74,7 @@
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
 			
 	    $(document).ready(function(){
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
 			
 			// show mindmaps only on Group expand
 			$('.mindmap-collapse').on('show.bs.collapse', function(){
@@ -113,9 +113,11 @@
 	</c:if>
 		
 	<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
+		<h4 class="text-center mt-4">
+			<fmt:message key="label.gallery.walk.ratings.header" />
+		</h4>
+		<table id="gallery-walk-rating-table" class="table table-hover table-sm">
+		  <thead class="table-light">
 		    <tr>
 		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
 		      <th scope="col"><fmt:message key="label.rating" /></th>
@@ -126,7 +128,7 @@
 				<tr>
 					<td>${mindmapSession.sessionName}</td>
 					<td>
-						<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
+						<lams:Rating5 itemRatingDto="${mindmapSession.itemRatingDto}" 
 									 isItemAuthoredByUser="true"
 									 hideCriteriaTitle="true" />
 					</td>
@@ -136,21 +138,23 @@
 		</table>
 	</c:if>
 	
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
+	<h4 class="text-center mt-4">
+		<fmt:message key="label.gallery.walk" />
+	</h4>
 	
 	<c:if test="${mode == 'author'}">
 		<lams:Alert5 type="info" id="gallery-walk-preview-info" close="false">
 			<fmt:message key="label.gallery.walk.preview" />
 		</lams:Alert5>
 	</c:if>
-	
 
 	<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}" varStatus="status">
 	    <div class="panel panel-default">
 	       <div class="panel-heading" role="tab" id="heading${mindmapSession.sessionID}">
 	       	<span class="panel-title collapsable-icon-left">
-	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${mindmapSession.sessionID}" 
-						aria-expanded="false" aria-controls="collapse${mindmapSession.sessionID}">
+	       		<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${mindmapSession.sessionID}" 
+						aria-expanded="false" aria-controls="collapse${mindmapSession.sessionID}"
+				>
 					<c:choose>
 						<c:when test="${toolSessionID == mindmapSession.sessionID}">
 							<b><c:out value="${mindmapSession.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
@@ -159,15 +163,16 @@
 							<c:out value="${mindmapSession.sessionName}" />
 						</c:otherwise>
 					</c:choose>
-				</a>
+				</button>
 			</span>
 	       </div>
+	       
 	       <div id="collapse${mindmapSession.sessionID}" class="panel-collapse collapse mindmap-collapse" 
 	       	    role="tabpanel" aria-labelledby="heading${mindmapSession.sessionID}">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not mindmapDTO.galleryWalkReadOnly and (mindmapDTO.galleryWalkFinished or mode == 'teacher' or toolSessionID != mindmapSession.sessionID)}">
 	       	    	<div class="gallery-walk-rating-comment-container">
-	       	    		<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}"
+	       	    		<lams:Rating5 itemRatingDto="${mindmapSession.itemRatingDto}"
 								     isItemAuthoredByUser="${mindmapDTO.galleryWalkFinished or mode == 'teacher'}" />
 					 </div>
 	       	    </c:if>
@@ -175,7 +180,6 @@
 				<iframe class="mindmap-frame"
 						data-src='<c:url value="/learning/getGalleryWalkMindmap.do?toolSessionID=${mindmapSession.sessionID}"/>'>
 				</iframe>
-
 			</div>
 		</div>
 	</c:forEach>
@@ -184,8 +188,8 @@
 		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${not mindmapDTO.galleryWalkFinished}">
-					<button data-toggle="tooltip" 
-							class="btn btn-default ${mode == 'author' ? '' : 'disabled'}"
+					<button data-bs-toggle="tooltip" 
+							class="btn btn-primary ${mode == 'author' ? '' : 'disabled'}"
 							<c:choose>
 								<c:when test="${mode == 'author'}">
 									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
@@ -201,7 +205,7 @@
 				</c:when>
 				<c:when test="${reflectOnActivity and not finishedActivity}">
 					<button name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-default">
+							onclick="return continueReflect()" class="btn btn-primary">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>

@@ -41,33 +41,37 @@
 					    </c:if>			
 	                </div>
 	                
-					<div class="complete-item-gif">
-						<c:if test="${not empty toolSessionID}">
-							<c:choose>
-								<c:when test="${question.multipleAnswersAllowed}">
-									<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
-				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-										disabled="disabled"
-										aria-labelledby="option-name-${option.uid}"
-									/>
-								</c:when>
-								<c:otherwise>
-									<input type="radio" name="question${status.index}" value="${option.displayOrder}"
-				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-				 						disabled="disabled"
-				 						aria-labelledby="option-name-${option.uid}"
-									/>
-								</c:otherwise>
-							</c:choose>
-						</c:if>
-						
-						<c:if test="${question.prefixAnswersWithLetters}">
-				 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
-	 	                </c:if>	
-					</div>
-					
-					<div class="col" id="option-name-${option.uid}">
-						<c:out value="${option.name}" escapeXml="false" />
+					<div class="col">
+						<div class="form-check ms-3">
+							<c:if test="${not empty toolSessionID}">
+								<c:choose>
+									<c:when test="${question.multipleAnswersAllowed}">
+										<input type="checkbox" name="question${questionIndex}_${option.displayOrder}" id="option-${questionIndex}-${option.uid}" 
+											class="form-check-input" 
+											value="${true}"
+					 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+											disabled="disabled"
+										/>
+									</c:when>
+									<c:otherwise>
+										<input type="radio" name="question${questionIndex}" id="option-${questionIndex}-${option.uid}"
+											class="form-check-input" 
+											value="${option.displayOrder}"
+					 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+					 						disabled="disabled"
+										/>
+									</c:otherwise>
+								</c:choose>
+							</c:if>
+							
+							<label class="form-check-label" for="option-${questionIndex}-${option.uid}">
+								<c:if test="${question.prefixAnswersWithLetters}">
+						 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
+			 	                </c:if>	
+			 	                
+			 	                <c:out value="${option.name}" escapeXml="false" />
+		 	                </label>
+	 	                </div>
 					</div>
 					
 					<c:if test="${assessment.allowQuestionFeedback}">

@@ -72,12 +72,12 @@
 <c:set var="ellipsisControl">
 <c:choose>
 	<c:when test="${sessionMap.learningView=='horizontal'}">
-	<i class="fa fa-ellipsis-h loffset10" title="<fmt:message key="label.common.view.change" />"
-	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
+		<i class="fa-solid fa-ellipsis ms-2" title="<fmt:message key="label.common.view.change" />"
+	 		onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
 	</c:when>
 	<c:otherwise>
-	<i class="fa fa-ellipsis-v loffset10" title="<fmt:message key="label.common.view.change" />"
-	 onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
+		<i class="fa-solid fa-ellipsis-vertical ms-2" title="<fmt:message key="label.common.view.change" />"
+	 		onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
 	</c:otherwise>
 </c:choose>
 </c:set> 
@@ -102,12 +102,12 @@
 <c:if test="${mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default btn-disable-on-submit voffset5 float-end">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-primary btn-disable-on-submit mt-2 float-end">
 					<fmt:message key="label.learning.continue" />
 				</button>
 			</c:when>
 			<c:otherwise>
-				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit voffset5 float-end na">
+				<button type="submit" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit mt-2 float-end na">
 					<c:choose>
 		 					<c:when test="${sessionMap.isLastActivity}">
 		 						<fmt:message key="label.learning.submit" />

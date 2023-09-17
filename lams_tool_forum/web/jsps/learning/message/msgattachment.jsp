@@ -4,7 +4,7 @@
 <input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>
 <c:if test="${topic.hasAttachment}">
 		<c:forEach var="file" items="${topic.message.attachments}">
-		    <a id="removeAttachmentButton" href="#" onclick="removeAtt('${sessionMapID}')" class="btn btn-default btn-xs"><i class="fa fa-trash-o"></i></a>
+		    <a id="removeAttachmentButton" href="#" onclick="removeAtt('${sessionMapID}')" class="btn btn-secondary btn-sm"><i class="fa fa-trash-o"></i></a>
 			<fmt:message key="message.label.attachment"/>: 
 			<c:set var="downloadURL">
 				<lams:WebAppURL />download/?uuid=${file.fileDisplayUuid}&versionID=${file.fileVersionId}&preferDownload=true
@@ -19,7 +19,7 @@
 		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
 			   value="${empty messageForm.tmpFileUploadId ? tmpFileUploadId : messageForm.tmpFileUploadId}" />
 		<label for="image-upload-area"><fmt:message key="message.label.attachment" /></label>
-		<div id="image-upload-area" class="voffset20"></div>
+		<div id="image-upload-area" class="mt-4"></div>
 		<script>
 			initFileUpload('${empty messageForm.tmpFileUploadId ? tmpFileUploadId : messageForm.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
 		</script>

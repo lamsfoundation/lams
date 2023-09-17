@@ -12,7 +12,7 @@
 
 			<div class="panel panel-default">
 				<div class="panel-heading clearfix">
-					<div class="panel-title float-start" data-toggle="collapse" data-target="#collapse${item.uid}">
+					<div class="panel-title float-start" data-bs-toggle="collapse" data-bs-target="#collapse${item.uid}">
 						<c:out value="${item.title}" escapeXml="true" /> 
 						<c:if test="${!item.createByAuthor && item.createBy != null}">
 							[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
@@ -22,6 +22,7 @@
 						</c:if>
 						</a>
 					</div>
+					
 					<div class="float-end">
 						<c:choose>
 							<c:when test="${item.complete}">
@@ -55,7 +56,7 @@
 	</c:forEach>
 
 	<c:if test="${fn:length(taskList.minimumNumberTasksErrorStr) > 0}">
-		<p class="help-block">
+		<p class="form-text">
 			<c:out value="${taskList.minimumNumberTasksErrorStr}" />
 		</p>
 	</c:if>

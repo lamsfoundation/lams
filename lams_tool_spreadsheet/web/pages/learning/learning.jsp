@@ -69,11 +69,11 @@
 		<br>
 		
 		<c:if test="${spreadsheet.markingEnabled}">
-		<div class="row no-gutter">
-			<div class="col-xs-12">
+		<div class="row g-0">
+			<div class="col-12">
 			<div class="panel panel-default">
 				<div class="panel-body">
-				<div class="row no-gutter">
+				<div class="row g-0">
 					<div class="col-sm-2"><fmt:message key="label.learning.comments" /></div>
 					<div class="col-sm-10">
 						<c:choose>
@@ -86,7 +86,7 @@
 						</c:choose>
 					</div>
 				</div>
-				<div class="row no-gutter">
+				<div class="row g-0">
 				<div class="col-sm-2"><fmt:message key="label.learning.marks" /></div>
 					<div class="col-sm-10">
 						<c:choose>
@@ -106,8 +106,8 @@
 		</c:if>		
 
 		
-		<div class="row no-gutter">
-			<div class="col-xs-12">
+		<div class="row g-0">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-body">
 					<iframe
@@ -130,8 +130,8 @@
 
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="row no-gutter">
-				<div class="col-xs-12">
+			<div class="row g-0">
+				<div class="col-12">
 					<div class="panel panel-default">
 						<div class="panel-heading panel-title">
 							<fmt:message key="title.reflection" />
@@ -145,7 +145,7 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<button name="forwardtoReflection" class="btn btn-default float-start"
+								<button name="forwardtoReflection" class="btn btn-secondary float-start"
 									onclick="submitMethod('forwardtoReflection');">
 									<fmt:message key="label.edit" />
 								</button>
@@ -161,8 +161,8 @@
 							</c:choose>
 
 							<c:if test="${mode != 'teacher'}">
-								<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default voffset10 float-start">
-								<fmt:message key="label.edit" />
+								<button name="FinishButton" onclick="return continueReflect()" class="btn btn-secondary mt-2 float-start">
+									<fmt:message key="label.edit" />
 								</button>
 							</c:if>
 							

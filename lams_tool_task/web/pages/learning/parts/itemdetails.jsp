@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <div class="row">
-	<div class="col-xs-12">
+	<div class="col-12">
 		<div class="panel-body">${item.description}</div>
 		
 		<!-- Comments Part -->
@@ -32,13 +32,13 @@
 				<c:if test="${sessionMap.mode != 'teacher'}">
 					<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId"
 						   value="${taskListItemForm.tmpFileUploadId}_${item.uid}" />
-					<div id="file-upload-area-${item.uid}" class="voffset20"></div>
+					<div id="file-upload-area-${item.uid}" class="mt-4"></div>
 					<script>
 						initFileUpload('#file-upload-area-${item.uid}', '${taskListItemForm.tmpFileUploadId}_${item.uid}', '<lams:user property="localeLanguage"/>');
 					</script>
 					
 					<input type="submit" name="uploadedFileButton" value='<fmt:message key="label.preview.upload.button" />'
-						class="btn btn-default btn-disable-on-submit voffset5" />
+						class="btn btn-secondary btn-disable-on-submit mt-2" />
 				</c:if>
 			</form:form>
 				

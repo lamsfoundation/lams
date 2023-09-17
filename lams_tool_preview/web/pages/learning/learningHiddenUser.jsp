@@ -29,7 +29,7 @@
 		</lams:Alert5>
 		
 		<div class="activity-bottom-buttons">
-			<a href="javascript:location.reload(true);"	class="btn btn-default">
+			<a href="javascript:location.reload(true);"	class="btn btn-secondary">
 				<fmt:message key="button.try.again" />
 			</a>
 		

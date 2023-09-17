@@ -13,8 +13,8 @@
 				<c:out value="${option.name}" escapeXml="false" />
 			</div>
 				
-			<div style="width: 60px;">
-				<select name="question${questionIndex}_${option.uid}" class="mark-hedging-select" data-question-index="${questionIndex}"
+			<div style="width: 70px;">
+				<select name="question${questionIndex}_${option.uid}" class="mark-hedging-select form-select" data-question-index="${questionIndex}"
 					<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 					aria-labelledby="instructions-${questionIndex} option-name-${option.uid}"
 					${question.answerRequired? 'aria-required="true" required="true"' : ''}			

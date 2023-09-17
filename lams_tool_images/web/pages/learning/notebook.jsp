@@ -37,7 +37,7 @@
 
 			<textarea id="focused" rows="5" name="entryText" class="form-control"></textarea>
 
-			<a href="#nogo" class="btn btn-primary voffset5 float-end" id="finishButton"">
+			<a href="#nogo" class="btn btn-primary mt-2 float-end" id="finishButton"">
 				<div class="na"> 
 					<c:choose>
 						<c:when test="${sessionMap.isLastActivity}">

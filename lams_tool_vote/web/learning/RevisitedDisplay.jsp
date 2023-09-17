@@ -77,11 +77,11 @@
 		</strong>
 		<c:forEach var="vote" items="${requestScope.listUserEntriesContent}">
 			<c:if test="${vote.userEntry != ''}">
-				<div class="media">
-					<div class="media-left">
+				<div class="d-flex">
+					<div class="flex-shrink-0">
 						<i class="fa fa-xs fa-check text-success"></i>
 					</div>
-					<div class="media-body">
+					<div class="flex-grow-1 ms-3">
 						<c:choose>
 							<c:when test="${vote.visible}">
 								<c:out value="${vote.userEntry}" escapeXml="true" />
@@ -97,7 +97,7 @@
 		</c:forEach>
 	</c:if>
 </div>
-<div id="nominations" class="voffset10">
+<div id="nominations" class="mt-2">
 	<c:choose>
 		<c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
 			<strong><fmt:message key="label.learner.nominations" /> </strong>
@@ -108,22 +108,22 @@
 	</c:choose>
 
 	<c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
-		<div class="media">
-			<div class="media-left">
+		<div class="d-flex">
+			<div class="flex-shrink-0">
 				<i class="fa fa-xs fa-check text-success"></i>
 			</div>
-			<div class="media-body">
+			<div class="flex-grow-1 ms-3">
 				<c:out value="${entry}" escapeXml="true" />
 			</div>
 		</div>
 	</c:forEach>
 
 	<c:if test="${not empty VoteLearningForm.userEntry}">
-		<div class="media">
-			<div class="media-left">
+		<div class="d-flex">
+			<div class="flex-shrink-0">
 				<i class="fa fa-xs fa-check text-success"></i>
 			</div>
-			<div class="media-body">
+			<div class="flex-grow-1 ms-3">
 				<c:out value="${VoteLearningForm.userEntry}" escapeXml="false" />
 			</div>
 		</div>

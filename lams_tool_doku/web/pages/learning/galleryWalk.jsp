@@ -76,7 +76,7 @@
 				}
 			});
 			
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		function finishSession(){
@@ -101,14 +101,18 @@
 	<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
 	
 	<c:if test="${not empty dokumaran.galleryWalkInstructions}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.instructions.header" /></h4>
+		<h4 class="text-center mt-4">
+			<fmt:message key="label.gallery.walk.instructions.header" />
+		</h4>
 		<p><c:out value="${dokumaran.galleryWalkInstructions}" escapeXml="false" /></p>
 	</c:if>
 		
 	<c:if test="${dokumaran.galleryWalkFinished and not dokumaran.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
+		<h4 class="text-center mt-4">
+			<fmt:message key="label.gallery.walk.ratings.header" />
+		</h4>
+		<table id="gallery-walk-rating-table" class="table table-hover table-sm">
+		  <thead class="table-light">
 		    <tr>
 		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
 		      <th scope="col"><fmt:message key="label.rating" /></th>
@@ -119,7 +123,7 @@
 				<tr>
 					<td>${groupSummary.sessionName}</td>
 					<td>
-						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
+						<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
 									 isItemAuthoredByUser="true"
 									 hideCriteriaTitle="true" />
 					</td>
@@ -129,14 +133,15 @@
 		</table>
 	</c:if>
 	
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
+	<h4 class="text-center mt-4">
+		<fmt:message key="label.gallery.walk" />
+	</h4>
 	
 	<c:if test="${mode == 'author'}">
 		<lams:Alert5 type="info" id="gallery-walk-preview-info" close="false">
 			<fmt:message key="label.gallery.walk.preview" />
 		</lams:Alert5>
 	</c:if>
-	
 
 	<div id="doku-group-panels" class="panel-group" role="tablist" aria-multiselectable="true"> 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
@@ -144,7 +149,7 @@
 		    <div class="panel panel-default doku-group-panel">
 		       <div class="panel-heading" role="tab" id="heading${groupSummary.sessionId}">
 		       	<span class="panel-title collapsable-icon-left">
-		       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+		       		<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}" 
 							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" data-parent="#doku-group-panels">
 						<c:choose>
 							<c:when test="${toolSessionID == groupSummary.sessionId}">
@@ -154,14 +159,14 @@
 								<c:out value="${groupSummary.sessionName}" />
 							</c:otherwise>
 						</c:choose>
-					</a>
+					</button>
 				</span>
 		       </div>
 		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	    <c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
-		       	    	<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" showComments="true"
+		       	    	<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" showComments="true"
 								     isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	    </c:if>
 		 
@@ -178,8 +183,8 @@
 		<div>
 			<c:choose>
 				<c:when test="${not dokumaran.galleryWalkFinished}">
-					<button data-toggle="tooltip" 
-							class="btn btn-default voffset5 float-end ${mode == 'author' ? '' : 'disabled'}"
+					<button data-bs-toggle="tooltip" 
+							class="btn btn-secondary mt-2 float-end ${mode == 'author' ? '' : 'disabled'}"
 							<c:choose>
 								<c:when test="${mode == 'author'}">
 									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
@@ -195,12 +200,12 @@
 				</c:when>
 				<c:when test="${sessionMap.reflectOn and not sessionMap.userFinished}">
 					<button name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-default voffset5 float-end">
+							onclick="return continueReflect()" class="btn btn-primary mt-2 float-end">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
 				<c:otherwise>
-					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary voffset5 float-end na">
+					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary mt-2 float-end na">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${sessionMap.isLastActivity}">

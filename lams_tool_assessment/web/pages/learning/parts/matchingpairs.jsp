@@ -21,7 +21,7 @@
 			</div>
 				
 			<div style="width: 250px;">
-				<select name="question${questionIndex}_${option.uid}" 
+				<select name="question${questionIndex}_${option.uid}" class="form-select"
 					<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 					${question.answerRequired? 'aria-required="true" required="true"' : ''}
 					aria-labelledby="option-name-${option.uid} instructions-${questionIndex}"

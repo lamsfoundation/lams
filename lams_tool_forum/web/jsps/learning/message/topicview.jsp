@@ -93,7 +93,7 @@
 			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
 				<!--  start thread  -->
 				<div id="thread${msgDto.message.uid}" class="clearfix">
-				<table id="${messageTablename}" class="col-xs-12">
+				<table id="${messageTablename}" class="col-12">
 					<tr data-tt-id="${msgDto.message.uid}"><td>
 			</c:when>
 			<c:otherwise>
@@ -134,6 +134,8 @@
 			<c:set var="more">
 				<lams:WebAppURL />learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}
 			</c:set>
-			<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
+			<a href="<c:out value="${more}"/>" class="btn btn-sm btn-secondary">
+				<fmt:message key="label.show.more.messages" />
+			</a>
 		</div>
 	</c:if>	

@@ -101,7 +101,7 @@
 							
 							rows += '<tr>';
 
-							rows += '<td class="username"><div class="float-start roffset5">';
+							rows += '<td class="username"><div class="float-start me-2">';
 							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
 							rows += '</div><span class="portrait-sm-lineheight">';
 							rows += userData["itemDescription"];
@@ -307,7 +307,7 @@
 			<c:set var="numColumns" value="3"/>
 		</c:if>
 	
-		<lams:TSTable numColumns="${numColumns}">
+		<lams:TSTable5 numColumns="${numColumns}">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
 				<fmt:message key="label.user.name" />
 			</th>
@@ -319,7 +319,7 @@
 				<fmt:message key="label.comment" />
 			</th>
 			</c:if>
-		</lams:TSTable>
+		</lams:TSTable5>
 
 		<div id="no-users-info">
 			<fmt:message key="label.no.users" />

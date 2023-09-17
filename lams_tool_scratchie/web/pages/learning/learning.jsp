@@ -113,7 +113,7 @@
 			</c:if>
 
 			//initialize tooltips showing user names next to confidence levels
-			$('[data-toggle="tooltip"]').tooltip();
+			$('[data-bs-toggle="tooltip"]').tooltip();
 		});
 
 		//scratch image (used by both scratchMcq() and scratchVsa())

@@ -23,7 +23,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<a href="#nogo" id="finishButton" onclick="return continueReflect()" cssClass="btn btn-sm btn-default voffset5">
+						<a href="#nogo" id="finishButton" onclick="return continueReflect()" cssClass="btn btn-sm btn-secondary mt-2">
 							<fmt:message key="label.edit" />
 						</a>
 					</c:if>

@@ -98,7 +98,7 @@
 				</div>
 				<c:if test="${assessment.allowGradesAfterAttempt}">
 					<div style="width: 70px; padding-left: 0px;" >
-						<div style="text-align: center;">
+						<div class="text-center">
 							<fmt:formatNumber value="${questionResult.mark}" maxFractionDigits="3"/>
 						</div>
 					</div>

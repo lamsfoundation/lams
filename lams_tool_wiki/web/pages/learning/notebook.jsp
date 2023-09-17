@@ -45,7 +45,7 @@
 				<div class="panel">
 					<lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true" />
 				</div>
-				<div class="form-group">
+				<div class="mb-3">
 					<textarea id="focused" rows="4" name="entryText" class="form-control">${learningForm.entryText}</textarea>
 		
 					<div class="activity-bottom-buttons">

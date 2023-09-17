@@ -15,7 +15,7 @@
 			<form:hidden path="mode" id="mode"/>
 			<form:hidden path="sessionMapID"/>
 
-			<div class="form-group" id="addurl">
+			<div class="mb-3" id="addurl">
 				<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
 				<form:input path="url" cssClass="form-control" tabindex="2" id="url"/>
 			</div>
@@ -33,21 +33,21 @@
 				</div>
 			</div>
 
-			<div class="form-group">
+			<div class="mb-3">
 				<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
 				<form:input path="title" tabindex="1" cssClass="form-control"/>
 			</div>
 
-			<div class="form-group">
+			<div class="mb-3">
 				<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
 				<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
 			</div>
 
 			<div id="buttons" class="float-end" >
-				<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-default" id="cancelButton">
+				<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-secondary" id="cancelButton">
 					<fmt:message key="button.cancel" />
 				</button>&nbsp;
-				<button type="submit" class="btn btn-sm btn-default btn-disable-on-submit" id="submitButton">
+				<button type="submit" class="btn btn-sm btn-secondary btn-disable-on-submit" id="submitButton">
 					<fmt:message key="button.add" />
 				</button>
 			</div>

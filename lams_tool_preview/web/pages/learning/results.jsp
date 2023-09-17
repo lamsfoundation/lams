@@ -155,7 +155,7 @@
 	<!-- End Reflection -->
 
 	<c:if test="${!peerreview.lockWhenFinished}">
-		<a href="#nogo" class="btn btn-default voffset5 float-start voffset20" onclick="redoRatings();">
+		<a href="#nogo" class="btn btn-secondary mt-2 float-start mt-4" onclick="redoRatings();">
 			<fmt:message key="label.redo" />
 		</a>
 	</c:if>	
@@ -164,7 +164,7 @@
 		<div class="activity-bottom-buttons">
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-default">
+					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-primary">
 						<fmt:message key="label.continue" />
 					</a>
 				</c:when>

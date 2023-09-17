@@ -96,31 +96,31 @@
                 <div class="btn-group float-end">
                   <c:if test="${contentEditable}">
 
-                    <a href="javascript:refreshPage();" title="<fmt:message key='label.wiki.refresh.toolTip'/>" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.wiki.refresh"/></a>
+                    <a href="javascript:refreshPage();" title="<fmt:message key='label.wiki.refresh.toolTip'/>" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.wiki.refresh"/></a>
 
                     <c:if test="${editableFlag or addFlag}">
-                      <a href="javascript:changeDiv('view');" title="<fmt:message key='label.wiki.view.toolTip'/>" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-play"></i> <fmt:message key="label.wiki.view"/></a>
+                      <a href="javascript:changeDiv('view');" title="<fmt:message key='label.wiki.view.toolTip'/>" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-play"></i> <fmt:message key="label.wiki.view"/></a>
                     </c:if>
 
                     <c:if test="${editableFlag and not currentWikiPage.deleted}">
-                      <a href="javascript:changeDiv('edit');" title="<fmt:message key='label.wiki.edit.toolTip'/>" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-pencil"></i> <fmt:message key="label.wiki.edit"/></a>
+                      <a href="javascript:changeDiv('edit');" title="<fmt:message key='label.wiki.edit.toolTip'/>" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-pencil"></i> <fmt:message key="label.wiki.edit"/></a>
                     </c:if>
 
                     <c:if test="${addFlag}">
-                      <a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key='label.wiki.add.toolTip'/>" type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-plus"></i> 
+                      <a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key='label.wiki.add.toolTip'/>" type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-plus"></i> 
                         <fmt:message key="label.wiki.add"/></a>
                     </c:if>
 
                     <c:if test="${editableFlag}">
                       <a href="javascript:changeDiv('history');" title="<fmt:message key='label.wiki.history.toolTip'/>" 
-                         type="button" class="btn btn-xs btn-default"><i class="fa fa-xm fa-history"></i> 
+                         type="button" class="btn btn-sm btn-secondary"><i class="fa fa-xm fa-history"></i> 
                         <fmt:message key="label.wiki.history"/>
                       </a>
                     </c:if>
 
                     <c:if test="${currentWikiPage.title != mainWikiPage.title and not currentWikiPage.deleted}">
 
-                      <a type="button" class="btn btn-xs btn-default" href="javascript:doRemove('<fmt:message key="label.wiki.remove.mark.confirm"/>')"
+                      <a type="button" class="btn btn-sm btn-secondary" href="javascript:doRemove('<fmt:message key="label.wiki.remove.mark.confirm"/>')"
                          title="<fmt:message key="label.wiki.remove.mark.toolTip"/>"
                          ><i class="fa fa-xm fa-trash"></i> 
                         <fmt:message key="label.wiki.remove"></fmt:message>
@@ -128,7 +128,7 @@
                     </c:if>
                     <c:if test="${currentWikiPage.deleted and editableFlag}">
 
-                      <a type="button" class="btn btn-xs btn-default" href="javascript:submitWiki('restorePage')"
+                      <a type="button" class="btn btn-sm btn-secondary" href="javascript:submitWiki('restorePage')"
                          title="<fmt:message key="label.wiki.restore.toolTip"/>"
                          ><i class="fa fa-xm fa-backward"></i> 
                         <fmt:message key="label.wiki.restore"/>
@@ -222,8 +222,8 @@
                 <!-- end annoucements -->
 
                 <!-- Wiki main -->
-                <div class="row no-gutter">
-                  <div class="col-xs-12">
+                <div class="row g-0">
+                  <div class="col-12">
 
                     <div class="panel panel-default" id="view">
                       <div class="panel-heading">
@@ -239,7 +239,7 @@
                         </c:choose>
                         ${lastEditPortrait}
                         <h4 class="panel-title">${fn:escapeXml(currentWikiPage.title)}</h4> 
-                        <div class="voffset5" style="font-size: 12px">
+                        <div class="mt-2" style="font-size: 12px">
                           <fmt:message key="label.wiki.last.edit">
                             <fmt:param>${lastEditName}</fmt:param>
                             <fmt:param>
@@ -389,7 +389,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="voffset5 float-end">
+                          <div class="mt-2 float-end">
                             <a href="javascript:changeDiv('view');" class="btn btn-primary"><fmt:message key="button.cancel"/></a> 
                             <a href="javascript:doEditOrAdd('editPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
                           </div>
@@ -400,8 +400,8 @@
                 </div>
 
                 <div id="add" style="display: none;">
-                  <div class="row no-gutter">
-                    <div class="col-xs-12">
+                  <div class="row g-0">
+                    <div class="col-12">
 
                       <div class="panel panel-default" id="view">
                         <div class="panel-heading">
@@ -425,8 +425,8 @@
                                          contentFolderID="${contentFolderID}" toolbarSet="CustomWikiLearner">
                           </lams:CKEditor>
 
-                          <a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary float-end voffset5"><fmt:message key="label.wiki.savechanges"></fmt:message></a> 
-                          <a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-primary float-end voffset5 roffset5"><fmt:message key="button.cancel"></fmt:message></a>
+                          <a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary float-end mt-2"><fmt:message key="label.wiki.savechanges"></fmt:message></a> 
+                          <a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-primary float-end mt-2 me-2"><fmt:message key="button.cancel"></fmt:message></a>
 
                         </div>
                       </div>

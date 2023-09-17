@@ -94,14 +94,14 @@
 
 		<div class="container-fluid" id="instructions">
 		  <div class="row">
-			<div class="col-xs-12 ">
+			<div class="col-12 ">
 				<c:choose>
 					<c:when test="${reflectOn && runAuto}">
 						<input type="button" id="FinishInstruction" name="FinishInstruction"
-							onClick="javascript:continueReflect()" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.continue' />" />
+							onClick="javascript:continueReflect()" class="btn btn-primary float-end me-2" value="<fmt:message key='label.continue' />" />
 					</c:when>
 					<c:otherwise>
-						<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.finish' />" />
+						<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary float-end me-2" value="<fmt:message key='label.finish' />" />
 					</c:otherwise>
 				</c:choose>
 			</div>

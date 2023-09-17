@@ -305,25 +305,25 @@
 				<!--  Panel button bar controlling refresh and adding items -->
 				<div class="btn-group float-end">
 					<c:if test="${mode != 'teacher'}">
-						<a href="#" onclick="javascript:return checkNew()" type="button" class="btn btn-xs btn-default">
+						<a href="#" onclick="javascript:return checkNew()" type="button" class="btn btn-sm btn-secondary">
 							<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" /></a>
 					</c:if>
 					<c:if test="${not finishedLock}">
 						<c:choose>
 							<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-xs btn-default">
+								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-sm btn-secondary">
 									<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.url.input" /></a>
-								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-xs btn-default">
+								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-sm btn-secondary">
 									<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.file.input" /></a>
 							</c:when>
 
 							<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-xs btn-default">
+								<a href="#" onclick="javascript:gotoFile()" type="button" class="btn btn-sm btn-secondary">
 									<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.file.input" /></a>
 							</c:when>
 
 							<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-xs btn-default">
+								<a href="#" onclick="javascript:gotoURL()" type="button" class="btn btn-sm btn-secondary">
 									<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.authoring.basic.resource.url.input" /></a>
 							</c:when>
 						</c:choose>
@@ -336,14 +336,16 @@
 				<div class="item-panel panel panel-default" >
 					<div class="panel-heading" id="heading${item.uid}">
 			        	<span class="panel-title collapsable-icon-left">
-				        	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${item.uid}"
-							   aria-expanded="false" aria-controls="collapse${item.uid}" >
+				        	<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${item.uid}"
+							   aria-expanded="false" aria-controls="collapse${item.uid}" 
+							>
 								<c:out value="${item.title}" escapeXml="true"/>
 								<c:if test="${!item.createByAuthor && item.createBy != null}">
 									(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
 								</c:if>
-							</a>
+							</button>
 						</span>
+						
 						<div class="float-end">
 							<c:choose>
 								<c:when test="${item.complete}">
@@ -352,7 +354,7 @@
 								<c:when test="${not finishedLock}">
 									<i class="fa fa-check-circle icon-complete hidden" style="font-size: 1.5em;color: green;" title='<fmt:message key="label.completed" />'></i>
 									<button type="button" onClick="javascript:completeItem(${item.uid})"
-											class="complete-item-button btn btn-xs btn-default">
+											class="complete-item-button btn btn-sm btn-secondary">
 										<fmt:message key='label.finish' />
 									</button>
 								</c:when>
@@ -405,7 +407,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<button onclick="return continueReflect()" class="btn btn-sm btn-default voffset5 btn-disable-on-submit">
+						<button onclick="return continueReflect()" class="btn btn-sm btn-secondary mt-2 btn-disable-on-submit">
 							<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -418,7 +420,7 @@
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default btn-disable-on-submit">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary btn-disable-on-submit">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>

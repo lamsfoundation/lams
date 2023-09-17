@@ -43,7 +43,7 @@
 				<p>
 					<fmt:message key="label.learning.conferenceNotAvailable" />
 				</p>
-				<a href="#" onclick="window.location.reload()" class="btn btn-default"><fmt:message key="label.refresh" /></a>
+				<a href="#" onclick="window.location.reload()" class="btn btn-secondary"><fmt:message key="label.refresh" /></a>
 			</c:when>
 			<c:otherwise>
 				<c:if test="${not empty meetingPassword}">
@@ -51,7 +51,7 @@
 				</c:if>
 				
 				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
-				<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-default">
+				<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-secondary">
 					<fmt:message key="button.enter" />
 				</a>
 

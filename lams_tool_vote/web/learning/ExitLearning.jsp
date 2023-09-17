@@ -83,13 +83,13 @@
 
 						<lams:out value="${voteGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 
-						<div class="panel-body voffset5 bg-warning">
+						<div class="panel-body mt-2 bg-warning">
 							<lams:out value="${voteGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
 						</div>
 
 						<c:if
 							test="${voteGeneralLearnerFlowDTO.lockOnFinish == 'false' && hasEditRight && voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
-							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-default voffset10 float-start"
+							<form:button path="forwardtoReflection" cssClass="btn btn-sm btn-secondary mt-2 float-start"
 								onclick="submitMethod('forwardtoReflection');">
 								<fmt:message key="label.edit" />
 							</form:button>

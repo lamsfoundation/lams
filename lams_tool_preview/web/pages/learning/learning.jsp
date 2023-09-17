@@ -141,22 +141,31 @@
 			</c:otherwise>
 		</c:choose>
 
-		<div class="voffset5" id="buttondiv">
+		<div class="mt-2" id="buttondiv">
 		
 		<div class="float-start">		
-		<span id="refreshButton" class="btn btn-default" onclick="javascript:refresh();"><fmt:message key="label.refresh"/></span>
+			<button type="button" id="refreshButton" class="btn btn-secondary" onclick="javascript:refresh();">
+				<fmt:message key="label.refresh"/>
+			</button>
 		</div>
 		
 		<div class="activity-bottom-buttons" id="buttonNextPrevDiv">		
 			<c:if test="${stepNumber > 1}">
-				<button type="button" id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></button>
+				<button type="button" id="prevButton" class="btn btn-secondary" onclick="javascript:${method}(false);">
+					<fmt:message key="label.previous"/>
+				</button>
 			</c:if>
+			
 			<c:choose>
 				<c:when test="${stepNumber == numCriteria}">
-					<button type="button" id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</button>
+					<button type="button" id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">
+						${finishButtonLabel}
+					</button>
 				</c:when>
 				<c:otherwise>
-					<button type="button" id="finishButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></button>
+					<button type="button" id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">
+						<fmt:message key="label.next"/>
+					</button>
 				</c:otherwise>
 			</c:choose>
 		</div>

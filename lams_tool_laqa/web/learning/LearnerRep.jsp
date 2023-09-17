@@ -19,7 +19,6 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
-	<lams:css />
 	<style>
 		#rating-comment-info {
 			margin: 10px 0;
@@ -130,16 +129,16 @@
 						<%--User own responses---------------------------------------%>
 					<c:set var="userResponse" value="${question.userResponse}"/>
 					<c:if test="${userResponse != null}">
-						<div class="row no-gutter">
+						<div class="row g-0">
 							<!-- split if ratings are on -->
-							<c:set var="splitRow" value="col-xs-12" />
+							<c:set var="splitRow" value="col-12" />
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-								<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-10 col-lg-10" />
+								<c:set var="splitRow" value="col-12 col-sm-9 col-md-10 col-lg-10" />
 							</c:if>
 							<div class="${splitRow}">
 								<div class="sbox">
 									<div class="sbox-heading bg-warning">
-										<div class="float-start roffset5"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
+										<div class="float-start me-2"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
 										<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
 										<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
 									</div>
@@ -149,11 +148,11 @@
 								</div>
 							</div>
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
-								<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 rate-answers-area">
+								<div class="col-12 col-sm-3 col-md-2 col-lg-2 rate-answers-area">
 									<h4 class="text-center">
 										<fmt:message key="label.learning.rating" />
 									</h4>
-									<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
+									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
 												 maxRates="${qaContent.maximumRates}" />
 								</div>
 							</c:if>
@@ -183,7 +182,7 @@
 						</c:choose>
 
 						<div class="other-users-responses">
-							<lams:TSTable numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' >
+							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' >
 								<thead>
 								<tr>
 									<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
@@ -203,7 +202,7 @@
 								<tbody>
 
 								</tbody>
-							</lams:TSTable>
+							</lams:TSTable5>
 						</div>
 					</c:if>
 
@@ -216,7 +215,7 @@
 		<!-- reflections -->
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
 
-			<div class="panel panel-default voffset10">
+			<div class="panel panel-default mt-2">
 				<div class="panel-heading panel-title">
 					<fmt:message key="label.reflection" />
 				</div>
@@ -229,7 +228,7 @@
 					</div>
 
 					<c:if test="${hasEditRight && mode != 'teacher'}">
-						<button name="forwardtoReflection" type="button" class="btn btn-default float-start"
+						<button name="forwardtoReflection" type="button" class="btn btn-secondary float-start"
 								onclick="submitMethod('forwardtoReflection');">
 							<fmt:message key="label.edit" />
 						</button>

@@ -101,7 +101,7 @@
 						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
 							<c:set var="description"><div><span class="caption-description">${image.descriptionEscaped}</span></c:set>
 							<c:if test="${!image.createByAuthor && (image.createBy != null)}">
-								<c:set var="portrait"><div class="roffset5"><lams:Portrait userId="${image.createBy.userId}"/></div></c:set>
+								<c:set var="portrait"><div class="me-2"><lams:Portrait userId="${image.createBy.userId}"/></div></c:set>
 								<c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
 								<c:set var="imageAddedBy"><div class="caption-description"><fmt:message key="label.learning.added.by" />&nbsp;<c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div></c:set>
 								<c:set var="description"><table><tr><td>${portrait}</td><td>${description}${imageAddedBy}</td></tr></table></c:set>
@@ -230,7 +230,7 @@
 		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default voffset10">
+			<div class="panel panel-default mt-2">
 				<div class="panel-heading panel-title">
 					<fmt:message key="title.reflection" />
 				</div>
@@ -258,7 +258,7 @@
 					</div>
 
 					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default float-start">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-secondary float-start">
 							<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -269,7 +269,7 @@
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div id="learner-submit" class="voffset10"
+			<div id="learner-submit" class="mt-2"
 				<c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
 			>
 				<c:choose>

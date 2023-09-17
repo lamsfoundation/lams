@@ -18,11 +18,11 @@
 <%--  outermsg${msgDto.message.uid} is used to replace existing message areas when a message is edited. --%>
 <c:choose>
 	<c:when test='${(msgDto.level <= 1)}'>
-		<div class="row no-gutter voffset5">
-			<div class="col-xs-12" id="outermsg${msgDto.message.uid}">
+		<div class="row g-0 mt-2">
+			<div class="col-12" id="outermsg${msgDto.message.uid}">
 	</c:when>
 	<c:otherwise>
-		<div class="no-gutter voffset2">
+		<div class="g-0 mt-1">
 			<div style="margin-left:<c:out value="${(msgDto.level-1)*indent}"/>px;" id="outermsg${msgDto.message.uid}">
 	</c:otherwise>
 </c:choose>
@@ -107,7 +107,7 @@
 
 		<c:if test="${not empty msgDto.message.attachments}">
 			<div id="attachments${msgDto.message.uid}" class="attachments">
-				<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
+				<i class="fa fa-paperclip ms-1" title="<fmt:message key='message.label.attachment'/>"></i>
 				<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 					<c:forEach var="file" items="${msgDto.message.attachments}">
 						<c:set var="downloadURL">

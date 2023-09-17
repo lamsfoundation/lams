@@ -139,12 +139,12 @@
 					class="fa fa-question-circle text-info"></i></abbr>
 				<fmt:message key="heading.report" />
 			</h4>
-			<p class="help-block" style="font-size: 12px"><fmt:message key="activity.title"/>: ${appointedScribe}</p>
+			<p class="form-text" style="font-size: 12px"><fmt:message key="activity.title"/>: ${appointedScribe}</p>
 		
 				<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 		
 					<div class="row">
-						<div class="col-xs-12">
+						<div class="col-12">
 							<div class="panel panel-default">
 								<div class="panel-heading panel-title">
 									<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
@@ -165,7 +165,7 @@
 				</c:forEach>
 		
 				<div class="row">
-					<div class="col-xs-12" id="agreeButton">
+					<div class="col-12" id="agreeButton">
 						<button class="btn btn-success float-start" onClick="javascript:submitApproval()">
 							<fmt:message key="button.agree" />
 						</button>

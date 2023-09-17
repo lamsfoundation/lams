@@ -13,7 +13,7 @@
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
-<div class="voffset10">
+<div class="mt-2">
 <c:if test="${daco.lockOnFinished and mode != 'teacher'}">
 	<lams:Alert id="activityLocked" type="danger" close="false">
 		<c:choose>
@@ -103,6 +103,7 @@
 							</c:choose>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==2}"><%-- Multi-line text --%>
 							<fmt:message key="label.learning.textarea.hint" var="textareaHint"/>
 							<c:if test="${horizontal}">
@@ -111,6 +112,7 @@
 							<form:textarea placeholder="${textareaHint}" path="answer[${answerIndex}]" cols="60" rows="3"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==3}"><%-- Number --%>
 							<fmt:message key="label.learning.number.hint" var="numberHint"/>
 							<c:if test="${not empty question.digitsDecimal}">
@@ -129,118 +131,150 @@
 							<form:input placeholder="${numberHint}" path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==4}"><%-- Date can be entered in three textfields --%>
 							<div class="hint"><fmt:message key="label.learning.date.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<span class="form-inline">
-								<div class="form-group">
+							<span class="d-flex flex-row align-items-center flex-wrap">
+								<div class="mb-3">
 								<label><fmt:message key="label.learning.date.day" /></label>
-								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control input-sm"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control form-control-sm"/>&nbsp;
 								</div>
 								
-								<div class="form-group">
+								<div class="mb-3">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.month" /></label>
-								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control input-sm"/>&nbsp;
+								<form:input path="answer[${answerIndex}]" size="3"  cssClass="form-control form-control-sm"/>&nbsp;
 								</div>
 								
-								<div class="form-group">
+								<div class="mb-3">
 								<c:set var="answerIndex" value="${answerIndex+1}" />
 								<label><fmt:message key="label.learning.date.year" /></label>
-								<form:input path="answer[${answerIndex}]" size="5"  cssClass="form-control input-sm"/>
+								<form:input path="answer[${answerIndex}]" size="5"  cssClass="form-control form-control-sm"/>
 								</div>
 							</span>							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==5}"><%-- File --%>
 							<div class="hint"><fmt:message key="label.learning.file.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<lams:FileUpload fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
+							<lams:FileUpload5 fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
 								fileInputMessageKey="label.authoring.basic.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"
 								fileButtonBrowse="fileButtonBrowse-${fileNumber+1}" fileInputNameFieldname="fileInputName-${fileNumber+1}" errorMsgDiv="fileerror-${fileNumber+1}"/>
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==6}"><%-- Image --%>  
 							<div class="hint"><fmt:message key="label.learning.image.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<lams:FileUpload fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
+							<lams:FileUpload5 fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
 								fileInputMessageKey="label.authoring.basic.image" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"
 								fileButtonBrowse="fileButtonBrowse-${fileNumber+1}" fileInputNameFieldname="fileInputName-${fileNumber+1}" errorMsgDiv="imageerror-${fileNumber+1}"/>
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==7}"><%-- Radio buttons  --%>
-							<div class="hint"><fmt:message key="label.learning.radio.hint" /></div>
+							<div class="hint">
+								<fmt:message key="label.learning.radio.hint" />
+							</div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
+							
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-							<%-- It displays for example A) instead of 1) --%>
-							${fn:substring(ordinal,status.index,status.index+1)}) 
-							<form:radiobutton path="answer[${answerIndex}]" value="${status.index+1}" /><label>&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/></label><br />
+								<div class="form-check">
+									<%-- It displays for example A) instead of 1) --%>
+									${fn:substring(ordinal,status.index,status.index+1)}) 
+									<form:radiobutton path="answer[${answerIndex}]" value="${status.index+1}" cssClass="form-check-input"/>
+									<label for="answer[${answerIndex}]" class="form-check-label">
+										&nbsp;<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+									</label>
+								</div>
+								<br />
 							</c:forEach>
+							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==8}"><%-- Dropdown menu --%>
-							<div class="hint"><fmt:message key="label.learning.dropdown.hint" /></div>
+							<div class="hint">
+								<fmt:message key="label.learning.dropdown.hint" />
+							</div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<form:select path="answer[${answerIndex}]"  cssClass="form-control">
-							<form:option value="0"><fmt:message key="label.learning.dropdown.select"/></form:option>
-							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-								<form:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></form:option>
-							</c:forEach>
+							
+							<form:select path="answer[${answerIndex}]"  cssClass="form-select">
+								<form:option value="0"><fmt:message key="label.learning.dropdown.select"/></form:option>
+								<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
+									<form:option value="${status.index+1}"><c:out value="${answerOption.answerOption}" escapeXml="true"/></form:option>
+								</c:forEach>
 							</form:select>
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==9}"><%-- Checkboxes --%>
-							<div class="hint"><fmt:message key="label.learning.checkbox.hint" /></div>
+							<div class="hint">
+								<fmt:message key="label.learning.checkbox.hint" />
+							</div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<form:hidden  id="checkbox-${questionStatus.index+1}" path="answer[${answerIndex}]" />
+							
+							<form:hidden id="checkbox-${questionStatus.index+1}" path="answer[${answerIndex}]" />
 							<c:forEach var="answerOption" items="${question.answerOptions}" varStatus="status">
-							${fn:substring(ordinal,status.index,status.index+1)}) 
-							<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}"/>
-							<label><c:out value="${answerOption.answerOption}" escapeXml="true"/>
-							</label><br/>
+								<div class="form-check">
+									${fn:substring(ordinal,status.index,status.index+1)}) 
+									<input type="checkbox" id="checkbox-${questionStatus.index+1}-${status.index+1}" value="${status.index+1}" class="form-check-input"/>
+									<label for="checkbox-${questionStatus.index+1}-${status.index+1}" class="form-check-label">
+										<c:out value="${answerOption.answerOption}" escapeXml="true"/>
+									</label>
+								</div>
+								<br/>
 							</c:forEach>
+							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
+						
 						<c:when test="${question.type==10}"><%-- Longitude/latitude --%>
-							<div class="hint"><fmt:message key="label.learning.longlat.hint" /></div>
+							<div class="hint">
+								<fmt:message key="label.learning.longlat.hint" />
+							</div>
 							<c:if test="${horizontal}">
 								</td>
 								<td>
 							</c:if>
-								<div class="form-horizontal">
-									<div class="form-group  no-gutter">
-									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.longitude" /></label>
+							
+							<div class="form-horizontal">
+								<div class="mb-3  g-0">
+									<label class="col-sm-2 col-form-label"><fmt:message key="label.learning.longlat.longitude" /></label>
 									<div class="col-sm-2">
 									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control "/>
 									</div>
 									<div class="col-sm-1">
-									<p class="form-control-static"><fmt:message key="label.learning.longlat.longitude.unit" /></p>
+									<p class="form-control-plaintext"><fmt:message key="label.learning.longlat.longitude.unit" /></p>
 									</div>								
-									</div>
-									<c:set var="answerIndex" value="${answerIndex+1}" />
+								</div>
+								<c:set var="answerIndex" value="${answerIndex+1}" />
 												
-									<div class="form-group  no-gutter">
-									<label class="col-sm-2 control-label"><fmt:message key="label.learning.longlat.latitude" /></label>
+								<div class="mb-3  g-0">
+									<label class="col-sm-2 col-form-label"><fmt:message key="label.learning.longlat.latitude" /></label>
 									<div class="col-sm-2">
 									<form:input path="answer[${answerIndex}]" size="10"  cssClass="form-control"/>
 									</div>
 									<div class="col-sm-1">
-									<p class="form-control-static"><fmt:message key="label.learning.longlat.latitude.unit" /></p>
-									</div>
+									<p class="form-control-plaintext"><fmt:message key="label.learning.longlat.latitude.unit" /></p>
 									</div>
 								</div>
+							</div>
+							
 							<c:set var="answerIndex" value="${answerIndex+1}" />
 						</c:when>
 					</c:choose>
@@ -250,7 +284,7 @@
 			<tr>
 				<td>
 					<c:if test="${mode != 'teacher'}">
-						<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-secondary btn-disable-on-submit voffset5 float-start"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
+						<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-secondary btn-disable-on-submit mt-2 float-start"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
 					</c:if>
 					<c:if test="${horizontal}">
 					</td><td style="vertical-align: middle;">
@@ -287,7 +321,7 @@
 			</div>
 
 			<c:if test="${mode != 'teacher'}">
-				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-default float-start">
+				<button name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-secondary float-start">
 					<fmt:message key="label.common.edit" />
 				</button>
 			</c:if>

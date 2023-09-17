@@ -79,7 +79,7 @@
 								</c:choose> 
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div style="text-align: center; margin-top: 2px;">
+									<div class="text-center mt-1">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>
@@ -135,7 +135,7 @@
 								</c:choose>
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div style="text-align: center; margin-top: 2px;">
+									<div class="text-center mt-1">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>
@@ -169,7 +169,7 @@
 						</div>
 									
 						<div>
-							<input type="text" id="input-${item.uid}" size="70" class="form-control input-sm submit-user-answer-input
+							<input type="text" id="input-${item.uid}" size="70" class="form-control form-control-sm submit-user-answer-input
 								<c:if test="${item.qbQuestion.autocompleteEnabled}">ui-autocomplete-input</c:if>"
 								style="display: inline-block; width: 70%;" data-item-uid="${item.uid}" aria-labelledby="type-your-answer-descr-${item.uid}"/>
 									

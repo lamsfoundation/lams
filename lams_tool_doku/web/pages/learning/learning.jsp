@@ -71,7 +71,7 @@
 				</c:if>
 			});
 			
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
@@ -279,7 +279,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-secondary voffset5">
+						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-secondary mt-2">
 						<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -292,7 +292,7 @@
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkEnabled}">
-						<button data-toggle="tooltip" id="continue-button"
+						<button data-bs-toggle="tooltip" id="continue-button"
 								class="btn btn-primary ${mode == 'author' ? '' : 'disabled'}"
 								<c:choose>
 									<c:when test="${mode == 'author'}">

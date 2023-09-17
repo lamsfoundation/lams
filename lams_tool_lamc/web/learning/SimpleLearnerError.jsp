@@ -13,7 +13,7 @@
 
 <body class="stripes">
 	<lams:Page type="learner" title="${title}">
-		<div class="voffset10 float-end">
+		<div class="mt-2 float-end">
 			<lams:errors/>
 		</div>
 		<div id="footer"></div>

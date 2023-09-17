@@ -14,7 +14,7 @@
 <c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">
 
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<div class="panel panel-default">
 				<div class="panel-heading panel-title">
 					<c:out value="${reportDTO.headingDTO.headingText}" escapeXml="false" />
@@ -34,7 +34,7 @@
 
 <c:if test="${scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<div class="panel panel-default">
 				<div class="panel-heading panel-title">
 					<fmt:message key="heading.reflection" />
@@ -44,7 +44,7 @@
 						<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true" />
 					</div>
 
-					<div class="panel-body bg-warning voffset10">
+					<div class="panel-body bg-warning mt-2">
 						<lams:out value="${scribeUserDTO.notebookEntry}" escapeHtml="true" />
 					</div>
 				</div>
@@ -63,11 +63,16 @@
 	<c:forEach var="scribeSessionDTO" items="${otherScribeSessions}">
 		<c:set var="sessNumber" value="${sessNumber +1 }"/>
 		<div class="row">
-			<div class="col-xs-12">
+			<div class="col-12">
 				<div class="panel panel-default">
 					<div class="panel-heading panel-title">
-					<a data-toggle="collapse" data-target="#panel-${sessNumber}" href="#panel-${sessNumber}">${scribeSessionDTO.sessionName}</a>
+						<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse"
+							 data-bs-target="#panel-${sessNumber}"
+						>
+							${scribeSessionDTO.sessionName}
+						</button>
 					</div>
+					
 					<div id="panel-${sessNumber}" class="panel-body panel-collapse collapse in">
 
 						<c:forEach var="reportDTO" items="${scribeSessionDTO.reportDTOs}">

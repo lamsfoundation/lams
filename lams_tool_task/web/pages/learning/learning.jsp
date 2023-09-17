@@ -295,15 +295,15 @@
 
 		<!--"Check for new" button-->
 
-		<p class="help-block">
+		<p class="form-text">
 			* -
 			<fmt:message key="label.learning.required.tasks" />
 		</p>
 
 		<c:if test="${mode != 'teacher'}">
 			<p>
-				<button onclick="return checkNew()" class="btn btn-sm btn-default btn-disable-on-submit"> 
-				<fmt:message key="label.learning.check.for.new" />
+				<button onclick="return checkNew()" class="btn btn-sm btn-secondary btn-disable-on-submit"> 
+					<fmt:message key="label.learning.check.for.new" />
 				</button>
 			</p>
 		</c:if>
@@ -315,7 +315,7 @@
 
 				<p>
 					<button onclick="javascript:showMessage('<lams:WebAppURL/>learning/addtask.do?sessionMapID=${sessionMapID}&mode=${mode}');"
-						class="btn btn-sm btn-default btn-disable-on-submit"><i class="fa fa-sm fa-plus-circle"></i>&nbsp;<fmt:message
+						class="btn btn-sm btn-secondary btn-disable-on-submit"><i class="fa fa-sm fa-plus-circle"></i>&nbsp;<fmt:message
 							key="label.authoring.basic.add.task" /> </button>
 				<p>
 
@@ -337,7 +337,7 @@
 									<lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}" />
 								</div>
 
-								<div class="form-group">
+								<div class="mb-3">
 
 									<c:choose>
 										<c:when test="${empty sessionMap.reflectEntry}">
@@ -355,7 +355,7 @@
 
 									<c:if test="${mode != 'teacher'}">
 										<button type="submit" id="finishButton" onclick="return continueReflect()"
-											class="btn btn-sm btn-default float-start voffset10 btn-disable-on-submit">
+											class="btn btn-sm btn-secondary float-start mt-2 btn-disable-on-submit">
 											<fmt:message key="label.edit" />
 										</button>
 									</c:if>

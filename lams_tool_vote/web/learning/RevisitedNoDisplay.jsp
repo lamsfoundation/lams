@@ -15,22 +15,22 @@
 </c:choose>
 
 <c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
-	<div class="media">
-		<div class="media-left">
+	<div class="d-flex">
+		<div class="flex-shrink-0">
 			<i class="fa fa-xs fa-check text-success"></i>
 		</div>
-		<div class="media-body">
+		<div class="flex-grow-1 ms-3">
 			<c:out value="${entry}" escapeXml="false" />
 		</div>
 	</div>
 </c:forEach>
 
 <c:if test="${not empty VoteLearningForm.userEntry}">
-	<div class="media">
-		<div class="media-left">
+	<div class="d-flex">
+		<div class="flex-shrink-0">
 			<i class="fa fa-xs fa-check text-success"></i>
 		</div>
-		<div class="media-body">
+		<div class="flex-grow-1 ms-3">
 			<c:out value="${VoteLearningForm.userEntry}" escapeXml="true" />
 		</div>
 	</div>

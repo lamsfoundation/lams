@@ -83,7 +83,7 @@
 				</button>
 					
 				<c:if test="${!pixlrDTO.lockOnFinish}">
-					<button  class="btn btn-secondary btn-sm loffset5" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning.do';">
+					<button  class="btn btn-secondary btn-sm ms-1" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning.do';">
 						<fmt:message key="button.redo" />
 					</button>
 				</c:if>

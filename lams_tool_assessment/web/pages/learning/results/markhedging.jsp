@@ -32,9 +32,9 @@
 				</div>
 			</c:if>
 				
-			<div style="width:60px;">
+			<div style="width:70px;">
 				<c:if test="${not empty toolSessionID}">
-					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select" data-question-index="${questionIndex}"
+					<select name="question${questionIndex}_${option.displayOrder}" class="mark-hedging-select form-select" data-question-index="${questionIndex}"
 							aria-labelledby="instructions-${questionIndex} option-name-${option.uid}"
 							disabled="disabled">
 							

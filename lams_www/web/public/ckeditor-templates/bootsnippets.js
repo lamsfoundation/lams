@@ -253,7 +253,7 @@ CKEDITOR.addSnippets( 'bootsnippets-image', {
 		css: '',
 		html: 
 		'<div class="container">' +
-		'	<div class="col-xs-12 col-sm-9 offset-sm-1">' +
+		'	<div class="col-12 col-sm-9 offset-sm-1">' +
 		'		<img class="img-fluid" style="margin: auto" src="/lams/www/public/ckeditor-templates/images/desk.jpg">' +
 		'		<div class="carousel-caption">' +
 		'			<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut eleifend, turpis non luctus tempor</h2>' +
@@ -483,10 +483,10 @@ CKEDITOR.addSnippets( 'bootsnippets-advanced-layout', {
 		html: 
 			'<div class="bootstrap-tabs" data-tab-set-title="Tab Set Title" style="background-color:#f8f8f8;border: 1px solid #e8e5e5;border-radius: 5px 5px 40px 10px;padding: 5px;">' +
 			'	<ul class="nav nav-tabs" role="tablist"><!-- add tabs here -->' +
-			'		<li role="presentation"><a aria-controls="title-tab-1" class="tab-link" data-toggle="tab" href="#title-tab-1" role="tab" target="_blank">Tab 1 Name</a></li>' +
-			'		<li role="presentation"><a aria-controls="title-tab-2" class="tab-link" data-toggle="tab" href="#title-tab-2" role="tab" target="_blank">Tab 2 Name</a></li>' +
-			'		<li role="presentation"><a aria-controls="title-tab-3" class="tab-link" data-toggle="tab" href="#title-tab-3" role="tab" target="_blank">Tab 3 Name</a></li>' +
-			'		<li class="active" role="presentation"><a aria-controls="title-tab-4" class="tab-link" data-toggle="tab" href="#title-tab-4" role="tab" target="_blank">Tab 4 Name</a></li>' +
+			'		<li role="presentation"><a aria-controls="title-tab-1" class="tab-link" data-bs-toggle="tab" href="#title-tab-1" role="tab" target="_blank">Tab 1 Name</a></li>' +
+			'		<li role="presentation"><a aria-controls="title-tab-2" class="tab-link" data-bs-toggle="tab" href="#title-tab-2" role="tab" target="_blank">Tab 2 Name</a></li>' +
+			'		<li role="presentation"><a aria-controls="title-tab-3" class="tab-link" data-bs-toggle="tab" href="#title-tab-3" role="tab" target="_blank">Tab 3 Name</a></li>' +
+			'		<li class="active" role="presentation"><a aria-controls="title-tab-4" class="tab-link" data-bs-toggle="tab" href="#title-tab-4" role="tab" target="_blank">Tab 4 Name</a></li>' +
 			'	</ul>' +
 		
 			'	<div class="tab-content"><!-- add tab panels here -->' +

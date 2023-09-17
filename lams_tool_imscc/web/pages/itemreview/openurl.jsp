@@ -16,7 +16,7 @@
 				<div class="panel-heading panel-title ">
 					<div class="row">
 						<a href="javascript:;" onclick="javascipt:launchPopup('<c:url value='${popupUrl}'/>','popupUrl');"
-								class="btn btn-primary pull-right roffset5">
+								class="btn btn-primary float-end me-2">
 							<fmt:message key="open.in.new.window" />
 						</a>
 					</div>

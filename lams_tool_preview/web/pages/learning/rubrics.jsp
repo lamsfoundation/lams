@@ -90,7 +90,7 @@
 			- criterionTables.length;
 	}
 </script>
-<button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsUserPanels()">
+<button class="btn btn-secondary expand-all-button" onClick="javascript:expandAllRubricsUserPanels()">
 	<fmt:message key="label.rating.rubrics.expand.all" />
 </button>
 <div class="clearfix"></div>
@@ -104,10 +104,15 @@
 	    <div class="panel panel-default rubrics-user-panel">
 	       <div class="panel-heading" role="tab" id="heading${ratingDto.itemId}">
 	       	<span class="panel-title collapsable-icon-left">
-	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${ratingDto.itemId}" 
-						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-panels">
-					<lams:Portrait userId="${ratingDto.itemId}" hover="false" />&nbsp;<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
-				</a>
+	       		<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
+						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-panels"
+				>
+					<lams:Portrait userId="${ratingDto.itemId}" hover="false" />
+					&nbsp;
+					<strong>
+						<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
+					</strong>
+				</button>
 			</span>
 	       </div>
 	       

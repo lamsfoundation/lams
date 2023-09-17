@@ -441,32 +441,32 @@
 	
 		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
 		<div style="display:inline" role="group">
-        <a href="#" class="btn btn-default btn-sm full-screen-launch-button pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default btn-sm full-screen-exit-button pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-secondary btn-sm full-screen-launch-button float-end ms-1" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
+        <a href="#" class="btn btn-secondary btn-sm full-screen-exit-button float-end ms-1" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
 		
 		<c:if test="${param.allowPrinting}">
-			<a href="#" class="btn btn-default btn-sm pull-right loffset5" id="print" onclick="javascript:showPrintView()"
+			<a href="#" class="btn btn-secondary btn-sm float-end ms-1" id="print" onclick="javascript:showPrintView()"
 			   title="<fmt:message key='button.print'/>"><i class="fa fa-print" aria-hidden="true"></i></a> 
 		</c:if>
 		
-		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
+		<input type="text" id="background-color" class='updateStyle form-control form-control-sm' data-mm-target-property='background' size="7" width="180px">
 
 		</div>
 		 
 		<div>
 			<div class="btn-group btn-group-sm" role="group">
-			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
-			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom.reset'/></a>
-			<a href="#" class="scaleUp btn btn-default btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
-			<a href="#" class="scaleDown btn btn-default btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
+			<a href="#" class="resetView btn btn-secondary btn-sm"><fmt:message key='label.zoom'/>:</a>
+			<a href="#" class="resetView btn btn-secondary btn-sm"><fmt:message key='label.zoom.reset'/></a>
+			<a href="#" class="scaleUp btn btn-secondary btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
+			<a href="#" class="scaleDown btn btn-secondary btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
 			</div>
 			
 			<div style="display:inline-block" role="group">
-		 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
+		 	<a href="#" class="toggleCollapse btn btn-secondary btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
 		<c:if test="${contentEditable}">
-			<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.add.idea'/></span></a>
-			<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
-			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
+			<a href="#" class="addSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.add.idea'/></span></a>
+			<a href="#" class="editNode btn btn-secondary btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
+			<a href="#" class="removeSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
 	<%-- Not yet implemented in back end  --%> 
 	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
 	<%--  		<input type="button" class="insertRoot" value="add root node">  --%> 

@@ -141,9 +141,9 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<div class="form-group text-center">
+								<div class="mb-3 text-center">
 									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-											class="btn btn-default btn-success btn-disable-on-submit"
+											class="btn btn-secondary btn-success btn-disable-on-submit"
 											title='<fmt:message key="label.add.tip" />' >
 										<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <fmt:message key="label.add" />
 									</button>

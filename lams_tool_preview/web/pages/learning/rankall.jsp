@@ -138,7 +138,7 @@
 		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
 		<input type="hidden" name="next" id="next" value=""/>
 
-		<div class="row voffset10">
+		<div class="row mt-2">
 			<div class="col-sm-6">
 				<strong><fmt:message key="label.ranked"></fmt:message></strong>
 				<div id="ranked"><div id="lastEntry" class="${rowdrop}" style="padding-top:10px;padding-bottom:10px"><fmt:message key="label.addlearnerhere"></fmt:message></div></div>

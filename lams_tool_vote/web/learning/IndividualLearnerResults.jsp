@@ -66,7 +66,7 @@
 			</c:if>
 
 			<div class="row">
-				<div class="col-xs-12">
+				<div class="col-12">
 					<div class="panel panel-default">
 						<div class="panel-heading panel-title">
 							<fmt:message key="label.learning.reportMessage" />
@@ -74,29 +74,29 @@
 						<div class="panel-body">
 
 							<c:forEach var="entry" items="${requestScope.mapGeneralCheckedOptionsContent}">
-								<div class="media">
-									<div class="media-left">
+								<div class="d-flex">
+									<div class="flex-shrink-0">
 										<i class="fa fa-xs fa-check text-success"></i>
 									</div>
-									<div class="media-body">
+									<div class="flex-grow-1 ms-3">
 										<c:out value="${entry.value}" escapeXml="false" />
 									</div>
 								</div>
 							</c:forEach>
 
 							<c:if test="${not empty voteLearningForm.userEntry}">
-								<div class="media">
-									<div class="media-left">
+								<div class="d-flex">
+									<div class="flex-shrink-0">
 										<i class="fa fa-xs fa-check text-success"></i>
 									</div>
-									<div class="media-body">
+									<div class="flex-grow-1 ms-3">
 										<c:out value="${voteLearningForm.userEntry}" escapeXml="true" />
 									</div>
 								</div>
 							</c:if>
 
 							<c:if test="${hasEditRight}">
-								<input type="submit" name="redoQuestions" class="btn btn-sm btn-default float-start voffset10"
+								<input type="submit" name="redoQuestions" class="btn btn-sm btn-secondary float-start mt-2"
 									onclick="submitMethod('redoQuestions');"
 									value='<fmt:message key="label.retake" />?' />
 							</c:if>

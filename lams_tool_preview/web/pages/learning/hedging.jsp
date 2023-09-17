@@ -86,7 +86,7 @@
 		<input type="hidden" name="next" id="next" value=""/>
 
 		<div class="table-responsive">
-			<table class="table table-hover table-condensed">
+			<table class="table table-hover table-sm">
 				<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
 				<tr>
 					<td>
@@ -99,7 +99,7 @@
 							${ratingDto.userRating}
 						</c:when>
 						<c:otherwise>
-							<select name="mark${ratingDto.itemId}" class="mark-hedging-select">
+							<select name="mark${ratingDto.itemId}" class="mark-hedging-select form-select">
 								<c:if test="${isEditingDisabled || question.responseSubmitted}">disabled="disabled"</c:if>				
 								<c:forEach var="i" begin="0" end="${criteriaRatings.ratingCriteria.maxRating}">
 									<option
@@ -116,8 +116,8 @@
 		</div>
 
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-			<div class="form-group">
-			<h4><label for="justify" class="voffset10"><fmt:message key="label.justify.hedging.marks" /></label></h4>
+			<div class="mb-3">
+			<h4><label for="justify" class="mt-2"><fmt:message key="label.justify.hedging.marks" /></label></h4>
 			<c:choose>
 			<c:when test="${finishedLock}">
 				<span>${criteriaRatings.justificationComment}</span>

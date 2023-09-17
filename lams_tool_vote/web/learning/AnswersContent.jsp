@@ -184,16 +184,23 @@
 
 			<!-- options  -->
 			<div class="table-responsive">
-				<table class="table table-hover table-condensed">
+				<table class="table table-hover table-sm">
 					<tbody>
 						<c:set var="count" value="0" scope="page" />
 						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 							<c:set var="count" value="${count + 1}" scope="page" />
 
 							<tr>
-								<td width="20px"><input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}"
-									onClick="updateCount(this);"></td>
-								<td width="100%"><label for="vote${count}"><c:out value="${subEntry.value}" escapeXml="false" /></label></td>
+								<td width="100%">
+									<div class="form-check">
+										<input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}" class="form-check-input"
+											onClick="updateCount(this);">
+	
+										<label for="vote${count}" class="form-check-label">
+											<c:out value="${subEntry.value}" escapeXml="false" />
+										</label>
+									</div>
+								</td>
 							</tr>
 						</c:forEach>
 					</tbody>

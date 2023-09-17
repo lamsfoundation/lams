@@ -89,7 +89,7 @@
 			- criterionTables.length;
 	}
 </script>
-<button class="btn btn-default expand-all-button" onClick="javascript:expandAllRubricsPanels()">
+<button class="btn btn-secondary expand-all-button" onClick="javascript:expandAllRubricsPanels()">
 	<fmt:message key="label.rating.rubrics.expand.all" />
 </button>
 <div class="clearfix"></div>
@@ -106,11 +106,12 @@
 	    <div class="panel panel-default rubrics-row-panel">
 	       <div class="panel-heading" role="tab" id="heading${criteria.ratingCriteriaId}">
 	       	<span class="panel-title collapsable-icon-left" style="font-size:larger">
-	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${criteria.ratingCriteriaId}" 
-						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
+	       		<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
+						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels"
+				>
 					<%-- Criterion "row" --%>
 					<c:out value="${criteria.title}" escapeXml="false" />
-				</a>
+				</button>
 			</span>
 	       </div>
 	       

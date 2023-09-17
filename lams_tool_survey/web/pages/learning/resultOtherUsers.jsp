@@ -120,7 +120,7 @@ table.alternative-color td:first-child {
 		<%-- user personal results--%>
 		<div class="panel">
 		<c:forEach var="element" items="${sessionMap.questionList}">
-			<div class="sbox voffset10">
+			<div class="sbox mt-2">
 				<div class="sbox-heading clearfix">
 					<c:if test="${not question.optional}">
 						<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i
@@ -170,15 +170,16 @@ table.alternative-color td:first-child {
 		</c:forEach>
 
 		<c:if test="${not sessionMap.lockOnFinish}">
-			<div class="voffset5">
-			<button property="RetakeButton" onclick="return retakeSurvey()" class="btn btn-default">
-				<fmt:message key="label.retake.survey" />
-			</button></div>
+			<div class="mt-2">
+				<button property="RetakeButton" onclick="return retakeSurvey()" class="btn btn-secondary">
+					<fmt:message key="label.retake.survey" />
+				</button>
+			</div>
 		</c:if>
 		</div>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="voffset10 panel panel-default">
+			<div class="mt-2 panel panel-default">
 				<div class="panel-heading panel-title">
 					<fmt:message key="title.reflection" />
 				</div>
@@ -209,7 +210,7 @@ table.alternative-color td:first-child {
 
 		<%-- other users personal results--%>
 		<c:if test="${sessionMap.showOtherUsersAnswers}">
-		<div class="voffset10 panel panel-default">
+		<div class="mt-2 panel panel-default">
 			<div class="panel-heading panel-title" id="other-users-answers-title">
 				<fmt:message key="label.other.answers" />
 			</div>
@@ -223,7 +224,7 @@ table.alternative-color td:first-child {
 
 			<c:forEach var="question" items="${answerDtos}" varStatus="queStatus">
 				<div class="table-responsive">
-					<table class="table table-hover table-condensed">
+					<table class="table table-hover table-sm">
 						<tr>
 							<th class="first" colspan="2"><c:out value="${question.shortTitle}" /> <%-- Only show pie/bar chart when question is single/multiple choics type --%>
 								<c:if test="${question.type != 3}">
@@ -266,9 +267,9 @@ table.alternative-color td:first-child {
 						<c:if test="${question.type == 3}">
 							<tr>
 								<td colspan="2">
-									<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"' test="2"> 
+									<lams:TSTable5 numColumns="1" dataId='data-question-uid="${question.uid}"' test="2"> 
 										<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.answer" /></th>
-									</lams:TSTable>
+									</lams:TSTable5>
 									
 								</td>
 							</tr>

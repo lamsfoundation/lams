@@ -71,7 +71,7 @@
 
 			<!--present  a mini summary table here -->
 
-			<table class="table table-condensed table-hover">
+			<table class="table table-sm table-hover">
 				<tr>
 					<th><fmt:message key="label.nomination" /></th>
 					<th class="text-center"><fmt:message key="label.total.votes" /></th>
@@ -145,19 +145,19 @@
 
 					<c:forEach var="vote" items="${requestScope.listUserEntriesContent}">
 						<c:if test="${vote.userEntry != ''}">
-							<div class="media">
-								<div class="media-left">
+							<div class="d-flex">
+								<div class="flex-shrink-0">
 									<i class="fa fa-xs fa-check text-success"></i>
 								</div>
-								<div class="media-body">
-						<c:choose>
-						<c:when test="${vote.visible}">
-							<c:out value="${vote.userEntry}" escapeXml="true" />
-						</c:when>
-						<c:otherwise>
-							<em>(<fmt:message key="label.hidden"/>)</em>
-						</c:otherwise>
-						</c:choose>
+								<div class="flex-grow-1 ms-3">
+									<c:choose>
+										<c:when test="${vote.visible}">
+											<c:out value="${vote.userEntry}" escapeXml="true" />
+										</c:when>
+										<c:otherwise>
+											<em>(<fmt:message key="label.hidden"/>)</em>
+										</c:otherwise>
+									</c:choose>
 								</div>
 							</div>
 						</c:if>
@@ -174,22 +174,22 @@
 					</c:otherwise>
 				</c:choose>
 				<c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
-					<div class="media">
-						<div class="media-left">
+					<div class="d-flex">
+						<div class="flex-shrink-0">
 							<i class="fa fa-xs fa-check text-success"></i>
 						</div>
-						<div class="media-body">
+						<div class="flex-grow-1 ms-3">
 							<c:out value="${entry}" escapeXml="false" />
 						</div>
 					</div>
 				</c:forEach>
 
 				<c:if test="${not empty voteLearningForm.userEntry}">
-					<div class="media">
-						<div class="media-left">
+					<div class="d-flex">
+						<div class="flex-shrink-0">
 							<i class="fa fa-xs fa-check text-success"></i>
 						</div>
-						<div class="media-body">
+						<div class="flex-grow-1 ms-3">
 							<c:out value="${voteLearningForm.userEntry}" escapeXml="true" />
 						</div>
 					</div>

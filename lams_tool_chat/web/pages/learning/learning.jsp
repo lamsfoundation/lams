@@ -63,16 +63,16 @@
 		
 			<!-- chat UI -->
 			<div class="row">
-				<div class="col-xs-12 col-sm-9 col-md-9 col-lg-8">
+				<div class="col-12 col-sm-9 col-md-9 col-lg-8">
 					<div id="messages"></div>
 				</div>
-				<div class="col-xs-12 col-sm-3 col-md-3 col-lg-4">
+				<div class="col-12 col-sm-3 col-md-3 col-lg-4">
 					<div id="roster" class="d-none d-sm-block"></div>
 				</div>
 			</div>
 			<c:if test="${MODE == 'teacher'}">
 				<div class="row">
-					<div class="col-xs-12 voffset5">
+					<div class="col-12 mt-2">
 						<div id="sentTo">
 							<fmt:message key="label.sendMessageTo" />
 							&nbsp;<span id="sendToEveryone"><fmt:message key="label.everyone" /></span> <span id="sendToUser"
@@ -84,14 +84,14 @@
 		
 			<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
 				<div class="row">
-					<div class="col-xs-12 col-sm-9 col-md-9 col-lg-8">
-						<div id="textArea" class="voffset5">
+					<div class="col-12 col-sm-9 col-md-9 col-lg-8">
+						<div id="textArea" class="mt-2">
 							<textarea id="sendMessageArea" rows="2" class="form-control" autofocus></textarea>
 						</div>
 					</div>
-					<div class="col-xs-12 col-sm-3 col-md-3 col-lg-4">
-						<div id="sendMessageButtonCell" class="voffset5">
-							<input id="sendMessageButton" class="btn btn-autoresize btn-default" type="button" onclick="javascript:sendChatToolMessage()"
+					<div class="col-12 col-sm-3 col-md-3 col-lg-4">
+						<div id="sendMessageButtonCell" class="mt-2">
+							<input id="sendMessageButton" class="btn btn-autoresize btn-secondary" type="button" onclick="javascript:sendChatToolMessage()"
 								value='<fmt:message key="button.send"/>' />
 						</div>
 					</div>
