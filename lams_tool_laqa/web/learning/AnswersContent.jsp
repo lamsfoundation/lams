@@ -27,8 +27,6 @@
 	<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.instructions'/>">
 		<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 	</div>
-	<hr class="mx-5 text-primary">
-
 
 	<div class="container-lg">
 		<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->

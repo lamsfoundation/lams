@@ -42,7 +42,6 @@
 	</div>
 
 	<div class="container-lg">
-		<hr class="text-primary">
 		<div id="notices">
 			<!-- notices and announcements -->
 			<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">
