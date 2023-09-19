@@ -88,6 +88,7 @@ public class LearningController {
 
 	// check defineLater
 	if (chat.isDefineLater()) {
+	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	    return "pages/learning/defineLater";
 	}
 

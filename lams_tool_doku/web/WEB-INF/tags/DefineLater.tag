@@ -37,25 +37,28 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%@ attribute name="defineLaterMessageKey" required="false" rtexprvalue="true"%>
-<%@ attribute name="buttonTryAgainKey" required="false" rtexprvalue="true"%>
-
-<%-- Default value for I18N keys --%>
-<c:if test="${empty defineLaterMessageKey}">
-	<c:set var="defineLaterMessageKey" value="define.later.message" />
+<%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
+<%@ attribute name="refresh" required="false" rtexprvalue="true"%>
+<c:if test="${empty refresh}">
+	<c:set var="refresh" value="60" />
 </c:if>
-<c:if test="${empty buttonTryAgainKey}">
-	<c:set var="buttonTryAgainKey" value="button.try.again" />
+<%@ attribute name="defineLaterLabel" required="false" rtexprvalue="true"%>
+<c:if test="${empty defineLaterLabel}">
+	<c:set var="defineLaterLabel" value="define.later.message" />
 </c:if>
 
-<div class="container-lg">
-	<lams:Alert5 type="info" id="define-later-info" close="false">
-		<fmt:message key="${defineLaterMessageKey}" />
-	</lams:Alert5>
+<fmt:message var="title" key='activity.title'/>
 
-	<div class="activity-bottom-buttons">
-		<a id="finishButton" href="javascript:location.reload(true);" class="btn btn-primary btn-icon-refresh mt-3"> 
-			<fmt:message key="${buttonTryAgainKey}" />
-		</a>
+<lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" refresh="${refresh}">
+	<div class="container-lg">
+		<lams:Alert5 type="info" id="define-later-info" close="false">
+			<fmt:message key="${defineLaterLabel}" />
+		</lams:Alert5>
+	
+		<div class="activity-bottom-buttons">
+			<button type="button" id="finishButton" onclick="javascript:location.reload(true);" class="btn btn-primary btn-icon-refresh mt-3"> 
+				<fmt:message key="button.try.again" />
+			</button>
+		</div>
 	</div>
-</div>
+</lams:PageLearner>

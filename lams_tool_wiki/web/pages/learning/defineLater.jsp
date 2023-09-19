@@ -1,37 +1,5 @@
 <!DOCTYPE html>
-            
+<%@include file="/common/taglibs.jsp"%>
 
-<%@ include file="/common/taglibs.jsp"%>
+<lams:DefineLater toolSessionID="${learningForm.toolSessionID}" defineLaterLabel="message.defineLaterSet" />
 
-<lams:html>
-		<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<c:set var="tool">
-		<lams:WebAppURL />
-	</c:set>
-	
-	<lams:head>  
-		<title>
-			<fmt:message key="activity.title" />
-		</title>
-		<lams:css/>
-	
-		<lams:JSImport src="includes/javascript/common.js" />
-		<lams:JSImport src="includes/javascript/wikiCommon.js" relative="true" />
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	</lams:head>
-
-	<body class="stripes">
-		<c:set var="title" scope="request">
-			<fmt:message key="activity.title" />
-		</c:set>
-		
-		<lams:Page type="learner" title="${title}">
-						<lams:DefineLater defineLaterMessageKey="message.defineLaterSet" />
-		</lams:Page>
-		<div class="footer">
-		</div>					
-	</body>
-</lams:html>

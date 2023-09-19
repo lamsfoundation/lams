@@ -1,6 +1,7 @@
 <%@ tag body-content="scriptless" %>
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
+<%@ attribute name="refresh" required="false" rtexprvalue="true"%>
 
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
@@ -31,6 +32,9 @@
                 </c:otherwise>
             </c:choose>
         </title>
+        <c:if test="${not empty refresh}">
+        	<meta http-equiv="refresh" content="${refresh}">
+        </c:if>
 
         <link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
         <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">

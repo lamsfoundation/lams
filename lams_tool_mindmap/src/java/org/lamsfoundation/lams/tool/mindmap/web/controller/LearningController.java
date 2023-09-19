@@ -110,7 +110,6 @@ public class LearningController {
 	// TODO need to catch exceptions and handle errors.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
 		LearningController.MODE_OPTIONAL);
-
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// Retrieve the session and content.
@@ -119,6 +118,7 @@ public class LearningController {
 	    throw new MindmapException("Cannot retrieve session with toolSessionID: " + toolSessionID);
 	}
 
+	learningForm.setToolSessionID(toolSessionID);
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mindmapService.isLastActivity(toolSessionID));
 
 	HttpSession ss = SessionManager.getSession();
@@ -159,7 +159,6 @@ public class LearningController {
 		request);
 
 	if (mindmap.isGalleryWalkStarted()) {
-
 	    mindmapService.fillGalleryWalkRatings(mindmapDTO, mindmapUser.getUserId());
 	    return "pages/learning/galleryWalk";
 	}
@@ -168,9 +167,6 @@ public class LearningController {
 	if (mindmap.isDefineLater()) {
 	    return "pages/learning/defineLater";
 	}
-
-	// set mode, toolSessionID and MindmapDTO
-	learningForm.setToolSessionID(toolSessionID);
 
 	// Set the content in use flag.
 	if (!mindmap.isContentInUse()) {
