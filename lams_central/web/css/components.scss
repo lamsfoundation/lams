@@ -479,6 +479,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border-radius: 2.8rem;
 	overflow: hidden;
 	background-color: var(--bs-white);
+	margin: 0.25rem;
 }
 
 .component-page-wrapper button.no-decoration {
@@ -497,7 +498,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 .component-page-wrapper .component-page-content {
 	min-height: 100%;
-	padding: 1rem 2rem 3rem 2rem;
+	padding: 1rem 2rem 2rem 2rem;
 	transition: all .3s ease;
 	vertical-align: top;
 }
@@ -604,6 +605,18 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 /* fontawesome icon x-small */
 .fa-xs {
 	font-size: smaller;
+}
+
+.component-page-wrapper .collapsable-icon-left button[data-bs-toggle="collapse"]:after {
+	font-family: FontAwesome;
+	content: "\f078";
+	float: left;
+	color: #6c757d;
+	margin-right: .5rem;
+}
+
+.component-page-wrapper .collapsable-icon-left button.collapsed:after {
+	content: "\f054";
 }
 
 /* Unused or used in assessment rewritten authoring */
@@ -730,18 +743,6 @@ body.component .tooltip.bs-tooltip-top .arrow:before {
 	{
 	content: '\f139';
 	color: #3C42E0;
-}
-
-.component-page-wrapper .collapsable-icon-left:after {
-	font-family: FontAwesome;
-	content: "\f078";
-	float: left;
-	color: #6c757d;
-	margin-right: .5rem;
-}
-
-.component-page-wrapper .collapsable-icon-left.collapsed:after {
-	content: "\f054";
 }
 
 

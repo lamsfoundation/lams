@@ -1,5 +1,4 @@
-	<script type="text/javascript">
-	
+<script type="text/javascript">	
 		var currentMark = 0;
 		
 		$(document).ready(function(){
@@ -65,35 +64,46 @@
 		function cancel() {
 			document.location.href='<c:url value="/learning/refresh.do?sessionMapID=${sessionMapID}"/>';
 		}
-    </script>
+</script>
 
-	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="post" id="editForm">
-
-		<c:if test="${notcomplete}">
-			<lams:Alert type="danger" id="warn-assign-more" close="true">
-				<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>
-			</lams:Alert>
-		</c:if>
-		<span id="instructions"><strong><fmt:message key="label.assign.marks">
+<c:if test="${notcomplete}">
+	<lams:Alert5 type="danger" id="warn-assign-more" close="true">
+		<fmt:message key="error.assign.marks">
 			<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
-			<fmt:param><span id="totalMark">0</span></fmt:param>
-			</fmt:message></strong>
-		</span>
+		</fmt:message>
+	</lams:Alert5>
+</c:if>
 
-		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-		<input type="hidden" name="toolContentId" value="${toolContentId}"/>
-		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
-		<input type="hidden" name="next" id="next" value=""/>
+<lams:Alert5 type="info" id="assign-mark-info" close="false">
+	<fmt:message key="label.assign.marks">
+		<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
+		<fmt:param>
+			<span id="totalMark">0</span>
+		</fmt:param>
+	</fmt:message>
+</lams:Alert5>
+
+<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="post" id="editForm">
+	<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+	<input type="hidden" name="toolContentId" value="${toolContentId}"/>
+	<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
+	<input type="hidden" name="next" id="next" value=""/>
+		
+	<div class="card lcard">
+		<div class="card-header text-bg-secondary">
+			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+		</div>
 
 		<div class="table-responsive">
-			<table class="table table-hover table-sm">
+			<div class="div-hover">
 				<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
-				<tr>
-					<td>
-						<lams:Portrait userId="${ratingDto.itemId}"/><span class="portrait-sm-lineheight">${ratingDto.itemDescription}</span>
-						
-					</td>
-					<td style="width: 100px;">
+				<div class="row">
+					<div class="col">
+						<lams:Portrait userId="${ratingDto.itemId}"/>
+						<span class="portrait-sm-lineheight ms-2">${ratingDto.itemDescription}</span>
+					</div>
+					
+					<div style="width: 100px;">
 						<c:choose>
 						<c:when test="${finishedLock}">
 							${ratingDto.userRating}
@@ -109,25 +119,30 @@
 							</select>
 						</c:otherwise>
 						</c:choose>
-					</td>
-				</tr>
+					</div>
+				</div>
 				</c:forEach>
-			</table>
+			</div>
 		</div>
 
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-			<div class="mb-3">
-			<h4><label for="justify" class="mt-2"><fmt:message key="label.justify.hedging.marks" /></label></h4>
-			<c:choose>
-			<c:when test="${finishedLock}">
-				<span>${criteriaRatings.justificationComment}</span>
-			</c:when>
-			<c:otherwise>
-				<textarea id="justify" name="justify" rows="4" cols="60" class="mark-hedging-select form-control" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
-			</c:otherwise>
-			</c:choose>
+			<div class="m-3">
+				<div>
+					<label for="justify" class="fst-italic">
+						<fmt:message key="label.justify.hedging.marks" />
+					</label>
+				</div>
+				<c:choose>
+					<c:when test="${finishedLock}">
+						<span>${criteriaRatings.justificationComment}</span>
+					</c:when>
+					<c:otherwise>
+						<textarea id="justify" name="justify" rows="4" cols="60"
+							class="mark-hedging-select form-control" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</c:if>
-	
-	</form>
+	</div>
+</form>
 		

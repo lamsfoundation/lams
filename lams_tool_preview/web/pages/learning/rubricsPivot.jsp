@@ -1,30 +1,38 @@
-<style>	
-	.rubrics-row-panel .collapsable-icon-left a {
-		text-decoration: none;
-	}
-		
-	.rubrics-table td:not(:first-child) {
+<style>
+	.rubrics-table .row:not(.rubrics-table-header) .col:not(:first-child) {
 		cursor: pointer;
 		text-align: center;
 	}
+	
+	.rubrics-table .row .col:first-child {
+		font-weight: bold;
+	}
 
-	.rubrics-table th {
+	.rubrics-table-header {
 		font-style: normal;
 		text-align: center;
 	}
 	
-	.rubrics-table td.bg-success {
+	.rubrics-table .col.text-bg-success {
 		font-weight: bold;
-		font-size: larger;
+		line-height: 40px;
+		margin: -0.5em 0;
 	}
 	
 	.column-header-span {
 		font-style: italic;
 	}
 
-	.expand-all-button {
+	#expand-all-button {
 		margin-bottom: 15px;
 		float: right;
+	}	
+	.rubrics-row-card .collapsable-icon-left button, .collapsable-icon-left button:after {
+		color: inherit !important;
+	}
+	
+	.lcard {
+		margin-bottom: 1.25rem;
 	}
 </style>
 
@@ -32,7 +40,7 @@
 	var rubricsRequireRatings = ${peerreview.rubricsRequireRatings};
 	
 	$(document).ready(function(){
-		$('#rubrics-row-panels').closest('.container').addClass('container-fluid').removeClass('container');
+		$('#rubrics-row-cards').closest('.container').addClass('container-fluid').removeClass('container');
 		if (rubricsRequireRatings){
 			$('#finishButton').prop('disabled', isRatingMissing());
 		}
@@ -64,10 +72,10 @@
     			}
     			let row = $(cell).parent(),
     				columnIndex = row.children().index(cell);
-    			$(cell).closest('tbody').children('tr').each(function(){
-        			$(this).children('td').eq(columnIndex).removeClass('bg-success');
+    			$(cell).closest('.ltable').children('.row').each(function(){
+        			$(this).children('.col').eq(columnIndex).removeClass('text-bg-success');
         		});
-        		$(cell).addClass('bg-success');
+        		$(cell).addClass('text-bg-success');
 
         		if (rubricsRequireRatings) {
 					$('#finishButton').prop('disabled', isRatingMissing());
@@ -79,22 +87,27 @@
     	});
 	}
 
-	function expandAllRubricsPanels(){
-		$('.collapse').collapse('show');
+	function expandAllRubricsCards(){
+		var isCollapsing = $("#expand-all-button").hasClass("collapsed") ? "show" : "hide";
+		$("#expand-all-button").toggleClass("collapsed");
+		$('.collapse').collapse(isCollapsing);
 	}
 
 	function isRatingMissing() {
 		let criterionTables = $('.rubrics-table');
-		return $('tbody td.bg-success', criterionTables).length !== $('thead th', criterionTables).length 
+		return $('.text-bg-success', criterionTables).length !== $('.rubrics-table-header .col', criterionTables).length 
 			- criterionTables.length;
 	}
 </script>
-<button class="btn btn-secondary expand-all-button" onClick="javascript:expandAllRubricsPanels()">
-	<fmt:message key="label.rating.rubrics.expand.all" />
-</button>
+
+<div class="collapsable-icon-left">
+	<button id="expand-all-button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" onClick="javascript:expandAllRubricsCards()">
+		<fmt:message key="label.rating.rubrics.expand.all" />
+	</button>
+</div>
 <div class="clearfix"></div>
 
-<div id="rubrics-row-panels" class="panel-group" role="tablist" aria-multiselectable="true">
+<div id="rubrics-row-cards" role="tablist" aria-multiselectable="true">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
 	<c:set var="columnHeaders" value="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" />
@@ -103,11 +116,11 @@
 	<c:forEach var="criteriaDto" items="${criteriaRatings.criteriaGroup}">
 		<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 		
-	    <div class="panel panel-default rubrics-row-panel">
-	       <div class="panel-heading" role="tab" id="heading${criteria.ratingCriteriaId}">
-	       	<span class="panel-title collapsable-icon-left" style="font-size:larger">
-	       		<button type="button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
-						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels"
+	    <div class="lcard card rubrics-row-card">
+	       <div class="card-header text-bg-secondary" role="tab" id="heading${criteria.ratingCriteriaId}">
+	       	<span class="card-title collapsable-icon-left">
+	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
+						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-cards"
 				>
 					<%-- Criterion "row" --%>
 					<c:out value="${criteria.title}" escapeXml="false" />
@@ -115,65 +128,58 @@
 			</span>
 	       </div>
 	       
-	       <div id="collapse${criteria.ratingCriteriaId}" class="panel-collapse collapse" 
-	       	    role="tabpanel" aria-labelledby="heading${criteria.ratingCriteriaId}">
-					<table class="table table-hover table-bordered rubrics-table">
-						<thead>
-							<tr>
-								<%-- Learner profile pictures and names --%>
-								<th></th>
-								<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-									<th>
-										<lams:Portrait userId="${ratingDto.itemId}" hover="false" /><br>
-										<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
-									</th>
-								</c:forEach>
-							</tr>
-						</thead>
+	       <div id="collapse${criteria.ratingCriteriaId}" class="collapse" 
+	       	    	role="tabpanel" aria-labelledby="heading${criteria.ratingCriteriaId}">
+				<div class="ltable rubrics-table">
+					<div class="row rubrics-table-header m-0">
+						<%-- Learner profile pictures and names --%>
+						<div class="col"></div>
+						<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
+							<div class="col">
+								<lams:Portrait userId="${ratingDto.itemId}" hover="false" /><br>
+								<strong><c:out value="${ratingDto.itemDescription}" escapeXml="false"/></strong>
+							</div>
+						</c:forEach>
+					</div>
 						
-						<tbody>
 							<c:forEach items="${columnHeaders}" varStatus="columnStatus">
 								<c:set var="columnHeader" value="${columnHeaders[columnHeaderCount - columnStatus.count]}" />
-								<tr>
-									<td>
+								<div class="row align-items-center m-0">
+									<div class="col">
 										<%-- Criterion "column" --%>
 										<c:if test="${not empty columnHeader}">
 										<span class="column-header-span"><c:out value="${columnHeader}" escapeXml="false"/></span><br>
 										</c:if>
 										<%-- Criterion "cell" --%>
 										<c:out value="${criteria.rubricsColumns[columnHeaderCount - columnStatus.count].name}" escapeXml="false" />	
-									</td>
+									</div>
 									<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 										
-										<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index})"
+										<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index})" role="button"
 											<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
-											<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index)}">
-												class="bg-success"
-											</c:if>
+											 class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index)}">text-bg-success</c:if>'
 										>
 											${columnHeaderCount - columnStatus.index}
-										</td>
+										</div>
 									</c:forEach>
-								</tr>
+								</div>
+								
 								<c:if test="${not columnStatus.last and peerreview.rubricsInBetweenColumns}">
-									<tr>
-										<td>
+									<div class="row align-items-center m-0">
+										<div class="col">
 											<i><fmt:message key="label.rating.rubrics.in.between" /></i>
-										</td>
+										</div>
 										<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-											<td onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index - 0.5})"
-												<c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">
-													class="bg-success"
-												</c:if>
+											<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index - 0.5})" role="button"
+												 class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">text-bg-success</c:if>'
 											>
 												${columnHeaderCount - columnStatus.index - 0.5}
-											</td>
+											</div>
 										</c:forEach>
-									</tr>
+									</div>
 								</c:if>
 							</c:forEach>
-						</tbody>
-					</table>
+				</div>
 			</div>
 		</div>
 		

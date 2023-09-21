@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
@@ -11,17 +12,15 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="finishImmediately" value="${peerreview.lockWhenFinished and not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity}" />
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
-	<%@ include file="/common/header.jsp"%>
 
+<lams:PageLearner title="${peerreview.title}" toolSessionID="${toolSessionId}">
+	<!-- ********************  CSS ********************** -->
 	<lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/learning.css">
 
+	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
@@ -32,19 +31,17 @@
 		COMMENTS_MIN_WORDS_LIMIT = 0,
 		MAX_RATINGS_FOR_ITEM = 0,
 		LIMIT_BY_CRITERIA = "true";
-		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = 0,
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>";
 	</script>
-	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>	
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<lams:JSImport src="includes/javascript/jquery.jRating.js" />
+	<lams:JSImport src="includes/javascript/jquery.tablesorter.js" />
+	<lams:JSImport src="includes/javascript/jquery.tablesorter-widgets.js" />
+	<lams:JSImport src="includes/javascript/jquery.tablesorter-pager.js" />
+	<lams:JSImport src="includes/javascript/common.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
@@ -85,15 +82,11 @@
 		function redoRatings(){
 			document.location.href='<c:url value="/learning/start.do?toolSessionID=${toolSessionId}&mode=${mode}&isRedo=true"/>';
 		}
-
     </script>
-</lams:head>
-<body class="stripes">
 
-	<lams:Page type="learner" title="${peerreview.title}">
-
+<div class="container-lg">
 	<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-		<lams:Alert type="danger" id="warn-lock" close="false">
+		<lams:Alert5 type="danger" id="warn-lock" close="false">
 			<c:choose>
 				<c:when test="${sessionMap.userFinished}">
 					<fmt:message key="message.activityLocked"/>
@@ -102,92 +95,90 @@
 					<fmt:message key="message.warnLockOnFinish" ><fmt:param><fmt:message key="label.finished" /></fmt:param></fmt:message>
 				</c:otherwise>
 			</c:choose>
-		</lams:Alert>
+		</lams:Alert5>
 	</c:if>
 
-	<c:if test="${peerreview.showRatingsLeftByUser}">
-
-		<c:if test="${not empty allCriteriaRatings}">
+	<c:if test="${peerreview.showRatingsLeftByUser and not empty allCriteriaRatings}">
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
-			<div class="panel panel-default">
-			<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
-				<div class="panel-heading panel-title">
-					<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
-				</div>
-			</c:if>
-			<div class="panel-body">
-			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
-							   currentUserDisplay="false" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}"
-							   rubricsPivotView="${peerreview.rubricsView eq 2}" />
-			</div>
+			<div class="card lcard">
+				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+					<div class="card-header text-bg-secondary">
+						<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
+					</div>
+				</c:if>
+				
+				<lams:StyledRating5 criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
+					   currentUserDisplay="false" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}"
+					   rubricsPivotView="${peerreview.rubricsView eq 2}" />
 			</div>
 		</c:forEach>
-		</c:if>
 	</c:if>
 	
 	<c:if test="${peerreview.showRatingsLeftForUser}">
+		<div class="card lcard">
+			<div class="card-header text-bg-secondary">
+				<fmt:message key="label.ratings.by.others" />
+			</div>
+			
+			<div class="card-body">
+				<lams:Alert5 type="info" id="warn-lock" close="false">
+					<fmt:message key="label.no.ratings.out.of.possible.ratings" ><fmt:param>${numberRatings}</fmt:param><fmt:param>${numberPotentialRatings}</fmt:param></fmt:message>
+				</lams:Alert5>
 
-		<div class="panel panel-default">
-		<div class="panel-heading panel-title">
-			<fmt:message key="label.ratings.by.others" />
-		</div>
-		<div class="panel-body">
-		
-			<lams:Alert type="info" id="warn-lock" close="false">
-				<fmt:message key="label.no.ratings.out.of.possible.ratings" ><fmt:param>${numberRatings}</fmt:param><fmt:param>${numberPotentialRatings}</fmt:param></fmt:message>
-			</lams:Alert>
-		
-			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
-				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
-					<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
-				</c:if>
-		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true"
-		 						   currentUserDisplay="true" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}" />
-			</c:forEach>
-		</div>
+				<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
+					<div class="card mb-3">
+					<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
+						<div class="card-header">
+							<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
+						</div>
+					</c:if>
+					
+					<div class="card-body">
+			 		<lams:StyledRating5 criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true"
+			 						   currentUserDisplay="true" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}" />
+			 		</div>
+			 		</div>
+				</c:forEach>
+			</div>
 		</div>
 	</c:if>
 				
 	<!-- Reflection -->
 	<c:if test="${sessionMap.reflectOn and not empty sessionMap.reflectEntry}">
-		<%@ include file="notebookdisplay.jsp"%>
+		<lams:NotebookReedit
+			reflectInstructions="${sessionMap.reflectInstructions}"
+			reflectEntry="${sessionMap.reflectEntry}"
+			isEditButtonEnabled="${mode != 'teacher'}"
+			notebookHeaderLabelKey="title.reflection"/>
 	</c:if>
-	<!-- End Reflection -->
-
-	<c:if test="${!peerreview.lockWhenFinished}">
-		<a href="#nogo" class="btn btn-secondary mt-2 float-start mt-4" onclick="redoRatings();">
-			<fmt:message key="label.redo" />
-		</a>
-	</c:if>	
 
 	<c:if test="${mode != 'teacher'}">
 		<div class="activity-bottom-buttons">
 			<c:choose>			
 				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<a href="#nogo" id="continueButton" onclick="return continueReflect()" class="btn btn-primary">
+					<button type="button" id="continueButton" onclick="continueReflect()" class="btn btn-primary na">
 						<fmt:message key="label.continue" />
-					</a>
+					</button>
 				</c:when>
 				<c:when test="${sessionMap.isLastActivity}">
-					<a href="#nogo" id="finishButton" class="btn btn-primary na">
+					<button type="button" id="finishButton" class="btn btn-primary na">
 						<fmt:message key="label.finish" />
-					</a>
+					</button>
 				</c:when>		
 				<c:otherwise>
-					<a href="#nogo" id="finishButton" class="btn btn-primary na">
+					<button type="button" id="finishButton" class="btn btn-primary na">
 						<fmt:message key="label.finished" />
-					</a>
+					</button>
 				</c:otherwise>
 			</c:choose>
+
+			<c:if test="${!peerreview.lockWhenFinished}">
+				<button type="button" class="btn btn-secondary btn-icon-return me-2" onclick="redoRatings();">
+					<fmt:message key="label.redo" />
+				</button>
+			</c:if>	
 		</div>
 	</c:if>
-
-	</lams:Page>
-	<!--closes content-->
-
-	<div id="footer">
-	</div>
-	<!--closes footer-->
-
-</body>
-</lams:html>
+	
+</div>
+</lams:PageLearner>

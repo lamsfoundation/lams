@@ -1,14 +1,14 @@
-	<lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
-	<style media="screen,projection" type="text/css">
-		#no-users-info {display: none;}
-	</style>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
+<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
 
-	<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
-	<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
-	
-	<script type="text/javascript">
+<!-- ********************  CSS ********************** -->
+	<lams:css suffix="jquery.jRating"/>
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+
+<!-- ********************  javascript ********************** -->	
+<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
 
@@ -18,30 +18,25 @@
 		COMMENTS_MIN_WORDS_LIMIT = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit},
 		MAX_RATINGS_FOR_ITEM = ${peerreview.maximumRatesPerUser},
 		LIMIT_BY_CRITERIA = "true";
-		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${criteriaRatings.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true">:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
 		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId};
-	</script>
+</script>
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-	
-	<script type="text/javascript">
-	
+<script type="text/javascript">	
 	var YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message></spring:escapeBody>',
 		IS_DISABLED =  ${sessionMap.isDisabled},
 		commentsSaved = true;
 	
-	
-	$(document).ready(function(){
-		
+	$(document).ready(function(){	
 		if ( ${minRates} > 0 && ${criteriaRatings.countRatedItems} < ${minRates}) {
 			hideButtons();
 		}
@@ -179,7 +174,6 @@
 			});
 		});
 	 });
-	
 
 <c:choose>
 <c:when test="${criteriaRatings.ratingCriteria.commentsEnabled}">
@@ -261,12 +255,11 @@
 			showButtons();
 		}
 	}
-    </script>
+</script>
 
-		<!-- Rating limits info -->
-		<c:if test="${rateAllUsers > 0 || criteriaRatings.ratingCriteria.minimumRates ne 0 || criteriaRatings.ratingCriteria.maximumRates ne 0}">
-		
-			<lams:Alert type="info" id="rate-limits-reminder" close="false">
+<!-- Rating limits info -->
+<c:if test="${rateAllUsers > 0 || criteriaRatings.ratingCriteria.minimumRates ne 0 || criteriaRatings.ratingCriteria.maximumRates ne 0}">
+			<lams:Alert5 type="info" id="rate-limits-reminder" close="false">
 				<c:choose>
 					<c:when test="${rateAllUsers > 0}">
 						<fmt:message key="label.rate.all.users"></fmt:message>
@@ -297,17 +290,20 @@
 				<fmt:message key="label.rate.limits.topic.reminder">
 					<fmt:param value="<span id='count-rated-items'>${criteriaRatings.countRatedItems}</span>"/>
 				</fmt:message>
-			</lams:Alert>
-				
-			
-		</c:if>
+			</lams:Alert5>
+</c:if>
 
-		<c:set var="numColumns" value="2"/>
-		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-			<c:set var="numColumns" value="3"/>
-		</c:if>
+<div class="card lcard">
+	<div class="card-header text-bg-secondary">
+		<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+	</div>
 	
-		<lams:TSTable5 numColumns="${numColumns}">
+	<c:set var="numColumns" value="2"/>
+	<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
+		<c:set var="numColumns" value="3"/>
+	</c:if>
+	
+		<lams:TSTable5 numColumns="${numColumns}" tableClass="tablesorter jRating">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
 				<fmt:message key="label.user.name" />
 			</th>
@@ -324,4 +320,4 @@
 		<div id="no-users-info">
 			<fmt:message key="label.no.users" />
 		</div>
-	
+</div>

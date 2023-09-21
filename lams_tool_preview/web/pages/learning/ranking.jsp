@@ -1,8 +1,5 @@
-	<script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
-	<lams:JSImport src="includes/javascript/ranking.js" relative="true" />
-
-	<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
-	<c:choose>
+<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
+<c:choose>
 	<c:when test="${finishedLock}">
 		<c:set var="rowdrop"></c:set>
 		<c:set var="itemdrop"></c:set>
@@ -11,23 +8,28 @@
 		<c:set var="rowdrop">dropzone</c:set>
 		<c:set var="itemdrop">draggable</c:set>
 	</c:otherwise>
-	</c:choose>
+</c:choose>
 	
-	<c:set var="itemDivs"></c:set>
-	<c:set var="javascriptReady"></c:set>	
-	<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
-		<c:set var="itemDivs">${itemDivs} <div id="item${ratingDto.itemId}" class="${itemdrop}">${ratingDto.itemDescription}</div></c:set>
-		<c:set var="javascriptReady">${javascriptReady} setRanking('${ratingDto.itemDescription}', ${ratingDto.itemId}, '${ratingDto.userRating}');</c:set>		
-	</c:forEach>
-	
-	<script type="text/javascript">
+<c:set var="itemDivs"></c:set>
+<c:set var="javascriptReady"></c:set>	
+<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
+	<c:set var="itemDivs">
+		${itemDivs} 
+		<li id="item${ratingDto.itemId}" class="${itemdrop} list-group-item">
+			${ratingDto.itemDescription}
+		</li>
+	</c:set>
+	<c:set var="javascriptReady">${javascriptReady} setRanking('${ratingDto.itemDescription}', ${ratingDto.itemId}, '${ratingDto.userRating}');</c:set>		
+</c:forEach>
 
+<script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
+<lams:JSImport src="includes/javascript/ranking.js" relative="true" />
+<script type="text/javascript">
 		$(document).ready(function(){
 			${javascriptReady}
 			
 			testButtons();
 		});
-		
 
 		function doDrop(event) {
 	    	var theTarget = event.target;
@@ -48,6 +50,7 @@
 				    }
 			    } 
 			    theTarget.appendChild(newChild);
+			    $(theTarget).effect("highlight", {}, 2000);
 	    	}
 	    	removeClassWithHighlight(newChild, 'can-drop');
 		    resetXY(newChild);
@@ -131,42 +134,54 @@
 		function cancel() {
 			document.location.href='<c:url value="/learning/refresh.do?sessionMapID=${sessionMapID}"/>';
 		}
-		
+</script>
 
-    </script>
-
-	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
-
-		<c:if test="${notcomplete}">
-			<lams:Alert type="info"  id="warn-assign-more" close="true">
-				<fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>
-			</lams:Alert>
-		</c:if>
-		<span id="instructions"><strong><fmt:message key="label.assign.ranks">
+<c:if test="${notcomplete}">
+	<lams:Alert5 type="info" id="warn-assign-more" close="true">
+		<fmt:message key="error.assign.ranks">
 			<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
-			</fmt:message></strong>
-		</span>
+		</fmt:message>
+	</lams:Alert5>
+</c:if>
 
-		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-		<input type="hidden" name="toolContentId" value="${toolContentId}"/>
-		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
-		<input type="hidden" name="next" id="next" value=""/>
+<lams:Alert5 type="info" id="warn-assign-ranks" close="true">
+	<fmt:message key="label.assign.ranks">
+		<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
+	</fmt:message>
+</lams:Alert5>
 
-		<div class="row mt-2" id="drag-area">
-			<div class="col-sm-6">
-				<strong><fmt:message key="label.ranked"></fmt:message></strong>
-				<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
-					<div class="row"><div class="col-sm-1 divrankxlabel">${index}:</div><div class="col-sm-5 divrankx ${rowdrop}" id="divrank${index}" ></div></div>
-				</c:forEach>
-			</div>
-			
-			<div class="col-sm-6">
-				<div class="${rowdrop}" id="unranked"><strong><fmt:message key="label.unranked"></fmt:message></strong></div>
-				<div id="learners">
-					${itemDivs}
-				</div>
-			</div>
+<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
+	<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+	<input type="hidden" name="toolContentId" value="${toolContentId}"/>
+	<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
+	<input type="hidden" name="next" id="next" value=""/>
+
+	<div class="card lcard">
+		<div class="card-header text-bg-secondary">
+			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
 		</div>
 		
-	</form>
+		<div class="row m-3 mb-4" id="drag-area">
+			<ul class="col-sm-6 list-group">
+				<strong><fmt:message key="label.ranked"/></strong>
+
+				<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
+					<div class="row text-bg-success mt-2 ms-0">
+						<div class="col-sm-1 divrankxlabel">${index}:</div>
+						<div class="col-sm-10 divrankx ${rowdrop}" id="divrank${index}"></div>
+					</div>
+				</c:forEach>
+			</ul>
+			
+			<div class="col-sm-6">
+				<div class="${rowdrop} fw-bold" id="unranked">
+					<fmt:message key="label.unranked"/>
+				</div>
+				<ul id="learners" class="list-group mt-2">
+					${itemDivs}
+				</ul>
+			</div>
+		</div>
+	</div>
+</form>
 		

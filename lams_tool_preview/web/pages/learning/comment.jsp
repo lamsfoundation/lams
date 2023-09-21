@@ -1,14 +1,13 @@
+<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
+<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
+
+<!-- ********************  CSS ********************** -->
 	<lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>/includes/css/learning.css'/>">
-	<style media="screen,projection" type="text/css">
-		#no-users-info {display: none;}
-	</style>
 
-	<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
-	<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
-
+<!-- ********************  javascript ********************** -->
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
@@ -18,7 +17,6 @@
 		MIN_RATES = 0, // only applies to stars
 		MAX_RATINGS_FOR_ITEM = 0, // only applies to stars
 		COUNT_RATED_ITEMS = 0, // only applies to stars
-		LAMS_URL = '${lams}',
 		COMMENTS_MIN_WORDS_LIMIT = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit},
 		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
@@ -31,16 +29,13 @@
 			commentsOnOtherPages = ${countRatedItems};
 			numCommentsOnPage = 0;
 	</script>
-	
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-	
 	<script type="text/javascript">
-
 	$(document).ready(function(){
 
 		$(".tablesorter").tablesorter({
@@ -221,9 +216,7 @@
 	}
 	</c:if>
 
-	
 	function submitEntry(next, skipNumberValidation){	
-
 		hideButtons();
 		if (!skipNumberValidation && (numCommentsOnPage + commentsOnOtherPages < ${minRates})) {
 			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rate.limits.reminder.min"/></spring:escapeBody>'.replace('{0}',${minRates}) );
@@ -291,10 +284,9 @@
 	}
     </script>
 
-		<!-- Rating limits info -->
-		<c:if test="${minRates ne 0 || maxRates ne 0}">
-		
-			<lams:Alert type="info" id="rate-limits-reminder" close="false">
+	<!-- Rating limits info -->
+	<c:if test="${minRates ne 0 || maxRates ne 0}">	
+		<lams:Alert5 type="info" id="rate-limits-reminder" close="false">
 				<c:choose>
 					<c:when test="${rateAllUsers > 0}">
 						<fmt:message key="label.rate.all.users"></fmt:message>
@@ -327,10 +319,14 @@
 						<fmt:param value="<span id='count-rated-items'>${countRatedItems}</span>"/>
 					</fmt:message>
 				</span>
-			</lams:Alert>
-				
-		</c:if>
-		
+		</lams:Alert5>
+	</c:if>
+	
+<div class="card lcard">
+	<div class="card-header text-bg-secondary">
+		<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+	</div>
+
 	<form action="<c:url value="/learning/submitComments.do?"/>" method="get" id="editForm">
 		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 		<input type="hidden" name="toolContentId" value="${peerreview.contentId}"/>
@@ -345,9 +341,9 @@
 				<fmt:message key="label.comment" />
 			</th>
 		</lams:TSTable5>
-
 	</form>
 								
-	<div id="no-users-info">
+	<div id="no-users-info" class="alert alert-warning">
 		<fmt:message key="label.no.users" />
 	</div>
+</div>
