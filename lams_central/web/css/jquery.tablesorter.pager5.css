@@ -20,9 +20,12 @@ td.tablesorter-pager {
 	text-align: center;
 }
 
+/* Altered by LAMS */
 .tablesorter-pager select {
-	margin: 0;
-	padding: 0
+	padding: 0.225rem 2.25rem 0.225rem 0.75rem;
+	width: 70px; 
+	display: inline-block;
+	vertical-align: middle;
 }
 
 .tablesorter-pager.disabled {

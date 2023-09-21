@@ -16,8 +16,8 @@
 
 	<lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
 	<style>
 		#rating-comment-info {
@@ -50,9 +50,6 @@
 		}
 	</style>
 
-
-
-
 	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 	<form:form action="/lams/tool/laqa11/learning/learning.do"  modelAttribute="qaLearningForm" method="POST" target="_self">
 		<form:hidden path="toolSessionID" id="toolSessionID" />
@@ -61,9 +58,7 @@
 		<form:hidden path="totalQuestionCount" />
 		<form:hidden path="refreshAnswers" />
 
-
 		<!-- Announcements -->
-
 		<c:if test="${not empty sessionMap.submissionDeadline}">
 			<lams:Alert5 id="submission-deadline" type="danger" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction">

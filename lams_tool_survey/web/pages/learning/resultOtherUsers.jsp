@@ -13,20 +13,21 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
-table.alternative-color td:first-child {
-	width: 25%;
-}
-
-.chartDiv {
-	display: none;
-	height: 220px;
-	padding 0;
-}
-</style>
+		table.alternative-color td:first-child {
+			width: 25%;
+		}
+		
+		.chartDiv {
+			display: none;
+			height: 220px;
+			padding 0;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
@@ -34,7 +35,6 @@ table.alternative-color td:first-child {
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
-
 	<script type="text/javascript">
 		$(document).ready(function() {
 

@@ -40,8 +40,8 @@
 	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
 	
     <lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 	<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
     

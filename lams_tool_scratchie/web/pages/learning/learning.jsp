@@ -15,11 +15,8 @@
 <c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
 <c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
-<fmt:message key="label.learning.title" var="titlr"/>
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
-
-	<!-- ********************  CSS ********************** -->
-	
+	<!-- ********************  CSS ********************** -->	
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
