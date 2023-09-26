@@ -105,9 +105,11 @@
 		<c:choose>
 			<c:when test='${disabled || isItemAuthoredByUser || ((maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating) || !(isCriteriaNotRatedByUser || allowRetries)}'>
 				<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
+				<c:set var="isWidgetDisabled" value="true"/>
 			</c:when>
 			<c:otherwise>
 				<c:set var="ratingStarsClass" value="rating-stars"/>
+				<c:set var="isWidgetDisabled" value="false" />
 			</c:otherwise>
 		</c:choose>
 			
@@ -126,7 +128,8 @@
 			</c:otherwise>
 		</c:choose>
 		
-		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}" role="button" aria-label="<fmt:message key="${starsRateLabel}"/>">
+		<div class="${ratingStarsClass} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}" role="button" aria-label="<fmt:message key="${starsRateLabel}"/>"
+			<c:if test"${isWidgetDisabled}">tabindex="0"</c:if>>
 		</div>
 			
 		<c:choose>

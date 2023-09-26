@@ -22,6 +22,12 @@
 	<c:set var="javascriptReady">${javascriptReady} setRanking('${ratingDto.itemDescription}', ${ratingDto.itemId}, '${ratingDto.userRating}');</c:set>		
 </c:forEach>
 
+<style>
+	li.row.text-bg-success {
+		min-height: 50px;
+	}
+</style>
+
 <script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
 <lams:JSImport src="includes/javascript/ranking.js" relative="true" />
 <script type="text/javascript">
@@ -162,16 +168,17 @@
 		</div>
 		
 		<div class="row m-3 mb-4" id="drag-area">
-			<ul class="col-sm-6 list-group">
+			<div class="col-sm-6">
 				<strong><fmt:message key="label.ranked"/></strong>
-
-				<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
-					<div class="row text-bg-success mt-2 ms-0">
-						<div class="col-sm-1 divrankxlabel">${index}:</div>
-						<div class="col-sm-10 divrankx ${rowdrop}" id="divrank${index}"></div>
-					</div>
-				</c:forEach>
-			</ul>
+				<ul class="list-group">
+					<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
+						<li class="row text-bg-success mt-2 ms-0">
+							<div class="col-sm-1 divrankxlabel">${index}:</div>
+							<div class="col-sm-10 divrankx ${rowdrop}" id="divrank${index}"></div>
+						</li>
+					</c:forEach>
+				</ul>
+			</div>
 			
 			<div class="col-sm-6">
 				<div class="${rowdrop} fw-bold" id="unranked">

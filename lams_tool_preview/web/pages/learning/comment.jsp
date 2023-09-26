@@ -100,7 +100,7 @@
 
 							rows += '<td class="username" width="20%"><div class="float-start me-2">';
 							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
-							rows += '</div><span class="portrait-sm-lineheight">';
+							rows += '</div><span class="portrait-sm-lineheight" id="username-' + itemId + '">';
 							rows += userData["itemDescription"];
 							rows += '</span>'
 							rows += '</td>';
@@ -119,7 +119,7 @@
 								rows += '<div class="g-0">';
 								rows += '';
 								rows += '<div class="col-12 col-sm-11 ">';										
-								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control"';
+								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control" aria-labelledby="theader-comment username-' + itemId + '"';
 								<c:if test="${minRates ne 0 || maxRates ne 0}">
 									rows += ' onkeyup="return updatedComment(this);"';
 									if ( maxReached && commentPostedByUser == '' ) {
@@ -337,7 +337,7 @@
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" style="width:25%" > 
 				<fmt:message key="label.user.name" />
 			</th>
-			<th class="comment"> 
+			<th class="comment" id="theader-comment"> 
 				<fmt:message key="label.comment" />
 			</th>
 		</lams:TSTable5>

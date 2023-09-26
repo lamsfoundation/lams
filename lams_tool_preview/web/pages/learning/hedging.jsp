@@ -100,7 +100,7 @@
 				<div class="row">
 					<div class="col">
 						<lams:Portrait userId="${ratingDto.itemId}"/>
-						<span class="portrait-sm-lineheight ms-2">${ratingDto.itemDescription}</span>
+						<span class="portrait-sm-lineheight ms-2" id="username-${ratingDto.itemId}">${ratingDto.itemDescription}</span>
 					</div>
 					
 					<div style="width: 100px;">
@@ -109,7 +109,7 @@
 							${ratingDto.userRating}
 						</c:when>
 						<c:otherwise>
-							<select name="mark${ratingDto.itemId}" class="mark-hedging-select form-select">
+							<select name="mark${ratingDto.itemId}" class="mark-hedging-select form-select" aria-labelledby="assign-mark-info username-${ratingDto.itemId}">
 								<c:if test="${isEditingDisabled || question.responseSubmitted}">disabled="disabled"</c:if>				
 								<c:forEach var="i" begin="0" end="${criteriaRatings.ratingCriteria.maxRating}">
 									<option

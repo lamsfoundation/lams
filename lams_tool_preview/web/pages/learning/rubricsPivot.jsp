@@ -34,6 +34,10 @@
 	.lcard {
 		margin-bottom: 1.25rem;
 	}
+	.row>button.col {
+		border: none;
+		background: none;
+	}
 </style>
 
 <script>
@@ -107,7 +111,7 @@
 </div>
 <div class="clearfix"></div>
 
-<div id="rubrics-row-cards" role="tablist" aria-multiselectable="true">
+<div id="rubrics-row-cards">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
 	<c:set var="columnHeaders" value="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" />
@@ -117,19 +121,16 @@
 		<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 		
 	    <div class="lcard card rubrics-row-card">
-	       <div class="card-header text-bg-secondary" role="tab" id="heading${criteria.ratingCriteriaId}">
-	       	<span class="card-title collapsable-icon-left">
+	       <div class="card-header text-bg-secondary collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
 	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
 						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-cards"
 				>
 					<%-- Criterion "row" --%>
 					<c:out value="${criteria.title}" escapeXml="false" />
 				</button>
-			</span>
 	       </div>
 	       
-	       <div id="collapse${criteria.ratingCriteriaId}" class="collapse" 
-	       	    	role="tabpanel" aria-labelledby="heading${criteria.ratingCriteriaId}">
+	       <div id="collapse${criteria.ratingCriteriaId}" class="collapse" aria-labelledby="heading${criteria.ratingCriteriaId}">
 				<div class="ltable rubrics-table">
 					<div class="row rubrics-table-header m-0">
 						<%-- Learner profile pictures and names --%>
@@ -155,12 +156,12 @@
 									</div>
 									<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 										
-										<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index})" role="button"
+										<button type="button" onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index})"
 											<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
 											 class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index)}">text-bg-success</c:if>'
 										>
 											${columnHeaderCount - columnStatus.index}
-										</div>
+										</button>
 									</c:forEach>
 								</div>
 								
@@ -170,11 +171,11 @@
 											<i><fmt:message key="label.rating.rubrics.in.between" /></i>
 										</div>
 										<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
-											<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index - 0.5})" role="button"
+											<button type="button" onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnHeaderCount - columnStatus.index - 0.5})"
 												 class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnHeaderCount - columnStatus.index - 0.5)}">text-bg-success</c:if>'
 											>
 												${columnHeaderCount - columnStatus.index - 0.5}
-											</div>
+											</button>
 										</c:forEach>
 									</div>
 								</c:if>

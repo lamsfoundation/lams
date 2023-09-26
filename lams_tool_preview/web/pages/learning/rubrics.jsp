@@ -9,6 +9,7 @@
 	
 	.rubrics-table-header {
 		font-weight: bold;
+		text-align: center;
 	}
 
 	.rubrics-table .col:first-child {
@@ -35,6 +36,13 @@
 	
 	.lcard {
 		margin-bottom: 1.25rem;
+	}
+	.row>button.col {
+		border: none;
+		background: none;
+	}
+	.row>button.col:focus-visible {
+    	box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, .5);
 	}
 
 </style>
@@ -104,15 +112,14 @@
 </div>
 <div class="clearfix"></div>
 
-<div id="rubrics-user-cards" role="tablist" aria-multiselectable="true">
+<div id="rubrics-user-cards">
 	<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 	<c:set var="exampleRatings" value="${criteriaRatings.ratingDtos}" />
 
 	<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 			
 	    <div class="card lcard rubrics-user-card mt-2">
-	       <div class="card-header text-bg-secondary" role="tab" id="heading${ratingDto.itemId}">
-	       	<span class="card-title collapsable-icon-left">
+	       <div class="card-header text-bg-secondary collapsable-icon-left" id="heading${ratingDto.itemId}">
 	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
 						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-cards"
 				>
@@ -120,10 +127,9 @@
 					&nbsp;
 					<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
 				</button>
-			</span>
 	       </div>
 	       
-	       <div id="collapse${ratingDto.itemId}" class="collapse" role="tabpanel" aria-labelledby="heading${ratingDto.itemId}">
+	       <div id="collapse${ratingDto.itemId}" class="collapse" aria-labelledby="heading${ratingDto.itemId}">
 				<div class="ltable rubrics-table mb-0">
 						<div class="row rubrics-table-header m-0">
 							<%-- Each answer column has the same length, all remaining space is take by the question column --%>
@@ -147,18 +153,25 @@
 									<c:out value="${criteria.title}" escapeXml="false" />
 								</div>
 								<c:forEach var="column" items="${criteria.rubricsColumns}" varStatus="columnOrderId">
-									<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count})" role="button"
+									<button type="button" onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count})"
 										<%-- Columns are ordered from 1 to 5, so rate value is also the order ID of the column --%>
 										class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == columnOrderId.count}">text-bg-success</c:if>'
 									>
-										<c:out value="${column.name}" escapeXml="false" />	
-									</div>
+										<c:choose>
+											<c:when test="${empty column.name}">
+												...
+											</c:when>
+											<c:otherwise>
+												<c:out value="${column.name}" escapeXml="false" />	
+											</c:otherwise>
+										</c:choose>
+									</button>
 									<c:if test="${not columnOrderId.last and peerreview.rubricsInBetweenColumns}">
-										<div onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count + 0.5})" role="button"
+										<button type="button" onClick="javascript:rateRubricsCriteria(this, ${criteria.ratingCriteriaId}, ${ratingDto.itemId}, ${columnOrderId.count + 0.5})"
 											class='col <c:if test="${criteriaDto.ratingDtos[learnerOrderId.index].userRating == (columnOrderId.count + 0.5)}">text-bg-success</c:if>'
 										>
 											<i><fmt:message key="label.rating.rubrics.in.between" /></i>
-										</div>
+										</button>
 									</c:if>
 								</c:forEach>
 							</div>

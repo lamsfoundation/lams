@@ -94,20 +94,20 @@
 							
 							var isMaximumRatesPerUserReached = (${peerreview.maximumRatesPerUser} != 0) && (userData.ratesPerUser >= ${peerreview.maximumRatesPerUser});
 							
-							rows += '<tr>';
-
-							rows += '<td class="username"><div class="float-start me-2">';
-							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
-							rows += '</div><span class="portrait-sm-lineheight">';
-							rows += userData["itemDescription"];
-							rows += '</span>'
+							rows += '<tr>' +
+										'<td class="username">' + 
+											'<div class="float-start me-2">' +
+												definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' ) +
+										 	'</div>' +
+											'<span class="portrait-sm-lineheight" id="username-' + itemId + '">' +
+												userData["itemDescription"] +
+											'</span>';
 								
 							if (isMaximumRatesPerUserReached) {
 								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.cant.rate" /></spring:escapeBody></div>';
 							}
 
 							rows += '</td>';
-							
 							rows += '<td class="rating">';
 							rows += 	'<div class="rating-stars-holder text-center center-block">';		
 							
@@ -117,9 +117,11 @@
 							var userRating = userData["userRating"];
 							var isCriteriaNotRatedByUser = userRating == "";
 							var userRatingDisplayed = (!isCriteriaNotRatedByUser) ? userRating : 0;
-							var ratingStarsClass = (isDisabled && isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
+							let isWidgetDisabled = (isDisabled && isCriteriaNotRatedByUser);
+							var ratingStarsClass = isWidgetDisabled ? "rating-stars-disabled" : "rating-stars";
+							var tabindex = isWidgetDisabled ? "" : 'tabindex="0"';
 							
-							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ userRatingDisplayed +'" data-id="'+ objectId +'">';
+							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ userRatingDisplayed +'" data-id="'+ objectId +'" role="button" aria-labelledby="theader-rating username-' + itemId + '" ' + tabindex + '>';
 							rows += '</div>';
 									
 							rows += '<div class="rating-stars-caption" id="rating-stars-caption-'+ objectId +'"';
@@ -149,7 +151,7 @@
 										rows += '" style="visibility: hidden;';
 									rows += '">';	
 									commentPostedByUser = commentPostedByUser.replace(/<BR>/gi, '\n');
-									rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onblur="onRatingSuccessCallback()" class="form-control">'+commentPostedByUser+'</textarea>';
+									rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onblur="onRatingSuccessCallback()" class="form-control" aria-labelledby="theader-comment username-' + itemId + '">'+commentPostedByUser+'</textarea>';
 									rows += '</div>';											
 								}
 								
@@ -303,21 +305,21 @@
 		<c:set var="numColumns" value="3"/>
 	</c:if>
 	
-		<lams:TSTable5 numColumns="${numColumns}" tableClass="tablesorter jRating">
-			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
-				<fmt:message key="label.user.name" />
-			</th>
-			<th class="rating">  
-				<fmt:message key="label.rating" />
-			</th>
-			<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-			<th class="comment"> 
+	<lams:TSTable5 numColumns="${numColumns}" tableClass="tablesorter jRating">
+		<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
+			<fmt:message key="label.user.name" />
+		</th>
+		<th class="rating" id="theader-rating">  
+			<fmt:message key="label.rating" />
+		</th>
+		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
+			<th class="comment" id="theader-comment"> 
 				<fmt:message key="label.comment" />
 			</th>
-			</c:if>
-		</lams:TSTable5>
+		</c:if>
+	</lams:TSTable5>
 
-		<div id="no-users-info">
-			<fmt:message key="label.no.users" />
-		</div>
+	<div id="no-users-info">
+		<fmt:message key="label.no.users" />
+	</div>
 </div>

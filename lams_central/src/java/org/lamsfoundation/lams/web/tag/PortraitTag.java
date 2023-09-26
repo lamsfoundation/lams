@@ -29,6 +29,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -124,7 +125,8 @@ public class PortraitTag extends BodyTagSupport {
 	if (portraitId != null) {
 	    boolean isRound = (round != null ? Boolean.valueOf(round) : true);
 	    String[] sizes = getSizeClass();
-	    StringBuilder bldr = new StringBuilder("<img class=\"").append(sizes[0]);
+	    String alt = user == null || StringUtils.isBlank(user.getFirstName()) ? "user portrait" : user.getFirstName() + "'s portrait"; 
+	    StringBuilder bldr = new StringBuilder("<img alt=\"" + alt + "\" class=\"").append(sizes[0]);
 	    if (isRound) {
 		bldr.append(CSS_ROUND);
 	    }

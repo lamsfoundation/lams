@@ -1,4 +1,4 @@
-	<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
+<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
 <c:choose>
 	<c:when test="${finishedLock}">
 		<c:set var="rowdrop"></c:set>
@@ -23,6 +23,14 @@
 		<c:set var="javascriptReady">${javascriptReady} rankedArray[${ratingDto.userRating}]='item${ratingDto.itemId}';</c:set>		
 	</c:if>
 </c:forEach>
+
+<style>
+	#lastEntry {
+		padding-top:10px;
+		padding-bottom:10px;
+		list-style-type: none;
+	}
+</style>
 
 <script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
 <lams:JSImport src="includes/javascript/ranking.js" relative="true" />
@@ -152,9 +160,9 @@
 				<strong><fmt:message key="label.ranked"/></strong>
 				
 				<ul id="ranked" class="list-group mt-2">
-					<div id="lastEntry" class="${rowdrop} text-muted" style="padding-top:10px;padding-bottom:10px">
+					<li id="lastEntry" class="${rowdrop} text-muted">
 						<fmt:message key="label.addlearnerhere"/>
-					</div>
+					</li>
 				</ul>
 			</div>
 			

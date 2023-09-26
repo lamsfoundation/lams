@@ -132,34 +132,28 @@ When true, hides the names and groups the comments.  -->
 			</c:when>
 
 			<c:otherwise>
-				<table class="tablesorter" width="100%">
-					<tbody>
-					<c:forEach var="rating" items="${criteriaRatings.ratingDtos}" varStatus="status">
-						<c:if test="${status.first && not empty rating.averageRating}">
-							<tr>
-								<td class="rating">
-									<div class="rating-stars-holder text-center center-block">
-										<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
-										<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}"></div>
-										<div class="rating-stars-caption" id="rating-stars-caption-${objectId}">
-											<fmt:message key="label.avg.rating">
-												<fmt:param><span id="average-rating-${objectId}">${rating.averageRating}</span></fmt:param>
-												<fmt:param><span id="number-of-votes-${objectId}">${rating.numberOfVotes}</span></fmt:param>
-											</fmt:message>
-										</div>
-								</td>
-							</tr>
-						</c:if>
-						<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled && not empty rating.comment}">
-							<tr>
-								<td>
-									<div class="rating-comment"><c:out value="${rating.comment}" escapeXml="false"/></div>
-								</td>
-							</tr>
-						</c:if>
-					</c:forEach>
-					</tbody>
-				</table>
+				<c:forEach var="rating" items="${criteriaRatings.ratingDtos}" varStatus="status">
+					<c:if test="${status.first && not empty rating.averageRating}">
+						<div class="rating">
+							<div class="rating-stars-holder text-center center-block">
+								<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
+								<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}"></div>
+								<div class="rating-stars-caption" id="rating-stars-caption-${objectId}-currentUser">
+									<fmt:message key="label.avg.rating">
+										<fmt:param><span id="average-rating-${objectId}-currentUser">${rating.averageRating}</span></fmt:param>
+										<fmt:param><span id="number-of-votes-${objectId}-currentUser">${rating.numberOfVotes}</span></fmt:param>
+									</fmt:message>
+								</div>
+							</div>
+						</div>
+					</c:if>
+						
+					<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled && not empty rating.comment}">
+						<div>
+							<div class="rating-comment"><c:out value="${rating.comment}" escapeXml="false"/></div>
+						</div>
+					</c:if>
+				</c:forEach>
 			</c:otherwise>
 		</c:choose>
 
@@ -266,7 +260,6 @@ When true, hides the names and groups the comments.  -->
 			}
 
 			.rubrics-table.pivot-view .row:not(.rubrics-table-header) .col:not(:first-child) {
-				cursor: pointer;
 				text-align: center;
 			}
 
@@ -299,12 +292,6 @@ When true, hides the names and groups the comments.  -->
 			}
 			.rubrics-rating-count {
 				text-align: right;
-			}
-
-			.rubrics-rating-count > .badge {
-				color: gray;
-				background-color: white;
-				font-size: large;
 			}
 
 			.rubrics-table .rubrics-rating-cell .rubrics-rating-learner {
@@ -362,7 +349,7 @@ When true, hides the names and groups the comments.  -->
 									<c:if test="${rateCount > 0}">
 										<%-- learners see just how many rates they got from other learners --%>
 										<div class="rubrics-rating-count">
-											<span class="badge">x&nbsp;${rateCount}</span>
+											<span class="badge text-bg-light">x&nbsp;${rateCount}</span>
 										</div>
 
 										<%-- teachers see also who gave the rating --%>
@@ -394,7 +381,7 @@ When true, hides the names and groups the comments.  -->
 										<c:if test="${rateCount > 0}">
 											<%-- learners see just how many rates they got from other learners --%>
 											<div class="rubrics-rating-count">
-												<span class="badge">x&nbsp;${rateCount}</span>
+												<span class="badge text-bg-light">x&nbsp;${rateCount}</span>
 											</div>
 
 											<%-- teachers see also who gave the rating --%>
@@ -430,7 +417,7 @@ When true, hides the names and groups the comments.  -->
 			</c:when>
 			
 			<c:when test="${rubricsPivotView}">
-				<div id="rubrics-row-cards" role="tablist" aria-multiselectable="true">
+				<div id="rubrics-row-cards">
 						<%-- It is sufficient to take user names and columns from the first row/criterion --%>
 					<c:set var="columnHeaders" value="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" />
 					<c:set var="columnHeaderCount" value="${fn:length(columnHeaders)}" />
@@ -439,14 +426,12 @@ When true, hides the names and groups the comments.  -->
 						<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 
 						<div class="lcard card rubrics-row-card pivot-view">
-							<div class="card-header text-bg-secondary" role="tab" id="heading${criteria.ratingCriteriaId}">
-						       	<span class="card-title collapsable-icon-left">
-						       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}"
-									   aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
-										<%-- Criterion "row" --%>
-										<c:out value="${criteria.title}" escapeXml="false" />
-									</button>
-								</span>
+							<div class="card-header text-bg-secondary collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
+						       	<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}"
+								   aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
+									<%-- Criterion "row" --%>
+									<c:out value="${criteria.title}" escapeXml="false" />
+								</button>
 							</div>
 
 							<div id="collapse${criteria.ratingCriteriaId}" class="collapse"
@@ -511,15 +496,13 @@ When true, hides the names and groups the comments.  -->
 					<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 
 						<div class="card lcard rubrics-user-card">
-							<div class="card-header text-bg-secondary" role="tab" id="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
-						       	<span class="card-title collapsable-icon-left">
-						       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
+							<div class="card-header text-bg-secondary collapsable-icon-left" id="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
+					       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
 									   aria-expanded="false" aria-controls="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
 									   data-parent="#rubrics-users-panels-${criteriaGroupId}">
-										<lams:Portrait userId="${ratingDto.itemId}" hover="false" />
-										&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
-									</button>
-								</span>
+									<lams:Portrait userId="${ratingDto.itemId}" hover="false" />
+									&nbsp;<c:out value="${ratingDto.itemDescription}" escapeXml="false"/>
+								</button>
 							</div>
 
 							<div id="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}" class="collapse"
