@@ -34,6 +34,9 @@
 		<c:when test="${language eq 'el'}">
 			<script type="text/javascript" src="${lams}/includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
+		<c:when test="${language eq 'it'}">
+			<script type="text/javascript" src="${lams}/includes/javascript/uppy/it_IT.min.js"></script>
+		</c:when>
 	</c:choose>
 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		
@@ -44,9 +47,7 @@
 			UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
 	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-		   decoderDiv = $('<div />'),
-	       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-	       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+		   EXE_FILE_ERROR = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable" /></spring:escapeBody>';
 		
 		
 		$(document).ready(function() {
@@ -112,6 +113,7 @@
 			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
 				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
 				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+				case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break;
 			  }
 			  
 			  
@@ -174,10 +176,10 @@
 			<c:if test="${sessionMap.minLimitUploadNumber != null}">
 				if (uploadedFilesNumber < ${sessionMap.minLimitUploadNumber}) {
 					if (${sessionMap.mode eq 'author'}) {
-						alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>' + 
-							  '\n<fmt:message key="label.min.limit.preview"/>');
+						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message></spring:escapeBody>' + 
+							  '\n<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.min.limit.preview"/></spring:escapeBody>');
 					} else {
-						alert('<fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message>');
+						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.should.upload.another"><fmt:param value="${sessionMap.minLimitUploadNumber}" /></fmt:message></spring:escapeBody>');
 						return false;
 					}
 				}
@@ -186,11 +188,11 @@
 			//let user confirm zero files upload
 			if (uploadedFilesNumber == 0) {
 				if (${sessionMap.lockOnFinish}) {
-					if (!confirm("<fmt:message key='learner.finish.without.upload'/>")) {
+					if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.finish.without.upload'/></spring:escapeBody>")) {
 						return false;
 					}
 				} else {
-					if (!confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
+					if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='messsage.learner.finish.confirm'/></spring:escapeBody>")) {
 						return false;
 					}
 				}
@@ -228,7 +230,7 @@
 			// check description
 			clearFileError("desc-error-msg");
 			if ( $('#description').val().trim().length == 0 ) {
-				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="label.learner.fileDescription"/></fmt:param></fmt:message>';
+				var requiredMsg = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="errors.required"><fmt:param><fmt:message key="label.learner.fileDescription"/></fmt:param></fmt:message></spring:escapeBody>';
 				showFileError(requiredMsg, "desc-error-msg");
 				valid = false;
 			}
@@ -252,7 +254,7 @@
 		}
 		
 		function deleteLearnerFile(detailId, filename) {
-			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			var msg = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.monitor.confirm.original.learner.file.delete"/></spring:escapeBody>';
 			msg = msg.replace('{0}', filename);
 			var answer = confirm(msg);
 			if (answer) {	

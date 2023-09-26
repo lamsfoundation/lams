@@ -119,6 +119,7 @@
 		  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
 			case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
 			case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break; 			
 		  }
 		  
 		  
@@ -132,25 +133,21 @@
 			  limit : 1
 		  });
 		  
-		  uppy.use(Uppy.DragDrop, {
+		  uppy.use(Uppy.Dashboard, {
 			  target: '#image-upload-area',
 			  inline: true,
-			  height: 120,
-			  width: '100%'
+			  height: 200,
+			  width: '100%',
+			  showProgressDetails : true,
+			  hideRetryButton : true,
+			  hideCancelButton : true,
+			  showRemoveButtonAfterComplete: true,
+			  proudlyDisplayPoweredByUppy: false	  
 			});
 		  
 		  uppy.use(Uppy.Informer, {
 			  target: '#image-upload-area'
 		  });
-		  
-		  uppy.use(Uppy.StatusBar, {
-			  target: '#image-upload-area',
-			  hideAfterFinish: false,
-			  hideUploadButton: true,
-			  hideRetryButton: true,
-			  hidePauseResumeButton: true,
-			  hideCancelButton: true
-			});
 
 		  uppy.on('upload-success', function (file, response) {
 			  // if file name was modified by server, reflect it in Uppy

@@ -361,7 +361,7 @@ public abstract class LdTemplateController {
 	ldJSON.put(AuthoringJsonTags.WORKSPACE_FOLDER_ID, workspaceFolderID);
 	ldJSON.put(AuthoringJsonTags.COPY_TYPE, 1);
 	ldJSON.put(AuthoringJsonTags.TITLE, createTitle(templateCode, userEnteredTitleString, workspaceFolderID));
-	ldJSON.put(AuthoringJsonTags.DESCRIPTION, WebUtil.removeHTMLtags(userEnteredDescription));
+	ldJSON.put(AuthoringJsonTags.DESCRIPTION, userEnteredDescription);
 	ldJSON.put(AuthoringJsonTags.DESIGN_TYPE, templateCode.toLowerCase());
 	ldJSON.put(AuthoringJsonTags.MAX_ID, maxUIID);
 	ldJSON.put(AuthoringJsonTags.READ_ONLY, false);

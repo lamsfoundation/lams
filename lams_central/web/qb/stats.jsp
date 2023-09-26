@@ -98,10 +98,10 @@
 		function removeCollectionQuestion(collectionUid) {
 			if (permanentRemove) {
 				if (!permanentRemovePossible) {
-					alert('<fmt:message key="error.qb.permanent.remove" />');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.qb.permanent.remove" /></spring:escapeBody>');
 					return;
 				}
-				if (!confirm('<fmt:message key="label.qb.permanent.remove.confirm" />')){
+				if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.permanent.remove.confirm" /></spring:escapeBody>')){
 					return;
 				}
 			}

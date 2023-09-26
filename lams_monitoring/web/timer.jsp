@@ -110,7 +110,7 @@
  						var ratioLeft = 1 - toSeconds(periods[4],periods[5],periods[6])/startNumberOfSeconds
 						NProgress.set(ratioLeft);
  					},
-					expiryText: '<span class="text-danger countdown-row-replacement-text"><fmt:message key="label.time.is.expired" /></span>',
+					expiryText: '<span class="text-danger countdown-row-replacement-text"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.time.is.expired" /></spring:escapeBody></span>',
 					onExpiry: function(periods) {
 						isCounting = false;
 						if ( playSound ) {

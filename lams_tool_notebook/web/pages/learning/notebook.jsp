@@ -41,13 +41,13 @@
 
 					if (forceResponse =="true" && isEmpty ) {
 
-						retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+						retValue = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.alertforceResponse</fmt:message></spring:escapeBody>");
 						textAreaReady();
 						return retValue;
 						
 					} else if  (forceResponse =="false" && isEmpty && mode == "learner") {
 			
-						if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.input</fmt:message></spring:escapeBody>")) {
 							// otherwise, focus on the text area
 							textAreaReady();
 							return false;
@@ -57,13 +57,13 @@
 				<c:otherwise>
 					if (forceResponse =="true" && document.forms.messageForm.focusedInput.value == "") {
 
-						retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+						retValue = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.alertforceResponse</fmt:message></spring:escapeBody>");
 						textAreaReady();
 						return retValue;
 						
 					} else if  (forceResponse =="false" && document.forms.messageForm.focusedInput.value == "" && mode == "learner") {
 			
-						if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.input</fmt:message></spring:escapeBody>")) {
 							// otherwise, focus on the text area
 							textAreaReady();
 							return false;

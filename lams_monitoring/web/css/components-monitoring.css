@@ -242,7 +242,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas div.learner-icon-container {
-	position: relative;
+	position: fixed;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas div.learner-icon-container div.learner-icon,

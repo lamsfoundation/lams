@@ -27,16 +27,19 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/es_ES.min.js"></script>
 		</c:when>
 		<c:when test="${language eq 'fr'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/fr_FR.min.js"></script>
 		</c:when>
 		<c:when test="${language eq 'el'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/el_GR.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'it'}">
+			<script type="text/javascript" src="/lams/includes/javascript/uppy/it_IT.min.js"></script>
 		</c:when>
 	</c:choose>
 	
@@ -48,9 +51,7 @@
 	 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
 	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-		   decoderDiv = $('<div />'),
-	       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-	       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+		   EXE_FILE_ERROR = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable" /></spring:escapeBody>';
 
 		function disableButtons() {
 			// logic to disable all buttons depends on contained pages so to avoid future changes breaking this code and stopping the page working, wrap in a try.
@@ -76,8 +77,8 @@
 				return false;
 			} else {
 				var file = files[0];
-				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
-						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+				if ( ! validateShowErrorNotExecutable(file, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>', false, '${EXE_FILE_TYPES}')
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="errors.maxfilesize"/></spring:escapeBody>') ) {
 					return false;
 				}
 			}
@@ -193,9 +194,10 @@
 			  };
 			  
 			  switch(language) {
-			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
-				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
-				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break;
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break;
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break;
+				case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break;
 			  }
 			  
 			  

@@ -16,7 +16,7 @@
 </c:if>
 <c:set var="daco" value="${sessionMap.daco}" />
 <c:set var="questionSummaries" value="${sessionMap.questionSummaries}" />
-<c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
+<c:set var="ordinal"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></spring:escapeBody></c:set>
 
 <c:set var="userRecordCount" value="${includeMode=='monitoring' ? sessionMap.recordCount : fn:length(recordList)}" />
 <c:set var="groupRecordCount" value="${sessionMap.totalRecordCount}" />

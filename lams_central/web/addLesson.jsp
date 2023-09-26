@@ -31,17 +31,18 @@
 			CANVAS_RESIZE_OPTION_NONE = 0,
 			CANVAS_RESIZE_OPTION_FIT = 1,
 			CANVAS_RESIZE_OPTION_FULL = 2,
-			CANVAS_RESIZE_LABEL_FULL = '<fmt:message key="label.tab.lesson.size.full" />',
-			CANVAS_RESIZE_LABEL_FIT = '<fmt:message key="label.tab.lesson.size.fit" />',
+			CANVAS_RESIZE_LABEL_FULL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tab.lesson.size.full' /></spring:escapeBody>";
+			CANVAS_RESIZE_LABEL_FIT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tab.lesson.size.fit' /></spring:escapeBody>";
 
-			SPLIT_LEARNERS_DESCRIPTION = '<fmt:message key="label.tab.advanced.split.desc" />',
-			LABEL_MISSING_LEARNERS = '<fmt:message key="error.tab.class.learners" />',
-			LABEL_MISSING_MONITORS = '<fmt:message key="error.tab.class.monitors" />',
-			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
-			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />',
-			LABEL_PREVIEW_LESSON_DEFAULT_TITLE = '<fmt:message key="authoring.fla.preview.lesson.default.title" />',
-			LABEL_PREVIEW_ERROR = '<fmt:message key="authoring.fla.preview.error" />';
-			LABEL_ORG_GROUPING_DIALOG_TITLE = '<fmt:message key="label.course.groups.viewonly.title" />';
+			SPLIT_LEARNERS_DESCRIPTION = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tab.advanced.split.desc' /></spring:escapeBody>";
+			LABEL_MISSING_LEARNERS = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.tab.class.learners' /></spring:escapeBody>";
+			LABEL_MISSING_MONITORS = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.tab.class.monitors' /></spring:escapeBody>";
+			LABEL_RUN_SEQUENCES_FOLDER = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.tab.lesson.sequence.folder' /></spring:escapeBody>";
+			LABEL_NAME_INVALID_CHARACTERS = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.lessonname.invalid.characters' /></spring:escapeBody>";
+			LABEL_PREVIEW_LESSON_DEFAULT_TITLE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='authoring.fla.preview.lesson.default.title' /></spring:escapeBody>";
+			LABEL_PREVIEW_ERROR = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='authoring.fla.preview.error' /></spring:escapeBody>";
+			LABEL_ORG_GROUPING_DIALOG_TITLE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.course.groups.viewonly.title' /></spring:escapeBody>";
+
 			
  		$(document).ready(function(){
 			initLessonTab();

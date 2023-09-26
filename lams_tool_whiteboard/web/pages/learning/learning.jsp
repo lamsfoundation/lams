@@ -212,13 +212,13 @@
 					}
 				},
 				onExpiry: function(periods) {
-			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
+			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
 			        
 			        setTimeout(function() { 
 			        	location.reload();
 			        }, 4000); 
 				},
-				description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>"
+				description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.time.left' /></spring:escapeBody></div>"
 			});
 		}
 

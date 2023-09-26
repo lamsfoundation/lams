@@ -425,8 +425,29 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 .component-page-wrapper {
 	min-height: 100vh;
-	border-radius: 2rem;
+	border-radius: 2.8rem;
 	overflow: hidden;
+}
+
+.component-page-wrapper button.no-decoration {
+	background-color: inherit;
+	border: none;
+}
+
+.component-page-wrapper button.no-decoration:focus {
+	border: thin solid var(--bs-gray-700);
+}
+
+.component-page-wrapper .component-page-content > header .sidebar-toggle-button {
+	font-size: 2rem;
+	color: var(--bs-blue);
+}
+
+.component-page-wrapper .component-page-content {
+	min-height: 100%;
+	padding: 1rem 2rem 3rem 2rem;
+	transition: all .3s ease;
+	vertical-align: top;
 }
 
 .component-page-wrapper .component-sidebar {

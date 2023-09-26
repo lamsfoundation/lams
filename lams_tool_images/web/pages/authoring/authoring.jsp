@@ -24,22 +24,11 @@
 		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_LARGE_MAX_SIZE}";
 		// convert Java syntax to JSON
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
-		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+		var LABEL_ITEM_BLANK = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>';
 	</script>
 	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
 	
-	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
-	<c:choose>
-		<c:when test="${language eq 'es'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
-		</c:when>
-		<c:when test="${language eq 'fr'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
-		</c:when>
-		<c:when test="${language eq 'el'}">
-			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
-		</c:when>
-	</c:choose>
+	<%@ include file="/common/uppylang.jsp"%>
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>

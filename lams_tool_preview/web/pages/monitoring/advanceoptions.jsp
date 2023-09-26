@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<c:set var="adTitle"><spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.th.advancedSettings" /></spring:escapeBody></c:set>
 <lams:AdvancedAccordian title="${adTitle}">
              
 <table class="table table-striped table-condensed">

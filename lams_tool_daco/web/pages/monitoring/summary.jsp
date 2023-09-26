@@ -26,7 +26,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});
@@ -60,11 +60,11 @@
 							rows += '<td align="center">';
 							if ( userData["recordCount"] > 0) {
 								var url = '<c:url value="/monitoring/listRecords.do"/>?sessionMapID=${sessionMapID}&toolSessionID='+$(table).attr('data-session-id')+'&sort=1&userId='+userData["userId"];
-								var popUpTitle = '<fmt:message key="title.monitoring.recordlist" />';
+								var popUpTitle = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.monitoring.recordlist" /></spring:escapeBody>';
 								rows +=	'&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
 								rows += 'View Records'
 								url = '<c:url value="/monitoring/getQuestionSummaries.do"/>?sessionMapID=${sessionMapID}&toolSessionID='+$(table).attr('data-session-id')+'&userId='+userData["userId"];
-								popUpTitle = '<fmt:message key="label.common.summary" />';
+								popUpTitle = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.common.summary" /></spring:escapeBody>';
 								rows += '</a>&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
 								rows += 'View Summary'
 								rows += '</a>';
@@ -74,7 +74,7 @@
 							
 							if (${daco.reflectOnActivity}) {
 								rows += '<td style="text-align: left">';
-								rows += (userData["notebookEntry"]) ? userData["notebookEntry"] : '<fmt:message key="label.monitoring.notebook.none" />' ;
+								rows += (userData["notebookEntry"]) ? userData["notebookEntry"] : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.notebook.none" /></spring:escapeBody>' ;
 								rows += '</td>';
 							}
 							

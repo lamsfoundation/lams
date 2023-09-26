@@ -54,6 +54,11 @@
 	    form.submit();
 	};
 
+	function openActivityMonitoring(){
+		openPopUp('<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&contentFolderID='
+				+ contentFolderId, "MonitorActivity", popupHeight, popupWidth, true, true);
+	}
+
 	$(document).ready(function(){
 		openEventSource('<lams:WebAppURL />tblmonitoring/traStudentChoicesFlux.do?toolContentId=${toolContentID}', function(event) {
 			$(tlbMonitorHorizontalScrollElement).load('<lams:WebAppURL />tblmonitoring/traStudentChoicesTable.do?toolContentID=${toolContentID}');
@@ -97,6 +102,10 @@
 	 <div class="col-10 offset-1 pb-2">
 		<!-- Notifications -->  
 		<div class="float-end">
+			<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa-solid fa-circle-info"></i>
+				<fmt:message key="label.activity.monitoring"/>
+			</a>
 			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
 					onclick="javascript:loadTab('trat', $('#load-trat-tab-btn'))">
 				<i class="fa fa-clipboard-question"></i>

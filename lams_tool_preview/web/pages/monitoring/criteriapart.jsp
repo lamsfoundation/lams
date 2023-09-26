@@ -43,8 +43,8 @@
 			iconSet: 'fontAwesome',
 		   	colNames:[
 				'itemId',
-				'<fmt:message key="label.user.name" />',
-				'${heading}',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.user.name" /></spring:escapeBody>',
+				'<spring:escapeBody javaScriptEscape="true">${heading}</spring:escapeBody>',
 				'portraitId',
 				''
 			],
@@ -91,8 +91,8 @@
 						iconSet: 'fontAwesome',
 						colNames:[
 							'id',
-							'<fmt:message key="label.user.name" />',
-							'${heading}',
+							'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.user.name" /></spring:escapeBody>',
+							'<spring:escapeBody javaScriptEscape="true">${heading}</spring:escapeBody>',
 							'criteriaId',
 							'userId'
 							],
@@ -146,12 +146,12 @@
 							//remove empty subgrids
 					        var table_value = $('#'+subgridTableId).getGridParam('records');
 					        if(table_value === 0){
-					            $('#'+subgrid_id).parent().unbind('click').html('<fmt:message key="label.no.ratings.left" />');
+					            $('#'+subgrid_id).parent().unbind('click').html('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no.ratings.left" /></spring:escapeBody>');
 					        }
 						},
 						loadError: function(xhr,st,err) {
 					    	jQuery("#"+subgridTableId).clearGridData();
-					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+					    	info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
 					    }
 					})
 			}

@@ -23,19 +23,8 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -68,8 +57,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * @author Steve.Ni
@@ -93,10 +86,8 @@ public class LearningController {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
      * @throws EtherpadException
-     *
      * @throws DokumaranConfigurationException
      * @throws URISyntaxException
-     *
      */
     @RequestMapping("/start")
     private String start(HttpServletRequest request, HttpServletResponse response)
@@ -156,8 +147,8 @@ public class LearningController {
 	}
 
 	boolean isUserLeader = (user != null) && dokumaranService.isUserLeader(leaders, user.getUserId());
-	boolean hasEditRight = !dokumaran.isUseSelectLeaderToolOuput()
-		|| dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
+	boolean hasEditRight =
+		!dokumaran.isUseSelectLeaderToolOuput() || dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ON, dokumaran.isReflectOnActivity());
@@ -203,13 +194,17 @@ public class LearningController {
 	}
 
 	if (dokumaran.isGalleryWalkStarted()) {
+	    if (dokumaran.getGalleryWalkClusterSize() > 0 && session.getGalleryWalkCluster().isEmpty()) {
+		dokumaranService.assignSessionsForGalleryWalk(dokumaran.getContentId());
+	    }
+
 	    List<SessionDTO> groupList = null;
 	    try {
-		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUid());
 	    } catch (HibernateOptimisticLockingFailureException e) {
 		log.warn("Ignoring error caused probably by creating Gallery Walk criteria", e);
 		// simply run the transaction again
-		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUid());
 	    }
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
 

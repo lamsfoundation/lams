@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.form.OrganisationForm;
@@ -55,6 +48,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Fei Yang
@@ -133,9 +132,8 @@ public class OrganisationController {
 	if (!(request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
 		|| userManagementService.isUserGlobalGroupManager())) {
 	    // only appadmins and global group admins can create groups
-	    if (((organisationForm.getTypeId() != null)
-		    && organisationForm.getTypeId().equals(OrganisationType.COURSE_TYPE))
-		    || (organisationForm.getTypeId() == null)) {
+	    if (((organisationForm.getTypeId() != null) && organisationForm.getTypeId()
+		    .equals(OrganisationType.COURSE_TYPE)) || (organisationForm.getTypeId() == null)) {
 		return error(request);
 	    }
 	}
@@ -196,8 +194,8 @@ public class OrganisationController {
 	Integer organisationId = WebUtil.readIntParam(request, "orgId");
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, organisationId);
 	List<Long> lessonIDs = lessonService.getOrganisationLessons(organisationId);
-	StringBuilder logMessageBuilder = new StringBuilder("removed permanently lessons in organisation \"")
-		.append(organisation.getName()).append("\": ");
+	StringBuilder logMessageBuilder = new StringBuilder("removed permanently lessons in organisation \"").append(
+		organisation.getName()).append("\": ");
 	for (Long lessonId : lessonIDs) {
 	    Lesson lesson = lessonService.getLesson(lessonId);
 	    logMessageBuilder.append("\"").append(lesson.getLessonName()).append("\" (").append(lessonId)
@@ -226,7 +224,7 @@ public class OrganisationController {
     public String error(HttpServletRequest request) {
 	request.setAttribute("errorName", "OrganisationAction");
 	request.setAttribute("errorMessage", messageService.getMessage("error.authorisation"));
-	return "error";
+	return "/error";
     }
 
     private Integer getUserID() {

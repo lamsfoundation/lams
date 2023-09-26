@@ -854,7 +854,6 @@ function applyStateChange(state, method, newLessonEndDate) {
 	if (newLessonEndDate) {
 		params.lessonEndDate = newLessonEndDate;
 	}
-
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
 		data: params,
@@ -862,13 +861,10 @@ function applyStateChange(state, method, newLessonEndDate) {
 		cache : false,
 		success: function() {
 			if (state == 7) {
-				// user chose to finish the lesson, close monitoring and refresh the lesson list
-				closeMonitorLessonDialog(true);
+				// user chose to finish the lesson, close monitoring
+				document.location.href = "/";
 			} else {
-				loadTab();
-			}
-			if ( state == 4 ) {
-				lessonEndDate = newLessonEndDate;
+				document.location.reload();
 			}
 		}
 	});
@@ -930,55 +926,55 @@ function drawLessonCompletionChart(){
 					},
 					plugins : {
 						tooltip : {
-							enabled : true,
-							callbacks: {
+						enabled : true,
+						callbacks: {
 								label : function(context) {
 									let index =  context.dataIndex,
 
 										rawData = context.chart.lessonCompletionChartRawData,
 										percent = context.dataset.data,
 
-										label = labels[index],
-										value = percent[index],
-										rawValue = rawData[index];
+									label = labels[index],
+									value = percent[index],
+									rawValue = rawData[index];
 
 									return " " + rawValue + " (" + value + "%)";
-								}
 							}
-						},
-						legend : {
-							position: 'bottom',
-							align: 'start',
-							labels : {
+						}
+					},
+					legend : {
+						position: 'bottom',
+						align: 'start',
+						labels : {
 								font : {
 									size: 15
 								},
-								generateLabels : function(chart) {
-									var data = chart.data;
-									if (data.labels.length && data.datasets.length) {
-										return data.labels.map(function(label, i) {
-											let meta = chart.getDatasetMeta(0),
-												style = meta.controller.getStyle(i),
-												value = data.datasets[0].data[i],
-												rawData = chart.lessonCompletionChartRawData || raw,
-												rawValue = rawData[i];
+							generateLabels : function(chart) {
+								var data = chart.data;
+								if (data.labels.length && data.datasets.length) {
+									return data.labels.map(function(label, i) {
+										let meta = chart.getDatasetMeta(0),
+											style = meta.controller.getStyle(i),
+											value = data.datasets[0].data[i],
+											rawData = chart.lessonCompletionChartRawData || raw,
+											rawValue = rawData[i];
 
-											return {
-												text: label + ": " + rawValue + " (" + value + "%)",
-												fillStyle: style.backgroundColor,
-												strokeStyle: style.borderColor,
-												lineWidth: 0,
-												hidden: isNaN(value) || meta.data[i].hidden,
+										return {
+											text: label + ": " + rawValue + " (" + value + "%)",
+											fillStyle: style.backgroundColor,
+											strokeStyle: style.borderColor,
+											lineWidth: 0,
+											hidden: isNaN(value) || meta.data[i].hidden,
 
-												// Extra data used for toggling the
-												// correct item
-												index: i
-											};
-										});
-									}
-									return [];
+											// Extra data used for toggling the
+											// correct item
+											index: i
+										};
+									});
 								}
+								return [];
 							}
+						}
 						}
 					}
 				}
@@ -987,7 +983,7 @@ function drawLessonCompletionChart(){
 			lessonCompletionChart.lessonCompletionChartRawData = raw;
 			chartDiv.data('chart', lessonCompletionChart);
 		}
-	});
+		});
 }
 
 function checkScheduleDate(startDateString, endDateString) {
@@ -1008,8 +1004,7 @@ function scheduleLesson(){
 					'lessonStartDate' : date
 				},
 				success : function() {
-					lessonStartDate = date;
-					loadTab();
+					document.location.reload();
 				}
 			});
 		} else {
@@ -1130,7 +1125,7 @@ function updateContributeActivities(contributeActivities) {
 		// put it at the top of the contribution list
 		var cell = $('<div />').addClass('contributeActivityCell').text(LABELS.LIVE_EDIT_BUTTON);
 		var row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
-		var entryContent = LABELS.LIVE_EDIT_TOOLTIP 
+		var entryContent = LABELS.LIVE_EDIT_TOOLTIP
 			+ '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openLiveEdit()" title="' + LABELS.CONTRIBUTE_TOOLTIP
 			+ '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
 		cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
@@ -1180,7 +1175,7 @@ function updateContributeActivities(contributeActivities) {
 
 					}
 						break;
-					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" target="_blank" href="'
+					case 6 : entryContent += '<a class="btn btn-primary contribute-go-button" href="'
 						+ this.url + '" title="' + LABELS.CONTRIBUTE_TOOLTIP + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
 						break;
 					default : entryContent += '<button type="button" class="btn btn-primary contribute-go-button" onClick="javascript:openPopUp(\''
@@ -1577,7 +1572,7 @@ function updateSequenceTab() {
 						});
 					} else if (isGrouping) {
 						dblTap(activityGroup, function(){
-							window.open(LAMS_URL + activity.url, "_blank");
+							document.location.href = LAMS_URL + activity.url;
 						});
 					} else {
 						dblTap(activityGroup, function(){
@@ -2678,9 +2673,9 @@ function launchPopup(url,title) {
 	wd.window.focus();
 }
 
-/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is 
+/* gradebook dialog windows	on the ipad do not update the grid width properly using setGridWidth. Calling this is
 -- setting the grid to parentWidth-1 and the width of the parent to parentWidth+1, leading to growing width window
--- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well. 
+-- that overflows the dialog window. Keep the main grids slightly smaller than their containers and all is well.
 */
 
 function resizeJqgrid(jqgrids) {
@@ -2769,16 +2764,6 @@ function openPopUp(url, title, h, w, status, forceNewWindow) {
 		+ ",resizable=yes,scrollbars=yes,status=" + status
 		+ ",menubar=no, toolbar=no"
 		+ ",top=" + top + ",left=" + left);
-}
-
-/**
- * Tells parent document to close this Monitor dialog.
- */
-function closeMonitorLessonDialog(refresh) {
-	//check method is available in order to avoid JS errors (as it's not available from integrations)
-	if (typeof window.parent.closeDialog === "function") {
-		window.parent.closeDialog('dialogMonitorLesson' + lessonId, refresh);
-	}
 }
 
 /**

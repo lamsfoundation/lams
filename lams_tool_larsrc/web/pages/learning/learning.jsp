@@ -88,18 +88,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 
 		<c:set var="language"><lams:user property="localeLanguage"/></c:set>
-		<script src="${lams}includes/javascript/uppy/uppy.min.js"></script>
-		<c:choose>
-			<c:when test="${language eq 'es'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'fr'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'el'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
-			</c:when>
-		</c:choose>
+		<%@ include file="/common/uppylang.jsp"%>
 
 		<c:if test="${sessionMap.rateItems}">
 			<script>
@@ -108,9 +97,9 @@
 						MAX_RATES = MAX_RATINGS_FOR_ITEM = MIN_RATES = COUNT_RATED_ITEMS = 0, // no restrictions
 						COMMENTS_MIN_WORDS_LIMIT = 0, // comments not used,
 						COMMENT_TEXTAREA_TIP_LABEL = WARN_COMMENTS_IS_BLANK_LABEL = WARN_MIN_NUMBER_WORDS_LABEL = '',
-						AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+						AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 						YOUR_RATING_LABEL =
-								'<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+								'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 						ALLOW_RERATE = true,
 						SESSION_ID = ${toolSessionID};
 
@@ -256,7 +245,7 @@
 			}
 
 			function hideItem(itemUid) {
-				if(confirm("<fmt:message key='${delConfirmMsgKey}'/>")){
+				if(confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='${delConfirmMsgKey}'/></spring:escapeBody>")){
 					$.ajax({
 						url: '<c:url value="/learning/hideItem.do"/>',
 						data: 'sessionMapID=${sessionMapID}&itemUid=' + itemUid,

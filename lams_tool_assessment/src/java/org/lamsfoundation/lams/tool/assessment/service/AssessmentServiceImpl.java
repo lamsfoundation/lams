@@ -23,33 +23,10 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -102,7 +79,15 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentQuestionResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
-import org.lamsfoundation.lams.tool.assessment.dto.*;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
+import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
@@ -126,19 +111,44 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.*;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.util.UriUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import reactor.core.publisher.Flux;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -195,9 +205,15 @@ public class AssessmentServiceImpl
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null,
-		(Long toolContentId) -> UriUtils.encode(getCompletionChartsData(toolContentId),
-			StandardCharsets.UTF_8.toString()), FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			HibernateSessionManager.openSession();
+			return UriUtils.encode(getCompletionChartsData(toolContentId),
+				StandardCharsets.UTF_8.toString());
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
 	FluxRegistry.bindSink(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME,
 		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
 	FluxRegistry.bindSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
@@ -907,16 +923,6 @@ public class AssessmentServiceImpl
 
 	questionResult.setAnswerModified(isAnswerModified);
 	return questionResult;
-    }
-
-    @Override
-    public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
-	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
-    }
-
-    @Override
-    public Flux<String> getTimeLimitPanelUpdateFlux(long toolContentId) {
-	return FluxRegistry.get(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
     }
 
     /**
@@ -4278,7 +4284,6 @@ public class AssessmentServiceImpl
 	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId, e);
 	    return "";
 	}
-
     }
 
     private ObjectNode getTimeLimitSettingsJson(long toolContentId) {

@@ -92,6 +92,6 @@
 </c:choose>
 
 <c:if test="${not empty questionResult.justification}">
-	responseStr += '<br><br><i><fmt:message key="label.answer.justification" /></i><br>';
+	responseStr += '<br><br><i><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.answer.justification" /></spring:escapeBody></i><br>';
 	responseStr += "${questionResult.justificationEscaped}"
 </c:if>

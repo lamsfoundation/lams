@@ -17,7 +17,7 @@
 					$("#lessonDescription").val(CKEDITOR.instances.lessonDescription.getData());                 
 				},
 			    success:    function() {
-			    	alert('<fmt:message key="label.lesson.introduction.updated"/>');
+			    	alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.lesson.introduction.updated" /></spring:escapeBody>');
 			    	if ( typeof parent.window.refreshMonitor !== "undefined") {
 						parent.window.refreshMonitor('lesson', false);
 						parent.window.closeIntroductionDialog();

@@ -361,7 +361,7 @@
 								expiredHideContainers.hide();
 							}
 						},
-						expiryText : '<span class="countdown-timeout"><fmt:message key="label.monitoring.time.limit.expired" /></span>'
+						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
 					});
 		} else {
 			// if counter is paused, we can not adjust time, so resume it for a moment
@@ -378,7 +378,7 @@
 	}
 
 	function timeLimitFinishNow(){
-		showConfirm('<fmt:message key="label.monitoring.time.limit.finish.now.confirm" />', function(){
+		showConfirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.finish.now.confirm" /></spring:escapeBody>', function(){
 			updateTimeLimit('absolute', 'stop');
 		});
 	}

@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <%@ attribute name="type" required="true" rtexprvalue="true"%>
 <%@ attribute name="formID" required="false" rtexprvalue="true"%>
@@ -188,7 +189,7 @@
 				// check if autosave does not happen too often
 				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
 					// this label is required only in tool which implement autosave
-					alert('<fmt:message key="label.prevent.learner.autosave.mutliple.tabs" />');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.prevent.learner.autosave.mutliple.tabs" /></spring:escapeBody>');
 					return false;
 				}
 				localStorage.setItem('lamsAutosaveTimestamp', currentTime);

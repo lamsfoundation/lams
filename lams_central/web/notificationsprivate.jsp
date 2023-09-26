@@ -10,10 +10,11 @@
 <script type="text/javascript">
 
 	var LAMS_URL = '<lams:LAMSURL/>',
-		PRIVATE_NOTIFICATIONS_MESSAGES = '<fmt:message key="label.private.notifications.messages"/>',
-		PRIVATE_NOTIFICATIONS_READ = '<fmt:message key="label.private.notifications.read"/>',
-		PRIVATE_NOTIFICATIONS_READ_HINT = '<fmt:message key="label.private.notifications.read.hint"/>',
-		PRIVATE_NOTIFICATIONS_READ_ALL_HINT = '<fmt:message key="label.private.notifications.read.all.hint" />';
+		PRIVATE_NOTIFICATIONS_MESSAGES = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.private.notifications.messages'/></spring:escapeBody>",
+		PRIVATE_NOTIFICATIONS_READ = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.private.notifications.read'/></spring:escapeBody>",
+		PRIVATE_NOTIFICATIONS_READ_HINT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.private.notifications.read.hint'/></spring:escapeBody>",
+		PRIVATE_NOTIFICATIONS_READ_ALL_HINT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.private.notifications.read.all.hint'/></spring:escapeBody>";
+
 
 	function markAllPrivateNotificationsAsRead(){
 		$('#tablePrivateNotifications tr[id^=subscription-]').each(function(){

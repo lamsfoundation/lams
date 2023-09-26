@@ -19,7 +19,7 @@
 		disableButton(btnName);
 
 		if (validateBodyText($('#newFormBody').val(),
-<%=CommentConstants.MAX_BODY_LENGTH%>,"<fmt:message key="label.comment.body.validation" />")) {
+<%=CommentConstants.MAX_BODY_LENGTH%>,"<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.body.validation" /></spring:escapeBody>")) {
 
 			$.ajax({ // create an AJAX call...
 						data : theForm.serialize(),
@@ -45,7 +45,7 @@
 										newCommentDiv.firstChild);
 
 								if (!newCommentDiv || !newThreadDiv) {
-									alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+									alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>');
 								} else if (commentUid) {
 									var loadString = '<lams:LAMSURL />comments/viewTopicThread.do?sessionMapID='
 											+ response.sessionMapID
@@ -62,7 +62,7 @@
 									alert(response.errMessage);
 									enableButton(btnName);
 								} else {
-									alert('<fmt:message key="error.please.refresh"/>');
+									alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>');
 								}
 
 							});

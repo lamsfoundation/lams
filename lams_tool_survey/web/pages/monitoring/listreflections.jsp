@@ -30,7 +30,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});

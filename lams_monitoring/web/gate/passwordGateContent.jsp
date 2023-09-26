@@ -49,7 +49,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     </lams:head>
     
     <body class="stripes">
-		<c:set var="title"><fmt:message key="label.password.gate.title"/></c:set>
+		<c:set var="title"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.password.gate.title"/></spring:escapeBody></c:set>
 		<lams:Page title="${title}" type="monitoring" formID="gateForm">
 			
 			<%@ include file="gateInfo.jsp" %>

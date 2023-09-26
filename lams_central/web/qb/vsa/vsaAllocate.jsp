@@ -43,8 +43,8 @@
 	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
   	    <script>
-			var VS_ANSWER_ALLOCATED_ALERT = "<fmt:message key="label.someone.allocated.this.answer" />",
-				VS_ANSWER_DEALLOCATE_CONFIRM = "<fmt:message key="label.vsa.deallocate.confirm" />",
+			var VS_ANSWER_ALLOCATED_ALERT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.someone.allocated.this.answer' /></spring:escapeBody>",
+				VS_ANSWER_DEALLOCATE_CONFIRM = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.vsa.deallocate.confirm' /></spring:escapeBody>",
 				LAMS_URL = "${lams}",
 				csrfTokenName = "<csrf:tokenname/>",
 				csrfTokenValue = "<csrf:tokenvalue/>";

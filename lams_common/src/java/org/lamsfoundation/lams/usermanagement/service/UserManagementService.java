@@ -956,6 +956,9 @@ public class UserManagementService implements IUserManagementService, Initializi
 
     @Override
     public boolean isUserAppAdmin() {
+	if (isUserSysAdmin()) {
+	    return true;
+	}
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.APPADMIN) : false;

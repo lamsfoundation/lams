@@ -26,21 +26,6 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.assessment.dto.*;
-import org.lamsfoundation.lams.tool.assessment.model.*;
-import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.util.excel.ExcelSheet;
-
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
@@ -58,7 +43,13 @@ import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
-import reactor.core.publisher.Flux;
+
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface that defines the contract that all ShareAssessment service provider must follow.
@@ -259,10 +250,6 @@ public interface IAssessmentService extends ICommonToolService {
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
-
-    Flux<String> getCompletionChartsDataFlux(long toolContentId);
-
-    Flux<String> getTimeLimitPanelUpdateFlux(long toolContentId);
 
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 

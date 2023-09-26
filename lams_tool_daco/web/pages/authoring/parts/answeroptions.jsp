@@ -2,7 +2,7 @@
 
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="listSize" value="${fn:length(answerOptionList)}" />
-<c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
+<c:set var="ordinal"><spring:escapeBody javaScriptEscape='true'></spring:escapeBody><fmt:message key="label.authoring.basic.answeroption.ordinal"/></spring:escapeBody></c:set>
 
 <div id="answerOptionsArea" class="voffset10">
 <form id="answerOptionsForm"><input type="hidden" id="answerOptionCount" name="answerOptionCount" value="${listSize}"/>

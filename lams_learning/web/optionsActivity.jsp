@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 			}
 			if (!validated) {
-				alert("<fmt:message key="message.activity.options.noActivitySelected" />");
+				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.activity.options.noActivitySelected' /></spring:escapeBody>");
 				return false;
 			} else {
 				return true;

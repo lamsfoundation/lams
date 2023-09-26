@@ -56,6 +56,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -327,6 +328,20 @@ public class MonitoringController {
 	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
 
 	dokumaranService.enableGalleryWalkLearnerEdit(toolContentId);
+    }
+
+    @RequestMapping("/showGalleryWalkClusters")
+    private String showGalleryWalkClusters(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId, Model model) {
+	Map<String, Set<String>> groups = dokumaranService.getDokumaranSessionsByToolContentId(toolContentId).stream()
+		.collect(Collectors.toMap(DokumaranSession::getSessionName,
+			session -> session.getGalleryWalkCluster().stream().collect(
+				Collectors.mapping(DokumaranSession::getSessionName, Collectors.toCollection(
+					() -> new TreeSet<>(DokumaranSession.SESSION_NAME_COMPARATOR)))),
+			(session1Cluster, session2Cluster) -> session1Cluster,
+			() -> new TreeMap<>(DokumaranSession.SESSION_NAME_COMPARATOR)));
+	model.addAttribute("groups", groups);
+	return "pages/monitoring/viewGalleryWalkClusters";
     }
 
     @RequestMapping("/ae")

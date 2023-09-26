@@ -1040,6 +1040,10 @@ public class MonitoringController {
 	}
 	request.setAttribute("ldPath", ldPathBuilder.toString());
 
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, learningDesign.getContentFolderID());
+
+	request.setAttribute("isIntegrationLogin", ss.getAttribute("isIntegrationLogin"));
+
 	return "monitor";
     }
 
