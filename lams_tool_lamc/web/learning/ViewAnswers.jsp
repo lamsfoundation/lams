@@ -8,13 +8,7 @@
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 <c:set var="isPrefixAnswersWithLetters" value="${sessionMap.content.prefixAnswersWithLetters}" scope="request" />
 
-
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
-	
-	<lams:css />
-	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+<lams:PageLearner title="${mcGeneralLearnerFlowDTO.activityTitle}" toolSessionID="${mcLearningForm.toolSessionID}">
 	<style media="screen,projection" type="text/css">
 		div.growlUI h1, div.growlUI h2 {
 			color: white;
@@ -30,17 +24,8 @@
 		}
 	</style>	
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${mcLearningForm.toolSessionID}', '', submitForm);
-		
-		$(document).ready(function() {
-			//initialize bootstrap-sliders if "Enable confidence level" option is ON
-			$('.bootstrap-slider').bootstrapSlider();
-		});
 	
 		function disableFinishButton() {
 			var elem = document.getElementById("finishButton");
@@ -54,24 +39,18 @@
 			f.submit();
 		}
 	</script>
-</lams:head>
 
-<body class="stripes">
+	<div class="container-lg">
 	<form:form action="displayMc.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
 
-	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="mcLearningForm">
 		<c:if test="${isLeadershipEnabled}">
-			<h4>
-				<fmt:message key="label.group.leader">
-					<fmt:param><c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true"/></fmt:param>
-				</fmt:message>
-			</h4>
+			<lams:LeaderDisplay idName="leader-info" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.userId}" />
 		</c:if>
 		
 		<c:if test="${hasEditRight && mcGeneralLearnerFlowDTO.retries == 'true'
 				&& mcGeneralLearnerFlowDTO.userOverPassMark != 'true'
 				&& mcGeneralLearnerFlowDTO.passMarkApplicable == 'true'}">
-			<p>
+			<lams:Alert5 id="learning-notEnoughMarks-info" type="danger" close="false">
 				<fmt:message key="label.notEnoughMarks">
 					<fmt:param>
 						<c:if test="${mcGeneralLearnerFlowDTO.passMark != mcGeneralLearnerFlowDTO.totalMarksPossible}">
@@ -83,14 +62,17 @@
 						<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
 					</fmt:param>
 				</fmt:message>
-			</p>
-			<p>
+			</lams:Alert5>
+		</c:if> 
+		
+		<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight || (mcGeneralLearnerFlowDTO.displayAnswers == 'true')}">
+			<lams:Alert5 id="learning-mark-info" type="info" close="false">
 				<strong><fmt:message key="label.mark" /> </strong>
 				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
 				&nbsp;<fmt:message key="label.outof" />&nbsp;
 				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
-			</p>
-		</c:if> 
+			</lams:Alert5>
+		</c:if>
 
 		<h4>
 			<fmt:message key="label.viewAnswers" />
@@ -101,250 +83,200 @@
 		<c:forEach var="question" varStatus="status" items="${mcGeneralLearnerFlowDTO.questions}">
 			<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
-			<div class="row g-0">
-				<div class="col-12">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<table>
-								<tr>
-									<td>
-										${status.count})
-									</td>
-									<td width="100%" style="padding: 5px">
-										<c:if test="${not sessionMap.hideTitles}">
-											<c:out value="${question.name}" escapeXml="false" />
-											<br>
-										</c:if>
-										<c:out value="${question.description}" escapeXml="false" />
-									</td>
-								</tr>
-							</table>
+			<div class="card lcard">
+				<div class="card-header text-bg-secondary">
+					<div class="row align-items-center">
+						<div style="width:50px;">
+							${status.count})
 						</div>
-						
-						<div class="panel-body">
-
-							<!--  CANDIDATE ANSWERS  -->
-							<c:set var="queIndex" scope="request" value="0" />
-							<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
-								<c:set var="queIndex" scope="request" value="${queIndex +1}" />
-
-								<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
-									<!-- list of candidate answers -->
-				                     <c:choose>
-				                     <c:when test="${isPrefixAnswersWithLetters}">
-										<table class="table table-hover table-sm table-no-border table-top">
-										<c:forEach var="subEntry" items="${mainEntry.value}">
-										<tr><td>${subEntry.key}
-										</td>
-										<td width="100%"><c:out value="${subEntry.value}" escapeXml="false" /></td>
-										</tr>
-										</c:forEach>
-										</tbody></table>
-									</c:when>
-									<c:otherwise>
-									<ul>
-										<c:forEach var="subEntry" items="${mainEntry.value}">
-											<li><c:out value="${subEntry.value}" escapeXml="false" /></li>
-										</c:forEach>
-									</ul>
-									</c:otherwise>
-									</c:choose>
-									<!-- end list of candidate answers -->
-
-									<!-- display students answers -->
-									<div class="table-responsive">
-										<table class="table table-sm">
-											<thead>
-												<tr>
-													<th colspan="2"><fmt:message key="label.yourAnswers" /></th>
-												</tr>
-											</thead>
-											<tr>
-												<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-													<!-- show right/wrong -->
-													<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
-														<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-															<c:choose>
-																<c:when test="${attemptEntry.value.qbOption.correct}">
-																	<td class="bg-success" style="vertical-align: top;"><i class="fa fa-check"
-																		style="color: green; font-size: 22px"></i>
-																	</td>
-																</c:when>
-																<c:otherwise>
-																	<td class="bg-danger" style="vertical-align: top;"><i class="fa fa-times"
-																		style="color: red; font-size: 22px"></i>
-																	</td>
-																</c:otherwise>
-															</c:choose>
-														</c:if>
-													</c:forEach>
-													<!-- end show right/wrong -->
-												</c:if>
-												
-												<td>
-													<!-- display student selection --> 
-													<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
-														<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-															<c:out value="${attemptEntry.value.qbOption.name}" escapeXml="false" />
-														</c:if>
-													</c:forEach> 
-													<!-- end student selection -->
-												</td>
-											</tr>
-											
-											<c:if test="${sessionMap.content.enableConfidenceLevels}">
-												<tr>
-													<td
-														<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">colspan="2"</c:if>
-													>
-														<div class="question-type">
-															<fmt:message key="label.what.is.your.confidence.level" />
-														</div>
-														
-														<div class="ms-2">
-															<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
-																<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-																	<input class="bootstrap-slider" type="text" 
-																		data-slider-ticks="[0, 5, 10]" data-slider-ticks-labels='["0", "50", "100%"]' 
-																		data-slider-enabled="false" data-slider-tooltip="hide"
-																		<c:if test="${attemptEntry.value.confidenceLevel != -1}">data-slider-value="${attemptEntry.value.confidenceLevel}"</c:if>
-																	/>
-																</c:if>
-															</c:forEach>
-														</div>
-													</td>
-												</tr>
-											</c:if>
-										</table>
-									</div>
-								</c:if>
-							</c:forEach>
-
-							<!-- answer feedback -->
-							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true' || mcGeneralLearnerFlowDTO.displayFeedbackOnly == 'true'}">
-								<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
-									<c:if test="${(requestScope.mainQueIndex == feedbackEntry.key)
-                                          && (feedbackEntry.value != null) && (feedbackEntry.value != '')}">
-
-										<div class="panel panel-default">
-											<div class="panel-heading">
-												<h4 class="panel-title">
-													<fmt:message key="label.feedback.simple" />
-												</h4>
-											</div>
-											<div class="panel-body">
-												<c:out value="${feedbackEntry.value}" escapeXml="false" />
-											</div>
-										</div>
-
-									</c:if>
-								</c:forEach>
+	
+						<div class="col">
+							<c:if test="${not sessionMap.hideTitles}">
+								<c:out value="${question.name}" escapeXml="false" />
 							</c:if>
-							<!-- end answer feedback -->
+												
+							<div class="font-size-init">
+								<c:out value="${question.description}" escapeXml="false" />
+							</div>
 						</div>
 					</div>
 				</div>
+						
+				<div class="card-body">
+
+					<!--  CANDIDATE ANSWERS  -->
+					<c:set var="queIndex" scope="request" value="0" />
+					<c:forEach var="mainEntry" items="${mcGeneralLearnerFlowDTO.mapGeneralOptionsContent}">
+						<c:set var="queIndex" scope="request" value="${queIndex +1}" />
+
+						<c:if test="${requestScope.mainQueIndex == requestScope.queIndex}">
+							<!-- list of candidate answers -->
+							<ul>
+								<c:forEach var="subEntry" items="${mainEntry.value}">
+									<li>
+										<c:if test="${isPrefixAnswersWithLetters}">
+											${subEntry.key}
+											&nbsp;
+										</c:if>
+												
+										<c:out value="${subEntry.value}" escapeXml="false" />
+									</li>
+								</c:forEach>
+							</ul>
+
+							<!-- display students answers -->
+							<div class="table-responsive">
+								<div class="card-subheader">
+									<fmt:message key="label.yourAnswers" />			
+								</div>
+
+								<div class="row">
+									<!-- show right/wrong -->
+									<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
+										<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+											<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+												<c:choose>
+													<c:when test="${attemptEntry.value.qbOption.correct}">
+														<span class="text-bg-success badge ms-3" style="width: 40px;">
+															<i class="fa fa-check" style="font-size: 22px"></i>
+														</span>
+													</c:when>
+													<c:otherwise>
+														<span class="text-bg-danger badge ms-3" style="width: 40px;">
+															<i class="fa fa-times" style="font-size: 22px"></i>
+														</span>
+													</c:otherwise>
+												</c:choose>
+											</c:if>
+										</c:forEach>
+									</c:if>
+			
+									<!-- display student selection --> 
+									<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+										<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+											<div class="col">
+												<c:out value="${attemptEntry.value.qbOption.name}" escapeXml="false" />
+											</div>
+										</c:if>
+									</c:forEach>
+								</div>
+											
+								<c:if test="${sessionMap.content.enableConfidenceLevels}">
+													
+									<div class="bootstrap-slider mt-3">
+										<div class="card-subheader">
+											<label for="confidenceLevel${queIndex}">
+												<fmt:message key="label.what.is.your.confidence.level" />
+											</label>
+										</div>
+										
+										<div>
+											<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+												<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+													<input type="range" name="confidenceLevel${queIndex}" id="confidenceLevel${queIndex}" 
+														list="slider-step-list-${queIndex}" 
+														min="0" max="10" step="5" disabled
+														<c:if test="${attemptEntry.value.confidenceLevel != -1}">value="${attemptEntry.value.confidenceLevel}"</c:if>
+													>
+													<datalist id="slider-step-list-${queIndex}">
+														<option value="0" label="0%"/>
+														<option value="5" label="50%"/>
+														<option value="10" label="100%"/>
+													</datalist>
+												</c:if>
+											</c:forEach>
+										</div>
+									</div>
+								</c:if>
+							</div>
+						</c:if>
+					</c:forEach>
+
+					<!-- answer feedback -->
+					<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true' || mcGeneralLearnerFlowDTO.displayFeedbackOnly == 'true'}">
+						<c:forEach var="feedbackEntry" items="${mcGeneralLearnerFlowDTO.mapFeedbackContent}">
+							<c:if test="${(requestScope.mainQueIndex == feedbackEntry.key)
+                    		        && (feedbackEntry.value != null) && (feedbackEntry.value != '')}">
+								<div class="card-subheader">
+									<fmt:message key="label.feedback.simple" />
+								</div>
+								
+								<div>
+									<c:out value="${feedbackEntry.value}" escapeXml="false" />
+								</div>
+							</c:if>
+						</c:forEach>
+					</c:if>
+				</div>
 			</div>
 		</c:forEach>
-		<!-- end page panel -->
-
-		<!-- END QUESTION  -->
-		
-		<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight || (mcGeneralLearnerFlowDTO.displayAnswers == 'true')}">
-			<p>
-				<strong><fmt:message key="label.mark" /> </strong>
-				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
-				&nbsp;<fmt:message key="label.outof" />&nbsp;
-				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
-			</p>
-		</c:if>
 
 		<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
 			<h4>
 				<fmt:message key="label.group.results" />
 			</h4>
 
-			<table class="table table-sm">
-				<tr>
-					<td class="table-active" width="30%"><fmt:message key="label.topMark" /></td>
-					<td><c:out value="${mcGeneralLearnerFlowDTO.topMark}" /></td>
-				</tr>
+			<div class="ltable table-sm">
+				<div class="row">
+					<div class="col table-active"><fmt:message key="label.topMark" /></div>
+					<div class="col-10"><c:out value="${mcGeneralLearnerFlowDTO.topMark}" /></div>
+				</div>
 
-				<tr>
-					<td class="table-active"><fmt:message key="label.avMark" /></td>
-					<td><c:out value="${mcGeneralLearnerFlowDTO.averageMark}" /></td>
-				</tr>
-			</table>
-		</c:if>
-
-		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
-			<div class="row g-0">
-				<div class="col-12">
-					<h4>
-						<fmt:message key="label.reflection" />
-					</h4>
-
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h2 class="panel-title">
-								<lams:out value="${mcGeneralLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
-							</h2>
-						</div>
-						<div class="panel-body">
-
-							<c:choose>
-								<c:when test="${not empty mcGeneralLearnerFlowDTO.notebookEntry}">
-									<lams:out value="${mcGeneralLearnerFlowDTO.notebookEntry}" escapeHtml="true" />
-								</c:when>
-								<c:otherwise>
-									<em><fmt:message key="message.no.reflection.available" /></em>
-								</c:otherwise>
-							</c:choose>
-						</div>
-					</div>
+				<div class="row">
+					<div class="table-active col"><fmt:message key="label.avMark" /></div>
+					<div class="col-10"><c:out value="${mcGeneralLearnerFlowDTO.averageMark}" /></div>
 				</div>
 			</div>
 		</c:if>
 
+		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
+			<lams:NotebookReedit
+				reflectInstructions="${mcGeneralLearnerFlowDTO.reflectionSubject}"
+				reflectEntry="${mcGeneralLearnerFlowDTO.notebookEntry}"
+				isEditButtonEnabled="false"
+				notebookHeaderLabelKey="label.reflection"/>				
+		</c:if>
+
 		<!--  now really start the form -->
-		<div class="mb-3">
-				<form:hidden path="toolContentID" />
-				<form:hidden path="toolSessionID" />
-				<form:hidden path="httpSessionID" />
-				<form:hidden path="userID" />
-				<form:hidden path="userOverPassMark" />
-				<form:hidden path="passMarkApplicable" />
-
-				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
-					<input type="submit" name="redoQuestions" class="btn btn-primary float-start" value="<fmt:message key="label.redo.questions" />"/>
-				</c:if>
+		<div class="activity-bottom-buttons">
+			<form:hidden path="toolContentID" />
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="httpSessionID" />
+			<form:hidden path="userID" />
+			<form:hidden path="userOverPassMark" />
+			<form:hidden path="passMarkApplicable" />
 				
-				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
-						|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
-					<div class="mt-2">
-						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<form:hidden path="learnerFinished" value="Finished" />
+			<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
+					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+				<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
+					<form:hidden path="learnerFinished" value="Finished" />
 
-							<a href="#nogo" class="btn btn-primary float-end na" id="finishButton">
-								<c:choose>
-									<c:when test="${isLastActivity}">
-										<fmt:message key="label.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="label.finished" />
-									</c:otherwise>
-								</c:choose>
-							</a>
-						</c:if>
-
-						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-							<input type="submit" name="forwardtoReflection" class="btn btn-primary float-end" value="<fmt:message key="label.continue" />"/>
-						</c:if>
-					</div>
+					<button type="button" class="btn btn-primary na" id="finishButton">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="label.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.finished" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 				</c:if>
 
+				<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
+					<button type="submit" name="forwardtoReflection" class="btn btn-primary na">
+						<fmt:message key="label.continue" />
+					</button>
+				</c:if>
+			</c:if>
+
+			<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
+				<button type="submit" name="redoQuestions" class="btn btn-secondary btn-icon-return me-2">
+					<fmt:message key="label.redo.questions" />
+				</button>
+			</c:if>
 		</div>
-		</lams:Page>
+		
 	</form:form>
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

@@ -32,12 +32,6 @@ div.growlUI h1, div.growlUI h2 {
 	padding-right: 5px;
 }
 
-.card-subheader {
-	padding-bottom: 7px; 
-	//font-style: italic;
-	font-weight: 500;
-	color: rgba(5, 112, 213,1) !important;
-}
 .question-table {
 	width: 98%;
 }
@@ -137,25 +131,6 @@ button.btn{
 }
 .div-hover>.row {
     padding: 12px 0 !important;
-}
-
-/*----------slider----------------*/
-
-.bootstrap-slider input[type="range"] {
-  width: 210px;
-  margin: 0;
-}
-
-.bootstrap-slider datalist {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  writing-mode: vertical-lr;
-  width: 210px;
-}
-
-.bootstrap-slider option {
-  padding: 0;
 }
 
 /*----------countdown growl----------------*/

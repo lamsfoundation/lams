@@ -590,7 +590,19 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
     vertical-align: middle;
 }
 
-// Ratings
+/* fontawesome icon x-small */
+.fa-xs {
+	font-size: smaller;
+}
+
+.card-subheader {
+	padding-bottom: 7px; 
+	/*font-style: italic;*/
+	font-weight: 500;
+	color: rgba(5, 112, 213,1) !important;
+}
+
+/*----------Ratings----------------*/ 
 .rating-comment{
 	background-image: none;
 	border: $border-thin-default-light;
@@ -602,9 +614,10 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	font-size: x-small;
 }
 
-/* fontawesome icon x-small */
-.fa-xs {
-	font-size: smaller;
+/*----------collapsable-icon-left----------------*/ 
+
+.component-page-wrapper .collapsable-icon-left button.collapsed:after {
+	content: "\f054";
 }
 
 .component-page-wrapper .collapsable-icon-left button[data-bs-toggle="collapse"]:after {
@@ -615,8 +628,23 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	margin-right: .5rem;
 }
 
-.component-page-wrapper .collapsable-icon-left button.collapsed:after {
-	content: "\f054";
+/*----------slider----------------*/
+
+.bootstrap-slider input[type="range"] {
+  width: 210px;
+  margin: 0;
+}
+
+.bootstrap-slider datalist {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  writing-mode: vertical-lr;
+  width: 210px;
+}
+
+.bootstrap-slider option {
+  padding: 0;
 }
 
 /* Unused or used in assessment rewritten authoring */
