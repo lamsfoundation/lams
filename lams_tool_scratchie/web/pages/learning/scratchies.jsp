@@ -20,24 +20,24 @@
 	        <c:if test="${not sessionMap.hideTitles}">
 	        	<c:out value="${item.qbQuestion.name}" escapeXml="true" />
 	       </c:if>
+		
+			<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
+				<div class="badge bg-success bg-opacity-75 float-end item-score">
+					<fmt:message key="label.score" />&nbsp;${item.mark}
+				</div>
+			</c:if>
 		</div>
 		
 		<div class="card-body">
 			<div class="question-description">
 				<c:out value="${item.qbQuestion.description}" escapeXml="false" />
 			</div>
-		
-			<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
-				<div class="panel-footer item-score">
-					<fmt:message key="label.score" />&nbsp;${item.mark}
-				</div>
-			</c:if>
 	
 			<c:choose>
 			<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
-				<div class="table div-hover scratches">
+				<div class="table div-hover scratches mt-4">
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-						<div id="tr${optionDto.qbOptionUid}" class="row mx-2">
+						<div id="tr${optionDto.qbOptionUid}" class="row mx-2x">
 							<div class="scartchie-image-col">
 								<c:choose>
 									<c:when test="${optionDto.scratched && optionDto.correct}">
@@ -79,7 +79,7 @@
 								</c:choose> 
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div class="text-center mt-1">
+									<div class="text-center  m-1 badge text-bg-success bg-opacity-75">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>
@@ -135,7 +135,7 @@
 								</c:choose>
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div class="text-center mt-1">
+									<div class="text-center m-1 badge text-bg-success bg-opacity-75">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>

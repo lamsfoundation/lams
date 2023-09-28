@@ -1,12 +1,4 @@
 @import "_lams_variables.scss";
-	
-.scratches {
-	margin: 40px 0 15px;
-}
-
-.scratches tr td {
-	padding: 12px 15px;
-}
 
 .scratches a, .scratches a:hover {
 	border-bottom: none;
@@ -85,10 +77,6 @@ hr.hr-confidence-level {
 	border: none;
 	color:black;
 	box-shadow:none;
-}
-		
-.item-score {
-	font-weight: bold;
 }
 
 .question-etherpad {

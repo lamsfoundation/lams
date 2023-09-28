@@ -195,9 +195,11 @@
 
 				<div class="modal-footer">
 					<button data-bs-dismiss="modal" class="btn btn-secondary">
+						<i class="fa fa-xmark fa-lg me-1"></i>
 						<fmt:message key="label.no" />
 					</button>
 					<button onclick="leaderSelection();" class="btn btn-primary">
+						<i class="fa fa-check fa-lg me-1"></i>
 						<fmt:message key="label.yes.become.leader" />
 					</button>
 				</div>

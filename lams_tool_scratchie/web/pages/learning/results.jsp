@@ -53,10 +53,6 @@
 			overflow:auto; 
 			margin-top: -20px;
 		}
-		
-		.item-score {
-			font-weight: bold;
-		}
 	</style>
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
