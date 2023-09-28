@@ -7,7 +7,10 @@
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="true" rtexprvalue="true"%>
 <%@ attribute name="instructions" required="true" rtexprvalue="true"%>
-<%@ attribute name="formActionUrl" required="true" rtexprvalue="true"%>
+<%@ attribute name="formActionUrl" required="false" rtexprvalue="true"%>
+<c:if test="${empty formActionUrl}">
+	<c:set var="formActionUrl" value="submitReflection.do" />
+</c:if>
 <%@ attribute name="formModelAttribute" required="false" rtexprvalue="true"%>
 <c:if test="${empty formModelAttribute}">
 	<c:set var="formModelAttribute" value="reflectionForm" />

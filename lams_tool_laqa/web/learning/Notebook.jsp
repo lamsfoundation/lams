@@ -5,7 +5,6 @@
 <lams:Notebook title="${generalLearnerFlowDTO.activityTitle}"
 	toolSessionID="${qaLearningForm.toolSessionID}"
 	instructions="${generalLearnerFlowDTO.reflectionSubject}"
-	formActionUrl="submitReflection.do"
 	formModelAttribute="qaLearningForm"
 	hiddenInputs="toolSessionID,userID,sessionMapID,totalQuestionCount"
 	notebookLabelKey="label.reflection"

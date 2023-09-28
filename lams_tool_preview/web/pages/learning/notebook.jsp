@@ -6,7 +6,6 @@
 <lams:Notebook title="${sessionMap.title}"
 	toolSessionID="${sessionMap.toolSessionId}"
 	instructions="${sessionMap.reflectInstructions}"
-	formActionUrl="submitReflection.do"
 	isNextActivityButtonSupported="true"
 	finishButtonLabelKey="label.finish"
 	notebookLabelKey="title.reflection"/>
