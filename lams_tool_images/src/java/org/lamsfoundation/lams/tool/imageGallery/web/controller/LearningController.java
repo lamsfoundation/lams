@@ -221,7 +221,7 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -232,19 +232,12 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = userDTO.getUserID().longValue();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = userDTO.getUserID().longValue();
 
-	    nextActivityUrl = igService.finishToolSession(sessionId, userID);
-	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ImageGalleryException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = igService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
@@ -283,7 +276,7 @@ public class LearningController {
      * Save file or url imageGallery item into database.
      */
     @RequestMapping("/deleteImage")
-    public String deleteImage(HttpServletRequest request, HttpServletResponse response) {
+    public String deleteImage(HttpServletRequest request) {
 
 	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -431,7 +424,8 @@ public class LearningController {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public void submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
 
 	Integer userId = reflectionForm.getUserID();
 
@@ -455,7 +449,7 @@ public class LearningController {
 	    igService.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************

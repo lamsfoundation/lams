@@ -265,15 +265,9 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    private String finish(HttpServletRequest request) {
+    private String finish(HttpServletRequest request, HttpServletResponse response) throws IOException, ResourceApplicationException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -288,30 +282,17 @@ public class LearningController {
 	}
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = user.getUserID().longValue();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = user.getUserID().longValue();
 
-	    nextActivityUrl = resourceService.finishToolSession(sessionId, userID);
-	    request.setAttribute(ResourceConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ResourceApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = resourceService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
+	return null;
     }
 
     /**
      * Save file or url resource item into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
      */
     @RequestMapping(value = "/saveOrUpdateItem", method = RequestMethod.POST)
     private String saveOrUpdateItem(ResourceItemForm resourceItemForm, HttpServletRequest request)
@@ -412,14 +393,7 @@ public class LearningController {
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
-
     @RequestMapping("/newReflection")
     private String newReflection(ReflectionForm reflectionForm, HttpServletRequest request) {
 
@@ -450,16 +424,11 @@ public class LearningController {
     }
 
     /**
-     * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
+     * Submit reflection form input database
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    private String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ResourceApplicationException {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -483,7 +452,7 @@ public class LearningController {
 	}
 	request.setAttribute("reflectionForm", reflectionForm);
 
-	return finish(request);
+	return finish(request, response);
     }
 
     // *************************************************************************************

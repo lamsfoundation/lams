@@ -61,8 +61,6 @@ public class DokumaranConstants {
 
     public static final String ATTR_IS_LEADER_RESPONSE_FINALIZED = "isLeaderResponseFinalized";
 
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
     public static final String ATTR_HAS_FAULTY_SESSION = "hasFaultySession";

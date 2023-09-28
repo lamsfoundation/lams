@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.daco.web.controller;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,6 +37,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -198,15 +200,10 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    protected String finish(@ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
+    protected String finish(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, DacoApplicationException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
@@ -225,30 +222,17 @@ public class LearningController {
 	}
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession httpSession = SessionManager.getSession();
-	    UserDTO user = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
-	    Long userUid = new Long(user.getUserID().longValue());
+	HttpSession httpSession = SessionManager.getSession();
+	UserDTO user = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
+	Long userUid = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = dacoService.finishToolSession(sessionId, userUid);
-	    request.setAttribute(DacoConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (DacoApplicationException e) {
-
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = dacoService.finishToolSession(sessionId, userUid);
+	response.sendRedirect(nextActivityUrl);
+	return null;
     }
 
     /**
      * Save file or textfield daco question into database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(value = "/saveOrUpdateRecord", method = RequestMethod.POST)
     protected String saveOrUpdateRecord(@ModelAttribute("recordForm") RecordForm recordForm,
@@ -473,12 +457,6 @@ public class LearningController {
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/startReflection")
     protected String startReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
@@ -520,16 +498,10 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, DacoApplicationException {
 	Integer userId = messageForm.getUserId();
 	Long sessionId = messageForm.getSessionId();
 	// check for existing notebook entry
@@ -547,7 +519,7 @@ public class LearningController {
 	    dacoService.updateEntry(entry);
 	}
 
-	return finish(recordForm, request);
+	return finish(request, response);
     }
 
     // *************************************************************************************

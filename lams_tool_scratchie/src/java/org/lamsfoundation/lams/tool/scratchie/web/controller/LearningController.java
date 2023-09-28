@@ -685,20 +685,15 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException, ScratchieApplicationException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	final Long userId = user.getUserID().longValue();
 
-	try {
-	    String nextActivityUrl = scratchieService.finishToolSession(toolSessionId, userId);
-	    request.setAttribute(ScratchieConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ScratchieApplicationException e) {
-	    log.error("Failed get next activity url:" + e.getMessage());
-	}
-	return "pages/learning/finish";
+	String nextActivityUrl = scratchieService.finishToolSession(toolSessionId, userId);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**

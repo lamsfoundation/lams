@@ -71,7 +71,6 @@ public class LearningController {
     private static final String DEFINE_LATER_PATH = "/pages/learning/definelater";
     private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do";
     private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do";
-    private static final String FINISH_PATH = "/pages/learning/finish";
     private static final String SHOW_RESULTS_PAGE_PATH = "/pages/learning/results";
     private static final String NOTEBOOK_PATH = "/pages/learning/notebook";
 
@@ -786,16 +785,9 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    @SuppressWarnings("unchecked")
-    public String finish(HttpServletRequest request, HttpSession session) {
+    public void finish(HttpServletRequest request, HttpSession session, HttpServletResponse response) throws PeerreviewApplicationException, IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -804,33 +796,16 @@ public class LearningController {
 	// get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 
-	return doFinish(request, sessionId, session);
-    }
-
-    private String doFinish(HttpServletRequest request, Long sessionId, HttpSession ss) {
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(PeerreviewConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (PeerreviewApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return FINISH_PATH;
+	String nextActivityUrl = service.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/newReflection")
     @SuppressWarnings("unchecked")
@@ -860,17 +835,11 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/submitReflection")
     @SuppressWarnings("unchecked")
-    public String submitReflection(@ModelAttribute ReflectionForm form, HttpServletRequest request,
-	    HttpServletResponse response, HttpSession session) {
+    public void submitReflection(@ModelAttribute ReflectionForm form, HttpServletRequest request,
+	    HttpServletResponse response, HttpSession session) throws PeerreviewApplicationException, IOException {
 	ReflectionForm refForm = form;
 	Integer userId = refForm.getUserID();
 
@@ -893,6 +862,6 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finish(request, session);
+	finish(request, session, response);
     }
 }

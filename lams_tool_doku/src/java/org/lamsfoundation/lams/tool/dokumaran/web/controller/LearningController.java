@@ -298,15 +298,9 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    private String finish(HttpServletRequest request) {
+    private void finish(HttpServletRequest request, HttpServletResponse response) throws IOException, DokumaranApplicationException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -318,29 +312,16 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = dokumaranService.finishToolSession(sessionId, userID);
-	    request.setAttribute(DokumaranConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (DokumaranApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = dokumaranService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/newReflection")
@@ -371,16 +352,10 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) {
+    private void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, DokumaranApplicationException {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -403,7 +378,7 @@ public class LearningController {
 	    dokumaranService.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************

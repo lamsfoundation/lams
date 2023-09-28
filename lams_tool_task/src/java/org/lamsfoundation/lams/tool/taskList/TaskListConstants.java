@@ -51,7 +51,6 @@ public interface TaskListConstants {
     public static final String ATTR_DELETED_CONDITION_LIST = "deleteConditionList";
     public static final String ATTR_TASKLIST = "taskList";
     public static final String ATTR_ITEM_UID = "itemUid";
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_MONITOR_VERIFICATION_REQUIRED = "monitorVerificationRequired";
     public static final String ATTR_SESSION_DTOS = "sessionDtos";
     public static final String ATTR_ITEM_SUMMARY = "itemSummary";

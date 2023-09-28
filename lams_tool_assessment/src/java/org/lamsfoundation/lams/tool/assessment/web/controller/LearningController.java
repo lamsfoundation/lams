@@ -692,28 +692,19 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = user.getUserID().longValue();
-	    Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = user.getUserID().longValue();
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(AssessmentConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (AssessmentApplicationException e) {
-	    log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = service.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * auto saves responses
-     *
-     * @throws IOException
      */
     @RequestMapping("/autoSaveAnswers")
     @ResponseStatus(HttpStatus.OK)
@@ -799,8 +790,8 @@ public class LearningController {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
-	    HttpServletRequest request) {
+    public void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = refForm.getUserID();
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -819,7 +810,7 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************
