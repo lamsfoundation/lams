@@ -28,7 +28,7 @@
 	<c:set var="editNotebookLabelKey" value="label.edit" />
 </c:if>
 
-<div class="card shadow-sm mt-5">
+<div class="card shadow mt-4 mb-4">
 	<div class="card-header">
 		<fmt:message key="${notebookHeaderLabelKey}" />
 	</div>
@@ -52,7 +52,7 @@
 			</p>
 
 			<c:if test="${isEditButtonEnabled}">
-				<div class="mt-2">
+				<div class="mt-2 float-end">
 					<button name="editNotebookButton" id="edit-notebook-button" class="btn btn-sm btn-secondary btn-icon-pen" type="button"
 						onclick="continueReflect()">
 						<fmt:message key="${editNotebookLabelKey}" />
