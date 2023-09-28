@@ -3,15 +3,12 @@
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 
 <lams:PageLearner title="${generalLearnerFlowDTO.activityTitle}" toolSessionID="${qaLearningForm.toolSessionID}" >
-
-
 	<div class="container-lg">
-		<h1>sessionid <c:out value="${qaLearningForm.toolSessionID}"></c:out></h1>
+		
 		<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 		<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" target="_self">
 
 			<!--  Announcements and advanced settings -->
-
 			<c:if test="${generalLearnerFlowDTO.noReeditAllowed}">
 				<lams:Alert5 type="danger" id="noRedosAllowed" close="false">
 					<fmt:message key="label.noredo.enabled" />
@@ -81,17 +78,14 @@
 
 					</div>
 				</div>
-
-
 			</c:forEach>
 
 			<hr class="msg-hr" />
 
 			<div class="activity-bottom-buttons">
-
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 					<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"
-							class="btn btn-primary mx-2">
+							class="btn btn-primary na mx-2">
 						<fmt:message key="label.allResponses" />
 					</button>
 				</c:if>
@@ -112,21 +106,19 @@
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
 						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
-								class="btn btn-primary">
+								class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:if>
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">
-					<button type="button" name="redoQuestions" class="btn btn-primary mx-2"
+					<button type="button" name="redoQuestions" class="btn btn-secondary btn-icon-return me-2"
 							onclick="submitMethod('redoQuestions');">
 						<fmt:message key="label.redo" />
 					</button>
 				</c:if>
 			</div>
-
-
 		</form:form>
 	</div>
 	<!-- end form -->

@@ -350,3 +350,17 @@ div.growlUI h1,div.growlUI h2 {
 .btn-icon-next:after {
   content: "\f101";
 }
+
+.sbox {
+  border-bottom: 2px solid $gray-lighter;
+  border-radius: 0px;
+}
+.sbox-body {
+  padding: 5px;
+}
+.sbox-heading {
+  padding: 3px 5px;
+  border-bottom: 1px solid $gray-lighter;
+  border-top-right-radius: $border-radius-small;
+  border-top-left-radius: $border-radius-small;
+}

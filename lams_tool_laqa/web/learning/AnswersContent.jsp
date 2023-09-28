@@ -15,7 +15,6 @@
 <lams:PageLearner title="${generalLearnerFlowDTO.activityTitle}" toolSessionID="${sessionMap.toolSessionID}" >
 
 	<style media="screen,projection" type="text/css">
-
 		div.growlUI h1, div.growlUI h2 {
 			color: white;
 			margin: 5px 5px 5px 0px;
@@ -66,24 +65,24 @@
 				<lams:errors5/>
 			</div>
 
-			<div id="questions" aria-label="<fmt:message key='label.questions'/>">
+			<div id="questions">
 				<c:choose>
 					<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
 						<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
 							<c:if test="${generalLearnerFlowDTO.initialScreen == 'true'}">
-								<p>
+								<lams:Alert5 type="info" id="feedback-seq" close="false">
 									<fmt:message key="label.feedback.seq" />&nbsp;
 									<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
 									<fmt:message key="label.questions.simple" />
-								</p>
+								</lams:Alert5>
 							</c:if>
 						</c:if>
 
 						<c:if test="${generalLearnerFlowDTO.initialScreen != 'true'}">
-							<p>
+							<lams:Alert5 type="info" id="questions-remaining" close="false">
 								<fmt:message key="label.questions.remaining" />&nbsp;
 								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
-							</p>
+							</lams:Alert5>
 						</c:if>
 
 						<jsp:include page="/learning/SequentialAnswersContent.jsp" />
@@ -91,19 +90,17 @@
 
 					<c:otherwise>
 						<c:if test="${generalLearnerFlowDTO.totalQuestionCount != 1}">
-							<p>
-								<fmt:message key="label.feedback.combined" />&nbsp;<c:out
-									value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;<fmt:message key="label.questions.simple" />
-							</p>
+							<lams:Alert5 type="info" id="feedback-combined" close="false">
+								<fmt:message key="label.feedback.combined" />&nbsp;
+								<c:out value="${generalLearnerFlowDTO.remainingQuestionCount}" />&nbsp;
+								<fmt:message key="label.questions.simple" />
+							</lams:Alert5>
 						</c:if>
 
 						<jsp:include page="/learning/CombinedAnswersContent.jsp" />
 					</c:otherwise>
 				</c:choose>
 			</div>
-
-
-
 		</form:form>
 	</div>
 

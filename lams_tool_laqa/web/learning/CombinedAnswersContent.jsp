@@ -7,7 +7,7 @@
 
 		<c:if test="${questionEntry.key == answerEntry.key}">
 
-			<div class="card lcard mt-4" id="question<c:out value='${questionEntry.key}' />" aria-label="question">
+			<div class="card lcard mt-4" id="question<c:out value='${questionEntry.key}' />">
 				<div class="card-header">
 					<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() !=1}"><c:out value="${questionEntry.key}" />. </c:if>  <c:out value="${questionEntry.value.name}" escapeXml="false" />
 				</div>
@@ -29,13 +29,14 @@
 							<fmt:message key="label.words.required" />&nbsp;<span id="words-required-${questionEntry.key}"></span>
 						</span>
 						</c:if>
-
 					</div>
 
 					<div class="my-2" id="answerResponse">
 						<c:choose>
 							<c:when test="${hasEditRight}">
-								<label id="yourAnswer" class="d-none"><fmt:message key="label.learning.yourAnswer" /></label>
+								<label class="visually-hidden" for="answer${questionEntry.key}">
+									<fmt:message key="label.learning.yourAnswer" />
+								</label>
 								<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
 								<div data-sequence-id="${questionEntry.key}"
 									 data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
@@ -52,7 +53,7 @@
 
 										<c:otherwise>
 											<lams:textarea name="answer${questionEntry.key}"
-														   id="answer${questionEntry.key}" rows="5" placeholder="${placeholder}" aria-labelledby="yourAnswer"
+														   id="answer${questionEntry.key}" rows="5" placeholder="${placeholder}"
 														   class="form-control"><c:out value='${answerEntry.value}' escapeXml='false' /></lams:textarea>
 										</c:otherwise>
 									</c:choose>

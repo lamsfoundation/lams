@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="mode" value="${sessionMap.mode}" />
@@ -15,7 +13,7 @@
 <lams:PageLearner title="${generalLearnerFlowDTO.activityTitle}" toolSessionID="${sessionMap.toolSessionID}" >
 
 	<lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
@@ -26,13 +24,12 @@
 		}
 
 		.other-users-responses {
-			margin: 0 -15px -35px -15px;
+			margin-bottom: -15px;
 		}
 
 		.add-comment {
 			margin-left: 10px;
 			float: left !important;
-			margin-top: auto;
 		}
 
 		.comment-textarea {
@@ -71,7 +68,6 @@
 
 		<!-- Rating limits info -->
 		<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
-
 			<lams:Alert5 id="rating-info" type="info" close="true">
 				<c:choose>
 					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
@@ -108,20 +104,19 @@
 		<!-- Questions and answers -->
 		<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
+			<div class="card lcard">
+				<div class="card-header text-bg-secondary">
 					<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if>
 					<c:out value="${question.qbQuestion.name}" escapeXml="false" />
+					
+					<div class="font-size-init">
+						<c:out value="${question.qbQuestion.description}" escapeXml="false" />
+					</div>
 				</div>
 
-				<div class="panel-body">
-					<c:if test="${not empty question.qbQuestion.description}">
-						<div class="panel">
-							<c:out value="${question.qbQuestion.description}" escapeXml="false" />
-						</div>
-					</c:if>
-
-						<%--User own responses---------------------------------------%>
+				<div class="card-body">
+						
+					<%--User own responses---------------------------------------%>
 					<c:set var="userResponse" value="${question.userResponse}"/>
 					<c:if test="${userResponse != null}">
 						<div class="row g-0">
@@ -130,23 +125,30 @@
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<c:set var="splitRow" value="col-12 col-sm-9 col-md-10 col-lg-10" />
 							</c:if>
+							
 							<div class="${splitRow}">
 								<div class="sbox">
-									<div class="sbox-heading bg-warning">
-										<div class="float-start me-2"><lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/></div>
+									<div class="sbox-heading bg-warning bg-opacity-50">
+										<div class="float-start me-2">
+											<lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/>
+										</div>
 										<span><c:out value="${userResponse.qaQueUser.fullname}" /></span>
-										<br><span style="font-size: smaller"><lams:Date value="${userResponse.attemptTime}" timeago="true"/></span>
+										<br>
+										<span style="font-size: smaller">
+											<lams:Date value="${userResponse.attemptTime}" timeago="true"/>
+										</span>
 									</div>
 									<div class="sbox-body">
 										<c:out value="${userResponse.answer}" escapeXml="false" />
 									</div>
 								</div>
 							</div>
+							
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<div class="col-12 col-sm-3 col-md-2 col-lg-2 rate-answers-area">
-									<h4 class="text-center">
+									<div class="text-center fs-4">
 										<fmt:message key="label.learning.rating" />
-									</h4>
+									</div>
 									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
 												 maxRates="${qaContent.maximumRates}" />
 								</div>
@@ -157,7 +159,7 @@
 					<!-- Others users' responses -->
 					<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 						<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-							<lams:Alert5 id="rating-comment-info" type="info" close="false" >
+							<lams:Alert5 id="rating-comment-info-${status.count}" type="info" close="false" >
 								<fmt:message key="label.comment.minimum.number.words">
 									<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
 								</fmt:message>
@@ -176,27 +178,32 @@
 							</c:otherwise>
 						</c:choose>
 
-						<div class="other-users-responses">
-							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' >
-								<thead>
-								<tr>
-									<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
-									<c:choose>
-										<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
-											<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
-										</c:when>
-										<c:otherwise>
-											<th style="display:none;"></th>
-										</c:otherwise>
-									</c:choose>
-									<c:if test="${isCommentsEnabled}">
-										<th><fmt:message key="label.comment" /></th>
-									</c:if>
-								</tr>
-								</thead>
-								<tbody>
-
-								</tbody>
+						<div class="other-users-responses mt-4">
+							<div class="fst-italic mb-2">
+								<fmt:message key="label.other.learners.answers" />
+							</div>
+						
+							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter jRating">
+								<th title="<fmt:message key='label.sort.by.answer'/>">
+									<fmt:message key="label.learning.answer" />
+								</th>
+									
+								<c:choose>
+									<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
+										<th title="<fmt:message key='label.sort.by.rating'/>">
+											<fmt:message key="label.learning.rating" />
+										</th>
+									</c:when>
+									<c:otherwise>
+										<!-- <th style="display:none;"></th> -->
+									</c:otherwise>
+								</c:choose>
+									
+								<c:if test="${isCommentsEnabled}">
+									<th>
+										<fmt:message key="label.comment" />
+									</th>
+								</c:if>
 							</lams:TSTable5>
 						</div>
 					</c:if>
@@ -209,51 +216,20 @@
 
 		<!-- reflections -->
 		<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
-
-			<div class="panel panel-default mt-2">
-				<div class="panel-heading panel-title">
-					<fmt:message key="label.reflection" />
-				</div>
-				<div class="panel-body">
-					<div class="reflectionInstructions">
-						<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
-					</div>
-					<div class="panel">
-						<lams:out value="${qaLearningForm.entryText}" escapeHtml="true" />
-					</div>
-
-					<c:if test="${hasEditRight && mode != 'teacher'}">
-						<button name="forwardtoReflection" type="button" class="btn btn-secondary float-start"
-								onclick="submitMethod('forwardtoReflection');">
-							<fmt:message key="label.edit" />
-						</button>
-					</c:if>
-				</div>
-			</div>
-
+			<lams:NotebookReedit
+				reflectInstructions="${generalLearnerFlowDTO.reflectionSubject}"
+				reflectEntry="${qaLearningForm.entryText}"
+				isEditButtonEnabled="${hasEditRight && mode != 'teacher'}"
+				notebookHeaderLabelKey="label.reflection"/>
 		</c:if>
 
 		<!-- buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons" id="learner-submit">
-				<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">
-					<button type="button" class="btn btn-secondary btn-icon-refresh float-start"
-							onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
-						<fmt:message key="label.refresh" />
-					</button>
-				</c:if>
-
-				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
-					<button name="redoQuestions" type="button" class="btn btn-secondary float-start"
-							onclick="submitMethod('redoQuestions');">
-						<fmt:message key="label.redo" />
-					</button>
-				</c:if>
-
 				<c:choose>
 					<c:when test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight && !generalLearnerFlowDTO.isLearnerFinished}">
 						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								class="btn btn-primary">
+								class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
@@ -271,9 +247,22 @@
 						</button>
 					</c:when>
 				</c:choose>
+
+				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
+					<button name="redoQuestions" type="button" class="btn btn-secondary btn-icon-return me-2"
+							onclick="submitMethod('redoQuestions');">
+						<fmt:message key="label.redo" />
+					</button>
+				</c:if>
+				
+				<c:if test="${!generalLearnerFlowDTO.isLearnerFinished}">
+					<button type="button" class="btn btn-secondary btn-icon-refresh me-2"
+							onclick="refreshPage('${qaLearningForm.refreshAnswers}');">
+						<fmt:message key="label.refresh" />
+					</button>
+				</c:if>
 			</div>
 		</c:if>
-
 	</form:form>
 
 	<script type="text/javascript">
@@ -355,7 +344,7 @@
 									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}',
 											${qaContent.useSelectLeaderToolOuput} ? userData["sessionName"] : userData["userName"],
 											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>',
-											false, "sbox-heading bg-warning")
+											false, "sbox-heading bg-warning bg-opacity-50")
 								}
 
 								rows += 	'<div class="user-answer">';
@@ -455,12 +444,12 @@
 
 											//show comments textarea and a submit button
 										} else if (! (IS_DISABLED || usesRatings && MAX_RATES>0 && countRatedItems >= MAX_RATES && !hasStartedRating)) {
-											rows += '<div id="add-comment-area-' + itemId + '">';
-											rows +=		'<textarea class="form-control comment-textarea" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;"><fmt:message key="label.comment.textarea.tip"/></textarea>';
-
-											rows += 	'<div class="button add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'">';
-											rows += 	'</div>';
-											rows += '</div>';
+											rows += '<div id="add-comment-area-' + itemId + '">' +
+														'<textarea class="form-control comment-textarea" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" placeholder="<fmt:message key="label.comment.textarea.tip"/>" aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>' +
+													 	'<button type="button" class="btn btn-success btn-sm add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'" aria-label="submit">' +
+														 	'<i class="fa fa-check fa-lg"></i>' + 
+														 '</button>' +
+													'</div>';
 										}
 									}
 
@@ -500,6 +489,11 @@
 				submitMethod('refreshAllResults');
 			}
 		}
+		
+		function continueReflect() {
+			submitMethod('forwardtoReflection');
+		}
+		
 		function submitMethod(actionMethod) {
 			document.forms.qaLearningForm.action=actionMethod+".do";
 			document.forms.qaLearningForm.submit();
