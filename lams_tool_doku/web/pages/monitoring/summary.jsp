@@ -119,9 +119,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -140,8 +140,8 @@
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/",
 			//vars for rating.js
-			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
@@ -165,7 +165,7 @@
 
 			//block #buttons
 			$(this).block({
-				message: '<h4 style="color:#fff";><fmt:message key="label.pad.started.fixing" /></h4>',
+				message: '<h4 style="color:#fff";><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.started.fixing" /></spring:escapeBody></h4>',
 				baseZ: 1000000,
 				fadeIn: 0,
 				css: {
@@ -189,8 +189,8 @@
 				data : 'toolSessionID=' + toolSessionId,
 				type: 'post',
 				success: function (response) {
-					button.parent().html('<fmt:message key="label.pad.fixed" />');
-					alert('<fmt:message key="label.pad.fixed" />');
+					button.parent().html('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.fixed" /></spring:escapeBody>');
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.fixed" /></spring:escapeBody>');
 				},
 				error: function (request, status, error) {
 					button.unblock();
@@ -267,7 +267,7 @@
 								.find('.copy-mark-value').text(mark);
 					},
 					error: function (request, status, error) {
-						alert('<fmt:message key="messsage.monitoring.learner.marks.update.fail" />');
+						alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key="messsage.monitoring.learner.marks.update.fail" /></spring:escapeBody>');
 					}
 				});
 
@@ -349,7 +349,7 @@
 	}
 
 	function startGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.start.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
@@ -373,7 +373,7 @@
 	}
 
 	function finishGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
@@ -401,7 +401,7 @@
 	}
 
 	function enableGalleryWalkLearnerEdit(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
