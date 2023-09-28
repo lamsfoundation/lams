@@ -984,7 +984,13 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void suspendLesson(long lessonId, Integer userId, boolean clearScheduleDetails) {
-	securityService.ensureLessonMonitor(lessonId, userId, "suspend lesson");
+	if (clearScheduleDetails) {
+	    // Check whether user is lesson monitor only on direct suspend.
+	    // If this call comes from Quartz Job, skip this check as the user can no longer be a monitor,
+	    // but we still need to suspend the lesson and put him into logs
+	    // https://lamssupport.atlassian.net/browse/LKC-145
+	    securityService.ensureLessonMonitor(lessonId, userId, "suspend lesson");
+	}
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	if (!Lesson.SUSPENDED_STATE.equals(lesson.getLessonStateId()) && !Lesson.REMOVED_STATE.equals(
 		lesson.getLessonStateId())) {
