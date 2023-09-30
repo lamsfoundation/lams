@@ -97,7 +97,8 @@
 				</c:if>
 			</c:if>
 		</c:if>
-		
+
+		<lams:JSImport src="includes/javascript/websocket.js" />
 		<script type="text/javascript">
 			var allowRestart = false,
 				restartLessonConfirmation = "Are you sure you want to start the lesson from the beginning?",
@@ -109,11 +110,6 @@
 				LEARNING_URL = LAMS_URL + 'learning/',
 
 				// it gets initialised along with progress bar
-				commandWebsocketInitTime = null,
-				commandWebsocket = null,
-				commandWebsocketPingTimeout = null,
-				commandWebsocketPingFunc = null,
-				commandWebsocketReconnectAttempts = 0,
 				commandWebsocketHookTrigger = null,
 				commandWebsocketHook = null,
 				
@@ -122,20 +118,6 @@
 						'containerId' : 'progressBarDiv'
 					}
 				};
-				
-			commandWebsocketPingFunc = function(skipPing){
-				if (commandWebsocket.readyState == commandWebsocket.CLOSING 
-						|| commandWebsocket.readyState == commandWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				commandWebsocketPingTimeout = setTimeout(commandWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					commandWebsocket.send("ping");
-				}
-			};
 				
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
@@ -193,80 +175,6 @@
 				localStorage.setItem('lamsAutosaveTimestamp', currentTime);
 				return true;
 			}
-
-			function initCommandWebsocket(){
-				commandWebsocketInitTime = Date.now();
-				// it is not an obvious place to init the websocket, but we need lesson ID
-				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
-						+ 'commandWebsocket?lessonID=' + lessonId);
-
-				commandWebsocket.onclose = function(e){
-					// check reason and whether the close did not happen immediately after websocket creation
-					// (possible access denied, user logged out?)
-					if (e.code === 1006 &&
-						Date.now() - commandWebsocketInitTime > 1000 &&
-						commandWebsocketReconnectAttempts < 20) {
-						commandWebsocketReconnectAttempts++;
-						// maybe iPad went into sleep mode?
-						// we need this websocket working, so init it again after delay
-						setTimeout(initCommandWebsocket, 3000);
-					}
-				};
-
-				// set up timer for the first time
-				commandWebsocketPingFunc(true);
-				
-				// when the server pushes new commands
-				commandWebsocket.onmessage = function(e){
-					// read JSON object
-					var command = JSON.parse(e.data);
-					if (command.message) {
-						// some tools implement autosave feature
-						// if it is such a tool, trigger it
-						if (command.message === 'autosave') {
-							// the name of this function is same in all tools
-							if (typeof learnerAutosave == 'function') {
-								learnerAutosave(true);
-							}
-						} else {
-							alert(command.message);
-						}
-					}
-					
-					// if learner's currently displayed page has hookTrigger same as in the JSON
-					// then a function also defined on that page will run
-					if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger 
-										    && typeof commandWebsocketHook === 'function') {
-					    commandWebsocketHook(command.hookParams);
-					}
-
-					if (command.redirectURL) {
-						window.location.href = command.redirectURL;
-					}
-
-					if (command.discussion) {
-						var discussionCommand = $('#discussion-sentiment-command');
-						if (discussionCommand.length === 0) {
-							discussionCommand = $('<div />').attr('id', 'discussion-sentiment-command').appendTo('body');
-						}
-						discussionCommand.load(LEARNING_URL + "discussionSentiment/" + command.discussion + ".do", {
-							lessonId : lessonId
-						});
-					}
-
-					// reset ping timer
-					clearTimeout(commandWebsocketPingTimeout);
-					commandWebsocketPingFunc(true);
-				};
-
-				// check if there is a running discussion; if so, a websocket command will come to display the widget
-				$.ajax({
-					url : LEARNING_URL + "discussionSentiment/checkLearner.do",
-					data: {
-						lessonId : lessonId
-					}
-				});
-			}
 			
 			$(document).ready(function() {
 				var showControlBar = 1; // 0/1/2 none/full/keep space
@@ -323,7 +231,51 @@
 								});
 							}
 
-							initCommandWebsocket();
+							let commandWebsocket = initWebsocket('commandWebsocket', LEARNING_URL.replace('http', 'ws')
+									+ 'commandWebsocket?lessonID=' + lessonId);
+
+							if (commandWebsocket) {
+								// when the server pushes new inputs
+								commandWebsocket.onmessage = function (e) {
+								// read JSON object
+									var command = JSON.parse(e.data);
+									if (command.message) {
+										// some tools implement autosave feature
+										// if it is such a tool, trigger it
+										if (command.message === 'autosave') {
+											// the name of this function is same in all tools
+											if (typeof learnerAutosave == 'function') {
+												learnerAutosave(true);
+											}
+										} else {
+											alert(command.message);
+										}
+									}
+
+									// if learner's currently displayed page has hookTrigger same as in the JSON
+									// then a function also defined on that page will run
+									if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger
+											&& typeof commandWebsocketHook === 'function') {
+										commandWebsocketHook(command.hookParams);
+									}
+
+									if (command.redirectURL) {
+										window.location.href = command.redirectURL;
+									}
+
+									if (command.discussion) {
+										var discussionCommand = $('#discussion-sentiment-command');
+										if (discussionCommand.length === 0) {
+											discussionCommand = $('<div />').attr('id', 'discussion-sentiment-command').appendTo('body');
+										}
+										discussionCommand.load(LEARNING_URL + "discussionSentiment/" + command.discussion + ".do", {
+											lessonId : lessonId
+										});
+									}
+									// reset ping timer
+									websocketPing('commandWebsocket', true);
+								};
+							}
 						}
 					});
 				}

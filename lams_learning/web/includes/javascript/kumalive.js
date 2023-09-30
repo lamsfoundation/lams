@@ -1,10 +1,6 @@
 "use strict"
 
-var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') 
-		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' +role),
-	kumaliveWebsocketPingTimeout = null,
-	kumaliveWebsocketPingFunc = null,
-	// is the user a learenr or a teacher
+var // is the user a learenr or a teacher
 	roleTeacher = false,
 	// was the initial set up run
 	initialised = false,
@@ -28,139 +24,106 @@ var kumaliveWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws')
 		.append($('<div />').addClass('name')),
 	REFRESH_DELAY = 1000,
 	ANIMATION_DURATION = 1000,
-	PING_DELAY = 3*60*1000;
+	websocket = initWebsocket('kumalive' + orgId,
+		LEARNING_URL.replace('http', 'ws')
+		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' + role);
 
-kumaliveWebsocketPingFunc = function(skipPing){
-	if (kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSING 
-			|| kumaliveWebsocket.readyState == kumaliveWebsocket.CLOSED){
-		location.reload();
-	}
-	
-	// check and ping every few minutes
-	kumaliveWebsocketPingTimeout = setTimeout(kumaliveWebsocketPingFunc, PING_DELAY);
-	// initial set up does not send ping
-	if (!skipPing) {
-		kumaliveWebsocket.send("ping");
-	}
-};
-// set up timer for the first time
-kumaliveWebsocketPingFunc(true);
+if (websocket) {
+	/**
+	 * Fetches existing Kumalive session
+	 */
+	websocket.onopen = function(e) {
+		websocket.send(JSON.stringify({
+			'type' : 'start'
+		}));
+	};
 
-kumaliveWebsocket.onclose = function(e){
-	// react only on abnormal close
-	if (e.code === 1006) {
-		location.reload();
-	}
-};
-// when the server pushes new messages and roster to the learner's browser
-
-
-/**
- * Fetches existing Kumalive session
- */
-kumaliveWebsocket.onopen = function(e) {
-	kumaliveWebsocket.send(JSON.stringify({
-		'type' : 'start'
-	}));
-};
-
-/**
- * Display information to an user when he gets disconnected
- */
-kumaliveWebsocket.onclose = function(e){
-	$('body > *').hide();
-	$('#closedDiv').show();
-};
-
-/**
- * Process a message from server.
- */
-kumaliveWebsocket.onmessage = function(e){
-	 // reset ping timer
-    clearTimeout(kumaliveWebsocketPingTimeout);
-    kumaliveWebsocketPingFunc(true);
-    
-	// read JSON object
-	var message = JSON.parse(e.data),
-		type = message.type;
-	// check what is this message about
-	switch(type) {
-		case 'start' : {
-			// user tried to join a Kumalive which is not started yet
-			// try to start it, if user is a teacher
-			// otherwise just wait for a teacher
-			kumaliveWebsocket.send(JSON.stringify({
-				'type' : 'start',
-				'role' : role
-			}));
-		}
-		break;
-		case 'create' : {
-			// user is a teacher and will now create a new Kumalive
-			
-			// hide splash screen
-			$('#initDiv').hide();
-			// show name input
-			var createDiv = $('#createKumaliveDiv'),
-				rubricsDiv = $('#rubrics .panel-body', createDiv);
-			if (message.rubrics) {
-				$.each(message.rubrics, function(){
-					if (this) {
-						var checkbox = $('<div />').addClass('checkbox').appendTo(rubricsDiv),
-							label = $('<label />').appendTo(checkbox);
-						$('<span />').text(this).appendTo(label);
-						$('<input />').attr('type', 'checkbox')
-									  .prop('checked', true)
-									  .prependTo(label);
-					}
-				});
+	// when the server pushes new inputs
+	websocket.onmessage = function (e) {
+		// read JSON object
+		var message = JSON.parse(e.data),
+			type = message.type;
+		// check what is this message about
+		switch(type) {
+			case 'start' : {
+				// user tried to join a Kumalive which is not started yet
+				// try to start it, if user is a teacher
+				// otherwise just wait for a teacher
+				websocket.send(JSON.stringify({
+					'type' : 'start',
+					'role' : role
+				}));
 			}
-			// do not show the box at all if there are no rubrics
-			// (exactly: there is the single default blank one)
-			if ($('.checkbox', rubricsDiv).length == 0){
-				rubricsDiv.remove();
-			}
-			
-			var createButton = createDiv.show().children('button').click(create).prop('disabled', true);
-			createDiv.children('input').focus().keyup(function(){
-				// name can not be empty
-				createButton.prop('disabled', !$(this).val());
-			})
-		}
-		break;
-		case 'join' : {
-			// server tell user to join Kumalive, so user obeys
-			kumaliveWebsocket.send(JSON.stringify({
-				'type' : 'join'
-			}));
-		}
-		break;
-		case 'init' : {
-			if (!initialised) {
-				// it is the first refresh message ever
-				init(message);
-			}
-		}
-		break;
-		case 'refresh': {
-			if (refreshing) {
-				// set current message as the next one to be processed
-				queuedMessage = message;
-			} else {
-				// no refresh is running, so process current message
-				processRefresh(message);
-			}
-		}
-		break;
-		case 'finish' : {
-			// tell user that Kumalive is finished and close the window
-			window.alert(LABELS.FINISH_KUMALIVE_MESSAGE);
-			window.close();
-		}
-		break;
-	} 
-};
+				break;
+			case 'create' : {
+				// user is a teacher and will now create a new Kumalive
 
+				// hide splash screen
+				$('#initDiv').hide();
+				// show name input
+				var createDiv = $('#createKumaliveDiv'),
+					rubricsDiv = $('#rubrics .panel-body', createDiv);
+				if (message.rubrics) {
+					$.each(message.rubrics, function(){
+						if (this) {
+							var checkbox = $('<div />').addClass('checkbox').appendTo(rubricsDiv),
+								label = $('<label />').appendTo(checkbox);
+							$('<span />').text(this).appendTo(label);
+							$('<input />').attr('type', 'checkbox')
+								.prop('checked', true)
+								.prependTo(label);
+						}
+					});
+				}
+				// do not show the box at all if there are no rubrics
+				// (exactly: there is the single default blank one)
+				if ($('.checkbox', rubricsDiv).length == 0){
+					rubricsDiv.remove();
+				}
+
+				var createButton = createDiv.show().children('button').click(create).prop('disabled', true);
+				createDiv.children('input').focus().keyup(function(){
+					// name can not be empty
+					createButton.prop('disabled', !$(this).val());
+				})
+			}
+				break;
+			case 'join' : {
+				// server tell user to join Kumalive, so user obeys
+				websocket.send(JSON.stringify({
+					'type' : 'join'
+				}));
+			}
+				break;
+			case 'init' : {
+				if (!initialised) {
+					// it is the first refresh message ever
+					init(message);
+				}
+			}
+				break;
+			case 'refresh': {
+				if (refreshing) {
+					// set current message as the next one to be processed
+					queuedMessage = message;
+				} else {
+					// no refresh is running, so process current message
+					processRefresh(message);
+				}
+			}
+				break;
+			case 'finish' : {
+				// tell user that Kumalive is finished and close the window
+				window.alert(LABELS.FINISH_KUMALIVE_MESSAGE);
+				window.close();
+			}
+				break;
+		}
+
+		// reset ping timer
+		websocketPing('kumalive' + orgId, true);
+	};
+}
 
 /**
  * Initialise basic Kumalive information when first refresh message arrives
@@ -728,25 +691,25 @@ function learnerFadeOut(learnerDiv) {
 }
 
 function raiseHandPrompt() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'raiseHandPrompt'
 	}));
 }
 
 function downHandPrompt() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'downHandPrompt'
 	}));
 }
 
 function raiseHand() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'raiseHand'
 	}));
 }
 
 function downHand() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'downHand'
 	}));
 }
@@ -765,14 +728,14 @@ function speak() {
 		return;
 	}
 	
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'speak',
 		'speaker' : speakerId
 	}));
 }
 
 function stopSpeak() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'speak'
 	}));
 }
@@ -793,7 +756,7 @@ function score(){
 	} 
 	
 	if (score !== null) {
-		kumaliveWebsocket.send(JSON.stringify({
+		websocket.send(JSON.stringify({
 			'type'     : 'score',
 			'userID'   : container.attr('userId'),
 			'rubricId' : container.attr('rubricId'),
@@ -964,7 +927,7 @@ function startPoll(){
 	}
 
 	$('#pollSetup').hide();
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'startPoll',
 		'poll' : poll
 	}));
@@ -979,7 +942,7 @@ function votePoll() {
 		return;
 	}
 	pollId = null;
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' 		  : 'votePoll',
 		'answerIndex' : checkedAnswer.val()
 	}));
@@ -992,7 +955,7 @@ function releaseVotes() {
 	if (!confirm(LABELS.POLL_RELEASE_VOTES_CONFIRM)){
 		return;
 	}
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' 		    : 'releasePollResults',
 		'votesReleased' : true
 	}));
@@ -1006,7 +969,7 @@ function releaseVoters() {
 	if (!confirm(LABELS.POLL_RELEASE_VOTERS_CONFIRM)){
 		return;
 	}
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' 		     : 'releasePollResults',
 		'votersReleased' : true
 	}));
@@ -1024,7 +987,7 @@ function finishPoll() {
 	if (!confirm(LABELS.POLL_FINISH_CONFIRM)) {
 		return;
 	}
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'finishPoll',
 		'pollId' : pollId
 	}));
@@ -1036,7 +999,7 @@ function finishPoll() {
  * Hide poll for everyone
  */
 function closePoll() {
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type' : 'closePoll'
 	}));
 }
@@ -1052,7 +1015,7 @@ function create(){
 	$('#rubrics input:checked', createDiv).each(function(){
 		rubrics.push($(this).siblings('span').text());
 	});
-	kumaliveWebsocket.send(JSON.stringify({
+	websocket.send(JSON.stringify({
 		'type'    : 'start',
 		'role'    : role,
 		'name'    : name,
@@ -1066,7 +1029,7 @@ function create(){
  */
 function finish(){
 	if (confirm(LABELS.FINISH_KUMALIVE_CONFIRM)) {
-		kumaliveWebsocket.send(JSON.stringify({
+		websocket.send(JSON.stringify({
 			'type' : 'finish'
 		}));
 	}

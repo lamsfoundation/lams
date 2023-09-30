@@ -36,6 +36,7 @@
 							 tag  : "groupchat"
 							};
 	</script>
+	<lams:JSImport src="includes/javascript/websocket.js" />
 	<lams:JSImport src="includes/javascript/presence.js" relative="true" />
 	<script type="text/javascript">
 		$(document).ready(function() {

@@ -323,8 +323,65 @@
 		}
 
 		<c:if test="${mode != 'teacher'}">
-			// time limit feature
-			
+			$(document).ready(function(){
+				// time limit feature
+				let websocket = initWebsocket('scratchieTimeLimit${scratchie.contentId}',
+						'<lams:WebAppURL />'.replace('http', 'ws')
+						+ 'learningWebsocket?toolSessionID=${toolSessionID}&toolContentID=${scratchie.contentId}');
+
+				if (websocket) {
+					// when the server pushes new inputs
+					websocket.onmessage = function (e) {
+
+						// create JSON object
+						var input = JSON.parse(e.data);
+
+						if (input.pageRefresh) {
+							location.reload();
+							return;
+						}
+
+						if (input.clearTimer == true) {
+							// teacher stopped the timer, destroy it
+							$('#countdown').countdown('destroy').remove();
+						} else if (typeof input.secondsLeft != 'undefined'){
+							// teacher updated the timer
+							var secondsLeft = +input.secondsLeft,
+									counterInitialised = $('#countdown').length > 0;
+
+							if (counterInitialised) {
+								// just set the new time
+								$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+							} else {
+								// initialise the timer
+								displayCountdown(secondsLeft);
+							}
+						} else if (${not isUserLeader}){
+							// reflect the leader's choices
+							$.each(input, function(itemUid, options) {
+								$.each(options, function(optionUid, optionProperties){
+
+									if (optionProperties.isVSA) {
+										var answer = optionUid;
+										optionUid = hashCode(optionUid);
+
+										//check if such image exists, create it otherwise
+										if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
+											paintNewVsaAnswer(eval(itemUid), answer);
+										}
+									}
+
+									scratchImage(itemUid, optionUid, optionProperties.isCorrect);
+								});
+							});
+						}
+
+						// reset ping timer
+						websocketPing('scratchieTimeLimit${scratchie.contentId}', true);
+					};
+				}
+			});
+
 			function displayCountdown(secondsLeft){
 				var countdown = '<div id="countdown"></div>' 
 				$.blockUI({
@@ -357,6 +414,12 @@
 						}
 					},
 					onExpiry: function(periods) {
+						if (isWebsocketClosed('scratchieTimeLimit${scratchie.contentId}')){
+							console.error('Time limit websocket closed on time expire, reloading page');
+							alert('Connection issue. The page will now reload.');
+							document.location.reload();
+							return;
+						}
 				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
 				        
 				        setTimeout(function() { 
@@ -370,88 +433,6 @@
 					description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody></div>"
 				});
 			}
-	
-			//init the connection with server using server URL but with different protocol
-			var scratchieWebsocketInitTime = Date.now(),
-				scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-							+ 'learningWebsocket?toolSessionID=' + ${toolSessionID} + '&toolContentID=' + ${scratchie.contentId}),
-				scratchieWebsocketPingTimeout = null,
-				scratchieWebsocketPingFunc = null;
-			
-			scratchieWebsocket.onclose = function(e) {
-				// react only on abnormal close
-				if (e.code === 1006 &&
-					Date.now() - scratchieWebsocketInitTime > 1000) {
-					location.reload();		
-				}
-			};
-			
-			scratchieWebsocketPingFunc = function(skipPing){
-				if (scratchieWebsocket.readyState == scratchieWebsocket.CLOSING 
-						|| scratchieWebsocket.readyState == scratchieWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				scratchieWebsocketPingTimeout = setTimeout(scratchieWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					scratchieWebsocket.send("ping");
-				}
-			};
-			
-			// set up timer for the first time
-			scratchieWebsocketPingFunc(true);
-			
-			// run when the server pushes new reports and vote statistics
-			scratchieWebsocket.onmessage = function(e) {
-				// create JSON object
-				var input = JSON.parse(e.data);
-
-				if (input.pageRefresh) {
-					location.reload();
-					return;
-				}
-			
-				if (input.clearTimer == true) {
-					// teacher stopped the timer, destroy it
-					$('#countdown').countdown('destroy').remove();
-				} else if (typeof input.secondsLeft != 'undefined'){
-					// teacher updated the timer
-					var secondsLeft = +input.secondsLeft,
-						counterInitialised = $('#countdown').length > 0;
-						
-					if (counterInitialised) {
-						// just set the new time
-						$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-					} else {
-						// initialise the timer
-						displayCountdown(secondsLeft);
-					}
-				} else if (${not isUserLeader}){
-					// reflect the leader's choices
-					$.each(input, function(itemUid, options) {
-						$.each(options, function(optionUid, optionProperties){
-							
-							if (optionProperties.isVSA) {
-								var answer = optionUid;
-								optionUid = hashCode(optionUid);
-	
-								//check if such image exists, create it otherwise
-								if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
-									paintNewVsaAnswer(eval(itemUid), answer);
-								}
-							}
-							
-							scratchImage(itemUid, optionUid, optionProperties.isCorrect);
-						});
-					});
-				}
-				
-				// reset ping timer
-				clearTimeout(scratchieWebsocketPingTimeout);
-				scratchieWebsocketPingFunc(true);
-			};
 		</c:if>
 			
 		

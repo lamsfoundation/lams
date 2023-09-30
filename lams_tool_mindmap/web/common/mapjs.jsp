@@ -9,6 +9,7 @@
 <%-- <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/fullscreen.js"></script> --%>
 
+<lams:JSImport src="includes/javascript/websocket.js" />
 <script type="text/javascript">
 
 	var initialActionId = null,  // multiuser request tracking
@@ -59,7 +60,72 @@
 		        </c:if>
 		        contentAggregate = window.mapModel.getIdea();
 		        <c:if  test="${multiMode && contentEditable}">
-		        startWebsocket(initialActionId);
+
+				<%-- Websockets used to get the node updates from the server --%>
+				<%-- init the connection with server using server URL but with different protocol --%>
+				let websocket = initWebsocket('mindmapNodes${sessionId}',
+						'<lams:WebAppURL />'.replace('http', 'ws')
+						+ 'learningWebsocket?toolSessionID=${sessionId}&lastActionId=' + initialActionId);
+
+				if (websocket) {
+					// when the server pushes new inputs
+					websocket.onmessage = function (e) {
+						// create JSON object
+						var response = JSON.parse(e.data);
+
+						if ( ! response.actions ) {
+							return;
+						}
+
+						var valuesChanged = false;
+						for ( i=0; i<response.actions.length; i++ ) {
+							var action = response.actions[i];
+							requestId =  action.actionId;
+							if ( ! action.actionId ) {
+								abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
+								return;
+							}
+							// only process requests we have not done already otherwise we would redo any we trigger
+							if ( requestId > initialActionId && requestsProcessed.indexOf(requestId) == -1 ) {
+								if ( action.type == 0 ) {
+									customRemoveSubIdea(action.nodeId);
+								} else if ( action.type == 1 ) {
+									updateUnsavedNodeIds(action.childNodeId);
+									// add node response.nodeId, response.title, response.color
+									contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
+									var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
+									newChildNode.attr = {};
+									newChildNode.attr.contentLocked = true;
+									newChildNode.creator = action.creator;
+									if ( action.color ) {
+										newChildNode.attr.style = {};
+										newChildNode.attr.style.background = action.color;
+									}
+								} else if ( action.type == 2 ) {
+									// update colour - this call updates the node on screen but also triggers the change
+									// action which will call onIdeaChangedLAMS() - so the change to the other user's node
+									// will need to be ignored.
+									contentAggregate.mergeAttrProperty(action.nodeId, 'style', 'background', action.color);
+								} else if ( action.type == 3 ) {
+									// update title
+									var ideaToUpdate = contentAggregate.findSubIdeaById(action.nodeId);
+									ideaToUpdate.title = action.title;
+								} else {
+									abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
+								}
+								requestsProcessed.push( requestId );
+								updateLastActionId( requestId );
+								valuesChanged = true;
+							}
+						}
+						if ( valuesChanged ) {
+							window.mapModel.rebuildRequired();
+						}
+
+						// reset ping timer
+						websocketPing('mindmapNodes${sessionId}', true);
+					};
+				}
 			    </c:if>
 			},
 			error: function (response) {
@@ -244,114 +310,11 @@
 				return removedNodeIds[link.ideaIdFrom]  || removedNodeIds[link.ideaIdTo];
 			});
 		} 
-		
-		<%-- Websockets used to get the node updates from the server --%>
-		<%-- init the connection with server using server URL but with different protocol --%>
-		var mindmapWebsocketInitTime = null, 
-			mindmapWebsocket = null,
-			mindmapWebsocketPingTimeout = null,
-			mindmapWebsocketPingFunc = null;
 
 		function abortLoad(msg) {
 			alert(msg);
 			window.mapModel.setEditingEnabled(false);
 		}
-
-		mindmapWebsocketPingFunc = function(skipPing){
-			if (mindmapWebsocket.readyState == mindmapWebsocket.CLOSING 
-					|| mindmapWebsocket.readyState == mindmapWebsocket.CLOSED){
-				if (Date.now() - mindmapWebsocketInitTime < 1000) {
-					return;
-				}
-				abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-			}
-			// check and ping every 3 minutes
-			mindmapWebsocketPingTimeout = setTimeout(mindmapWebsocketPingFunc, 3*60*1000);
-			// initial set up does not send ping
-			if (!skipPing) {
-				mindmapWebsocket.send("ping");
-			}
-		};
-	
-		mindmapWebsocketProcessMessage = function(e) {
-			// create JSON object
-			var response = JSON.parse(e.data);
-			
-			// reset ping timer
-			clearTimeout(mindmapWebsocketPingTimeout);
-			mindmapWebsocketPingFunc(true);
-			
-        		if ( ! response.actions ) {
-        			return;
-        		}
-			        		
-        		var valuesChanged = false;
-        		for ( i=0; i<response.actions.length; i++ ) {
-        			var action = response.actions[i];
-       				requestId =  action.actionId;
-        			if ( ! action.actionId ) {
-        				abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-        				return;
-        			}
-        			// only process requests we have not done already otherwise we would redo any we trigger
-        			if ( requestId > initialActionId && requestsProcessed.indexOf(requestId) == -1 ) {
-		        		if ( action.type == 0 ) {
-		        			customRemoveSubIdea(action.nodeId);
-		        		} else if ( action.type == 1 ) {
-						updateUnsavedNodeIds(action.childNodeId);
-		        			// add node response.nodeId, response.title, response.color
-						contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
-		        			var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
-						newChildNode.attr = {};
-						newChildNode.attr.contentLocked = true;
-						newChildNode.creator = action.creator;
-		        			if ( action.color ) {
-							newChildNode.attr.style = {};
-			        			newChildNode.attr.style.background = action.color;
-		        			}
-		        		} else if ( action.type == 2 ) {
-		        			// update colour - this call updates the node on screen but also triggers the change
-		        			// action which will call onIdeaChangedLAMS() - so the change to the other user's node
-		        			// will need to be ignored.
-		        			contentAggregate.mergeAttrProperty(action.nodeId, 'style', 'background', action.color);
-		        		} else if ( action.type == 3 ) {
-		        			// update title
-		        			var ideaToUpdate = contentAggregate.findSubIdeaById(action.nodeId);
-		        			ideaToUpdate.title = action.title;    		
-		        		} else {
-						abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-		        		}
-		        		requestsProcessed.push( requestId );
-        				updateLastActionId( requestId );
-        				valuesChanged = true;
-	        		}
-        		}
-        		if ( valuesChanged ) {
-	        		window.mapModel.rebuildRequired();
-        		}
-		};
-	
-		// websocket communicaton should only be done once the diagram is fully loaded.
-		function startWebsocket(lastActionId) {
-			mindmapWebsocketInitTime = Date.now();
-			mindmapWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws')
-						+ 'learningWebsocket?toolSessionID=' + '${sessionId}' + '&lastActionId=' + lastActionId );
-
-			// run when the server pushes new reports and vote statistics
-			mindmapWebsocket.onmessage = mindmapWebsocketProcessMessage;
-
-			mindmapWebsocket.onclose = function(e){
-				if (e.code === 1006 &&
-					Date.now() - mindmapWebsocketInitTime > 1000) {
-					abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-				}
-			};
-			
-			// set up timer for the first time
-			mindmapWebsocketPingFunc(true);
-		}			
-
-		<%--  End Websockets --%>
 
     </c:when>
 	<c:otherwise>

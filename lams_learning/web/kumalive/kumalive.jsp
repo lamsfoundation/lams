@@ -19,6 +19,7 @@
 	<lams:JSImport src="includes/javascript/portrait.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
+
 	<script type="text/javascript">
 		"use strict"
 		
@@ -42,6 +43,7 @@
 			};
 			
 	</script>
+	<lams:JSImport src="includes/javascript/websocket.js" />
 	<lams:JSImport src="includes/javascript/kumalive.js" relative="true" />
 </lams:head>
 <body>
