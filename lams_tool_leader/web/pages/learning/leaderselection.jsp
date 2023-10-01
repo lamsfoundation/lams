@@ -36,26 +36,20 @@
 					keyboard: true
 				});
 
-				let websocket = initWebsocket('leaderSelection${toolSessionID}',
+				initWebsocket('leaderSelection${toolSessionID}',
 						'<lams:WebAppURL />'.replace('http', 'ws')
-						+ 'learningWebsocket?toolSessionID=${toolSessionID}');
+						+ 'learningWebsocket?toolSessionID=${toolSessionID}',
+						function (e) {
+							// create JSON object
+							var input = JSON.parse(e.data);
 
-				if (websocket) {
-					// when the server pushes new inputs
-					websocket.onmessage = function (e) {
-						// no need to reset ping timer as the only possible message is page refresh
-
-						// create JSON object
-						var input = JSON.parse(e.data);
-
-						// The leader has just been selected and all non-leaders should refresh their pages in order
-						// to see new leader's name and a Finish button.
-						if (input.pageRefresh) {
-							location.reload();
-							return;
-						}
-					};
-				}
+							// The leader has just been selected and all non-leaders should refresh their pages in order
+							// to see new leader's name and a Finish button.
+							if (input.pageRefresh) {
+								location.reload();
+								return;
+							}
+						});
 			});
 		
 			function leaderSelection() {

@@ -231,51 +231,47 @@
 								});
 							}
 
-							let commandWebsocket = initWebsocket('commandWebsocket', LEARNING_URL.replace('http', 'ws')
-									+ 'commandWebsocket?lessonID=' + lessonId);
-
-							if (commandWebsocket) {
-								// when the server pushes new inputs
-								commandWebsocket.onmessage = function (e) {
-								// read JSON object
-									var command = JSON.parse(e.data);
-									if (command.message) {
-										// some tools implement autosave feature
-										// if it is such a tool, trigger it
-										if (command.message === 'autosave') {
-											// the name of this function is same in all tools
-											if (typeof learnerAutosave == 'function') {
-												learnerAutosave(true);
+							initWebsocket('commandWebsocket', LEARNING_URL.replace('http', 'ws')
+									+ 'commandWebsocket?lessonID=' + lessonId,
+									function (e) {
+										// read JSON object
+										var command = JSON.parse(e.data);
+										if (command.message) {
+											// some tools implement autosave feature
+											// if it is such a tool, trigger it
+											if (command.message === 'autosave') {
+												// the name of this function is same in all tools
+												if (typeof learnerAutosave == 'function') {
+													learnerAutosave(true);
+												}
+											} else {
+												alert(command.message);
 											}
-										} else {
-											alert(command.message);
 										}
-									}
 
-									// if learner's currently displayed page has hookTrigger same as in the JSON
-									// then a function also defined on that page will run
-									if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger
-											&& typeof commandWebsocketHook === 'function') {
-										commandWebsocketHook(command.hookParams);
-									}
-
-									if (command.redirectURL) {
-										window.location.href = command.redirectURL;
-									}
-
-									if (command.discussion) {
-										var discussionCommand = $('#discussion-sentiment-command');
-										if (discussionCommand.length === 0) {
-											discussionCommand = $('<div />').attr('id', 'discussion-sentiment-command').appendTo('body');
+										// if learner's currently displayed page has hookTrigger same as in the JSON
+										// then a function also defined on that page will run
+										if (command.hookTrigger && command.hookTrigger == commandWebsocketHookTrigger
+												&& typeof commandWebsocketHook === 'function') {
+											commandWebsocketHook(command.hookParams);
 										}
-										discussionCommand.load(LEARNING_URL + "discussionSentiment/" + command.discussion + ".do", {
-											lessonId : lessonId
-										});
-									}
-									// reset ping timer
-									websocketPing('commandWebsocket', true);
-								};
-							}
+
+										if (command.redirectURL) {
+											window.location.href = command.redirectURL;
+										}
+
+										if (command.discussion) {
+											var discussionCommand = $('#discussion-sentiment-command');
+											if (discussionCommand.length === 0) {
+												discussionCommand = $('<div />').attr('id', 'discussion-sentiment-command').appendTo('body');
+											}
+											discussionCommand.load(LEARNING_URL + "discussionSentiment/" + command.discussion + ".do", {
+												lessonId : lessonId
+											});
+										}
+										// reset ping timer
+										websocketPing('commandWebsocket', true);
+									});
 						}
 					});
 				}

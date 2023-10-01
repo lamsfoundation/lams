@@ -325,61 +325,57 @@
 		<c:if test="${mode != 'teacher'}">
 			$(document).ready(function(){
 				// time limit feature
-				let websocket = initWebsocket('scratchieTimeLimit${scratchie.contentId}',
+				initWebsocket('scratchieTimeLimit${scratchie.contentId}',
 						'<lams:WebAppURL />'.replace('http', 'ws')
-						+ 'learningWebsocket?toolSessionID=${toolSessionID}&toolContentID=${scratchie.contentId}');
+						+ 'learningWebsocket?toolSessionID=${toolSessionID}&toolContentID=${scratchie.contentId}',
+						function (e) {
 
-				if (websocket) {
-					// when the server pushes new inputs
-					websocket.onmessage = function (e) {
+							// create JSON object
+							var input = JSON.parse(e.data);
 
-						// create JSON object
-						var input = JSON.parse(e.data);
-
-						if (input.pageRefresh) {
-							location.reload();
-							return;
-						}
-
-						if (input.clearTimer == true) {
-							// teacher stopped the timer, destroy it
-							$('#countdown').countdown('destroy').remove();
-						} else if (typeof input.secondsLeft != 'undefined'){
-							// teacher updated the timer
-							var secondsLeft = +input.secondsLeft,
-									counterInitialised = $('#countdown').length > 0;
-
-							if (counterInitialised) {
-								// just set the new time
-								$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-							} else {
-								// initialise the timer
-								displayCountdown(secondsLeft);
+							if (input.pageRefresh) {
+								location.reload();
+								return;
 							}
-						} else if (${not isUserLeader}){
-							// reflect the leader's choices
-							$.each(input, function(itemUid, options) {
-								$.each(options, function(optionUid, optionProperties){
 
-									if (optionProperties.isVSA) {
-										var answer = optionUid;
-										optionUid = hashCode(optionUid);
+							if (input.clearTimer == true) {
+								// teacher stopped the timer, destroy it
+								$('#countdown').countdown('destroy').remove();
+							} else if (typeof input.secondsLeft != 'undefined'){
+								// teacher updated the timer
+								var secondsLeft = +input.secondsLeft,
+										counterInitialised = $('#countdown').length > 0;
 
-										//check if such image exists, create it otherwise
-										if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
-											paintNewVsaAnswer(eval(itemUid), answer);
+								if (counterInitialised) {
+									// just set the new time
+									$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+								} else {
+									// initialise the timer
+									displayCountdown(secondsLeft);
+								}
+							} else if (${not isUserLeader}){
+								// reflect the leader's choices
+								$.each(input, function(itemUid, options) {
+									$.each(options, function(optionUid, optionProperties){
+
+										if (optionProperties.isVSA) {
+											var answer = optionUid;
+											optionUid = hashCode(optionUid);
+
+											//check if such image exists, create it otherwise
+											if ($('#image-' + itemUid + '-' + optionUid).length == 0) {
+												paintNewVsaAnswer(eval(itemUid), answer);
+											}
 										}
-									}
 
-									scratchImage(itemUid, optionUid, optionProperties.isCorrect);
+										scratchImage(itemUid, optionUid, optionProperties.isCorrect);
+									});
 								});
-							});
-						}
+							}
 
-						// reset ping timer
-						websocketPing('scratchieTimeLimit${scratchie.contentId}', true);
-					};
-				}
+							// reset ping timer
+							websocketPing('scratchieTimeLimit${scratchie.contentId}', true);
+						});
 			});
 
 			function displayCountdown(secondsLeft){

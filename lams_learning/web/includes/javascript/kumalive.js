@@ -26,7 +26,91 @@ var // is the user a learenr or a teacher
 	ANIMATION_DURATION = 1000,
 	websocket = initWebsocket('kumalive' + orgId,
 		LEARNING_URL.replace('http', 'ws')
-		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' + role);
+		+ 'kumaliveWebsocket?organisationID=' + orgId + '&role=' + role,
+		function (e) {
+			// read JSON object
+			var message = JSON.parse(e.data),
+				type = message.type;
+			// check what is this message about
+			switch(type) {
+				case 'start' : {
+					// user tried to join a Kumalive which is not started yet
+					// try to start it, if user is a teacher
+					// otherwise just wait for a teacher
+					this.send(JSON.stringify({
+						'type' : 'start',
+						'role' : role
+					}));
+				}
+					break;
+				case 'create' : {
+					// user is a teacher and will now create a new Kumalive
+
+					// hide splash screen
+					$('#initDiv').hide();
+					// show name input
+					var createDiv = $('#createKumaliveDiv'),
+						rubricsDiv = $('#rubrics .panel-body', createDiv);
+					if (message.rubrics) {
+						$.each(message.rubrics, function(){
+							if (this) {
+								var checkbox = $('<div />').addClass('checkbox').appendTo(rubricsDiv),
+									label = $('<label />').appendTo(checkbox);
+								$('<span />').text(this).appendTo(label);
+								$('<input />').attr('type', 'checkbox')
+									.prop('checked', true)
+									.prependTo(label);
+							}
+						});
+					}
+					// do not show the box at all if there are no rubrics
+					// (exactly: there is the single default blank one)
+					if ($('.checkbox', rubricsDiv).length == 0){
+						rubricsDiv.remove();
+					}
+
+					var createButton = createDiv.show().children('button').click(create).prop('disabled', true);
+					createDiv.children('input').focus().keyup(function(){
+						// name can not be empty
+						createButton.prop('disabled', !$(this).val());
+					})
+				}
+					break;
+				case 'join' : {
+					// server tell user to join Kumalive, so user obeys
+					this.send(JSON.stringify({
+						'type' : 'join'
+					}));
+				}
+					break;
+				case 'init' : {
+					if (!initialised) {
+						// it is the first refresh message ever
+						init(message);
+					}
+				}
+					break;
+				case 'refresh': {
+					if (refreshing) {
+						// set current message as the next one to be processed
+						queuedMessage = message;
+					} else {
+						// no refresh is running, so process current message
+						processRefresh(message);
+					}
+				}
+					break;
+				case 'finish' : {
+					// tell user that Kumalive is finished and close the window
+					window.alert(LABELS.FINISH_KUMALIVE_MESSAGE);
+					window.close();
+				}
+					break;
+			}
+
+			// reset ping timer
+			websocketPing('kumalive' + orgId, true);
+		});
 
 if (websocket) {
 	/**
@@ -36,92 +120,6 @@ if (websocket) {
 		websocket.send(JSON.stringify({
 			'type' : 'start'
 		}));
-	};
-
-	// when the server pushes new inputs
-	websocket.onmessage = function (e) {
-		// read JSON object
-		var message = JSON.parse(e.data),
-			type = message.type;
-		// check what is this message about
-		switch(type) {
-			case 'start' : {
-				// user tried to join a Kumalive which is not started yet
-				// try to start it, if user is a teacher
-				// otherwise just wait for a teacher
-				websocket.send(JSON.stringify({
-					'type' : 'start',
-					'role' : role
-				}));
-			}
-				break;
-			case 'create' : {
-				// user is a teacher and will now create a new Kumalive
-
-				// hide splash screen
-				$('#initDiv').hide();
-				// show name input
-				var createDiv = $('#createKumaliveDiv'),
-					rubricsDiv = $('#rubrics .panel-body', createDiv);
-				if (message.rubrics) {
-					$.each(message.rubrics, function(){
-						if (this) {
-							var checkbox = $('<div />').addClass('checkbox').appendTo(rubricsDiv),
-								label = $('<label />').appendTo(checkbox);
-							$('<span />').text(this).appendTo(label);
-							$('<input />').attr('type', 'checkbox')
-								.prop('checked', true)
-								.prependTo(label);
-						}
-					});
-				}
-				// do not show the box at all if there are no rubrics
-				// (exactly: there is the single default blank one)
-				if ($('.checkbox', rubricsDiv).length == 0){
-					rubricsDiv.remove();
-				}
-
-				var createButton = createDiv.show().children('button').click(create).prop('disabled', true);
-				createDiv.children('input').focus().keyup(function(){
-					// name can not be empty
-					createButton.prop('disabled', !$(this).val());
-				})
-			}
-				break;
-			case 'join' : {
-				// server tell user to join Kumalive, so user obeys
-				websocket.send(JSON.stringify({
-					'type' : 'join'
-				}));
-			}
-				break;
-			case 'init' : {
-				if (!initialised) {
-					// it is the first refresh message ever
-					init(message);
-				}
-			}
-				break;
-			case 'refresh': {
-				if (refreshing) {
-					// set current message as the next one to be processed
-					queuedMessage = message;
-				} else {
-					// no refresh is running, so process current message
-					processRefresh(message);
-				}
-			}
-				break;
-			case 'finish' : {
-				// tell user that Kumalive is finished and close the window
-				window.alert(LABELS.FINISH_KUMALIVE_MESSAGE);
-				window.close();
-			}
-				break;
-		}
-
-		// reset ping timer
-		websocketPing('kumalive' + orgId, true);
 	};
 }
 
@@ -691,25 +689,25 @@ function learnerFadeOut(learnerDiv) {
 }
 
 function raiseHandPrompt() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'raiseHandPrompt'
 	}));
 }
 
 function downHandPrompt() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'downHandPrompt'
 	}));
 }
 
 function raiseHand() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'raiseHand'
 	}));
 }
 
 function downHand() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'downHand'
 	}));
 }
@@ -727,15 +725,14 @@ function speak() {
 			&& !confirm(LABELS.SPEAK_CONFIRM)){
 		return;
 	}
-	
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'speak',
 		'speaker' : speakerId
 	}));
 }
 
 function stopSpeak() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'speak'
 	}));
 }
@@ -756,7 +753,7 @@ function score(){
 	} 
 	
 	if (score !== null) {
-		websocket.send(JSON.stringify({
+		sendToWebsocket('kumalive' + orgId, JSON.stringify({
 			'type'     : 'score',
 			'userID'   : container.attr('userId'),
 			'rubricId' : container.attr('rubricId'),
@@ -927,7 +924,7 @@ function startPoll(){
 	}
 
 	$('#pollSetup').hide();
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'startPoll',
 		'poll' : poll
 	}));
@@ -942,7 +939,7 @@ function votePoll() {
 		return;
 	}
 	pollId = null;
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' 		  : 'votePoll',
 		'answerIndex' : checkedAnswer.val()
 	}));
@@ -955,7 +952,7 @@ function releaseVotes() {
 	if (!confirm(LABELS.POLL_RELEASE_VOTES_CONFIRM)){
 		return;
 	}
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' 		    : 'releasePollResults',
 		'votesReleased' : true
 	}));
@@ -969,7 +966,7 @@ function releaseVoters() {
 	if (!confirm(LABELS.POLL_RELEASE_VOTERS_CONFIRM)){
 		return;
 	}
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' 		     : 'releasePollResults',
 		'votersReleased' : true
 	}));
@@ -987,7 +984,7 @@ function finishPoll() {
 	if (!confirm(LABELS.POLL_FINISH_CONFIRM)) {
 		return;
 	}
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'finishPoll',
 		'pollId' : pollId
 	}));
@@ -999,7 +996,7 @@ function finishPoll() {
  * Hide poll for everyone
  */
 function closePoll() {
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type' : 'closePoll'
 	}));
 }
@@ -1015,7 +1012,7 @@ function create(){
 	$('#rubrics input:checked', createDiv).each(function(){
 		rubrics.push($(this).siblings('span').text());
 	});
-	websocket.send(JSON.stringify({
+	sendToWebsocket('kumalive' + orgId, JSON.stringify({
 		'type'    : 'start',
 		'role'    : role,
 		'name'    : name,
@@ -1029,7 +1026,7 @@ function create(){
  */
 function finish(){
 	if (confirm(LABELS.FINISH_KUMALIVE_CONFIRM)) {
-		websocket.send(JSON.stringify({
+		sendToWebsocket('kumalive' + orgId, JSON.stringify({
 			'type' : 'finish'
 		}));
 	}

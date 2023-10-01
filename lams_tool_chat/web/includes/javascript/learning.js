@@ -17,14 +17,12 @@ $(document).ready(function() {
 	});
 
 	// only Monitor can send a personal message
-	let selectedUser = null,
-		websocket = initWebsocket('chat' + TOOL_SESSION_ID,
-		APP_URL.replace('http', 'ws')
-		+ 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
+	let selectedUser = null;
 
-	if (websocket) {
-		// when the server pushes new inputs
-		websocket.onmessage = function (e) {
+	initWebsocket('chat' + TOOL_SESSION_ID,
+		APP_URL.replace('http', 'ws')
+		+ 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID,
+		function (e) {
 			// create JSON object
 			var input = JSON.parse(e.data);
 			// clear old messages
@@ -78,9 +76,8 @@ $(document).ready(function() {
 
 			// reset ping timer
 			websocketPing('chat' + TOOL_SESSION_ID, true);
-		};
-	}
-	
+		});
+
 	function userSelected(userDiv) {
 		var userDivContent = userDiv.children().last().html().trim();
 		// is Monitor clicked the already selectedd user, desect him and make message go to everyone
@@ -101,18 +98,15 @@ $(document).ready(function() {
 			return false;  // do not send empty messages.
 		}
 		sendMessageArea.val('');
-		
+
 		// only Monitor can send a personal message
 		var isPrivate = MODE == 'teacher' && selectedUser,
 			output = {
-				 'toolSessionID' : TOOL_SESSION_ID,
-			  	 'toUser'   : isPrivate ? selectedUser : '',
-			  	 'message'  : isPrivate ? '[' + selectedUser + '] ' + message : message
+				'toolSessionID' : TOOL_SESSION_ID,
+				'toUser'   : isPrivate ? selectedUser : '',
+				'message'  : isPrivate ? '[' + selectedUser + '] ' + message : message
 			};
-		
-		// send it to server
-		websocket.send(JSON.stringify(output));
-
+		sendToWebsocket('chat' + TOOL_SESSION_ID, JSON.stringify(output));
 		// reset ping timer
 		websocketPing('chat' + TOOL_SESSION_ID, true);
 	}

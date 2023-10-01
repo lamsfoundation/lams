@@ -147,38 +147,33 @@
 					});
 				}
 
-				let websocket = initWebsocket('assessmentTimeLimit${sessionMap.assessment.contentId}',
+				initWebsocket('assessmentTimeLimit${sessionMap.assessment.contentId}',
 						'<lams:WebAppURL />'.replace('http', 'ws')
-						+ 'learningWebsocket?toolContentID=${sessionMap.assessment.contentId}');
+						+ 'learningWebsocket?toolContentID=${sessionMap.assessment.contentId}',
+						function (e) {
+							// read JSON object
+							var input = JSON.parse(e.data);
 
-				if (websocket) {
-					// when the server pushes new inputs
-					websocket.onmessage = function (e) {
-
-						// read JSON object
-						var input = JSON.parse(e.data);
-
-						if (input.clearTimer == true) {
-							// teacher stopped the timer, destroy it
-							$('#countdown').countdown('destroy').remove();
-						} else {
-							// teacher updated the timer
-							var secondsLeft = +input.secondsLeft,
-									counterInitialised = $('#countdown').length > 0;
-
-							if (counterInitialised) {
-								// just set the new time
-								$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+							if (input.clearTimer == true) {
+								// teacher stopped the timer, destroy it
+								$('#countdown').countdown('destroy').remove();
 							} else {
-								// initialise the timer
-								displayCountdown(secondsLeft);
-							}
-						}
+								// teacher updated the timer
+								var secondsLeft = +input.secondsLeft,
+										counterInitialised = $('#countdown').length > 0;
 
-						// reset ping timer
-						websocketPing('assessmentTimeLimit${sessionMap.assessment.contentId}', true);
-					};
-				}
+								if (counterInitialised) {
+									// just set the new time
+									$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+								} else {
+									// initialise the timer
+									displayCountdown(secondsLeft);
+								}
+							}
+
+							// reset ping timer
+							websocketPing('assessmentTimeLimit${sessionMap.assessment.contentId}', true);
+						});
 
 				//autocomplete for VSA
 				$('.ui-autocomplete-input').each(function(){

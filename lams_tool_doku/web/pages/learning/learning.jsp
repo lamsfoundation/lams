@@ -71,44 +71,40 @@
 				</c:if>
 			});
 
-				let websocket = initWebsocket('dokuTimeLimit${sessionMap.toolContentID}',
+				let timeLimitExceeded = ${timeLimitExceeded};
+				initWebsocket('dokuTimeLimit${sessionMap.toolContentID}',
 								'<lams:WebAppURL />'.replace('http', 'ws')
-								+ 'learningWebsocket?toolContentID=${sessionMap.toolContentID}'),
-						timeLimitExceeded = ${timeLimitExceeded};
+								+ 'learningWebsocket?toolContentID=${sessionMap.toolContentID}',
+								function (e) {
+									// create JSON object
+									var input = JSON.parse(e.data);
 
-				if (websocket) {
-					// when the server pushes new inputs
-					websocket.onmessage = function (e) {
-						// create JSON object
-						var input = JSON.parse(e.data);
+									if (input.clearTimer == true) {
+										// teacher stopped the timer, destroy it
+										$('#countdown').countdown('destroy').remove();
+									} else if (typeof input.secondsLeft != 'undefined'){
+										// teacher updated the timer
+										var secondsLeft = +input.secondsLeft,
+												counterInitialised = $('#countdown').length > 0;
 
-						if (input.clearTimer == true) {
-							// teacher stopped the timer, destroy it
-							$('#countdown').countdown('destroy').remove();
-						} else if (typeof input.secondsLeft != 'undefined'){
-							// teacher updated the timer
-							var secondsLeft = +input.secondsLeft,
-									counterInitialised = $('#countdown').length > 0;
+										if (counterInitialised) {
+											// just set the new time
+											$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+										} else if (timeLimitExceeded){
+											if (secondsLeft > 0) {
+												// teacher gave extra time, reload to writable Etherpad
+												location.reload();
+												return;
+											}
+										} else {
+											// initialise the timer
+											displayCountdown(secondsLeft);
+										}
+									}
 
-							if (counterInitialised) {
-								// just set the new time
-								$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-							} else if (timeLimitExceeded){
-								if (secondsLeft > 0) {
-									// teacher gave extra time, reload to writable Etherpad
-									location.reload();
-									return;
-								}
-							} else {
-								// initialise the timer
-								displayCountdown(secondsLeft);
-							}
-						}
-
-						// reset ping timer
-						websocketPing('dokuTimeLimit${sessionMap.toolContentID}', true);
-					};
-				}
+									// reset ping timer
+									websocketPing('dokuTimeLimit${sessionMap.toolContentID}', true);
+								});
 
 				$('[data-toggle="tooltip"]').bootstrapTooltip();
 			});

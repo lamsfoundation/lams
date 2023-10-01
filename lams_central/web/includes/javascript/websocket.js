@@ -60,7 +60,7 @@ function websocketPing(instanceName, skipPing){
     }
 };
 
-function initWebsocket(instanceName, url){
+function initWebsocket(instanceName, url, onMessageFunction){
     let websocket = lamsWebsockets[instanceName];
     if (!websocket) {
         websocket = {
@@ -72,6 +72,9 @@ function initWebsocket(instanceName, url){
         };
         lamsWebsockets[instanceName] = websocket;
     } else if (websocket.instance) {
+        if (!onMessageFunction) {
+            onMessageFunction = websocket.instance.onmessage;
+        }
         try {
             websocket.instance.close(1000);
         } catch (e) {
@@ -99,9 +102,26 @@ function initWebsocket(instanceName, url){
             websocketReconnect(instanceName);
         }
     };
+    if (onMessageFunction) {
+        websocket.instance.onmessage = onMessageFunction;
+    }
 
     // set up timer for the first time
     websocketPing(instanceName, true);
 
     return websocket.instance;
+}
+
+function sendToWebsocket(instanceName, message) {
+    let websocket = lamsWebsockets[instanceName];
+    if (!websocket) {
+        console.error("Websocket not initialized: " + instanceName);
+        return;
+    }
+    if (websocket.instance.readyState == WebSocket.CLOSING
+        || websocket.instance.readyState == WebSocket.CLOSED){
+        websocketReconnect(instanceName);
+        return;
+    }
+    websocket.instance.send(message);
 }

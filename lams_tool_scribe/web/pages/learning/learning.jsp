@@ -38,52 +38,49 @@
 
 	<script type="text/javascript" src='<lams:LAMSURL/>includes/javascript/jquery.js'></script>
 	<script type="text/javascript">
-		let scribeWebsocket = null;
+		let agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
+				reportSubmitted = ${scribeSessionDTO.reportSubmitted};
 		$(document).ready(function() {
-			scribeWebsocket = initWebsocket('scribe${scribeSessionDTO.sessionID}',
+			initWebsocket('scribe${scribeSessionDTO.sessionID}',
 					'${tool}'.replace('http', 'ws')
-					+ 'learningWebsocket?toolSessionID=${scribeSessionDTO.sessionID}');
+					+ 'learningWebsocket?toolSessionID=${scribeSessionDTO.sessionID}',
+					function (e) {
+						// create JSON object
+						var input = JSON.parse(e.data),
+								agreeButton = $('#agreeButton').parent();
 
-			if (scribeWebsocket) {
-				// when the server pushes new inputs
-				scribeWebsocket.onmessage = function (e) {
-					// create JSON object
-					var input = JSON.parse(e.data),
-							agreeButton = $('#agreeButton').parent();
+						// if the scribe or monitor force completes the activity, reload to display report page
+						if (input.close) {
+							window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
+							return;
+						}
 
-					// if the scribe or monitor force completes the activity, reload to display report page
-					if (input.close) {
-						window.location.href = '${tool}learning.do?toolSessionID=${scribeSessionDTO.sessionID}&mode=${MODE}';
-						return;
-					}
+						// only changed reports will be sent
+						if (input.reports) {
+							reportSubmitted = true;
+							$.each(input.reports, function() {
+								$('#reportText-' + this.uid).html(this.text);
+							});
+						}
 
-					// only changed reports will be sent
-					if (input.reports) {
-						reportSubmitted = true;
-						$.each(input.reports, function() {
-							$('#reportText-' + this.uid).html(this.text);
-						});
-					}
+						// can the user vote
+						if (!reportSubmitted || input.approved) {
+							agreeButton.hide();
+						} else {
+							agreeButton.show();
+						}
 
-					// can the user vote
-					if (!reportSubmitted || input.approved) {
-						agreeButton.hide();
-					} else {
-						agreeButton.show();
-					}
+						// update vote statistics
+						var label = agreementPercentageLabel.replace('{0}', input.numberOfVotes)
+								.replace('{1}', input.numberOfLearners);
+						$('#agreementPercentageLabel').text(label);
+						$('#agreementPercentage').text('(' + input.votePercentage + '%)');
+						$('#agreementPercentageBar').attr('aria-valuenow', input.votePercentage)
+								.css('width',input.votePercentage + '%');
 
-					// update vote statistics
-					var label = agreementPercentageLabel.replace('{0}', input.numberOfVotes)
-							.replace('{1}', input.numberOfLearners);
-					$('#agreementPercentageLabel').text(label);
-					$('#agreementPercentage').text('(' + input.votePercentage + '%)');
-					$('#agreementPercentageBar').attr('aria-valuenow', input.votePercentage)
-							.css('width',input.votePercentage + '%');
-
-					// reset ping timer
-					websocketPing('scribe${scribeSessionDTO.sessionID}', true);
-				};
-			}
+						// reset ping timer
+						websocketPing('scribe${scribeSessionDTO.sessionID}', true);
+					});
 		});
 
 		function submitApproval() {
@@ -91,7 +88,7 @@
 					data = {
 						type : 'vote'
 					};
-			scribeWebsocket.send(JSON.stringify(data));
+			sendToWebsocket('scribe${scribeSessionDTO.sessionID}', JSON.stringify(data));
 
 			agreeButton.hide();
 		}

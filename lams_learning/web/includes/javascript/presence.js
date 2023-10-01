@@ -88,14 +88,11 @@ $(document).ready(function (){
 			// update presenceTabLabel
 			$("#presenceUserCount").html(labelUsers + " (" + users.length + ")");
 		}
-	},
-	presenceWebsocket = initWebsocket('presence' + lessonId,
-		APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId);
+	};
 
-	if (presenceWebsocket) {
-		// when the server pushes new inputs
-		presenceWebsocket.onmessage = function (e) {
-
+	initWebsocket('presence' + lessonId,
+		APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId,
+		function (e) {
 			// create JSON object
 			var input = JSON.parse(e.data);
 			if (input.roster) {
@@ -149,8 +146,7 @@ $(document).ready(function (){
 
 			// reset ping timer
 			websocketPing('presence' + lessonId, true);
-		};
-	}
+		});
 });
 
 
@@ -215,9 +211,8 @@ function addTab(nick, tag) {
 		 'type'     : 'fetchConversation',
 		 'to'       : nick
 		};
-	
-	presenceWebsocket.send(JSON.stringify(data));
-	
+	sendToWebsocket('presence' + lessonId, JSON.stringify(data));
+
 	return tab;
 }
 
@@ -276,9 +271,8 @@ function sendMessage(receiver) {
 		 'to'       : tag == groupChatInfo.tag ? '' : receiver,
 		 'message'  : message
 		};
-	
-	presenceWebsocket.send(JSON.stringify(data));
-	
+	sendToWebsocket('presence' + lessonId, JSON.stringify(data));
+
 	// reset ping timer
 	websocketPing('presence' + lessonId, true);
 }
