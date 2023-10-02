@@ -133,7 +133,7 @@
     flex-direction: row-reverse;
 }
 
-.activity-bottom-buttons button, .activity-bottom-buttons a  {
+.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn {
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
@@ -312,12 +312,12 @@ div.growlUI h1,div.growlUI h2 {
 	font-size: medium;
 }
 
-.div-hover .row {
+.div-hover>div {
 	align-items: center;
 	border-top: 1px solid #ddd;
 	padding: 12px;
 }
-.div-hover .row:hover{
+.div-hover>div:hover{
 	background-color: var(--bs-gray-200);
 }
 

@@ -10,6 +10,11 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<style>
+	#new-image-input-area {
+		clear: both;
+	}
+</style>
 
 <lams:JSImport src="includes/javascript/common.js" />
 <c:if test="${isImageSelected}">
@@ -23,7 +28,6 @@
 		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
 		MAX_RATES = ${imageGallery.maximumRates},
 		MIN_RATES = ${imageGallery.minimumRates},
-		LAMS_URL = '${lams}',
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
@@ -62,11 +66,9 @@
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
-		
 		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
 				minNumberWordsLabel="label.minimum.number.words" />
-		<br><br>
 	</c:if>
 
 	<div id="extra-controls">
@@ -78,7 +80,7 @@
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
 
-					<div class="form-check mt-2 me-0">
+					<div id="favourite-button" class="form-check float-end">
 						<input type="checkbox" name="vote" class="form-check-input" id="voting-form-checkbox" 
 								<c:if test="${finishedLock}">disabled="disabled"</c:if>	
 								<c:if test="${sessionMap.isVoted}">checked="checked"</c:if>	
@@ -100,22 +102,22 @@
 			
 			<%--"Check for new", "Add new image" and "Delete" buttons---------------%>
 				
-			<div id="manage-image-buttons" class="btn-group" role="group">	
+			<div id="manage-image-buttons" class="btn-group" role="group" aria-label="Control buttons">	
 				<c:if test="${imageGallery.allowShareImages}">
-					<button onclick="return checkNew()" class="btn btn-sm btn-secondary" id="check-for-new-button"> 
-						<i class="fa fa-refresh"></i> <fmt:message key="label.check.for.new" /> 
+					<button onclick="return checkNew()" class="btn btn-sm btn-outline-secondary" id="check-for-new-button"> 
+						<i class="fa fa-refresh me-1"></i> <fmt:message key="label.check.for.new" /> 
 					</button>
 								
 					<c:if test="${not finishedLock}">
-						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
-								class="btn btn-secondary btn-sm" id="add-new-image-button">  
-							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
+						<button onclick="javascript:newImageInit('<lams:WebAppURL />authoring/newImageInit.do?sessionMapID=${sessionMapID}&bootstrap5=true&saveUsingLearningAction=true');"
+								class="btn btn-outline-secondary btn-sm" id="add-new-image-button">  
+							<i class="fa fa-upload me-1"></i> <fmt:message key="label.learning.add.new.image" />
 						</button>
 					</c:if>
 					
 					<c:if test="${sessionMap.isAuthor}">
-						<button href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-secondary btn-sm" id="delete-button"> 
-							<i class="fa fa-trash"></i> <fmt:message key="label.learning.delete.image" /> 
+						<button href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-outline-secondary btn-sm" id="delete-button"> 
+							<i class="fa fa-trash me-1"></i> <fmt:message key="label.learning.delete.image" /> 
 						</button>
 					</c:if>
 				</c:if>

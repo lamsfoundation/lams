@@ -26,6 +26,9 @@
 	left:0;
 	z-index:3;
 }
+.rating-stars-disabled .jStar {
+	cursor: initial !important;
+}
 
 /** P containing the rate informations **/
 p.jRatingInfos {

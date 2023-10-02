@@ -4,6 +4,7 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -19,26 +20,17 @@
 	</c:otherwise>
 </c:choose>
 <c:set var="ALLOWED_EXTENSIONS_IMAGE"><%=FileUtil.ALLOWED_EXTENSIONS_IMAGE%></c:set>
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
+<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
+<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
-<lams:html>
-<lams:head>
-	<title>
-		<fmt:message key="label.learning.title" />
-	</title>
-	<%@ include file="/common/header.jsp"%>
-
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
-	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
-	<c:set var="language"><lams:user property="localeLanguage"/></c:set>
-
+<lams:PageLearner title="${imageGallery.title}" toolSessionID="${toolSessionID}" >
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
 	<link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
-	
     <lams:css suffix="jquery.jRating"/>
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
@@ -52,8 +44,8 @@
 		var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
 	</script>
+	<lams:JSImport src="includes/javascript/imageGallerycommon.js" relative="true" />
 	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
-	
 	<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
 	<c:choose>
 		<c:when test="${language eq 'es'}">
@@ -66,13 +58,10 @@
 			<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
 		</c:when>
 	</c:choose>
-	
 	<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     <lams:JSImport src="includes/javascript/upload.js" />
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<lams:JSImport src="includes/javascript/fotorama.js" relative="true" />
- 	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
-		
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 	
@@ -98,22 +87,18 @@
 					thumbwidth: 80,//${thumbnailImageDimensions},
 					thumbheight: 80,//${thumbnailImageDimensions},
 				    data: [
-						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
-							<c:set var="description"><div><span class="caption-description">${image.descriptionEscaped}</span></c:set>
-							<c:if test="${!image.createByAuthor && (image.createBy != null)}">
-								<c:set var="portrait"><div class="me-2"><lams:Portrait userId="${image.createBy.userId}"/></div></c:set>
-								<c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
-								<c:set var="imageAddedBy"><div class="caption-description"><fmt:message key="label.learning.added.by" />&nbsp;<c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div></c:set>
-								<c:set var="description"><table><tr><td>${portrait}</td><td>${description}${imageAddedBy}</td></tr></table></c:set>
-							</c:if>					
-						
+						<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">						
 							{
 								img: "<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false",
 								full: "<lams:WebAppURL />download/?uuid=${image.originalFileDisplayUuid}&preferDownload=false",
 								id: '${image.uid}', // Custom anchor is used with the hash:true option.
-								caption: '<div class="caption-heading">${image.titleEscaped}</div>'
-									+ '${description}'
-									+'</div>',
+								caption:'<div class="card-subheader">${image.titleEscaped}</div>' +
+										'<div>${image.descriptionEscaped}</div>'										
+										<c:if test="${!image.createByAuthor && (image.createBy != null)}">
+											<c:set var="portrait"><lams:Portrait userId="${image.createBy.userId}"/></c:set>
+											<c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
+											+ '<div class="fst-italic"><fmt:message key="label.learning.added.by" /> <span class="mx-2">${portrait}</span><c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div>'
+										</c:if>
 								//html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
 								//fit: 'cover' // Override the global fit option.
 								//any: 'Any data relative to the frame you want to store'
@@ -155,21 +140,17 @@
 					sessionMapID: "${sessionMapID}"
 				}
 			);
-		}
-				
+		}	
     </script>
-</lams:head>
-<body class="stripes">
-	 <lams:Page type="learner" title="${imageGallery.title}">
-
+	<div class="container-lg">
+	
 		<%--Advanced settings and notices-----------------------------------%>
-
-		<div class="panel">
+		<div id="instructions" class="instructions">
 			<c:out value="${imageGallery.instructions}" escapeXml="false"/>
 		</div>
 		
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="lock-on-finish" close="false">
+			<lams:Alert5 type="danger" id="lock-on-finish" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" />
@@ -178,12 +159,11 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${imageGallery.allowRank && (imageGallery.minimumRates ne 0 || imageGallery.maximumRates ne 0)}">
-		
-			<lams:Alert type="info" id="rating-limits" close="false">
+			<lams:Alert5 type="info" id="rating-limits" close="false">
 				<c:choose>
 					<c:when test="${imageGallery.minimumRates ne 0 and imageGallery.maximumRates ne 0}">
 						<fmt:message key="label.rate.limits.reminder">
@@ -209,8 +189,7 @@
 				<fmt:message key="label.rate.limits.topic.reminder">
 					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>"/>
 				</fmt:message>
-			</lams:Alert>
-			
+			</lams:Alert5>
 		</c:if>
 		
 		<lams:errors/>
@@ -230,77 +209,40 @@
 		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default mt-2">
-				<div class="panel-heading panel-title">
-					<fmt:message key="title.reflection" />
-				</div>
-						
-		 		<div class="panel-body">
-		 			<div class="reflectionInstructions">
-						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-					</div>
-				
-					<div class="panel">
-						<c:choose>
-							<c:when test="${empty sessionMap.reflectEntry}">
-								<p>
-									<em> 
-										<fmt:message key="message.no.reflection.available" />
-									</em>
-								</p>
-							</c:when>
-							<c:otherwise>
-								<p>
-									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-								</p>
-							</c:otherwise>
-						</c:choose>
-					</div>
-
-					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-secondary float-start">
-							<fmt:message key="label.edit" />
-						</button>
-					</c:if>
-				</div>
-			</div>
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${sessionMap.reflectEntry}"
+				isEditButtonEnabled="${mode != 'teacher'}"
+				notebookHeaderLabelKey="title.reflection"/>
 		</c:if>
 		
 		<%--Bottom buttons-------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div id="learner-submit" class="mt-2"
+			<div class="activity-bottom-buttons" id="learner-submit"
 				<c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
 			>
 				<c:choose>
 					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary float-end" >
+						<button type="button" name="FinishButton" onclick="return continueReflect()" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary float-end" >
-							<span class="na">
-								<c:choose>
-				 					<c:when test="${sessionMap.isLastActivity}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
-							</span>
-						</a>
+						<button type="button" name="FinishButton" id="finishButton" class="btn btn-primary na" >
+							<c:choose>
+				 				<c:when test="${sessionMap.isLastActivity}">
+				 					<fmt:message key="label.submit" />
+				 				</c:when>
+				 				<c:otherwise>
+				 		 			<fmt:message key="label.finished" />
+				 				</c:otherwise>
+				 			</c:choose>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>	
 
-	</lams:Page>
-	<%--closes lams:Page--%>
-
-	<div id="footer"></div>
-	<%--closes footer--%>
-
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

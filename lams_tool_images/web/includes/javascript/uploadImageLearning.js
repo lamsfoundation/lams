@@ -5,11 +5,11 @@ function imageUploadedCallback(data) {
         
 function hideMessage(){
 	$("#new-image-input-area").hide();
-    $("#manage-image-buttons").show();
+    $("#manage-image-buttons, #favourite-button").show();
 }
 
 function newImageInit(newImageInitUrl) {
 	showMessage(newImageInitUrl);
-	$("#manage-image-buttons").fadeOut();
+	$("#manage-image-buttons, #favourite-button").fadeOut();
 	$("html, body").animate({ scrollTop: $(document).height() }, "slow");
 }
