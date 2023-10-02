@@ -108,7 +108,7 @@ public class LearningController {
 	}
 	request.setAttribute("chatUserDTO", chatUserDTO);
 
-	// Ensure that the content is use flag is set.
+	// Ensure that the content is use flag is set
 	if (!chat.isContentInUse()) {
 	    chat.setContentInUse(true);
 	    chatService.saveOrUpdateChat(chat);
@@ -116,11 +116,9 @@ public class LearningController {
 
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionID));
 
-	/* Check if submission deadline is null */
-
+	// Check if submission deadline is null
 	Date submissionDeadline = chatDTO.getSubmissionDeadline();
 	request.setAttribute("chatDTO", chatDTO);
-
 	if (submissionDeadline != null) {
 
 	    HttpSession ss = SessionManager.getSession();
@@ -134,20 +132,17 @@ public class LearningController {
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		return "pages/learning/submissionDeadline";
 	    }
-
 	}
 
 	return "pages/learning/learning";
     }
 
     @RequestMapping("/finishActivity")
-    public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public void finishActivity(@ModelAttribute LearningForm learningForm, HttpServletResponse response) {
 	Long userUid = learningForm.getChatUserUID();
 
-	String nextActivityUrl;
 	try {
-	    nextActivityUrl = chatService.finishToolSession(userUid);
+	    String nextActivityUrl = chatService.finishToolSession(userUid);
 	    response.sendRedirect(nextActivityUrl);
 	} catch (DataMissingException e) {
 	    throw new ChatException(e);
@@ -156,8 +151,6 @@ public class LearningController {
 	} catch (IOException e) {
 	    throw new ChatException(e);
 	}
-
-	return null; // TODO need to return proper page.
     }
 
     @RequestMapping("/openNotebook")
@@ -185,11 +178,9 @@ public class LearningController {
     }
 
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public void submitReflection(@ModelAttribute LearningForm learningForm, HttpServletResponse response) {
 
 	// save the reflection entry and call the notebook.
-
 	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
 	Long toolSessionID = chatUser.getChatSession().getSessionId();
 	Integer userID = chatUser.getUserId().intValue();
@@ -209,7 +200,7 @@ public class LearningController {
 	    chatService.updateEntry(entry);
 	}
 
-	return finishActivity(learningForm, request, response);
+	finishActivity(learningForm, response);
     }
 
     private ChatUser getCurrentUser(Long toolSessionId) {

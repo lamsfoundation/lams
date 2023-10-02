@@ -1,108 +1,158 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"> <lams:LAMSURL /> </c:set>
+<c:set var="tool"> <lams:WebAppURL /> </c:set>
 
-<lams:html>
+<lams:PageLearner title="${chatDTO.title}" toolSessionID="${param.toolSessionID}" >
+	<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
+
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '<c:out value="${param.toolSessionID}" />', '', function(){
+			 submitForm('finishActivity');
+		});
 		
-		<c:set var="lams"> <lams:LAMSURL /> </c:set>
-		<c:set var="tool"> <lams:WebAppURL /> </c:set>
-	
-	<lams:head>
-		<title>
-			<fmt:message key="activity.title" />
-		</title>
-		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
-		<link href="<lams:LAMSURL/>css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript">
-		var MODE = "${MODE}", TOOL_SESSION_ID = '<c:out value="${param.toolSessionID}" />', APP_URL = '<lams:WebAppURL />', LEARNING_ACTION = "<c:url value='learning/learning.do'/>", LAMS_URL = '<lams:LAMSURL/>';
-		</script>
-		<lams:JSImport src="includes/javascript/portrait.js" />
-		<lams:JSImport src="includes/javascript/learning.js" relative="true" />
-			
-	
-	</lams:head>
+		function disableFinishButton() {
+			var finishButton = document.getElementById("finishButton");
+			if (finishButton != null) {
+				finishButton.disabled = true;
+			}
+		}
+	    function submitForm(metodName){
+	        var f = document.getElementById("learningForm");
+	        f.submit();
+	    }
 
-	<body class="stripes">
-			
-		<lams:Page type="learner" title="${chatDTO.title}">
-			<div class="panel">
-				<c:out value="${chatDTO.instructions}" escapeXml="false" />
+    	var MODE = "${MODE}", 
+			TOOL_SESSION_ID = '<c:out value="${param.toolSessionID}" />', 
+			APP_URL = '<lams:WebAppURL />', 
+			LEARNING_ACTION = "<c:url value='learning/learning.do'/>";
+	</script>
+	<lams:JSImport src="includes/javascript/portrait5.js" />
+	<lams:JSImport src="includes/javascript/learning.js" relative="true" />
+	
+	<div class="container-lg">
+		<div id="instructions" class="instructions">
+			<c:out value="${chatDTO.instructions}" escapeXml="false" />
+		</div>
+		
+		<!-- Announcements and advanced settings -->
+		<c:if test="${chatDTO.lockOnFinish}">
+			<lams:Alert5 id="lockWhenFinished" type="info" close="true">
+				<c:choose>
+					<c:when test="${chatUserDTO.finishedActivity}">
+						<fmt:message key="message.activityLocked" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="message.warnLockOnFinish" />
+					</c:otherwise>
+				</c:choose>
+			</lams:Alert5>
+		</c:if>
+		
+		<c:if test="${not empty submissionDeadline}">
+			<lams:Alert5 id="submissionDeadline" type="info" close="true">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${submissionDeadline}" />
+					</fmt:param>
+				</fmt:message>
+			</lams:Alert5>
+		</c:if>
+		
+		<!-- chat UI -->
+		<div class="row">
+			<div class="col-12 col-sm-9 col-md-9 col-lg-8">
+				<div id="messages" class="shadow" aria-live="polite"></div>
 			</div>
+			<div class="col-12 col-sm-3 col-md-3 col-lg-4">
+				<div id="roster" class="d-none d-sm-block div-hover shadow ${MODE == 'teacher' ? 'mode-teacher' : ''}"></div>
+			</div>
+		</div>
 		
-			<c:if test="${MODE == 'learner' || MODE == 'author'}">
-		
-				<!-- Announcements and advanced settings -->
-				<c:if test="${chatDTO.lockOnFinish}">
-					<lams:Alert id="lockWhenFinished" type="info" close="true">
-						<c:choose>
-							<c:when test="${chatUserDTO.finishedActivity}">
-								<fmt:message key="message.activityLocked" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="message.warnLockOnFinish" />
-							</c:otherwise>
-						</c:choose>
-					</lams:Alert>
-				</c:if>
-		
-				<c:if test="${not empty submissionDeadline}">
-		
-					<lams:Alert id="submissionDeadline" type="info" close="true">
-						<fmt:message key="authoring.info.teacher.set.restriction">
-							<fmt:param>
-								<lams:Date value="${submissionDeadline}" />
-							</fmt:param>
-						</fmt:message>
-					</lams:Alert>
-				</c:if>
-			</c:if>
-			<!-- End announcements and advanced settings -->
-		
-			<!-- chat UI -->
+		<c:if test="${MODE == 'teacher'}">
 			<div class="row">
+				<div class="col-12 mt-2">
+					<div id="sentTo" class="badge bg-info">
+						<fmt:message key="label.sendMessageTo" />
+						&nbsp;
+						<span id="sendToEveryone">
+							<fmt:message key="label.everyone" />
+						</span> 
+						<span id="sendToUser" style="display: none"></span>
+					</div>
+				</div>
+			</div>
+		</c:if>
+		
+		<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
+			<div class="row align-items-center">
 				<div class="col-12 col-sm-9 col-md-9 col-lg-8">
-					<div id="messages"></div>
+					<div id="textArea" class="mt-2">
+						<label for="sendMessageArea" class="visually-hidden">
+							<fmt:message key="button.send"/>
+						</label>
+						<textarea id="sendMessageArea" rows="2" class="form-control shadow" autofocus></textarea>
+					</div>
 				</div>
 				<div class="col-12 col-sm-3 col-md-3 col-lg-4">
-					<div id="roster" class="d-none d-sm-block"></div>
+					<div id="sendMessageButtonCell" class="mt-2">
+						<button id="sendMessageButton" class="btn btn-autoresize btn-secondary" type="button" onclick="javascript:sendChatToolMessage()">
+							<i class="fa-solid fa-comment fa-lg me-1"></i>
+							<fmt:message key="button.send"/>
+						</button>
+					</div>
 				</div>
 			</div>
-			<c:if test="${MODE == 'teacher'}">
-				<div class="row">
-					<div class="col-12 mt-2">
-						<div id="sentTo">
-							<fmt:message key="label.sendMessageTo" />
-							&nbsp;<span id="sendToEveryone"><fmt:message key="label.everyone" /></span> <span id="sendToUser"
-								style="display: none"></span>
-						</div>
-					</div>
-				</div>
-			</c:if>
+		</c:if>
 		
-			<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
-				<div class="row">
-					<div class="col-12 col-sm-9 col-md-9 col-lg-8">
-						<div id="textArea" class="mt-2">
-							<textarea id="sendMessageArea" rows="2" class="form-control" autofocus></textarea>
-						</div>
-					</div>
-					<div class="col-12 col-sm-3 col-md-3 col-lg-4">
-						<div id="sendMessageButtonCell" class="mt-2">
-							<input id="sendMessageButton" class="btn btn-autoresize btn-secondary" type="button" onclick="javascript:sendChatToolMessage()"
-								value='<fmt:message key="button.send"/>' />
-						</div>
-					</div>
-				</div>
-			</c:if>
-		
-			<c:if test="${MODE == 'learner' || MODE == 'author'}">
-				<%@ include file="parts/finishButton.jsp"%>
-			</c:if>
-		</lams:Page>
-
+		<c:if test="${MODE == 'learner' || MODE == 'author'}">
+			<form action="openNotebook.do" method="post">
+				<input type="hidden" name="chatUserUID" value="${chatUserDTO.uid}" />
 			
-	</body>
-</lams:html>
+				<c:if test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
+					<br class="mt-5">
+					<lams:NotebookReedit
+						reflectInstructions="${chatDTO.reflectInstructions}"
+						reflectEntry="${chatUserDTO.notebookEntry}"
+						isEditButtonEnabled="true"
+						notebookHeaderLabelKey="button.reflect"
+						editNotebookLabelKey="button.edit"/>
+				</c:if>
+			</form>
+
+			<div class="activity-bottom-buttons" id="learner-submit">
+				<c:choose>
+					<c:when test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
+						<form:form action="openNotebook.do" method="post"
+								onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
+							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+							<button type="submit" class="btn btn-responsive btn-primary na mt-2">
+								<fmt:message key="button.continue" />
+							</button>
+						</form:form>
+					</c:when>
+
+					<c:otherwise>
+						<form:form action="finishActivity.do" method="post"
+								onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+							<button type="button" class="btn btn-primary mt-2 na btn-autoresize" id="finishButton">
+								 <span class="nextActivity">
+									 <c:choose>
+									 	<c:when test="${isLastActivity}">
+									 		 <fmt:message key="button.submit" />
+									 	</c:when>
+									 	<c:otherwise>
+									 		 <fmt:message key="button.finish" />
+									 	</c:otherwise>
+									 </c:choose>
+								 </span>
+							</button>
+						</form:form>
+					</c:otherwise>
+				</c:choose>
+			</div>
+
+		</c:if>
+	</div>
+</lams:PageLearner>
