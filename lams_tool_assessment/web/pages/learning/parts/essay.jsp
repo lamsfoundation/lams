@@ -142,13 +142,13 @@
 	<div>
 		<c:choose>
 			<c:when test="${question.allowRichEditor && hasEditRight}">
-				<lams:CKEditor id="essay-question${questionIndex}"
+				<lams:CKEditor id="question${questionIndex}"
 					value="${question.answer}"
 					contentFolderID="${sessionMap.learnerContentFolder}"
 					toolbarSet="DefaultLearner" height="174px"
 					maxWords="${question.maxWordsLimit}"
 					ariaLabelledby="question-title-${questionIndex} instructions-${questionIndex}"
-					ariaRequired="${question.answerRequired}"
+					isRequired="${question.answerRequired}"
 					></lams:CKEditor>
 			</c:when>
 			
