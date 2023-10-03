@@ -5,19 +5,19 @@
 
 <!--question content goes here-->
 <c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
-
-	<c:if test="${questionEntry.key == generalLearnerFlowDTO.currentQuestionIndex}">
+	<c:set var="questionIndex" value="${questionEntry.key}"/>
+	<c:if test="${questionIndex == generalLearnerFlowDTO.currentQuestionIndex}">
 		
-		<div class="card lcard mt-4" id="question<c:out value='${questionEntry.key}' />">
+		<div class="card lcard mt-4" id="question${questionIndex}">
 			<div class="card-header">
 				<div class="card-title">
-					<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}"><c:out value="${questionEntry.key}" />.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
+					<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">${questionIndex}.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
 				</div>
 			</div>
 
 			<div class="card-body">
 				<c:if test="${not empty questionEntry.value.description}">
-					<div class="" id="questionDescription">
+					<div>
 						<c:out value="${questionEntry.value.description}" escapeXml="false" />
 					</div>
 				</c:if>
@@ -33,31 +33,33 @@
 					</c:if>
 				</div>
 
-				<div class="my-2" id="answerResponse">
-					<label class="visually-hidden" for="answer">
+				<div class="my-2">
+					<label class="visually-hidden" id="your-answer-label"  for="answer">
 						<fmt:message key="label.learning.yourAnswer" />
 					</label>
 					
-					<div data-sequence-id="${questionEntry.key}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
+					<div data-sequence-id="${questionIndex}" data-is-ckeditor="${generalLearnerFlowDTO.allowRichEditor}"
 						data-min-words-limit="${questionEntry.value.minWordsLimit}"
 						<c:if test="${questionEntry.value.minWordsLimit != 0}">class="min-words-limit-enabled"</c:if>>
-						<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
+						
 						<c:choose>
 							<c:when test="${generalLearnerFlowDTO.allowRichEditor}">
 								<lams:CKEditor id="answer" value="${generalLearnerFlowDTO.currentAnswer}"
-								 contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
+								 contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"
+								 ariaLabelledby="your-answer-label">
 								</lams:CKEditor>
 							</c:when>
 
 							<c:otherwise>
-								<lams:textarea name="answer" id="answer" rows="5" placeholder="${placeholder}" class="form-control">
+								<c:set var="placeholder"><fmt:message key="label.learning.yourAnswer" />...</c:set>
+								<lams:textarea name="answer" rows="5" placeholder="${placeholder}" class="form-control">
 									<c:out value='${generalLearnerFlowDTO.currentAnswer}' escapeXml='false' />
 								</lams:textarea>
 							</c:otherwise>
 						</c:choose>
 					</div>
 
-					<input type="hidden" name="currentQuestionIndex" value="${questionEntry.key}" />
+					<input type="hidden" name="currentQuestionIndex" value="${questionIndex}" />
 				</div>
 			</div>
 		</div>
