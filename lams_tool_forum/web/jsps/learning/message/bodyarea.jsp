@@ -40,7 +40,7 @@
 			var counter = function(evt) {
 				
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea[id="message.body"]').val();
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
 				//limit is not exceeded
@@ -74,7 +74,7 @@
 					this.value = this.value.substring(0, limit);
 					//fix a bug: when change "this.value", onchange event won't be fired any more. So this will 
 					//manually handle onchange event. It is a kind of crack coding!
-					filterData(document.getElementById('message.body__lamstextarea'),document.getElementById('message.body__lamshidden'));						
+					filterData(document.getElementById('message.body'),document.getElementById('message.body__lamshidden'));						
 				}
 			};
 			
@@ -91,7 +91,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea[id="message.body"]').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}
@@ -112,7 +112,7 @@
 			//character count fuction
 			var counter = function() {
 				var value = isCkeditor ? ckeditor.getSnapshot() 
-						: $('textarea[id="message.body__lamstextarea"]').val();
+						: $('textarea[id="message.body"]').val();
 			    
 				var charactersCount = getNumberOfCharacters(value, isCkeditor);
 				
@@ -133,7 +133,7 @@
 			    ckeditor.on('instanceReady', counter);
 			      
 			} else {
-				$('textarea[id="message.body__lamstextarea"]').on('change keydown keypress keyup paste', counter);
+				$('textarea[id="message.body"]').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
 			}

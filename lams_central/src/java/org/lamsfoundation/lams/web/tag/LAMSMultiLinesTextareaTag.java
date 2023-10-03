@@ -56,7 +56,7 @@ public class LAMSMultiLinesTextareaTag extends BodyTagSupport implements Dynamic
 
 	    this.name += "__textarea";
 	    if (StringUtils.isEmpty(this.getId())) {
-		this.setId(tagName + "__lamstextarea");
+		this.setId(tagName);
 	    }
 	    StringBuffer results = new StringBuffer(
 		    renderTextareaElement(getDataNoBr(oldBodyContent == null ? null : oldBodyContent.getString())));

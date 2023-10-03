@@ -30,7 +30,7 @@
 			</div>
 		
 			<div class="mb-3">
-				<label for="${saveUsingLearningAction ? 'description__lamstextarea' : 'description'}">
+				<label for="description">
 					<fmt:message key="label.authoring.basic.resource.description.input" />
 				</label>
 
