@@ -35,6 +35,21 @@
 					show: ${isSelectLeaderActive},
 					keyboard: true
 				});
+
+				initWebsocket('leaderSelection${toolSessionID}',
+						'<lams:WebAppURL />'.replace('http', 'ws')
+						+ 'learningWebsocket?toolSessionID=${toolSessionID}',
+						function (e) {
+							// create JSON object
+							var input = JSON.parse(e.data);
+
+							// The leader has just been selected and all non-leaders should refresh their pages in order
+							// to see new leader's name and a Finish button.
+							if (input.pageRefresh) {
+								location.reload();
+								return;
+							}
+						});
 			});
 		
 			function leaderSelection() {
@@ -52,54 +67,6 @@
 		    function finishActivity(){
 				location.href = '<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
 		    }
-		
-		 	//init the connection with server using server URL but with different protocol
-		 	var leaderWebsocketInitTime = Date.now(),
-		 		leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
-		 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID}),
-				leaderWebsocketPingTimeout = null,
-				leaderWebsocketPingFunc = null;
-		 	
-		 	leaderWebsocket.onclose = function(e){
-		 		// react only on abnormal close
-		 		if (e.code === 1006 &&
-		 		 	Date.now() - leaderWebsocketInitTime > 1000) {
-		 	 		location.reload();
-		 		}
-		 	};
-		 	
-			leaderWebsocketPingFunc = function(skipPing){
-				if (leaderWebsocket.readyState == leaderWebsocket.CLOSING 
-						|| leaderWebsocket.readyState == leaderWebsocket.CLOSED){
-					return;
-				}
-				
-				// check and ping every 3 minutes
-				leaderWebsocketPingTimeout = setTimeout(leaderWebsocketPingFunc, 3*60*1000);
-				// initial set up does not send ping
-				if (!skipPing) {
-					leaderWebsocket.send("ping");
-				}
-			};
-			
-			// set up timer for the first time
-			leaderWebsocketPingFunc(true);
-		
-		 	
-			// run when the leader has just been selected
-			leaderWebsocket.onmessage = function(e) {
-				// no need to reset ping timer as the only possible message is page refresh
-				
-				// create JSON object
-				var input = JSON.parse(e.data);
-				
-				// The leader has just been selected and all non-leaders should refresh their pages in order
-		     	// to see new leader's name and a Finish button.
-				if (input.pageRefresh) {
-					location.reload();
-					return;
-				}
-			};
 		</script>
 	</lams:head>
 	
