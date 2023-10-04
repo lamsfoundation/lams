@@ -273,13 +273,13 @@ body.component i.fa[role="button"] {
 	cursor: pointer;
 }
 
-body.component table.table thead th {
+body.component table.table:not(.table-bordered) thead th {
 	border: none;
 	border-bottom: 2px solid var(--bs-blue);
 }
 
-body.component table.table tbody td,
-body.component table.table tbody th,
+body.component table.table:not(.table-bordered) tbody td,
+body.component table.table:not(.table-bordered) tbody th,
 body.component .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
 	border: none;
 	border-bottom: 2px solid var(--bs-gray-200) !important;

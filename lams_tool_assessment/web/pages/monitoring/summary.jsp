@@ -20,6 +20,11 @@
 	   	overflow: auto;
 	   	min-width: 150px;
 	}
+
+	canvas {
+		width: 100% !important;
+		height: 100% !important;
+	}
 </style>
 
 <%@ include file="parts/discloseAnswers.jsp"%>

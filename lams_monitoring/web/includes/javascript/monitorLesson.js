@@ -871,13 +871,11 @@ function applyStateChange(state, method, newLessonEndDate) {
 }
 
 function drawLessonCompletionChart(){
-	d3.json(LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
-		function(error, response){
-			if (error) {
-				// forward error to browser
-				throw error;
-			}
-
+	$.ajax({
+		url : LAMS_URL + 'monitoring/monitoring/getLessonChartData.do?lessonID=' + lessonId,
+		dataType : 'json',
+		cache : false,
+		success : function(response) {
 			if (!response || $.isEmptyObject(response)) {
 				// if there is no data to display
 				return;
@@ -906,20 +904,13 @@ function drawLessonCompletionChart(){
 			let ctx = chartDiv[0].getContext('2d');
 			lessonCompletionChart = new Chart(ctx, {
 				type : 'doughnut',
-				borderWidth : 0,
 				data : {
-					elements : {
-						arc : {
-							borderWidth : 0,
-							fontSize : 0,
-						}
-					},
 					datasets : [ {
 						data : percent,
 						backgroundColor : [
+							GRAPH_COLORS.blue,
 							GRAPH_COLORS.yellow,
-							GRAPH_COLORS.green,
-							GRAPH_COLORS.blue
+							GRAPH_COLORS.green
 						],
 						borderWidth : 1,
 						borderColor : COLORS.gray
@@ -928,20 +919,26 @@ function drawLessonCompletionChart(){
 				},
 				options : {
 					responsive : false,
-					tooltips : {
+					animation : {
+						animateScale : true,
+						animateRotate : true,
+						duration : 1000
+					},
+					plugins : {
+						tooltip : {
 						enabled : true,
 						callbacks: {
-							label : function(tooltipItem, data) {
-								let index =  tooltipItem.index,
+								label : function(context) {
+									let index =  context.dataIndex,
 
-									rawData = this._chart.lessonCompletionChartRawData,
-									percent = data.datasets[0].data,
+										rawData = context.chart.lessonCompletionChartRawData,
+										percent = context.dataset.data,
 
 									label = labels[index],
 									value = percent[index],
 									rawValue = rawData[index];
 
-								return label + ": " + rawValue + " (" + value + "%)";
+									return " " + rawValue + " (" + value + "%)";
 							}
 						}
 					},
@@ -949,7 +946,9 @@ function drawLessonCompletionChart(){
 						position: 'bottom',
 						align: 'start',
 						labels : {
-							fontSize : 16,
+								font : {
+									size: 15
+								},
 							generateLabels : function(chart) {
 								var data = chart.data;
 								if (data.labels.length && data.datasets.length) {
@@ -976,17 +975,14 @@ function drawLessonCompletionChart(){
 								return [];
 							}
 						}
-					},
-					animation : {
-						animateScale : true,
-						animateRotate : true,
-						duration : 1000
+						}
 					}
 				}
 			});
 
 			lessonCompletionChart.lessonCompletionChartRawData = raw;
 			chartDiv.data('chart', lessonCompletionChart);
+		}
 		});
 }
 

@@ -101,7 +101,9 @@
 	<div class="row" id="completion-charts-container">
 		<div class="col-md-5 col-sm-12 offset-md-1 me-2 my-4">
 			<div class="monitoring-panel">
-				<canvas id="activity-completion-chart"></canvas>
+				<div style="max-width: 400px; margin: auto">
+					<canvas id="activity-completion-chart"></canvas>
+				</div>
 			</div>
 		</div>
 
