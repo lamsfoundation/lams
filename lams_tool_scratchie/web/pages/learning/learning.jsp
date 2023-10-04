@@ -524,7 +524,7 @@
 		}
     </script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<lams:LeaderDisplay username="${sessionMap.groupLeaderName}" userId="${sessionMap.groupLeaderUserId}"/>
 
 		<c:if test="${sessionMap.userFinished && (mode == 'teacher')}">

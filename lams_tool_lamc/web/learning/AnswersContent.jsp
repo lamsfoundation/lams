@@ -113,8 +113,7 @@
         }
       </script>
 
-	<div class="container-lg">
-
+	<div id="container-main">
 		<div id="instructions" class="instructions">
 			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 		</div>

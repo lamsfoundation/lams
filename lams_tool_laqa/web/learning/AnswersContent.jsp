@@ -22,12 +22,13 @@
 			font-size: 18px;
 		}
 	</style>
+	
+	<div id="container-main">
 
-	<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.instructions'/>">
-		<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-	</div>
+		<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.instructions'/>">
+			<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+		</div>
 
-	<div class="container-lg">
 		<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 		<form:form action="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential' ? 'getNextQuestion.do' : 'submitAnswersContent.do'}"
 				   method="POST" target="_self" id="qaLearningForm" modelAttribute="qaLearningForm">

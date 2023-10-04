@@ -615,7 +615,7 @@
 		}
     </script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
 			<lams:Alert5 id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >

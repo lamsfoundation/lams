@@ -84,7 +84,7 @@
 		}
     </script>
 
-<div class="container-lg">
+<div id="container-main">
 	<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
 		<lams:Alert5 type="danger" id="warn-lock" close="false">
 			<c:choose>

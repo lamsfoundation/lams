@@ -37,11 +37,11 @@
 		</c:when>
 	</c:choose>
 
-	<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
-		<c:out value="${sessionMap.instruction}" escapeXml="false" />
-	</div>
+	<div id="container-main">
+		<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
+			<c:out value="${sessionMap.instruction}" escapeXml="false" />
+		</div>
 
-	<div class="container-lg">
 		<div id="notices">
 			<!-- notices and announcements -->
 			<c:if test="${(sessionMap.mode == 'author' || sessionMap.mode == 'learner') && hasEditRight}">

@@ -341,7 +341,7 @@
 		}
     </script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<c:if test="${not empty sessionMap.submissionDeadline}">
 			<lams:Alert5 id="submissionDeadline">
 				<fmt:message key="authoring.info.teacher.set.restriction">

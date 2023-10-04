@@ -55,20 +55,20 @@
 		}
 	</script>
 	
-	<div id="instructions" class="instructions">
-		<lams:out value="${instructions}" escapeHtml="true" />
-	</div>
-
-	<form:form action="${formActionUrl}" modelAttribute="${formModelAttribute}" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
-		<c:forTokens items="${hiddenInputs}" delims="," var="hiddenInput"> 
-			<form:hidden path="${hiddenInput}" />
-		</c:forTokens>	
+	<div id="container-main">
+		<div id="instructions" class="instructions">
+			<lams:out value="${instructions}" escapeHtml="true" />
+		</div>
+	
+		<form:form action="${formActionUrl}" modelAttribute="${formModelAttribute}" method="post" onsubmit="disableFinishButton();" id="reflectionForm">
+			<c:forTokens items="${hiddenInputs}" delims="," var="hiddenInput"> 
+				<form:hidden path="${hiddenInput}" />
+			</c:forTokens>	
+					
+			<lams:errors5/>
 			
-		<lams:errors5/>
-		
-		<div class="container-lg">
 			<div class="card lcard">
-				<div class="card-header lcard-header-button-border">
+				<div class="card-header">
 					<fmt:message key="${notebookLabelKey}" />
 				</div>
 				<div class="card-body mb-3">
@@ -78,7 +78,7 @@
 						cssClass="form-control" id="focused" rows="5"></form:textarea>
 				</div>
 			</div>
-	
+		
 			<div class="activity-bottom-buttons">
 				<button name="finishButton" id="finish-button" class="btn btn-primary na">
 					<c:choose>
@@ -91,18 +91,17 @@
 					</c:choose>
 				</buttun>
 			</div>
-		</div>
-	</form:form>
-	
-	<c:if test="${isNbTool}">
-		<!-- Comments: the extra div counteracts the float -->
-		<c:if test="${allowComments}">
-			<div class="row g-0"><div class="col-12"></div></div>
-			<lams:Comments toolSessionId="${toolSessionID}"
-						   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
-						   pageSize="10" sortBy="1" />
+		</form:form>
+		
+		<!-- Comments -->
+		<c:if test="${isNbTool}">
+			<c:if test="${allowComments}">
+				<div class="row g-0"><div class="col-12"></div></div>
+				<lams:Comments toolSessionId="${toolSessionID}"
+							   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
+							   pageSize="10" sortBy="1" />
+			</c:if>
 		</c:if>
-		<!-- End comments -->
-	</c:if>
+	</div>
 
 </lams:PageLearner>

@@ -93,7 +93,7 @@
 			};
 	</script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<c:choose>
 			<c:when test="${not empty groupLeader}">
 				<lams:LeaderDisplay

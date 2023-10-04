@@ -40,7 +40,7 @@
 		}
 	</script>
 
-	<div class="container-lg">
+	<div id="container-main">
 	<form:form action="displayMc.do" method="POST" target="_self" onsubmit="disableFinishButton();" modelAttribute="mcLearningForm" id="mcLearningForm">
 
 		<c:if test="${isLeadershipEnabled}">

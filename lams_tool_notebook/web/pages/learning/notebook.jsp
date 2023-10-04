@@ -84,7 +84,7 @@
 			}
 		</script>
 
-	<div class="container-lg">
+	<div id="container-main">
 	<form:form action="learning/finishActivity.do" method="post" modelAttribute="messageForm" id="messageForm">
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="contentEditable" value="${contentEditable}" />

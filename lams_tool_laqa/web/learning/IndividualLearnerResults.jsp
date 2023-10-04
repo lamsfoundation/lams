@@ -3,7 +3,7 @@
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.sessionMapID]}" />
 
 <lams:PageLearner title="${generalLearnerFlowDTO.activityTitle}" toolSessionID="${qaLearningForm.toolSessionID}" >
-	<div class="container-lg">
+	<div id="container-main">
 		
 		<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 		<form:form action="/lams/tool/laqa11/learning/learning.do" method="POST" modelAttribute="qaLearningForm" target="_self">

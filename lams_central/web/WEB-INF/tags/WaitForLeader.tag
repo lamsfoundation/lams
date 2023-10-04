@@ -33,7 +33,7 @@
 	</c:if>
 </script>
 
-<div class="container-lg">
+<div id="container-main">
 	<lams:Alert5 id="waiting-for-leader-alert" type="info">
 		<fmt:message key="${waitingForLeaderKey}" />
 	</lams:Alert5>

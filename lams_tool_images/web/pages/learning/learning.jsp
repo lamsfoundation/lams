@@ -142,7 +142,7 @@
 			);
 		}	
     </script>
-	<div class="container-lg">
+	<div id="container-main">
 	
 		<%--Advanced settings and notices-----------------------------------%>
 		<div id="instructions" class="instructions">

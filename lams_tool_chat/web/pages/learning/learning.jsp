@@ -30,7 +30,7 @@
 	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<lams:JSImport src="includes/javascript/learning.js" relative="true" />
 	
-	<div class="container-lg">
+	<div id="container-main">
 		<div id="instructions" class="instructions">
 			<c:out value="${chatDTO.instructions}" escapeXml="false" />
 		</div>

@@ -10,7 +10,7 @@
 		}
      </script>
 	
-	<div class="container-lg">
+	<div id="container-main">
 		<lams:Alert5 type="info" id="removed-user-info" close="false">
 			<fmt:message key="label.removed.user.warning" />
 		</lams:Alert5>

@@ -12,7 +12,7 @@
 		setTimeout("refresh();", 30000);
 	</script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<lams:Alert5 id="waitingForLeader" type="info" close="false">
 			<fmt:message key="${waitingMessageKey}" />
 		</lams:Alert5>
