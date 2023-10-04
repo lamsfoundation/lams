@@ -205,7 +205,7 @@
 			<div class="component-menu">
 				<div class="component-menu-btn d-flex flex-column align-items-center">
 					<div class="navigate-btn-container">
-						<a id="load-sequence-tab-btn" href="#" class="btn btn-primary active"
+						<a id="load-sequence-tab-btn" href="#" class="btn btn-primary navigate-btn active"
 						   data-tab-name="sequence"	title="<fmt:message key='tab.dashboard' />">
 							<i class="fa fa-cubes fa-lg"></i>
 						</a>
@@ -216,7 +216,7 @@
 
 					<c:if test="${isTBLSequence}">
 						<div class="navigate-btn-container">
-							<a id="load-teams-tab-btn" class="btn btn-primary" href="#"
+							<a id="load-teams-tab-btn" class="btn btn-primary navigate-btn" href="#"
 							   data-tab-name="teams" title="<fmt:message key='label.teams' />">
 								<i class="fa fa-people-group fa-lg"></i>
 							</a>
@@ -227,7 +227,7 @@
 
 						<c:if test="${not empty isIraAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-irat-tab-btn" class="btn btn-primary" href="#"
+								<a id="load-irat-tab-btn" class="btn btn-primary navigate-btn" href="#"
 								   data-tab-name="iratStudentChoices"	title="<fmt:message key='label.ira' />">
 									<i class="fa fa-user fa-lg"></i>
 								</a>
@@ -240,7 +240,7 @@
 
 						<c:if test="${not empty isScratchieAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-trat-tab-btn" class="btn btn-primary" href="#"
+								<a id="load-trat-tab-btn" class="btn btn-primary navigate-btn" href="#"
 								   data-tab-name="tratStudentChoices" title="<fmt:message key='label.tra' />">
 									<i class="fa fa-users fa-lg"></i>
 								</a>
@@ -252,7 +252,7 @@
 
 							<c:if test="${burningQuestionsEnabled}">
 								<div class="navigate-btn-container">
-									<a id="load-burning-tab-btn" class="btn btn-primary" href="#"
+									<a id="load-burning-tab-btn" class="btn btn-primary navigate-btn" href="#"
 									   data-tab-name="burningQuestions" title="<fmt:message key='label.monitoring.burning.questions' />">
 										<i class="fa fa-question-circle fa-lg"></i>
 									</a>
@@ -265,7 +265,7 @@
 
 						<c:if test="${not empty isAeAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-aes-tab-btn" class="btn btn-primary" href="#"
+								<a id="load-aes-tab-btn" class="btn btn-primary navigate-btn" href="#"
 								   data-tab-name="aes" title="<fmt:message key='label.aes' />">
 									<i class="fa fa-dashboard fa-lg"></i>
 								</a>
@@ -277,7 +277,7 @@
 
 						<c:if test="${not empty isPeerreviewAvailable}">
 							<div class="navigate-btn-container">
-								<a id="load-peer-review-tab-btn" class="btn btn-primary" href="#"
+								<a id="load-peer-review-tab-btn" class="btn btn-primary navigate-btn" href="#"
 								   data-tab-name="peerReview" title="<fmt:message key='label.peer.review' />">
 									<i class="fa fa-person-circle-question fa-lg"></i>
 								</a>
@@ -289,7 +289,7 @@
 					</c:if>
 
 					<div class="navigate-btn-container">
-						<a id="load-learners-tab-btn" href="#" class="btn btn-primary"
+						<a id="load-learners-tab-btn" href="#" class="btn btn-primary navigate-btn"
 						   data-tab-name="learners"	title="<fmt:message key='tab.learners' />">
 							<i class="fa fa-solid fa-users fa-lg"></i>
 						</a>
@@ -299,7 +299,7 @@
 					</div>
 
 					<div class="navigate-btn-container">
-						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary"
+						<a id="load-gradebook-tab-btn" href="#" class="btn btn-primary navigate-btn"
 						   data-tab-name="gradebook" title="<fmt:message key='tab.gradebook' />">
 							<i class="fa fa-solid fa-list-ol fa-lg"></i>
 						</a>
@@ -309,7 +309,7 @@
 					</div>
 
 					<div class="navigate-btn-container">
-						<a id="edit-lesson-btn" class="btn btn-primary" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
+						<a id="edit-lesson-btn" class="btn btn-primary navigate-btn" href="#" title="<fmt:message key='label.monitoring.edit.lesson.settings' />">
 							<i class="fa fa-pen fa-lg"></i>
 						</a>
 						<label for="edit-lesson-btn" class="d-none d-md-block">
@@ -528,8 +528,8 @@
 				<h1 id="lesson-name"><c:out value="${lesson.lessonName}"/></h1>
 				<div class="top-menu">
 					<div id="sequenceSearchPhraseContainer" class="input-group">
-						<input id="sequenceSearchPhrase" type="search" class="form-control" placeholder="<fmt:message key='label.monitoring.search.learners' />...">
-						<button id="sequenceSearchPhraseButton" class="btn bg-white opacity-100" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)" aria-label="<fmt:message key='label.monitoring.search.learners' />">
+						<input id="sequenceSearchPhrase" type="search" class="form-control shadow" placeholder="<fmt:message key='label.monitoring.search.learners' />...">
+						<button id="sequenceSearchPhraseButton" class="btn bg-white shadow" type="button" disabled onClick="javascript:sequenceClearSearchPhrase(true)" aria-label="<fmt:message key='label.monitoring.search.learners' />">
 							<i id="sequenceSearchPhraseIcon" class="fa-solid fa-fw fa-magnifying-glass"></i>
 							<i id="sequenceSearchPhraseClearIcon" class="fa-solid fa-fw fa-lg fa-xmark"></i>
 						</button>

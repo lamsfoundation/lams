@@ -90,7 +90,9 @@
 	/*
 		Expands all subgrids of the given jqGrid.
 	*/
-	function expandAllRows(jqGridId) {
+	function expandAllRows(jqGridId, button) {
+		$(button).removeClass("collapsed");
+		
 		let jqGrid = $('#' + jqGridId),
 				ids = jqGrid.getDataIDs();
 		$.each(ids, function(){
@@ -893,14 +895,19 @@
 </c:if>
 
 <div class="grid-holder mt-4">
-	<div class="d-flex flex-row-reverse mb-2">
-		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('userView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	<div class="d-flex flex-row-reverse collapsable-icon-left mb-2">
+		<button class="btn btn-secondary btn-sm collapsed" onClick="javascript:expandAllRows('userView', this)">
+			<fmt:message key="gradebook.grid.expand.all"/>
+		</button>
 	</div>
+	
 	<table id="userView" class="scroll" ></table>
 	<div id="userViewPager" class="scroll" ></div>
 
-	<div class="d-flex flex-row-reverse mt-4 mb-2">
-		<button class="btn btn-secondary btn-sm" onClick="javascript:expandAllRows('activityView')"><fmt:message key="gradebook.grid.expand.all"/></button>
+	<div class="d-flex flex-row-reverse collapsable-icon-left mt-4 mb-2">
+		<button class="btn btn-secondary btn-sm collapsed" onClick="javascript:expandAllRows('activityView', this)">
+			<fmt:message key="gradebook.grid.expand.all"/>
+		</button>
 	</div>
 
 	<table id="activityView" class="scroll" ></table>

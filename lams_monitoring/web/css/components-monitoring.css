@@ -52,6 +52,14 @@ body.component .dialogContainer #emailProgressDialogTable {
 	margin-left: 1.8rem;
 }
 
+.monitoring-page-wrapper button.btn:not(.navigate-btn) {
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);/*copied from .shadow class*/
+}
+.monitoring-page-wrapper #learners-accordion {
+	margin-right: -0.8rem;
+    margin-left: -0.8rem;
+}
+
 body.component #sequenceInfoDialog {
 	cursor: pointer;
 }

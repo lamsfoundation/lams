@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
-<div id="learners-tab-content" class="container-fluid">
+<div id="learners-tab-content" class="container-fluid shadow">
 	<div class="row" id="learners-pager">
 		<div class="col offset-4 text-end" >
 			<button class="btn btn-secondary pager-element d-none" onClick="javascript:learnersPageShift(-1)"

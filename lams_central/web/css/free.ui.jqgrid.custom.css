@@ -9,8 +9,16 @@
 	font-size: 1rem;
 }
 
+.ui-jqgrid.ui-jqgrid-bootstrap {
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);/*copied from .shadow class*/
+}
+
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
 	background-color: var(--bs-gray-200);
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .btn:not(.disabled) {
+	opacity: 0.8;
 }
 
 .ui-jqgrid .ui-jqgrid-bdiv {
@@ -21,15 +29,12 @@
 	border: 3px !important;
 	padding: 0 !important;
 	font-family: mont-bold, sans-serif;
-	font-size: 1.1rem;
 	margin: 0;
 	width: 100%;
-	background-color: var(--bs-gray-200) !important;
-    border-top: 1px solid var(--bs-gray-400) !important;
+	background-color: transparent !important;
 }
 
 .ui-jqgrid-labels th {
-	border-bottom: 2px solid var(--bs-secondary)!important;
 	padding-bottom: .4rem !important;
 	background-color: #fff;
 }
@@ -72,15 +77,25 @@
 }
 
 .ui-subgrid.ui-row-ltr .subgrid-cell, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-bootstrap-corner-bottom	{
-	background-color: #F6F5FA;
+	
 }
 
-.table-hover tbody {
-	background-color: #FFF;
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-pager {
+	background-color: #e5e5e5;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap>.ui-jqgrid-view {
+	border: none;
 }
 
 .table-hover tbody tr:hover {
 	background-color: var(--bs-gray-200);
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar {
+	color: #fff !important; /* copied from .text-bg-secondary */
+    background-color: RGBA(108, 117, 125, var(--bs-bg-opacity, 1)) !important; /* copied from .text-bg-secondary */
+    --bs-bg-opacity: 0.85;
 }
 
 .ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close {

@@ -616,10 +616,9 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 /*----------collapsable-icon-left----------------*/ 
 
-.component-page-wrapper .collapsable-icon-left button[data-bs-toggle="collapse"]:after {
+.component-page-wrapper .collapsable-icon-left button:after {
 	font-family: FontAwesome;
 	float: left;
-	color: #6c757d;
 	margin-right: .5rem;
 }
 
