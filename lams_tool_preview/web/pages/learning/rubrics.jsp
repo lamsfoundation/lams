@@ -80,7 +80,7 @@
         			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rating.rubrics.error.rate" /></spring:escapeBody>');
     				return;
     			}
-    			$(cell).addClass('text-bg-success').siblings('div').removeClass('text-bg-success');
+    			$(cell).addClass('text-bg-success').siblings('button').removeClass('text-bg-success');
     			
         		if (rubricsRequireRatings) {
 					$('#finishButton').prop('disabled', isRatingMissing());

@@ -275,7 +275,7 @@
 						'</div>' +
 						'<hr class="hr-confidence-level" />' +
 						'<div style="padding-bottom: 10px;">' +
-							'<lams:Portrait userId="${sessionMap.groupLeaderUserId}"/>' +
+							'<spring:escapeBody javaScriptEscape="true"><lams:Portrait userId="${sessionMap.groupLeaderUserId}"/></spring:escapeBody>' +
 						'</div>' +
 					'</div>' +
 				'</div>';

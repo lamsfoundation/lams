@@ -616,16 +616,19 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 /*----------collapsable-icon-left----------------*/ 
 
+.component-page-wrapper .collapsable-icon-left button[data-bs-toggle="collapse"]:after {
+	font-family: FontAwesome;
+	float: left;
+	color: #6c757d;
+	margin-right: .5rem;
+}
+
 .component-page-wrapper .collapsable-icon-left button.collapsed:after {
 	content: "\f054";
 }
 
-.component-page-wrapper .collapsable-icon-left button[data-bs-toggle="collapse"]:after {
-	font-family: FontAwesome;
+.component-page-wrapper .collapsable-icon-left button:not(.collapsed):after {
 	content: "\f078";
-	float: left;
-	color: #6c757d;
-	margin-right: .5rem;
 }
 
 /*----------slider----------------*/

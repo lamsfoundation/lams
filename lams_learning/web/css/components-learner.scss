@@ -231,7 +231,7 @@
     border-top-right-radius: 0rem;
     border-bottom-right-radius: 1.25rem;
     border: 0;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);//copied from bootstrap .shadow class
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);//copied from .shadow class
     margin-bottom: 2rem;
 }
 
@@ -240,6 +240,9 @@
     border-top-right-radius: 0rem;
     font-size: 1.3rem;
     padding: 1rem;
+	color: #fff !important; //.text-bg-secondary
+    background-color: RGBA(108, 117, 125, var(--bs-bg-opacity, 1)) !important; //.text-bg-secondary
+    --bs-bg-opacity: 0.8;
 }
 
 .instructions {
@@ -255,7 +258,7 @@
 }
 
 /* coommented out for now by Andrey
-.lcard .lcard-header-button-border {
+.lcard .card-header {
     border-bottom: 0.2rem solid var(--bs-primary);
 }
 */

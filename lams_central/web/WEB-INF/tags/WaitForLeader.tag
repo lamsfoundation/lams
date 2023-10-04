@@ -39,7 +39,7 @@
 	</lams:Alert5>
 
 	<div class="card lcard mt-1">
-		<div class="card-header lcard-header-button-border">
+		<div class="card-header">
 			<fmt:message key="label.users.from.group" />
 		</div>
 

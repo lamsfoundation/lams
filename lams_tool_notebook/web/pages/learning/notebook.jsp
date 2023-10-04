@@ -3,8 +3,6 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <lams:PageLearner title="${notebookDTO.title}" toolSessionID="${messageForm.toolSessionID}" >
-		<lams:headItems/>
-		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 		<script type="text/javascript">
 			checkNextGateActivity('finishButton', '${messageForm.toolSessionID}', '', function(){
 				submitForm('finish');

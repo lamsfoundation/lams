@@ -267,7 +267,7 @@
 						<c:if test="${question.type == 3}">
 							<tr>
 								<td colspan="2">
-									<lams:TSTable5 numColumns="1" dataId='data-question-uid="${question.uid}"' test="2"> 
+									<lams:TSTable5 numColumns="1" dataId='data-question-uid="${question.uid}"'> 
 										<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.answer" /></th>
 									</lams:TSTable5>
 									

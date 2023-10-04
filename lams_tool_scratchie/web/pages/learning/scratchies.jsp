@@ -22,7 +22,7 @@
 	       </c:if>
 		
 			<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
-				<div class="badge bg-success bg-opacity-75 float-end item-score">
+				<div class="badge bg-success float-end item-score p-2">
 					<fmt:message key="label.score" />&nbsp;${item.mark}
 				</div>
 			</c:if>

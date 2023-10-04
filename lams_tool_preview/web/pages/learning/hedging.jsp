@@ -19,7 +19,6 @@
 			} else {
 				hideButtons();
 			}
-
 		} 		
 				
 		function submitEntry(next){
@@ -127,11 +126,20 @@
 
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
 			<div class="m-3">
+			
 				<div>
 					<label for="justify" class="fst-italic">
 						<fmt:message key="label.justify.hedging.marks" />
 					</label>
 				</div>
+				<c:if test="${criteriaRatings.ratingCriteria.commentsMinWordsLimit != 0}">
+					<lams:Alert5 type="info" id="commentsMinWordsLimit-info" close="false">
+						<fmt:message key="label.minimum.number.words">
+							<fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/>
+						</fmt:message>
+					</lams:Alert5>
+				</c:if>
+				
 				<c:choose>
 					<c:when test="${finishedLock}">
 						<span>${criteriaRatings.justificationComment}</span>

@@ -6,6 +6,8 @@ $yellow: #F9F871; /* rgb(249, 248, 113) */
 $green: #018847; /* rgb(1, 136, 71) */
 $red: #D73961; /* rgb(215, 57, 97) */
 
+$enable-shadows:              true !default;
+$enable-negative-margins:     true !default;
 
 @import "bootstrap/bootstrap.scss";
 

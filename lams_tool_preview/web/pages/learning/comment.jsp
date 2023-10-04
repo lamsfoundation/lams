@@ -333,7 +333,7 @@
 		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
 		<input type="hidden" name="next" id="next" value=""/>		
 
-		<lams:TSTable5 numColumns="2" test="1">
+		<lams:TSTable5 numColumns="2">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" style="width:25%" > 
 				<fmt:message key="label.user.name" />
 			</th>
