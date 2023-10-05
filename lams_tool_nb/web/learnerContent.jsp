@@ -22,7 +22,6 @@
         }
     </script>
 
-
     <p role="region">
         <c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
     </p>
@@ -32,44 +31,29 @@
         <form:hidden path="toolSessionID" />
 
         <c:if test="${userFinished and reflectOnActivity}">
-            <div class="card">
-                <div class="card-body">
-                    <p class="fst-italic">
-                        <lams:out value="${reflectInstructions}" escapeHtml="true" />
-                    </p>
-                    <p class="mt-5">
-                        <c:choose>
-                            <c:when test="${empty reflectEntry}">
-                                <fmt:message key="message.no.reflection.available" />
-                            </c:when>
-                            <c:otherwise>
-                                <lams:out escapeHtml="true" value="${reflectEntry}" />
-                            </c:otherwise>
-                        </c:choose>
-                    </p>
-                </div>
-            </div>
-
-
+			<lams:NotebookReedit
+				reflectInstructions="${reflectInstructions}"
+				reflectEntry="${reflectEntry}"
+				isEditButtonEnabled="false"
+				notebookHeaderLabelKey="titleHeading.reflection"/>
         </c:if>
 
         <c:if test="${allowComments}">
-            <hr/>
             <lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
                            toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}"
-                           anonymous="${anonymous}" />
+                           anonymous="${anonymous}" bootstrap5="true"/>
         </c:if>
 
         <c:if test="${not nbLearnerForm.readOnly}">
             <div class="activity-bottom-buttons">
                 <c:choose>
                     <c:when test="${reflectOnActivity}">
-                        <button class="btn btn-primary" onclick="submitForm('reflect')">
+                        <button class="btn btn-primary na" onclick="submitForm('reflect')">
                             <fmt:message key="button.continue" />
                         </button>
                     </c:when>
                     <c:otherwise>
-                        <button id="finishButton" class="btn btn-primary">
+                        <button id="finishButton" class="btn btn-primary na">
                             <c:choose>
                                 <c:when test="${isLastActivity}">
                                     <fmt:message key="button.submit" />

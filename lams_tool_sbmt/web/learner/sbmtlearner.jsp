@@ -253,46 +253,14 @@
 			</c:choose>
 		</div>
 
-		<!-- reflection -->
-
-		<div id="reflection">
-			<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-				<div class="card shadow-sm mt-5">
-					<div class="card-header">
-						<fmt:message key="title.reflection" />
-					</div>
-					<div class="card-body">
-						<div class="m-2" aria-label="<fmt:message key='monitor.summary.td.notebookInstructions'/>">
-							<lams:out escapeHtml="true" value="${sessionMap.reflectInstructions}" />
-						</div>
-						<hr/>
-
-						<div class="m-2">
-							<c:choose>
-								<c:when test="${empty learner.reflect}">
-									<p>
-										<em> <fmt:message key="message.no.reflection.available" />
-										</em>
-									</p>
-								</c:when>
-								<c:otherwise>
-									<p>
-										<lams:out escapeHtml="true" value="${learner.reflect}" />
-									</p>
-								</c:otherwise>
-							</c:choose>
-						</div>
-
-						<c:if test="${sessionMap.mode != 'teacher'}">
-							<button id="notebookButton" name="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
-									class="btn btn-sm btn-primary btn-disable-on-submit" >
-								<fmt:message key="label.edit" />
-							</button>
-						</c:if>
-					</div>
-				</div>
-			</c:if>
-		</div>
+		<!-- notebook reedit -->
+		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${learner.reflectEntry}"
+				isEditButtonEnabled="${sessionMap.mode != 'teacher'}"
+				notebookHeaderLabelKey="title.reflection"/>
+		</c:if>
 
 		<!-- submit buttons -->
 		<div class="activity-bottom-buttons">
@@ -342,22 +310,22 @@
 			}
 
 			<c:if test="${sessionMap.mode != 'author' and sessionMap.minLimitUploadNumber != null}">
-			var uploadedFilesNumber = +${learner.filesUploaded.size()};
-			if (uploadedFilesNumber >= ${sessionMap.minLimitUploadNumber}) {
-				$('.btn-hide-on-min-not-met').removeClass('btn-hide-on-min-not-met');
-			}
+				var uploadedFilesNumber = +${learner.filesUploaded.size()};
+				if (uploadedFilesNumber >= ${sessionMap.minLimitUploadNumber}) {
+					$('.btn-hide-on-min-not-met').removeClass('btn-hide-on-min-not-met');
+				}
 			</c:if>
 
 			<%-- Connect to command websocket only if it is learner UI --%>
 			<c:if test="${isLeadershipEnabled and sessionMap.mode == 'learner'}">
-			// command websocket stuff for refreshing
-			// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
-			commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
-			// if the trigger is recognised, the following action occurs
-			commandWebsocketHook = function() {
-				// in case in the address bar there is refresh.do, direct to the main learner URL
-				location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
-			};
+				// command websocket stuff for refreshing
+				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
+				commandWebsocketHookTrigger = 'submit-files-leader-change-refresh-${sessionMap.toolSessionID}';
+				// if the trigger is recognised, the following action occurs
+				commandWebsocketHook = function() {
+					// in case in the address bar there is refresh.do, direct to the main learner URL
+					location.href = '<lams:WebAppURL />learning/learner.do?toolSessionID=${sessionMap.toolSessionID}';
+				};
 			</c:if>
 		});
 
