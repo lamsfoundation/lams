@@ -102,7 +102,6 @@ INSERT INTO lams_user_organisation_role VALUES
 (42,20,3),
 (43,21,3),
 (44,22,3),
-(45,16,4),
 (47,18,4),
 (48,19,4),
 (49,20,4),
