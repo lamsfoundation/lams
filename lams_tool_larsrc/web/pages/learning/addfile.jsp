@@ -7,27 +7,29 @@
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
 <!-- Add a File Form-->
-<div class="panel panel-default">
-	<div class="panel-heading panel-title">
+<div class="card lcard">
+	<div class="card-header">
 		<fmt:message key="label.learning.new.file" />
 	</div>
-	<div class="panel-body">
+	<div class="card-body">
 	
 	<lams:errors/>
 	
 	<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm" focus="title">
-	
 		<form:hidden path="itemType" id="itemType" />
 		<form:hidden path="mode" id="mode"/>
 		<form:hidden path="sessionMapID"/>
 	
 		<div class="mb-3">
 	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-			<form:input path="title" class="form-control" tabindex="1" id="resourcetitle"/>
+			<form:input path="title" class="form-control" />
 	  	</div>	
 		<div class="mb-3">
-	    	<label for="instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
-			<lams:CKEditor id="instructions" value="" contentFolderID="${learnerContentFolder}"></lams:CKEditor>
+	    	<div id="instructions-label">
+	    		<fmt:message key="label.authoring.basic.instruction" />
+	    	</div>
+			<lams:CKEditor id="instructions-ckeditor" value="" contentFolderID="${learnerContentFolder}"
+				ariaLabelledby="instructions-label"></lams:CKEditor>
 	  	</div>	
 	  	
 		<input type="hidden" id="tmpFileUploadId" name="tmpFileUploadId" value="${resourceItemForm.tmpFileUploadId}" />
@@ -35,20 +37,19 @@
 		
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
 		<div id="buttons" class="float-end mt-2">
-	 		<button name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-secondary" id="cancelButton">
+	 		<button type="button" name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-secondary" id="cancelButton">
+	 			<i class="fa fa-cancel"></i>
 				<fmt:message key="button.cancel" />
 			</button>&nbsp;
 			<button type="submit" class="btn btn-sm btn-secondary btn-disable-on-submit" id="submitButton">
+				<i class="fa fa-plus"></i>
 			 	<fmt:message key="button.add" />
 			</button>
 		</div>
-	
 	</form:form>
 	
 	<script type="text/javascript">
-	
-		var LAMS_URL = '<lams:LAMSURL/>',
-			UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>',
+		var UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>',
 			// convert Java syntax to JSON
 	       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
 		   EXE_FILE_ERROR = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>';
@@ -87,9 +88,8 @@
 				errorPlacement: function(error, element) {
 			       error.insertAfter(element);
 			    }
-			});	
+		});	
 	</script>
 	
+	</div>
 </div>
-</div>
-

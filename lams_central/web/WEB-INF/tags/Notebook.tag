@@ -79,6 +79,16 @@
 				</div>
 			</div>
 		
+			<!-- Comments -->
+			<c:if test="${isNbTool}">
+				<c:if test="${allowComments}">
+					<div class="row g-0"><div class="col-12"></div></div>
+					<lams:Comments toolSessionId="${toolSessionID}"
+								   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
+								   pageSize="10" sortBy="1" bootstrap5="true"/>
+				</c:if>
+			</c:if>
+		
 			<div class="activity-bottom-buttons">
 				<button name="finishButton" id="finish-button" class="btn btn-primary na">
 					<c:choose>
@@ -92,16 +102,6 @@
 				</buttun>
 			</div>
 		</form:form>
-		
-		<!-- Comments -->
-		<c:if test="${isNbTool}">
-			<c:if test="${allowComments}">
-				<div class="row g-0"><div class="col-12"></div></div>
-				<lams:Comments toolSessionId="${toolSessionID}"
-							   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
-							   pageSize="10" sortBy="1" />
-			</c:if>
-		</c:if>
 	</div>
 
 </lams:PageLearner>

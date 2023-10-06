@@ -1,25 +1,4 @@
 <!DOCTYPE html>
-<%-- 
-Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
-License Information: http://lamsfoundation.org/licensing/lams/2.0/
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
-  USA
-
-  http://www.gnu.org/licenses/gpl.txt 
---%>
-
 <%@ include file="/common/taglibs.jsp" %>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 
@@ -29,7 +8,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <script>
 	$(document).ready(function(){
-
 		<c:if test="${sessionMap.rateItems}">
 			initializeJRating();
 		</c:if>
@@ -39,11 +17,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			panel = $('#item-content-${itemUid}');
 
 		if (isDownload) {
-			$('.download-button', panel).removeClass('hidden');
+			$('.download-button', panel).removeClass('d-none');
 			return;
    		}
    		if (isPage) {
-   			$('.iframe-open-button', panel).removeClass('hidden');
+   			$('.iframe-open-button', panel).removeClass('d-none');
    	   		return;
    	   	}
    		
@@ -55,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    jsonpCallback: 'iframelyCallback${itemUid}',
 		    contentType: "application/json; charset=utf-8",
 		    error: function (xhr, status, error) {
-			    $('.embedded-open-button', panel).removeClass('btn-secondary hidden btn-sm float-end').addClass('btn-primary');
+			    $('.embedded-open-button', panel).removeClass('d-none btn-sm float-end');
 		        console.log("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
 		    }
 		});
@@ -68,32 +46,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 <div id="item-content-${itemUid}" class="item-content">
 	<c:if test="${not empty instructions}">
-		<div class="item-instructions">
+		<div class="instructions">
 			<c:out value="${instructions}" escapeXml="false" />
 		</div>
 	</c:if>
 	
 	<div class="content-panel">
-	
-		<div class="text-center">
-			<a href="<c:url value='${resourceItemReviewUrl}' />&preferDownload=true" class="download-button hidden btn btn-primary">
+		<div class="float-end">
+			<a href="<c:url value='${resourceItemReviewUrl}' />&preferDownload=true" class="download-button d-none btn btn-secondary">
+				<i class="fa-solid fa-download" aria-hidden="true"></i>
 				<fmt:message key="label.download" />
 			</a>
-			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button hidden btn btn-secondary btn-sm float-end">
+			<a href="${resourceItemReviewUrl}" target="_blank" class="embedded-open-button d-none btn btn-secondary btn-sm float-end">
 				<i class="fa fa-external-link" aria-hidden="true"></i>
 				<fmt:message key="open.in.new.window" />
 			</a>
-			<a href="<c:url value='${resourceItemReviewUrl}'/>" target="_blank" class="iframe-open-button hidden btn btn-secondary btn-sm float-end">
+			<a href="<c:url value='${resourceItemReviewUrl}'/>" target="_blank" class="iframe-open-button d-none btn btn-secondary btn-sm float-end">
 				<i class="fa fa-external-link" aria-hidden="true"></i>
 				<fmt:message key="open.in.new.window" />
 			</a>
 		</div>
 
-		<a title="<fmt:message key='open.in.new.window' />" class="embedded-title" href="${resourceItemReviewUrl}"  target="_blank"   ></a>&nbsp;&nbsp;
-		<i title="<fmt:message key='open.in.new.window' />" class="new-window-icon fa fa-1 hidden fa-external-link" aria-hidden="true"></i>
+		<a title="<fmt:message key='open.in.new.window' />"
+			class="embedded-title" href="${resourceItemReviewUrl}"
+			target="_blank"></a>
+		&nbsp;&nbsp; 
+		<i title="<fmt:message key='open.in.new.window' />" class="new-window-icon fa fa-1 d-none fa-external-link" aria-hidden="true"></i>
 		<div class="embedded-description"></div>
-		<div class="embedded-content">
 		
+		<div class="embedded-content">
 			<c:if test="${isDisplayableImage}">
 				<div class="embedded-file">
 					<img src="<c:url value='${resourceItemReviewUrl}' />&preferDownload=false" />
@@ -113,9 +94,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<iframe src="<c:url value='${resourceItemReviewUrl}'/>"></iframe>
 			</c:if>		
 		</div>
-
 	</div>
-	<hr>
+
 	<c:if test="${mode eq 'learner' or mode eq 'author'}">
 		<c:if test="${sessionMap.rateItems && allowRating}">
 			<lams:Rating5 itemRatingDto="${ratingDTO}" 
@@ -126,7 +106,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
 			<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
 						  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
-						  readOnly="${finishedLock}"/>	
+						  readOnly="${finishedLock}" bootstrap5="true"/>	
 		</c:if>
 	</c:if>	
 </div>

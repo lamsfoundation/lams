@@ -22,9 +22,11 @@
 
 	<c:set var="title">${requestScope.itemTitle}: <fmt:message key="label.view.comments" /></c:set>
 	<lams:Page title="${title}" type="learner" hideProgressBar="true">
-	
-	<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" mode="${requestScope.mode}"  toolItemId="${requestScope.itemUid}"/>	
-	
+
+		<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
+			mode="${requestScope.mode}" toolItemId="${requestScope.itemUid}"  bootstrap5="false"
+		/>
+
 	</lams:Page>
 	
 </lams:html>

@@ -133,7 +133,7 @@
     flex-direction: row-reverse;
 }
 
-.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn {
+.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
@@ -242,7 +242,7 @@
     padding: 1rem;
 	color: #fff !important; //.text-bg-secondary
     background-color: RGBA(108, 117, 125, var(--bs-bg-opacity, 1)) !important; //.text-bg-secondary
-    --bs-bg-opacity: 0.8;
+    
 }
 
 .instructions {

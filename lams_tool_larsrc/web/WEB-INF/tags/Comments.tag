@@ -15,7 +15,7 @@
 <%@ attribute name="sortBy" required="false" rtexprvalue="true"%>
 <%@ attribute name="embedInAccordian" required="false" rtexprvalue="true"%>
 <%@ attribute name="accordionTitle" required="false" rtexprvalue="true"%>
-
+<%@ attribute name="bootstrap5" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty width}">
 	<c:set var="width" value="100%" />
@@ -52,15 +52,16 @@
 
 <c:if test="${embedInAccordian}">
 <div class="panel-group" id="accordionComments-${toolSessionId}-${toolItemId}" role="tablist" aria-multiselectable="true"> 
-    <div class="panel panel-default">
-        <div class="panel-heading collapsable-icon-left" id="headingComments-${toolSessionId}-${toolItemId}">
-        	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseComments-${toolSessionId}-${toolItemId}"
-	    		aria-expanded="false" aria-controls="collapseComments-${toolSessionId}-${toolItemId}">
-          	${not empty accordionTitle?accordionTitle:"Comments"}</a>
+    <div class="card">
+        <div class="card-header collapsable-icon-left" id="headingComments-${toolSessionId}-${toolItemId}">
+        	<span class="card-title">
+	    		<button class="collapsed btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseComments-${toolSessionId}-${toolItemId}"
+	    				aria-expanded="false" aria-controls="collapseComments-${toolSessionId}-${toolItemId}">
+          			${not empty accordionTitle?accordionTitle:"Comments"}
+          		</button>
       		</span>
         </div>
-        <div id="collapseComments-${toolSessionId}-${toolItemId}" class="panel-collapse collapse collapseComments"
+        <div id="collapseComments-${toolSessionId}-${toolItemId}" class="card-collapse collapse collapseComments"
         	 role="tabpanel" aria-labelledby="headingComments-${toolSessionId}-${toolItemId}" aria-expanded="false" style="">
 </c:if>
 
@@ -74,7 +75,7 @@
 
 <script>
 $(document).ready(function(){
-	var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
+	var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&newUI=${bootstrap5}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
 	
 	<c:choose>
 		<c:when test="${embedInAccordian}">

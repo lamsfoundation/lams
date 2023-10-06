@@ -6,11 +6,20 @@ $yellow: #F9F871; /* rgb(249, 248, 113) */
 $green: #018847; /* rgb(1, 136, 71) */
 $red: #D73961; /* rgb(215, 57, 97) */
 
-$enable-shadows:              true !default;
-$enable-negative-margins:     true !default;
+$enable-shadows:              true;
+$enable-negative-margins:     true;
 
 @import "bootstrap/bootstrap.scss";
 
 :root {
 	--lams-background-gray: #e0e0e0; /* rgb(224, 224, 224) */
+}
+
+#container-main {
+    @extend .container-lg;
+}
+
+.btn-secondary-darker {
+	@extend .btn-secondary;
+	background-color: shade-color($secondary, 20%);
 }
