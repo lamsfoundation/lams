@@ -559,7 +559,7 @@ var MenuLib = {
 	/**
 	 * Opens a pop up for AI window that generates a learning design
 	 */
-	useAiToCreateLearningDesign : function(){
+	useAiToCreateLearningDesign : function(pedagogy){
 		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
 			return;
 		}
@@ -587,14 +587,15 @@ var MenuLib = {
 					var dialog = $(this);
 					// load contents after opening the dialog
 					$('iframe', dialog).attr('id','aiWizardModal')
-						.attr('src', LAMS_URL + 'ai/authoring/lessonWizard.do').on('load', function(){
-						// override the close function so it works with the dialog, not window
-						this.contentWindow.closeWindow = function(){
-							// detach the 'beforeClose' handler above, attach the standard one and close the dialog
-							dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
-								$('iframe', this).attr('src', null);
-							}).modal('hide');
-						}
+						.attr('src', LAMS_URL + 'ai/authoring/' + pedagogy + '/lessonWizard.do')
+						.on('load', function(){
+							// override the close function so it works with the dialog, not window
+							this.contentWindow.closeWindow = function(){
+								// detach the 'beforeClose' handler above, attach the standard one and close the dialog
+								dialog.off('hide.bs.modal').on('hide.bs.modal', function(){
+									$('iframe', this).attr('src', null);
+								}).modal('hide');
+							}
 					});
 				},
 			}, true),
