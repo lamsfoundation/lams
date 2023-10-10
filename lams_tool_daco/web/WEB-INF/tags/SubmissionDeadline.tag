@@ -50,7 +50,7 @@
 		}
     </script>
 
-	<div class="container-lg">
+	<div id="container-main">
 		<lams:Alert5 id="submission-deadline-alert" close="false" type="danger">
 			<fmt:message key="${deadlineAlertLabelKey}">
 				<fmt:param>

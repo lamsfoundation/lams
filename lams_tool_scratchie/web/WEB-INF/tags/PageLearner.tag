@@ -1,11 +1,11 @@
 <%@ tag body-content="scriptless" %>
-<%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
-<%@ attribute name="title" required="false" rtexprvalue="true"%>
-<%@ attribute name="refresh" required="false" rtexprvalue="true"%>
-
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+
+<%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
+<%@ attribute name="title" required="false" rtexprvalue="true"%>
+<%@ attribute name="refresh" required="false" rtexprvalue="true"%>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
@@ -130,11 +130,12 @@
 
             <main class="p-3" id="component-main-content" tabindex="-1">
                 <c:if test="${not empty title}">
-                    <h2 class="mb-3"><c:out value="${title}" escapeXml="true" /></h2>
+                    <h2 class="mb-3">
+                    	<c:out value="${title}" escapeXml="true" />
+                    </h2>
                 </c:if>
-
+				
                 <jsp:doBody/>
-
             </main>
         </div>
     </div>

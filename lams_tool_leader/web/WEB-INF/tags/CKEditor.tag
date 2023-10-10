@@ -14,9 +14,13 @@
 <%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
 <%@ attribute name="method" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxWords" required="false" rtexprvalue="true"%>
+<%@ attribute name="isRequired" required="false" rtexprvalue="true"%>
+<c:if test="${empty isRequired}">
+	<c:set var="isRequired" value="false" />
+</c:if>
+<%-- Either "ariaLabel" or "ariaLabelledby" attribute is required for proper support of ARIA --%>
 <%@ attribute name="ariaLabel" required="false" rtexprvalue="true"%>
 <%@ attribute name="ariaLabelledby" required="false" rtexprvalue="true"%>
-<%@ attribute name="ariaRequired" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty method}">
 	<c:set var="method" value="inline" />
@@ -52,9 +56,7 @@
 
 <textarea id="${id}" name="${id}"
 	style="display: none; visibility: hidden; height: 0px;"
-	<c:if test="${not empty ariaLabel}">aria-label="${ariaLabel}"</c:if>
-	<c:if test="${not empty ariaLabelledby}">aria-labelledby="${ariaLabelledby}"</c:if>
-	aria-required="${ariaRequired}" aria-multiline="true">${fixedValue}</textarea>
+	>${fixedValue}</textarea>
 
 <c:if test="${not empty placeholder}">
 		<label for="${id}" class="cke-label-floating">${placeholder}</label>
@@ -100,7 +102,14 @@
 				filebrowserImageBrowseLinkUrl : "${ckEditorBasePath}filemanager/browser/default/browser.html?Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
 				filebrowserFlashBrowseUrl     : "${ckEditorBasePath}filemanager/browser/default/browser.html?Type=Flash&Connector=connectors/jsp/connector&CurrentFolder=/" + contentFolderID + "/",
 				filebrowserFlashUploadUrl     : "${ckEditorBasePath}filemanager/upload/simpleuploader?Type=Flash&CurrentFolder=/" + contentFolderID + "/",
-				contentFolderID				  : contentFolderID
+				contentFolderID				  : contentFolderID,
+				isRequired					  : ${isRequired},
+				<c:if test="${not empty ariaLabel}">
+					ariaLabel      			  : "${ariaLabel}",
+				</c:if>
+				<c:if test="${not empty ariaLabelledby}">
+					ariaLabelledby      	  : "${ariaLabelledby}",
+				</c:if>
 		};
 		
 		if (maxWords > 0) {
@@ -114,8 +123,6 @@
 			});
 		}
 
-		
-
 		instance = CKEDITOR[method](id, configuration);
 		instance.initializeFunction = function(){
 			 initializeCKEditor(id, method, resizeParentFrameName, width, height, toolbarSet, classes, language, displayExpanded, contentFolderID, maxWords);
@@ -125,7 +132,6 @@
 	
 	// run initialisation code
 	initializeCKEditor("${id}", "${method}", "${resizeParentFrameName}", "${width}", "${height}", "${toolbarSet}", "${classes}", "${language}", ${displayExpanded}, "${contentFolderID}", ${empty maxWords or maxWords <= 0 ? 0 : maxWords});
-	
 
 	function reinitializeCKEditorInstances(){
 		for (var instanceId in CKEDITOR.instances){

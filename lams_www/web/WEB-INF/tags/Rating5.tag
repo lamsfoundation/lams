@@ -190,11 +190,11 @@
 					<!-- Comment min words limit -->
 					<c:if test="${itemRatingDto.commentsMinWordsLimit ne 0}">
 					
-						<lams:Alert type="info" id="comment-limit-${itemRatingDto.itemId}" close="false">
+						<lams:Alert5 type="info" id="comment-limit-${itemRatingDto.itemId}" close="false">
 							<fmt:message key="${minNumberWordsLabel}">
 								: <fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/>
 							</fmt:message>
-						</lams:Alert>
+						</lams:Alert5>
 					</c:if>
 				
 					<div class="row">

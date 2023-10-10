@@ -50,7 +50,7 @@
 <fmt:message var="title" key='activity.title'/>
 
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" refresh="${refresh}">
-	<div class="container-lg">
+	<div id="container-main">
 		<lams:Alert5 type="info" id="define-later-info" close="false">
 			<fmt:message key="${defineLaterLabel}" />
 		</lams:Alert5>
