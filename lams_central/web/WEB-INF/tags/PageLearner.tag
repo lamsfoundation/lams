@@ -6,10 +6,6 @@
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refresh" required="false" rtexprvalue="true"%>
-<%@ attribute name="hideHeaderAndSidebar" required="false" rtexprvalue="true"%>
-<c:if test="${empty hideHeaderAndSidebar}">
-	<c:set var="hideHeaderAndSidebar" value="false" />
-</c:if>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
@@ -59,9 +55,7 @@
                 decoderDiv = $('<div />');
 
             $(document).ready(function (){
-            	<c:if test="${!hideHeaderAndSidebar}">
-                	initLearnerPage(${toolSessionID});
-                </c:if>
+                initLearnerPage(${toolSessionID});
             });
 
             function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
@@ -81,7 +75,6 @@
 
     <body class="component">
     <div class="component-page-wrapper">
-    	<c:if test="${!hideHeaderAndSidebar}">
         <nav inert class="component-sidebar" role="navigation dialog"
              aria-label="Side menu" aria-expanded="false"  aria-modal="true">
             <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
@@ -101,10 +94,8 @@
             <ul id="progress-bar-items" class="progress-bar-items w-100" role="menu">
             </ul>
         </nav>
-        </c:if>
 
         <div class="component-page-content">
-        	<c:if test="${!hideHeaderAndSidebar}">
             <a href="#component-main-content" class="visually-hidden-focusable p-2">Skip to main content</a>
 
             <header id="header" class="d-flex justify-content-between" role="banner">
@@ -136,7 +127,6 @@
                     </button>
                 </div>
             </header>
-            </c:if>
 
             <main class="p-3" id="component-main-content" tabindex="-1">
                 <c:if test="${not empty title}">

@@ -48,7 +48,13 @@
 					// make sure the old edit form is gone, so the user won't try to submit it again
 					$('#edit').remove();
 				}
-				reloadThread(response,'<lams:LAMSURL />',false,'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>','<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>');
+				reloadThread(
+					response,
+					'<lams:LAMSURL />',
+					true,
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>'
+				);
     		});
 		} // end validateBodyText
 		else {
@@ -60,44 +66,45 @@
 	function cancelEdit() {
 		$('#edit').remove();
 	}
-	
 </script>
 
-<div class="comment-entry form-group voffset5">
-<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
-	<textarea class="form-control"  id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment">${comment.comment.body}</textarea>
-	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
-	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
-	
-	<div class="row voffset5">
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<div class="comment-entry form-group mt-1">
+	<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
+		<textarea class="form-control" id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
+			class="comment"
+		>${comment.comment.body}</textarea>
+		<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" /> 
+		<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
+		<input type="hidden" name="newUI" value="true" />
 
- 	<c:choose>
- 	<c:when test="${sessionMap.anonymous}">
- 	<%-- Post Anonymously? --%>
-	<div class="col-xs-12 col-sm-6">
-		<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
-		<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
-		<%@include file="anonymouscheckbox.jsp" %>
- 	</div>
-
-	<%-- Cancel / Edit Buttons --%>
-	<div class="col-xs-12 col-sm-6">
-	</c:when>
-	<c:otherwise>
-	<div class="col-xs-12">
-	</c:otherwise>
-	</c:choose>
-	<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right" id="editCommentSubmitButton">
-		<fmt:message key="label.post" />
-	</a>&nbsp;
-	<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">
-		<fmt:message key="label.cancel" />
-	</a>
-	</div>
-
-</form>
+		<div class="row mt-1">
+			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		
+		 	<c:choose>
+			 	<c:when test="${sessionMap.anonymous}">
+				 	<%-- Post Anonymously? --%>
+					<div class="col-12 col-sm-6">
+						<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
+						<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
+						<%@include file="anonymouscheckbox.jsp" %>
+				 	</div>
+				
+					<%-- Cancel / Edit Buttons --%>
+					<div class="col-12 col-sm-6">
+				</c:when>
+				<c:otherwise>
+					<div class="col-12">
+				</c:otherwise>
+			</c:choose>
+			
+			<button type="button" onclick="javascript:editCommentSubmit();" class="btn btn-sm btn-secondary float-end" id="editCommentSubmitButton">
+				<i class="fa fa-comment me-1"></i>
+				<fmt:message key="label.post" />
+			</button>
+			<button type="button" onclick="javascript:cancelEdit();" class="btn btn-sm btn-secondary float-end me-1">
+				<i class="fa fa-cancel me-1"></i>
+				<fmt:message key="label.cancel" />
+			</button>
+		</div>
+	</form>
 </div>
-
-
-

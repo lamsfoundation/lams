@@ -51,7 +51,7 @@
 				reloadThread(
 					response,
 					'<lams:LAMSURL />',
-					false,
+					true,
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>',
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>'
 				);
@@ -68,43 +68,45 @@
 	}
 </script>
 
-<div class="comment-entry form-group voffset5">
-	<form id="replyForm" method="GET"
-		action="<lams:LAMSURL />comments/replyTopicInline.do">
-		<textarea class="form-control" id="replyFormBody"
-			maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
-			class="comment"></textarea>
-		<input type="hidden" id="sessionMapID" name="sessionMapID"
-			value="${sessionMapID}" /> <input type="hidden" id="parentUid"
-			name="parentUid" value="${parentUid}" />
+<div class="comment-entry form-group mt-1">
+	<form id="replyForm" method="GET" action="<lams:LAMSURL />comments/replyTopicInline.do">
+		<textarea class="form-control my-2" id="replyFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
+			class="comment"
+		></textarea>
+		<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" /> 
+		<input type="hidden" id="parentUid" name="parentUid" value="${parentUid}" />
+		<input type="hidden" name="newUI" value="true" />
 
-		<div class="row voffset5">
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		<div class="row mt-1">
+			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-		<c:choose>
-	 	<c:when test="${sessionMap.anonymous}">
-	 	<%-- Post Anonymously? --%>
-		<div class="col-xs-12 col-sm-6">
-			<c:set var="anonymousCheckboxChecked" value=""/>
-			<c:set var="anonymousCheckboxName" value="commentAnonymousReply"/>
-			<%@include file="anonymouscheckbox.jsp" %>
-	 	</div>
-	
-		<%-- Cancel / Edit Buttons --%>
-		<div class="col-xs-12 col-sm-6">
-		</c:when>
-		<c:otherwise>
-		<div class="col-xs-12">
-		</c:otherwise>
-		</c:choose>
-		<a href="#nogo" onclick="javascript:replyFormSubmit();"
-			class="btn btn-xs btn-primary pull-right" id="replyCommentSubmitButton"> <fmt:message
-				key="label.post" />
-		</a>&nbsp; <a href="#nogo" onclick="javascript:cancelReply();"
-			class="btn btn-xs btn-primary pull-right roffset5"> <fmt:message
-				key="label.cancel" />
-		</a>
+			<c:choose>
+				<c:when test="${sessionMap.anonymous}">
+					<%-- Post Anonymously? --%>
+					<div class="col-12 col-sm-6">
+						<c:set var="anonymousCheckboxChecked" value="" />
+						<c:set var="anonymousCheckboxName" value="commentAnonymousReply" />
+						<%@include file="anonymouscheckbox.jsp"%>
+					</div>
+
+					<%-- Cancel / Edit Buttons --%>
+					<div class="col-12 col-sm-6">
+				</c:when>
+				<c:otherwise>
+					<div class="col-12">
+				</c:otherwise>
+			</c:choose>
+
+			<button type="button" onclick="javascript:replyFormSubmit();" class="btn btn-sm btn-secondary float-end" id="replyCommentSubmitButton">
+				<i class="fa fa-comment me-1"></i>
+				<fmt:message key="label.post" />
+			</button>
+			&nbsp;
+			<button type="button" onclick="javascript:cancelReply();" class="btn btn-sm btn-secondary float-end me-1">
+				<i class="fa fa-cancel me-1"></i>
+				<fmt:message key="label.cancel" />
+			</button>
 		</div>
-	
+
 	</form>
 </div>

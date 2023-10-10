@@ -9,28 +9,31 @@
 <c:set var="hide"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide" /></spring:escapeBody></c:set>
 <c:set var="prompt"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.showhide.prompt" /></spring:escapeBody></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
-	stringCollapse:'${hide}',stringExpand:'${show}',
-	clickableNodeNames:true,indent:${indent},
+	expanderTemplate:'<button type="button" class="btn btn-sm btn-secondary text-nowrap my-1 py-0 px-1"><span style="margin-left:20px">${prompt}</span></button>',
+	stringCollapse:'${hide}',
+	stringExpand:'${show}',
+	clickableNodeNames:false,
+	indent:${indent},
 	onNodeInitialized:function() {
 		if (this.level() >= 2) {
 			this.collapse();
 		}
 	}
- </c:set>
+</c:set>
 <c:set var="tableCommandSticky">expandable:true,initialState:'collapsed',
-	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
-	stringCollapse:'${hide}',stringExpand:'${show}',
-	clickableNodeNames:true,indent:${indent},
+	expanderTemplate:'<button type="button" class="btn btn-sm btn-secondary text-nowrap my-1 py-0 px-1"><span style="margin-left:20px">${prompt}</span></a>',
+	stringCollapse:'${hide}',
+	stringExpand:'${show}',
+	clickableNodeNames:false,
+	indent:${indent},
 	onNodeInitialized:function() {
 		if (this.level() >= 2) {
 			this.collapse();
 		}
-	}
- </c:set>
+	} 
+</c:set>
 
 <script type="text/javascript">
-
 	// The treetable code uses the clicks to expand and collapse the replies but then 
 	// the buttons will not work. So stop the event propogating up the event chain. 
 	$(".button").click(function (e) {
@@ -39,7 +42,6 @@
 	$(".comment").click(function (e) {
 		e.stopPropagation();
 	});
-	
 	
 	function createReply(commentUid, url) {
 		if ( document.getElementById('reply') ) {
@@ -56,7 +58,6 @@
 			$(replyDiv).load(url);
 		}
 	}
-	
 	
 	function createEdit(commentUid, url) {
 		if ( document.getElementById('edit') ) {
@@ -75,14 +76,13 @@
 		}
 	}
 
-	
 	function hideEntry(commentUid, url) {
 		$.ajax({ // create an AJAX call...
 		    type: 'GET', 
 		    url: url
 		})
 	    .done(function (response) {
-			reloadThread(response, '<lams:LAMSURL />',false,'<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+			reloadThread(response, '<lams:LAMSURL />',true,'<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
 	    });
 	}
 
@@ -94,7 +94,7 @@
 	    .done(function (response) {
 	    	refreshComments
 	    	
-			reloadThread(response, '<lams:LAMSURL />',false,'<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+			reloadThread(response, '<lams:LAMSURL />',true,'<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
 	    });
 	}
 
@@ -119,33 +119,37 @@
 	function likeEntry(commentUid) {
 		updateLike(
 			commentUid,
-			'<lams:LAMSURL />comments/like.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
+			'<lams:LAMSURL />comments/like.do?newUI=true&sessionMapID=${sessionMapID}&commentUid='+commentUid,
 			1
 		);		
-		$( '#msglikebutton'+commentUid ).removeClass( 'fa-thumbs-up fa-faded' ).addClass( 'fa-thumbs-o-up' );
+		$( '#msglikebutton'+commentUid ).removeClass( 'fa-regular fa-faded' ).addClass( 'fa-solid' );
 		$( '#msglikebutton'+commentUid ).prop( 'onclick', null );
+		
 		<c:if test='${sessionMap.likeAndDislike}'> 
-		$( '#msgdislikebutton'+commentUid ).css( "display", "none" );
+			$( '#msgdislikebutton'+commentUid ).css( "display", "none" );
 		</c:if>
 	}
 
 	<c:if test='${sessionMap.likeAndDislike}'> 
-	function dislikeEntry(commentUid) {
-		updateLike(
-			commentUid, 
-			'<lams:LAMSURL />comments/dislike.do?sessionMapID=${sessionMapID}&commentUid='+commentUid,
-			-1
-		);		
-		$( '#msgdislikebutton'+commentUid ).removeClass( 'fa-thumbs-down fa-faded' ).addClass( 'fa-thumbs-o-down' );
-		$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
-		$( '#msglikebutton'+commentUid ).css( "display", "none" );
-	}
+		function dislikeEntry(commentUid) {
+			updateLike(
+				commentUid, 
+				'<lams:LAMSURL />comments/dislike.do?newUI=true&sessionMapID=${sessionMapID}&commentUid='+commentUid,
+				-1
+			);		
+			$( '#msgdislikebutton'+commentUid ).removeClass( 'fa-regular fa-faded' ).addClass( 'fa-solid' );
+			$( '#msgdislikebutton'+commentUid ).prop( 'onclick', null );
+			$( '#msglikebutton'+commentUid ).css( "display", "none" );
+		}
 	</c:if>
 
+
+    jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+    });
 </script>
 
 <c:set var="isSticky" value="false"/>
-
 <c:forEach var="commentDto" items="${commentThread}">
 	<c:set var="msgLevel" value="${commentDto.level}" />
 	<c:set var="hidden" value="${commentDto.comment.hideFlag}" />
@@ -171,7 +175,7 @@
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
 		<div id="thread${commentDto.comment.uid}" class="clearfix">
-		<table id="${messageTablename}" class="col-xs-12">
+		<table id="${messageTablename}" class="col-12">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
 	</c:when>
 	<c:otherwise>
@@ -187,24 +191,21 @@
 
 </c:forEach>
 
-	<c:if test='${messageTablename != ""}'>
-		</table>
-		<script>
-			$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
-		</script>	
-		</div>
-	</c:if>
-
-<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="text-center">
-	<c:set var="more"><lams:LAMSURL />/comments/viewTopic.do?pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}</c:set>
-	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
+<c:if test='${messageTablename != ""}'>
+	</table>
+	<script>
+		$("#${messageTablename}").treetable({${isSticky?tableCommandSticky:tableCommand}});
+	</script>	
 	</div>
 </c:if>
 
-  <script type="text/javascript">
-    jQuery(document).ready(function() {
-      jQuery("time.timeago").timeago();
-    });
-  </script>
-
+<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
+	<div class="text-center">
+		<c:set var="more">
+			<lams:LAMSURL />/comments/viewTopic.do?newUI=true&pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}
+		</c:set>
+		<a href="<c:out value="${more}"/>" class="btn btn-sm btn-light">
+			<fmt:message key="label.show.more.messages" />
+		</a>
+	</div>
+</c:if>

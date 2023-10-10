@@ -15,7 +15,7 @@
 	}
 
 	
-	function reloadThread(response, lamsUrl, savedCannotRedisplayMessage, errorCannotRedisplayMessage) {
+	function reloadThread(response, lamsUrl, newUi, savedCannotRedisplayMessage, errorCannotRedisplayMessage) {
 	    var threadDiv = document.getElementById('thread'+response.threadUid);
        	var threadUid = response.threadUid;
        	var commentUid = response.commentUid;
@@ -24,7 +24,7 @@
         	if ( ! threadDiv) {
         		alert(savedCannotRedisplayMessage);
        		} else {
-    			var loadString = lamsUrl+"comments/viewTopicThread.do?&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
+    			var loadString = lamsUrl+"comments/viewTopicThread.do?newUI=" + newUi + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
     			$.ajaxSetup({ cache: true });
 				$(threadDiv).load(loadString, function() {
 					// expand up to the reply - in case it is buried down in a lot of replies

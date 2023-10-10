@@ -299,7 +299,9 @@ public class CommentController {
 	// don't want to try to scroll as this is a single thread, completely displayed.
 	request.setAttribute(CommentConstants.ATTR_NO_MORE_PAGES, true);
 
-	return "comments/topicviewwrapper";
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+	String viewDir = newUI ? "comments5" : "comments";
+	return viewDir + "/topicviewwrapper";
     }
 
     /**
@@ -389,7 +391,10 @@ public class CommentController {
 		request.getParameter(CommentConstants.ATTR_SESSION_MAP_ID));
 	request.setAttribute(CommentConstants.ATTR_PARENT_COMMENT_ID,
 		request.getParameter(CommentConstants.ATTR_PARENT_COMMENT_ID));
-	return "comments/reply";
+
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+	String viewDir = newUI ? "comments5" : "comments";
+	return viewDir + "/reply";
     }
 
     /**
@@ -477,7 +482,10 @@ public class CommentController {
 	request.setAttribute(CommentConstants.ATTR_COMMENT_ID, commentId);
 	request.setAttribute(CommentConstants.ATTR_COMMENT, comment);
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	return "comments/edit";
+	
+	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+	String viewDir = newUI ? "comments5" : "comments";
+	return viewDir + "/edit";
     }
 
     /**
