@@ -568,7 +568,7 @@ public class LearningController {
 	// Reflection
 	NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
 	if (entry != null) {
-	    request.setAttribute("reflectEntry", entry.getEntry());
+	    learningForm.setEntryText(entry.getEntry());
 	}
 
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY,

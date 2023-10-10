@@ -8,9 +8,14 @@
 <%-- <script src="${tool}includes/javascript/mapjs/main.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/fullscreen.js"></script> --%>
+<style>
+	/* hack to display tooltip even when input is disabled */
+	#background-color[disabled], [data-bs-toggle="tooltip"].disabled {
+	    pointer-events: auto !important;
+	}
+</style>
 
 <script type="text/javascript">
-
 	var initialActionId = null,  // multiuser request tracking
 		lastActionId = null, 	// multiuser request tracking
 		// Requests already processed:
@@ -425,61 +430,113 @@
 </c:if>
 </script>	
 
-	<div class="full-screen-content-div">
+<div class="full-screen-content-div">
 	<div class="full-screen-flex-div">
-	<div class="full-screen-main-div">
-	
-	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
-		<div>
-		<c:if test="${not multiMode}">
-			<div class="hint"><fmt:message key="label.your.mindmap.saved.every.minute"/><lams:WaitingSpinner id="spinnerArea_Busy" showInline="true"/></div>
-		</c:if>
-		</div>
-	</c:if>	
+		<div class="full-screen-main-div">
 
-	<div id="mindmap-controls">
-	
-		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
-		<div style="display:inline" role="group">
-        <a href="#" class="btn btn-secondary btn-sm full-screen-launch-button float-end ms-1" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-secondary btn-sm full-screen-exit-button float-end ms-1" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
-		
-		<c:if test="${param.allowPrinting}">
-			<a href="#" class="btn btn-secondary btn-sm float-end ms-1" id="print" onclick="javascript:showPrintView()"
-			   title="<fmt:message key='button.print'/>"><i class="fa fa-print" aria-hidden="true"></i></a> 
-		</c:if>
-		
-		<input type="text" id="background-color" class='updateStyle form-control form-control-sm' data-mm-target-property='background' size="7" width="180px">
+			<c:if test="${contentEditable and (mode == 'learner' || mode == 'author') and not multiMode}">
+				<div class="alert alert-secondary" role="alert">
+					<fmt:message key="label.your.mindmap.saved.every.minute" />
+					<lams:WaitingSpinner id="spinnerArea_Busy" showInline="true" />
+				</div>
+			</c:if>
 
-		</div>
-		 
-		<div>
-			<div class="btn-group btn-group-sm" role="group">
-			<a href="#" class="resetView btn btn-secondary btn-sm"><fmt:message key='label.zoom'/>:</a>
-			<a href="#" class="resetView btn btn-secondary btn-sm"><fmt:message key='label.zoom.reset'/></a>
-			<a href="#" class="scaleUp btn btn-secondary btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
-			<a href="#" class="scaleDown btn btn-secondary btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
+			<div id="mindmap-controls">
+
+				<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
+				<div style="display: inline" role="group">
+					<button type="button" class="btn btn-secondary btn-sm full-screen-launch-button float-end ms-1" id="expand"
+						onclick="javascript:launchIntoFullscreen(this)"
+						data-bs-toggle="tooltip" data-bs-original-title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.enter.full.screen' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.enter.full.screen' />"						
+					> 
+						<i class="fa-solid fa-maximize" aria-hidden="true"></i>
+					</button> 
+					
+					<button type="button" class="btn btn-secondary btn-sm full-screen-exit-button float-end ms-1" id="shrink"
+						onclick="javascript:exitFullscreen()" style="display: none;"
+						title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.exit.full.screen' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.exit.full.screen' />"
+					> 
+						<i class="fa fa-compress" aria-hidden="true"></i>
+					</button>
+
+					<c:if test="${param.allowPrinting}">
+						<button type="button" class="btn btn-secondary btn-sm float-end ms-1" id="print" onclick="javascript:showPrintView()"
+							title="<fmt:message key='button.print'/>"
+						>
+							<i class="fa fa-print" aria-hidden="true"></i>
+						</button>
+					</c:if>
+
+					<input type="text" id="background-color" class='updateStyle btn btn-secondary btn-sm' 
+						data-mm-target-property='background' size="7" width="180px" 
+						data-bs-toggle="tooltip" data-bs-original-title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.background.color' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.background.color' />"
+					>
+				</div>
+
+				<div>
+					<div class="btn-group mt-1" role="group">
+						<button type="button" class="resetView btn btn-secondary btn-sm">
+							<fmt:message key='label.zoom' />:<fmt:message key='label.zoom.reset' />							
+						</button> 
+						<button type="button" class="scaleUp btn btn-secondary btn-sm"
+							title="<fmt:message key='label.zoom.increase'/>"
+						>
+							<i class="fa fa-lg fa-search-plus"></i>
+						</button> 
+						<button type="button" class="scaleDown btn btn-secondary btn-sm"
+							title="<fmt:message key='label.zoom.decrease'/>"
+						>
+							<i class="fa fa-lg fa-search-minus"></i>
+						</button>
+					</div>
+
+					<div style="display: inline-block" role="group" class="btn-group mt-1">
+						<button type="button" class="toggleCollapse btn btn-secondary btn-sm"
+							title="<fmt:message key='label.expand.collapse.idea'/>"
+						>
+							<i class="fa fa-lg fa-navicon"></i>
+							<span class="d-none d-sm-inline">&nbsp;
+								<fmt:message key='label.expand.collapse.idea'/>
+							</span>
+						</button>
+						<c:if test="${contentEditable}">
+							<button type="button" class="addSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.add.idea'/>">
+								<i class="fa-regular fa-lg fa-square-plus"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.add.idea' />
+								</span>
+							</button>
+							<button type="button" class="editNode btn btn-secondary btn-sm" title="<fmt:message key='label.edit.idea.text'/>">
+								<i class="fa-regular fa-lg fa-pen-to-square"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.edit.idea.text' />
+								</span>
+							</button>
+							<button type="button" class="removeSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.delete.idea'/>">
+								<i class="fa-regular fa-lg fa-trash-can"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.delete.idea' />
+								</span>
+							</button>
+							<%-- Not yet implemented in back end  --%>
+							<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%>
+							<%--  		<input type="button" class="insertRoot" value="add root node">  --%>
+							<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root">  --%>
+						</c:if>
+					</div>
+				</div>
 			</div>
-			
-			<div style="display:inline-block" role="group">
-		 	<a href="#" class="toggleCollapse btn btn-secondary btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
-		<c:if test="${contentEditable}">
-			<a href="#" class="addSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.add.idea'/></span></a>
-			<a href="#" class="editNode btn btn-secondary btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
-			<a href="#" class="removeSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="d-none d-sm-block">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
-	<%-- Not yet implemented in back end  --%> 
-	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
-	<%--  		<input type="button" class="insertRoot" value="add root node">  --%> 
-	<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root">  --%> 
-	 	</c:if>
-	 		</div>
- 		</div>
-	</div>
 
- 	<div id="mindmap-container"></div>
- 	<style id="themecss">
-	</style>
-	
+			<div id="mindmap-container"></div>
+			<style id="themecss">
+			</style>
+
+		</div>
 	</div>
-	</div>
-	</div>
+</div>

@@ -16,9 +16,13 @@
 				<c:if test="${not empty currentMindmapUser}">
 					&nbsp;<fmt:message key='node.learner.label'/>&nbsp;"<c:out value="${currentMindmapUser}" />"
 				</c:if>
-				</title>
+			</title>
 		</c:if>
-		<lams:css/>
+		
+        <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
@@ -60,8 +64,8 @@
 			</c:otherwise>
 		</c:choose>
 
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+        <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+        <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
 		<script src="${lams}includes/javascript/fullscreen.js"></script>
 		<script src="${tool}includes/javascript/jquery.timer.js"></script>
