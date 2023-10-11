@@ -22,8 +22,8 @@
 		</label>
 	</div>
 	
-	<div class="ms-2">
-		<input type="range" id="confidence-level-${questionIndex}" 
+	<div class="col-12 col-sm-8 col-md-6 col-lg-4 ms-2">
+		<input type="range" id="confidence-level-${questionIndex}" class="form-range"
 			list="slider-step-list-${question.uid}" disabled
 			min="0" max="10" step="${sliderStep}" 
 			<c:if test="${question.confidenceLevel != -1}">value="${question.confidenceLevel}"</c:if>>

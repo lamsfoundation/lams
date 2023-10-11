@@ -22,9 +22,9 @@
 		</label>
 	</div>
 	
-	<div>
-		<input type="range" name="confidenceLevel${questionIndex}" id="confidenceLevel${questionIndex}" 
-			list="slider-step-list-${question.uid}" 
+	<div class="col-12 col-sm-8 col-md-6 col-lg-4">
+		<input type="range" name="confidenceLevel${questionIndex}" id="confidenceLevel${questionIndex}" class="form-range"
+			list="slider-step-list-${question.uid}"
 			min="0" max="10" step="${sliderStep}" 
 			<c:if test="${question.confidenceLevel != -1}">value="${question.confidenceLevel}"</c:if>
 			<c:if test="${!hasEditRight}">disabled</c:if>

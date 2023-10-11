@@ -633,16 +633,13 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 /*----------slider----------------*/
 
 .bootstrap-slider input[type="range"] {
-  width: 210px;
   margin: 0;
+  appearance: auto !important;
 }
 
 .bootstrap-slider datalist {
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
-  writing-mode: vertical-lr;
-  width: 210px;
 }
 
 .bootstrap-slider option {

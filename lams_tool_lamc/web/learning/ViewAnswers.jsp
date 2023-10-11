@@ -170,10 +170,10 @@
 											</label>
 										</div>
 										
-										<div>
+										<div class="col-12 col-sm-8 col-md-6 col-lg-4">
 											<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 												<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-													<input type="range" name="confidenceLevel${queIndex}" id="confidenceLevel${queIndex}" 
+													<input type="range" name="confidenceLevel${queIndex}" id="confidenceLevel${queIndex}" class="form-range"
 														list="slider-step-list-${queIndex}" 
 														min="0" max="10" step="5" disabled
 														<c:if test="${attemptEntry.value.confidenceLevel != -1}">value="${attemptEntry.value.confidenceLevel}"</c:if>

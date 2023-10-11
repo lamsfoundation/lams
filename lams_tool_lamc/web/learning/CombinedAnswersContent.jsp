@@ -68,8 +68,8 @@
 						</label>
 					</div>
 					
-					<div>
-						<input type="range" name="confidenceLevel${questionUid}" id="confidenceLevel${questionUid}" 
+					<div class="col-12 col-sm-8 col-md-6 col-lg-4">
+						<input type="range" name="confidenceLevel${questionUid}" id="confidenceLevel${questionUid}" class="form-range"
 							list="slider-step-list-${questionUid}" 
 							min="0" max="10" step="5" 
 							<c:if test="${answerDto.confidenceLevel != -1}">value="${answerDto.confidenceLevel}"</c:if>
