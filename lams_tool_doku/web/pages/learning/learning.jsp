@@ -71,7 +71,9 @@
 				</c:if>
 			});
 			
-			$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
+			});
 		});
 		
 		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {

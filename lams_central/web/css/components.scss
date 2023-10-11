@@ -602,6 +602,11 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	color: rgba(5, 112, 213,1) !important;
 }
 
+/* display tooltip even though element is disabled */
+[data-bs-toggle="tooltip"].disabled {
+    pointer-events: auto !important;
+}
+
 /*----------Ratings----------------*/ 
 .rating-comment{
 	background-image: none;

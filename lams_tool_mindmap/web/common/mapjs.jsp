@@ -10,7 +10,7 @@
 <%-- <script src="${tool}includes/javascript/fullscreen.js"></script> --%>
 <style>
 	/* hack to display tooltip even when input is disabled */
-	#background-color[disabled], [data-bs-toggle="tooltip"].disabled {
+	#background-color[disabled] {
 	    pointer-events: auto !important;
 	}
 </style>

@@ -76,7 +76,9 @@
 				}
 			});
 			
-			$('[data-bs-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
+			});
 		});
 		
 		function finishSession(){
@@ -162,7 +164,7 @@
 					</button>
 				</span>
 		       </div>
-		       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse etherpad-collapse" 
+		       <div id="collapse${groupSummary.sessionId}" class="collapse etherpad-collapse" 
 		       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 					<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	    <c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
