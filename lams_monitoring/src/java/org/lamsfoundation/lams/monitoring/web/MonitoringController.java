@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
+import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.*;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
@@ -1042,7 +1043,9 @@ public class MonitoringController {
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, learningDesign.getContentFolderID());
 
-	request.setAttribute("isIntegrationLogin", ss.getAttribute("isIntegrationLogin"));
+	boolean isIntegrationOrganisation = !userManagementService.findByProperty(ExtCourseClassMap.class,
+		"organisation", organisation).isEmpty();
+	request.setAttribute("isIntegrationOrganisation", isIntegrationOrganisation);
 
 	return "monitor";
     }
@@ -1195,8 +1198,6 @@ public class MonitoringController {
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
 	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
-
-
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
