@@ -121,7 +121,7 @@
 		<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 		
 	    <div class="lcard card rubrics-row-card">
-	       <div class="card-header text-bg-secondary collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
+	       <div class="card-header collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
 	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
 						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-cards"
 				>

@@ -5,7 +5,7 @@
   	<c:set var="questionUid" value="${answerDto.questionUid}"/>
 
 	<div class="card lcard">
-		<div class="card-header text-bg-secondary">
+		<div class="card-header">
 			<div class="row align-items-center">
 				<div style="width:50px;">
 					${answerDto.displayOrder})
@@ -15,10 +15,6 @@
 		            <c:if test="${not sessionMap.hideTitles}">
 			           	<c:out value="${answerDto.questionName}" escapeXml="false" />
 		            </c:if>
-		                	
-		            <div class="font-size-init">
-		               	<c:out value="${answerDto.questionDescription}" escapeXml="false" />
-		            </div>
 	            </div>
             </div>
 
@@ -30,7 +26,11 @@
 			</c:if>
 		</div>
 
-		<div class="card-body table-responsive">
+		<div class="card-body table-responsive">    	
+			<div class="mb-3">
+		       	<c:out value="${answerDto.questionDescription}" escapeXml="false" />
+			</div>
+		            
 			<div class="div-hover mx-2">
 				<fieldset>
 					<legend class="visually-hidden">

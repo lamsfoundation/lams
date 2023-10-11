@@ -323,7 +323,7 @@
 	</c:if>
 	
 <div class="card lcard">
-	<div class="card-header text-bg-secondary">
+	<div class="card-header">
 		<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
 	</div>
 

@@ -163,7 +163,7 @@
 	<input type="hidden" name="next" id="next" value=""/>
 
 	<div class="card lcard">
-		<div class="card-header text-bg-secondary">
+		<div class="card-header">
 			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
 		</div>
 		

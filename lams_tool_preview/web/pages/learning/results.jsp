@@ -102,7 +102,7 @@
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
 			<div class="card lcard">
 				<c:if test="${not criteriaRatings.ratingCriteria.rubricsStyleRating}">
-					<div class="card-header text-bg-secondary">
+					<div class="card-header">
 						<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
 					</div>
 				</c:if>
@@ -116,7 +116,7 @@
 	
 	<c:if test="${peerreview.showRatingsLeftForUser}">
 		<div class="card lcard">
-			<div class="card-header text-bg-secondary">
+			<div class="card-header">
 				<fmt:message key="label.ratings.by.others" />
 			</div>
 			

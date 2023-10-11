@@ -169,7 +169,7 @@
 
 			<c:if test="${question.answerRequired}">
 				<span class="asterisk float-end"> 
-					<i class="fa fa-xs fa-asterisk text-danger"
+					<i class="fa fa-asterisk text-danger"
 					title="<fmt:message key="label.answer.required"/>"
 					alt="<fmt:message key="label.answer.required"/>"></i>
 				</span>
@@ -184,13 +184,13 @@
 					${question.title}
 				</c:if>
 			</div>
-
-			<div class="font-size-init">
-				${question.question}
-			</div>
 		</div>
 
 		<div class="card-body" id="question-area-${questionIndex}">
+			<div class="mb-4">
+				${question.question}
+			</div>
+			
 			<c:choose>
 				<c:when test="${question.type == 1}">
 					<c:set var="justificationEligible" value="true" />

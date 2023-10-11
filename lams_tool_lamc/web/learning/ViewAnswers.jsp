@@ -84,7 +84,7 @@
 			<c:set var="mainQueIndex" scope="request" value="${mainQueIndex +1}" />
 
 			<div class="card lcard">
-				<div class="card-header text-bg-secondary">
+				<div class="card-header">
 					<div class="row align-items-center">
 						<div style="width:50px;">
 							${status.count})
@@ -94,15 +94,14 @@
 							<c:if test="${not sessionMap.hideTitles}">
 								<c:out value="${question.name}" escapeXml="false" />
 							</c:if>
-												
-							<div class="font-size-init">
-								<c:out value="${question.description}" escapeXml="false" />
-							</div>
 						</div>
 					</div>
 				</div>
 						
-				<div class="card-body">
+				<div class="card-body">		
+					<div class="font-size-init">
+						<c:out value="${question.description}" escapeXml="false" />
+					</div>
 
 					<!--  CANDIDATE ANSWERS  -->
 					<c:set var="queIndex" scope="request" value="0" />

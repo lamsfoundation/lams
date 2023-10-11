@@ -119,7 +119,7 @@
 	<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 			
 	    <div class="card lcard rubrics-user-card mt-2">
-	       <div class="card-header text-bg-secondary collapsable-icon-left" id="heading${ratingDto.itemId}">
+	       <div class="card-header collapsable-icon-left" id="heading${ratingDto.itemId}">
 	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
 						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-cards"
 				>

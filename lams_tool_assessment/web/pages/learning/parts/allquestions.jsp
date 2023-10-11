@@ -40,23 +40,19 @@
 										
 					<c:if test="${question.answerRequired}">
 						<span class="asterisk float-end"> 
-							<i class="fa fa-xs fa-asterisk text-danger"
+							<i class="fa fa-asterisk text-danger"
 							title="<fmt:message key="label.answer.required"/>"
 							alt="<fmt:message key="label.answer.required"/>"></i>
 						</span>
 					</c:if>
 				</div>
-
-				<div class="font-size-init" id="question-description-${question.uid}">
-					<c:if test="${empty question.question}">
-						<!--  must have something here otherwise the question-numbers span does not float properly -->
-						&nbsp;
-					</c:if>
-					${question.question}
-				</div>
 			</div>
 					
 			<div class="card-body question-area" id="question-area-${questionIndex}">
+				<div class="mb-4" id="question-description-${question.uid}">
+					${question.question}
+				</div>
+				
 				<c:choose>
 					<c:when test="${question.type == 1}">
 						<c:set var="justificationEligible" value="true" />

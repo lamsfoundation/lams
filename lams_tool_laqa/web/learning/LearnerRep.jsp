@@ -105,7 +105,7 @@
 		<c:forEach var="question" items="${generalLearnerFlowDTO.questions}" varStatus="status">
 
 			<div class="card lcard">
-				<div class="card-header text-bg-secondary">
+				<div class="card-header">
 					<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if>
 					<c:out value="${question.qbQuestion.name}" escapeXml="false" />
 					
