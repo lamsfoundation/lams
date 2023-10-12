@@ -290,12 +290,12 @@
 		</div>
 
 		<!-- Resources to View -->
-		<div class="card-subheader">
+		<div class="card-subheader mb-3">
 			<fmt:message key="label.resoruce.to.review" />
 		</div>
 
 		<c:forEach var="item" items="${sessionMap.resourceList}">
-			<div class="item-card card lcard" >
+			<div class="item-card card lcard">
 				<div class="card-header" id="heading${item.uid}">
 			        	<span class="card-title collapsable-icon-left">
 				        	<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${item.uid}"
@@ -337,44 +337,6 @@
 			</div>
 		</c:forEach>
 
-		<!--  Card button bar controlling refresh and adding items -->
-		<div class="btn-group float-end my-3">
-			<c:if test="${mode != 'teacher'}">
-				<button onclick="javascript:return checkNew()" type="button" class="btn btn-secondary"> 
-					<i class="fa fa-refresh"></i> 
-					<fmt:message key="label.check.for.new" />
-				</button>
-			</c:if>
-			<c:if test="${not finishedLock}">
-				<c:choose>
-					<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
-						<button onclick="javascript:gotoURL()" type="button" class="btn btn-secondary"> 
-							<i class="fa fa-plus"></i>
-							<fmt:message key="label.authoring.basic.resource.url.input" />
-						</button>
-						<button onclick="javascript:gotoFile()" type="button" class="btn btn-secondary"> 
-							<i class="fa fa-plus"></i>
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</button>
-					</c:when>
-
-					<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
-						<button onclick="javascript:gotoFile()" type="button" class="btn btn-secondary"> 
-							<i class="fa fa-plus"></i>
-							<fmt:message key="label.authoring.basic.resource.file.input" />
-						</button>
-					</c:when>
-
-					<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
-						<button onclick="javascript:gotoURL()" type="button" class="btn btn-secondary"> 
-							<i class="fa fa-plus"></i>
-							<fmt:message key="label.authoring.basic.resource.url.input" />
-						</button>
-					</c:when>
-				</c:choose>
-			</c:if>
-		</div>
-
 		<!-- Add a URL/File Form-->
 		<div id="addresource">
 		</div>
@@ -388,9 +350,10 @@
 				notebookHeaderLabelKey="title.reflection"/>
 		</c:if>
 		
-		<!-- Finish buttons -->
-		<c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
-			<div class="activity-bottom-buttons">
+		<div class="activity-bottom-buttons mt-5">
+		
+			<!-- Finish buttons -->
+			<c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button type="button" name="FinishButton" onclick="return continueReflect()" class="btn btn-primary na btn-disable-on-submit">
@@ -399,7 +362,6 @@
 					</c:when>
 					<c:otherwise>
 						<button type="submit" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
-							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="label.submit" />
@@ -408,12 +370,49 @@
 										<fmt:message key="label.finished" />
 									</c:otherwise>
 								</c:choose>
-							</span>
 						</button>
 					</c:otherwise>
 				</c:choose>
+			</c:if>			
+
+			<!--  Card button bar controlling refresh and adding items -->
+			<div class="btn-group mx-2">
+				<c:if test="${mode != 'teacher'}">
+					<button onclick="javascript:return checkNew()" type="button" class="btn btn-secondary"> 
+						<i class="fa fa-refresh"></i> 
+						<fmt:message key="label.check.for.new" />
+					</button>
+				</c:if>
+				<c:if test="${not finishedLock}">
+					<c:choose>
+						<c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
+							<button onclick="javascript:gotoURL()" type="button" class="btn btn-secondary"> 
+								<i class="fa fa-plus"></i>
+								<fmt:message key="label.authoring.basic.resource.url.input" />
+							</button>
+							<button onclick="javascript:gotoFile()" type="button" class="btn btn-secondary"> 
+								<i class="fa fa-plus"></i>
+								<fmt:message key="label.authoring.basic.resource.file.input" />
+							</button>
+						</c:when>
+	
+						<c:when test="${resource.allowAddFiles && !resource.allowAddUrls}">
+							<button onclick="javascript:gotoFile()" type="button" class="btn btn-secondary"> 
+								<i class="fa fa-plus"></i>
+								<fmt:message key="label.authoring.basic.resource.file.input" />
+							</button>
+						</c:when>
+	
+						<c:when test="${!resource.allowAddFiles && resource.allowAddUrls}">
+							<button onclick="javascript:gotoURL()" type="button" class="btn btn-secondary"> 
+								<i class="fa fa-plus"></i>
+								<fmt:message key="label.authoring.basic.resource.url.input" />
+							</button>
+						</c:when>
+					</c:choose>
+				</c:if>
 			</div>
-		</c:if>
+		</div>
 
 	</div>
 </lams:PageLearner>

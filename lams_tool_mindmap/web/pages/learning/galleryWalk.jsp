@@ -91,12 +91,12 @@
 	</div>
 
 	<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
-		<div class="text-center my-3 card-subheader">
+		<div class="text-center card-subheader my-3">
 			<fmt:message key="label.gallery.walk.ratings.header" />
 		</div>
 		
 		<div id="gallery-walk-rating-table" class="ltable table-sm">
-			<div class="row table-lightx">
+			<div class="row">
 		    	<div class="col"><fmt:message key="monitoring.label.group" /></div>
 		    	<div class="col text-center"><fmt:message key="label.rating" /></div>
 			</div>
@@ -116,7 +116,7 @@
 		</div>
 	</c:if>
 	
-	<div class="text-center my-3 card-subheader">
+	<div class="text-center card-subheader my-3">
 		<fmt:message key="label.gallery.walk" />
 	</div>
 	
@@ -145,7 +145,7 @@
 			</span>
 	       </div>
 	       
-	       <div id="collapse${mindmapSession.sessionID}" class="card-body panel-collapse collapse mindmap-collapse" 
+	       <div id="collapse${mindmapSession.sessionID}" class="card-body collapse mindmap-collapse" 
 	       	    aria-labelledby="heading${mindmapSession.sessionID}">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not mindmapDTO.galleryWalkReadOnly and (mindmapDTO.galleryWalkFinished or mode == 'teacher' or toolSessionID != mindmapSession.sessionID)}">
@@ -191,14 +191,14 @@
 				
 				<c:otherwise>
 					<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
-							<c:choose>
-			 					<c:when test="${sessionMap.isLastActivity}">
-			 						<fmt:message key="button.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="button.finish" />
-			 					</c:otherwise>
-			 				</c:choose>
+						<c:choose>
+			 				<c:when test="${sessionMap.isLastActivity}">
+			 					<fmt:message key="button.submit" />
+			 				</c:when>
+			 				<c:otherwise>
+			 		 			<fmt:message key="button.finish" />
+			 				</c:otherwise>
+			 			</c:choose>
 					</button>
 				</c:otherwise>
 			</c:choose>

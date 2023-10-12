@@ -11,7 +11,7 @@
  		document.location.href = '<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&reqID='+reqIDVar.getTime();	
  	</script>
  	
-	<div style="align:center">
+	<div id="container-main text-center">
 		<!--  Should never be seen -->
 		<a href="<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}" type="button" class="btn btn-primary">
 			<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" />
