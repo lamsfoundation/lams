@@ -110,7 +110,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	dialog.on('hidden.bs.modal', initParams.close);
 
 	dialog.modal({
-		'keyboard' : false,
+		'keyboard' : initParams.hasOwnProperty('keyboard') && initParams.keyboard,
 		'backdrop' : 'static'
 	});
 
@@ -346,6 +346,7 @@ function showMyPortraitDialog() {
 	showDialog("dialogMyProfile", {
 		'title' : "Portrait",
 		'modal' : true,
+		'keyboard' : true,
 		'width' : Math.max(380, Math.min(770, $(window).width() - 60)),
 		'open' : function() {
 			var dialog = $(this);

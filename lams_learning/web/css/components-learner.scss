@@ -29,7 +29,14 @@
 }
 
 .component-page-wrapper #hamb {
+	font-size: 2rem;
+	color: var(--bs-blue);
     font-size: 1.8rem;
+	margin-bottom: -0.5rem;
+}
+
+.component-page-wrapper .offcanvas-body {
+	text-align: -webkit-center;
 }
 
 .component-page-wrapper .component-page-content {
@@ -40,6 +47,11 @@
     box-shadow: 0px 1px 0px var(--bs-gray-400);
 }
 
+.component-page-wrapper .component-page-content #header>div:first-child {
+	margin-top: -0.35rem;
+    margin-bottom: 0.35rem;
+}
+
 .component-page-wrapper .component-page-content #lesson-name {
     margin-left: 1rem;
     margin-top: .6rem;
@@ -47,8 +59,8 @@
 
 .component-page-wrapper .top-menu #progress-bar-widget {
     min-width: 10rem;
-    margin-top: .6rem;
-    margin-right: 3rem !important;
+    margin: 0rem 1.5rem;
+    padding: 0;
 }
 
 .component-page-wrapper .top-menu #progress-bar-widget .progress {
@@ -60,71 +72,70 @@
     background-color: var(--bs-blue);
 }
 
-.component-page-wrapper .component-sidebar {
-    top: 6rem;
-    left: -72rem;
+.component-page-wrapper .top-menu #return-to-index {
+	margin-top: 0.8rem;
+}
+
+
+
+
+.component-page-wrapper .offcanvas {
+	text-align: center;
+	transition: all .3s ease;
+}
+
+.component-page-wrapper .offcanvas .lams-logo {
+	display: block;
+	width: 3.6rem;
+	margin-bottom: 2rem;
+}
+
+
+
+
+.component-page-wrapper .offcanvas {
+    top: 4.5rem;
+	width: 18rem;
     max-width: 70rem;
-    border-radius: 1.2rem;
+    border-radius: 0 1.2rem 0 0;
     border: thin solid var(--bs-gray-400);
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
-.component-page-wrapper .component-sidebar.active {
+.component-page-wrapper .offcanvas .offcanvas-title {
+	font-weight: 500;
+    color: rgb(5, 112, 213);
+}
+
+.component-page-wrapper .offcanvas .offcanvas-bar {
+	background-color: var(--bs-gray-200);
+    border-radius: 1.2rem;
+}
+
+.component-page-wrapper .offcanvas.active {
     left: 1rem;
 }
 
-.component-page-wrapper .component-sidebar .sidebar-toggle-button {
-    font-size: 1.5rem;
-    align-self: end;
-    color: var(--bs-primary);
-}
-
-.component-page-wrapper .component-sidebar .progress-bar-items {
-    background-color: var(--bs-gray-200);
+.component-page-wrapper .offcanvas .progress-bar-items > li {
     padding: .5rem;
-    margin-bottom: 0;
-    border-radius: 1.2rem;
-    list-style: none;
-    text-align: left;
-    max-width: 60vh;
 }
 
-.component-page-wrapper .component-sidebar .progress-bar-items > li {
-    padding: .5rem 2rem;
-    border-radius: 1.2rem;
-    color: var(--bs-secondary);
-}
-
-.component-page-wrapper .component-sidebar .progress-bar-items > li a {
+.component-page-wrapper .offcanvas .progress-bar-items > li a {
     color: var(--bs-gray-dark);
 }
 
-.component-page-wrapper .component-sidebar .progress-bar-items > li > .progress-bar-icon {
+.component-page-wrapper .offcanvas .progress-bar-items > li > .progress-bar-icon {
     margin-right: .5rem;
 }
 
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-incomplete,
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-incomplete > .progress-bar-icon {
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-incomplete,
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-incomplete > .progress-bar-icon {
     color: var(--bs-gray-700);
 }
 
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-complete,
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-complete,
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
     color: var(--bs-green);
-}
-
-.component-page-wrapper .component-sidebar .progress-bar-items > li.support-bar-item,
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-current,
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-current > .progress-bar-icon {
-    color: var(--bs-black);
-}
-
-.component-page-wrapper .component-sidebar .progress-bar-items > li.progress-bar-item-current > .progress-bar-activity-name {
-    font-weight: bold;
-}
-
-.component-page-wrapper .component-sidebar .progress-bar-items > li:hover {
-    background-color: var(--bs-white);
 }
 
 .component-page-wrapper .activity-bottom-buttons {
@@ -145,21 +156,6 @@
 .component-page-wrapper #progress-bar-widget {
     font-size: 0.90rem;
 }
-
-.component-page-wrapper .sidebar-title {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem
-}
-
-.component-page-wrapper .sidebar-title {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem
-}
-
-.component-page-wrapper .sidebar-title-icon {
-    font-size: 1rem;
-}
-
 
 .wave-orange {
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2Q1NmExMSIgd2lkdGg9IjEyNDAiIGhlaWdodD0iMzA0IiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6IiBmaWxsPSIjZjkzIi8+PC9zdmc+");

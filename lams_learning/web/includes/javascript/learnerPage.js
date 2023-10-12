@@ -1,10 +1,5 @@
 // refresh progress bar on first/next activity load
 function initLearnerPage(toolSessionId, userId) {
-    $('.component-page-wrapper .sidebar-toggle-button').click(function (event) {
-        event.stopPropagation();
-        toggleProgressBar();
-    });
-
     $.ajax({
         url: LAMS_URL + 'learning/learner/getLearnerProgress.do',
         data: {
@@ -18,11 +13,11 @@ function initLearnerPage(toolSessionId, userId) {
 
             // draw support activities if they exist
             if (result.support) {
-                let supportBarItems = $('.component-page-wrapper .component-sidebar #support-bar').removeClass('d-none')
+                let supportBarItems = $('.component-page-wrapper .offcanvas #offcanvas-support-bar').removeClass('d-none')
                     .find('#support-bar-items').empty();
                 $.each(result.support, function (activityIndex, activityData) {
-                    let activityItem = $('<li>').attr('role', 'presentation')
-                        .addClass('support-bar-item progress-bar-item-openable')
+                    let activityItem = $('<li>')
+                        .addClass('list-group-item list-group-item-action progress-bar-item-openable')
                         .prepend('<i class="fa-solid fa-fw fa-up-right-from-square progress-bar-icon">').appendTo(supportBarItems);
                     let activityLink = $('<a>').text(activityData.name).attr({
                         'target': '_blank',
@@ -34,15 +29,17 @@ function initLearnerPage(toolSessionId, userId) {
                 });
             }
 
-            let progressBarItems = $('.component-page-wrapper .component-sidebar #progress-bar-items').empty(),
+            let progressBarItems = $('.component-page-wrapper .offcanvas #progress-bar-items').empty(),
                 completedActivityCount = 0;
             $.each(result.activities, function (activityIndex, activityData) {
-                let activityItem = $('<li>').attr('role', 'presentation').appendTo(progressBarItems),
+                let activityItem = $('<li>')
+                		.addClass('list-group-item list-group-item-action')
+                		.appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
-                    activityIcon = $('<i class="fa-solid fa-fw progress-bar-icon"></i>');
+                    activityIcon = $('<i class="fa-solid fa-fw fa-lg progress-bar-icon"></i>');
 
                 if (activityData.status === 0) {
-                    activityItem.addClass('progress-bar-item-current').text(activityName).prepend(activityIcon);
+                    activityItem.addClass('active').text(activityName).prepend(activityIcon);
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-hourglass-half');
                     } else {
@@ -186,9 +183,10 @@ function initCommandWebsocket(lessonId) {
 
 function toggleProgressBar(forceClose) {
     let pageContent = $('.component-page-wrapper .component-page-content'),
-        progressBar = $('.component-page-wrapper .component-sidebar'),
-        topToggleButton = $('header .sidebar-toggle-button', pageContent),
+        progressBar = $('.component-page-wrapper .offcanvas'),
+        topToggleButton = $('header #hamb', pageContent),
         isExpanded = forceClose || topToggleButton.attr('aria-expanded') == 'true';
+        
     topToggleButton.attr('aria-expanded', !isExpanded)
         .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
     progressBar.toggleClass('active').attr('aria-expanded', !isExpanded);
@@ -201,7 +199,7 @@ function toggleProgressBar(forceClose) {
     } else {
         pageContent.attr('inert', '');
         progressBar.removeAttr('inert');
-        $('.sidebar-toggle-button', progressBar).focus();
+        $('.btn-close', progressBar).focus();
 
         $('body').on('keyup', function (event) {
             if (event.key === "Escape") {

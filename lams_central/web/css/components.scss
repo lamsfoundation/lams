@@ -491,11 +491,6 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border: thin solid var(--bs-gray-700);
 }
 
-.component-page-wrapper .component-page-content > header .sidebar-toggle-button {
-	font-size: 2rem;
-	color: var(--bs-blue);
-}
-
 .component-page-wrapper .component-page-content {
 	min-height: 100%;
 	padding: 1rem 2rem 2rem 2rem;
@@ -517,8 +512,10 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 }
 
 .component-page-wrapper .component-sidebar .lams-logo {
-	width: 3.6rem;
+	display: block;
+ 	width: 3.6rem;
 	margin-bottom: 1.2rem;
+	margin-bottom: 2rem;
 }
 
 .component-page-wrapper .component-sidebar .component-menu {
@@ -536,7 +533,6 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	margin-bottom: 10px;
 }
 
-
 .component-page-wrapper .component-menu-btn a {
 	width: 3.1rem;
 	height: 3.1rem;
@@ -550,7 +546,6 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	display: block;
 	font-size: 15px;
 }
-
 
 .component-page-wrapper .top-menu,
 .component-page-wrapper .top-menu-btn {
