@@ -292,7 +292,6 @@ public class LearningController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
 	return responseJSON.toString();
     }
 

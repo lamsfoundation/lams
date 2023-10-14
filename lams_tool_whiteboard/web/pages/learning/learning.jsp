@@ -318,7 +318,10 @@
 					</c:when>
 					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finish-button"
-						   class="btn btn-primary voffset5 pull-right na">
+						   class="btn btn-primary voffset5 pull-right na"
+								<c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
+									style="display: none"
+								</c:if>>
 							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">

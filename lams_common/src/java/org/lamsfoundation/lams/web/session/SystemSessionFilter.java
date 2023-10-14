@@ -23,7 +23,8 @@
 
 package org.lamsfoundation.lams.web.session;
 
-import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.springframework.web.util.NestedServletException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -34,13 +35,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.springframework.web.util.NestedServletException;
+import java.io.IOException;
 
 /**
- * This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml
- * because LocaleFilter need get value from SystemSession.
+ * This filter must set before <code>org.lamsfoundation.lams.web.filter.LocaleFilter</code> in web.xml because
+ * LocaleFilter need get value from SystemSession.
  *
  * @author Steve.Ni
  */
@@ -69,7 +68,7 @@ public class SystemSessionFilter implements Filter {
 	    chain.doFilter(request, response);
 	    return;
 	}
-	
+
 	HttpSession session = null;
 	try {
 	    session = SessionManager.startSession(httpRequest);
@@ -80,7 +79,7 @@ public class SystemSessionFilter implements Filter {
 		// There seems to be a problem with Infinispan session invalidation.
 		// Until we upgrade WildFly we need to keep these safety measures.
 		String sessionId = session.getId();
-		log.warn("Session " + sessionId + " was already invalidated");
+		log.warn("Session " + sessionId + " seems already invalidated: " + e.getCause().getMessage());
 		SessionManager.removeSessionByID(sessionId, false, true);
 	    } else {
 		throw e;

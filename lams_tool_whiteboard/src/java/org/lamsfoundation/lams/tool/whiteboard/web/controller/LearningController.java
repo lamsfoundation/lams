@@ -23,19 +23,8 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -62,8 +51,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 @Controller
 @RequestMapping("/learning")
@@ -273,7 +271,6 @@ public class LearningController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
 	return responseJSON.toString();
     }
 
