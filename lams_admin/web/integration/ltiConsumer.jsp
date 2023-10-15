@@ -61,12 +61,12 @@
 					</div>
 					<div class="mb-3">
 						<label for="serverkey" class="form-label"><fmt:message key="sysadmin.serversecret" /></label>&nbsp;<span class="text-danger">*</span>
-						<input id="serverkey" maxlength="20" name="serverkey" value="${ltiConsumerForm.serverkey}" class="form-control" required/>
+						<input id="serverkey" maxlength="32" name="serverkey" value="${ltiConsumerForm.serverkey}" class="form-control" required/>
 						<lams:errors path="serverkey"/>
 					</div>
 					<div class="mb-3">
 						<label for="servername" class="form-label"><fmt:message key="sysadmin.servername" /></label>&nbsp;<span class="text-danger">*</span>
-						<input id="servername" maxlength="20" name="servername" value="${ltiConsumerForm.servername}" class="form-control" required/>
+						<input id="servername" maxlength="32" name="servername" value="${ltiConsumerForm.servername}" class="form-control" required/>
 						<lams:errors path="servername"/>
 					</div>
 					<div class="mb-3">
@@ -87,10 +87,9 @@
 						<label for="userIdParameterName" class="form-label"><fmt:message key="sysadmin.user.id.name" /></label>:
 						<form:input id="userIdParameterName" path="userIdParameterName" cssClass="form-control" />
 					</div>
-					<div class="mb-3 my-2">
-						<label for="lessonFinishUrl" class="form-label"><fmt:message key="sysadmin.lessonFinishUrl" /></label>:
-						<form:hidden id="lessonFinishUrl" path="lessonFinishUrl"/>
-						<c:out value="${ltiConsumerForm.lessonFinishUrl}"/>
+					<div class="mb-3">
+						<label for="lessonFinishUrl" class="form-label"><fmt:message key="sysadmin.lessonFinishUrl" /></label>
+						<form:input id="lessonFinishUrl" path="lessonFinishUrl" size="70" cssClass="form-control"/>
 					</div>
 
 					<div class="mb-3 mt-3">
