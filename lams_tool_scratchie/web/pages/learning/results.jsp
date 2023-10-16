@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams">
 	<lams:LAMSURL />
@@ -191,7 +191,7 @@
 										</c:when>
 										<%-- If we show titles, we display question number and then a link with question title --%>
 										<c:otherwise>
-											"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><c:out value='${scratchieItem.qbQuestion.name}' /></a>"
+											"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape="true"><c:out value='${scratchieItem.qbQuestion.name}' /></spring:escapeBody></a>"
 										</c:otherwise>
 									</c:choose>
 								</c:otherwise>
