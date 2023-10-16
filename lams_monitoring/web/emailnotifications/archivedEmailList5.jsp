@@ -6,8 +6,7 @@
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>	
-	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
+
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">

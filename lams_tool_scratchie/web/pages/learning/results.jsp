@@ -18,7 +18,6 @@
 	
 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
 		#reflections-div {
