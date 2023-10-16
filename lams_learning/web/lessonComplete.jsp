@@ -118,8 +118,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					    // as if the user clicked the activity in progress bar.
 					    // The code depends on progressBar.js import in Page.tag
 					    $.each(data.rows, function() {
-						    this.cell[0] = '<a href="#" onClick="javascript:openActivity(\'' 
-							    			+ data.urls[this.id] + '\')">' + this.cell[0] + '</a>';
+						    this.cell[0] = '<a target="_blank" title="Open completed activity" href="' 
+							    			+ data.urls[this.id] + '">' + this.cell[0] + '</a>';
 						});
 					},
 				    loadComplete : function(data) {

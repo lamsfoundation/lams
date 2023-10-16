@@ -26,7 +26,7 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                         'role': 'menuitem',
                         'title': 'Open completed activity'
                     });
-                    activityItem.addClass('progress-bar-item-openable').append(activityLink);
+                    activityItem.append(activityLink);
                 });
             }
 
