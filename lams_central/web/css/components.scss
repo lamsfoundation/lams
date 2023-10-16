@@ -479,7 +479,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border-radius: 2.8rem;
 	overflow: hidden;
 	background-color: var(--bs-white);
-	margin: 0.25rem;
+	margin: var(--component_page_wrapper_margin);
 }
 
 .component-page-wrapper button.no-decoration {

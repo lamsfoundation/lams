@@ -40,7 +40,7 @@
 }
 
 .component-page-wrapper .component-page-content {
-    min-height: 100vh;
+    min-height: calc(100vh - 2*var(--lams-component-page-wrapper-margin));
 }
 
 .component-page-wrapper .component-page-content #header {
