@@ -18,46 +18,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
+<c:set var="lastName"><lams:user property="lastName"/></c:set>
+<c:set var="firstName"><lams:user property="firstName"/></c:set>
+<c:set var="title"><fmt:message key="gradebook.lesson.complete" /></c:set>
 
-<lams:html>
-
-<lams:head>
-	<title><fmt:message key="learner.title" />
-	</title>
-
-	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
-</lams:head>
-
-<body class="stripes">
-	<c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
-	<c:set var="lastName"><lams:user property="lastName"/></c:set>
-	<c:set var="firstName"><lams:user property="firstName"/></c:set>
-	
-	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
+<lams:PageLearner toolSessionID="" lessonID="${lessonID}">
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
 		.grid-holder .ui-jqgrid {
 		    margin-left: auto;
 		    margin-right: auto;
 		}
-		
-		h3, h4 {
-			text-align: center;
-		}
 	</style> 
-	
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		function restartLesson(){
@@ -98,9 +75,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				    datatype		   : "json",
 				    url				   : "<lams:LAMSURL />gradebook/gradebook/getLessonCompleteGridData.do?lessonID=${lessonID}",
 				    height			   : "100%",
-				    // use new theme
-				    guiStyle 		   : "bootstrap",
-				    iconSet 		   : 'fontAwesome',
+				    width			   : 520,
+				    guiStyle		   : "bootstrap4",
+					iconSet			   : 'fontAwesomeSolid',
 				    autoencode		   : false,
 					colNames : [
 						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="gradebook.columntitle.activity"/></spring:escapeBody>',
@@ -157,14 +134,31 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.lesson.finished.ok"/></spring:escapeBody>');
 				    }
 				});
+
+		        $(window).bind('resize', function() {
+		            resizeJqgrid($(".ui-jqgrid-btable:visible"));
+		        });
+		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 			});
+
+			function resizeJqgrid(jqgrids) {
+			    jqgrids.each(function(index) {
+			        var gridId = $(this).attr('id');
+			        var parent = jQuery('#gbox_' + gridId).parent();
+			        var gridParentWidth = parent.width();
+			        if ( parent.hasClass('grid-holder') ) {
+			            	gridParentWidth = gridParentWidth - 2;
+			        }
+			        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+			    });
+			}
 		</c:if>
-	
 	</script>
 	
-	<lams:Page type="learner">
+	<div id="container-main">
 		
-		<div class="lead" id="lessonFinished"><i class="fa fa-lg fa-check-square-o text-success"></i>&nbsp;
+		<div class="lead mb-2" id="lessonFinished">
+			<i class="fa-regular fa-lg fa-circle-check text-success"></i>&nbsp;
 			<fmt:message key="message.lesson.finished">
 				<fmt:param>
 					<strong><c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/></strong>
@@ -172,7 +166,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</fmt:message>
 		</div>
 		
-		<div class="voffset10">
+		<div>
 			<fmt:message key="message.lesson.finishedCont">
 				<fmt:param>
 					<strong><c:out value="${learnerprogress.lesson.lessonName}" escapeXml="true"/></strong>
@@ -184,16 +178,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 		
 		<c:if test="${learnerprogress.lesson.allowLearnerRestart}">
-			<div class="voffset10">
+			<div class="mt-2">
 				<fmt:message key="message.lesson.restart" />
-				<a class="btn btn-default loffset20" href="#" onClick="javascript:restartLesson()">
+				<button type="button" class="btn btn-secondary ms-3" onClick="javascript:restartLesson()">
 					<fmt:message key="message.lesson.restart.button" />
-				</a>
+				</button>
 			</div>
 		</c:if>
 		
 		<c:if test="${not empty releasedLessons}">
-			<div class="voffset10">
+			<div class="mt-2">
 				<fmt:message key="message.released.lessons">
 					<fmt:param>
 						<c:out value="${releasedLessons}" escapeXml="true"/> 
@@ -203,25 +197,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</c:if>
 		
 		<c:if test="${displayPrintButton}">
-			<div class="pull-right voffset10">
-				<a href="#" class="btn btn-default" onclick="JavaScript:window.print();">
+			<div class="float-end mt-2">
+				<button type="button" class="btn btn-secondary" onclick="JavaScript:window.print();">
 					<fmt:message key="label.print" />
-				</a>	
+				</button>	
 			</div>
 		</c:if>
 		
 		<c:if test="${gradebookOnComplete}">
-			<div class="lead voffset20"><i class="fa fa-lg fa-list-ol text-success"></i>
-			&nbsp;<fmt:message key="gradebook.lesson.complete" /></div>
-			
-			<h3><fmt:message key="gradebook.learner.lesson.mark" />: <span id="learnerLessonMark"></span></h3>
-			<h4><fmt:message key="gradebook.columntitle.averageMark" />: <span id="averageLessonMark"></span></h4>
-			
-			<div class="grid-holder voffset20">
-				<table id="userGradebookGrid"></table>
-			</div>
+			<br>
+			<lams:Alert5 type="success"> 		
+				<div class="text-center fs-5 fw-semibold">
+					<fmt:message key="gradebook.lesson.complete" />
+				</div>
+				<div class="text-center">
+					<fmt:message key="gradebook.learner.lesson.mark" />: <span id="learnerLessonMark"></span><br>
+					<fmt:message key="gradebook.columntitle.averageMark" />: <span id="averageLessonMark"></span>
+				</div>
+				
+				<div class="grid-holder mt-3">
+					<table id="userGradebookGrid" class=""></table>
+				</div>
+			</lams:Alert5>
 		</c:if>
-	</lams:Page>
-</body>
-
-</lams:html>
+	</div>
+</lams:PageLearner>

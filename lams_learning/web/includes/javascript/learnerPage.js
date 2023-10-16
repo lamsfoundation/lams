@@ -1,9 +1,10 @@
 // refresh progress bar on first/next activity load
-function initLearnerPage(toolSessionId, userId) {
+function initLearnerPage(toolSessionId, lessonId, userId) {
     $.ajax({
         url: LAMS_URL + 'learning/learner/getLearnerProgress.do',
         data: {
             'toolSessionID': toolSessionId,
+            'lessonID': lessonId,
             'userID': userId
         },
         cache: false,
