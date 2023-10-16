@@ -73,38 +73,38 @@
 
 				let timeLimitExceeded = ${timeLimitExceeded};
 				initWebsocket('dokuTimeLimit${sessionMap.toolContentID}',
-								'<lams:WebAppURL />'.replace('http', 'ws')
-								+ 'learningWebsocket?toolContentID=${sessionMap.toolContentID}',
-								function (e) {
-									// create JSON object
-									var input = JSON.parse(e.data);
+						'<lams:WebAppURL />'.replace('http', 'ws')
+						+ 'learningWebsocket?toolContentID=${sessionMap.toolContentID}',
+						function (e) {
+							// create JSON object
+							var input = JSON.parse(e.data);
 
-									if (input.clearTimer == true) {
-										// teacher stopped the timer, destroy it
-										$('#countdown').countdown('destroy').remove();
-									} else if (typeof input.secondsLeft != 'undefined'){
-										// teacher updated the timer
-										var secondsLeft = +input.secondsLeft,
-												counterInitialised = $('#countdown').length > 0;
+							if (input.clearTimer == true) {
+								// teacher stopped the timer, destroy it
+								$('#countdown').countdown('destroy').remove();
+							} else if (typeof input.secondsLeft != 'undefined'){
+								// teacher updated the timer
+								var secondsLeft = +input.secondsLeft,
+										counterInitialised = $('#countdown').length > 0;
 
-										if (counterInitialised) {
-											// just set the new time
-											$('#countdown').countdown('option', 'until', secondsLeft + 'S');
-										} else if (timeLimitExceeded){
-											if (secondsLeft > 0) {
-												// teacher gave extra time, reload to writable Etherpad
-												location.reload();
-												return;
-											}
-										} else {
-											// initialise the timer
-											displayCountdown(secondsLeft);
-										}
+								if (counterInitialised) {
+									// just set the new time
+									$('#countdown').countdown('option', 'until', secondsLeft + 'S');
+								} else if (timeLimitExceeded){
+									if (secondsLeft > 0) {
+										// teacher gave extra time, reload to writable Etherpad
+										location.reload();
+										return;
 									}
+								} else {
+									// initialise the timer
+									displayCountdown(secondsLeft);
+								}
+							}
 
-									// reset ping timer
-									websocketPing('dokuTimeLimit${sessionMap.toolContentID}', true);
-								});
+							// reset ping timer
+							websocketPing('dokuTimeLimit${sessionMap.toolContentID}', true);
+						});
 
 				$('[data-toggle="tooltip"]').bootstrapTooltip();
 			});
@@ -286,12 +286,12 @@
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
-					<c:when test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
-						<%-- show no button for non-leaders until leader will finish activity  --%>
-					</c:when>
 					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finish-button"
-						   class="btn btn-primary voffset5 pull-right na">
+						   class="btn btn-primary voffset5 pull-right na"
+								<c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
+									style="display: none"
+								</c:if>>
 							<span class="nextActivity">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
