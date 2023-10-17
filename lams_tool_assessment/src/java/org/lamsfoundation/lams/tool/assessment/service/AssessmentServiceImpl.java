@@ -367,7 +367,7 @@ public class AssessmentServiceImpl
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
 	int learnersStarted = assessmentUserDao.getCountLearnersByContentId(toolContentId, null);
-	if (learnersStarted == 1 && assessment.getRelativeTimeLimit() == 0 && assessment.getAbsoluteTimeLimit() > 0
+	if (learnersStarted > 0 && assessment.getRelativeTimeLimit() == 0 && assessment.getAbsoluteTimeLimit() > 0
 		&& assessment.getAbsoluteTimeLimitFinish() == null) {
 	    assessment.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(assessment.getAbsoluteTimeLimit()));
 	    assessment.setAbsoluteTimeLimit(0);

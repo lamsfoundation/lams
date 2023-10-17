@@ -339,7 +339,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		break;
 	    }
 	}
-	if (learnersStarted == 1 && dokumaran.getRelativeTimeLimit() == 0 && dokumaran.getAbsoluteTimeLimit() > 0
+	if (learnersStarted > 0 && dokumaran.getRelativeTimeLimit() == 0 && dokumaran.getAbsoluteTimeLimit() > 0
 		&& dokumaran.getAbsoluteTimeLimitFinish() == null) {
 	    dokumaran.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(dokumaran.getAbsoluteTimeLimit()));
 	    dokumaran.setAbsoluteTimeLimit(0);
@@ -420,7 +420,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     public List<DokumaranSession> getDokumaranSessionsByToolContentId(long toolContentId) {
-	return  dokumaranSessionDao.getByContentId(toolContentId);
+	return dokumaranSessionDao.getByContentId(toolContentId);
     }
 
     @Override
