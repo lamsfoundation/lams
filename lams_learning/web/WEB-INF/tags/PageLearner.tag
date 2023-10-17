@@ -57,7 +57,7 @@
 
             $(document).ready(function (){
                 const toolSessionID = ${empty lessonID ? toolSessionID : 'null'},
-            		lessonID = ${lessonID};
+            		lessonID = ${empty lessonID ? 'null' : lessonID};
                 initLearnerPage(toolSessionID, lessonID);
             });
 
@@ -112,11 +112,12 @@
 					<button class="no-decoration" id="hamb" type="button" accesskey="p" 
 							data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 							aria-controls="component-offcanvas"
-							aria-labelledby="offcanvas-progress-bar-title">
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
 						<i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
 					</button>
 
-                    <h1 id="lesson-name"></h1>
+                    <h1 id="lesson-name" title="Lesson name"></h1>
                 </div>
                 
                 <div class="top-menu">
@@ -125,10 +126,11 @@
                         <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="Your profile portrait">
                     </button>
                     
-                    <button type="button" id="progress-bar-widget" title="Your lesson completion" class="no-decoration d-none d-sm-none d-md-block"
+                    <button type="button" id="progress-bar-widget" class="no-decoration d-none d-sm-none d-md-block"
                     		data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 							aria-controls="component-offcanvas"
-							aria-labelledby="offcanvas-progress-bar-title">
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
                         <div class="row m-0">
                             <div class="col-6 text-start p-0">
                                 Progress

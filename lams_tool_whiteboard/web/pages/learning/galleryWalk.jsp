@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
@@ -8,32 +8,12 @@
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	
-	<%@ include file="/common/header.jsp"%>
+<lams:PageLearner title="${whiteboard.title}" toolSessionID="${toolSessionID}">
 	<lams:css suffix="jquery.jRating"/>
-	
 	<style>
 		#gallery-walk-rating-table {
 			width: 60%;
 			margin: 50px auto;
-			border-bottom: 1px solid #ddd;
-		}
-		
-		#gallery-walk-rating-table th {
-			font-weight: bold;
-			font-style: normal;
-			text-align: center;
-		}
-		
-		#gallery-walk-rating-table td {
-			text-align: center;
-		}
-		
-		#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
-			text-align: right;
 		}
 		
 		.gallery-walk-rating-comment-container {
@@ -73,10 +53,6 @@
 			padding: 20px 0 70px 0;
 		}
 		
-		.full-screen-content-div:fullscreen .full-screen-flex-div {
-			margin: 0 2%;
-		}
-		
 		.full-screen-content-div:fullscreen .full-screen-flex-div,
 		.full-screen-content-div:fullscreen .full-screen-main-div,
 		.full-screen-content-div:fullscreen .whiteboard-frame {
@@ -86,7 +62,6 @@
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",
@@ -95,7 +70,6 @@
 			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
-			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
 			COMMENTS_MIN_WORDS_LIMIT = 0,
 			COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
@@ -106,7 +80,9 @@
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
 			
 	    $(document).ready(function(){
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
+			});
 			
 			// show Whiteboards only on Group expand
 			$('.whiteboard-collapse').on('show.bs.collapse', function(){
@@ -129,65 +105,63 @@
 		}
 	</script>
 	<lams:JSImport src="includes/javascript/rating.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>	
 	<%@ include file="websocket.jsp"%>	
-</lams:head>
-<body class="stripes">
 
-<lams:Page type="learner" title="${whiteboard.title}" style="">
-
+<div id="container-main">
 	<lams:errors/>
 	
-	<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
+	<div id="instructions" class="instructions">
+		<c:out value="${whiteboard.instructions}" escapeXml="false" />
 	
-	<c:if test="${not empty whiteboard.galleryWalkInstructions}">
-		<hr>
-		<p><c:out value="${whiteboard.galleryWalkInstructions}" escapeXml="false" /></p>
-	</c:if>
+		<c:if test="${not empty whiteboard.galleryWalkInstructions}">
+			<div class="mt-3">
+				<c:out value="${whiteboard.galleryWalkInstructions}" escapeXml="false" />
+			</div>
+		</c:if>
+	</div>
 		
 	<c:if test="${whiteboard.galleryWalkFinished and not whiteboard.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
-		    <tr>
-		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-		      <th scope="col"><fmt:message key="label.rating" /></th>
-		    </tr>
-		  </thead>
-		  <tbody>
+		<div class="text-center card-subheader my-3">
+			<fmt:message key="label.gallery.walk.ratings.header" />
+		</div>
+		
+		<div id="gallery-walk-rating-table" class="ltable table-sm">
+			<div class="row">
+		    	<div class="col"><fmt:message key="monitoring.label.group" /></div>
+		    	<div class="col text-center"><fmt:message key="label.rating" /></div>
+		    </div>
+
 			<c:forEach var="groupSummary" items="${summaryList}">
-				<tr>
-					<td>${groupSummary.sessionName}</td>
-					<td>
-						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
-									 isItemAuthoredByUser="true"
-									 hideCriteriaTitle="true" />
-					</td>
-				</tr>
-			</c:forEach>
-		  </tbody>
-		</table>
-	</c:if>
-	
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
-	
-	<c:if test="${mode == 'author'}">
-		<div class="row no-gutter" id="gallery-walk-preview-info">
-			<div class="col-xs-12 col-sm-offset-2 col-sm-8">
-				<div class="alert alert-info leader-display">
-					<fmt:message key="label.gallery.walk.preview" />
+				<div class="row">
+					<div class="col">
+						${groupSummary.sessionName}
+					</div>
+					<div class="col">
+						<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
+								isItemAuthoredByUser="true"
+								hideCriteriaTitle="true" />
+					</div>
 				</div>
-			</div>
+			</c:forEach>
 		</div>
 	</c:if>
 	
+	<div class="card-subheader text-center my-3">
+		<fmt:message key="label.gallery.walk" />
+	</div>
+	
+	<c:if test="${mode == 'author'}">
+		<lams:Alert5 type="info" id="gallery-walk-preview-info" close="false">
+			<fmt:message key="label.gallery.walk.preview" />
+		</lams:Alert5>
+	</c:if>
 
 	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	    <div class="panel panel-default">
-	       <div class="panel-heading" role="tab" id="heading${groupSummary.sessionId}">
-	       	<span class="panel-title collapsable-icon-left">
-	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+	    <div class="card lcard">
+	       <div class="card-header" id="heading${groupSummary.sessionId}">
+	       	<span class="card-title collapsable-icon-left">
+	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}" 
 						aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}">
 					<c:choose>
 						<c:when test="${toolSessionID == groupSummary.sessionId}">
@@ -197,31 +171,34 @@
 							<c:out value="${groupSummary.sessionName}" />
 						</c:otherwise>
 					</c:choose>
-				</a>
+				</button>
 			</span>
 	       </div>
-	       <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse whiteboard-collapse" 
-	       	    role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+	       
+	       <div id="collapse${groupSummary.sessionId}" class="card-body collapse whiteboard-collapse" 
+	       	    aria-labelledby="heading${groupSummary.sessionId}">
+	       	    
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 	       	    	<div class="gallery-walk-rating-comment-container">
-	       	    		<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
+	       	    		<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}"
 								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 					 </div>
 	       	    </c:if>
 	 
 			 	<div class="full-screen-content-div">
 					<div class="full-screen-flex-div">
-						<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
-						   title="<fmt:message key='label.fullscreen.open' />">
-							<i class="fa fa-arrows-alt" aria-hidden="true"></i>
-						</a> 
-				       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
-						   title="<fmt:message key='label.fullscreen.close' />">
+						<button type="button" class="btn btn-secondary float-end ms-1 full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
+								title="<fmt:message key='label.fullscreen.open' />">
+							<i class="fa-solid fa-maximize" aria-hidden="true"></i>
+						</button>
+				       	<button type="button" class="btn btn-secondary float-end ms-1 full-screen-exit-button" onclick="javascript:exitFullscreen()"
+								title="<fmt:message key='label.fullscreen.close' />">
 				       		<i class="fa fa-compress" aria-hidden="true"></i>
-				       	</a>
+				       	</button>
+				       	
 				       	<div class="full-screen-main-div">
-							<iframe class="whiteboard-frame"
+							<iframe class="whiteboard-frame" title="Whiteboard"
 									data-src='${whiteboardServerUrl}/?whiteboardid=${groupSummary.wid}&username=${whiteboardAuthorName}${empty groupSummary.accessToken ? "" : "&accesstoken=".concat(groupSummary.accessToken)}&copyfromwid=${sourceWid}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(groupSummary.copyAccessToken)}'>
 							</iframe>		
 						</div>
@@ -233,47 +210,44 @@
 	</c:forEach>
 	
 	<c:if test="${mode != 'teacher'}">
-		<div>
+		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${not whiteboard.galleryWalkFinished}">
-					<button data-toggle="tooltip" 
-							class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
-							<c:choose>
-								<c:when test="${mode == 'author'}">
-									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
-									onClick="javascript:location.href = location.href + '&galleryWalk=forceFinish'"
-								</c:when>
-								<c:otherwise>
-									title="<fmt:message key='label.gallery.walk.wait.finish' />"
-								</c:otherwise>
-							</c:choose>
+					<button type="button" data-bs-toggle="tooltip" class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
+						<c:choose>
+							<c:when test="${mode == 'author'}">
+								title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
+								onClick="javascript:location.href = location.href + '&galleryWalk=forceFinish'"
+							</c:when>
+							<c:otherwise>
+								title="<fmt:message key='label.gallery.walk.wait.finish' />"
+							</c:otherwise>
+						</c:choose>
 					>
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
+				
 				<c:when test="${sessionMap.reflectOn and not sessionMap.userFinished}">
-					<button name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+					<button type="button" name="FinishButton" id="finish-button" onclick="return continueReflect()" class="btn btn-primary na">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>
+				
 				<c:otherwise>
-					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary voffset5 pull-right na">
-						<span class="nextActivity">
-							<c:choose>
-			 					<c:when test="${sessionMap.isLastActivity}">
-			 						<fmt:message key="label.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="label.finished" />
-			 					</c:otherwise>
-			 				</c:choose>
-						</span>
-					</a>
+					<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
+						<c:choose>
+			 				<c:when test="${sessionMap.isLastActivity}">
+			 					<fmt:message key="label.submit" />
+			 				</c:when>
+			 				<c:otherwise>
+			 		 			<fmt:message key="label.finished" />
+			 				</c:otherwise>
+			 			</c:choose>
+					</button>
 				</c:otherwise>
 			</c:choose>
 		</div>
 	</c:if>
-</lams:Page>
-</body>
-</lams:html>
+</div>
+</lams:PageLearner>

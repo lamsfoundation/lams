@@ -356,7 +356,7 @@
 	});
 
 	function startGalleryWalk(){
-		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.start.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 

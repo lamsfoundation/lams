@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -12,10 +13,7 @@
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<lams:PageLearner title="${whiteboard.title}" toolSessionID="${toolSessionID}">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<style media="screen,projection" type="text/css">
   		.countdown-timeout {
@@ -66,13 +64,13 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
-	
 	<script type="text/javascript">
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
 		
 		$(document).ready(function(){
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
+			});
 
 			// Use container-fluid just for this tool
 			$('.panel-learner-page').closest('.container').removeClass('container').addClass('container-fluid');
@@ -110,8 +108,6 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-
-
 		
 		// TIME LIMIT
 		var whiteboardWebsocketInitTime = Date.now(),
@@ -120,7 +116,7 @@
 			whiteboardWebsocketPingTimeout = null,
 			whiteboardWebsocketPingFunc = null;
 		
-		whiteboardWebsocket.onclose = function(){
+		whiteboardWebsocket.onclose = function(e){
 			// react only on abnormal close
 			if (e.code === 1006 &&
 				Date.now() - whiteboardWebsocketInitTime > 1000) {
@@ -179,8 +175,10 @@
 			whiteboardWebsocketPingFunc(true);
 		};
 
-		function displayCountdown(secondsLeft){
-			var countdown = '<div id="countdown"></div>';
+		// time limit feature
+		function displayCountdown(secondsLeft){ 
+			var countdown = '<div id="countdown" role="timer"></div>' + 
+						    '<div id="screenreader-countdown" aria-live="polite" class="visually-hidden" aria-atomic="true"></div>'; 
 			
 			$.blockUI({
 				message: countdown, 
@@ -210,9 +208,30 @@
 					} else {
 						$(this).removeClass('countdown-timeout');
 					}
+
+					//handle screenreaders
+					var screenCountdown = $("#screenreader-countdown");
+					var hours = $("#countdown").countdown('getTimes')[4];
+					var minutes = $("#countdown").countdown('getTimes')[5];
+					if (screenCountdown.data("hours") != hours || screenCountdown.data("minutes") != minutes) {
+						var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody> ";
+						if (hours > 0) {
+							timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.hours' /></spring:escapeBody> ";
+						}
+						timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.minutes' /></spring:escapeBody> ";
+						screenCountdown.html(timeLeftText);
+						
+						screenCountdown.data("hours", hours);
+						screenCountdown.data("minutes", minutes);
+					}
 				},
 				onExpiry: function(periods) {
-			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
+			        $.blockUI({ 
+				        message: '<h1 id="timelimit-expired" role="alert">' +
+									'<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> ' +
+									'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody>' + 
+		 			 			 '</h1>'
+			        }); 
 			        
 			        setTimeout(function() { 
 			        	location.reload();
@@ -227,24 +246,21 @@
 			$('.full-screen-content-div').toggleClass('fullscreen', fullscreenElement && fullscreenElement != null);
 		}
 	</script>
-	
-	<%@ include file="websocket.jsp"%>		
-</lams:head>
-<body class="stripes">
-
-	<lams:Page type="learner" title="${whiteboard.title}" style="">
-	
+	<%@ include file="websocket.jsp"%>
+			
+	<div id="container-main">	
+		
+		<!--  Warnings -->
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
-			<lams:Alert id="submission-deadline" type="info" close="true">
+			<lams:Alert5 id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
-		<!--  Warnings -->
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="warn-lock" close="false">
+			<lams:Alert5 type="warning" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" /> 
@@ -253,25 +269,28 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
 		<lams:errors/>
 		
-		<p><c:out value="${whiteboard.instructions}" escapeXml="false" /></p>
+		<div id="instructions" class="instructions">
+			<c:out value="${whiteboard.instructions}" escapeXml="false" />
+		</div>
 		
 		<div class="full-screen-content-div">
 			<div class="full-screen-flex-div">
-				<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
-				   title="<fmt:message key='label.fullscreen.open' />">
-					<i class="fa fa-arrows-alt" aria-hidden="true"></i>
-				</a> 
-		       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
-				   title="<fmt:message key='label.fullscreen.close' />">
+				<button type="button" class="btn btn-secondary float-end ms-1 full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
+				   		title="<fmt:message key='label.fullscreen.open' />">
+					<i class="fa-solid fa-maximize" aria-hidden="true"></i>
+				</button> 
+		       	<button type="button" class="btn btn-secondary float-end ms-1 full-screen-exit-button" onclick="javascript:exitFullscreen()"
+				   		title="<fmt:message key='label.fullscreen.close' />">
 		       		<i class="fa fa-compress" aria-hidden="true"></i>
-		       	</a>
+		       	</button>
+		       	
 		       	<div class="full-screen-main-div">
-					<iframe id="whiteboard-frame"
+					<iframe id="whiteboard-frame" title="Whiteboard"
 					        src='${whiteboardServerUrl}/?whiteboardid=${wid}&username=${whiteboardAuthorName}${empty whiteboardAccessToken ? "" : "&accesstoken=".concat(whiteboardAccessToken)}&copyfromwid=${sourceWid}${empty whiteboardCopyAccessToken ? "" : "&copyaccesstoken=".concat(whiteboardCopyAccessToken)}'>
 					</iframe>
 				</div>
@@ -280,93 +299,57 @@
 
 		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
-					<fmt:message key="title.reflection" />
-				</div>
-				<div class="panel-body">
-					<div class="reflectionInstructions">
-						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-					</div>
-
-					<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> 
-								<fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-					</c:choose>
-
-					<c:if test="${mode != 'teacher'}">
-						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-default voffset5">
-						<fmt:message key="label.edit" />
-						</button>
-					</c:if>
-				</div>
-			</div>
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${sessionMap.reflectEntry}"
+				isEditButtonEnabled="${mode != 'teacher'}"
+				notebookHeaderLabelKey="title.reflection"/>
 		</c:if>
-		<!-- End Reflection -->
 
 		<c:if test="${mode != 'teacher'}">
-			<div>
+			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${whiteboard.galleryWalkEnabled}">
-						<button data-toggle="tooltip" 
-								class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
-								<c:choose>
-									<c:when test="${mode == 'author'}">
-										title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
-										onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
-									</c:when>
-									<c:otherwise>
-										title="<fmt:message key='label.gallery.walk.wait.start' />"
-									</c:otherwise>
-								</c:choose>
-							>
+						<button type="button" data-bs-toggle="tooltip" class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
+							<c:choose>
+								<c:when test="${mode == 'author'}">
+									title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+									onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+								</c:when>
+								<c:otherwise>
+									title="<fmt:message key='label.gallery.walk.wait.start' />"
+								</c:otherwise>
+							</c:choose>
+						>
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
+					
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" id="continue-button"
-								onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+						<button type="button" name="FinishButton" id="continue-button" onclick="return continueReflect()" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
+					
 					<c:when test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
 						<%-- show no button for non-leaders until leader will finish activity  --%>
 					</c:when>
+					
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finish-button"
-								 class="btn btn-primary voffset5 pull-right na">
-							<span class="nextActivity">
-								<c:choose>
-				 					<c:when test="${sessionMap.isLastActivity}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
-							</span>
-						</a>
+						<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
+							<c:choose>
+				 				<c:when test="${sessionMap.isLastActivity}">
+				 					<fmt:message key="label.submit" />
+				 				</c:when>
+				 				<c:otherwise>
+				 		 			<fmt:message key="label.finished" />
+				 				</c:otherwise>
+				 			</c:choose>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
 
-		<!--closes content-->
-	
-		<div id="footer">
-		</div>
-		<!--closes footer-->
-
-	</lams:Page>
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>
