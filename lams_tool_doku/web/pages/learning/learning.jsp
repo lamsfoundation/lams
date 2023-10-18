@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -12,10 +13,7 @@
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<lams:PageLearner title="${dokumaran.title}" toolSessionID="${toolSessionID}">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<style media="screen,projection" type="text/css">
   		.countdown-timeout {
@@ -39,7 +37,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<lams:JSImport src="includes/javascript/etherpad.js" />
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
 		$(document).ready(function(){
@@ -102,8 +99,6 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
-
-
 		
 		// TIME LIMIT
 		var dokuWebsocketInitTime = Date.now(),
@@ -112,7 +107,7 @@
 			dokuWebsocketPingTimeout = null,
 			dokuWebsocketPingFunc = null;
 		
-		dokuWebsocket.onclose = function(){
+		dokuWebsocket.onclose = function(e){
 			// react only on abnormal close
 			if (e.code === 1006 &&
 				Date.now() - dokuWebsocketInitTime > 1000) {
@@ -171,10 +166,12 @@
 			dokuWebsocketPingFunc(true);
 		};
 
+		// time limit feature
 		function displayCountdown(secondsLeft){
 			$('#etherpad-panel').addClass('lower-to-fit-countdown');
-			
-			var countdown = '<div id="countdown"></div>';
+
+			var countdown = '<div id="countdown" role="timer"></div>' + 
+		    				'<div id="screenreader-countdown" aria-live="polite" class="visually-hidden" aria-atomic="true"></div>'; 
 			
 			$.blockUI({
 				message: countdown, 
@@ -204,10 +201,30 @@
 					} else {
 						$(this).removeClass('countdown-timeout');
 					}
+
+					//handle screenreaders
+					var screenCountdown = $("#screenreader-countdown");
+					var hours = $("#countdown").countdown('getTimes')[4];
+					var minutes = $("#countdown").countdown('getTimes')[5];
+					if (screenCountdown.data("hours") != hours || screenCountdown.data("minutes") != minutes) {
+						var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody> ";
+						if (hours > 0) {
+							timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.hours' /></spring:escapeBody> ";
+						}
+						timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.minutes' /></spring:escapeBody> ";
+						screenCountdown.html(timeLeftText);
+						
+						screenCountdown.data("hours", hours);
+						screenCountdown.data("minutes", minutes);
+					}
 				},
 				onExpiry: function(periods) {
-			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
-			        
+			        $.blockUI({  
+				        message: '<h1 id="timelimit-expired" role="alert">' +
+	        						'<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> ' +
+	        						'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody>' + 
+	        		 			 '</h1>'
+			        });
 			        setTimeout(function() { 
 			        	location.reload();
 			        }, 4000); 
@@ -216,23 +233,21 @@
 			});
 		}
 	</script>
-	
 	<%@ include file="websocket.jsp"%>		
-</lams:head>
-<body class="stripes">
 
-	<lams:Page type="learner" title="${dokumaran.title}" style="">
+	<div id="container-main">	
+
+		<!--  Warnings -->
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
-			<lams:Alert id="submission-deadline" type="info" close="true">
+			<lams:Alert5 id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
-		
-		<!--  Warnings -->
+	
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="warn-lock" close="false">
+			<lams:Alert5 type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked" /> 
@@ -241,14 +256,16 @@
 						<fmt:message key="message.warnLockOnFinish" />
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
 		<lams:errors/>
 		
-		<p><c:out value="${dokumaran.description}" escapeXml="false" /></p>
+		<div id="instructions" class="instructions">
+			<c:out value="${dokumaran.description}" escapeXml="false" />
+		</div>
 		
-		<div id="etherpad-panel" class='panel panel-default'>			
+		<div id="etherpad-panel" class='card lcard'>			
 			<div id="etherpad-container"></div>
 			<div id="etherpad-containera"></div>
 			<div id="etherpad-containerb"></div>
@@ -256,37 +273,11 @@
 
 		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
-					<fmt:message key="title.reflection" />
-				</div>
-				<div class="panel-body">
-					<div class="reflectionInstructions">
-						<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
-					</div>
-
-					<c:choose>
-					<c:when test="${empty sessionMap.reflectEntry}">
-						<p>
-							<em> 
-								<fmt:message key="message.no.reflection.available" />
-							</em>
-						</p>
-					</c:when>
-					<c:otherwise>
-						<p>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</p>
-					</c:otherwise>
-					</c:choose>
-
-					<c:if test="${mode != 'teacher'}">
-						<button name="ContinueButton" onclick="return continueReflect()" class="btn btn-sm btn-secondary mt-2">
-						<fmt:message key="label.edit" />
-						</button>
-					</c:if>
-				</div>
-			</div>
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${sessionMap.reflectEntry}"
+				isEditButtonEnabled="${mode != 'teacher'}"
+				notebookHeaderLabelKey="title.reflection"/>
 		</c:if>
 		<!-- End Reflection -->
 
@@ -294,8 +285,8 @@
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${dokumaran.galleryWalkEnabled}">
-						<button data-bs-toggle="tooltip" id="continue-button"
-								class="btn btn-primary ${mode == 'author' ? '' : 'disabled'}"
+						<button type="button" data-bs-toggle="tooltip" id="continue-button"
+								class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
 								<c:choose>
 									<c:when test="${mode == 'author'}">
 										title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
@@ -309,40 +300,33 @@
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
+					
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" id="continue-button"
-								onclick="return continueReflect()" class="btn btn-primary">
+						<button type="button" name="FinishButton" id="continue-button"
+								onclick="return continueReflect()" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
+					
 					<c:when test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
 						<%-- show no button for non-leaders until leader will finish activity  --%>
 					</c:when>
+					
 					<c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finish-button"
-								class="btn btn-primary na">
-							<span class="nextActivity">
-								<c:choose>
-				 					<c:when test="${sessionMap.isLastActivity}">
-				 						<fmt:message key="label.submit" />
-				 					</c:when>
-				 					<c:otherwise>
-				 		 				<fmt:message key="label.finished" />
-				 					</c:otherwise>
-				 				</c:choose>
-							</span>
-						</a>
+						<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
+							<c:choose>
+				 				<c:when test="${sessionMap.isLastActivity}">
+				 					<fmt:message key="label.submit" />
+				 				</c:when>
+				 				<c:otherwise>
+				 		 			<fmt:message key="label.finished" />
+				 				</c:otherwise>
+				 			</c:choose>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
 		</c:if>
 
-		<!--closes content-->
-	
-		<div id="footer">
-		</div>
-		<!--closes footer-->
-
-	</lams:Page>
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

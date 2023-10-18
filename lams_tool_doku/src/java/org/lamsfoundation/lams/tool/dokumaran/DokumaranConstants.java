@@ -32,13 +32,6 @@ public class DokumaranConstants {
 
     public static final int COMPLETED = 1;
 
-    // for action forward name
-    public static final String SUCCESS = "success";
-
-    public static final String ERROR = "error";
-
-    public static final String DEFINE_LATER = "definelater";
-
     // for parameters' name
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 

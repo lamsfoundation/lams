@@ -6,6 +6,7 @@
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refresh" required="false" rtexprvalue="true"%>
+<%@ attribute name="lessonID" required="false" rtexprvalue="true"%>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
@@ -55,7 +56,9 @@
                 decoderDiv = $('<div />');
 
             $(document).ready(function (){
-                initLearnerPage(${toolSessionID});
+                const toolSessionID = ${empty lessonID ? toolSessionID : 'null'},
+            		lessonID = ${empty lessonID ? 'null' : lessonID};
+                initLearnerPage(toolSessionID, lessonID);
             });
 
             function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
@@ -75,56 +78,75 @@
 
     <body class="component">
     <div class="component-page-wrapper">
-        <nav inert class="component-sidebar" role="navigation dialog"
-             aria-label="Side menu" aria-expanded="false"  aria-modal="true">
-            <button class="sidebar-toggle-button no-decoration" aria-labelledby="progress-bar-title">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <a href="/" title="Return to course page" class="lams-logo">
-                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="false"/>
-            </a>
+		<div class="offcanvas offcanvas-start" tabindex="-1" id="component-offcanvas" aria-label="Side menu">
+			<div class="offcanvas-body">
+				<button type="button" class="btn-close float-end" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+				
+	            <span class="lams-logo mt-3">
+	                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="false"/>
+	            </span>
+			
+	            <div id="offcanvas-support-bar" class="offcanvas-bar lcard d-none pb-3">
+	                <div class="offcanvas-title py-3">
+	                	Support activities
+	                </div>
+	                <ul id="support-bar-items" class="progress-bar-items list-group text-start">
+	                </ul>
+	            </div>
+	
+				<div class="offcanvas-bar lcard pb-3">
+		            <div class="offcanvas-title py-3" id="offcanvas-progress-bar-title">
+		            	My progress
+		            </div>
+		            <ul id="progress-bar-items" class="progress-bar-items list-group text-start">
+		            </ul>
+	            </div>
+			</div>
+		</div>
 
-            <div id="support-bar" class="d-none pb-4 w-100">
-                <span class="sidebar-title"><i class="fa-solid fa-toolbox sidebar-title-icon"></i>&nbsp;<span tabindex="0" id="support-bar-title">Support activities</span></span>
-                <ul id="support-bar-items" class="progress-bar-items" role="menu">
-                </ul>
-            </div>
-
-            <span class="sidebar-title"><i class="fa-solid fa-fw fa-bars-progress sidebar-title-icon"></i>&nbsp;<span tabindex="0" id="progress-bar-title">Progress bar</span></span>
-            <ul id="progress-bar-items" class="progress-bar-items w-100" role="menu">
-            </ul>
-        </nav>
-
-        <div class="component-page-content">
+		<div class="component-page-content">
             <a href="#component-main-content" class="visually-hidden-focusable p-2">Skip to main content</a>
 
             <header id="header" class="d-flex justify-content-between" role="banner">
                 <div class="d-flex">
-                    <button class="sidebar-toggle-button no-decoration" accesskey="p" id="hamb"
-                            data-closed-class="fa-bars" data-opened-class="fa-bars-staggered"
-                            aria-labelledby="progress-bar-title" aria-expanded="false">
-                        <i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
-                    </button>
-                    <h1 id="lesson-name"></h1>
+					<button class="no-decoration" id="hamb" type="button" accesskey="p" 
+							data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
+							aria-controls="component-offcanvas"
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
+						<i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
+					</button>
+
+                    <h1 id="lesson-name" title="Lesson name"></h1>
                 </div>
+                
                 <div class="top-menu">
-                    <div id="progress-bar-widget" title="Your lesson completion" class="d-none d-sm-none d-md-block">
-                        <div class="row">
-                            <div class="col-6">
+                    <button id="profile-picture" class="no-decoration px-3" type="button"
+                            onclick="javascript:showMyPortraitDialog()" title="Your portrait" >
+                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="Your profile portrait">
+                    </button>
+                    
+                    <button type="button" id="progress-bar-widget" class="no-decoration d-none d-sm-none d-md-block"
+                    		data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
+							aria-controls="component-offcanvas"
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
+                        <div class="row m-0">
+                            <div class="col-6 text-start p-0">
                                 Progress
                             </div>
-                            <div class="col-6 text-end" id="progress-bar-widget-value">
+                            <div class="col-6 text-end p-0" id="progress-bar-widget-value">
                             </div>
                         </div>
                         <div class="progress mt-1 mb-2">
                             <div class="progress-bar bg-success" role="progressbar" aria-label="Progress bar widget"
                                  aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                    </div>
-                    <button id="profile-picture" class="no-decoration px-3 py-1" type="button"
-                            onclick="javascript:showMyPortraitDialog()">
-                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="<c:out value="${pageLearnerFirstName} ${pageLearnerLastName}" escapeXml="true"/> profile picture" alt="User profile picture">
                     </button>
+                    
+                    <c:if test="${not isIntegrationLogin}">
+                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" title="Close and return to the course page"></a>
+                    </c:if>
                 </div>
             </header>
 
