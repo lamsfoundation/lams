@@ -23,10 +23,6 @@
 
 package org.lamsfoundation.lams.monitoring.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
@@ -35,6 +31,10 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Interface defines all monitoring services needed by presentation tier.
@@ -71,27 +71,25 @@ public interface IMonitoringService {
      * </p>
      *
      * @param lessonName
-     *            the name of the lesson
+     * 	the name of the lesson
      * @param lessonDescription
-     *            the description of the lesson.
+     * 	the description of the lesson.
      * @param learningDesignId
-     *            the selected learning design
+     * 	the selected learning design
      * @param organisationId
-     *            the copied sequence will be put in the default runtime sequence folder for this org, if such a folder
-     *            exists.
+     * 	the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
      * @param userId
-     *            the user who want to create this lesson.
+     * 	the user who want to create this lesson.
      * @param customCSV
-     *            the custom comma separated values to be used by toolAdapters
+     * 	the custom comma separated values to be used by toolAdapters
      * @param enableLessonIntro
-     *            display an intro page to the lesson
+     * 	display an intro page to the lesson
      * @param displayDesignImage
-     *            display the design image or not
+     * 	display the design image or not
      * @param enableNotifications
-     *            enable "email notifications" link for the current lesson
+     * 	enable "email notifications" link for the current lesson
      * @param numberDaysToLessonFinish
-     *            number of days the lesson will be available to user since he starts it. (lesson finish scheduling
-     *            feature)
+     * 	number of days the lesson will be available to user since he starts it. (lesson finish scheduling feature)
      * @return the lesson initialized.
      */
     Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId, Integer organisationId,
@@ -120,17 +118,17 @@ public interface IMonitoringService {
      * </p>
      *
      * @param lessonId
-     *            the lesson without lesson class and organization
+     * 	the lesson without lesson class and organization
      * @param organisation
-     *            the organization this lesson belongs to.
+     * 	the organization this lesson belongs to.
      * @param learnerGroupName
-     *            name of learner group
+     * 	name of learner group
      * @param organizationUsers
-     *            a list of learner will be in this new lessons.
+     * 	a list of learner will be in this new lessons.
      * @param staffGroupName
-     *            name of staff group
+     * 	name of staff group
      * @param staffs
-     *            a list of staffs who will be in charge of this lesson.
+     * 	a list of staffs who will be in charge of this lesson.
      */
     void createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userID)
@@ -140,13 +138,15 @@ public interface IMonitoringService {
      * Start the specified the lesson. It must be created before calling this service.
      *
      * @param lessonId
-     *            the specified the lesson id.
+     * 	the specified the lesson id.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      * @throws LamsToolServiceException
-     *             the exception occurred during the lams and tool interaction to start a lesson.
+     * 	the exception occurred during the lams and tool interaction to start a lesson.
      */
     void startLesson(long lessonId, Integer userId) throws UserAccessDeniedException;
+
+    void startLesson(long lessonId, Integer userId, boolean skipSecurityCheck);
 
     /**
      * Do any normal initialisation needed for gates and branching. Done both when a lesson is started, or for new
@@ -160,9 +160,9 @@ public interface IMonitoringService {
      *
      * @param lessonId
      * @param startDate
-     *            the lesson start date and time.
+     * 	the lesson start date and time.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      * @see org.lamsfoundation.lams.monitoring.service#startLesson(long)
      */
     void startLessonOnSchedule(long lessonId, Date startDate, Integer userId) throws UserAccessDeniedException;
@@ -172,9 +172,9 @@ public interface IMonitoringService {
      *
      * @param lessonId
      * @param endDate
-     *            number of days since lesson start when the lesson should be closed.
+     * 	number of days since lesson start when the lesson should be closed.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      */
     void finishLessonOnSchedule(long lessonId, int scheduledNumberDaysToLessonFinish, Integer userId)
 	    throws UserAccessDeniedException;
@@ -184,9 +184,9 @@ public interface IMonitoringService {
      *
      * @param lessonId
      * @param endDate
-     *            number of days since lesson start when the lesson should be closed.
+     * 	number of days since lesson start when the lesson should be closed.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      */
     void finishLessonOnSchedule(long lessonId, Date endDate, Integer userId) throws UserAccessDeniedException;
 
@@ -197,9 +197,9 @@ public interface IMonitoringService {
      * </P>
      *
      * @param lessonId
-     *            the specified the lesson id.
+     * 	the specified the lesson id.
      * @param userId
-     *            checks that the user is a staff member for this lesson
+     * 	checks that the user is a staff member for this lesson
      */
     void removeLesson(long lessonId, Integer userId) throws SecurityException;
 
@@ -212,7 +212,7 @@ public interface IMonitoringService {
      * Return an activity object based on the requested id.
      *
      * @param activityId
-     *            id of the activity.
+     * 	id of the activity.
      * @return the requested activity object.
      */
     Activity getActivityById(Long activityId);
@@ -222,7 +222,7 @@ public interface IMonitoringService {
      * cast properly.
      *
      * @param activityId
-     *            id of the activity.
+     * 	id of the activity.
      * @return the requested activity object.
      */
     @SuppressWarnings("rawtypes")
@@ -234,7 +234,7 @@ public interface IMonitoringService {
      * Return an activity object based on the requested id.
      *
      * @param activityId
-     *            id of the activity.
+     * 	id of the activity.
      * @return the requested activity object.
      */
     GroupingActivity getGroupingActivityById(Long activityID);
@@ -242,13 +242,15 @@ public interface IMonitoringService {
     // ---------------------------------------------------------------------
     // Preview Methods
     // ---------------------------------------------------------------------
+
     /**
-     * Create the lesson class and the staff class for a preview lesson. The lesson is not attached to any organisation.
+     * Create the lesson class and the staff class for a preview lesson. The lesson is not attached to any
+     * organisation.
      *
      * @param userID
-     *            User ID of the teacher running the preview. Mandatory.
+     * 	User ID of the teacher running the preview. Mandatory.
      * @param lessonID
-     *            ID of the lesson
+     * 	ID of the lesson
      */
     abstract void createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
 
