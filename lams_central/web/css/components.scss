@@ -559,7 +559,10 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border: 0;
 }
 
-.ltable>div:first-child {
+.ltable {
+	margin-bottom: 1rem;	
+}
+.ltable:not(.table-striped)>div:first-child {
 	border-top: 1px solid #ddd;
     background-color: rgba(var(--bs-light-rgb), 1);
     font-style: italic;
@@ -568,9 +571,16 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 .ltable>.row {
 	border-bottom: 2px solid var(--bs-gray-200);
 	padding: 0.5rem;
+	margin-left: 0;
+	margin-right: 0;
 }
 .ltable.table-sm>.row {
 	padding: 0.25rem;
+}
+.ltable.table-striped {
+   > div:nth-of-type(odd) {
+    background-color: var(--bs-gray-200);
+  }
 }
 
 /* jqGrid text wrapping */

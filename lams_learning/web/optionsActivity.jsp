@@ -25,18 +25,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		request.setAttribute("isOptionsWithSequencesActivity", "true");
 	}
 %>
-<c:set var="lams"><lams:LAMSURL /></c:set>
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="learner.title" /></title>
-	<lams:css />
-
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<lams:JSImport src="includes/javascript/common.js" />
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
-	
+<lams:PageLearner title="${optionsActivityForm.title}" toolSessionID="" lessonID="${optionsActivityForm.lessonID}">	
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '', ${optionsActivityForm.activityID}, finishActivity);
 		
@@ -65,18 +55,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			document.getElementById('messageForm').submit();
 		}
 	</script>
-</lams:head>
-<body class="stripes">
-	<lams:Page type="learner" title="${optionsActivityForm.title}">
-		
+
+	<div id="container-main">
 		<c:if test="${not empty optionsActivityForm.description}">
-			<div class="panel">
+			<div id="instructions" class="instructions">
 				<c:out value="${optionsActivityForm.description}" />
 			</div>
 		</c:if>
 
 		<c:if test="${optionsActivityForm.minimum != 0 && !optionsActivityForm.minimumLimitReached}">
-			<lams:Alert id="min-liimt" close="false" type="danger">	
+			<lams:Alert5 id="min-liimt" close="false" type="danger">	
 				<c:choose>
 					<c:when test="${isOptionsWithSequencesActivity}">
 						<fmt:message key="message.activity.set.options.activityCount">
@@ -89,11 +77,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</fmt:message>
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 								
 		<c:if test="${optionsActivityForm.maximum != 0}">
-			<lams:Alert id="max-limit" type="danger" close="false">
+			<lams:Alert5 id="max-limit" type="danger" close="false">
 				<c:choose>
 					<c:when test="${isOptionsWithSequencesActivity}">
 						<fmt:message key="message.activity.set.options.note.maximum">
@@ -117,11 +105,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						</c:otherwise>
 					</c:choose>
 				</c:if>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${optionsActivityForm.hasCompletedActivities}">
-			<lams:Alert id="can-revisit" type="info" close="true">
+			<lams:Alert5 id="can-revisit" type="info" close="true">
 				<c:choose>
 					<c:when test="${isOptionsWithSequencesActivity}">
 						<fmt:message key="message.activity.set.options.note" />
@@ -130,31 +118,34 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<fmt:message key="message.activity.options.note" />
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
-		
-		<div class="group-box">
-			<form:form action="ChooseActivity.do" modelAttribute="activityForm" method="post" onsubmit="return validate();">
-				<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
-		
-				<div class="options">
-					<table class="table table-condensed table-hover">
-						<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL">
-							<tr><td>
 
+		<form:form action="ChooseActivity.do" modelAttribute="activityForm" method="post" onsubmit="return validate();">
+			<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
+			
+			<fieldset>
+				<legend class="visually-hidden">
+					<fmt:message key="message.activity.options.noActivitySelected" />
+				</legend>
+		
+				<div class="ltable table-stripped">
+					<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL">
+						<div class="row">
+							<div class="col">
 								<c:choose>
 									<c:when test="${not activityURL.complete and not optionsActivityForm.maxActivitiesReached}">
-										<div class="radio">
-											<label>
-												<input type="radio" name="activityID" class="noBorder" id="activityID-${activityURL.activityId}"
+										<div class="form-check">
+											<input type="radio" name="activityID" class="form-check-input" id="activityID-${activityURL.activityId}"
 													value="${activityURL.activityId}" onchange="$('#choose-branch-button').prop('disabled', false);">
+											<label class="form-check-label" for="activityID-${activityURL.activityId}">
 												<c:out value="${activityURL.title}" />
 											</label>
 										</div>
 									</c:when>
 									
 									<c:when test="${activityURL.complete}">
-										<div class="radio loffset20">
+										<div class="form-check">
 											<i class="fa fa-lg fa-check-circle text-success radio-button-offset" style="cursor: auto;"></i>
 										
 											<c:choose>
@@ -167,10 +158,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 														<c:out value="${activityURL.title}" />
 													</span>
 													
-													<div class="loffset20">
+													<div class="ms-4">
 														<c:forEach items="${activityURL.childActivities}" var="childActivityURL">
-															<a href="${childActivityURL.url}"><c:out value="${childActivityURL.title}" /></a>
-															<br>
+															<div>
+																<a href="${childActivityURL.url}"><c:out value="${childActivityURL.title}" /></a>
+															</div>
 														</c:forEach>
 													</div>
 												</c:when>
@@ -179,38 +171,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 									</c:when>
 											
 									<c:otherwise>
-										<div class="radio loffset20">
+										<div class="form-check ms-3">
 											<c:out value="${activityURL.title}" />
 										</div>
 									</c:otherwise>
 								</c:choose>
-							</td></tr>
-						</c:forEach>
-					</table>
+							</div>
+						</div>
+					</c:forEach>
 				</div>
+			</fieldset>
 		
-				<div align="center" class="voffset10">
-					<c:if test="${!optionsActivityForm.maxActivitiesReached}">
-						<button id="choose-branch-button" class="btn btn-success" disabled="disabled">
-							<fmt:message key="label.activity.options.choose" />
-						</button>						
-					</c:if>
-				</div>
+			<div class="float-end mb-3">
+				<c:if test="${!optionsActivityForm.maxActivitiesReached}">
+					<button id="choose-branch-button" class="btn btn-secondary" disabled="disabled">
+						<fmt:message key="label.activity.options.choose" />
+					</button>						
+				</c:if>
+			</div>
 		
-			</form:form>
-		</div>
+		</form:form>
 		
 		<c:if test="${optionsActivityForm.minimumLimitReached or isPreview}">
-			<form:form action="/lams/learning/CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
-				<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
-				<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
-				<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />">
-				<input type="hidden" name="progressID" value="<c:out value='${optionsActivityForm.progressID}' />">
-		
-				<hr class="msg-hr">
-		
-				<div class="voffset10">
-					<a href="#nogo" class="btn btn-primary pull-right na" id="finishButton">
+			<div class="activity-bottom-buttons">
+				<form:form action="/lams/learning/CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
+					<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
+					<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">
+					<input type="hidden" name="lessonID" value="<c:out value='${optionsActivityForm.lessonID}' />">
+					<input type="hidden" name="progressID" value="<c:out value='${optionsActivityForm.progressID}' />">
+				
+					<button type="submit" class="btn btn-primary na" id="finishButton">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="label.submit.button" />
@@ -219,12 +209,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<fmt:message key="label.finish.button" />
 							</c:otherwise>
 						</c:choose>
-					</a>
-				</div>
-		
-			</form:form>
+					</button>
+				</form:form>
+			</div>
 		</c:if>
 			
-	</lams:Page>
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

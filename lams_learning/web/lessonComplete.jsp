@@ -206,7 +206,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<c:if test="${gradebookOnComplete}">
 			<br>
-			<lams:Alert5 type="success"> 		
+			<lams:Alert5 type="success" isIconDisplayed="false">
 				<div class="text-center fs-5 fw-semibold">
 					<fmt:message key="gradebook.lesson.complete" />
 				</div>

@@ -21,14 +21,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="userId" value="${user.userID}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.view.groups.title" /></title>
+<lams:PageLearner title="${title}" toolSessionID="" lessonID="${lessonID}">
 
-	<lams:css />
 	<style type="text/css">
 		.user-container {
 			padding: 2px;
@@ -39,11 +35,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		}
 	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<lams:JSImport src="includes/javascript/common.js" />
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
-	
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '', ${activityID}, submitForm);
 		
@@ -52,29 +43,26 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			f.submit();
 		}
 	</script>
-</lams:head>
 
-<body class="stripes">
-	<lams:Page type="learner" title="${title}">
-	
+	<div id="container-main">	
 		<form:form action="/lams/learning/grouping/completeActivity.do?userId=${userId}&lessonId=${lessonID}&activityID=${activityID}"
 			target="_self" modelAttribute="messageForm" id="messageForm">
 	
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
-					<i class="fa fa-sm fa-users text-primary"></i>&nbsp;
+			<div class="card lcard">
+				<div class="card-header">
+					<i class="fa fa-sm fa-users"></i>&nbsp;
 					<fmt:message key="label.view.groups.title" />
 				</div>
 				
-				<div class="panel-body">
+				<div>
 					<div class="table-responsive">
-						<table class="table table-condensed table-hover" cellspacing="0">
+						<div class="ltable table-stripped mb-0">
 							<c:forEach var="group" items="${groups}">
-								<tr>
-									<td width="15%">
+								<div class="row">
+									<div class="col-2">
 										<strong><c:out value="${group.groupName}" /></strong>
-									</td>
-									<td>
+									</div>
+									<div class="col-10">
 										<c:choose>
 											<c:when test="${RestrictedGroupUserNames && !group.userBelongsToGroup}">
 												<fmt:message key="label.learners">
@@ -86,55 +74,35 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											
 											<c:otherwise>
 												<c:forEach items="${group.userList}" var="groupUser">
-													<div name="u-${groupUser.userID}" class="user-container">
-														<lams:Portrait userId="${groupUser.userID}"/>&nbsp;<c:out value="${groupUser.firstName}" />&nbsp;<c:out value="${groupUser.lastName}" />
+													<div name="u-${groupUser.userID}" class="user-container ${groupUser.userID ==  userId ? 'alert alert-info you mb-0' : ''}">
+														<lams:Portrait userId="${groupUser.userID}"/>&nbsp;
+														<c:out value="${groupUser.firstName}" />&nbsp;<c:out value="${groupUser.lastName}" />
 													</div>
 												</c:forEach>
 											</c:otherwise>
 										</c:choose>
-									</td>
-								</tr>
+									</div>
+								</div>
 							</c:forEach>
-						</table>
+						</div>
 					</div>
 				</div>
 			</div>
 	
 			<c:if test="${finishedButton}">
-				<div class="row no-gutter">
-					<div class="col-xs-12">
-						<div id="right-buttons" class="pull-right voffset10">
-							<a href="javascript:;" class="btn btn btn-primary na" id="finishButton">
-								<span class="nextActivity"> 
-									<c:choose>
-										<c:when test="${activityPosition.last}">
-											<fmt:message key="label.submit.button" />
-										</c:when>
-										<c:otherwise>
-											<fmt:message key="label.finish.button" />
-										</c:otherwise>
-									</c:choose>
-								</span>
-							</a>
-						</div>
-					</div>
+				<div class="activity-bottom-buttons">
+					<buttton class="btn btn-primary na" id="finishButton"> 
+						<c:choose>
+							<c:when test="${activityPosition.last}">
+								<fmt:message key="label.submit.button" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.finish.button" />
+							</c:otherwise>
+						</c:choose>
+					</buttton>
 				</div>
 			</c:if>
-
-			<div id="footer"></div>
-			<!--closes footer-->
-			<script type="text/javascript">
-				function codeAddress() {
-					var youUser = document.getElementsByName('u-${userId}');
-					if (youUser) {
-						youUser[0].className += ' alert-info you';
-					}
-				}
-				window.onload = codeAddress;
-			</script>
-
 		</form:form>
-	</lams:Page>
-</body>
-
-</lams:html>
+	</div>
+</lams:PageLearner>
