@@ -52,7 +52,13 @@ import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.*;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranSessionDAO;
@@ -75,10 +81,17 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -650,7 +663,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void startGalleryWalk(long toolContentId) throws IOException {
+    public void startGalleryWalk(long toolContentId) {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	if (!dokumaran.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -671,7 +684,31 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void finishGalleryWalk(long toolContentId) throws IOException {
+    public void skipGalleryWalk(long toolContentId) {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	if (!dokumaran.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is not enabled for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	if (dokumaran.isGalleryWalkStarted()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already started for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	if (dokumaran.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already finished for Dokumaran with tool content ID "
+			    + toolContentId);
+	}
+	dokumaran.setGalleryWalkEnabled(false);
+	dokumaranDao.saveObject(dokumaran);
+
+	sendGalleryWalkRefreshRequest(dokumaran);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	if (!dokumaran.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -685,7 +722,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException {
+    public void enableGalleryWalkLearnerEdit(long toolContentId) {
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
 	if (!dokumaran.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(

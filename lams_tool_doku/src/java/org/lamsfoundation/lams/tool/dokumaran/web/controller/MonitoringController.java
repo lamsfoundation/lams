@@ -312,6 +312,15 @@ public class MonitoringController {
 	updateTimeLimit(toolContentId, 0, 0, null);
     }
 
+    @RequestMapping("/skipGalleryWalk")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    private void skipGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.skipGalleryWalk(toolContentId);
+    }
+
     @RequestMapping("/finishGalleryWalk")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)

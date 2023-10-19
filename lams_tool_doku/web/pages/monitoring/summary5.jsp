@@ -58,6 +58,10 @@
 		margin-bottom: 20px;
 	}
 
+	.doku-monitoring-summary #gallery-walk-skip {
+		margin-top: 20px;
+	}
+
 	.doku-monitoring-summary #gallery-walk-rating-table th {
 		font-weight: bold;
 		font-style: normal;
@@ -327,6 +331,23 @@
 		});
 	}
 
+	function startGalleryWalk(){
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
+			return;
+		}
+
+		$.ajax({
+			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				// reload current tab with Doku summary
+				loadTab(null, null, false);
+			}
+		});
+	}
+
 	function finishGalleryWalk(){
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
@@ -486,6 +507,13 @@
 						</button>
 
 						<br>
+
+						<button id="gallery-walk-skip" type="button"
+								class="btn btn-danger
+						        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'd-none'}"
+								onClick="javascript:skipGalleryWalk()">
+							<fmt:message key="monitoring.summary.gallery.walk.skip" />
+						</button>
 
 						<button id="gallery-walk-show-clusters" type="button"
 								class="btn btn-primary
