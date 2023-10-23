@@ -18,38 +18,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="WebAppURL"><lams:WebAppURL/></c:set>
 
-<c:set var="lams"><lams:LAMSURL /></c:set>
+<lams:PageLearner title="${gateForm.gate.title}" toolSessionID="" lessonID="${gateForm.lessonID}"
+		refresh="60;URL=${WebAppURL}/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
 
-<!DOCTYPE html>
-<lams:html xhtml="true">
-
-<lams:head>
-	<META HTTP-EQUIV="Refresh"
-		CONTENT="60;URL=<lams:WebAppURL/>/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
-
-	<c:set var="title"><fmt:message key="label.permission.gate.title"/></c:set>
-	<title><c:out value="${title}" /></title>
-	
-	<lams:css />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>	
-</lams:head>
-
-<body class="stripes">
-	<lams:Page type="learner" title="${title}">
-
-		<%@ include file="gateDescription.jsp"%>
-		
-		<div class="voffset5">
+	<div id="container-main">
+		<lams:Alert5 type="info" id="permission-gate">
 			<fmt:message key="label.permission.gate.message" />
-		</div>
-
-		<%@ include file="../gate/gateNext.jsp"%>
-
-	</lams:Page>
-</body>
-
-</lams:html>
+		</lams:Alert5>
+		
+		<%@ include file="gateDescription.jsp"%>
+		<%@ include file="gateNext.jsp"%>
+	</div>
+</lams:PageLearner>
