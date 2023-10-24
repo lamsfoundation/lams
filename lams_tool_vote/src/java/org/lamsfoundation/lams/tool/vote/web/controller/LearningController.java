@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -751,8 +753,14 @@ public class LearningController implements VoteAppConstants {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
-
-		Set<VoteQueUsr> groupUsers = voteSession.getVoteQueUsers();
+		Set<VoteQueUsr> groupVoteUsers = voteSession.getVoteQueUsers();
+		List<User> groupUsers = groupVoteUsers.stream().map(qaUser -> {
+		    User userI = new User();
+		    userI.setUserId(qaUser.getQueUsrId().intValue());
+		    userI.setFirstName(qaUser.getFullname());
+	            return userI;
+	        }).collect(Collectors.toList());
+		
 		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, voteContent);

@@ -1,22 +1,25 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<h4>
+<div class="card-subheader">
 	<fmt:message key="label.progressiveResults" />
-</h4>
+</div>
 
 <!--present  a mini summary table here -->
-<table class="table table-hover table-stripped" id="voteSummary">
-	<tr>
-		<th><fmt:message key="label.nomination" /></th>
-		<th class="text-center"><fmt:message key="label.total.votes" /></th>
-	</tr>
+<div class="ltable table-hover" id="voteSummary">
+	<div class="row">
+		<div class="col"><fmt:message key="label.nomination" /></div>
+		<div class="col-2 text-center"><fmt:message key="label.total.votes" /></div>
+	</div>
+	
 	<c:forEach var="currentNomination" items="${voteGeneralLearnerFlowDTO.mapStandardNominationsHTMLedContent}">
 		<c:set var="currentNominationKey" scope="request" value="${currentNomination.key}" />
-		<tr>
-			<td class="text-left"><c:out value="${currentNomination.value}" escapeXml="false" /></td>
+		<div class="row">
+			<div class="col text-left">
+				<c:out value="${currentNomination.value}" escapeXml="false" />
+			</div>
 
-			<td class="text-center"><c:forEach var="currentUserCount"
-					items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
+			<div class="col-2 text-center">
+				<c:forEach var="currentUserCount" items="${voteGeneralLearnerFlowDTO.mapStandardUserCount}">
 					<c:set var="currentUserKey" scope="request" value="${currentUserCount.key}" />
 					<c:if test="${currentNominationKey == currentUserKey}">
 
@@ -50,36 +53,41 @@
 							<c:out value="${currentUserCount.value}" />
 						</c:if>
 					</c:if>
-				</c:forEach> <c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
+				</c:forEach> 
+				
+				<c:forEach var="currentRate" items="${voteGeneralLearnerFlowDTO.mapStandardRatesContent}">
 					<c:set var="currentRateKey" scope="request" value="${currentRate.key}" />
 					<c:if test="${currentNominationKey == currentRateKey}"> 				
 						&nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentRate.value}" />
 						<fmt:message key="label.percent" />) 
 					</c:if>
-				</c:forEach></td>
-		</tr>
+				</c:forEach>
+			</div>
+		</div>
 	</c:forEach>
-
-</table>
-
+</div>
 
 <div class="float-end">
-	<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${VoteLearningForm.toolSessionID}" />
-	<a title="<fmt:message key='label.tip.displayPieChart'/>" class="fa fa-pie-chart text-primary btn btn-md btn-primary"
-		onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')"></a> <a
-		title="<fmt:message key='label.tip.displayBarChart'/>" class="fa fa-bar-chart text-primary btn btn-md btn-primary"
-		onclick="javascript:drawChart('bar', 'chartDiv', '${chartURL}')"></a>
+	<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${voteLearningForm.toolSessionID}" />
+	<button type="button" title="<fmt:message key='label.tip.displayPieChart'/>"
+		class="fa fa-pie-chart text-primary btn btn-light"
+		onclick="javascript:drawChart('pie', 'chartDiv', '${chartURL}')"></button> 
+	<button type="button"  title="<fmt:message key='label.tip.displayBarChart'/>"
+		class="fa fa-bar-chart text-primary btn btn-light"
+		onclick="javascript:drawChart('bar', 'chartDiv', '${chartURL}')"></button>
 </div>
 
 <div id="textEntries">
-	<c:if test="${VoteLearningForm.allowTextEntry}">
-		<strong> <fmt:message key="label.open.votes" />
-		</strong>
+	<c:if test="${voteLearningForm.allowTextEntry}">
+		<div class="card-subheader"> 
+			<fmt:message key="label.open.votes" />
+		</div>
+		
 		<c:forEach var="vote" items="${requestScope.listUserEntriesContent}">
 			<c:if test="${vote.userEntry != ''}">
 				<div class="d-flex">
 					<div class="flex-shrink-0">
-						<i class="fa fa-xs fa-check text-success"></i>
+						<i class="fa fa-check text-success"></i>
 					</div>
 					<div class="flex-grow-1 ms-3">
 						<c:choose>
@@ -97,20 +105,23 @@
 		</c:forEach>
 	</c:if>
 </div>
-<div id="nominations" class="mt-2">
-	<c:choose>
-		<c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
-			<strong><fmt:message key="label.learner.nominations" /> </strong>
-		</c:when>
-		<c:otherwise>
-			<strong><fmt:message key="label.learner.nomination" /> </strong>
-		</c:otherwise>
-	</c:choose>
+
+<div id="nominations" class="mt-4">
+	<div class="card-subheader">
+		<c:choose>
+			<c:when test="${fn:length(requestScope.listGeneralCheckedOptionsContent) > 1}">
+				<fmt:message key="label.learner.nominations" />
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="label.learner.nomination" />
+			</c:otherwise>
+		</c:choose>
+	</div>
 
 	<c:forEach var="entry" items="${requestScope.listGeneralCheckedOptionsContent}">
 		<div class="d-flex">
 			<div class="flex-shrink-0">
-				<i class="fa fa-xs fa-check text-success"></i>
+				<i class="fa fa-check text-success"></i>
 			</div>
 			<div class="flex-grow-1 ms-3">
 				<c:out value="${entry}" escapeXml="true" />
@@ -118,13 +129,13 @@
 		</div>
 	</c:forEach>
 
-	<c:if test="${not empty VoteLearningForm.userEntry}">
+	<c:if test="${not empty voteLearningForm.userEntry}">
 		<div class="d-flex">
 			<div class="flex-shrink-0">
-				<i class="fa fa-xs fa-check text-success"></i>
+				<i class="fa fa-check text-success"></i>
 			</div>
 			<div class="flex-grow-1 ms-3">
-				<c:out value="${VoteLearningForm.userEntry}" escapeXml="false" />
+				<c:out value="${voteLearningForm.userEntry}" escapeXml="false" />
 			</div>
 		</div>
 	</c:if>

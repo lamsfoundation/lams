@@ -59,7 +59,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<fmt:message key="message.activity.options.noActivitySelected" />
 			</legend>
 		
-			<div class="ltable table-striped">
+			<div class="ltable table-striped no-header">
 				<c:forEach items="${branchingForm.activityURLs}" var="activityURL" varStatus="loop">
 					<div class="row">
 						<div class="col">

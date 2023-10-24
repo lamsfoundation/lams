@@ -479,7 +479,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border-radius: 2.8rem;
 	overflow: hidden;
 	background-color: var(--bs-white);
-	margin: var(--component_page_wrapper_margin);
+	margin: var(--lams-component-page-wrapper-margin);
 }
 
 .component-page-wrapper button.no-decoration {
@@ -562,7 +562,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 .ltable {
 	margin-bottom: 1rem;	
 }
-.ltable:not(.table-striped)>div:first-child {
+.ltable:not(.no-header)>div:first-child {
 	border-top: 1px solid #ddd;
     background-color: rgba(var(--bs-light-rgb), 1);
     font-style: italic;
@@ -581,6 +581,9 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
    > div:nth-of-type(odd) {
     background-color: var(--bs-gray-200);
   }
+}
+.ltable.table-hover>div:not(:first-child):hover{
+	background-color: var(--bs-gray-200);
 }
 
 /* jqGrid text wrapping */
