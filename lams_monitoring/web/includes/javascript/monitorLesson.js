@@ -724,10 +724,12 @@ function loadTab(tabName, button) {
 			break;
 
 		case 'aes': {
-			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?'
-				+ '&aeToolContentIds='+ aeToolContentIds
-				+ '&aeToolTypes=' + aeToolTypes
-				+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
+			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?',
+				{
+					aeToolContentIds: aeToolContentIds,
+					aeToolTypes: aeToolTypes,
+					aeActivityTitles: aeActivityTitles
+				});
 			searchStudentWidget.hide();
 		}
 			break;
@@ -926,55 +928,55 @@ function drawLessonCompletionChart(){
 					},
 					plugins : {
 						tooltip : {
-						enabled : true,
-						callbacks: {
+							enabled : true,
+							callbacks: {
 								label : function(context) {
 									let index =  context.dataIndex,
 
 										rawData = context.chart.lessonCompletionChartRawData,
 										percent = context.dataset.data,
 
-									label = labels[index],
-									value = percent[index],
-									rawValue = rawData[index];
+										label = labels[index],
+										value = percent[index],
+										rawValue = rawData[index];
 
 									return " " + rawValue + " (" + value + "%)";
+								}
 							}
-						}
-					},
-					legend : {
-						position: 'bottom',
-						align: 'start',
-						labels : {
+						},
+						legend : {
+							position: 'bottom',
+							align: 'start',
+							labels : {
 								font : {
 									size: 15
 								},
-							generateLabels : function(chart) {
-								var data = chart.data;
-								if (data.labels.length && data.datasets.length) {
-									return data.labels.map(function(label, i) {
-										let meta = chart.getDatasetMeta(0),
-											style = meta.controller.getStyle(i),
-											value = data.datasets[0].data[i],
-											rawData = chart.lessonCompletionChartRawData || raw,
-											rawValue = rawData[i];
+								generateLabels : function(chart) {
+									var data = chart.data;
+									if (data.labels.length && data.datasets.length) {
+										return data.labels.map(function(label, i) {
+											let meta = chart.getDatasetMeta(0),
+												style = meta.controller.getStyle(i),
+												value = data.datasets[0].data[i],
+												rawData = chart.lessonCompletionChartRawData || raw,
+												rawValue = rawData[i];
 
-										return {
-											text: label + ": " + rawValue + " (" + value + "%)",
-											fillStyle: style.backgroundColor,
-											strokeStyle: style.borderColor,
-											lineWidth: 0,
-											hidden: isNaN(value) || meta.data[i].hidden,
+											return {
+												text: label + ": " + rawValue + " (" + value + "%)",
+												fillStyle: style.backgroundColor,
+												strokeStyle: style.borderColor,
+												lineWidth: 0,
+												hidden: isNaN(value) || meta.data[i].hidden,
 
-											// Extra data used for toggling the
-											// correct item
-											index: i
-										};
-									});
+												// Extra data used for toggling the
+												// correct item
+												index: i
+											};
+										});
+									}
+									return [];
 								}
-								return [];
 							}
-						}
 						}
 					}
 				}
@@ -983,7 +985,7 @@ function drawLessonCompletionChart(){
 			lessonCompletionChart.lessonCompletionChartRawData = raw;
 			chartDiv.data('chart', lessonCompletionChart);
 		}
-		});
+	});
 }
 
 function checkScheduleDate(startDateString, endDateString) {
