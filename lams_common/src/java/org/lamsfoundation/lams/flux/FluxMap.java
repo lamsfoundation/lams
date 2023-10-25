@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.flux;
 
+import java.sql.Time;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,13 +12,12 @@ import java.util.function.Function;
 import org.apache.log4j.Logger;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
- * Utility class for serving updates to shared Fluxes.
- * It receives signals from a source Flux, probably a part of SharedSink.
- * For each requested key it creates a hot publisher Flux which fetches data for the key.
- * Supports time-based throttling.
- * If the sink does not produce any matching signals for given timeout, the flux gets removed.
+ * Utility class for serving updates to shared Fluxes. It receives signals from a source Flux, probably a part of
+ * SharedSink. For each requested key it creates a hot publisher Flux which fetches data for the key. Supports
+ * time-based throttling. If the sink does not produce any matching signals for given timeout, the flux gets removed.
  *
  * @author Marcin Cieslak
  */
@@ -125,17 +125,24 @@ public class FluxMap<T, U> {
 
 	    // remove Flux when source Flux did not emit an accepted signal before given timeout
 	    if (timeoutSeconds != null) {
-		flux = flux.timeout(Duration.ofSeconds(timeoutSeconds)).onErrorResume(TimeoutException.class,
-			throwable -> {
-			    if (log.isDebugEnabled()) {
-				log.debug("Removing timed out flux for \"" + name + "\" with key " + key);
-			    }
-			    // remove terminated Flux from the map
-			    map.remove(key);
-			    // switch subscribers to a dummy Flux which completes and cancels their subscriptions
-			    return Flux.empty();
-			});
+		flux = flux.timeout(Duration.ofSeconds(timeoutSeconds));
 	    }
+
+	    // backpressure and error handling
+	    flux = flux.onBackpressureLatest().onErrorResume(throwable -> {
+		if (throwable instanceof TimeoutException) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Removing timed out flux for \"" + name + "\" with key " + key);
+		    }
+		} else {
+		    log.error("Error while processing flux for \"" + name + "\" with key " + key, throwable);
+		}
+
+		// remove terminated Flux from the map
+		map.remove(key);
+		// switch subscribers to a dummy Flux which completes and cancels their subscriptions
+		return Flux.empty();
+	    });
 
 	    map.put(key, flux);
 	}
