@@ -6,6 +6,7 @@
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refresh" required="false" rtexprvalue="true"%>
+<%@ attribute name="lessonID" required="false" rtexprvalue="true"%>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
@@ -55,7 +56,9 @@
                 decoderDiv = $('<div />');
 
             $(document).ready(function (){
-                initLearnerPage(${toolSessionID});
+                const toolSessionID = ${empty lessonID ? toolSessionID : 'null'},
+            		lessonID = ${empty lessonID ? 'null' : lessonID};
+                initLearnerPage(toolSessionID, lessonID);
             });
 
             function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
@@ -109,23 +112,25 @@
 					<button class="no-decoration" id="hamb" type="button" accesskey="p" 
 							data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 							aria-controls="component-offcanvas"
-							aria-labelledby="offcanvas-progress-bar-title">
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
 						<i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
 					</button>
 
-                    <h1 id="lesson-name"></h1>
+                    <h1 id="lesson-name" title="Lesson name"></h1>
                 </div>
                 
                 <div class="top-menu">
                     <button id="profile-picture" class="no-decoration px-3" type="button"
-                            onclick="javascript:showMyPortraitDialog()">
-                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" aria-label="<c:out value="${pageLearnerFirstName} ${pageLearnerLastName}" escapeXml="true"/> profile picture" alt="User profile picture">
+                            onclick="javascript:showMyPortraitDialog()" title="Your portrait" >
+                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="Your profile portrait">
                     </button>
                     
-                    <button type="button" id="progress-bar-widget" title="Your lesson completion" class="no-decoration d-none d-sm-none d-md-block"
+                    <button type="button" id="progress-bar-widget" class="no-decoration d-none d-sm-none d-md-block"
                     		data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 							aria-controls="component-offcanvas"
-							aria-labelledby="offcanvas-progress-bar-title">
+							aria-labelledby="offcanvas-progress-bar-title"
+							title="Your lesson completion">
                         <div class="row m-0">
                             <div class="col-6 text-start p-0">
                                 Progress
@@ -140,7 +145,7 @@
                     </button>
                     
                     <c:if test="${not isIntegrationLogin}">
-                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" title="Return to course page"></a>
+                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" title="Close and return to the course page"></a>
                     </c:if>
                 </div>
             </header>
@@ -148,7 +153,9 @@
             <main class="p-3" id="component-main-content" tabindex="-1">
                 <c:if test="${not empty title}">
                     <h2 class="mb-3">
-                    	<c:out value="${title}" escapeXml="true" />
+                    	<span title="Activity name">
+                    		<c:out value="${title}" escapeXml="true" />
+                    	</span>
                     </h2>
                 </c:if>
 				

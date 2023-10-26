@@ -5,6 +5,10 @@
 <%@ attribute name="id" required="false" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="type" required="false" rtexprvalue="true"%>
+<%@ attribute name="isIconDisplayed" required="false" rtexprvalue="true"%>
+<c:if test="${empty isIconDisplayed}">
+	<c:set var="isIconDisplayed" value="true" />
+</c:if>
 
 <c:set var="idName" value="alert-${type}" />
 <c:if test="${not empty id}">
@@ -24,7 +28,7 @@
 	</c:when>
 	<c:when test="${type == 'warning'}">
 		<c:set var="alertType" value="warning" />
-		<c:set var="iconType" value="exclamation-circle" />
+		<c:set var="iconType" value="circle-exclamation" />
 	</c:when>
 </c:choose>
 
@@ -35,13 +39,15 @@
 				<button type="button" class="btn-close btn-sm float-end ms-4" data-bs-dismiss="alert" aria-label="Close"></button>
 			</c:if>
 				
-			<c:if test="${not empty title}">
-				<span class="alert-heading fw-bold">${title}</span>
+			<c:if test="${not empty pageScope.title}">
+				<span class="alert-heading fw-bold">${pageScope.title}</span>
 				<hr>
 			</c:if>
-				
-			<i class="fa fa-lg fa-${iconType} text-muted me-1"></i>
+			
+			<c:if test="${isIconDisplayed}">
+				<i class="fa fa-lg fa-${iconType} text-muted me-1"></i>
+			</c:if>
 			<jsp:doBody />	
 		</div>
 	</div>
-</div>	
+</div>

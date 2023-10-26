@@ -153,7 +153,9 @@
             <main class="p-3" id="component-main-content" tabindex="-1">
                 <c:if test="${not empty title}">
                     <h2 class="mb-3">
-                    	<c:out value="${title}" escapeXml="true" />
+                    	<span title="Activity name">
+                    		<c:out value="${title}" escapeXml="true" />
+                    	</span>
                     </h2>
                 </c:if>
 				

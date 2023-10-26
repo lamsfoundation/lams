@@ -12,7 +12,7 @@
 
 <%-- Default value for I18N keys --%>
 <c:if test="${empty isUserIdPropertyCapitalized}">
-	//org.lamsfoundation.lams.usermanagement.User has non-capitalized userId property
+	<%--org.lamsfoundation.lams.usermanagement.User has non-capitalized userId property--%>
 	<c:set var="isUserIdPropertyCapitalized" value="false" />
 </c:if> 
 <c:if test="${empty refreshKey}">
