@@ -61,11 +61,28 @@
 		
 		<!-- chat UI -->
 		<div class="row">
-			<div class="col-12 col-sm-9 col-md-9 col-lg-8">
-				<div id="messages" class="shadow" aria-live="polite"></div>
+			<div class="col-12 col-sm-3 col-md-3 col-lg-3">
+				<div id="roster" class="d-none d-sm-block div-hover shadow rounded ${MODE == 'teacher' ? 'mode-teacher' : ''}"></div>
 			</div>
-			<div class="col-12 col-sm-3 col-md-3 col-lg-4">
-				<div id="roster" class="d-none d-sm-block div-hover shadow ${MODE == 'teacher' ? 'mode-teacher' : ''}"></div>
+			<div class="col-12 col-sm-9 col-md-9 col-lg-9">
+				<div id="messages" class="shadow rounded p-3" aria-live="polite"></div>
+				
+				<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
+					<div class="d-flex align-items-center flex-row mt-2">
+						<div id="textArea" class="flex-fill">
+							<label for="sendMessageArea" class="visually-hidden">
+								<fmt:message key="button.send"/>
+							</label>
+							<textarea id="sendMessageArea" rows="2" class="form-control shadow rounded" autofocus></textarea>
+						</div>
+						<div id="sendMessageButtonCell" class="ms-2">
+							<button id="sendMessageButton" class="btn btn-secondary" type="button" onclick="javascript:sendChatToolMessage()">
+								<i class="fa-solid fa-comment fa-lg me-1"></i>
+								<fmt:message key="button.send"/>
+							</button>
+						</div>
+					</div>
+				</c:if>
 			</div>
 		</div>
 		
@@ -84,26 +101,7 @@
 			</div>
 		</c:if>
 		
-		<c:if test="${MODE != 'learner' || !chatDTO.lockOnFinish || !chatUserDTO.finishedActivity}">
-			<div class="row align-items-center">
-				<div class="col-12 col-sm-9 col-md-9 col-lg-8">
-					<div id="textArea" class="mt-2">
-						<label for="sendMessageArea" class="visually-hidden">
-							<fmt:message key="button.send"/>
-						</label>
-						<textarea id="sendMessageArea" rows="2" class="form-control shadow" autofocus></textarea>
-					</div>
-				</div>
-				<div class="col-12 col-sm-3 col-md-3 col-lg-4">
-					<div id="sendMessageButtonCell" class="mt-2">
-						<button id="sendMessageButton" class="btn btn-autoresize btn-secondary" type="button" onclick="javascript:sendChatToolMessage()">
-							<i class="fa-solid fa-comment fa-lg me-1"></i>
-							<fmt:message key="button.send"/>
-						</button>
-					</div>
-				</div>
-			</div>
-		</c:if>
+
 		
 		<c:if test="${MODE == 'learner' || MODE == 'author'}">
 			<form action="openNotebook.do" method="post">
@@ -126,7 +124,7 @@
 						<form:form action="openNotebook.do" method="post"
 								onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
 							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-							<button type="submit" class="btn btn-responsive btn-primary na mt-2">
+							<button type="submit" class="btn btn-primary na mt-2">
 								<fmt:message key="button.continue" />
 							</button>
 						</form:form>
@@ -136,17 +134,15 @@
 						<form:form action="finishActivity.do" method="post"
 								onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
 							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-							<button type="button" class="btn btn-primary mt-2 na btn-autoresize" id="finishButton">
-								 <span class="nextActivity">
-									 <c:choose>
-									 	<c:when test="${isLastActivity}">
-									 		 <fmt:message key="button.submit" />
-									 	</c:when>
-									 	<c:otherwise>
-									 		 <fmt:message key="button.finish" />
-									 	</c:otherwise>
-									 </c:choose>
-								 </span>
+							<button type="button" class="btn btn-primary mt-2 na" id="finishButton">
+								 <c:choose>
+								 	<c:when test="${isLastActivity}">
+								 		 <fmt:message key="button.submit" />
+								 	</c:when>
+								 	<c:otherwise>
+								 		 <fmt:message key="button.finish" />
+								 	</c:otherwise>
+								 </c:choose>
 							</button>
 						</form:form>
 					</c:otherwise>
