@@ -149,7 +149,7 @@
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
-.component-page-wrapper #finishButton:focus {
+.component-page-wrapper .btn:focus {
     box-shadow: var(--bs-btn-focus-box-shadow);
 }
 

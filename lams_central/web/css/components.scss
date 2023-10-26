@@ -488,7 +488,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 }
 
 .component-page-wrapper button.no-decoration:focus {
-	border: thin solid var(--bs-gray-700);
+	box-shadow: 0 0 0 0.25rem rgba(5, 112, 213, 0.25);/*the same as .btn-close:focus*/
 }
 
 .component-page-wrapper .component-page-content {
