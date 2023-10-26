@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<c:set var="sessionMapID" value="${surveyForm.sessionMapID}" />
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="position" value="${surveyForm.position}" />
+<c:set var="questionSeqID" value="${surveyForm.questionSeqID}" />
+<c:set var="currentIdx" value="${surveyForm.currentIdx}" />
 
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
 	<script type="text/javascript">
 		function previousQuestion(sessionMapID) {
 			$("#surveyForm").attr('action', '<c:url value="/learning/previousQuestion.do"/>');
@@ -26,35 +27,29 @@
 		function disableButtons() {
 			$('.btn').prop('disabled', true);
 		}
-
 	</script>
-</lams:head>
-<body class="stripes">
-	<form:form action="doSurvey.do" method="post" modelAttribute="surveyForm" id="surveyForm" onsubmit="disableButtons();">
-		<form:hidden path="questionSeqID" />
-		<form:hidden path="sessionMapID" />
-		<form:hidden path="position" />
-		<form:hidden path="currentIdx" />
-		<c:set var="sessionMapID" value="${surveyForm.sessionMapID}" />
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		<c:set var="position" value="${surveyForm.position}" />
-		<c:set var="questionSeqID" value="${surveyForm.questionSeqID}" />
-		<c:set var="currentIdx" value="${surveyForm.currentIdx}" />
+	
+	<div id="container-main">
+		<form:form action="doSurvey.do" method="post" modelAttribute="surveyForm" id="surveyForm" onsubmit="disableButtons();">
+			<form:hidden path="questionSeqID" />
+			<form:hidden path="sessionMapID" />
+			<form:hidden path="position" />
+			<form:hidden path="currentIdx" />
 
-		<lams:Page type="learner" title="${sessionMap.title}">
-
-			<div class="panel">
+			<div id="instructions" class="instructions">
 				<c:out value="${sessionMap.instructions}" escapeXml="false" />
 			</div>
+			
 			<c:if test="${not empty sessionMap.submissionDeadline}">
-				<lams:Alert id="submissionDeadline" type="info" close="true">
+				<lams:Alert5 id="submissionDeadline" type="info" close="true">
 					<fmt:message>
 						<fmt:param>
 							<lams:Date value="${sessionMap.submissionDeadline}" />
 						</fmt:param>
 					</fmt:message>
-				</lams:Alert>
+				</lams:Alert5>
 			</c:if>
+			
 			<c:choose>
 				<%-- Show on one page or when learner does not choose edit one question --%>
 				<c:when test="${sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)}">
@@ -65,8 +60,10 @@
 				</c:when>
 				<c:otherwise>
 					<c:set var="question" value="${sessionMap.questionList[questionSeqID]}" />
-					<fmt:message key="label.question" />&nbsp;${currentIdx}&nbsp;<fmt:message key="label.of" />&nbsp;${sessionMap.totalQuestions}
-						<%@ include file="/pages/learning/question.jsp"%>
+					<c:set var="questionSequenceNumber">
+						<fmt:message key="label.question" />&nbsp;${currentIdx}&nbsp;<fmt:message key="label.of" />&nbsp;${sessionMap.totalQuestions}
+					</c:set>
+					<%@ include file="/pages/learning/question.jsp"%>
 				</c:otherwise>
 			</c:choose>
 
@@ -76,12 +73,18 @@
 				<c:choose>
 					<c:when test="${(sessionMap.showOnOnePage && (empty questionSeqID or questionSeqID == 0)) or position == 3}">
 						<form:button onclick="submit" path="doSurvey" value="Done" disabled="${sessionMap.finishedLock}"
-							class="btn btn-primary">
+							class="btn btn-primary na">
 							<fmt:message key="label.submit.survey" />
 						</form:button>
 					</c:when>
 				
 					<c:otherwise>
+						 <c:if test="${position == 2}">
+							<form:button onclick="submit" path="doSurvey" disabled="${sessionMap.finishedLock}" class="btn btn-primary na ms-2">
+								<fmt:message key="label.submit.survey" />
+							</form:button>
+						</c:if>
+						
 						<c:set var="preChecked" value="true" />
 						<c:if test="${position == 2 || position == 0}">
 							<c:set var="preChecked" value="false" />
@@ -90,28 +93,23 @@
 						<c:if test="${position == 1 || position == 0}">
 							<c:set var="nextChecked" value="false" />
 						</c:if>
-						<div class="float-start"> 
-							<form:button path="PreviousButton" onclick="previousQuestion()"
-								class="btn btn-secondary" disabled="${preChecked}">
-								<fmt:message key="label.previous" />
-							</form:button>
-						</div>
 
 						<c:if test="${position != 2}">
-							<form:button path="NextButton" onclick="nextQuestion()" class="btn btn-secondary" disabled="${nextChecked}">
+							<form:button path="NextButton" onclick="nextQuestion()" class="btn btn-secondary btn-icon-next ms-2" disabled="${nextChecked}">
 								<fmt:message key="label.next" />
 							</form:button>
 						</c:if>
-						 <c:if test="${position == 2}">
-							<form:button onclick="submit" path="doSurvey" disabled="${sessionMap.finishedLock}" class="btn btn-primary">
-								<fmt:message key="label.submit.survey" />
+						
+						<div class="float-start"> 
+							<form:button path="PreviousButton" onclick="previousQuestion()"
+								class="btn btn-secondary btn-icon-previous" disabled="${preChecked}">
+								<fmt:message key="label.previous" />
 							</form:button>
-						</c:if>
+						</div>
 					</c:otherwise>
 				</c:choose>
 			</div>
 
-		</lams:Page>
-	</form:form>
-</body>
-</lams:html>
+		</form:form>
+	</div>
+</lams:PageLearner>
