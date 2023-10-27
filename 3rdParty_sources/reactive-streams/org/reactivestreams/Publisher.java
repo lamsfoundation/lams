@@ -1,13 +1,6 @@
-/************************************************************************
- * Licensed under Public Domain (CC0)                                    *
- *                                                                       *
- * To the extent possible under law, the person who associated CC0 with  *
- * this code has waived all copyright and related or neighboring         *
- * rights to this code.                                                  *
- *                                                                       *
- * You should have received a copy of the CC0 legalcode along with this  *
- * work. If not, see <http://creativecommons.org/publicdomain/zero/1.0/>.*
- ************************************************************************/
+/***************************************************
+ * Licensed under MIT No Attribution (SPDX: MIT-0) *
+ ***************************************************/
 
 package org.reactivestreams;
 
@@ -15,10 +8,10 @@ package org.reactivestreams;
  * A {@link Publisher} is a provider of a potentially unbounded number of sequenced elements, publishing them according to
  * the demand received from its {@link Subscriber}(s).
  * <p>
- * A {@link Publisher} can serve multiple {@link Subscriber}s subscribed {@link #subscribe(Subscriber)} dynamically
+ * A {@link Publisher} can serve multiple {@link Subscriber}s subscribed {@link Publisher#subscribe(Subscriber)} dynamically
  * at various points in time.
  *
- * @param <T> the type of element signaled.
+ * @param <T> the type of element signaled
  */
 public interface Publisher<T> {
 
@@ -32,7 +25,7 @@ public interface Publisher<T> {
      * A {@link Subscriber} should only subscribe once to a single {@link Publisher}.
      * <p>
      * If the {@link Publisher} rejects the subscription attempt or otherwise fails it will
-     * signal the error via {@link Subscriber#onError}.
+     * signal the error via {@link Subscriber#onError(Throwable)}.
      *
      * @param s the {@link Subscriber} that will consume signals from this {@link Publisher}
      */

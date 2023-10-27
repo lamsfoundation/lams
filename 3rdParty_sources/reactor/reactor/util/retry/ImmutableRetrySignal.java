@@ -20,7 +20,7 @@ import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
 /**
- * An immutable {@link reactor.util.retry.Retry.RetrySignal} that can be used for retained
+ * An immutable {@link Retry.RetrySignal} that can be used for retained
  * copies of mutable implementations.
  *
  * @author Simon Baslé

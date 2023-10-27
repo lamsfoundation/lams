@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2018-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package reactor.core.publisher;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
+import java.util.stream.Collectors;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Counter;
@@ -30,12 +29,12 @@ import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.Timer;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
+
 import reactor.core.CoreSubscriber;
 import reactor.core.Scannable;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 import reactor.util.Metrics.MicrometerConfiguration;
-import reactor.util.function.Tuple2;
 
 /**
  * Activate metrics gathering on a {@link Flux}, assuming Micrometer is on the classpath.
@@ -46,6 +45,7 @@ import reactor.util.function.Tuple2;
  * @author Simon Baslé
  * @author Stephane Maldini
  */
+@Deprecated
 final class FluxMetrics<T> extends InternalFluxOperator<T, T> {
 
 	final String name;
@@ -257,10 +257,6 @@ final class FluxMetrics<T> extends InternalFluxOperator<T, T> {
 
 	static final Logger log = Loggers.getLogger(FluxMetrics.class);
 
-	static final BiFunction<Tags, Tuple2<String, String>, Tags> TAG_ACCUMULATOR =
-			(prev, tuple) -> prev.and(Tag.of(tuple.getT1(), tuple.getT2()));
-	static final BinaryOperator<Tags> TAG_COMBINER = Tags::and;
-
 	/**
 	 * Extract the name from the upstream, and detect if there was an actual name (ie. distinct from {@link
 	 * Scannable#stepName()}) set by the user.
@@ -299,13 +295,11 @@ final class FluxMetrics<T> extends InternalFluxOperator<T, T> {
 		Scannable scannable = Scannable.from(source);
 
 		if (scannable.isScanAvailable()) {
-			LinkedList<Tuple2<String, String>> scannableTags = new LinkedList<>();
-			scannable.tags().forEach(scannableTags::push);
-			return scannableTags.stream()
-			                    //Note the combiner below is for parallel streams, which won't be used
-			                    //For the identity, `commonTags` should be ok (even if reduce uses it multiple times)
-			                    //since it deduplicates
-			                    .reduce(tags, TAG_ACCUMULATOR, TAG_COMBINER);
+			List<Tag> discoveredTags = scannable.tagsDeduplicated()
+				.entrySet().stream()
+				.map(e -> Tag.of(e.getKey(), e.getValue()))
+				.collect(Collectors.toList());
+			return tags.and(discoveredTags);
 		}
 
 		return tags;

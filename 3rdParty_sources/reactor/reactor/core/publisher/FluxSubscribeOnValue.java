@@ -119,7 +119,7 @@ final class FluxSubscribeOnValue<T> extends Flux<T> implements Fuseable, Scannab
 
 		@Override
 		@Nullable
-		public Object scanUnsafe(Scannable.Attr key) {
+		public Object scanUnsafe(Attr key) {
 			if (key == Attr.CANCELLED) {
 				return future == OperatorDisposables.DISPOSED;
 			}

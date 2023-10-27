@@ -131,7 +131,7 @@ public abstract class BaseSubscriber<T> implements CoreSubscriber<T>, Subscripti
 	 * cancel). The hook is executed in addition to and after {@link #hookOnError(Throwable)},
 	 * {@link #hookOnComplete()} and {@link #hookOnCancel()} hooks, even if these callbacks
 	 * fail. Defaults to doing nothing. A failure of the callback will be caught by
-	 * {@link Operators#onErrorDropped(Throwable, reactor.util.context.Context)}.
+	 * {@link Operators#onErrorDropped(Throwable, Context)}.
 	 *
 	 * @param type the type of termination event that triggered the hook
 	 * ({@link SignalType#ON_ERROR}, {@link SignalType#ON_COMPLETE} or

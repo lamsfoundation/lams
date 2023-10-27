@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ final class ExecutorScheduler implements Scheduler, Scannable {
 			throw Exceptions.failWithRejected();
 		}
 		Objects.requireNonNull(task, "task");
+
+		task = Schedulers.onSchedule(task);
+
 		ExecutorPlainRunnable r = new ExecutorPlainRunnable(task);
 		//RejectedExecutionException are propagated up, but since Executor doesn't from
 		//failing tasks we'll also wrap the execute call in a try catch:
@@ -218,20 +221,27 @@ final class ExecutorScheduler implements Scheduler, Scannable {
 	/**
 	 * A non-trampolining worker that tracks tasks.
 	 */
-	static final class ExecutorSchedulerWorker implements Scheduler.Worker, WorkerDelete, Scannable {
+	static final class ExecutorSchedulerWorker implements Worker, WorkerDelete, Scannable {
+
+		private final boolean wrapSchedule;
 
 		final Executor executor;
 
-		final Disposable.Composite tasks;
+		final Composite tasks;
 
 		ExecutorSchedulerWorker(Executor executor) {
 			this.executor = executor;
+			this.wrapSchedule = !(executor instanceof Scheduler);
 			this.tasks = Disposables.composite();
 		}
 
 		@Override
 		public Disposable schedule(Runnable task) {
 			Objects.requireNonNull(task, "task");
+
+			if (wrapSchedule) {
+				task = Schedulers.onSchedule(task);
+			}
 
 			ExecutorTrackedRunnable r = new ExecutorTrackedRunnable(task, this, true);
 			if (!tasks.add(r)) {
@@ -284,7 +294,9 @@ final class ExecutorScheduler implements Scheduler, Scannable {
 	 * A trampolining worker that tracks tasks.
 	 */
 	static final class ExecutorSchedulerTrampolineWorker
-			implements Scheduler.Worker, WorkerDelete, Runnable, Scannable {
+			implements Worker, WorkerDelete, Runnable, Scannable {
+
+		private final boolean wrapSchedule;
 
 		final Executor executor;
 
@@ -299,6 +311,7 @@ final class ExecutorScheduler implements Scheduler, Scannable {
 
 		ExecutorSchedulerTrampolineWorker(Executor executor) {
 			this.executor = executor;
+			this.wrapSchedule = !(executor instanceof Scheduler);
 			this.queue = new ConcurrentLinkedQueue<>();
 		}
 
@@ -307,6 +320,10 @@ final class ExecutorScheduler implements Scheduler, Scannable {
 			Objects.requireNonNull(task, "task");
 			if (terminated) {
 				throw Exceptions.failWithRejected();
+			}
+
+			if (wrapSchedule) {
+				task = Schedulers.onSchedule(task);
 			}
 
 			ExecutorTrackedRunnable r = new ExecutorTrackedRunnable(task, this, false);

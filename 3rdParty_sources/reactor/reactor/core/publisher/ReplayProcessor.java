@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ import static reactor.core.publisher.FluxReplay.ReplaySubscriber.TERMINATED;
  *
  * @param <T> the value type
  * @deprecated To be removed in 3.5, prefer clear cut usage of {@link Sinks} through
- * variations under {@link reactor.core.publisher.Sinks.MulticastReplaySpec Sinks.many().replay()}.
+ * variations under {@link Sinks.MulticastReplaySpec Sinks.many().replay()}.
  */
 @Deprecated
 public final class ReplayProcessor<T> extends FluxProcessor<T, T>
@@ -446,14 +446,14 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 	@Override
 	public void onComplete() {
 		//no particular error condition handling for onComplete
-		@SuppressWarnings("unused") Sinks.EmitResult emitResult = tryEmitComplete();
+		@SuppressWarnings("unused") EmitResult emitResult = tryEmitComplete();
 	}
 
 	@Override
-	public Sinks.EmitResult tryEmitComplete() {
+	public EmitResult tryEmitComplete() {
 		FluxReplay.ReplayBuffer<T> b = buffer;
 		if (b.isDone()) {
-			return Sinks.EmitResult.FAIL_TERMINATED;
+			return EmitResult.FAIL_TERMINATED;
 		}
 
 		b.onComplete();
@@ -496,10 +496,10 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 	}
 
 	@Override
-	public Sinks.EmitResult tryEmitNext(T t) {
+	public EmitResult tryEmitNext(T t) {
 		FluxReplay.ReplayBuffer<T> b = buffer;
 		if (b.isDone()) {
-			return Sinks.EmitResult.FAIL_TERMINATED;
+			return EmitResult.FAIL_TERMINATED;
 		}
 
 		//note: ReplayProcessor can so far ALWAYS buffer the element, no FAIL_ZERO_SUBSCRIBER here
@@ -507,7 +507,7 @@ public final class ReplayProcessor<T> extends FluxProcessor<T, T>
 		for (FluxReplay.ReplaySubscription<T> rs : subscribers) {
 			b.replay(rs);
 		}
-		return Sinks.EmitResult.OK;
+		return EmitResult.OK;
 	}
 
 	@Override

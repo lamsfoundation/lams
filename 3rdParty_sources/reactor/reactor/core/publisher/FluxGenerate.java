@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Generate signals one-by-one via a function callback.
@@ -120,8 +121,7 @@ extends Flux<T> implements Fuseable, SourceProducer<T> {
 			AtomicLongFieldUpdater.newUpdater(GenerateSubscription.class, "requested");
 
 		GenerateSubscription(CoreSubscriber<? super T> actual, S state,
-											 BiFunction<S, SynchronousSink<T>, S> generator, Consumer<? super
-		  S> stateConsumer) {
+							 BiFunction<S, SynchronousSink<T>, S> generator, Consumer<? super S> stateConsumer) {
 			this.actual = actual;
 			this.state = state;
 			this.generator = generator;
@@ -129,7 +129,13 @@ extends Flux<T> implements Fuseable, SourceProducer<T> {
 		}
 
 		@Override
+		@Deprecated
 		public Context currentContext() {
+			return actual.currentContext();
+		}
+
+		@Override
+		public ContextView contextView() {
 			return actual.currentContext();
 		}
 
@@ -290,6 +296,7 @@ extends Flux<T> implements Fuseable, SourceProducer<T> {
 				if (n == e) {
 					state = s;
 					n = REQUESTED.addAndGet(this, -e);
+					e = 0L;
 					if (n == 0L) {
 						return;
 					}

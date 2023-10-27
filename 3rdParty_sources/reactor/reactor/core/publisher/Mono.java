@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Spliterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
@@ -52,9 +53,9 @@ import reactor.core.Disposable;
 import reactor.core.Exceptions;
 import reactor.core.Fuseable;
 import reactor.core.Scannable;
+import reactor.core.publisher.FluxOnAssembly.AssemblySnapshot;
 import reactor.core.publisher.FluxOnAssembly.CheckpointHeavySnapshot;
 import reactor.core.publisher.FluxOnAssembly.CheckpointLightSnapshot;
-import reactor.core.publisher.FluxOnAssembly.AssemblySnapshot;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Scheduler.Worker;
 import reactor.core.scheduler.Schedulers;
@@ -72,6 +73,8 @@ import reactor.util.function.Tuple6;
 import reactor.util.function.Tuple7;
 import reactor.util.function.Tuple8;
 import reactor.util.function.Tuples;
+import reactor.core.observability.SignalListener;
+import reactor.core.observability.SignalListenerFactory;
 import reactor.util.retry.Retry;
 
 /**
@@ -213,25 +216,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	public static <T> Mono<T> defer(Supplier<? extends Mono<? extends T>> supplier) {
 		return onAssembly(new MonoDefer<>(supplier));
-	}
-
-	/**
-	 * Create a {@link Mono} provider that will {@link Function#apply supply} a target {@link Mono}
-	 * to subscribe to for each {@link Subscriber} downstream.
-	 * This operator behaves the same way as {@link #defer(Supplier)},
-	 * but accepts a {@link Function} that will receive the current {@link Context} as an argument.
-	 *
-	 * <p>
-	 * <img class="marble" src="doc-files/marbles/deferForMono.svg" alt="">
-	 * <p>
-	 * @param contextualMonoFactory a {@link Mono} factory
-	 * @param <T> the element type of the returned Mono instance
-	 * @return a deferred {@link Mono} deriving actual {@link Mono} from context values for each subscription
-	 * @deprecated use {@link #deferContextual(Function)} instead. to be removed in 3.5.0.
-	 */
-	@Deprecated
-	public static <T> Mono<T> deferWithContext(Function<Context, ? extends Mono<? extends T>> contextualMonoFactory) {
-		return deferContextual(view -> contextualMonoFactory.apply(Context.of(view)));
 	}
 
 	/**
@@ -537,10 +521,9 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/fromFuture.svg" alt="">
 	 * <p>
-	 * Note that the completion stage is not cancelled when that Mono is cancelled, but
-	 * that behavior can be obtained by using {@link #doFinally(Consumer)} that checks
-	 * for a {@link SignalType#CANCEL} and calls eg.
-	 * {@link CompletionStage#toCompletableFuture() .toCompletableFuture().cancel(false)}.
+	 * If the completionStage is also a {@link Future}, cancelling the Mono will cancel the future.
+	 * Use {@link #fromFuture(CompletableFuture, boolean)} with {@code suppressCancellation} set to
+	 * {@code true} if you need to suppress cancellation propagation.
 	 *
 	 * @param completionStage {@link CompletionStage} that will produce a value (or a null to
 	 * complete immediately)
@@ -548,20 +531,19 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return A {@link Mono}.
 	 */
 	public static <T> Mono<T> fromCompletionStage(CompletionStage<? extends T> completionStage) {
-		return onAssembly(new MonoCompletionStage<>(completionStage));
+		return onAssembly(new MonoCompletionStage<>(completionStage, false));
 	}
 
 	/**
-	 * Create a {@link Mono} that wraps a {@link CompletionStage} on subscription,
+	 * Create a {@link Mono} that wraps a lazily-supplied {@link CompletionStage} on subscription,
 	 * emitting the value produced by the {@link CompletionStage}.
 	 *
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/fromFutureSupplier.svg" alt="">
 	 * <p>
-	 * Note that the completion stage is not cancelled when that Mono is cancelled, but
-	 * that behavior can be obtained by using {@link #doFinally(Consumer)} that checks
-	 * for a {@link SignalType#CANCEL} and calls eg.
-	 * {@link CompletionStage#toCompletableFuture() .toCompletableFuture().cancel(false)}.
+	 * If the completionStage is also a {@link Future}, cancelling the Mono will cancel the future.
+	 * Use {@link #fromFuture(CompletableFuture, boolean)} with {@code suppressCancellation} set to
+	 * {@code true} if you need to suppress cancellation propagation.
 	 *
 	 * @param stageSupplier The {@link Supplier} of a {@link CompletionStage} that will produce a value (or a null to
 	 * complete immediately). This allows lazy triggering of CompletionStage-based APIs.
@@ -569,7 +551,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return A {@link Mono}.
 	 */
 	public static <T> Mono<T> fromCompletionStage(Supplier<? extends CompletionStage<? extends T>> stageSupplier) {
-		return defer(() -> onAssembly(new MonoCompletionStage<>(stageSupplier.get())));
+		return defer(() -> onAssembly(new MonoCompletionStage<>(stageSupplier.get(), false)));
 	}
 
 	/**
@@ -611,14 +593,14 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * Create a {@link Mono}, producing its value using the provided {@link CompletableFuture}.
+	 * Create a {@link Mono}, producing its value using the provided {@link CompletableFuture}
+	 * and cancelling the future if the Mono gets cancelled.
 	 *
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/fromFuture.svg" alt="">
 	 * <p>
-	 * Note that the future is not cancelled when that Mono is cancelled, but that behavior
-	 * can be obtained by using a {@link #doFinally(Consumer)} that checks
-	 * for a {@link SignalType#CANCEL} and calls {@link CompletableFuture#cancel(boolean)}.
+	 * Use {@link #fromFuture(CompletableFuture, boolean)} with {@code suppressCancellation} set to
+	 * {@code true} if you need to suppress cancellation propagation.
 	 *
 	 * @param future {@link CompletableFuture} that will produce a value (or a null to
 	 * complete immediately)
@@ -627,28 +609,64 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @see #fromCompletionStage(CompletionStage) fromCompletionStage for a generalization
 	 */
 	public static <T> Mono<T> fromFuture(CompletableFuture<? extends T> future) {
-		return onAssembly(new MonoCompletionStage<>(future));
+		return fromFuture(future, false);
 	}
 
 	/**
-	 * Create a {@link Mono} that wraps a {@link CompletableFuture} on subscription,
-	 * emitting the value produced by the Future.
+	 * Create a {@link Mono}, producing its value using the provided {@link CompletableFuture}
+	 * and optionally cancelling the future if the Mono gets cancelled (if {@code suppressCancel == false}).
+	 *
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/fromFuture.svg" alt="">
+	 * <p>
+	 *
+	 * @param future {@link CompletableFuture} that will produce a value (or a null to complete immediately)
+	 * @param suppressCancel {@code true} to prevent cancellation of the future when the Mono is cancelled,
+	 * {@code false} otherwise (the default)
+	 * @param <T> type of the expected value
+	 * @return A {@link Mono}.
+	 */
+	public static <T> Mono<T> fromFuture(CompletableFuture<? extends T> future, boolean suppressCancel) {
+		return onAssembly(new MonoCompletionStage<>(future, suppressCancel));
+	}
+
+	/**
+	 * Create a {@link Mono} that wraps a lazily-supplied {@link CompletableFuture} on subscription,
+	 * emitting the value produced by the future and cancelling the future if the Mono gets cancelled.
 	 *
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/fromFutureSupplier.svg" alt="">
 	 * <p>
-	 * Note that the future is not cancelled when that Mono is cancelled, but that behavior
-	 * can be obtained by using a {@link #doFinally(Consumer)} that checks
-	 * for a {@link SignalType#CANCEL} and calls {@link CompletableFuture#cancel(boolean)}.
 	 *
-	 * @param futureSupplier The {@link Supplier} of a {@link CompletableFuture} that will produce a value (or a null to
-	 * complete immediately). This allows lazy triggering of future-based APIs.
+	 * @param futureSupplier The {@link Supplier} of a {@link CompletableFuture} that will produce a value
+	 * (or a null to complete immediately). This allows lazy triggering of future-based APIs.
 	 * @param <T> type of the expected value
 	 * @return A {@link Mono}.
 	 * @see #fromCompletionStage(Supplier) fromCompletionStage for a generalization
 	 */
 	public static <T> Mono<T> fromFuture(Supplier<? extends CompletableFuture<? extends T>> futureSupplier) {
-		return defer(() -> onAssembly(new MonoCompletionStage<>(futureSupplier.get())));
+		return fromFuture(futureSupplier, false);
+	}
+
+	/**
+	 * Create a {@link Mono} that wraps a lazily-supplied  {@link CompletableFuture} on subscription,
+	 * emitting the value produced by the future and optionally cancelling the future if the Mono gets cancelled
+	 * (if {@code suppressCancel == false}).
+	 *
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/fromFutureSupplier.svg" alt="">
+	 * <p>
+	 *
+	 * @param futureSupplier The {@link Supplier} of a {@link CompletableFuture} that will produce a value
+	 * (or a null to complete immediately). This allows lazy triggering of future-based APIs.
+	 * @param suppressCancel {@code true} to prevent cancellation of the future when the Mono is cancelled,
+	 * {@code false} otherwise (the default)
+	 * @param <T> type of the expected value
+	 * @return A {@link Mono}.
+	 * @see #fromCompletionStage(Supplier) fromCompletionStage for a generalization
+	 */
+	public static <T> Mono<T> fromFuture(Supplier<? extends CompletableFuture<? extends T>> futureSupplier, boolean suppressCancel) {
+		return defer(() -> onAssembly(new MonoCompletionStage<>(futureSupplier.get(), suppressCancel)));
 	}
 
 	/**
@@ -819,21 +837,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 			Publisher<? extends T> source2,
 			BiPredicate<? super T, ? super T> isEqual, int prefetch) {
 		return onAssembly(new MonoSequenceEqual<>(source1, source2, isEqual, prefetch));
-	}
-
-	/**
-	 * Create a {@link Mono} emitting the {@link Context} available on subscribe.
-	 * If no Context is available, the mono will simply emit the
-	 * {@link Context#empty() empty Context}.
-	 *
-	 * @return a new {@link Mono} emitting current context
-	 * @see #subscribe(CoreSubscriber)
-	 * @deprecated Use {@link #deferContextual(Function)} or {@link #transformDeferredContextual(BiFunction)} to materialize
-	 * the context. To obtain the same Mono of Context, use {@code Mono.deferContextual(Mono::just)}. To be removed in 3.5.0.
-	 */
-	@Deprecated
-	public static Mono<Context> subscriberContext() {
-		return onAssembly(MonoCurrentContext.INSTANCE);
 	}
 
 	/**
@@ -1702,7 +1705,9 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	@Nullable
 	public T block() {
-		BlockingMonoSubscriber<T> subscriber = new BlockingMonoSubscriber<>();
+		Context context = ContextPropagationSupport.shouldPropagateContextToThreadLocals()
+				? ContextPropagation.contextCaptureToEmpty() : Context.empty();
+		BlockingMonoSubscriber<T> subscriber = new BlockingMonoSubscriber<>(context);
 		subscribe((Subscriber<T>) subscriber);
 		return subscriber.blockingGet();
 	}
@@ -1726,7 +1731,9 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	@Nullable
 	public T block(Duration timeout) {
-		BlockingMonoSubscriber<T> subscriber = new BlockingMonoSubscriber<>();
+		Context context = ContextPropagationSupport.shouldPropagateContextToThreadLocals()
+				? ContextPropagation.contextCaptureToEmpty() : Context.empty();
+		BlockingMonoSubscriber<T> subscriber = new BlockingMonoSubscriber<>(context);
 		subscribe((Subscriber<T>) subscriber);
 		return subscriber.blockingGet(timeout.toNanos(), TimeUnit.NANOSECONDS);
 	}
@@ -1747,7 +1754,10 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return T the result
 	 */
 	public Optional<T> blockOptional() {
-		BlockingOptionalMonoSubscriber<T> subscriber = new BlockingOptionalMonoSubscriber<>();
+		Context context = ContextPropagationSupport.shouldPropagateContextToThreadLocals()
+				? ContextPropagation.contextCaptureToEmpty() : Context.empty();
+		BlockingOptionalMonoSubscriber<T> subscriber =
+				new BlockingOptionalMonoSubscriber<>(context);
 		subscribe((Subscriber<T>) subscriber);
 		return subscriber.blockingGet();
 	}
@@ -1772,7 +1782,10 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return T the result
 	 */
 	public Optional<T> blockOptional(Duration timeout) {
-		BlockingOptionalMonoSubscriber<T> subscriber = new BlockingOptionalMonoSubscriber<>();
+		Context context = ContextPropagationSupport.shouldPropagateContextToThreadLocals()
+				? ContextPropagation.contextCaptureToEmpty() : Context.empty();
+		BlockingOptionalMonoSubscriber<T> subscriber =
+				new BlockingOptionalMonoSubscriber<>(context);
 		subscribe((Subscriber<T>) subscriber);
 		return subscriber.blockingGet(timeout.toNanos(), TimeUnit.NANOSECONDS);
 	}
@@ -2260,6 +2273,36 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
+	 * If <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * is on the classpath, this is a convenience shortcut to capture thread local values during the
+	 * subscription phase and put them in the {@link Context} that is visible upstream of this operator.
+	 * <p>
+	 * As a result this operator should generally be used as close as possible to the end of
+	 * the chain / subscription point.
+	 * <p>
+	 * If the {@link ContextView} visible upstream is not empty, a small subset of operators will automatically
+	 * restore the context snapshot ({@link #handle(BiConsumer) handle}, {@link #tap(SignalListenerFactory) tap}).
+	 * If context-propagation is not available at runtime, this operator simply returns the current {@link Mono}
+	 * instance.
+	 *
+	 * @return a new {@link Flux} where context-propagation API has been used to capture entries and
+	 * inject them into the {@link Context}
+	 * @see #handle(BiConsumer)
+	 * @see #tap(SignalListenerFactory)
+	 */
+	public final Mono<T> contextCapture() {
+		if (!ContextPropagationSupport.isContextPropagationAvailable()) {
+			return this;
+		}
+		if (ContextPropagationSupport.propagateContextToThreadLocals) {
+			return onAssembly(new MonoContextWriteRestoringThreadLocals<>(
+					this, ContextPropagation.contextCapture()
+			));
+		}
+		return onAssembly(new MonoContextWrite<>(this, ContextPropagation.contextCapture()));
+	}
+
+	/**
 	 * Enrich the {@link Context} visible from downstream for the benefit of upstream
 	 * operators, by making all values from the provided {@link ContextView} visible on top
 	 * of pairs from downstream.
@@ -2302,6 +2345,11 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @see Context
 	 */
 	public final Mono<T> contextWrite(Function<Context, Context> contextModifier) {
+		if (ContextPropagationSupport.shouldPropagateContextToThreadLocals()) {
+			return onAssembly(new MonoContextWriteRestoringThreadLocals<>(
+					this, contextModifier
+			));
+		}
 		return onAssembly(new MonoContextWrite<>(this, contextModifier));
 	}
 
@@ -2472,30 +2520,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * Add behavior triggered after the {@link Mono} terminates, either by completing downstream successfully or with an error.
-	 * The arguments will be null depending on success, success with data and error:
-	 * <ul>
-	 *     <li>null, null : completed without data</li>
-	 *     <li>T, null : completed with data</li>
-	 *     <li>null, Throwable : failed with/without data</li>
-	 * </ul>
-	 *
-	 * <p>
-	 * <img class="marble" src="doc-files/marbles/doAfterSuccessOrError.svg" alt="">
-	 * <p>
-	 * The relevant signal is propagated downstream, then the {@link BiConsumer} is executed.
-	 *
-	 * @param afterSuccessOrError the callback to call after {@link Subscriber#onNext}, {@link Subscriber#onComplete} without preceding {@link Subscriber#onNext} or {@link Subscriber#onError}
-	 *
-	 * @return a new {@link Mono}
-	 * @deprecated prefer using {@link #doAfterTerminate(Runnable)} or {@link #doFinally(Consumer)}. will be removed in 3.5.0
-	 */
-	@Deprecated
-	public final Mono<T> doAfterSuccessOrError(BiConsumer<? super T, Throwable> afterSuccessOrError) {
-		return doOnTerminalSignal(this, null, null, afterSuccessOrError);
-	}
-
-	/**
 	 * Add behavior (side-effect) triggered after the {@link Mono} terminates, either by
 	 * completing downstream successfully or with an error.
 	 * <p>
@@ -2573,9 +2597,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	public final Mono<T> doFinally(Consumer<SignalType> onFinally) {
 		Objects.requireNonNull(onFinally, "onFinally");
-		if (this instanceof Fuseable) {
-			return onAssembly(new MonoDoFinallyFuseable<>(this, onFinally));
-		}
 		return onAssembly(new MonoDoFinally<>(this, onFinally));
 	}
 
@@ -2621,7 +2642,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @return a {@link Mono} that cleans up matching elements that get discarded upstream of it.
 	 */
 	public final <R> Mono<T> doOnDiscard(final Class<R> type, final Consumer<? super R> discardHook) {
-		return subscriberContext(Operators.discardLocalAdapter(type, discardHook));
+		return contextWrite(Operators.discardLocalAdapter(type, discardHook));
 	}
 
 	/**
@@ -2812,32 +2833,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * Add behavior triggered when the {@link Mono} terminates, either by emitting a value,
-	 * completing empty or failing with an error.
-	 * The value passed to the {@link Consumer} reflects the type of completion:
-	 * <ul>
-	 *     <li>null, null : completing without data. handler is executed right before onComplete is propagated downstream</li>
-	 *     <li>T, null : completing with data. handler is executed right before onNext is propagated downstream</li>
-	 *     <li>null, Throwable : failing. handler is executed right before onError is propagated downstream</li>
-	 * </ul>
-	 *
-	 * <p>
-	 * <img class="marble" src="doc-files/marbles/doOnSuccessOrError.svg" alt="">
-	 * <p>
-	 * The {@link BiConsumer} is executed before propagating either onNext, onComplete or onError downstream.
-	 *
-	 * @param onSuccessOrError the callback to call {@link Subscriber#onNext}, {@link Subscriber#onComplete} without preceding {@link Subscriber#onNext} or {@link Subscriber#onError}
-	 *
-	 * @return a new {@link Mono}
-	 * @deprecated prefer using {@link #doOnNext(Consumer)}, {@link #doOnError(Consumer)}, {@link #doOnTerminate(Runnable)} or {@link #doOnSuccess(Consumer)}. will be removed in 3.5.0
-	 */
-	@Deprecated
-	public final Mono<T> doOnSuccessOrError(BiConsumer<? super T, Throwable> onSuccessOrError) {
-		Objects.requireNonNull(onSuccessOrError, "onSuccessOrError");
-		return doOnTerminalSignal(this, v -> onSuccessOrError.accept(v, null), e -> onSuccessOrError.accept(null, e), null);
-	}
-
-	/**
 	 * Add behavior triggered when the {@link Mono} terminates, either by completing with a value,
 	 * completing empty or failing with an error. Unlike in {@link Flux#doOnTerminate(Runnable)},
 	 * the simple fact that a {@link Mono} emits {@link Subscriber#onNext(Object) onNext} implies
@@ -2858,7 +2853,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * Map this {@link Mono} into {@link reactor.util.function.Tuple2 Tuple2&lt;Long, T&gt;}
+	 * Map this {@link Mono} into {@link Tuple2 Tuple2&lt;Long, T&gt;}
 	 * of timemillis and source data. The timemillis corresponds to the elapsed time between
 	 * the subscribe and the first next signal, as measured by the {@link Schedulers#parallel() parallel} scheduler.
 	 *
@@ -2873,7 +2868,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * Map this {@link Mono} sequence into {@link reactor.util.function.Tuple2 Tuple2&lt;Long, T&gt;}
+	 * Map this {@link Mono} sequence into {@link Tuple2 Tuple2&lt;Long, T&gt;}
 	 * of timemillis and source data. The timemillis corresponds to the elapsed time between the subscribe and the first
 	 * next signal, as measured by the provided {@link Scheduler}.
 	 *
@@ -3205,6 +3200,11 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * output sink for each onNext. At most one {@link SynchronousSink#next(Object)}
 	 * call must be performed and/or 0 or 1 {@link SynchronousSink#error(Throwable)} or
 	 * {@link SynchronousSink#complete()}.
+	 * <p>
+	 * When the <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * is available at runtime and the downstream {@link ContextView} is not empty, this operator implicitly uses the
+	 * library to restore thread locals around the handler {@link BiConsumer}. Typically, this would be done in conjunction
+	 * with the use of {@link #contextCapture()} operator down the chain.
 	 *
 	 * @param handler the handling {@link BiConsumer}
 	 * @param <R> the transformed type
@@ -3478,7 +3478,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * The name serves as a prefix in the reported metrics names. In case no name has been provided, the default name "reactor" will be applied.
 	 * <p>
 	 * The {@link MeterRegistry} used by reactor can be configured via
-	 * {@link reactor.util.Metrics.MicrometerConfiguration#useRegistry(MeterRegistry)}
+	 * {@link Metrics.MicrometerConfiguration#useRegistry(MeterRegistry)}
 	 * prior to using this operator, the default being
 	 * {@link io.micrometer.core.instrument.Metrics#globalRegistry}.
 	 * </p>
@@ -3487,7 +3487,10 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 *
 	 * @see #name(String)
 	 * @see #tag(String, String)
+	 * @deprecated Prefer using the {@link #tap(SignalListenerFactory)} with the {@link SignalListenerFactory} provided by
+	 * the new reactor-core-micrometer module. To be removed in 3.6.0 at the earliest.
 	 */
+	@Deprecated
 	public final Mono<T> metrics() {
 		if (!Metrics.isInstrumentationAvailable()) {
 			return this;
@@ -3503,7 +3506,8 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * Give a name to this sequence, which can be retrieved using {@link Scannable#name()}
 	 * as long as this is the first reachable {@link Scannable#parents()}.
 	 * <p>
-	 * If {@link #metrics()} operator is called later in the chain, this name will be used as a prefix for meters' name.
+	 * The name is typically visible at assembly time by the {@link #tap(SignalListenerFactory)} operator,
+	 * which could for example be configured with a metrics listener using the name as a prefix for meters' id.
 	 *
 	 * @param name a name for the sequence
 	 *
@@ -3556,6 +3560,52 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
+	 * Simply complete the sequence by replacing an {@link Subscriber#onError(Throwable) onError signal}
+	 * with an {@link Subscriber#onComplete() onComplete signal}. All other signals are propagated as-is.
+	 *
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/onErrorCompleteForMono.svg" alt="">
+	 *
+	 * @return a new {@link Mono} falling back on completion when an onError occurs
+	 * @see #onErrorReturn(Object)
+	 */
+	public final Mono<T> onErrorComplete() {
+		return onAssembly(new MonoOnErrorReturn<>(this, null, null));
+	}
+
+	/**
+	 * Simply complete the sequence by replacing an {@link Subscriber#onError(Throwable) onError signal}
+	 * with an {@link Subscriber#onComplete() onComplete signal} if the error matches the given
+	 * {@link Class}. All other signals, including non-matching onError, are propagated as-is.
+	 *
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/onErrorCompleteForMono.svg" alt="">
+	 *
+	 * @return a new {@link Mono} falling back on completion when a matching error occurs
+	 * @see #onErrorReturn(Class, Object)
+	 */
+	public final Mono<T> onErrorComplete(Class<? extends Throwable> type) {
+		Objects.requireNonNull(type, "type must not be null");
+		return onErrorComplete(type::isInstance);
+	}
+
+	/**
+	 * Simply complete the sequence by replacing an {@link Subscriber#onError(Throwable) onError signal}
+	 * with an {@link Subscriber#onComplete() onComplete signal} if the error matches the given
+	 * {@link Predicate}. All other signals, including non-matching onError, are propagated as-is.
+	 *
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/onErrorCompleteForMono.svg" alt="">
+	 *
+	 * @return a new {@link Mono} falling back on completion when a matching error occurs
+	 * @see #onErrorReturn(Predicate, Object)
+	 */
+	public final Mono<T> onErrorComplete(Predicate<? super Throwable> predicate) {
+		Objects.requireNonNull(predicate, "predicate must not be null");
+		return onAssembly(new MonoOnErrorReturn<>(this, predicate, null));
+	}
+
+	/**
 	 * Let compatible operators <strong>upstream</strong> recover from errors by dropping the
 	 * incriminating element from the sequence and continuing with subsequent elements.
 	 * The recovered error and associated value are notified via the provided {@link BiConsumer}.
@@ -3591,7 +3641,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	public final Mono<T> onErrorContinue(BiConsumer<Throwable, Object> errorConsumer) {
 		BiConsumer<Throwable, Object> genericConsumer = errorConsumer;
-		return subscriberContext(Context.of(
+		return contextWrite(Context.of(
 				OnNextFailureStrategy.KEY_ON_NEXT_ERROR_STRATEGY,
 				OnNextFailureStrategy.resume(genericConsumer)
 		));
@@ -3681,7 +3731,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 		@SuppressWarnings("unchecked")
 		Predicate<Throwable> genericPredicate = (Predicate<Throwable>) errorPredicate;
 		BiConsumer<Throwable, Object> genericErrorConsumer = errorConsumer;
-		return subscriberContext(Context.of(
+		return contextWrite(Context.of(
 				OnNextFailureStrategy.KEY_ON_NEXT_ERROR_STRATEGY,
 				OnNextFailureStrategy.resumeIf(genericPredicate, genericErrorConsumer)
 		));
@@ -3698,7 +3748,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * was used downstream
 	 */
 	public final Mono<T> onErrorStop() {
-		return subscriberContext(Context.of(
+		return contextWrite(Context.of(
 				OnNextFailureStrategy.KEY_ON_NEXT_ERROR_STRATEGY,
 				OnNextFailureStrategy.stop()));
 	}
@@ -3815,12 +3865,14 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/onErrorReturnForMono.svg" alt="">
 	 *
-	 * @param fallback the value to emit if an error occurs
+	 * @param fallbackValue the value to emit if an error occurs
 	 *
 	 * @return a new falling back {@link Mono}
+	 * @see #onErrorComplete()
 	 */
-	public final Mono<T> onErrorReturn(final T fallback) {
-		return onErrorResume(throwable -> just(fallback));
+	public final Mono<T> onErrorReturn(final T fallbackValue) {
+		Objects.requireNonNull(fallbackValue, "fallbackValue must not be null");
+		return onAssembly(new MonoOnErrorReturn<>(this, null, fallbackValue));
 	}
 
 	/**
@@ -3834,9 +3886,12 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @param <E> the error type
 	 *
 	 * @return a new falling back {@link Mono}
+	 * @see #onErrorComplete(Class)
 	 */
 	public final <E extends Throwable> Mono<T> onErrorReturn(Class<E> type, T fallbackValue) {
-		return onErrorResume(type, throwable -> just(fallbackValue));
+		Objects.requireNonNull(type, "type must not be null");
+		Objects.requireNonNull(fallbackValue, "fallbackValue must not be null");
+		return onErrorReturn(type::isInstance, fallbackValue);
 	}
 
 	/**
@@ -3849,9 +3904,12 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * @param fallbackValue the value to emit if an error occurs that matches the predicate
 	 *
 	 * @return a new {@link Mono}
+	 * @see #onErrorComplete(Predicate)
 	 */
 	public final Mono<T> onErrorReturn(Predicate<? super Throwable> predicate, T fallbackValue) {
-		return onErrorResume(predicate,  throwable -> just(fallbackValue));
+		Objects.requireNonNull(predicate, "predicate must not be null");
+		Objects.requireNonNull(fallbackValue, "fallbackValue must not be null");
+		return onAssembly(new MonoOnErrorReturn<>(this, predicate, fallbackValue));
 	}
 
 	/**
@@ -4057,9 +4115,11 @@ public abstract class Mono<T> implements CorePublisher<T> {
 				return repeatFactory.apply(o.index().map(Tuple2::getT1));
 			}
 			else {
-				return repeatFactory.apply(o.index().map(Tuple2::getT1)
-						.take(maxRepeat)
-						.concatWith(Flux.error(() -> new IllegalStateException("Exceeded maximum number of repeats"))));
+				return repeatFactory.apply(o
+					.index()
+					.map(Tuple2::getT1)
+					.take(maxRepeat, false)
+					.concatWith(Flux.error(() -> new IllegalStateException("Exceeded maximum number of repeats"))));
 			}
 		}).next());
 	}
@@ -4097,7 +4157,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * The companion is generated by the provided {@link Retry} instance, see {@link Retry#max(long)}, {@link Retry#maxInARow(long)}
 	 * and {@link Retry#backoff(long, Duration)} for readily available strategy builders.
 	 * <p>
-	 * The operator generates a base for the companion, a {@link Flux} of {@link reactor.util.retry.Retry.RetrySignal}
+	 * The operator generates a base for the companion, a {@link Flux} of {@link Retry.RetrySignal}
 	 * which each give metadata about each retryable failure whenever this {@link Mono} signals an error. The final companion
 	 * should be derived from that base companion and emit data in response to incoming onNext (although it can emit less
 	 * elements, or delay the emissions).
@@ -4107,11 +4167,11 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/retryWhenSpecForMono.svg" alt="">
 	 * <p>
-	 * Note that the {@link reactor.util.retry.Retry.RetrySignal} state can be transient and change between each source
+	 * Note that the {@link Retry.RetrySignal} state can be transient and change between each source
 	 * {@link org.reactivestreams.Subscriber#onError(Throwable) onError} or
 	 * {@link org.reactivestreams.Subscriber#onNext(Object) onNext}. If processed with a delay,
 	 * this could lead to the represented state being out of sync with the state at which the retry
-	 * was evaluated. Map it to {@link reactor.util.retry.Retry.RetrySignal#copy()} right away to mediate this.
+	 * was evaluated. Map it to {@link Retry.RetrySignal#copy()} right away to mediate this.
 	 * <p>
 	 * Note that if the companion {@link Publisher} created by the {@code whenFactory}
 	 * emits {@link Context} as trigger objects, these {@link Context} will be merged with
@@ -4136,7 +4196,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * </blockquote>
 	 *
 	 * @param retrySpec the {@link Retry} strategy that will generate the companion {@link Publisher},
-	 * given a {@link Flux} that signals each onError as a {@link reactor.util.retry.Retry.RetrySignal}.
+	 * given a {@link Flux} that signals each onError as a {@link Retry.RetrySignal}.
 	 *
 	 * @return a {@link Mono} that retries on onError when a companion {@link Publisher} produces an onNext signal
 	 * @see Retry#max(long)
@@ -4171,7 +4231,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 
 	/**
 	 * Expect exactly one item from this {@link Mono} source or signal
-	 * {@link java.util.NoSuchElementException} for an empty source.
+	 * {@link NoSuchElementException} for an empty source.
 	 * <p>
 	 * <img class="marble" src="doc-files/marbles/singleForMono.svg" alt="">
 	 * <p>
@@ -4206,6 +4266,37 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
+	 * Wrap the item produced by this {@link Mono} source into an Optional
+	 * or emit an empty Optional for an empty source.
+	 * <p>
+	 * <img class="marble" src="doc-files/marbles/singleOptional.svg" alt="">
+	 * <p>
+	 *
+	 * @return a {@link Mono} with an Optional containing the item, an empty optional or an error signal
+	 */
+	public final Mono<Optional<T>> singleOptional() {
+		if (this instanceof Callable) {
+			if (this instanceof Fuseable.ScalarCallable) {
+				@SuppressWarnings("unchecked")
+				Fuseable.ScalarCallable<T> scalarCallable = (Fuseable.ScalarCallable<T>) this;
+
+				T v;
+				try {
+					v = scalarCallable.call();
+				}
+				catch (Exception e) {
+					return Mono.error(Exceptions.unwrap(e));
+				}
+				return Mono.just(Optional.ofNullable(v));
+			}
+			@SuppressWarnings("unchecked")
+			Callable<T> thiz = (Callable<T>)this;
+			return Mono.onAssembly(new MonoSingleOptionalCallable<>(thiz));
+		}
+		return Mono.onAssembly(new MonoSingleOptional<>(this));
+	}
+
+	/**
 	 * Subscribe to this {@link Mono} and request unbounded demand.
 	 * <p>
 	 * This version doesn't specify any consumption behavior for the events from the
@@ -4236,7 +4327,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * Subscribe a {@link Consumer} to this {@link Mono} that will consume all the
 	 * sequence. It will request an unbounded demand ({@code Long.MAX_VALUE}).
 	 * <p>
-	 * For a passive version that observe and forward incoming data see {@link #doOnNext(java.util.function.Consumer)}.
+	 * For a passive version that observe and forward incoming data see {@link #doOnNext(Consumer)}.
 	 * <p>
 	 * Keep in mind that since the sequence can be asynchronous, this will immediately
 	 * return control to the calling thread. This can give the impression the consumer is
@@ -4260,7 +4351,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * The subscription will request an unbounded demand ({@code Long.MAX_VALUE}).
 	 * <p>
 	 * For a passive version that observe and forward incoming data see {@link #doOnSuccess(Consumer)} and
-	 * {@link #doOnError(java.util.function.Consumer)}.
+	 * {@link #doOnError(Consumer)}.
 	 * <p>
 	 * Keep in mind that since the sequence can be asynchronous, this will immediately
 	 * return control to the calling thread. This can give the impression the consumer is
@@ -4285,7 +4376,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * will request unbounded demand ({@code Long.MAX_VALUE}).
 	 * <p>
 	 * For a passive version that observe and forward incoming data see {@link #doOnSuccess(Consumer)} and
-	 * {@link #doOnError(java.util.function.Consumer)}.
+	 * {@link #doOnError(Consumer)}.
 	 * <p>
 	 * Keep in mind that since the sequence can be asynchronous, this will immediately
 	 * return control to the calling thread. This can give the impression the consumer is
@@ -4315,7 +4406,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * {@code Long.MAX_VALUE} if no such consumer is provided.
 	 * <p>
 	 * For a passive version that observe and forward incoming data see {@link #doOnSuccess(Consumer)} and
-	 * {@link #doOnError(java.util.function.Consumer)}.
+	 * {@link #doOnError(Consumer)}.
 	 * <p>
 	 * Keep in mind that since the sequence can be asynchronous, this will immediately
 	 * return control to the calling thread. This can give the impression the consumer is
@@ -4347,7 +4438,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 * is tied to the subscription. At subscription, an unbounded request is implicitly made.
 	 * <p>
 	 * For a passive version that observe and forward incoming data see {@link #doOnSuccess(Consumer)} and
-	 * {@link #doOnError(java.util.function.Consumer)}.
+	 * {@link #doOnError(Consumer)}.
 	 * <p>
 	 * Keep in mind that since the sequence can be asynchronous, this will immediately
 	 * return control to the calling thread. This can give the impression the consumer is
@@ -4377,6 +4468,10 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	public final void subscribe(Subscriber<? super T> actual) {
 		CorePublisher publisher = Operators.onLastAssembly(this);
 		CoreSubscriber subscriber = Operators.toCoreSubscriber(actual);
+
+		if (subscriber instanceof Fuseable.QueueSubscription && this != publisher && this instanceof Fuseable && !(publisher instanceof Fuseable)) {
+			subscriber = new FluxHide.SuppressFuseableSubscriber<>(subscriber);
+		}
 
 		try {
 			if (publisher instanceof OptimizableOperator) {
@@ -4418,55 +4513,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	public abstract void subscribe(CoreSubscriber<? super T> actual);
 
 	/**
-	 * Enrich a potentially empty downstream {@link Context} by adding all values
-	 * from the given {@link Context}, producing a new {@link Context} that is propagated
-	 * upstream.
-	 * <p>
-	 * The {@link Context} propagation happens once per subscription (not on each onNext):
-	 * it is done during the {@code subscribe(Subscriber)} phase, which runs from
-	 * the last operator of a chain towards the first.
-	 * <p>
-	 * So this operator enriches a {@link Context} coming from under it in the chain
-	 * (downstream, by default an empty one) and makes the new enriched {@link Context}
-	 * visible to operators above it in the chain.
-	 *
-	 * @param mergeContext the {@link Context} to merge with a previous {@link Context}
-	 * state, returning a new one.
-	 *
-	 * @return a contextualized {@link Mono}
-	 * @see Context
-	 * @deprecated Use {@link #contextWrite(ContextView)} instead. To be removed in 3.5.0.
-	 */
-	@Deprecated
-	public final Mono<T> subscriberContext(Context mergeContext) {
-		return subscriberContext(c -> c.putAll(mergeContext.readOnly()));
-	}
-
-	/**
-	 * Enrich a potentially empty downstream {@link Context} by applying a {@link Function}
-	 * to it, producing a new {@link Context} that is propagated upstream.
-	 * <p>
-	 * The {@link Context} propagation happens once per subscription (not on each onNext):
-	 * it is done during the {@code subscribe(Subscriber)} phase, which runs from
-	 * the last operator of a chain towards the first.
-	 * <p>
-	 * So this operator enriches a {@link Context} coming from under it in the chain
-	 * (downstream, by default an empty one) and makes the new enriched {@link Context}
-	 * visible to operators above it in the chain.
-	 *
-	 * @param doOnContext the function taking a previous {@link Context} state
-	 *  and returning a new one.
-	 *
-	 * @return a contextualized {@link Mono}
-	 * @see Context
-	 * @deprecated Use {@link #contextWrite(Function)} instead. To be removed in 3.5.0.
-	 */
-	@Deprecated
-	public final Mono<T> subscriberContext(Function<Context, Context> doOnContext) {
-		return new MonoContextWrite<>(this, doOnContext);
-	}
-
-	/**
 	 * Run subscribe, onSubscribe and request on a specified {@link Scheduler}'s {@link Worker}.
 	 * As such, placing this operator anywhere in the chain will also impact the execution
 	 * context of onNext/onError/onComplete signals from the beginning of the chain up to
@@ -4504,7 +4550,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 
 	/**
 	 * Subscribe the given {@link Subscriber} to this {@link Mono} and return said
-	 * {@link Subscriber} (eg. a {@link MonoProcessor}).
+	 * {@link Subscriber}, allowing subclasses with a richer API to be used fluently.
 	 *
 	 * @param subscriber the {@link Subscriber} to subscribe with
 	 * @param <E> the reified type of the {@link Subscriber} for chaining
@@ -4534,11 +4580,10 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	/**
 	 * Tag this mono with a key/value pair. These can be retrieved as a {@link Set} of
 	 * all tags throughout the publisher chain by using {@link Scannable#tags()} (as
-	 * traversed
-	 * by {@link Scannable#parents()}).
+	 * traversed by {@link Scannable#parents()}).
 	 * <p>
-	 * Note that some monitoring systems like Prometheus require to have the exact same set of
-	 * tags for each meter bearing the same name.
+	 * The name is typically visible at assembly time by the {@link #tap(SignalListenerFactory)} operator,
+	 * which could for example be configured with a metrics listener applying the tag(s) to its meters.
 	 *
 	 * @param key a tag key
 	 * @param value a tag value
@@ -4604,6 +4649,114 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	public final Mono<T> takeUntilOther(Publisher<?> other) {
 		return onAssembly(new MonoTakeUntilOther<>(this, other));
+	}
+
+	/**
+	 * Tap into Reactive Streams signals emitted or received by this {@link Mono} and notify a stateful per-{@link Subscriber}
+	 * {@link SignalListener}.
+	 * <p>
+	 * Any exception thrown by the {@link SignalListener} methods causes the subscription to be cancelled
+	 * and the subscriber to be terminated with an {@link Subscriber#onError(Throwable) onError signal} of that
+	 * exception. Note that {@link SignalListener#doFinally(SignalType)}, {@link SignalListener#doAfterComplete()} and
+	 * {@link SignalListener#doAfterError(Throwable)} instead just {@link Operators#onErrorDropped(Throwable, Context) drop}
+	 * the exception.
+	 * <p>
+	 * This simplified variant assumes the state is purely initialized within the {@link Supplier},
+	 * as it is called for each incoming {@link Subscriber} without additional context.
+	 * <p>
+	 * When the <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * is available at runtime and the downstream {@link ContextView} is not empty, this operator implicitly uses the library
+	 * to restore thread locals around all invocations of {@link SignalListener} methods. Typically, this would be done
+	 * in conjunction with the use of {@link #contextCapture()} operator down the chain.
+	 *
+	 * @param simpleListenerGenerator the {@link Supplier} to create a new {@link SignalListener} on each subscription
+	 * @return a new {@link Mono} with side effects defined by generated {@link SignalListener}
+	 * @see #tap(Function)
+	 * @see #tap(SignalListenerFactory)
+	 */
+	public final Mono<T> tap(Supplier<SignalListener<T>> simpleListenerGenerator) {
+		return tap(new SignalListenerFactory<T, Void>() {
+			@Override
+			public Void initializePublisherState(Publisher<? extends T> ignored) {
+				return null;
+			}
+
+			@Override
+			public SignalListener<T> createListener(Publisher<? extends T> ignored1, ContextView ignored2, Void ignored3) {
+				return simpleListenerGenerator.get();
+			}
+		});
+	}
+
+	/**
+	 * Tap into Reactive Streams signals emitted or received by this {@link Mono} and notify a stateful per-{@link Subscriber}
+	 * {@link SignalListener}.
+	 * <p>
+	 * Any exception thrown by the {@link SignalListener} methods causes the subscription to be cancelled
+	 * and the subscriber to be terminated with an {@link Subscriber#onError(Throwable) onError signal} of that
+	 * exception. Note that {@link SignalListener#doFinally(SignalType)}, {@link SignalListener#doAfterComplete()} and
+	 * {@link SignalListener#doAfterError(Throwable)} instead just {@link Operators#onErrorDropped(Throwable, Context) drop}
+	 * the exception.
+	 * <p>
+	 * This simplified variant allows the {@link SignalListener} to be constructed for each subscription
+	 * with access to the incoming {@link Subscriber}'s {@link ContextView}.
+	 * <p>
+	 * When the <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * is available at runtime and the {@link ContextView} is not empty, this operator implicitly uses the library
+	 * to restore thread locals around all invocations of {@link SignalListener} methods. Typically, this would be done
+	 * in conjunction with the use of {@link #contextCapture()} operator down the chain.
+	 *
+	 * @param listenerGenerator the {@link Function} to create a new {@link SignalListener} on each subscription
+	 * @return a new {@link Mono} with side effects defined by generated {@link SignalListener}
+	 * @see #tap(Supplier)
+	 * @see #tap(SignalListenerFactory)
+	 */
+	public final Mono<T> tap(Function<ContextView, SignalListener<T>> listenerGenerator) {
+		return tap(new SignalListenerFactory<T, Void>() {
+			@Override
+			public Void initializePublisherState(Publisher<? extends T> ignored) {
+				return null;
+			}
+
+			@Override
+			public SignalListener<T> createListener(Publisher<? extends T> ignored1, ContextView listenerContext, Void ignored2) {
+				return listenerGenerator.apply(listenerContext);
+			}
+		});
+	}
+
+	/**
+	 * Tap into Reactive Streams signals emitted or received by this {@link Mono} and notify a stateful per-{@link Subscriber}
+	 * {@link SignalListener} created by the provided {@link SignalListenerFactory}.
+	 * <p>
+	 * The factory will initialize a {@link SignalListenerFactory#initializePublisherState(Publisher) state object} for
+	 * each {@link Flux} or {@link Mono} instance it is used with, and that state will be cached and exposed for each
+	 * incoming {@link Subscriber} in order to generate the associated {@link SignalListenerFactory#createListener(Publisher, ContextView, Object) listener}.
+	 * <p>
+	 * Any exception thrown by the {@link SignalListener} methods causes the subscription to be cancelled
+	 * and the subscriber to be terminated with an {@link Subscriber#onError(Throwable) onError signal} of that
+	 * exception. Note that {@link SignalListener#doFinally(SignalType)}, {@link SignalListener#doAfterComplete()} and
+	 * {@link SignalListener#doAfterError(Throwable)} instead just {@link Operators#onErrorDropped(Throwable, Context) drop}
+	 * the exception.
+	 * <p>
+	 * When the <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * is available at runtime and the downstream {@link ContextView} is not empty, this operator implicitly uses the library
+	 * to restore thread locals around all invocations of {@link SignalListener} methods. Typically, this would be done
+	 * in conjunction with the use of {@link #contextCapture()} operator down the chain.
+	 *
+	 * @param listenerFactory the {@link SignalListenerFactory} to create a new {@link SignalListener} on each subscription
+	 * @return a new {@link Mono} with side effects defined by generated {@link SignalListener}
+	 * @see #tap(Supplier)
+	 * @see #tap(Function)
+	 */
+	public final Mono<T> tap(SignalListenerFactory<T, ?> listenerFactory) {
+		if (ContextPropagationSupport.shouldPropagateContextToThreadLocals()) {
+			return onAssembly(new MonoTapRestoringThreadLocals<>(this, listenerFactory));
+		}
+		if (this instanceof Fuseable) {
+			return onAssembly(new MonoTapFuseable<>(this, listenerFactory));
+		}
+		return onAssembly(new MonoTap<>(this, listenerFactory));
 	}
 
 	/**
@@ -4871,7 +5024,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * If this {@link Mono} is valued, emit a {@link reactor.util.function.Tuple2} pair of
+	 * If this {@link Mono} is valued, emit a {@link Tuple2} pair of
 	 * T1 the current clock time in millis (as a {@link Long} measured by the
 	 * {@link Schedulers#parallel() parallel} Scheduler) and T2 the emitted data (as a {@code T}).
 	 *
@@ -4886,7 +5039,7 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	}
 
 	/**
-	 * If this {@link Mono} is valued, emit a {@link reactor.util.function.Tuple2} pair of
+	 * If this {@link Mono} is valued, emit a {@link Tuple2} pair of
 	 * T1 the current clock time in millis (as a {@link Long} measured by the
 	 * provided {@link Scheduler}) and T2 the emitted data (as a {@code T}).
 	 *
@@ -4918,26 +5071,6 @@ public abstract class Mono<T> implements CorePublisher<T> {
 	 */
 	public final CompletableFuture<T> toFuture() {
 		return subscribeWith(new MonoToCompletableFuture<>(false));
-	}
-
-	/**
-	 * Wrap this {@link Mono} into a {@link MonoProcessor} (turning it hot and allowing to block,
-	 * cancel, as well as many other operations). Note that the {@link MonoProcessor}
-	 * is subscribed to its parent source if any.
-	 *
-	 * @return a {@link MonoProcessor} to use to either retrieve value or cancel the underlying {@link Subscription}
-	 * @deprecated prefer {@link #share()} to share a parent subscription, or use {@link Sinks}
-	 */
-	@Deprecated
-	public final MonoProcessor<T> toProcessor() {
-		if (this instanceof MonoProcessor) {
-			return (MonoProcessor<T>) this;
-		}
-		else {
-			NextProcessor<T> result = new NextProcessor<>(this);
-			result.connect();
-			return result;
-		}
 	}
 
 	/**

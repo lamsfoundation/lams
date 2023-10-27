@@ -26,7 +26,7 @@ import reactor.util.annotation.Nullable;
 import reactor.util.function.Tuple2;
 
 /**
- * A {@link reactor.core.Fuseable} version of {@link FluxIndex}, an
+ * A {@link Fuseable} version of {@link FluxIndex}, an
  * operator that tags the values it passes through with their index in the original
  * sequence, either as their natural long index (0-based) or as a customized index
  * by way of a user-provided {@link BiFunction}. The resulting sequence is one of

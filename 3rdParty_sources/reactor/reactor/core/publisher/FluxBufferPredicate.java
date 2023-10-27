@@ -40,7 +40,7 @@ import reactor.util.context.Context;
 
 /**
  * Buffers elements into custom collections where the buffer boundary is determined by
- * a {@link java.util.function.Predicate} on the values. The predicate can be used in
+ * a {@link Predicate} on the values. The predicate can be used in
  * several modes:
  * <ul>
  *     <li>{@code Until}: A new buffer starts when the predicate returns true. The

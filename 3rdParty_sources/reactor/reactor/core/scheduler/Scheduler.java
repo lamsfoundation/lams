@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 package reactor.core.scheduler;
 
-import java.util.concurrent.Executor;
+import reactor.core.Disposable;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import reactor.core.Disposable;
-import reactor.core.Exceptions;
 
 /**
  * Provides an abstract asynchronous boundary to operators.
@@ -128,14 +129,33 @@ public interface Scheduler extends Disposable {
 	 * Instructs this Scheduler to release all resources and reject
 	 * any new tasks to be executed.
 	 *
-	 * <p>The operation is thread-safe but one should avoid using
-	 * start() and dispose() concurrently as it would non-deterministically
-	 * leave the Scheduler in either active or inactive state.
+	 * <p>The operation is thread-safe.
 	 *
 	 * <p>The Scheduler may choose to ignore this instruction.
-	 *
+	 * <p>When used in combination with {@link #disposeGracefully()}
+	 * there are no guarantees that all resources will be forcefully shutdown.
+	 * When a graceful disposal has started, the references to the underlying
+	 * {@link java.util.concurrent.Executor}s might have already been lost.
 	 */
 	default void dispose() {
+	}
+
+	/**
+	 * Lazy variant of {@link #dispose()} that also allows for graceful cleanup
+	 * of underlying resources.
+	 * <p>It is advised to apply a {@link Mono#timeout(Duration)} operator to the
+	 * resulting {@link Mono}.
+	 * <p>The returned {@link Mono} can be {@link Mono#retry(long) retried} in case of
+	 * {@link java.util.concurrent.TimeoutException timeout errors}. It can also be
+	 * followed by a call to {@link #dispose()} to issue a forceful shutdown of
+	 * underlying resources.
+	 *
+	 * @return {@link Mono} which upon subscription initiates the graceful dispose
+	 * procedure. If the disposal is successful, the returned {@link Mono} completes
+	 * without an error.
+	 */
+	default Mono<Void> disposeGracefully() {
+		return Mono.fromRunnable(this::dispose);
 	}
 
 	/**
@@ -145,8 +165,27 @@ public interface Scheduler extends Disposable {
 	 * <p>The operation is thread-safe but one should avoid using
 	 * start() and dispose() concurrently as it would non-deterministically
 	 * leave the Scheduler in either active or inactive state.
+	 *
+	 * @deprecated Use {@link #init()} instead. The use of this method is discouraged.
+	 * Some implementations allowed restarting a Scheduler, while others did not. One
+	 * of the issues with restarting is that checking
+	 * {@link #isDisposed() the disposed state} is unreliable in concurrent scenarios.
+	 * @see #init()
 	 */
+	@Deprecated
 	default void start() {
+	}
+
+	/**
+	 * Instructs this Scheduler to prepare itself for running tasks
+	 * directly or through its {@link Worker}s.
+	 *
+	 * <p>Implementations are encouraged to throw an exception if this method is called
+	 * after the scheduler has been disposed via {@link #dispose()}
+	 * or {@link #disposeGracefully()}.
+	 */
+	default void init() {
+		start();
 	}
 
 	/**

@@ -79,8 +79,8 @@ final class MonoIgnorePublisher<T> extends Mono<T> implements Scannable,
 
 	@Override
 	@Nullable
-	public Object scanUnsafe(Scannable.Attr key) {
-		if (key == Scannable.Attr.PARENT) {
+	public Object scanUnsafe(Attr key) {
+		if (key == Attr.PARENT) {
 			return source;
 		}
 		if (key == Attr.RUN_STYLE) {
