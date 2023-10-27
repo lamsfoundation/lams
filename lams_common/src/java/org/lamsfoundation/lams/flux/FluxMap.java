@@ -26,7 +26,7 @@ public class FluxMap<T, U> {
     public static final int SHORT_THROTTLE = 5;
     public static final int STANDARD_THROTTLE = 10;
     public static final int LONG_THROTTLE = 30;
-    public static final int STANDARD_TIMEOUT = 60;
+    public static final int STANDARD_TIMEOUT = 3 * 60;
 
     private final Map<T, Flux<U>> map;
 

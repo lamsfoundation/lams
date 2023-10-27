@@ -1446,6 +1446,8 @@ function closeIntroductionDialog() {
  * Updates learner progress in sequence tab
  */
 function updateSequenceTab() {
+	clearEventSources();
+
 	drawLessonCompletionChart();
 
 	sequenceCanvas = $('#sequenceCanvas');
@@ -3089,6 +3091,7 @@ function openEventSource(url, onMessageFunction) {
 	const eventSource = new EventSource(url);
 	eventSources.push(eventSource);
 	eventSource.onmessage = onMessageFunction;
+	return eventSource;
 }
 
 function clearEventSources() {
