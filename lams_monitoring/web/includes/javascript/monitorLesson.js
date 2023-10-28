@@ -14,6 +14,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	learnersTabSortedByProgress = false,
 // currently opened EventSources
 	eventSources = [],
+
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
@@ -23,7 +24,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	popupWidth = 1280,
 	popupHeight = 720,
 
-// cached gate icon data 
+// cached gate icon data
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
 	gateOpenIconData   = null,
 
@@ -347,7 +348,7 @@ function initCommonElements(){
 
 	$('#openImButton').click(openChatWindow);
 
-	//enable renaming of lesson title  
+	//enable renaming of lesson title
 	$('#lesson-name').editable({
 		type: 'text',
 		pk: lessonId,
@@ -856,6 +857,7 @@ function applyStateChange(state, method, newLessonEndDate) {
 	if (newLessonEndDate) {
 		params.lessonEndDate = newLessonEndDate;
 	}
+
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
 		data: params,
@@ -1446,8 +1448,6 @@ function closeIntroductionDialog() {
  * Updates learner progress in sequence tab
  */
 function updateSequenceTab() {
-	clearEventSources();
-
 	drawLessonCompletionChart();
 
 	sequenceCanvas = $('#sequenceCanvas');
@@ -1605,6 +1605,18 @@ function updateSequenceTab() {
 				$.each(response.timeLimits, function(){
 					// it is a list of tool content IDs to which the dashboard will react and update time limits
 					timeLimitFluxUrl += 'toolContentIds=' + this.toolContentId + '&';
+				});
+
+				// remove from eventSources items which contain "getTimeUpdateFlux" in the URL
+				$.each(eventSources, function(index, eventSource){
+					if (eventSource.url.indexOf('getTimeLimitUpdateFlux.do') > -1) {
+						try {
+							eventSource.close();
+						} catch(e) {
+							console.error("Error while closing Event Source", e);
+						}
+						eventSources.splice(index, 1);
+					}
 				});
 
 				openEventSource(timeLimitFluxUrl,
@@ -2369,7 +2381,7 @@ function fillClassList(role, disableCreator) {
  * Adds/removes a Learner/Monitor to/from the class.
  */
 function editClassMember(userCheckbox){
-	var data = {
+	var data={
 		'lessonID' : lessonId,
 		'userID'   : userCheckbox.closest('.dialogListItem').attr('userId'),
 		'role'     : userCheckbox.parents('table.dialogTable')
@@ -3087,7 +3099,15 @@ function dblTap(elem, dblClickFunction) {
 	});
 }
 
-function openEventSource(url, onMessageFunction) {
+function openEventSource(url, onMessageFunction, skipExisting) {
+	if (skipExisting) {
+		for (let i = 0; i < eventSources.length; i++) {
+			if (eventSources[i].url === url) {
+				return eventSources[i];
+			}
+		}
+	}
+
 	const eventSource = new EventSource(url);
 	eventSources.push(eventSource);
 	eventSource.onmessage = onMessageFunction;
