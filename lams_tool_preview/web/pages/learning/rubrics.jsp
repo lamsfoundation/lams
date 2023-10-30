@@ -30,9 +30,6 @@
 		margin-bottom: 15px;
 		float: right;
 	}
-	.rubrics-user-card .collapsable-icon-left button, .collapsable-icon-left button:after {
-		color: inherit !important;
-	}
 	
 	.lcard {
 		margin-bottom: 1.25rem;
@@ -118,9 +115,9 @@
 
 	<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 			
-	    <div class="card lcard rubrics-user-card mt-2">
+	    <div class="card lcard rubrics-user-card">
 	       <div class="card-header collapsable-icon-left" id="heading${ratingDto.itemId}">
-	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
+	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
 						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-cards"
 				>
 					<lams:Portrait userId="${ratingDto.itemId}" hover="false" />

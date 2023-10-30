@@ -26,9 +26,6 @@
 	#expand-all-button {
 		margin-bottom: 15px;
 		float: right;
-	}	
-	.rubrics-row-card .collapsable-icon-left button, .collapsable-icon-left button:after {
-		color: inherit !important;
 	}
 	
 	.lcard {
@@ -122,7 +119,7 @@
 		
 	    <div class="lcard card rubrics-row-card">
 	       <div class="card-header collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
-	       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
+	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
 						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-cards"
 				>
 					<%-- Criterion "row" --%>
