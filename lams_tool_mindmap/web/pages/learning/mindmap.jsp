@@ -111,7 +111,7 @@
 								
 								<c:when test="${reflectOnActivity}">
 									<button type="button" onclick="javascript:submitForm();" class="btn btn-primary na" id="continueButton">
-										   <span class="nextActivity"><fmt:message key="button.continue"/></span>
+										   <fmt:message key="button.continue"/>
 									</button>
 								</c:when>
 				

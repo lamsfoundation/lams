@@ -153,8 +153,8 @@
 						<button type="button" onclick="javascript:newCommentSubmit();"
 							class="btn btn-secondary btn-sm float-end" id="newCommentSubmitButton"
 						>
-							<i class="fa fa-comment me-1"></i>
 							<fmt:message key="label.post" />
+							<i class="fa-regular fa-paper-plane ms-1"></i>
 						</button>
 						<button type="button" onclick="javascript:clearNewForm();"
 							class="btn btn-secondary btn-sm float-end me-2"

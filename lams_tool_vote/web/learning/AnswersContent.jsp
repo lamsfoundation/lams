@@ -162,18 +162,19 @@
 			</div>
 
 			<!-- options  -->
+				<div class="card lcard">
+					<div class="card-body">
 			<fieldset>
 				<legend class="visually-hidden">
 					<fmt:message key="label.vote.nominations" />
 				</legend>
 			
-				<div class="table-responsive">
-					<div class="div-hover">
+					<div class="div-hover my-3">
 						<c:set var="count" value="0" scope="page" />
 						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 							<c:set var="count" value="${count + 1}" scope="page" />
 	
-							<div class="row">
+							<div class="row g-0">
 								<div class="col">
 									<div class="form-check">
 										<input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}" class="form-check-input"
@@ -188,7 +189,7 @@
 						</c:forEach>
 						
 						<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
-							<div class="row">
+							<div class="row g-0">
 								<div class="col input-group">
 									<label for="userEntry" class="input-group-text">
 										<fmt:message key="label.other" />:
@@ -198,8 +199,9 @@
 							</div>
 						</c:if>
 					</div>
-				</div>
 			</fieldset>
+					</div>
+				</div>
 			<!-- End options -->
 
 			<div class="activity-bottom-buttons">

@@ -77,8 +77,8 @@
 						</div>
 						<div id="sendMessageButtonCell" class="ms-2">
 							<button id="sendMessageButton" class="btn btn-secondary" type="button" onclick="javascript:sendChatToolMessage()">
-								<i class="fa-solid fa-comment fa-lg me-1"></i>
 								<fmt:message key="button.send"/>
+								<i class="fa-regular fa-paper-plane ms-1"></i>
 							</button>
 						</div>
 					</div>
@@ -100,8 +100,6 @@
 				</div>
 			</div>
 		</c:if>
-		
-
 		
 		<c:if test="${MODE == 'learner' || MODE == 'author'}">
 			<form action="openNotebook.do" method="post">
