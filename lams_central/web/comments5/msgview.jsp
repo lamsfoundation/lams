@@ -106,12 +106,12 @@
 				</c:if>
 
 				<hr class="msg-hr">
-				<div class="msg-footer">
+				<div class="float-end">
 					<c:if test='${not sessionMap.readOnly}'>
 						<c:set var="replytopic">
 							<lams:LAMSURL />comments/newReplyTopic.do?newUI=true&sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}
 						</c:set>
-						<button type="button" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="btn btn-sm btn-secondary comment">
+						<button type="button" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="btn btn-sm btn-light comment">
 							Reply
 						</button>
              			 &middot; 
@@ -121,7 +121,7 @@
 						<c:set var="edittopic">
 							<lams:LAMSURL />comments/editTopic.do?newUI=true&sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}
 						</c:set>
-						<button type="button" onclick="javascript:createEdit(${commentDto.comment.uid}, '${edittopic}');" class="btn btn-sm btn-secondary comment">
+						<button type="button" onclick="javascript:createEdit(${commentDto.comment.uid}, '${edittopic}');" class="btn btn-sm btn-light comment">
 							Edit
 						</button>
               			&middot; 

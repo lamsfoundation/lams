@@ -58,9 +58,10 @@
 			</div>
 		
 			<div id="uploadButtons" class="mt-3 float-end">
-			    <button type="button" onclick="javascript:cancelImageGalleryItem()" class="btn btn-sm btn-secondary me-2">
-					<i class="fa fa-cancel me-1"></i> <fmt:message key="label.cancel" /> 
+			    <button type="button" onclick="javascript:cancelImageGalleryItem()" class="btn btn-sm btn-secondary btn-icon-cancel me-2">
+					<fmt:message key="label.cancel" /> 
 				</button>
+				
 				<button type="button" id="addImageBtn" onclick="javascript:submitImageGalleryItem()" class="btn btn-sm btn-secondary button-add-item">
 					<i class="fa fa-upload me-1"></i> <fmt:message key="label.authoring.basic.add.image" /> 
 				</button>

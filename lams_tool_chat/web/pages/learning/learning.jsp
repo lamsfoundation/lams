@@ -76,9 +76,8 @@
 							<textarea id="sendMessageArea" rows="2" class="form-control shadow rounded" autofocus></textarea>
 						</div>
 						<div id="sendMessageButtonCell" class="ms-2">
-							<button id="sendMessageButton" class="btn btn-secondary" type="button" onclick="javascript:sendChatToolMessage()">
+							<button id="sendMessageButton" class="btn btn-secondary btn-icon-comment" type="button" onclick="javascript:sendChatToolMessage()">
 								<fmt:message key="button.send"/>
-								<i class="fa-regular fa-paper-plane ms-1"></i>
 							</button>
 						</div>
 					</div>

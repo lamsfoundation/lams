@@ -17,7 +17,7 @@
 	</c:when>
 
 	<c:otherwise>
-		<div class="form-check mt-2">
+		<div class="form-check form-check-reverse mt-2">
 			<input type="checkbox" id="${anonymousCheckboxName}" class="form-check-input"
 				name="${anonymousCheckboxName}" value="true" ${anonymousCheckboxChecked ? 'checked="checked"' : ''}
 				aria-description='<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.anonymous.tooltip"/></spring:escapeBody>'

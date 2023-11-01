@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
@@ -68,7 +69,9 @@
 	}
 </script>
 
-<div class="comment-entry form-group mt-1">
+<div class="card lcard m-2">
+<div class="card-body">
+<div class="comment-entry form-group">
 	<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
 		<textarea class="form-control" id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
 			class="comment"
@@ -77,34 +80,25 @@
 		<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
 		<input type="hidden" name="newUI" value="true" />
 
-		<div class="row mt-1">
-			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-		
-		 	<c:choose>
-			 	<c:when test="${sessionMap.anonymous}">
-				 	<%-- Post Anonymously? --%>
-					<div class="col-12 col-sm-6">
-						<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
-						<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
-						<%@include file="anonymouscheckbox.jsp" %>
-				 	</div>
+		<div class="mt-3">
+			<div class="clearfix">
+				<button type="button" onclick="javascript:editCommentSubmit();" class="btn btn-sm btn-secondary float-end btn-icon-comment" id="editCommentSubmitButton">
+					<fmt:message key="label.post" />
+				</button>
 				
-					<%-- Cancel / Edit Buttons --%>
-					<div class="col-12 col-sm-6">
-				</c:when>
-				<c:otherwise>
-					<div class="col-12">
-				</c:otherwise>
-			</c:choose>
+				<button type="button" onclick="javascript:cancelEdit();" class="btn btn-sm btn-secondary btn-icon-cancel float-end me-1">
+					<fmt:message key="label.cancel" />
+				</button>
+			</div>
 			
-			<button type="button" onclick="javascript:editCommentSubmit();" class="btn btn-sm btn-secondary float-end" id="editCommentSubmitButton">
-				<i class="fa fa-comment me-1"></i>
-				<fmt:message key="label.post" />
-			</button>
-			<button type="button" onclick="javascript:cancelEdit();" class="btn btn-sm btn-secondary float-end me-1">
-				<i class="fa fa-cancel me-1"></i>
-				<fmt:message key="label.cancel" />
-			</button>
+			<%-- Post Anonymously? --%>
+			<c:if test="${sessionMap.anonymous}">
+				<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
+				<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
+				<%@include file="anonymouscheckbox.jsp"%>
+			</c:if>
 		</div>
 	</form>
+</div>
+</div>
 </div>

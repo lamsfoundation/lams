@@ -321,36 +321,6 @@ div.growlUI h1,div.growlUI h2 {
 	background-color: var(--bs-gray-200);
 }
 
-.na, .btn-icon-refresh, .btn-icon-pen, .btn-icon-return, .btn-icon-previous, .btn-icon-next {
-  display: inline-block;
-}
-.na:after, .btn-icon-refresh:before, .btn-icon-pen:before, .btn-icon-return:before, .btn-icon-previous:before, .btn-icon-next:after {
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  text-decoration: inherit;
-  margin-left: 5px;
-  color: inherit;
-}
-.na:after {
-  content: "\f0a9";
-}
-.btn-icon-refresh:before {
-  content: "\f021";
-}
-.btn-icon-pen:before {
-  content: "\f044";
-}
-.btn-icon-return:before {
-  content: "\f2ea";
-}
-.btn-icon-previous:before {
-  content: "\f100";
-}
-.btn-icon-next:after {
-  content: "\f101";
-}
-
 .sbox {
   border-bottom: 2px solid $gray-lighter;
   border-radius: 0px;

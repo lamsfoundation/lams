@@ -57,9 +57,8 @@
 		</label>
 		<textarea name="comment-${itemUid}" id="comment-${itemUid}" class="form-control me-2" rows="2"></textarea>
 
-		<button type="button" class="btn btn-secondary btn-disable-on-submit" onclick="addNewComment(${itemUid})">
+		<button type="button" class="btn btn-secondary btn-disable-on-submit btn-icon-comment" onclick="addNewComment(${itemUid})">
 			<fmt:message key="label.preview.post" />
-			<i class="fa-regular fa-paper-plane ms-1"></i>
 		</button>
 	</div>
 </c:if>

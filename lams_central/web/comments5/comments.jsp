@@ -115,66 +115,43 @@
 		return false;
 	}
 </script>
-
-<div class="mt-4">
-	<c:if test='${not sessionMap.readOnly}'>
-		<div class="comments mb-2">
+	
+<c:if test='${not sessionMap.readOnly}'>
+	<div class="card lcard mb-4">
+	<div class="card-body">
+		<div class="comments my-3">
 			<div class="comment-entry">
 				<form id="newForm" method="GET" action="<lams:LAMSURL />comments/newComment.do">
-					<div class="mb-2 float-end">
-						<select id="sortMenu" name="sortMenu" class="form-control float-end w-auto">
-							<option value='0'
-								<c:if test='${sessionMap.sortBy == 0}'>selected</c:if>>
-								<fmt:message key="label.newest.first" />
-							</option>
-							<option value='1'
-								<c:if test='${sessionMap.sortBy == 1}'>selected</c:if>>
-								<fmt:message key="label.top.comments" />
-							</option>
-						</select>
-					</div>
-		
-					<textarea class="form-control" placeholder="..." id="newFormBody"
-						maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body" class="comment" aria-label="comment"
-					></textarea>
-		
 					<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" />
 					<input type="hidden" name="newUI" value="true" />
-		
-					<div class="clearfix my-2">
-						<c:if test="${sessionMap.anonymous}">
-							<div class="float-start">
-								<c:set var="anonymousCheckboxChecked" value="" />
-								<c:set var="anonymousCheckboxName" value="commentAnonymousNew" />
-								<%@include file="anonymouscheckbox.jsp"%>
-							</div>
-						</c:if>
-			
+					
+					<textarea class="form-control" placeholder="..." id="newFormBody"
+						maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body" class="comment" aria-label="comment"></textarea>
+					
+					<div class="clearfix mt-3">
 						<button type="button" onclick="javascript:newCommentSubmit();"
-							class="btn btn-secondary btn-sm float-end" id="newCommentSubmitButton"
-						>
+								class="btn btn-secondary btn-sm float-end btn-icon-comment" id="newCommentSubmitButton">
 							<fmt:message key="label.post" />
-							<i class="fa-regular fa-paper-plane ms-1"></i>
 						</button>
+						
 						<button type="button" onclick="javascript:clearNewForm();"
-							class="btn btn-secondary btn-sm float-end me-2"
-						>
-							<i class="fa fa-cancel me-1"></i>
+								class="btn btn-secondary btn-sm btn-icon-cancel float-end me-2">
 							<fmt:message key="label.cancel" />
 						</button>
 					</div>
-					
-					<div class="text-center">
-						<button type="button" onclick="javascript:refreshComments();" class="btn btn-secondary btn-sm btn-icon-refresh"> 
-							<fmt:message key="label.refresh"/>
-						</button>
-					</div>
+						
+					<c:if test="${sessionMap.anonymous}">
+						<c:set var="anonymousCheckboxChecked" value="" />
+						<c:set var="anonymousCheckboxName" value="commentAnonymousNew" />
+						<%@include file="anonymouscheckbox.jsp"%>
+					</c:if>
 				</form>
 			</div>
 		</div>
-	</c:if>
-
-	<div id="commentDiv" class="mt-1">
-		<%@ include file="allview.jsp"%>
 	</div>
+	</div>
+</c:if>
+
+<div id="commentDiv" class="mt-1">
+	<%@ include file="allview.jsp"%>
 </div>

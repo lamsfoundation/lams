@@ -1,15 +1,13 @@
 <%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
-
 <c:set var="maxThreadUid" value="0"/>
 <c:set var="minThreadLike" value="-1"/>
 <c:set var="messageTablename" value=""/>
-<c:set var="indent" value="10"/>
-
+<c:set var="indent" value="20"/>
 <c:set var="show"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show" /></spring:escapeBody></c:set>
 <c:set var="hide"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide" /></spring:escapeBody></c:set>
 <c:set var="prompt"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.showhide.prompt" /></spring:escapeBody></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<button type="button" class="btn btn-sm btn-secondary text-nowrap my-1 py-0 px-1"><span style="margin-left:20px">${prompt}</span></button>',
+	expanderTemplate:'<button type="button" class="btn btn-sm btn-light text-nowrap my-2 py-0 px-1 ms-2"><span style="margin-left:20px">${prompt}</span></button>',
 	stringCollapse:'${hide}',
 	stringExpand:'${show}',
 	clickableNodeNames:false,
@@ -21,7 +19,7 @@
 	}
 </c:set>
 <c:set var="tableCommandSticky">expandable:true,initialState:'collapsed',
-	expanderTemplate:'<button type="button" class="btn btn-sm btn-secondary text-nowrap my-1 py-0 px-1"><span style="margin-left:20px">${prompt}</span></a>',
+	expanderTemplate:'<button type="button" class="btn btn-sm btn-light text-nowrap my-2 py-0 px-1 ms-2"><span style="margin-left:20px">${prompt}</span></a>',
 	stringCollapse:'${hide}',
 	stringExpand:'${show}',
 	clickableNodeNames:false,
@@ -50,6 +48,7 @@
 			// set up the new reply area
 			var replyDiv = document.createElement("div");
 			replyDiv.id = 'reply';
+			replyDiv.className = 'pt-5 clearfix';
 
 			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(replyDiv);
@@ -67,6 +66,7 @@
 			// set up the new reply area
 			var editDiv = document.createElement("div");
 			editDiv.id = 'edit';
+			editDiv.className = 'pt-5 clearfix';
 
 			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(editDiv);
@@ -200,7 +200,7 @@
 </c:if>
 
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
-	<div class="text-center">
+	<div class="text-center d-none">
 		<c:set var="more">
 			<lams:LAMSURL />/comments/viewTopic.do?newUI=true&pageLastId=${maxThreadUid}&likeCount=${minThreadLike}&pageSize=${sessionMap.pageSize}&sessionMapID=${sessionMapID}
 		</c:set>
@@ -208,4 +208,12 @@
 			<fmt:message key="label.show.more.messages" />
 		</a>
 	</div>
+	
+	<div class="text-center">
+		<button type="button" onclick="javascript:refreshComments();" class="btn btn-light btn-sm btn-icon-refresh"> 
+			<fmt:message key="label.refresh"/>
+		</button>
+	</div>
 </c:if>
+
+					

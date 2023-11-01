@@ -58,8 +58,7 @@
 
 				<div class="mt-3 float-end">
 					<lams:ImgButtonWrapper>
-						<button onclick="cancel();" class="btn btn-sm btn-secondary btn-disable-on-submit"> 
-							<i class="fa fa-cancel"></i>
+						<button onclick="cancel();" class="btn btn-sm btn-secondary btn-disable-on-submit btn-icon-cancel"> 
 							<fmt:message key="label.cancel" />
 						</button>
 						

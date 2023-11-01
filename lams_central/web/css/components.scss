@@ -643,6 +643,44 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	content: "\f078";
 }
 
+/*----------buttons with icons ----------------*/ 
+
+.na, .btn-icon-refresh, .btn-icon-pen, .btn-icon-return, .btn-icon-previous, .btn-icon-next, .btn-icon-comment, .btn-icon-cancel {
+	display: inline-block;
+}
+.na:after, .btn-icon-refresh:before, .btn-icon-pen:before, .btn-icon-return:before, .btn-icon-previous:before, .btn-icon-next:after, .btn-icon-comment:after, .btn-icon-cancel:before {
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+	margin-left: 0.25rem;
+	color: inherit;
+}
+.na:after {
+	content: "\f0a9";
+}
+.btn-icon-refresh:before {
+	content: "\f021";
+}
+.btn-icon-pen:before {
+	content: "\f044";
+}
+.btn-icon-return:before {
+	content: "\f2ea";
+}
+.btn-icon-previous:before {
+	content: "\f100";
+}
+.btn-icon-next:after {
+	content: "\f101";
+}
+.btn-icon-comment:after {
+	content: "\f1d8";
+}
+.btn-icon-cancel:before {
+	content: "\f05e";
+}
+
 /*----------slider----------------*/
 
 .bootstrap-slider input[type="range"] {

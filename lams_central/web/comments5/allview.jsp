@@ -1,5 +1,17 @@
-<!-- Wraps up both the sticky and non-sticky comments. Used for page refresh and changing the sort.
- -->
+<!-- Wraps up both the sticky and non-sticky comments. Used for page refresh and changing the sort.-->
+
+<div class="mb-2 float-end">
+	<select id="sortMenu" name="sortMenu" class="form-control float-end w-auto">
+		<option value='0'
+			<c:if test='${sessionMap.sortBy == 0}'>selected</c:if>>
+				<fmt:message key="label.newest.first" />
+		</option>
+		<option value='1'
+				<c:if test='${sessionMap.sortBy == 1}'>selected</c:if>>
+			<fmt:message key="label.top.comments" />
+		</option>
+	</select>
+</div>
 
 <!--  if sticky comments exists, they need to be displayed first, but do not clobber the non sticky threads! -->
 <c:set var="nonsticky" value="${commentThread}" />

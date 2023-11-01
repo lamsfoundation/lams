@@ -37,8 +37,7 @@
 		
 		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
 		<div id="buttons" class="float-end mt-2">
-	 		<button type="button" name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-secondary" id="cancelButton">
-	 			<i class="fa fa-cancel"></i>
+	 		<button type="button" name="goback" onclick="javascript:cancel()" class="btn btn-sm btn-secondary btn-icon-cancel" id="cancelButton">
 				<fmt:message key="button.cancel" />
 			</button>&nbsp;
 			<button type="submit" class="btn btn-sm btn-secondary btn-disable-on-submit" id="submitButton">

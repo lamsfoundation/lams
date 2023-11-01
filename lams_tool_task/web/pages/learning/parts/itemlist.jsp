@@ -22,9 +22,9 @@
 								</span>
 							</c:if>
 							
-						<c:if test="${item.required}">
-							<i class="fa-solid fa-asterisk text-danger ms-2" title="<fmt:message key='label.monitoring.tasksummary.task.required.to.finish'/>"></i>
-						</c:if>
+							<c:if test="${item.required}">
+								<i class="fa-solid fa-asterisk text-danger ms-2" title="<fmt:message key='label.monitoring.tasksummary.task.required.to.finish'/>"></i>
+							</c:if>
 						</button>
 					</span>
 					
