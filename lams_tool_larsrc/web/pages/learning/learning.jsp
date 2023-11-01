@@ -302,32 +302,36 @@
 							   aria-expanded="false" aria-controls="collapse${item.uid}" 
 							>
 								<c:out value="${item.title}" escapeXml="true"/>
+								
 								<c:if test="${!item.createByAuthor && item.createBy != null}">
-									(<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true"/>)
+									<span class="badge text-bg-warning rounded-pill mx-2">
+										[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
+									</span>
 								</c:if>
 							</button>
 						</span>
 						
 						<div class="float-end">
-							<c:choose>
-								<c:when test="${item.complete}">
-									<i class="fa fa-check-circle text-bg-success icon-complete" style="font-size: 1.1em;color: green;" title='<fmt:message key="label.completed" />'></i>
-								</c:when>
-								<c:when test="${not finishedLock}">
-									<i class="fa fa-check-circle icon-complete d-none" style="font-size: 1.5em;color: green;" title='<fmt:message key="label.completed" />'></i>
-									<button type="button" onClick="javascript:completeItem(${item.uid})"
-											class="complete-item-button btn btn-sm btn-success no-shadow">
-										<i class="fa-solid fa-check" aria-hidden="true"></i>
-										<fmt:message key='label.finish' />
-									</button>
-								</c:when>
-							</c:choose>
-
 							<c:if test="${not finishedLock && !item.createByAuthor && userID == item.createBy.userId}">
-								<span role="button" class="fa fa-trash delete-item-button" style="color: red;"
+								<button type="button" class="no-decoration fa fa-trash delete-item-button text-bg-danger shadow p-2"
 								   title="<fmt:message key="label.delete" />"
-								   aria-label="<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.delete" /></spring:escapeBody>
-								   onclick="hideItem(${item.uid})"></span>
+								   aria-label="<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.delete" /></spring:escapeBody>"
+								   onclick="hideItem(${item.uid})">
+								 </button>
+							</c:if>
+							
+							<c:if test="${!item.complete && !finishedLock}">
+								<button type="button" onClick="javascript:completeItem(${item.uid})"
+										class="complete-item-button btn btn-success no-shadow ms-2">
+									<i class="fa-solid fa-pen-to-square fa-xl me-1"></i>
+									<fmt:message key="label.completed" />
+								</button>
+							</c:if>
+							
+							<c:if test="${item.complete || !finishedLock}">
+								<span class="text-bg-success icon-complete shadow p-2 ms-2 ${(!item.complete && !finishedLock) ? 'd-none' : ''}"> 
+									<i class="fa-regular fa-square-check fa-xl" title='<fmt:message key="label.completed" />'></i>
+								</span>
 							</c:if>
 						</div>
 				</div>
@@ -336,10 +340,6 @@
 					 role="tabpanel" aria-labelledby="heading${item.uid}"></div>
 			</div>
 		</c:forEach>
-
-		<!-- Add a URL/File Form-->
-		<div id="addresource">
-		</div>
 
 		<!-- Reflection -->
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
@@ -362,14 +362,14 @@
 					</c:when>
 					<c:otherwise>
 						<button type="submit" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
-								<c:choose>
-									<c:when test="${sessionMap.isLastActivity}">
-										<fmt:message key="label.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="label.finished" />
-									</c:otherwise>
-								</c:choose>
+							<c:choose>
+								<c:when test="${sessionMap.isLastActivity}">
+									<fmt:message key="label.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="label.finished" />
+								</c:otherwise>
+							</c:choose>
 						</button>
 					</c:otherwise>
 				</c:choose>
@@ -412,6 +412,10 @@
 					</c:choose>
 				</c:if>
 			</div>
+		</div>
+
+		<!-- Add a URL/File Form-->
+		<div id="addresource" class="mt-4">
 		</div>
 
 	</div>
