@@ -23,27 +23,11 @@
 
 package org.lamsfoundation.lams.learning.web.servlet;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Set;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
-import org.lamsfoundation.lams.learningdesign.SimpleActivity;
+import org.lamsfoundation.lams.learningdesign.ListingLearningDesignProcessor;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
@@ -54,9 +38,18 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Set;
 
 @SuppressWarnings("serial")
 public class RepopulateProgressMarksServlet extends HttpServlet {
@@ -113,7 +106,7 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
 		    .append(".\n----------------------------------------------------------------------------------\n\n")
 		    .toString();
 
-	    ActivitiesToCheckProcessor processor = new ActivitiesToCheckProcessor(lesson.getLearningDesign(),
+	    ListingLearningDesignProcessor processor = new  ListingLearningDesignProcessor(lesson.getLearningDesign(),
 		    activityDAO);
 	    processor.parseLearningDesign();
 	    ArrayList<Activity> activityList = processor.getActivityList();
@@ -184,38 +177,5 @@ public class RepopulateProgressMarksServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 	doGet(request, response);
-    }
-
-    class ActivitiesToCheckProcessor extends LearningDesignProcessor {
-
-	ArrayList<Activity> activityList;
-
-	public ActivitiesToCheckProcessor(LearningDesign design, IActivityDAO activityDAO) {
-	    super(design, activityDAO);
-	    activityList = new ArrayList<>();
-	}
-
-	@Override
-	public boolean startComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-	    return true;
-	}
-
-	@Override
-	public void endComplexActivity(ComplexActivity activity) throws LearningDesignProcessorException {
-	    activityList.add(activity);
-	}
-
-	@Override
-	public void startSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
-	}
-
-	@Override
-	public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
-	    activityList.add(activity);
-	}
-
-	public ArrayList<Activity> getActivityList() {
-	    return activityList;
-	}
     }
 }
