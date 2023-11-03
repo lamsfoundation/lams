@@ -1,35 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-	<%-- for validateForm() method --%>
-	<input type="hidden" name="minCharactersEnabled" id="min-characters-enabled" value="${sessionMap.minCharacters > 0}"/>
-
-	<c:choose>
-		<c:when test="${sessionMap.allowRichEditor}">
-			<lams:CKEditor id="message.body" value="${messageForm.message.body}" 
-					contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner">
-			</lams:CKEditor>
-		</c:when>
-		
-		<c:otherwise>
-			<%-- Does not use general tag because this field need keep compatible with CKEditor's content --%>
-			<lams:textarea name="message.body" class="form-control" tabindex="2" rows="10">${messageForm.message.body}</lams:textarea>
-		</c:otherwise>
-	</c:choose>
- 
-	<c:if test="${sessionMap.allowAnonym || sessionMap.maxCharacters > 0 || sessionMap.minCharacters > 0}">
-	<div class="row mt-2">
-
-	<div class="col-12 col-sm-6">
+<script type="text/javascript">
+	$(document).ready(function() {
+		<c:if test="${sessionMap.maxCharacters > 0}">
 	
-	<%-- If limitChars == 0, then we don't want to limit the characters at all. --%>
-	<c:if test="${sessionMap.maxCharacters > 0}">
-
-		<fmt:message key="lable.char.left" />: <span id="char-left-div"></span>
-		<input type="hidden" name="limitCount" id="max-limit-count" />
-				
-		<script type="text/javascript">
-		$(document).ready(function() {
-			
 			// Whether content has exceeded the maximum characters.
 			var isNewlyInstantiated = true;
 			var isCkeditor = ${sessionMap.allowRichEditor};
@@ -95,17 +69,9 @@
 				//count characters initially
 				counter();
 			}
+		</c:if>
 
-		});
-		</script>
-	</c:if>
-
-	<c:if test="${sessionMap.minCharacters > 0}">
-		<fmt:message key="label.char.required" />: <span id="char-required-div"></span>
-			
-		<script type="text/javascript">
-		$(document).ready(function() {
-
+		<c:if test="${sessionMap.minCharacters > 0}">
 			var isCkeditor = ${sessionMap.allowRichEditor};
 			var ckeditor = isCkeditor ? CKEDITOR.instances["message.body"] : null;
 			
@@ -136,41 +102,56 @@
 				$('textarea[id="message.body"]').on('change keydown keypress keyup paste', counter);
 				//count characters initially
 				counter();
-			}
+			}	
+		</c:if>
 
-		});
-		</script>			
-	</c:if>
-	</div>
-	
-	<div class="col-12 col-sm-6 text-end">
 		<c:if test="${sessionMap.allowAnonym}">
-			<div class="checkbox form-control-inline form-check">
-				<form:checkbox path="message.isAnonymous" id="isAnonymous" cssClass="form-check-input"/> 
-				
-				<label for="isAnonymous" class="form-check-label">	
-					<fmt:message key="label.post.anonomously" />
-				</label>
-			</div>
-			&nbsp;
-			<a tabindex="0" role="button" data-bs-toggle="popover">
-				<i class="fa fa-info-circle"></i>
-			</a>
-		
-			<%-- Use c:out to escape any quotes in the I18N string. Then use html: true converts any escaped quotes back --%>
-			<%-- into real quotes. Should be safe from XSS attack as the string is coming from a translation file. --%>	
-			<fmt:message key="label.anonymous.tooltip" var="ANONYMOUS_TOOLTIP_VAR"></fmt:message>
-					
-	 		<script type="text/javascript">
-			$(document).ready(function() {
-				var ANONYMOUS_TOOLTIP = '<c:out value="${ANONYMOUS_TOOLTIP_VAR}" />';
-		    		$('[data-bs-toggle="popover"]').popover({title: "", content: ANONYMOUS_TOOLTIP, placement:"auto left", delay: 50, trigger:"hover focus", html: true});
+			$('[data-bs-toggle="popover"]').each((i, el) => {
+				new bootstrap.Popover($(el), {
+					content: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.anonymous.tooltip"/></spring:escapeBody>',  
+					delay: 50, 
+					html: true
+				})
 			});
-			</script>
-	 	</c:if>
-	</div>
+		</c:if>
+	});
+</script>
 
-	</div> <!-- end row -->
-	</c:if>
+<%-- for validateForm() method --%>
+<input type="hidden" name="minCharactersEnabled" id="min-characters-enabled" value="${sessionMap.minCharacters > 0}"/>
+
+<c:choose>
+	<c:when test="${sessionMap.allowRichEditor}">
+		<lams:CKEditor id="message.body"
+			value="${messageForm.message.body}"
+			contentFolderID="${sessionMap.learnerContentFolder}"
+			toolbarSet="DefaultLearner" 
+			ariaLabelledby="label-body"
+			isRequired="true"
+			></lams:CKEditor>
+	</c:when>
+		
+	<c:otherwise>
+		<%-- Does not use general tag because this field need keep compatible with CKEditor's content --%>
+		<lams:textarea id="message.body"
+			name="message.body" class="form-control" rows="10"
+			aria-labelledby="label-body"
+			aria-required="true"
+		>${messageForm.message.body}</lams:textarea>
+	</c:otherwise>
+</c:choose>
+ 
+<c:if test="${sessionMap.maxCharacters > 0 || sessionMap.minCharacters > 0}">
+	<div class="badge alert alert-info mt-1">
+		<c:if test="${sessionMap.maxCharacters > 0}">
+			<fmt:message key="lable.char.left" />: <span id="char-left-div"></span>
+			<input type="hidden" name="limitCount" id="max-limit-count" />
+		</c:if>
 	
-	<lams:errors path="message.body"/>
+		<c:if test="${sessionMap.minCharacters > 0}">
+			<fmt:message key="label.char.required" />: <span id="char-required-div"></span>		
+		</c:if>
+	</div>
+</c:if>
+	
+<lams:errors5 path="message.body"/>

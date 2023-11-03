@@ -1,25 +1,13 @@
-<%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-
+<%@ page import="org.lamsfoundation.lams.tool.forum.ForumConstants"%>
 <c:set var="maxThreadUid" value="0" />
 <c:set var="messageTablename" value="" />
-<c:set var="indent" value="10" />
-
-<c:set var="show">
-	<fmt:message key="label.show.replies" />
-</c:set>
-<c:set var="hide">
-	<fmt:message key="label.hide.replies" />
-</c:set>
-<c:set var="prompt">
-	<fmt:message key="label.showhide.prompt" />
-</c:set>
+<c:set var="indent" value="20" />
+<c:set var="show"><fmt:message key="label.show.replies" /></c:set>
+<c:set var="hide"><fmt:message key="label.hide.replies" /></c:set>
+<c:set var="prompt"><fmt:message key="label.showhide.prompt" /></c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
+	expanderTemplate:'<button type="butotn" class="btn btn-sm btn-light py-0 mb-2 ms-2"><span style="margin-left:20px">${prompt}</span></button>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
@@ -29,20 +17,10 @@
 	}
  </c:set>
 
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 <script type="text/javascript">
-
-	// The treetable code uses the clicks to expand and collapse the replies but then 
-	// the buttons will not work. So stop the event propogating up the event chain. 
-	$(".button").click(function (e) {
-    	e.stopPropagation();
-	});
-	$(".msg-footer").click(function (e) {
-    	e.stopPropagation();
-	});
-	$(".attachments").click(function (e) {
-    	e.stopPropagation();
-	});
-
 	function createReply(messageUid, url, level) {
 		if ( document.getElementById('reply') ) {
 			alert('<fmt:message key="message.complete.or.cancel.reply"/>');
@@ -69,6 +47,9 @@
 		}
 	}
 	
+	jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+	});
 </script>
 
 	<c:forEach var="msgDto" items="${topicThread}">
@@ -111,7 +92,6 @@
 		<c:if test='${(msgLevel >= 1)}'>
 					</td></tr>
 		</c:if>
-	
 	</c:forEach>
 	
 	<c:if test='${messageTablename != ""}'>	
@@ -121,12 +101,6 @@
 		</script>	
 		</div>
 	</c:if>
-
-	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
-		});
-	</script>
 	
 	<c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
 	<c:if test='${maxThreadUid > 0 && ! noMorePages}'>

@@ -10,70 +10,50 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
+<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="originalMessage" value="${sessionMap.originalMessage}"/>
 
-<lams:html>
-	<lams:head>
-		<title><fmt:message key="activity.title" /></title>
-
-		<!-- ********************  CSS ********************** -->
-
-		<lams:css />
-		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
-		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
-		<style media="screen,projection" type="text/css">
-			.info {
-				margin: 10px;
-			}
-		</style>
+<!-- ********************  CSS ********************** -->
+<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
+<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		
-		<!-- ********************  javascript ********************** -->
-		<lams:JSImport src="includes/javascript/common.js" />
-		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
-		<lams:JSImport src="includes/javascript/upload.js" />
-						
-		<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
-		<c:choose>
-			<c:when test="${language eq 'es'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'fr'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
-			</c:when>
-			<c:when test="${language eq 'el'}">
-				<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
-			</c:when>
-		</c:choose>
-		
-		<script type="text/javascript">
-			var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
-			var warning = '<fmt:message key="warn.minimum.number.characters" />';
-			var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
-			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
+<!-- ********************  javascript ********************** -->
+<lams:JSImport src="includes/javascript/common.js" />
+<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
+<lams:JSImport src="includes/javascript/upload.js" />	
+<script type="text/javascript" src="${lams}includes/javascript/uppy/uppy.min.js"></script>
+<c:choose>
+	<c:when test="${language eq 'es'}">
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/es_ES.min.js"></script>
+	</c:when>
+	<c:when test="${language eq 'fr'}">
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/fr_FR.min.js"></script>
+	</c:when>
+	<c:when test="${language eq 'el'}">
+		<script type="text/javascript" src="${lams}includes/javascript/uppy/el_GR.min.js"></script>
+	</c:when>
+</c:choose>
+<script type="text/javascript">
+	var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
+	var warning = '<fmt:message key="warn.minimum.number.characters" />';
+	var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
+	var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
 			
-   			var LAMS_URL = '${lams}',
-   		 		UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
-   		 		UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
-   				// convert Java syntax to JSON
-   		       EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
-   			   decoderDiv = $('<div />'),
-   		       <fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
-   		       EXE_FILE_ERROR = decoderDiv.html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
-
-		</script>
-		<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
-		
-	</lams:head>
-	
-	<body class="stripes">
-		<lams:JSImport src="includes/javascript/message.js" relative="true" />
-
-		<script type="text/javascript">
+	var UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>',
+		UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>',
+		// convert Java syntax to JSON
+	    EXE_FILE_TYPES = JSON.parse("[" + "${EXE_FILE_TYPES}".replace(/\.\w+/g, '"$&"') + "]"),
+		<fmt:message key="error.attachment.executable" var="EXE_FILE_ERROR_VAR" />
+		EXE_FILE_ERROR = $('<div />').html('<c:out value="${EXE_FILE_ERROR_VAR}" />').text();
+</script>
+<script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>	
+<lams:JSImport src="includes/javascript/message.js" relative="true" />
+<script type="text/javascript">
+	jQuery(document).ready(function() {
 			// The treetable code uses the clicks to expand and collapse the replies but then 
 			// the buttons will not work. So stop the event propogating up the event chain. 
 			$("#messageForm").click(function (e) {
@@ -152,33 +132,24 @@
 				}
 				return false;
 			});
-		
-			function cancelReply() {
-				$('#reply').remove();
-			}
-			
-		</script>
-		
-		<form:form action="replyTopic.do" focus="message.body" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
+	});
 				
-			<c:set var="sessionMapID" value="${messageForm.sessionMapID}"/>
-			<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-			<c:set var="originalMessage" value="${sessionMap.originalMessage}"/>
+	function cancelReply() {
+		$('#reply').remove();
+	}
+</script>
 		
-			<form:hidden path="sessionMapID"/>
+<form:form action="replyTopic.do" focus="message.body" enctype="multipart/form-data" modelAttribute="messageForm" id="messageForm" >
+	<form:hidden path="sessionMapID"/>
 			
-			<div class="container-fluid">
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
-					<fmt:message key="title.message.reply" />
-				</div>
-		 		<div class="panel-body">
-					<lams:errors/>
-					<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
-				</div> 
-			</div>
-			</div>
-		</form:form>
-
-	</body>
-</lams:html>
+	<div class="card m-2">
+		<div class="card-header">
+			<fmt:message key="title.message.reply" />
+		</div>
+				
+ 		<div class="card-body">
+			<lams:errors5/>
+			<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
+		</div> 
+	</div>
+</form:form>

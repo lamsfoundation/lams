@@ -169,4 +169,7 @@
 			    })
 			  }
 		  })
+		  
+		  //assign uppy's button id, so we can assign label to it
+		  $("#image-upload-area button").first().attr("id","uppy-upload-button");
 	}
