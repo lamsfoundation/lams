@@ -157,7 +157,11 @@ function drawAnsweredQuestionsChart(data, animate){
 		return;
 	}
 
-	let ctx = chartPlaceholder[0].getContext('2d');
+	let ctx = chartPlaceholder[0].getContext('2d'),
+		// prevent scale to change on each update
+		// set suggested max number of students to 3/4
+		// of all possible learners
+		suggestedBarMax = Math.max(2, Math.floor(3 * (useGroupsAsNames ? data.sessionCount : data.possibleLearners.length) / 4));
 
 	answeredQuestionsChart = new Chart(ctx, {
 		type : 'bar',
@@ -172,6 +176,10 @@ function drawAnsweredQuestionsChart(data, animate){
 			animation : {
 				duration : animate ? 1000 : 0
 			},
+			interaction : {
+				mode : 'index',
+				intersect : suggestedBarMax <= 20
+			},
 			scales : {
 				x : {
 					title: {
@@ -185,10 +193,7 @@ function drawAnsweredQuestionsChart(data, animate){
 				y :
 					{
 						beginAtZero   : true,
-						// prevent scale to change on each update
-						// set suggested max number of students to 3/4
-						// of all possible learners
-						suggestedMax  : Math.max(2, Math.floor(3 * (useGroupsAsNames ? data.sessionCount : data.possibleLearners.length) / 4)),
+						suggestedMax  : suggestedBarMax,
 						ticks : {
 							stepSize      : 1,
 							maxTicksLimit : 5,
@@ -237,6 +242,17 @@ function listCompletionChartLearners(chartPlaceholder) {
 		return;
 	}
 
+	// iterate over learners, get their names and portraits
+	var counter = 0,
+		data = chartPlaceholder.data('tooltip-input'),
+		useGroupsAsNames = chartPlaceholder.data('useGroupsAsNames'),
+		isGrouped = chartPlaceholder.data('isGrouped'),
+		users = data[tooltipModel.dataPoints[0].dataIndex];
+
+	if (!users || users.length === 0) {
+		return;
+	}
+
 	// create tooltip
 	var tooltipEl = $('<div />').addClass(tooltipClassName)
 		.appendTo(document.body)
@@ -250,12 +266,6 @@ function listCompletionChartLearners(chartPlaceholder) {
 			'border-radius' : '25px'
 		});
 
-	// iterate over learners, get their names and portraits
-	var counter = 0,
-		data = chartPlaceholder.data('tooltip-input'),
-		useGroupsAsNames = chartPlaceholder.data('useGroupsAsNames'),
-		isGrouped = chartPlaceholder.data('isGrouped'),
-		users = data[tooltipModel.dataPoints[0].dataIndex];
 	$(users).each(function(){
 		var portraitDiv = $(definePortrait(this.portraitUuid, this.id, STYLE_SMALL, true, LAMS_URL)).css({
 				'vertical-align' : 'middle'
