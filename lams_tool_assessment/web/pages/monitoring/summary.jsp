@@ -25,6 +25,20 @@
 		width: 100% !important;
 		height: 100% !important;
 	}
+
+	#questions-data {
+		border-collapse: separate;
+	}
+
+	#questions-data .sticky-left-header {
+		position: sticky;
+		left: 0;
+		background-color: inherit;
+	}
+
+	#questions-data tbody tr:nth-of-type(even){
+		background-color: white;
+	}
 </style>
 
 <%@ include file="parts/discloseAnswers.jsp"%>
@@ -364,7 +378,7 @@
 								<tbody>
 
 								<tr role="row">
-									<th><b>Question type</b></th>
+									<th class="sticky-left-header"><b>Question type</b></th>
 									<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 										<td class="text-center">
 												${tblQuestionDto.questionTypeLabel}
@@ -373,7 +387,7 @@
 								</tr>
 
 								<tr>
-									<td><b>Correct answer</b></td>
+									<td class="sticky-left-header"><b>Correct answer</b></td>
 									<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 										<td class="text-center">
 											<c:out value="${tblQuestionDto.correctAnswer}" escapeXml="false" />
@@ -387,7 +401,7 @@
 
 								<c:forEach var="session" items="${sessions}" varStatus="i">
 									<tr>
-										<td class="text-center">
+										<td class="text-center sticky-left-header">
 												${session.sessionName}
 										</td>
 
