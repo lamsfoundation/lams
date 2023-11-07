@@ -34,26 +34,23 @@
 	</div>
 
 	<div class="card-body">
-		<div class="m-2">
+		<div class="instructions">
 			<lams:out value="${reflectInstructions}" escapeHtml="true" />
 		</div>
-		<hr />
 
-		<div class="m-2">
-			<p>
-				<c:choose>
-					<c:when test="${empty reflectEntry}">
-						<em><fmt:message key="${noReflectionLabelKey}" /></em>
-					</c:when>
-					<c:otherwise>
-						<lams:out value="${reflectEntry}" escapeHtml="true" />
-					</c:otherwise>
-				</c:choose>
-			</p>
+		<div>
+			<c:choose>
+				<c:when test="${empty reflectEntry}">
+					<em><fmt:message key="${noReflectionLabelKey}" /></em>
+				</c:when>
+				<c:otherwise>
+					<lams:out value="${reflectEntry}" escapeHtml="true" />
+				</c:otherwise>
+			</c:choose>
 
 			<c:if test="${isEditButtonEnabled}">
-				<div class="mt-2 float-end">
-					<button name="editNotebookButton" id="edit-notebook-button" class="btn btn-sm btn-secondary btn-disable-on-submit btn-icon-pen" type="button"
+				<div class="mt-4 float-end">
+					<button type="button" name="editNotebookButton" id="edit-notebook-button" class="btn btn-sm btn-light btn-disable-on-submit btn-icon-pen"
 						onclick="continueReflect()">
 						<fmt:message key="${editNotebookLabelKey}" />
 					</button>

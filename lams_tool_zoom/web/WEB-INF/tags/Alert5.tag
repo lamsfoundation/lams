@@ -32,8 +32,8 @@
 	</c:when>
 </c:choose>
 
-<div class="row justify-content-md-center">
-	<div class="col-md-auto">
+<div class="row justify-content-md-center text-center">
+	<div class="col-md-auto" style="min-width: 33%;">
 		<div id="${idName}" class="alert alert-${alertType} shadow" role="alert">
 			<c:if test="${close}">
 				<button type="button" class="btn-close btn-sm float-end ms-4" data-bs-dismiss="alert" aria-label="Close"></button>

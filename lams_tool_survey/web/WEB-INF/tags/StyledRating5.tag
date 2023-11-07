@@ -343,7 +343,7 @@ When true, hides the names and groups the comments.  -->
 								<c:set var="rowRateCount" value="${rowRateCount + rateCount}" />
 								<c:set var="rowRateValue" value="${rowRateValue + rateCount * columnOrderId.count}" />
 
-								<div class="col rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>">
+								<div class="col rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>  px-1">
 									<c:out value="${column.name}" escapeXml="false" />
 									
 									<c:if test="${rateCount > 0}">
@@ -375,7 +375,7 @@ When true, hides the names and groups the comments.  -->
 									<c:set var="rowRateCount" value="${rowRateCount + rateCount}" />
 									<c:set var="rowRateValue" value="${rowRateValue + rateCount * (columnOrderId.count + 0.5)}" />
 
-									<div class="col rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>">
+									<div class="col rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>  px-1">
 										<i><fmt:message key="label.rating.rubrics.in.between" /></i>
 										
 										<c:if test="${rateCount > 0}">
@@ -427,7 +427,7 @@ When true, hides the names and groups the comments.  -->
 
 						<div class="lcard card rubrics-row-card pivot-view">
 							<div class="card-header text-bg-secondary collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
-						       	<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}"
+						       	<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}"
 								   aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-panels">
 									<%-- Criterion "row" --%>
 									<c:out value="${criteria.title}" escapeXml="false" />
@@ -497,7 +497,7 @@ When true, hides the names and groups the comments.  -->
 
 						<div class="card lcard rubrics-user-card">
 							<div class="card-header text-bg-secondary collapsable-icon-left" id="rubrics-heading-${criteriaGroupId}-${ratingDto.itemId}">
-					       		<button type="button" class="btn collapsed" data-bs-toggle="collapse" data-bs-target="#rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
+					       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
 									   aria-expanded="false" aria-controls="rubrics-collapse-${criteriaGroupId}-${ratingDto.itemId}"
 									   data-parent="#rubrics-users-panels-${criteriaGroupId}">
 									<lams:Portrait userId="${ratingDto.itemId}" hover="false" />

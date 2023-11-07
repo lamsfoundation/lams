@@ -156,14 +156,11 @@
 						</fmt:param>
 					</fmt:message>
 				</div>
-				
 			</c:otherwise>
 		</c:choose>
 			
 	</c:forEach>
-
 </div>
-
 </div>
 
 <%--Comments area---------------------------------------%>
@@ -189,7 +186,6 @@
 			
 					<!-- Comment min words limit -->
 					<c:if test="${itemRatingDto.commentsMinWordsLimit ne 0}">
-					
 						<lams:Alert5 type="info" id="comment-limit-${itemRatingDto.itemId}" close="false">
 							<fmt:message key="${minNumberWordsLabel}">
 								: <fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/>
@@ -197,27 +193,25 @@
 						</lams:Alert5>
 					</c:if>
 				
-					<div class="row">
-						<div class="col-12 col-sm-11">
+					<div class="d-flex align-items-center">
+						<div class="flex-grow-1">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control comment-textarea"
 									placeholder="<fmt:message key="label.comment.textarea.tip"/>"
 									aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
 						</div>
-						<div class="col-12 col-sm-1 p-0">
-							<button class="btn btn-success btn-sm add-comment add-comment-new"
+						<div>
+							<button class="btn btn-secondary btn-sm add-comment add-comment-new ms-2"
 									data-item-id="${itemRatingDto.itemId}"
 									data-comment-criteria-id="${itemRatingDto.commentsCriteriaId}"
 									data-show-all-comments="${showAllComments}"
 									data-refresh-on-submit="${refreshOnComment}"
 									aria-label="<fmt:message key="${postCommentButtonLabel}"/>">
-								<i class="fa fa-check fa-lg"></i>
+								<i class="fa-solid fa-paper-plane"></i>
 							</button>
 						</div>
 					</div>
-						
 				</div>			
 			</c:when>
 		</c:choose>
-			
 	</div>	
 </c:if>
