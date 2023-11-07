@@ -3,7 +3,7 @@ var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
 	generatingLearningDesign = false;
-	submitInProgress = false,
+submitInProgress = false,
 	originalThumbnailWidth = 0,
 	originalThumbnailHeight = 0;
 
@@ -19,23 +19,23 @@ function doSelectTab(tabId) {
  */
 function initLessonTab(){
 	tree = $('#learningDesignTree');
-	
+
 	// customise treeview label
 	ldTreeview.LABEL_RUN_SEQUENCES_FOLDER = LABEL_RUN_SEQUENCES_FOLDER;
-	
-	ldTreeview.init('#learningDesignTree', 
-	   function(event, node) {
+
+	ldTreeview.init('#learningDesignTree',
+		function(event, node) {
 			// deselect LD if highlighted in "recently used sequences" section 
 			$('div#accessDiv .access-selected').removeClass('access-selected');
-		
+
 			// hide existing LD image
 			$('.ldChoiceDependentCanvasElement').css('display', 'none');
-			
+
 			if (orgGroupingsAvailable) {
 				$('#grouping-tab-desc-select, #grouping-tab-select').hide();
 				$('#grouping-tab-desc-none').show();
 			}
-			
+
 			// if a LD is selected
 			if (node.state.selected && node.learningDesignId) {
 				$('#lessonNameInput').val(node.label);
@@ -43,9 +43,14 @@ function initLessonTab(){
 				if (isElementInViewport($('#lessonNameInput'))) {
 					$('#lessonNameInput').focus();
 				}
+
+				if (node.modifiedDate) {
+					$('#modified-date-span').text(node.modifiedDate).show();
+				}
+
 				// display "loading" animation and finally LD thumbnail
 				loadLearningDesignSVG(node.learningDesignId);
-				
+
 				if (orgGroupingsAvailable) {
 					$.ajax({
 						'url' : LAMS_URL + 'monitoring/monitoring/isLearningDesignHasGroupings.do',
@@ -63,42 +68,43 @@ function initLessonTab(){
 			} else {
 				// a folder got selected or LD got deselected
 				$('#lessonNameInput').val(null);
+				$('#modified-date-span').hide();
 				toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 			}
 		},
-	  function(event, node) {
+		function(event, node) {
 			if (!node.learningDesignId){
 				if (!node.state.expanded) {
 					ldTreeview.refresh(tree, node);
 				}
 				return;
 			}
-			
+
 			// start lesson
 			addLesson(node.learningDesignId, node.label);
-	  });
-	
+		});
+
 	// ability to start a lesson on pressing Enter button in a lesson name input
 	$('#lessonNameInput').on('keyup', function (e) {
-	    if (e.keyCode == 13) {
-	    	 addLesson();
-	    }
+		if (e.keyCode == 13) {
+			addLesson();
+		}
 	});
-	
+
 	loadRecentlyAccessedLearningDesigns();
 }
 
 //checks whether element is visible in the current viewport
 function isElementInViewport(el) {
 	el = el[0];
-    var rect = el.getBoundingClientRect();
+	var rect = el.getBoundingClientRect();
 
-    return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
-        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
-    );
+	return (
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+	);
 }
 
 
@@ -108,44 +114,44 @@ function initClassTab(){
 	fillUserContainer(users.unselectedLearners, 'unselected-learners');
 	fillUserContainer(users.selectedMonitors, 'selected-monitors');
 	fillUserContainer(users.unselectedMonitors, 'unselected-monitors');
-	
+
 	// allow dragging of user divs
 	$('.draggableItem').each(function(){
 		$(this).draggable({ 'scope'       : getDraggableScope($(this).parents('.userContainer').attr('id')),
-							'appendTo'    : 'body',
-							'containment' : '#classTable',
-						    'revert'      : 'invalid',
-						    'distance'    : 20,
-						    'scroll'      : false,
-						    'cursor'      : 'move',
-							'helper'      : function(event){
-								// include the user from which dragging started
-								$(this).addClass('draggableSelected');
-								
-								// copy selected users
-								var helperContainer = $('<div />');
-								$(this).siblings('.draggableSelected').addBack().each(function(){
-									$(this).clone().appendTo(helperContainer);
-								});
-								return helperContainer;
-							}	
+			'appendTo'    : 'body',
+			'containment' : '#classTable',
+			'revert'      : 'invalid',
+			'distance'    : 20,
+			'scroll'      : false,
+			'cursor'      : 'move',
+			'helper'      : function(event){
+				// include the user from which dragging started
+				$(this).addClass('draggableSelected');
+
+				// copy selected users
+				var helperContainer = $('<div />');
+				$(this).siblings('.draggableSelected').addBack().each(function(){
+					$(this).clone().appendTo(helperContainer);
+				});
+				return helperContainer;
+			}
 		}).click(function(event){
 			var wasSelected = $(this).hasClass('draggableSelected');
 			var parentId = $(this).parent().attr('id');
 			// this is needed for shift+click
 			var lastSelectedUser = lastSelectedUsers[parentId];
-			
+
 			if (event.shiftKey && lastSelectedUser && lastSelectedUser != this) {
 				// clear current selection
 				$(this).siblings().addBack().removeClass('draggableSelected');
-				
+
 				// find range of users to select
 				var lastSelectedIndex = $(lastSelectedUser).index();
 				var index = $(this).index();
-				
+
 				var startingElem = lastSelectedIndex > index ? this : lastSelectedUser;
 				var endingElem = lastSelectedIndex > index ? lastSelectedUser : this;
-				
+
 				$(startingElem).nextUntil(endingElem).addBack().add(endingElem)
 					.addClass('draggableSelected');
 			} else {
@@ -153,7 +159,7 @@ function initClassTab(){
 					// clear current sleection
 					$(this).siblings().addBack().removeClass('draggableSelected');
 				}
-				
+
 				if (wasSelected && !event.shiftKey){
 					$(this).removeClass('draggableSelected');
 					lastSelectedUsers[parentId] = null;
@@ -164,23 +170,23 @@ function initClassTab(){
 			}
 		});
 	});
-	
+
 	// allow putting dragged users into container divs
 	$('.userContainer').each(function(){
 		var containerId = $(this).attr('id');
-		
+
 		$(this).droppable({'scope'       : containerId,
-						   'activeClass' : 'droppableHighlight',
-						   'tolerance'   : 'touch',
-						   'accept'      : function (draggable) {
-							   return acceptDraggable(draggable, containerId);
-						   },
-						   'drop'        : function () {
-							   transferUsers(containerId);
-						   }
+			'activeClass' : 'droppableHighlight',
+			'tolerance'   : 'touch',
+			'accept'      : function (draggable) {
+				return acceptDraggable(draggable, containerId);
+			},
+			'drop'        : function () {
+				transferUsers(containerId);
+			}
 		});
 	});
-	
+
 	$('.sortUsersButton').click(function(){
 		sortUsers($(this).attr('id'));
 	});
@@ -192,13 +198,13 @@ function initAdvancedTab(){
 		// CKEditor needs to load first, then only hide the whole div to prevent errors
 		$('#introDescriptionDiv').hide();
 	});
-	
+
 	$('#splitLearnersCountField').attr({
 		'step'        : 1,
 		'min'         : 1,
 		'max'         : users.selectedLearners ? users.selectedLearners.length : 1
 	}).change(updateSplitLearnersFields);
-	
+
 	$('#splitLearnersField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#splitLearnersTable').show('slow');
@@ -207,7 +213,7 @@ function initAdvancedTab(){
 			$('#splitLearnersTable').hide('slow');
 		}
 	});
-	
+
 	$('#introEnableField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#introDescriptionDiv').show('slow');
@@ -215,11 +221,11 @@ function initAdvancedTab(){
 			$('#introDescriptionDiv').hide('slow');
 		}
 	});
-	
+
 	$('#presenceEnableField').change(function(){
 		$('#imEnableField').prop('disabled', !$(this).is(':checked'));
 	});
-	
+
 	$('#schedulingEnableField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#scheduleStartTime').show('slow');
@@ -229,20 +235,20 @@ function initAdvancedTab(){
 			$('#scheduleEndTime').hide('slow');
 		}
 	});
-	
+
 	$('#startMonitorField').change(function(){
 		var checked = !$(this).is(':checked');
 		if (!checked) {
 			$('#schedulingEnableField, #precedingLessonEnableField, ' +
-	          '#timeLimitEnableField, #timeLimitIndividualField').prop('checked', false).change();
+				'#timeLimitEnableField, #timeLimitIndividualField').prop('checked', false).change();
 			$('#schedulingDatetimeField').val(null);
 			$('#schedulingEndDatetimeField').val(null);
 		}
-		
+
 		$('#schedulingEnableField, #precedingLessonEnableField, #timeLimitEnableField, #timeLimitIndividualField,' +
-		  '#precedingLessonIdField, #schedulingDatetimeField, #schedulingEndDatetimeField').prop('disabled', !checked);
+			'#precedingLessonIdField, #schedulingDatetimeField, #schedulingEndDatetimeField').prop('disabled', !checked);
 	});
-	
+
 	$('#schedulingDatetimeField').datetimepicker({
 		'minDate' : 0,
 		'dateFormat' : 'yy-mm-dd'
@@ -251,8 +257,8 @@ function initAdvancedTab(){
 		'minDate' : 0,
 		'dateFormat' : 'yy-mm-dd'
 	});
-	
-	
+
+
 	$('#schedulingEndDatetimeField').change(function(){
 		if ( $('#schedulingEndDatetimeField').val() == "" ) {
 			$('#timeLimitIndividualField').prop('disabled', false);
@@ -284,13 +290,13 @@ function initConditionsTab(){
 			$('#precedingLessonIdField').hide('slow');
 		}
 	});
-	
+
 	$('#timeLimitDaysField').attr({
 		'min'         : 0,
 		'max'         : 180,
 		'step'		  : 1
 	}).val(30);
-	
+
 	$('#timeLimitEnableField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#timeLimitDiv').show('slow');
@@ -317,7 +323,7 @@ function addLesson(learningDesignId, lessonName){
 	if (lessonName){
 		$('#lessonNameInput').removeClass('errorBorder');
 	}
-	
+
 	if (!learningDesignId) {
 		var ldNode = tree.treeview('getSelected')[0];
 		if (ldNode == null) {
@@ -326,16 +332,16 @@ function addLesson(learningDesignId, lessonName){
 			learningDesignId = ldNode.learningDesignId;
 		}
 	}
-	
+
 	if (!learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
 	}
 	$('#ldIdField').val(learningDesignId);
-	
+
 	if (lessonName){
-		var nameValidator = /^[^<>^*@%$]*$/igm;	
+		var nameValidator = /^[^<>^*@%$]*$/igm;
 		if (!nameValidator.test(lessonName)) {
 			$('#lessonNameInput').addClass('errorBorder');
 			doSelectTab(1);
@@ -348,23 +354,23 @@ function addLesson(learningDesignId, lessonName){
 		return;
 	}
 	$('#lessonNameField').val(lessonName);
-	
-	
+
+
 	var learners = getSelectedUserList('selected-learners');
 	if (learners == ''){
 		$('<div />').addClass('errorMessage')
-		            .text(LABEL_MISSING_LEARNERS)
-		            .appendTo('#selected-learners');
+			.text(LABEL_MISSING_LEARNERS)
+			.appendTo('#selected-learners');
 		doSelectTab(2);
 		return;
 	}
 	$('#learnersField').val(learners);
-	
+
 	var monitors = getSelectedUserList('selected-monitors');
 	if (monitors == ''){
 		$('<div />').addClass('errorMessage')
-		            .text(LABEL_MISSING_MONITORS)
-		            .appendTo('#selected-monitors');
+			.text(LABEL_MISSING_MONITORS)
+			.appendTo('#selected-monitors');
 		doSelectTab(2);
 		return;
 	}
@@ -379,19 +385,19 @@ function addLesson(learningDesignId, lessonName){
 			$("#timelimitError").css("display","none");
 		}
 	}
-	
+
 	$('#addButton').button('loading');
-	
+
 	if ($('#splitLearnersField').is(':checked')) {
 		var maxLearnerCount = $('#selected-learners div.draggableItem').length,
 			learnerCount = $('#splitLearnersCountField').val(),
 			instances = Math.ceil(maxLearnerCount/learnerCount);
 		$('#splitNumberLessonsField').val(instances);
 	}
-	
+
 	// copy CKEditor contents to textarea for submit
 	$('#introDescription').val(CKEDITOR.instances['introDescription'].getData());
-	
+
 	//handle multiple lessons feature
 	if ($(".multiple-lessons:checked").length) {
 		//don't send main organisation's id to the server in case other multiple lessons are chosen
@@ -409,7 +415,7 @@ function addLesson(learningDesignId, lessonName){
 function previewLesson(){
 	var ldNode = tree.treeview('getSelected')[0],
 		learningDesignID = null;
-		popupWidth = 1280,
+	popupWidth = 1280,
 		popupHeight = 720;
 
 	if (ldNode && ldNode.learningDesignId) {
@@ -419,7 +425,7 @@ function previewLesson(){
 		// get data from "recently used sequences" list
 		learningDesignID = +$('div#accessDiv .access-selected').data('learningDesignId');
 	}
-			
+
 	if (!learningDesignID) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
@@ -442,7 +448,7 @@ function previewLesson(){
 				previewButton.button('reset');
 				return;
 			}
-			
+
 			$.ajax({
 				url : LAMS_URL + 'monitoring/monitoring/startPreviewLesson.do',
 				data : {
@@ -453,7 +459,7 @@ function previewLesson(){
 				success : function() {
 					// open preview pop up window
 					window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
-								'width=' + popupWidth + ',height=' + popupHeight + ',resizable,status=yes');
+						'width=' + popupWidth + ',height=' + popupHeight + ',resizable,status=yes');
 					previewButton.button('reset');
 				}
 			});
@@ -465,7 +471,7 @@ function previewLesson(){
 // ********** LESSON TAB FUNCTIONS **********
 
 function loadLearningDesignSVG(ldId) {
-	
+
 	$.ajax({
 		dataType : 'text',
 		url : LAMS_URL + 'home/getLearningDesignThumbnail.do',
@@ -474,13 +480,13 @@ function loadLearningDesignSVG(ldId) {
 		data : {
 			'ldId'      : ldId,
 			'_t'		: new Date().getTime()
-			
+
 		},
 		success : function(response) {
 			// hide "loading" animation
 			$('.ldChoiceDependentCanvasElement').css('display', 'none');
 			generatingLearningDesign = false;
-			
+
 			// show the thumbnail
 			$('#ldScreenshotAuthor').html(response);
 			$('#ldScreenshotAuthor').css('display', 'block').css('width', 'auto').css('height', 'auto');
@@ -491,7 +497,7 @@ function loadLearningDesignSVG(ldId) {
 			// resize if needed
 			var resized = resizeSequenceThumbnail();
 			toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
-					: CANVAS_RESIZE_OPTION_NONE);
+				: CANVAS_RESIZE_OPTION_NONE);
 		},
 		error : function(error) {
 
@@ -504,17 +510,17 @@ function loadLearningDesignSVG(ldId) {
 			}
 
 			generatingLearningDesign = true;
-			
+
 			// iframe just to load Authoring for a single purpose, generate the SVG
 			var frame = $('<iframe />').appendTo('body').css('visibility', 'hidden');
 			frame.on('load', function(){
 				// disable current onload handler as closing the dialog reloads the iframe
 				frame.off('load');
-				
+
 				// call svgGenerator.jsp code to store LD SVG on the server
 				var win = frame[0].contentWindow || frame[0].contentDocument;
 				$(win.document).ready(function(){
-				    // when LD opens, make a callback which save the thumbnail and displays it in current window
+					// when LD opens, make a callback which save the thumbnail and displays it in current window
 					win.GeneralLib.openLearningDesign(ldId, function(){
 						result = win.GeneralLib.saveLearningDesignImage();
 						frame.remove();
@@ -529,7 +535,7 @@ function loadLearningDesignSVG(ldId) {
 			frame.attr('src', LAMS_URL + 'authoring/generateSVG.do?selectable=false');
 		}
 	});
-	
+
 }
 
 function resizeSequenceThumbnail(reset) {
@@ -543,18 +549,18 @@ function resizeSequenceThumbnail(reset) {
 			if ( originalThumbnailWidth > 550 ) {
 				$('#ldScreenshotAuthor').css('width', 550).css('height', originalThumbnailHeight);
 			}
-		} else { 
+		} else {
 			var svgWidth = svg.attr('width'),
 				svgHeight = svg.attr('height');
 			if ( svgWidth > 550 ) {
 				svg.attr('width', 550);
 				svg.attr('height', Math.ceil(svgHeight * (550 / svgWidth)));
 				returnValue = true;
-			} 
+			}
 			$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
 		}
 	}
-	
+
 	return returnValue;
 }
 
@@ -566,25 +572,25 @@ function toggleCanvasResize(mode) {
 
 	var toggleCanvasResizeLink = $('#toggleCanvasResizeLink');
 	switch (mode) {
-	case CANVAS_RESIZE_OPTION_NONE:
-		toggleCanvasResizeLink.css('display', 'none');
-		break;
-	case CANVAS_RESIZE_OPTION_FIT:
-		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FULL).one('click',
+		case CANVAS_RESIZE_OPTION_NONE:
+			toggleCanvasResizeLink.css('display', 'none');
+			break;
+		case CANVAS_RESIZE_OPTION_FIT:
+			toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FULL).one('click',
 				function() {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FULL)
 				});
-		toggleCanvasResizeLink.css('display', 'inline');
-		resizeSequenceThumbnail();
-		break;
-	case CANVAS_RESIZE_OPTION_FULL:
-		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
+			toggleCanvasResizeLink.css('display', 'inline');
+			resizeSequenceThumbnail();
+			break;
+		case CANVAS_RESIZE_OPTION_FULL:
+			toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
 				function() {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FIT)
 				});
-		toggleCanvasResizeLink.css('display', 'inline');
-		resizeSequenceThumbnail(true);
-		break;
+			toggleCanvasResizeLink.css('display', 'inline');
+			resizeSequenceThumbnail(true);
+			break;
 	}
 }
 
@@ -601,44 +607,44 @@ function loadRecentlyAccessedLearningDesigns(){
 			access = response;
 		}
 	});
-	
-	
+
+
 	if (access) {
 		var accessCell = $('#accessDiv');
 		accessCell.children('div.access').remove();
 		$.each(access, function(){
 			$('<div />').addClass('access')
-						.data({
-							'title'			   : this.title,
-							'learningDesignId' : this.learningDesignId,
-							'folderID'         : this.workspaceFolderId
-						})
-						.text(this.title)
-						.appendTo(accessCell)
-						.click(function(){
-							// deselect LD in main tree
-							var selectedNode = tree.treeview('getSelected')[0];
-							if (selectedNode != null) {
-								tree.treeview('unselectNode', selectedNode);
-							}
-							// deselect node in access list
-							$('.access-selected', accessCell).removeClass('access-selected');
-							
-							// select clicked node
-							var accessEntry = $(this).addClass('access-selected'),
-								learningDesignID = +accessEntry.data('learningDesignId');
-							
-							// hide existing LD image
-							$('.ldChoiceDependentCanvasElement').css('display', 'none');
-							
-							$('#lessonNameInput').val(accessEntry.data('title'));
-							//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
-							if (isElementInViewport($('#lessonNameInput'))) {
-								$('#lessonNameInput').focus();
-							}
-							// display "loading" animation and finally LD thumbnail
-							loadLearningDesignSVG(learningDesignID);
-						});
+				.data({
+					'title'			   : this.title,
+					'learningDesignId' : this.learningDesignId,
+					'folderID'         : this.workspaceFolderId
+				})
+				.text(this.title)
+				.appendTo(accessCell)
+				.click(function(){
+					// deselect LD in main tree
+					var selectedNode = tree.treeview('getSelected')[0];
+					if (selectedNode != null) {
+						tree.treeview('unselectNode', selectedNode);
+					}
+					// deselect node in access list
+					$('.access-selected', accessCell).removeClass('access-selected');
+
+					// select clicked node
+					var accessEntry = $(this).addClass('access-selected'),
+						learningDesignID = +accessEntry.data('learningDesignId');
+
+					// hide existing LD image
+					$('.ldChoiceDependentCanvasElement').css('display', 'none');
+
+					$('#lessonNameInput').val(accessEntry.data('title'));
+					//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
+					if (isElementInViewport($('#lessonNameInput'))) {
+						$('#lessonNameInput').focus();
+					}
+					// display "loading" animation and finally LD thumbnail
+					loadLearningDesignSVG(learningDesignID);
+				});
 		});
 	}
 }
@@ -650,16 +656,16 @@ function fillUserContainer(users, containerId) {
 		// create user DIVs
 		$.each(users, function(index, userJSON) {
 			$('#' + containerId).append(
-					$('<div />').attr({
-									'userId'  : userJSON.userID
-									})
-			                    .addClass('draggableItem')
-    						    .text(userJSON.lastName + ', ' + userJSON.firstName 
-    						    		  + ' (' + userJSON.login + ')'
-    						    	 )
-    		);
+				$('<div />').attr({
+					'userId'  : userJSON.userID
+				})
+					.addClass('draggableItem')
+					.text(userJSON.lastName + ', ' + userJSON.firstName
+						+ ' (' + userJSON.login + ')'
+					)
+			);
 		});
-		
+
 		sortUsers('sort-' + containerId);
 	}
 }
@@ -694,7 +700,7 @@ function sortUsers(buttonId) {
 	var users = container.children('div.draggableItem');
 	if (users.length > 1) {
 		var sortOrderAsc = sortOrderAscending[buttonId];
-		
+
 		users.each(function(){
 			$(this).detach();
 		}).sort(function(a, b){
@@ -705,7 +711,7 @@ function sortUsers(buttonId) {
 		}).each(function(){
 			$(this).appendTo(container);
 		});
-		
+
 		var button = $('#' + buttonId);
 		if (sortOrderAsc) {
 			button.html('▼');
@@ -714,7 +720,7 @@ function sortUsers(buttonId) {
 			button.html('▲');
 			sortOrderAscending[buttonId] = true;
 		}
-		
+
 		colorDraggableUsers(container);
 	}
 }
@@ -731,30 +737,30 @@ function transferUsers(toContainerId) {
 	var fromContainer = $('#' + fromContainerId);
 	var selectedUsers =  fromContainer.children('.draggableSelected');
 	if (selectedUsers.length > 0){
-	   // remove error message, if exists
-	   toContainer.children('.errorMessage').remove();
-	   
-	   // move the selected users
-	   selectedUsers.each(function(){
-		   if (acceptDraggable(this, toContainerId)) {
-			  $(this).css({'top'  : '0px',
-	              		   'left' : '0px',
-	          })
-	          .draggable('option', 'scope', fromContainerId)
-	          .appendTo(toContainer);
-		   }
-	   });
-	            
-	   
-	   // recolour both containers
-	   toContainer.children().removeClass('draggableSelected');
-	   colorDraggableUsers(toContainer);
-	   colorDraggableUsers(fromContainer);
-	   
-	   if (toContainerId.indexOf('learners') > 0) {
-		   // number of selected learners changed, so update this control too
-		   updateSplitLearnersFields();
-	   }
+		// remove error message, if exists
+		toContainer.children('.errorMessage').remove();
+
+		// move the selected users
+		selectedUsers.each(function(){
+			if (acceptDraggable(this, toContainerId)) {
+				$(this).css({'top'  : '0px',
+					'left' : '0px',
+				})
+					.draggable('option', 'scope', fromContainerId)
+					.appendTo(toContainer);
+			}
+		});
+
+
+		// recolour both containers
+		toContainer.children().removeClass('draggableSelected');
+		colorDraggableUsers(toContainer);
+		colorDraggableUsers(fromContainer);
+
+		if (toContainerId.indexOf('learners') > 0) {
+			// number of selected learners changed, so update this control too
+			updateSplitLearnersFields();
+		}
 	}
 }
 
