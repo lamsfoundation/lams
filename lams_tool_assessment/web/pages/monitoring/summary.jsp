@@ -26,6 +26,11 @@
 		height: 100% !important;
 	}
 
+	#activity-completion-chart {
+		max-width: 400px;
+		margin: auto;
+	}
+
 	#questions-data {
 		border-collapse: separate;
 	}
