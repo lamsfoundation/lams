@@ -353,7 +353,7 @@
 
 		<lams:errors5/>
 
-		<lams:Alert5 id="score" type="info" close="false">
+		<lams:Alert5 id="score" type="success" close="false">
 			<fmt:message key="label.you.ve.got">
 				<fmt:param>${score}</fmt:param>
 				<fmt:param>${scorePercentage}</fmt:param>

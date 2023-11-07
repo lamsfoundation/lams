@@ -62,8 +62,8 @@
 					<fmt:message key="label.cancel" /> 
 				</button>
 				
-				<button type="button" id="addImageBtn" onclick="javascript:submitImageGalleryItem()" class="btn btn-sm btn-secondary button-add-item">
-					<i class="fa fa-upload me-1"></i> <fmt:message key="label.authoring.basic.add.image" /> 
+				<button type="button" id="addImageBtn" onclick="javascript:submitImageGalleryItem()" class="btn btn-sm btn-secondary btn-icon-add">
+					<fmt:message key="label.authoring.basic.add.image" /> 
 				</button>
 			</div>
 			

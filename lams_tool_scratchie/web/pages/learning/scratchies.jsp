@@ -203,7 +203,7 @@
 			
 			<%-- show burning questions --%>
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
-				<div class="burning-question-container mb-3">
+				<div class="burning-question-container mb-2 mt-4">
 					<button type="button" id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}"
 							class="btn btn-light btn-sm <c:if test="${empty item.burningQuestion}">collapsed</c:if>">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
@@ -211,7 +211,7 @@
 						<fmt:message key="label.burning.question" />
 					</button>
 					
-					<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">show</c:if> p-2">
+					<div id="burning-question-item${item.uid}" class="collapse <c:if test="${not empty item.burningQuestion}">show</c:if> pt-3">
 						<textarea rows="5" name="burningQuestion${item.uid}" class="form-control" aria-labelledby="questionTitle${questionNumber.count} bq${item.uid}" 
 							<c:if test="${mode == 'teacher'}">disabled="disabled"</c:if>
 						>${item.burningQuestion}</textarea>

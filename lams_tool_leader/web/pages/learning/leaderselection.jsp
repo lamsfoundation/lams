@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 	
 <lams:PageLearner title="${content.title}" toolSessionID="${toolSessionID}">
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet" />
@@ -101,13 +99,10 @@
 					userId="${groupLeader.userId}" />
 			</c:when>
 			<c:otherwise>
-				<lams:Alert5 type="warning" id="no-leader" close="false">
-					<h4>
-						<fmt:message key="label.no.leader.yet.title" />
-					</h4>
-					<p>
-						<fmt:message key="label.no.leader.yet.body" />
-					</p>
+				<fmt:message key="label.no.leader.yet.title" var="alertTitle"/>
+				<lams:Alert5 type="warning" id="no-leader" close="false"
+						title="${alertTitle}">
+					<fmt:message key="label.no.leader.yet.body" />
 				</lams:Alert5>
 			</c:otherwise>
 		</c:choose>
@@ -160,11 +155,11 @@
 	<div id="leaderSelectionDialog" class="modal fade" data-bs-keyboard="true" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="exampleModalLabel">
+				<div class="modal-header text-bg-secondary">
+					<h1 class="modal-title text-white fs-5" id="exampleModalLabel">
 						<fmt:message key="label.are.you.going.to.be.leader" />
 					</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 					
 				<div class="modal-body">
@@ -173,32 +168,29 @@
 						<c:out value="${content.instructions}" escapeXml="false" />
 					</div>
 						
-					<div class="card lcard mt-3">
+					<div class="ltable table-hover mt-3">
 						<div class="card-header">
 							<fmt:message key="label.users.from.group" />
 						</div>
-						
-						<div class="card-body mb-3">
-							<div id="usersInGroup-modal" class="row mt-n2" role="list">
-								<c:forEach var="user" items="${groupUsers}">
-									<div id="user-${user.userId}-modal" role="listitem" class="mt-3 ms-3">
-										<lams:Portrait userId="${user.userId}" />
-										<span> 
-											<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
-										</span>
-									</div>
-								</c:forEach>
+
+						<c:forEach var="user" items="${groupUsers}">
+							<div id="user-${user.userId}-modal" class="ps-2">
+								<lams:Portrait userId="${user.userId}" />
+								<span class="ms-2"> 
+									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+								</span>
 							</div>
-						</div>
+						</c:forEach>
 					</div>
 				</div>
 
 				<div class="modal-footer">
-					<button data-bs-dismiss="modal" class="btn btn-secondary">
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
 						<i class="fa fa-xmark fa-lg me-1"></i>
 						<fmt:message key="label.no" />
 					</button>
-					<button onclick="leaderSelection();" class="btn btn-primary">
+					
+					<button type="button" onclick="leaderSelection();" class="btn btn-primary">
 						<i class="fa fa-check fa-lg me-1"></i>
 						<fmt:message key="label.yes.become.leader" />
 					</button>

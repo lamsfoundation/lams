@@ -99,7 +99,7 @@
 							</fmt:message>
 						</c:when>
 					</c:choose>
-					<br>
+					&nbsp;
 
 					<fmt:message key="label.rateLimits.topic.reminder">
 						<fmt:param value="<span id='numOfRatings'>${sessionMap.numOfRatings}</span>" />

@@ -40,9 +40,10 @@
 			<c:forEach var="questionEntry" items="${generalLearnerFlowDTO.mapQuestionContentLearner}">
 				<div class="card lcard mt-4" id="questions${questionEntry.key}">
 					<div class="card-header">
-						<strong>
-							<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">${questionEntry.key}.&nbsp;</c:if> <c:out value="${questionEntry.value.name}" escapeXml="false" />
-						</strong>
+						<c:if test="${generalLearnerFlowDTO.mapQuestionContentLearner.size() != 1}">
+							${questionEntry.key}.&nbsp;
+						</c:if> 
+						<c:out value="${questionEntry.value.name}" escapeXml="false" />
 					</div>
 
 					<div class="card-body">
@@ -52,11 +53,11 @@
 
 						<c:forEach var="answerEntry" items="${generalLearnerFlowDTO.mapAnswersPresentable}">
 							<c:if test="${answerEntry.key == questionEntry.key}">
-							<span class="fw-bold my-1">
-								<fmt:message key="label.learning.yourAnswer" />
-							</span>
+								<div class="card-subheader">
+									<fmt:message key="label.learning.yourAnswer" />
+								</div>
 
-								<div class="border border-primary p-3 m-2 border-opacity-50 rounded-2" id="answer${questionEntry.key}">
+								<div id="answer${questionEntry.key}">
 									<c:out value="${answerEntry.value}" escapeXml="false" />
 								</div>
 							</c:if>
@@ -64,12 +65,12 @@
 
 						<!-- Feedback -->
 						<c:if test="${(questionEntry.value.feedback != '') && (questionEntry.value.feedback != null) }">
-
-							<div class="panel panel-default mt-4" id="feedback${questionEntry.key}">
-								<div class="panel-heading panel-heading-sm panel-title">
+							<div id="feedback${questionEntry.key}">
+								<div class="card-subheader mt-4">
 									<fmt:message key="label.feedback" />
 								</div>
-								<div class="panel-body panel-body-sm">
+								
+								<div>
 									<c:out value="${questionEntry.value.feedback}" escapeXml="false" />
 								</div>
 							</div>
@@ -101,7 +102,7 @@
 									<fmt:message key="button.endLearning" />
 								</c:otherwise>
 							</c:choose>
-							</button>
+						</button>
 					</c:if>
 
 					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">

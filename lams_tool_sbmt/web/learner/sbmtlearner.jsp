@@ -11,9 +11,7 @@
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
-
 <lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}" >
-
 	<link href="<lams:LAMSURL />css/uppy.min.css" rel="stylesheet" type="text/css" />
 	<link href="<lams:LAMSURL />css/uppy.custom5.css" rel="stylesheet" type="text/css" />
 	<style>
@@ -115,11 +113,11 @@
 
 					<!--File path row -->
 					<div class="card lcard">
-						<div class="card-header">
-							<fmt:message key="label.learner.upload" />
-						</div>
-
 						<div class="card-body">
+							<div class="card-subheader">
+								<fmt:message key="label.learner.upload" />
+							</div>
+						
 							<div class="form-floating">
 								<label for="file-upload-area" class="d-none"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
 
@@ -127,7 +125,7 @@
 							</div>
 
 							<!--File Description -->
-							<div class="form-floating m-3">
+							<div class="form-floating my-3">
 								<form:textarea style="height: 80px" id="description" aria-multiline="true" aria-required="true" required="true" cssClass="form-control" path="description" placeholder="-"></form:textarea>
 								<label for="description"><fmt:message key="label.learner.fileDescription" /></label>
 								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
@@ -140,11 +138,12 @@
 							</div>
 
 							<c:if test="${hasEditRight}">
-								<div class="mb-3 text-center">
+								<div class="mb-3 text-end">
 									<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.maxLimitReached}">disabled="disabled"</c:if>
-											class="btn btn-secondary btn-success btn-disable-on-submit"
+											class="btn btn-secondary btn-disable-on-submit"
 											title='<fmt:message key="label.add.tip" />' >
-										<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <fmt:message key="label.add" />
+										<i class="fa-solid fa-cloud-arrow-up me-1" aria-hidden="true"></i>
+										<fmt:message key="label.add" />
 									</button>
 								</div>
 							</c:if>
@@ -158,8 +157,6 @@
 			<!-- end div uppy form-->
 		</div>
 
-
-
 		<!--Checks if the filesUploaded property of the SbmtLearnerForm is set -->
 		<div id="submittedFiles" class="mt-4">
 			<c:choose>
@@ -170,40 +167,52 @@
 				</c:when>
 
 				<c:otherwise>
-					<h3 class="mt-5">
-						<fmt:message key="monitoring.user.submittedFiles" />
-					</h3>
-					<small class="text-muted"><c:out value="${fn:length(learner.filesUploaded)}" />&nbsp;<fmt:message key="label.files" /></small>
+					<div class="card lcard">
+						<div class="card-body">
+							<div class="card-subheader mb-4">
+								<fmt:message key="monitoring.user.submittedFiles" />
+								
+								<small class="text-muted">
+									<c:out value="${fn:length(learner.filesUploaded)}" />&nbsp;<fmt:message key="label.files" />
+								</small>
+							</div>
 
-					<div role="list" class="mt-2 mb-4" aria-labelledby="submittedFiles">
+					<div class="ltable no-header table-striped div-hover mt-2 mb-4">
 						<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
-							<div role="listitem" class="card lcard mt-4">
+							<div class="p-3">
 								<!--The name of the File -->
 								<c:if test="${file.currentLearner}">
-									<div class="card-header">
+									<div>
 										<c:set var="downloadURL">
 											<c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
 										</c:set>
-										<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;<a class="fw-bold" style="color: var(--bs-link-hover-color)" href="${downloadURL}" aria-label="<fmt:message key="label.download" />"><c:out value="${file.filePath}" /></a>
+										<i class="fa-regular fa-file" aria-label="false"></i> &nbsp;
+										<a class="fw-bold" style="color: var(--bs-link-hover-color)" href="${downloadURL}" aria-label="<fmt:message key="label.download" />">
+											<c:out value="${file.filePath}" />
+										</a>
+										
 										<div class="float-end">
 											<c:if test="${empty file.marks && hasEditRight}">
-												<a href="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" class="btn btn-primary btn-disable-on-submit"
-												   title="<fmt:message key="label.monitoring.original.learner.file.delete"/>">
-													<i class="fa fa-trash" aria-label="<fmt:message key="label.monitoring.original.learner.file.delete"/>"></i>
-												</a>
+												<button type="button" onclick="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');" 
+													class="btn btn-danger btn-disable-on-submit px-2"
+													title="<fmt:message key="label.monitoring.original.learner.file.delete"/>">
+													<i class="fa fa-trash fa-lg" aria-label="<fmt:message key="label.monitoring.original.learner.file.delete"/>"></i>
+												</button>
 											</c:if>
 
-											<a href="${downloadURL}"  class="btn btn-primary btn-disable-on-submit" title="<fmt:message key="label.download" />" >
-												<i class="fa fa-download" aria-label="<fmt:message key="label.download" />"></i>
+											<a href="${downloadURL}" class="btn btn-secondary btn-disable-on-submit px-2" title="<fmt:message key="label.download" />" >
+												<i class="fa fa-download fa-lg" aria-label="<fmt:message key="label.download" />"></i>
 											</a>
 										</div>
+										
 										<br>
 										<small>
 											<fmt:message key="label.learner.time" />&nbsp;<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
 										</small>
 									</div>
 								</c:if>
-								<div class="card-body">
+								
+								<div>
 									<!--The description of the File -->
 									<div id="fileDescription" aria-label="<fmt:message key='label.learner.fileDescription' />">
 										<lams:out value="${file.fileDescription}" escapeHtml="true" />
@@ -248,6 +257,8 @@
 							</div>
 						</c:forEach>
 					</div>
+					</div>
+					</div>
 
 				</c:otherwise>
 			</c:choose>
@@ -257,7 +268,7 @@
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<lams:NotebookReedit
 				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${learner.reflectEntry}"
+				reflectEntry="${learner.reflect}"
 				isEditButtonEnabled="${sessionMap.mode != 'teacher'}"
 				notebookHeaderLabelKey="title.reflection"/>
 		</c:if>
@@ -267,17 +278,16 @@
 			<c:if test="${sessionMap.mode != 'teacher'}">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-						<button id="notebookButton" onclick="javascript:notebook();"
+						<button type="button" id="notebookButton" onclick="javascript:notebook();"
 								class="btn btn-primary btn-disable-on-submit
 								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 					<c:otherwise>
-						<button type="button"
+						<button type="button" id="finishButton"
 								class="btn btn-primary btn-disable-on-submit na
-								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}"
-								id="finishButton">
+								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
 							<c:choose>
 								<c:when test="${isLastActivity}">
 									<fmt:message key="button.submit" />

@@ -287,13 +287,13 @@ body.component .cke_textarea_inline {
 	color: #555;
 	background-color: var(--bs-white);
 	background-image: none;
-	border-radius: 4px;
+	border-radius: 0.375rem; /* from .form-control */
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 	-webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
 	-o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	border: thin solid var(--bs-secondary);
+	border: 1px solid #ced4da; /* from .form-control */
 	overflow: hidden;
 	/* keeps floating objects within ckeditor area */
 	/* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields
@@ -558,6 +558,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 	border-radius: 1rem;
 	border: 0;
 }
+/*---------- .ltable ----------------*/ 
 
 .ltable {
 	margin-bottom: 1rem;	
@@ -568,21 +569,30 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
     font-style: italic;
     color: initial !important;
 }
-.ltable>.row {
+.ltable>div {
 	border-bottom: 2px solid var(--bs-gray-200);
 	padding: 0.5rem;
 	margin-left: 0;
 	margin-right: 0;
 }
-.ltable.table-sm>.row {
+
+.ltable.table-sm>div {
 	padding: 0.25rem;
 }
-.ltable.table-striped {
+
+.ltable.table-striped.no-header {
    > div:nth-of-type(odd) {
     background-color: var(--bs-gray-200);
   }
 }
-.ltable.table-hover>div:not(:first-child):hover{
+.ltable.table-striped:not(.no-header) {
+   > div:not(:first-child):nth-of-type(even) {
+    background-color: var(--bs-gray-200);
+  }
+}
+
+.ltable.table-hover > div:not(:first-child):hover,
+.ltable.table-hover.no-header > div:first-child:hover{
 	background-color: var(--bs-gray-200);
 }
 
@@ -619,6 +629,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 .rating-comment{
 	background-image: none;
 	border: $border-thin-default-light;
+	border-radius: 0.375rem; /* from .form-control */
 }
 
 .rating-comment-posted-by{
@@ -645,40 +656,77 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 /*----------buttons with icons ----------------*/ 
 
-.na, .btn-icon-refresh, .btn-icon-pen, .btn-icon-return, .btn-icon-previous, .btn-icon-next, .btn-icon-comment, .btn-icon-cancel {
+.btn-icon-add,
+.btn-icon-cancel,
+.btn-icon-comment,
+.btn-icon-next,
+.btn-icon-pen,
+.btn-icon-previous,
+.btn-icon-refresh,
+.btn-icon-remove,
+.btn-icon-return,
+na {
 	display: inline-block;
 }
-.na:after, .btn-icon-refresh:before, .btn-icon-pen:before, .btn-icon-return:before, .btn-icon-previous:before, .btn-icon-next:after, .btn-icon-comment:after, .btn-icon-cancel:before {
-	font-family: FontAwesome;
+.btn-icon-add:before,
+.btn-icon-cancel:before,
+.btn-icon-comment:after,
+.btn-icon-next:after,
+.btn-icon-previous:before,
+.btn-icon-pen:before,
+.btn-icon-refresh:before,
+.btn-icon-remove:before,
+.btn-icon-return:before,
+.na:after {	font-family: FontAwesome;
 	font-style: normal;
 	font-weight: normal;
 	text-decoration: inherit;
-	margin-left: 0.25rem;
 	color: inherit;
 }
+.btn-icon-comment:after,
+.btn-icon-next:after,
 .na:after {
-	content: "\f0a9";
+	margin-left: 0.25rem;
 }
-.btn-icon-refresh:before {
-	content: "\f021";
-}
-.btn-icon-pen:before {
-	content: "\f044";
-}
+.btn-icon-add:before,
+.btn-icon-cancel:before,
+.btn-icon-previous:before,
+.btn-icon-pen:before,
+.btn-icon-refresh:before,
+.btn-icon-remove:before,
 .btn-icon-return:before {
-	content: "\f2ea";
+	margin-right: 0.25rem;
 }
-.btn-icon-previous:before {
-	content: "\f100";
+
+.btn-icon-add:before {
+	content: "\2b";
 }
-.btn-icon-next:after {
-	content: "\f101";
+.btn-icon-cancel:before {
+	content: "\f05e";
 }
 .btn-icon-comment:after {
 	content: "\f1d8";
 }
-.btn-icon-cancel:before {
-	content: "\f05e";
+.btn-icon-next:after {
+	content: "\f101";
+}
+.btn-icon-pen:before {
+	content: "\f044";
+}
+.btn-icon-previous:before {
+	content: "\f100";
+}
+.btn-icon-refresh:before {
+	content: "\f021";
+}
+.btn-icon-remove:before {
+	content: "\f1f8";
+}
+.btn-icon-return:before {
+	content: "\f2ea";
+}
+.na:after {
+	content: "\f0a9";
 }
 
 /*----------slider----------------*/

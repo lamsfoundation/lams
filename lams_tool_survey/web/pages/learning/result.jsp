@@ -137,7 +137,7 @@
 					<c:if test="${(not sessionMap.finishedLock) && (not sessionMap.showOnOnePage)}">
 						<div>
 							<button type="button" onclick="retakeSurvey(${question.sequenceId})" class="btn btn-sm btn-secondary btn-icon-return float-end mt-1">
-								<small><fmt:message key="label.retake" /></small>
+								<fmt:message key="label.retake" />
 							</button>
 						</div>
 					</c:if>

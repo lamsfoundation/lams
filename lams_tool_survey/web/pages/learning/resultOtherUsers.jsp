@@ -164,14 +164,14 @@
 
 		<%-- other users personal results--%>
 		<c:if test="${sessionMap.showOtherUsersAnswers}">
-			<div class="card-subheader">
+			<div class="card-subheader mb-3">
 				<fmt:message key="label.other.answers" />
-			</div>
 			
-			<div class="alert alert-info badge mb-4">
-				<fmt:message key="label.total.responses">
-					<fmt:param>${countFinishedUser}</fmt:param>
-				</fmt:message>
+				<span class="alert alert-info badge ms-2 p-2">
+					<fmt:message key="label.total.responses">
+						<fmt:param>${countFinishedUser}</fmt:param>
+					</fmt:message>
+				</span>
 			</div>
 
 			<c:forEach var="question" items="${answerDtos}" varStatus="queStatus">

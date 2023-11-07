@@ -66,37 +66,6 @@
 			</lams:Alert5>
 		</c:if>
 
-		<!-- Rating limits info -->
-		<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
-			<lams:Alert5 id="rating-info" type="info" close="true">
-				<c:choose>
-					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
-						<fmt:message key="label.rate.limits.reminder">
-							<fmt:param value="${qaContent.minimumRates}" />
-							<fmt:param value="${qaContent.maximumRates}" />
-						</fmt:message>
-					</c:when>
-
-					<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
-						<fmt:message key="label.rate.limits.reminder.min">
-							<fmt:param value="${qaContent.minimumRates}" />
-						</fmt:message>
-					</c:when>
-
-					<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
-						<fmt:message key="label.rate.limits.reminder.max">
-							<fmt:param value="${qaContent.maximumRates}" />
-						</fmt:message>
-					</c:when>
-				</c:choose>
-				<br>
-
-				<fmt:message key="label.rate.limits.topic.reminder">
-					<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>" />
-				</fmt:message>
-			</lams:Alert5>
-		</c:if>
-
 		<c:if test="${isLeadershipEnabled}">
 			<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
 		</c:if>
@@ -108,27 +77,30 @@
 				<div class="card-header">
 					<c:if test="${generalLearnerFlowDTO.questions.size() != 1}">${status.count}.&nbsp;</c:if>
 					<c:out value="${question.qbQuestion.name}" escapeXml="false" />
-					
-					<div class="font-size-init">
-						<c:out value="${question.qbQuestion.description}" escapeXml="false" />
-					</div>
 				</div>
 
 				<div class="card-body">
+					<div class="mb-3">
+						<c:out value="${question.qbQuestion.description}" escapeXml="false" />
+					</div>
 						
 					<%--User own responses---------------------------------------%>
 					<c:set var="userResponse" value="${question.userResponse}"/>
 					<c:if test="${userResponse != null}">
-						<div class="row g-0">
+						<div class="card-subheader">
+							<fmt:message key="label.learning.yourAnswer" />
+						</div>
+					
+						<div class="row">
 							<!-- split if ratings are on -->
-							<c:set var="splitRow" value="col-12" />
+							<c:set var="splitRow" value="" />
 							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<c:set var="splitRow" value="col-12 col-sm-9 col-md-10 col-lg-10" />
 							</c:if>
 							
 							<div class="${splitRow}">
 								<div class="sbox">
-									<div class="sbox-heading bg-warning bg-opacity-50">
+									<div class="sbox-heading bg-warning bg-opacity-10">
 										<div class="float-start me-2">
 											<lams:Portrait userId="${userResponse.qaQueUser.queUsrId}"/>
 										</div>
@@ -158,6 +130,38 @@
 
 					<!-- Others users' responses -->
 					<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
+
+						<!-- Rating limits info -->
+						<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
+							<lams:Alert5 id="rating-info" type="info" close="true">
+								<c:choose>
+									<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
+										<fmt:message key="label.rate.limits.reminder">
+											<fmt:param value="${qaContent.minimumRates}" />
+											<fmt:param value="${qaContent.maximumRates}" />
+										</fmt:message>
+									</c:when>
+				
+									<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
+										<fmt:message key="label.rate.limits.reminder.min">
+											<fmt:param value="${qaContent.minimumRates}" />
+										</fmt:message>
+									</c:when>
+				
+									<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
+										<fmt:message key="label.rate.limits.reminder.max">
+											<fmt:param value="${qaContent.maximumRates}" />
+										</fmt:message>
+									</c:when>
+								</c:choose>
+								<br>
+				
+								<fmt:message key="label.rate.limits.topic.reminder">
+									<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>" />
+								</fmt:message>
+							</lams:Alert5>
+						</c:if>
+					
 						<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
 							<lams:Alert5 id="rating-comment-info-${status.count}" type="info" close="false" >
 								<fmt:message key="label.comment.minimum.number.words">
@@ -179,7 +183,7 @@
 						</c:choose>
 
 						<div class="other-users-responses mt-4">
-							<div class="fst-italic mb-2">
+							<div class="card-subheader mb-2">
 								<fmt:message key="label.other.learners.answers" />
 							</div>
 						
@@ -190,7 +194,7 @@
 									
 								<c:choose>
 									<c:when test="${generalLearnerFlowDTO.allowRateAnswers}">
-										<th title="<fmt:message key='label.sort.by.rating'/>">
+										<th title="<fmt:message key='label.sort.by.rating'/>" class="text-center">
 											<fmt:message key="label.learning.rating" />
 										</th>
 									</c:when>
@@ -210,7 +214,6 @@
 
 				</div>
 			</div>
-
 		</c:forEach>
 		<!-- End questions and answers -->
 
@@ -341,10 +344,15 @@
 								rows += '<td style="vertical-align:top;">';
 
 								if (${generalLearnerFlowDTO.userNameVisible}) {
-									rows += definePortraitMiniHeader(userData["portraitId"], userData["userID"], '${lams}',
-											${qaContent.useSelectLeaderToolOuput} ? userData["sessionName"] : userData["userName"],
-											'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>',
-											false, "sbox-heading bg-warning bg-opacity-50")
+									rows += definePortraitMiniHeader(
+										userData["portraitId"], 
+										userData["userID"], 
+										'${lams}',
+										${qaContent.useSelectLeaderToolOuput} ? userData["sessionName"] : userData["userName"],
+										'<time class="timeago" title="' + userData["attemptTime"] + '" datetime="' + userData["timeAgo"] + '"></time>',
+										false, 
+										"sbox-heading bg-warning bg-opacity-10"
+									)
 								}
 
 								rows += 	'<div class="user-answer">';
@@ -445,10 +453,14 @@
 											//show comments textarea and a submit button
 										} else if (! (IS_DISABLED || usesRatings && MAX_RATES>0 && countRatedItems >= MAX_RATES && !hasStartedRating)) {
 											rows += '<div id="add-comment-area-' + itemId + '">' +
-														'<textarea class="form-control comment-textarea" name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" placeholder="<fmt:message key="label.comment.textarea.tip"/>" aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>' +
-													 	'<button type="button" class="btn btn-success btn-sm add-comment add-comment-new" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'" aria-label="submit">' +
-														 	'<i class="fa fa-check fa-lg"></i>' + 
-														 '</button>' +
+														'<div class="d-flex align-items-center">' +
+															'<textarea class="form-control comment-textarea" name="comment" rows="4" id="comment-textarea-'+ itemId +'" ' +
+																	'onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" ' +
+																	'placeholder="<fmt:message key="label.comment.textarea.tip"/>" aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>' +
+														 	'<button type="button" class="btn btn-secondary btn-sm add-comment add-comment-new ms-2" data-item-id="'+ itemId +'" data-comment-criteria-id="'+ commentsCriteriaId +'" aria-label="submit">' +
+															 	'<i class="fa-solid fa-paper-plane"></i>' + 
+															 '</button>' +
+														 '</div>' +
 													'</div>';
 										}
 									}

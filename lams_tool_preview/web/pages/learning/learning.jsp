@@ -35,10 +35,10 @@
 	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		function hideButtons() {
-			$("#buttonNextPrevDiv button").prop('disabled', true);
+			$("#button-next-prev-area button").prop('disabled', true);
 		}	
 		function showButtons() {
-			$("#buttonNextPrevDiv button").prop('disabled', false);
+			$("#button-next-prev-area button").prop('disabled', false);
 		}	
 
  		function finishSession(){
@@ -93,44 +93,44 @@
 			</c:if>
 		</div>
 		
-			<c:choose>
-				<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">					
-					<%@ include file="comment.jsp"%>
-				</c:when>
+		<c:choose>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">					
+				<%@ include file="comment.jsp"%>
+			</c:when>
 				
-				<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isStar}">
-					<%@ include file="star.jsp"%>
-				</c:when>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isStar}">
+				<%@ include file="star.jsp"%>
+			</c:when>
 				
-				<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
-					<c:choose>
-						<c:when test="${rateAllUsers > 0}">
-							<%@ include file="rankall.jsp"%>
-						</c:when>
-						<c:otherwise>
-							<%@ include file="ranking.jsp"%>
-						</c:otherwise>
-					</c:choose>
-				</c:when>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
+				<c:choose>
+					<c:when test="${rateAllUsers > 0}">
+						<%@ include file="rankall.jsp"%>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="ranking.jsp"%>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
 				
-				<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isHedging}">
-					<%@ include file="hedging.jsp"%>
-				</c:when>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isHedging}">
+				<%@ include file="hedging.jsp"%>
+			</c:when>
 				
-				<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
-					<c:choose>
-						<c:when test="${peerreview.rubricsView eq 2}">
-							<%@ include file="rubricsPivot.jsp"%>
-						</c:when>
-						<c:otherwise>
-							<%@ include file="rubrics.jsp"%>
-						</c:otherwise>
-					</c:choose>
-				</c:when>
-			</c:choose>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
+				<c:choose>
+					<c:when test="${peerreview.rubricsView eq 2}">
+						<%@ include file="rubricsPivot.jsp"%>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="rubrics.jsp"%>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
+		</c:choose>
 
 		<div class="activity-bottom-buttons">
-			<div id="buttonNextPrevDiv">
+			<div id="button-next-prev-area">
 				<c:choose>	
 					<c:when test="${finishedLock || mode == 'teacher'}">
 						<c:set var="method">nextPrev</c:set>
@@ -160,7 +160,7 @@
 				</c:choose>
 			</div>
 						
-			<button type="button" id="refreshButton" class="btn btn-secondary btn-icon-refresh me-4" onclick="javascript:refresh();">
+			<button type="button" id="refreshButton" class="btn btn-secondary btn-icon-refresh me-2" onclick="javascript:refresh();">
 				<fmt:message key="label.refresh"/>
 			</button>
 		</div>			

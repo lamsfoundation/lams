@@ -106,27 +106,8 @@
 				</c:if>
 
 				<hr class="msg-hr">
+				
 				<div class="float-end">
-					<c:if test='${not sessionMap.readOnly}'>
-						<c:set var="replytopic">
-							<lams:LAMSURL />comments/newReplyTopic.do?newUI=true&sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}
-						</c:set>
-						<button type="button" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="btn btn-sm btn-light comment">
-							Reply
-						</button>
-             			 &middot; 
-           			 </c:if>
-
-					<c:if test='${((sessionMap.mode == "teacher") || commentDto.author) && not sessionMap.readOnly }'>
-						<c:set var="edittopic">
-							<lams:LAMSURL />comments/editTopic.do?newUI=true&sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}
-						</c:set>
-						<button type="button" onclick="javascript:createEdit(${commentDto.comment.uid}, '${edittopic}');" class="btn btn-sm btn-light comment">
-							Edit
-						</button>
-              			&middot; 
-           			</c:if>
-
 					<c:if test='${sessionMap.mode == "teacher" && not sessionMap.readOnly}'>
 						<!--  call the hide action -->
 						<c:choose>
@@ -163,18 +144,16 @@
              			 &middot; 
             		</c:if>
 
-					<span id="msglikeCount${commentDto.comment.uid}">${commentDto.comment.likeCount}</span>
-					<fmt:message key="label.likes" />
 					<c:if test='${sessionMap.mode == "learner"}'>
 						<span id="msgvote${commentDto.comment.uid}"> 
 							<c:choose>
 								<c:when test="${empty commentDto.comment.vote && not sessionMap.readOnly}">
-									<button type="button" class="btn fa-regular fa-thumbs-up fa-md fa-faded" title="<fmt:message key="label.like"/>"
+									<button type="button" class="btn btn-light fa-regular fa-thumbs-up fa-md fa-faded" title="<fmt:message key="label.like"/>"
 										onclick="javascript:likeEntry(${commentDto.comment.uid});" id="msglikebutton${commentDto.comment.uid}"
 									></button>
 									
 									<c:if test='${sessionMap.likeAndDislike}'> 
-                      					<button type="button" class="btn fa-regular fa-thumbs-down fa-md fa-flip-horizontal fa-faded"
+                      					<button type="button" class="btn btn-light fa-regular fa-thumbs-down fa-md fa-flip-horizontal fa-faded"
 											title="<fmt:message key="label.dislike"/>" onclick="javascript:dislikeEntry(${commentDto.comment.uid});"
 											id="msgdislikebutton${commentDto.comment.uid}"
 										></button>
@@ -182,14 +161,14 @@
 								</c:when>
 								
 								<c:when test="${commentDto.comment.vote == 1}">
-									<span class="fa-solid fa-thumbs-up fa-md" title="<fmt:message key="label.like"/>"
+									<span class="btn btn-light disabled fa-solid fa-thumbs-up fa-md" title="<fmt:message key="label.like"/>"
 										id="msglikebutton${commentDto.comment.uid}"
 									/>
 								</c:when>
 								
 								<c:otherwise>
 									<c:if test='${sessionMap.likeAndDislike}'>
-										<span class="fa-solid fa-thumbs-down fa-md fa-flip-horizontal" title="<fmt:message key="label.dislike"/>"
+										<span class="btn btn-light disabled fa-solid fa-thumbs-down fa-md fa-flip-horizontal" title="<fmt:message key="label.dislike"/>"
 											id="msgdislikebutton${commentDto.comment.uid}"
 										></span>
 									</c:if>
@@ -197,7 +176,30 @@
 							</c:choose>
 						</span>
 					</c:if>
+					<span id="msglikeCount${commentDto.comment.uid}">${commentDto.comment.likeCount}</span>
+					<fmt:message key="label.likes" />
 
+					<c:if test='${((sessionMap.mode == "teacher") || commentDto.author) && not sessionMap.readOnly }'>
+              			&middot;
+						<c:set var="edittopic">
+							<lams:LAMSURL />comments/editTopic.do?newUI=true&sessionMapID=${sessionMapID}&commentUid=${commentDto.comment.uid}&create=${commentDto.comment.created.time}
+						</c:set>
+						<button type="button" onclick="javascript:createEdit(${commentDto.comment.uid}, '${edittopic}');" class="btn btn-sm btn-light comment">
+							<i class="fa-regular fa-pen-to-square me-1"></i>
+							Edit
+						</button> 
+           			</c:if>
+
+					<c:if test='${not sessionMap.readOnly}'>
+						&middot;
+						<c:set var="replytopic">
+							<lams:LAMSURL />comments/newReplyTopic.do?newUI=true&sessionMapID=${sessionMapID}&parentUid=${commentDto.comment.uid}
+						</c:set>
+						<button type="button" onclick="javascript:createReply(${commentDto.comment.uid}, '${replytopic}');" class="btn btn-sm btn-light comment">
+							<i class="fa-solid fa-reply me-1"></i>
+							Reply
+						</button> 
+           			 </c:if>
 				</div>
 			</div>
 		</div>

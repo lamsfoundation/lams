@@ -195,16 +195,22 @@
 		<lams:errors/>
 		
 		<%--Main image---------------------------------------------------%>
-		
-		<div class="fotorama-container">
-			<div class="fotorama"></div>
-		</div>
+		<div class="card lcard">
+			<div class="card-body">
+				<div class="fotorama-container">
+					<div class="fotorama"></div>
+				</div>
 			
-		<%--Comments & Ranking/Voting area----------------------------------------------%>	
-	 	
-		<div id="image-info">
-			<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
+		<%--Comments & Ranking/Voting area-------------------------------%>
+				<div id="image-info">
+					<%@ include file="/pages/learning/parts/commentsarea.jsp"%>
+				</div>
+			</div>
 		</div>
+							
+		<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages) && imageGallery.allowShareImages && !finishedLock}">
+			<div id="new-image-input-area" class="mt-4"></div>
+		</c:if>	
  
 		<%--Reflection--------------------------------------------------%>
 

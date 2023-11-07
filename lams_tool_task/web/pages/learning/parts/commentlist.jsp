@@ -19,7 +19,7 @@
 <c:forEach var="comment" items="${itemDTO.comments}">
 	<c:if test="${(sessionMap.userLogin == comment.createBy.loginName) || (sessionMap.mode == 'teacher') || (sessionMap.mode == 'author')}">
 		<div class="card mt-2">
-			<div class="card-header text-bg-warning bg-opacity-50">
+			<div class="card-header">
 				<c:if test="${not empty comment.createBy.userId}">
 					<lams:Portrait userId="${comment.createBy.userId}"/>&nbsp;
 				</c:if>

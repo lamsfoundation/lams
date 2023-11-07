@@ -124,40 +124,42 @@
 		</c:if>
 
 		<!-- Form -->
-		<div class="mb-4 shadow">
-			<c:choose>
-				<c:when test="${contentEditable}">
-					<c:choose>
-						<c:when test="${notebookDTO.allowRichEditor}">
-							<lams:CKEditor id="entryText" value="${messageForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
-								toolbarSet="DefaultLearner"
-								ariaLabelledby="instructions">
-							</lams:CKEditor>
-						</c:when>
-
-						<c:otherwise>
-							<form:textarea rows="8" path="entryText" cssClass="form-control" id="entryText" aria-labelledby="instructions"/>
-						</c:otherwise>
-					</c:choose>
-				</c:when>
-
-				<c:otherwise>
-					<div class="sbox sbox-body mt-2 bg-warning">
-						<lams:out value="${messageForm.entryText}" />
+		<div class="card lcard">
+			<div class="card-body">
+				<c:choose>
+					<c:when test="${contentEditable}">
+						<c:choose>
+							<c:when test="${notebookDTO.allowRichEditor}">
+								<lams:CKEditor id="entryText" value="${messageForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
+									toolbarSet="DefaultLearner"
+									ariaLabelledby="instructions">
+								</lams:CKEditor>
+							</c:when>
+	
+							<c:otherwise>
+								<form:textarea rows="8" path="entryText" cssClass="form-control" id="entryText" aria-labelledby="instructions"/>
+							</c:otherwise>
+						</c:choose>
+					</c:when>
+	
+					<c:otherwise>
+						<div class="sbox sbox-body mt-2 bg-warning">
+							<lams:out value="${messageForm.entryText}" />
+						</div>
+					</c:otherwise>
+				</c:choose>
+	
+				<c:if test="${not empty teachersComment}">
+					<div class="panel panel-default mt-2 me-2">
+						<div class="panel-heading">
+							<fmt:message key="label.reply.comment" />
+						</div>
+						<div class="panel-body">
+							<lams:out value="${teachersComment}" escapeHtml="true" />
+						</div>
 					</div>
-				</c:otherwise>
-			</c:choose>
-
-			<c:if test="${not empty teachersComment}">
-				<div class="panel panel-default mt-2 me-2">
-					<div class="panel-heading">
-						<fmt:message key="label.reply.comment" />
-					</div>
-					<div class="panel-body">
-						<lams:out value="${teachersComment}" escapeHtml="true" />
-					</div>
-				</div>
-			</c:if>
+				</c:if>
+			</div>
 		</div>
 
 		<c:if test="${mode != 'teacher'}">

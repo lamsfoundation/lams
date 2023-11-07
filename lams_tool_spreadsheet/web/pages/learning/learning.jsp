@@ -55,14 +55,16 @@
 		</div>
 
 		<input type=hidden name="spreadsheetCode" id="spreadsheet-code" value="${sessionMap.code}"/>
-		
-		<c:if test="${spreadsheet.markingEnabled}">
-			<div class="card lcard mb-3">
-				<div class="card-body">
+
+		<div class="card lcard mb-3">
+			<div class="card-body">	
+			
+				<c:if test="${spreadsheet.markingEnabled}">
 					<div class="row">
 						<div class="col-2">
 							<fmt:message key="label.learning.comments" />
 						</div>
+						
 						<div class="col-10">
 							<c:choose>
 								<c:when test="${mark == null}">
@@ -79,6 +81,7 @@
 						<div class="col-2">
 							<fmt:message key="label.learning.marks" />
 						</div>
+						
 						<div class="col-10">
 							<c:choose>
 								<c:when test="${mark == null}">
@@ -90,14 +93,11 @@
 							</c:choose>
 						</div>
 					</div>
-				</div>
-			</div>
-		</c:if>		
+					
+					<hr class="msg-hr mb-4" />
+				</c:if>		
 
-		<div class="card lcard">
-			<div class="card-body">
-				<iframe
-						id="externalSpreadsheet" name="externalSpreadsheet" src="<lams:WebAppURL/>includes/javascript/simple_spreadsheet/spreadsheet_offline.html?lang=${language}"
+				<iframe id="externalSpreadsheet" name="externalSpreadsheet" src="<lams:WebAppURL/>includes/javascript/simple_spreadsheet/spreadsheet_offline.html?lang=${language}"
 						style="width:99%;" frameborder="no" height="385px"
 						scrolling="no">
 				</iframe>
