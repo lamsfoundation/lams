@@ -381,9 +381,12 @@ public class AssessmentServiceImpl
 	if (lastResult == null) {
 	    return null;
 	}
-	LocalDateTime launchedDate = LocalDateTime.now();
-	lastResult.setTimeLimitLaunchedDate(launchedDate);
-	assessmentResultDao.saveObject(lastResult);
+	LocalDateTime launchedDate = lastResult.getTimeLimitLaunchedDate();
+	if (launchedDate == null) {
+	    launchedDate = LocalDateTime.now();
+	    lastResult.setTimeLimitLaunchedDate(launchedDate);
+	    assessmentResultDao.saveObject(lastResult);
+	}
 	return launchedDate;
     }
 
