@@ -23,10 +23,6 @@
 	function checkCheckbox(checkboxName){
 		var checkbox = document.getElementById(checkboxName);
 		checkbox.checked=true;
-	}	
-	function setValue(elementName,value){
-		var element = document.getElementById(elementName);
-		element.value=value;
 	}
 	
 	function resizeHorizontalRecordListFrame(elementIdPrefix,questionListLength){
