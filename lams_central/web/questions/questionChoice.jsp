@@ -114,7 +114,7 @@
 						alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.questions.choice.generate.more.error" /></spring:escapeBody>');
 					},
 					'success': function (response) {
-						let questions = response.questions[0],
+						let questions = response.questions,
 								questionCount = +$('#questionCount').val();
 
 						$('#selectAll').attr('checked', false);

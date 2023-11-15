@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@ import org.reactivestreams.Publisher;
 import reactor.core.Exceptions;
 import reactor.core.publisher.FluxOnAssembly.AssemblySnapshot;
 import reactor.core.publisher.FluxOnAssembly.MethodReturnSnapshot;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.Logger;
 import reactor.util.Loggers;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * A set of overridable lifecycle hooks that can be used for cross-cutting
@@ -472,7 +474,7 @@ public abstract class Hooks {
 
 	/**
 	 * Reset global data dropped strategy to throwing via {@link
-	 * reactor.core.Exceptions#failWithCancel()}
+	 * Exceptions#failWithCancel()}
 	 */
 	public static void resetOnNextDropped() {
 		log.debug("Reset to factory defaults : onNextDropped");
@@ -510,6 +512,53 @@ public abstract class Hooks {
 	 */
 	public static void disableContextLossTracking() {
 		DETECT_CONTEXT_LOSS = false;
+	}
+
+	private static final String CONTEXT_IN_THREAD_LOCALS_KEY = "CONTEXT_IN_THREAD_LOCALS";
+
+	/**
+	 * Globally enables automatic context propagation to {@link ThreadLocal}s.
+	 * <p>
+	 * It requires the
+	 * <a href="https://github.com/micrometer-metrics/context-propagation">context-propagation library</a>
+	 * to be on the classpath to have an effect.
+	 * Using the implicit global {@code ContextRegistry} it reads entries present in
+	 * the modified {@link Context} using
+	 * {@link Flux#contextWrite(ContextView)} (or {@link Mono#contextWrite(ContextView)})
+	 * and {@link Flux#contextWrite(Function)} (or {@link Mono#contextWrite(Function)})
+	 * and restores all {@link ThreadLocal}s associated via same keys for which
+	 * {@code ThreadLocalAccessor}s are registered.
+	 * <p>
+	 * The {@link ThreadLocal}s are present in the upstream operators from the
+	 * {@code contextWrite(...)} call and the unmodified (downstream) {@link Context} is
+	 * used when signals are delivered downstream, making the {@code contextWrite(...)}
+	 * a logical boundary for the context propagation mechanism.
+	 * <p>
+	 * This mechanism automatically performs {@link Flux#contextCapture()}
+	 * and {@link Mono#contextCapture()} in {@link Flux#blockFirst()},
+	 * {@link Flux#blockLast()}, {@link Flux#toIterable()}, and {@link Mono#block()} (and
+	 * their overloads).
+	 * @since 3.5.3
+	 */
+	public static void enableAutomaticContextPropagation() {
+		if (ContextPropagationSupport.isContextPropagationOnClasspath) {
+			Schedulers.onScheduleHook(CONTEXT_IN_THREAD_LOCALS_KEY,
+					ContextPropagation.scopePassingOnScheduleHook());
+			ContextPropagationSupport.propagateContextToThreadLocals = true;
+			ContextPropagation.configureContextSnapshotFactory(true);
+		}
+	}
+
+	/**
+	 * Globally disables automatic context propagation to {@link ThreadLocal}s.
+	 * @see #enableAutomaticContextPropagation()
+	 */
+	public static void disableAutomaticContextPropagation() {
+		if (ContextPropagationSupport.isContextPropagationOnClasspath) {
+			Hooks.removeQueueWrapper(CONTEXT_IN_THREAD_LOCALS_KEY);
+			Schedulers.resetOnScheduleHook(CONTEXT_IN_THREAD_LOCALS_KEY);
+			ContextPropagationSupport.propagateContextToThreadLocals = false;
+		}
 	}
 
 	@Nullable

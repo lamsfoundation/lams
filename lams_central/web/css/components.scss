@@ -2,659 +2,664 @@
 
 /* For Boostrap 3 & 5 compability */
 .img-responsive {
-	max-width: 100%;
-	height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 .center-block {
-    display: block;
-    margin-right: auto;
-    margin-left: auto;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .img-soft-shadow {
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 .img-circle {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .jumbotron {
-    padding-top: 30px;
-    padding-bottom: 30px;
-    margin-bottom: 30px;
-    color: inherit;
-    background-color: #eee;
-    padding-right: 15px;
-    padding-left: 15px;
-    border-radius: 6px
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  color: inherit;
+  background-color: #eee;
+  padding-right: 15px;
+  padding-left: 15px;
+  border-radius: 6px
 }
 
 .jumbotron .h1,.jumbotron h1 {
-    color: inherit
+  color: inherit
 }
 
 .jumbotron p {
-    margin-bottom: 15px;
-    font-size: 21px;
-    font-weight: 200
+  margin-bottom: 15px;
+  font-size: 21px;
+  font-weight: 200
 }
 
 .jumbotron>hr {
-    border-top-color: #d5d5d5
+  border-top-color: #d5d5d5
 }
 
 .jumbotron .container {
-    max-width: 100%
+  max-width: 100%
 }
 
 @media screen and (min-width: 768px) {
-    .jumbotron {
-        padding-top: 23px;
-        padding-bottom: 23px;
-		padding-right: 30px;
-		padding-left: 30px
-    }
+  .jumbotron {
+    padding-top: 23px;
+    padding-bottom: 23px;
+    padding-right: 30px;
+    padding-left: 30px
+  }
 
-    .jumbotron .h1,.jumbotron h1 {
-        font-size: 63px
-    }
+  .jumbotron .h1,.jumbotron h1 {
+    font-size: 63px
+  }
 
 }
 
 body.component {
-	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-	background-color: var(--lams-background-gray);
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  background-color: var(--lams-background-gray);
 }
 
 body.component .btn-success,
 body.component .btn-success:hover {
-	color: #fff;
+  color: #fff;
 }
 
 body.component .form-select-sm,
 body.component .btn-sm,
 body.component .btn-group-sm>.btn {
-	font-size: 15px;
+  font-size: 15px;
 }
 
 body.component .toast-top {
-	position: fixed;
-	top: 3rem;
-	left: 50%;
-	transform: translate(-50%, 0px);
-	z-index: 10;
+  position: fixed;
+  top: 3rem;
+  left: 50%;
+  transform: translate(-50%, 0px);
+  z-index: 10;
 }
 
 body.component .toast-top .alert {
-	margin: 0;
+  margin: 0;
 }
 
 body.component .toast {
-	border-color: var(--bs-yellow);
-	border-width: 3px;
-	font-size: 1rem;
+  border-color: var(--bs-yellow);
+  border-width: 3px;
+  font-size: 1rem;
 }
 
 body.component .table-hover > tbody > tr:hover > * {
-	--bs-table-accent-bg: var(--bs-gray-200);
-	color: var(--bs-black) !important;
+  --bs-table-accent-bg: var(--bs-gray-200);
+  color: var(--bs-black) !important;
 }
 
 body.component #confirmationDialog {
-	z-index: calc(var(--bs-modal-zindex) + 1);
+  z-index: calc(var(--bs-modal-zindex) + 1);
 }
 
 body.component .ui-menu-item-wrapper.autocomplete-menu-item-with-portrait {
-	display: flex;
-	justify-content: space-between;
-	padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
 }
 
 body.component .dialogContainer {
-	display: none;
-	-webkit-overflow-scrolling: touch !important;
-	overflow: auto;
+  display: none;
+  -webkit-overflow-scrolling: touch !important;
+  overflow: auto;
 }
 
 body.component .dialogContainer iframe {
-	width: 100%;
-	height: calc(100% - 10px);
-	border: none;
+  width: 100%;
+  height: calc(100% - 10px);
+  border: none;
 }
 
 body.component .dialogContainer .dialogTitle {
-	text-align: center;
-	font-weight: 500;
+  text-align: center;
+  font-weight: 500;
 }
 
 body.component .dialogContainer .modal-body {
-	height: 100%;
-	max-height: calc(100% - 56px);
-	padding: 10px;
-	overflow: auto;
+  height: 100%;
+  max-height: calc(100% - 56px);
+  padding: 10px;
+  overflow: auto;
 }
 
 body.component .dialogContainer .bottom-buttons {
-	margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 body.component .ui-front {
-	z-index: 1100;
+  z-index: 1100;
 }
 
 body.component .ui-front.ui-autocomplete {
-	border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
 }
 
 body.component .portrait-sm {
-	width: 35px;
-	height: 35px;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
+  width: 35px;
+  height: 35px;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 body.component .portrait-md {
-	width: 80px;
-	height: 80px;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
+  width: 80px;
+  height: 80px;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 body.component .portrait-lg {
-	width: 200px;
-	height: 200px;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 body.component .portrait-xl {
-	width: 400px;
-	height: 400px;
-	display: inline-block;
-	background-repeat: no-repeat;
-	background-size: cover;
+  width: 400px;
+  height: 400px;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 body.component .portrait-container-sm {
-	height: 38px;
-	margin-top: 3px;
+  height: 38px;
+  margin-top: 3px;
 }
 
 body.component .popover-link {
-	color: var(--bs-blue) !important;
+  color: var(--bs-blue) !important;
 }
 
 body.component .popover-title {
-	background-color: var(--bs-gray);
+  background-color: var(--bs-gray);
 }
 
 body.component .popover-content-with-portrait {
-	min-height: 220px;
-	min-width: 220px;
+  min-height: 220px;
+  min-width: 220px;
 }
 
 body.component .portrait-color-0 {
-	color: black;
+  color: black;
 }
 
 body.component .portrait-color-1 {
-	color: var(--bs-red);
+  color: var(--bs-red);
 }
 
 body.component .portrait-color-2 {
-	color: var(--bs-yellow);
+  color: var(--bs-yellow);
 }
 
 body.component .portrait-color-3 {
-	color: var(--bs-gray);
+  color: var(--bs-gray);
 }
 
 body.component .portrait-color-4 {
-	color: var(--bs-green);
+  color: var(--bs-green);
 }
 
 body.component .portrait-color-5 {
-	color: var(--bs-blue);
+  color: var(--bs-blue);
 }
 
 /* lineheight setting to use on the name if it is next to portrait, as generated by the Portrait tag. e.g. in Peer Review*/
 body.component .portrait-sm-lineheight {
-	line-height: 32px;
-	vertical-align: top;
+  line-height: 32px;
+  vertical-align: top;
 }
 
 body.component .portrait-generic-sm {
-	display: inline-block;
-	height: 35px;
-	vertical-align: middle;
+  display: inline-block;
+  height: 35px;
+  vertical-align: middle;
 }
 
 body.component .portrait-generic-sm:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 35px;
-	font-weight: normal;
-	line-height: 35px;
+  content: "\f2be";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-size: 35px;
+  font-weight: normal;
+  line-height: 35px;
 }
 
 body.component .portrait-generic-md {
-	display: inline-block;
-	height: 80px;
-	vertical-align: middle;
+  display: inline-block;
+  height: 80px;
+  vertical-align: middle;
 }
 
 body.component .portrait-generic-md:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 80px;
-	font-weight: normal;
-	line-height: 65px;
+  content: "\f2be";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-size: 80px;
+  font-weight: normal;
+  line-height: 65px;
 }
 
 body.component .portrait-generic-lg {
-	display: inline-block;
-	height: 200px;
-	vertical-align: middle;
+  display: inline-block;
+  height: 200px;
+  vertical-align: middle;
 }
 
 body.component .portrait-generic-lg:before {
-	content: "\f2be";
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 200px;
-	font-weight: normal;
-	line-height: 200px;
+  content: "\f2be";
+  font-family: FontAwesome;
+  font-style: normal;
+  font-size: 200px;
+  font-weight: normal;
+  line-height: 200px;
 }
 
 body.component .portrait-round {
-	border-radius: 50%;
+  border-radius: 50%;
 }
 
 body.component .cke_textarea_inline {
-	/* From bootstrap form-control */
-	display: block;
-	width: 100%;
-	padding: 6px 12px;
-	font-size: 14px;
-	line-height: 1.42857143;
-	color: #555;
-	background-color: var(--bs-white);
-	background-image: none;
-	border-radius: 0.375rem; /* from .form-control */
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-	-webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
-	-o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-	border: 1px solid #ced4da; /* from .form-control */
-	overflow: hidden;
-	/* keeps floating objects within ckeditor area */
-	/* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields
-     * are the right size and only the ones where the height is overridden does the size change.  */
-	min-height: 60px;
-	-webkit-appearance: textfield;
+  /* From bootstrap form-control */
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: var(--bs-white);
+  background-image: none;
+  border-radius: 0.375rem; /* from .form-control */
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  border: 1px solid #ced4da; /* from .form-control */
+  overflow: hidden;
+  /* keeps floating objects within ckeditor area */
+  /* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields
+   * are the right size and only the ones where the height is overridden does the size change.  */
+  min-height: 60px;
+  -webkit-appearance: textfield;
 }
 body.component .cke_textarea_inline:focus {
-	border-color: var(--bs-blue);
-	outline: 0;
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border-color: var(--bs-blue);
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
 
 body.component .cke_float {
-	width: 70% !important;
+  width: 70% !important;
 }
 
 /** Overwrite CKEditor's default CSS, so that content in an editor is displayed the same way as in real life */
 body.component .cke_widget_inline {
-	display: block !important;
+  display: block !important;
 }
 
 body.component .btn {
-	border-radius: 1.0rem;
+  border-radius: 1.0rem;
 }
 
 body.component i.fa[role="button"] {
-	cursor: pointer;
+  cursor: pointer;
 }
 
-body.component table.table tbody td,
-body.component table.table tbody th,
+body.component table.table:not(.table-bordered) thead th {
+  border: none;
+  border-bottom: 2px solid var(--bs-blue);
+}
+
+body.component table.table:not(.table-bordered) tbody td,
+body.component table.table:not(.table-bordered) tbody th,
 body.component .ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
-	border: none;
-	border-bottom: 2px solid var(--bs-gray-200) !important;
+  border: none;
+  border-bottom: 2px solid var(--bs-gray-200) !important;
 }
 
 body.component .table > tbody > tr > td {
-	vertical-align: middle;
+  vertical-align: middle;
 }
 
 body.component .card-header {
-	background-color: var(--bs-gray-200);
+  background-color: var(--bs-gray-200);
 }
 
 body.component input:focus,
 body.component button:focus,
 body.component textarea:focus {
-	outline: none;
+  outline: none;
 }
 
 body.component input::placeholder {
-	opacity: 0.7;
+  opacity: 0.7;
 }
 
 body.component a:hover,
 body.component a:focus {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 body.component .switch input {
-	position: absolute;
-	height: 1px;
-	width: 1px;
-	background: none;
-	border: 0;
-	clip: rect(0, 0, 0, 0);
-	clip-path: inset(50%);
-	overflow: hidden;
-	padding: 0;
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  background: none;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  padding: 0;
 }
 
 body.component .switch input ~ label {
-	position: relative;
-	min-width: calc(calc(2.375rem * .8)* 2);
-	border-radius: calc(2.375rem * .8);
-	height: calc(2.375rem * .8);
-	line-height: calc(2.375rem * .8);
-	display: inline-block;
-	cursor: pointer;
-	outline: none;
-	user-select: none;
-	vertical-align: middle;
-	text-indent: calc(calc(calc(2.375rem * .8)* 2) + .5rem);
-	margin-bottom: 0;
+  position: relative;
+  min-width: calc(calc(2.375rem * .8)* 2);
+  border-radius: calc(2.375rem * .8);
+  height: calc(2.375rem * .8);
+  line-height: calc(2.375rem * .8);
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  vertical-align: middle;
+  text-indent: calc(calc(calc(2.375rem * .8)* 2) + .5rem);
+  margin-bottom: 0;
 }
 
 body.component .switch input ~ label::before,
 body.component .switch input ~ label::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: calc(calc(2.375rem * .8)* 2);
-	bottom: 0;
-	display: block;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(calc(2.375rem * .8)* 2);
+  bottom: 0;
+  display: block;
 }
 
 body.component .switch input ~ label::before {
-	right: 0;
-	background-color: var(--bs-gray);
-	border-radius: calc(2.375rem * .8);
-	transition: 0.2s all;
+  right: 0;
+  background-color: var(--bs-gray);
+  border-radius: calc(2.375rem * .8);
+  transition: 0.2s all;
 }
 
 body.component .switch input ~ label::after {
-	top: 2px;
-	left: 2px;
-	width: calc(calc(2.375rem * .8) - calc(2px * 2));
-	height: calc(calc(2.375rem * .8) - calc(2px * 2));
-	border-radius: 50%;
-	background-color: white;
-	transition: 0.2s all;
+  top: 2px;
+  left: 2px;
+  width: calc(calc(2.375rem * .8) - calc(2px * 2));
+  height: calc(calc(2.375rem * .8) - calc(2px * 2));
+  border-radius: 50%;
+  background-color: white;
+  transition: 0.2s all;
 }
 
 body.component .switch input:checked ~ label::before {
-	background-color: var(--bs-green);
+  background-color: var(--bs-green);
 }
 
 body.component .switch input:checked ~ label::after {
-	margin-left: calc(2.375rem * .8);
+  margin-left: calc(2.375rem * .8);
 }
 
 body.component .switch input:focus ~ label::before {
-	outline: none;
-	box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
 }
 
 body.component .switch input:disabled ~ label {
-	color: #868e96;
-	cursor: not-allowed;
+  color: #868e96;
+  cursor: not-allowed;
 }
 
 body.component .switch input:disabled ~ label::before {
-	background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 body.component .switch.switch-sm {
-	font-size: 1rem;
+  font-size: 1rem;
 }
 
 body.component .switch.switch-sm input ~ label {
-	min-width: calc(calc(1.9375rem * .8)* 2);
-	height: calc(1.9375rem * .8);
-	line-height: calc(1.9375rem * .8);
-	text-indent: calc(calc(calc(1.9375rem * .8)* 2) + .5rem);
+  min-width: calc(calc(1.9375rem * .8)* 2);
+  height: calc(1.9375rem * .8);
+  line-height: calc(1.9375rem * .8);
+  text-indent: calc(calc(calc(1.9375rem * .8)* 2) + .5rem);
 }
 
 body.component .switch.switch-sm input ~ label::before {
-	width: calc(calc(1.9375rem * .8)* 2);
+  width: calc(calc(1.9375rem * .8)* 2);
 }
 
 body.component .switch.switch-sm input ~ label::after {
-	width: calc(calc(1.9375rem * .8) - calc(2px * 2));
-	height: calc(calc(1.9375rem * .8) - calc(2px * 2));
+  width: calc(calc(1.9375rem * .8) - calc(2px * 2));
+  height: calc(calc(1.9375rem * .8) - calc(2px * 2));
 }
 
 body.component .switch.switch-sm input:checked ~ label::after {
-	margin-left: calc(1.9375rem * .8);
+  margin-left: calc(1.9375rem * .8);
 }
 
 body.component .switch+.switch {
-	margin-left: 1rem;
+  margin-left: 1rem;
 }
 
 body.component .editable-click,
 body.component a.editable-click,
 body.component a.editable-click:hover {
-	border-bottom: none;
+  border-bottom: none;
 }
 
 body.component .card.ui-jqgrid-view {
-	overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table td {
-	border-bottom: none !important;
+  border-bottom: none !important;
 }
 
 .component-page-wrapper {
-	min-height: 100vh;
-	border-radius: 2.8rem;
-	overflow: hidden;
-	background-color: var(--bs-white);
-	margin: var(--lams-component-page-wrapper-margin);
+  min-height: 100vh;
+  border-radius: 2.8rem;
+  overflow: hidden;
+  background-color: var(--bs-white);
+  margin: var(--lams-component-page-wrapper-margin);
 }
 
 .component-page-wrapper button.no-decoration {
-	background-color: inherit;
-	border: none;
+  background-color: inherit;
+  border: none;
 }
 
 .component-page-wrapper button.no-decoration:focus {
-	box-shadow: 0 0 0 0.25rem rgba(5, 112, 213, 0.25);/*the same as .btn-close:focus*/
+  box-shadow: 0 0 0 0.25rem rgba(5, 112, 213, 0.25);/*the same as .btn-close:focus*/
 }
 
 .component-page-wrapper .component-page-content {
-	min-height: 100%;
-	padding: 1rem 2rem 2rem 2rem;
-	transition: all .3s ease;
-	vertical-align: top;
+  min-height: 100%;
+  padding: 1rem 2rem 2rem 2rem;
+  transition: all .3s ease;
+  vertical-align: top;
 }
 
 .component-page-wrapper .component-sidebar {
-	position: absolute;
-	height: initial;
-	background-color: var(--bs-white);
-	text-align: center;
-	display: flex;
-	align-items: center;
-	flex-direction: column;
-	transition: all .3s ease;
-	z-index: 1;
-	padding: 0.7rem 1.7rem 2rem 1.7rem;
+  position: absolute;
+  height: initial;
+  background-color: var(--bs-white);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  transition: all .3s ease;
+  z-index: 1;
+  padding: 0.7rem 1.7rem 2rem 1.7rem;
 }
 
 .component-page-wrapper .component-sidebar .lams-logo {
-	display: block;
- 	width: 3.6rem;
-	margin-bottom: 1.2rem;
-	margin-bottom: 2rem;
+  display: block;
+  width: 3.6rem;
+  margin-bottom: 1.2rem;
+  margin-bottom: 2rem;
 }
 
 .component-page-wrapper .component-sidebar .component-menu {
-	width: 100%;
-	display: flex;
-	justify-content: flex-start;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .component-page-wrapper .component-sidebar .component-menu-btn {
-	width: 3.6rem;
-	height: 100%;
+  width: 3.6rem;
+  height: 100%;
 }
 
 .component-page-wrapper .component-sidebar .component-menu-btn .navigate-btn-container {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .component-page-wrapper .component-menu-btn a {
-	width: 3.1rem;
-	height: 3.1rem;
+  width: 3.1rem;
+  height: 3.1rem;
 }
 
 .component-page-wrapper .component-menu-btn a i.fa {
-	padding-top: 1.1rem;
+  padding-top: 1.1rem;
 }
 
 .component-page-wrapper .component-sidebar .component-menu-btn label {
-	display: block;
-	font-size: 15px;
+  display: block;
+  font-size: 15px;
 }
 
 .component-page-wrapper .top-menu,
 .component-page-wrapper .top-menu-btn {
-	display: flex;
+  display: flex;
 }
 
 .component-page-wrapper .top-menu input {
-	width: 100%;
-	height: 3rem;
-	border-radius: 1rem;
-	border: 0;
+  width: 100%;
+  height: 3rem;
+  border-radius: 1rem;
+  border: 0;
 }
-/*---------- .ltable ----------------*/ 
+/*---------- .ltable ----------------*/
 
 .ltable {
-	margin-bottom: 1rem;	
+  margin-bottom: 1rem;
 }
 .ltable:not(.no-header)>div:first-child {
-	border-top: 1px solid #ddd;
-    background-color: rgba(var(--bs-light-rgb), 1);
-    font-style: italic;
-    color: initial !important;
+  border-top: 1px solid #ddd;
+  background-color: rgba(var(--bs-light-rgb), 1);
+  font-style: italic;
+  color: initial !important;
 }
 .ltable>div {
-	border-bottom: 2px solid var(--bs-gray-200);
-	padding: 0.5rem;
-	margin-left: 0;
-	margin-right: 0;
+  border-bottom: 2px solid var(--bs-gray-200);
+  padding: 0.5rem;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .ltable.table-sm>div {
-	padding: 0.25rem;
+  padding: 0.25rem;
 }
 
 .ltable.table-striped.no-header {
-   > div:nth-of-type(odd) {
+  > div:nth-of-type(odd) {
     background-color: var(--bs-gray-200);
   }
 }
 .ltable.table-striped:not(.no-header) {
-   > div:not(:first-child):nth-of-type(even) {
+  > div:not(:first-child):nth-of-type(even) {
     background-color: var(--bs-gray-200);
   }
 }
 
 .ltable.table-hover > div:not(:first-child):hover,
 .ltable.table-hover.no-header > div:first-child:hover{
-	background-color: var(--bs-gray-200);
+  background-color: var(--bs-gray-200);
 }
 
 /* jqGrid text wrapping */
 .ui-jqgrid tr.jqgrow td, .ui-jqgrid tr.ui-subgrid td {
-	white-space:normal !important;
-   	height:auto;
+  white-space:normal !important;
+  height:auto;
 }
 /* jqGrid text wrapping, that has no blanks or other white-space (https://stackoverflow.com/a/6915486) */
 .ui-jqgrid tr.jqgrow td, .ui-jqgrid tr.ui-subgrid td {
-	word-wrap: break-word; /* IE 5.5+ and CSS3 */
-    overflow: hidden;
-    vertical-align: middle;
+  word-wrap: break-word; /* IE 5.5+ and CSS3 */
+  overflow: hidden;
+  vertical-align: middle;
 }
 
 /* fontawesome icon x-small */
 .fa-xs {
-	font-size: smaller;
+  font-size: smaller;
 }
 
 .card-subheader {
-	padding-bottom: 7px; 
-	/*font-style: italic;*/
-	font-weight: 500;
-	color: rgba(5, 112, 213,1) !important;
+  padding-bottom: 7px;
+  /*font-style: italic;*/
+  font-weight: 500;
+  color: rgba(5, 112, 213,1) !important;
 }
 
 /* display tooltip even though element is disabled */
 [data-bs-toggle="tooltip"].disabled {
-    pointer-events: auto !important;
+  pointer-events: auto !important;
 }
 
-/*----------Ratings----------------*/ 
+/*----------Ratings----------------*/
 .rating-comment{
-	background-image: none;
-	border: $border-thin-default-light;
-	border-radius: 0.375rem; /* from .form-control */
+  background-image: none;
+  border: $border-thin-default-light;
+  border-radius: 0.375rem; /* from .form-control */
 }
 
 .rating-comment-posted-by{
-	color: $brand-primary;
-	text-align: left;
-	font-size: x-small;
+  color: $brand-primary;
+  text-align: left;
+  font-size: x-small;
 }
 
-/*----------collapsable-icon-left----------------*/ 
+/*----------collapsable-icon-left----------------*/
 
 .component-page-wrapper .collapsable-icon-left button:after {
-	font-family: FontAwesome;
-	float: left;
-	margin-right: .5rem;
+  font-family: FontAwesome;
+  float: left;
+  margin-right: .5rem;
 }
 
 .component-page-wrapper .collapsable-icon-left button.collapsed:after {
-	content: "\f054";
+  content: "\f054";
 }
 
 .component-page-wrapper .collapsable-icon-left button:not(.collapsed):after {
-	content: "\f078";
+  content: "\f078";
 }
 
-/*----------buttons with icons ----------------*/ 
+/*----------buttons with icons ----------------*/
 
 .btn-icon-add,
 .btn-icon-cancel,
@@ -666,7 +671,7 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 .btn-icon-remove,
 .btn-icon-return,
 na {
-	display: inline-block;
+  display: inline-block;
 }
 .btn-icon-add:before,
 .btn-icon-cancel:before,
@@ -678,15 +683,15 @@ na {
 .btn-icon-remove:before,
 .btn-icon-return:before,
 .na:after {	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-decoration: inherit;
-	color: inherit;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: inherit;
+  color: inherit;
 }
 .btn-icon-comment:after,
 .btn-icon-next:after,
 .na:after {
-	margin-left: 0.25rem;
+  margin-left: 0.25rem;
 }
 .btn-icon-add:before,
 .btn-icon-cancel:before,
@@ -695,38 +700,38 @@ na {
 .btn-icon-refresh:before,
 .btn-icon-remove:before,
 .btn-icon-return:before {
-	margin-right: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 .btn-icon-add:before {
-	content: "\2b";
+  content: "\2b";
 }
 .btn-icon-cancel:before {
-	content: "\f05e";
+  content: "\f05e";
 }
 .btn-icon-comment:after {
-	content: "\f1d8";
+  content: "\f1d8";
 }
 .btn-icon-next:after {
-	content: "\f101";
+  content: "\f101";
 }
 .btn-icon-pen:before {
-	content: "\f044";
+  content: "\f044";
 }
 .btn-icon-previous:before {
-	content: "\f100";
+  content: "\f100";
 }
 .btn-icon-refresh:before {
-	content: "\f021";
+  content: "\f021";
 }
 .btn-icon-remove:before {
-	content: "\f1f8";
+  content: "\f1f8";
 }
 .btn-icon-return:before {
-	content: "\f2ea";
+  content: "\f2ea";
 }
 .na:after {
-	content: "\f0a9";
+  content: "\f0a9";
 }
 
 /*----------slider----------------*/

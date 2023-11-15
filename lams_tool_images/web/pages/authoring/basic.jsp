@@ -21,7 +21,7 @@
 	var imageGalleryListTargetDiv = "imageGalleryListArea";
 	function deleteItem(idx, sessionMapID) {
 
-		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+		var	deletionConfirmed = confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.msg.authoring.do.you.want.to.delete"/></spring:escapeBody>');
 		
 		if (deletionConfirmed) {
 			deleteItemLoading();

@@ -92,12 +92,11 @@
 					<fmt:message key="error.file.wrong.format" var="ERROR_FILE_WRONG_FORMAT_VAR"/>
 					ERROR_FILE_WRONG_FORMAT_LABEL : "<spring:escapeBody javaScriptEscape='true'>${ERROR_FILE_WRONG_FORMAT_VAR}</spring:escapeBody>",
 
-					<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR">
-					<fmt:param value="%1"/>
-					<fmt:param value="%2"/>
-					</fmt:message>
+					<fmt:message key="label.import.successful" var="LABEL_IMPORT_SUCCESSFUL_VAR" />
 					LABEL_IMPORT_SUCCESSFUL_LABEL : "<spring:escapeBody javaScriptEscape='true'>${LABEL_IMPORT_SUCCESSFUL_VAR}</spring:escapeBody>",
 
+					<fmt:message key="label.import.successful.skipped" var="LABEL_IMPORT_SUCCESSFUL_SKIPPED_VAR" />
+					LABEL_IMPORT_SUCCESSFUL_SKIPPED_LABEL : "<spring:escapeBody javaScriptEscape='true'>${LABEL_IMPORT_SUCCESSFUL_SKIPPED_VAR}</spring:escapeBody>"
 				};
 
 		<!-- LDEV_NTU-7 Page jumps to the top when clicking the link in Grouping -->
@@ -114,8 +113,8 @@
 
 	<body class="component my-2">
 	<lams:Page5 title="${title}" type="monitoring">
-		<c:if test="${param.displayReturnToMonitoringLink eq 'true'}">
-			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${param.lessonID}">
+		<c:if test="${not empty lessonID}">
+			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lessonID}">
 				<i class="fa-solid fa-arrow-left"></i>&nbsp;<fmt:message key="label.grouping.return.to.monitoring"/>
 			</a>
 		</c:if>

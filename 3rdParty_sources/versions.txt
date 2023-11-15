@@ -60,7 +60,9 @@ passpol 0.7.1-SNAPSHOT
 
 picketbox 5.0.3
 
-Reactive Streams 1.0.3
+Reactive Streams 1.0.4
+
+Reactor 3.5.11
 
 Servlet API 4.0.0
 

@@ -370,7 +370,7 @@
 								expiredHideContainers.hide();
 							}
 						},
-						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody>></span>'
+						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
 					});
 		} else {
 			// if counter is paused, we can not adjust time, so resume it for a moment

@@ -40,6 +40,8 @@
       <excludeFolder url="file://$MODULE_DIR$/websocket" />
       <excludeFolder url="file://$MODULE_DIR$/xmltooling" />
       <excludeFolder url="file://$MODULE_DIR$/xstream" />
+      <excludeFolder url="file://$MODULE_DIR$/reactive-streams" />
+      <excludeFolder url="file://$MODULE_DIR$/reactor" />
     </content>
     <orderEntry type="jdk" jdkName="11" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />

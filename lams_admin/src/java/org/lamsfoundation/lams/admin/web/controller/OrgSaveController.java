@@ -22,12 +22,6 @@
  */
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -53,6 +47,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
@@ -121,13 +120,12 @@ public class OrgSaveController {
 	    if (log.isDebugEnabled()) {
 		log.debug("orgId: " + org.getOrganisationId() + " create date: " + org.getCreateDate());
 	    }
-	    org = userManagementService.saveOrganisation(org, user.getUserID());
+	    userManagementService.saveOrganisation(org, user.getUserID());
 
-	    request.setAttribute("org", organisationForm.getParentId());
-	    return "forward:/orgmanage.do";
+	    return "redirect:/orgmanage.do?org=" + organisationForm.getParentId();
 	} else {
 	    request.setAttribute("errorMap", errorMap);
-	    return "forward:/organisation/edit.do";
+	    return "forward:/organisation/" + (orgId == null ? "create.do" : "edit.do");
 	}
     }
 

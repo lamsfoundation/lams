@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package reactor.core.publisher;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.function.Consumer;
@@ -57,6 +56,11 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 	final Supplier<? extends Queue<T>> queueSupplier;
 
+	/**
+	 * Whether to prepare for a reconnect after the source terminates.
+	 */
+	final boolean resetUponSourceTermination;
+
 	volatile PublishSubscriber<T> connection;
 	@SuppressWarnings("rawtypes")
 	static final AtomicReferenceFieldUpdater<FluxPublish, PublishSubscriber> CONNECTION =
@@ -66,13 +70,15 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 	FluxPublish(Flux<? extends T> source,
 			int prefetch,
-			Supplier<? extends Queue<T>> queueSupplier) {
+			Supplier<? extends Queue<T>> queueSupplier,
+			boolean resetUponSourceTermination) {
 		if (prefetch <= 0) {
 			throw new IllegalArgumentException("bufferSize > 0 required but it was " + prefetch);
 		}
 		this.source = Objects.requireNonNull(source, "source");
 		this.prefetch = prefetch;
 		this.queueSupplier = Objects.requireNonNull(queueSupplier, "queueSupplier");
+		this.resetUponSourceTermination = resetUponSourceTermination;
 	}
 
 	@Override
@@ -91,7 +97,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 				s = u;
 			}
 
-			doConnect = s.tryConnect();
+ 			doConnect = s.tryConnect();
 			break;
 		}
 
@@ -111,7 +117,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 			}
 
 			PublishSubscriber<T> c = connection;
-			if (c == null || c.isTerminated()) {
+			if (c == null || (this.resetUponSourceTermination && c.isTerminated())) {
 				PublishSubscriber<T> u = new PublishSubscriber<>(prefetch, this);
 				if (!CONNECTION.compareAndSet(this, c, u)) {
 					continue;
@@ -127,7 +133,16 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 				else {
 					inner.parent = c;
 				}
-				c.drain();
+
+				c.drainFromInner();
+				break;
+			}
+			else if (!this.resetUponSourceTermination) {
+				if (c.error != null) {
+					inner.actual.onError(c.error);
+				} else {
+					inner.actual.onComplete();
+				}
 				break;
 			}
 		}
@@ -155,12 +170,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 		final FluxPublish<T> parent;
 
-		volatile Subscription s;
-		@SuppressWarnings("rawtypes")
-		static final AtomicReferenceFieldUpdater<PublishSubscriber, Subscription> S =
-				AtomicReferenceFieldUpdater.newUpdater(PublishSubscriber.class,
-						Subscription.class,
-						"s");
+		Subscription s;
 
 		volatile PubSubInner<T>[] subscribers;
 
@@ -170,16 +180,10 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 						PubSubInner[].class,
 						"subscribers");
 
-		volatile int wip;
+		volatile long state;
 		@SuppressWarnings("rawtypes")
-		static final AtomicIntegerFieldUpdater<PublishSubscriber> WIP =
-				AtomicIntegerFieldUpdater.newUpdater(PublishSubscriber.class, "wip");
-
-		volatile int connected;
-		@SuppressWarnings("rawtypes")
-		static final AtomicIntegerFieldUpdater<PublishSubscriber> CONNECTED =
-				AtomicIntegerFieldUpdater.newUpdater(PublishSubscriber.class,
-						"connected");
+		static final AtomicLongFieldUpdater<PublishSubscriber> STATE =
+				AtomicLongFieldUpdater.newUpdater(PublishSubscriber.class, "state");
 
 		//notes: FluxPublish needs to distinguish INIT from CANCELLED in order to correctly
 		//drop values in case of an early connect() without any subscribers.
@@ -190,11 +194,11 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 		@SuppressWarnings("rawtypes")
 		static final PubSubInner[] TERMINATED = new PublishInner[0];
 
-		volatile Queue<T> queue;
+		Queue<T> queue;
 
 		int sourceMode;
 
-		volatile boolean   done;
+		boolean   done;
 
 		volatile Throwable error;
 
@@ -204,7 +208,6 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 						Throwable.class,
 						"error");
 
-		@SuppressWarnings("unchecked")
 		PublishSubscriber(int prefetch, FluxPublish<T> parent) {
 			this.prefetch = prefetch;
 			this.parent = parent;
@@ -217,7 +220,9 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 		@Override
 		public void onSubscribe(Subscription s) {
-			if (Operators.setOnce(S, this, s)) {
+			if (Operators.validate(this.s, s)) {
+				this.s = s;
+
 				if (s instanceof Fuseable.QueueSubscription) {
 					@SuppressWarnings("unchecked") Fuseable.QueueSubscription<T> f =
 							(Fuseable.QueueSubscription<T>) s;
@@ -226,46 +231,82 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 					if (m == Fuseable.SYNC) {
 						sourceMode = m;
 						queue = f;
-						drain();
+						long previousState = markSubscriptionSetAndAddWork(this);
+						if (isCancelled(previousState)) {
+							s.cancel();
+							return;
+						}
+
+						if (hasWorkInProgress(previousState)) {
+							return;
+						}
+
+						drain(previousState | SUBSCRIPTION_SET_FLAG | 1);
 						return;
 					}
+
 					if (m == Fuseable.ASYNC) {
 						sourceMode = m;
 						queue = f;
-						s.request(Operators.unboundedOrPrefetch(prefetch));
+						long previousState = markSubscriptionSet(this);
+						if (isCancelled(previousState)) {
+							s.cancel();
+						}
+						else {
+							s.request(Operators.unboundedOrPrefetch(prefetch));
+						}
 						return;
 					}
 				}
 
 				queue = parent.queueSupplier.get();
-
-				s.request(Operators.unboundedOrPrefetch(prefetch));
+				long previousState = markSubscriptionSet(this);
+				if (isCancelled(previousState)) {
+					s.cancel();
+				}
+				else {
+					s.request(Operators.unboundedOrPrefetch(prefetch));
+				}
 			}
 		}
 
 		@Override
-		public void onNext(T t) {
+		public void onNext(@Nullable T t) {
 			if (done) {
 				if (t != null) {
 					Operators.onNextDropped(t, currentContext());
 				}
 				return;
 			}
-			if (sourceMode == Fuseable.ASYNC) {
-				drain();
-				return;
-			}
-
-			if (!queue.offer(t)) {
+			boolean isAsyncMode = sourceMode == Fuseable.ASYNC;
+			if (!isAsyncMode && !queue.offer(t)) {
 				Throwable ex = Operators.onOperatorError(s,
-						Exceptions.failWithOverflow(Exceptions.BACKPRESSURE_ERROR_QUEUE_FULL), t, currentContext());
+						Exceptions.failWithOverflow(Exceptions.BACKPRESSURE_ERROR_QUEUE_FULL),
+						t,
+						currentContext());
 				if (!Exceptions.addThrowable(ERROR, this, ex)) {
 					Operators.onErrorDroppedMulticast(ex, subscribers);
 					return;
 				}
 				done = true;
 			}
-			drain();
+
+			long previousState = addWork(this);
+
+			if (isFinalized(previousState)) {
+				clear();
+				return;
+			}
+
+			if (isTerminated(previousState) || isCancelled(previousState)) {
+				return;
+			}
+
+			if (hasWorkInProgress(previousState)) {
+				return;
+			}
+
+			drain(previousState + 1);
 		}
 
 		@Override
@@ -274,13 +315,22 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 				Operators.onErrorDroppedMulticast(t, subscribers);
 				return;
 			}
-			if (Exceptions.addThrowable(ERROR, this, t)) {
-				done = true;
-				drain();
-			}
-			else {
+
+			done = true;
+			if (!Exceptions.addThrowable(ERROR, this, t)) {
 				Operators.onErrorDroppedMulticast(t, subscribers);
 			}
+
+			long previousState = markTerminated(this);
+			if (isTerminated(previousState) || isCancelled(previousState)) {
+				return;
+			}
+
+			if (hasWorkInProgress(previousState)) {
+				return;
+			}
+
+			drain((previousState | TERMINATED_FLAG) + 1);
 		}
 
 		@Override
@@ -289,7 +339,17 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 				return;
 			}
 			done = true;
-			drain();
+
+			long previousState = markTerminated(this);
+			if (isTerminated(previousState) || isCancelled(previousState)) {
+				return;
+			}
+
+			if (hasWorkInProgress(previousState)) {
+				return;
+			}
+
+			drain((previousState | TERMINATED_FLAG) + 1);
 		}
 
 		@Override
@@ -298,19 +358,40 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 				return;
 			}
 			if (CONNECTION.compareAndSet(parent, this, null)) {
-				Operators.terminate(S, this);
-				if (WIP.getAndIncrement(this) != 0) {
+				long previousState = markCancelled(this);
+				if (isTerminated(previousState) || isCancelled(previousState)) {
 					return;
 				}
-				disconnectAction();
+
+				if (hasWorkInProgress(previousState)) {
+					return;
+				}
+
+				disconnectAction(previousState);
 			}
 		}
 
-		void disconnectAction() {
+		void clear() {
+			if (sourceMode == Fuseable.NONE) {
+				T t;
+				while ((t = queue.poll()) != null) {
+					Operators.onDiscard(t, currentContext());
+				}
+			}
+			else {
+				queue.clear();
+			}
+		}
+
+		void disconnectAction(long previousState) {
+			if (isSubscriptionSet(previousState)) {
+				this.s.cancel();
+				clear();
+			}
+
 			@SuppressWarnings("unchecked")
 			PubSubInner<T>[] inners = SUBSCRIBERS.getAndSet(this, CANCELLED);
 			if (inners.length > 0) {
-				queue.clear();
 				CancellationException ex = new CancellationException("Disconnected");
 
 				for (PubSubInner<T> inner : inners) {
@@ -321,7 +402,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 		boolean add(PublishInner<T> inner) {
 			for (; ; ) {
-				FluxPublish.PubSubInner<T>[] a = subscribers;
+				PubSubInner<T>[] a = subscribers;
 				if (a == TERMINATED) {
 					return false;
 				}
@@ -335,7 +416,6 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		public void remove(PubSubInner<T> inner) {
 			for (; ; ) {
 				PubSubInner<T>[] a = subscribers;
@@ -379,25 +459,36 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 		}
 
 		boolean tryConnect() {
-			return connected == 0 && CONNECTED.compareAndSet(this, 0, 1);
+			long previousState = markConnected(this);
+
+			return !isConnected(previousState);
 		}
 
-		final void drain() {
-			if (WIP.getAndIncrement(this) != 0) {
+		final void drainFromInner() {
+			long previousState = addWorkIfSubscribed(this);
+
+			if (!isSubscriptionSet(previousState)) {
 				return;
 			}
 
-			int missed = 1;
+			if (hasWorkInProgress(previousState)) {
+				return;
+			}
 
+			drain(previousState + 1);
+		}
+
+		final void drain(long expectedState) {
 			for (; ; ) {
 
 				boolean d = done;
 
 				Queue<T> q = queue;
+				int mode = sourceMode;
 
 				boolean empty = q == null || q.isEmpty();
 
-				if (checkTerminated(d, empty)) {
+				if (checkTerminated(d, empty, null)) {
 					return;
 				}
 
@@ -432,10 +523,10 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 							d = true;
 							v = null;
 						}
-						if (checkTerminated(d, v == null)) {
+						if (checkTerminated(d, v == null, v)) {
 							return;
 						}
-						if (sourceMode != Fuseable.SYNC) {
+						if (mode != Fuseable.SYNC) {
 							s.request(1);
 						}
 						continue;
@@ -460,15 +551,15 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 						empty = v == null;
 
-						if (checkTerminated(d, empty)) {
+						if (checkTerminated(d, empty, v)) {
 							return;
 						}
 
 						if (empty) {
 							//async mode only needs to break but SYNC mode needs to perform terminal cleanup here...
-							if (sourceMode == Fuseable.SYNC) {
+							if (mode == Fuseable.SYNC) {
 								done = true;
-								checkTerminated(true, true);
+								checkTerminated(true, true, null);
 							}
 							break;
 						}
@@ -485,7 +576,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 						e++;
 					}
 
-					if (e != 0 && sourceMode != Fuseable.SYNC) {
+					if (e != 0 && mode != Fuseable.SYNC) {
 						s.request(e);
 					}
 
@@ -493,30 +584,39 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 						continue;
 					}
 				}
-				else if (sourceMode == Fuseable.SYNC) {
+				else if (q != null && mode == Fuseable.SYNC) {
 					done = true;
-					if (checkTerminated(true, empty)) {
+					if (checkTerminated(true, empty, null)) {
 						break;
 					}
 				}
 
-				missed = WIP.addAndGet(this, -missed);
-				if (missed == 0) {
-					break;
+				expectedState = markWorkDone(this, expectedState);
+				if (isCancelled(expectedState)) {
+					clearAndFinalize(this);
+					return;
+				}
+
+				if (!hasWorkInProgress(expectedState)) {
+					return;
 				}
 			}
 		}
 
-		boolean checkTerminated(boolean d, boolean empty) {
-			if (s == Operators.cancelledSubscription()) {
-				disconnectAction();
+		boolean checkTerminated(boolean d, boolean empty, @Nullable T t) {
+			long state = this.state;
+			if (isCancelled(state)) {
+				Operators.onDiscard(t, currentContext());
+				disconnectAction(state);
 				return true;
 			}
 			if (d) {
 				Throwable e = error;
 				if (e != null && e != Exceptions.TERMINATED) {
-					CONNECTION.compareAndSet(parent, this, null);
-					e = Exceptions.terminate(ERROR, this);
+					if (parent.resetUponSourceTermination) {
+						CONNECTION.compareAndSet(parent, this, null);
+						e = Exceptions.terminate(ERROR, this);
+					}
 					queue.clear();
 					for (PubSubInner<T> inner : terminate()) {
 						inner.actual.onError(e);
@@ -524,7 +624,9 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 					return true;
 				}
 				else if (empty) {
-					CONNECTION.compareAndSet(parent, this, null);
+					if (parent.resetUponSourceTermination) {
+						CONNECTION.compareAndSet(parent, this, null);
+					}
 					for (PubSubInner<T> inner : terminate()) {
 						inner.actual.onComplete();
 					}
@@ -560,9 +662,193 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 
 		@Override
 		public boolean isDisposed() {
-			return s == Operators.cancelledSubscription() || done;
+			long state = this.state;
+			return isTerminated(state) || isCancelled(state);
 		}
 
+		static void clearAndFinalize(PublishSubscriber<?> instance) {
+			for (; ; ) {
+				final long state = instance.state;
+
+				if (isFinalized(state)) {
+					instance.clear();
+					return;
+				}
+
+				if (isSubscriptionSet(state)) {
+					instance.clear();
+				}
+
+				if (STATE.compareAndSet(
+						instance, state,
+						(state & ~WORK_IN_PROGRESS_MASK) | FINALIZED_FLAG)) {
+					break;
+				}
+			}
+		}
+
+		static long addWork(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (STATE.compareAndSet(instance, state, addWork(state))) {
+					return state;
+				}
+			}
+		}
+
+		static long addWorkIfSubscribed(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (!isSubscriptionSet(state)) {
+					return state;
+				}
+
+				if (STATE.compareAndSet(instance, state, addWork(state))) {
+					return state;
+				}
+			}
+		}
+
+		static long addWork(long state) {
+			if ((state & WORK_IN_PROGRESS_MASK) == WORK_IN_PROGRESS_MASK) {
+				return (state &~ WORK_IN_PROGRESS_MASK) | 1;
+			}
+			else {
+				return state + 1;
+			}
+		}
+
+		static long markTerminated(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (isCancelled(state) || isTerminated(state)) {
+					return state;
+				}
+
+				long nextState = addWork(state);
+				if (STATE.compareAndSet(instance, state, nextState | TERMINATED_FLAG)) {
+					return state;
+				}
+			}
+		}
+
+		static long markConnected(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (isConnected(state)) {
+					return state;
+				}
+
+				if (STATE.compareAndSet(instance, state, state | CONNECTED_FLAG)) {
+					return state;
+				}
+			}
+		}
+
+		static long markSubscriptionSet(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (isCancelled(state)) {
+					return state;
+				}
+
+				if (STATE.compareAndSet(instance, state, state | SUBSCRIPTION_SET_FLAG)) {
+					return state;
+				}
+			}
+		}
+
+		static long markSubscriptionSetAndAddWork(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (isCancelled(state)) {
+					return state;
+				}
+
+				long nextState = addWork(state);
+				if (STATE.compareAndSet(instance, state, nextState | SUBSCRIPTION_SET_FLAG)) {
+					return state;
+				}
+			}
+		}
+
+		static long markCancelled(PublishSubscriber<?> instance) {
+			for (;;) {
+				long state = instance.state;
+
+				if (isCancelled(state)) {
+					return state;
+				}
+
+				long nextState = addWork(state);
+				if (STATE.compareAndSet(instance, state, nextState | CANCELLED_FLAG)) {
+					return state;
+				}
+			}
+		}
+
+		static long markWorkDone(PublishSubscriber<?> instance, long expectedState) {
+			for (;;) {
+				long state = instance.state;
+
+				if (expectedState != state) {
+					return state;
+				}
+
+				long nextState = state & ~WORK_IN_PROGRESS_MASK;
+				if (STATE.compareAndSet(instance, state, nextState)) {
+					return nextState;
+				}
+			}
+		}
+
+		static boolean isConnected(long state) {
+			return (state & CONNECTED_FLAG) == CONNECTED_FLAG;
+		}
+
+		static boolean isFinalized(long state) {
+			return (state & FINALIZED_FLAG) == FINALIZED_FLAG;
+		}
+
+		static boolean isCancelled(long state) {
+			return (state & CANCELLED_FLAG) == CANCELLED_FLAG;
+		}
+
+		static boolean isTerminated(long state) {
+			return (state & TERMINATED_FLAG) == TERMINATED_FLAG;
+		}
+
+		static boolean isSubscriptionSet(long state) {
+			return (state & SUBSCRIPTION_SET_FLAG) == SUBSCRIPTION_SET_FLAG;
+		}
+
+		static boolean hasWorkInProgress(long state) {
+			return (state & WORK_IN_PROGRESS_MASK) > 0;
+		}
+
+		static final long FINALIZED_FLAG =
+				0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L;
+
+		static final long CANCELLED_FLAG =
+				0b0010_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L;
+
+		static final long TERMINATED_FLAG =
+				0b0100_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L;
+
+		static final long SUBSCRIPTION_SET_FLAG =
+				0b0000_1000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L;
+
+		static final long CONNECTED_FLAG =
+				0b0000_0100_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000L;
+
+		static final long WORK_IN_PROGRESS_MASK =
+				0b0000_0000_0000_0000_0000_0000_0000_0000_1111_1111_1111_1111_1111_1111_1111_1111L;
 	}
 
 	static abstract class PubSubInner<T> implements InnerProducer<T> {
@@ -631,7 +917,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 		void drainParent() {
 			PublishSubscriber<T> p = parent;
 			if (p != null) {
-				p.drain();
+				p.drainFromInner();
 			}
 		}
 
@@ -640,7 +926,7 @@ final class FluxPublish<T> extends ConnectableFlux<T> implements Scannable {
 			PublishSubscriber<T> p = parent;
 			if (p != null) {
 				p.remove(this);
-				p.drain();
+				p.drainFromInner();
 			}
 		}
 

@@ -8,7 +8,6 @@
 			<attribute name="javadoc_location" value="http://tomcat.apache.org/tomcat-8.0-doc/servletapi/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/lams_common/src/java/org/lamsfoundation/lams/dao/hibernate"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>
 	<classpathentry kind="output" path="bin"/>
 	<classpathentry kind="var" path="WILDFLY_HOME_48/modules/system/layers/base/org/jboss/log4j/logmanager/main/log4j-jboss-logmanager-1.1.6.Final.jar"/>

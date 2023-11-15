@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ final class MonoHandle<T, R> extends InternalMonoOperator<T, R> {
 
 	@Override
 	public CoreSubscriber<? super T> subscribeOrReturn(CoreSubscriber<? super R> actual) {
-		return new FluxHandle.HandleSubscriber<>(actual, handler);
+		BiConsumer<? super T, SynchronousSink<R>> handler2 = ContextPropagationSupport.shouldRestoreThreadLocalsInSomeOperators() ?
+				ContextPropagation.contextRestoreForHandle(this.handler, actual::currentContext) : this.handler;
+		return new FluxHandle.HandleSubscriber<>(actual, handler2);
 	}
 
 	@Override

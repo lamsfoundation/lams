@@ -29,7 +29,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});
@@ -80,7 +80,7 @@
 							rows += '</span>';
 							if ( userData["userModifiedSpreadsheet"] ) {
 								var editUrl = '<c:url value="/monitoring/editMark.do"/>?userUid=' + userData["userUid"] +'&toolContentID=${param.toolContentID}&sessionMapID=${sessionMapID}';
-								rows += '<a href="javascript:launchPopup(\''+ editUrl +'\')" class="btn btn-default btn-xs loffset5"><fmt:message key="label.monitoring.summary.mark.button" /></a>';
+								rows += '<a href="javascript:launchPopup(\''+ editUrl +'\')" class="btn btn-default btn-xs loffset5"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.mark.button" /></spring:escapeBody></a>';
 							}
 							rows += '</td>';
 							</c:if>

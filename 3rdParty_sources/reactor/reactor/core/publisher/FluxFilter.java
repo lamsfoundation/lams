@@ -61,7 +61,7 @@ final class FluxFilter<T> extends InternalFluxOperator<T, T> {
 
 	static final class FilterSubscriber<T>
 			implements InnerOperator<T, T>,
-			           Fuseable.ConditionalSubscriber<T> {
+			           ConditionalSubscriber<T> {
 
 		final CoreSubscriber<? super T> actual;
 		final Context ctx;
@@ -194,9 +194,9 @@ final class FluxFilter<T> extends InternalFluxOperator<T, T> {
 
 	static final class FilterConditionalSubscriber<T>
 			implements InnerOperator<T, T>,
-			           Fuseable.ConditionalSubscriber<T> {
+			           ConditionalSubscriber<T> {
 
-		final Fuseable.ConditionalSubscriber<? super T> actual;
+		final ConditionalSubscriber<? super T> actual;
 		final Context ctx;
 
 		final Predicate<? super T> predicate;
@@ -205,7 +205,7 @@ final class FluxFilter<T> extends InternalFluxOperator<T, T> {
 
 		boolean done;
 
-		FilterConditionalSubscriber(Fuseable.ConditionalSubscriber<? super T> actual,
+		FilterConditionalSubscriber(ConditionalSubscriber<? super T> actual,
 				Predicate<? super T> predicate) {
 			this.actual = actual;
 			this.ctx = actual.currentContext();

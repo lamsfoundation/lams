@@ -38,9 +38,7 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/popper.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/x-editable.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.bundle.min.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chartjs/chart.umd.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/tempus-dominus.min.js"></script>
@@ -191,12 +189,12 @@
 	<div class="component-page-wrapper monitoring-page-wrapper ">
 		<div class="component-sidebar active">
 
-			<c:if test="${not isIntegrationLogin}">
+			<c:if test="${not isIntegrationOrganisation}">
 			<a href="/" title="<fmt:message key='label.monitoring.return.to.index' />">
 				</c:if>
 				<img class="lams-logo" src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg"
 					 alt="<fmt:message key='label.monitoring.logo' />" />
-				<c:if test="${not isIntegrationLogin}">
+				<c:if test="${not isIntegrationOrganisation}">
 			</a>
 			</c:if>
 

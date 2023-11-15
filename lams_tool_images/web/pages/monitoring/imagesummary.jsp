@@ -19,7 +19,7 @@
 			var pathToImageFolder = "${lams}images/css/";
 		
 			//vars for rating.js
-			var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '',
 			IS_DISABLED =  true,
 			COMMENTS_MIN_WORDS_LIMIT = 0,

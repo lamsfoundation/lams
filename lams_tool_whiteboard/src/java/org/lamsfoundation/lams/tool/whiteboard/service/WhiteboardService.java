@@ -216,7 +216,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 		break;
 	    }
 	}
-	if (learnersStarted == 1 && whiteboard.getRelativeTimeLimit() == 0 && whiteboard.getAbsoluteTimeLimit() > 0
+	if (learnersStarted > 0 && whiteboard.getRelativeTimeLimit() == 0 && whiteboard.getAbsoluteTimeLimit() > 0
 		&& whiteboard.getAbsoluteTimeLimitFinish() == null) {
 	    whiteboard.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(whiteboard.getAbsoluteTimeLimit()));
 	    whiteboard.setAbsoluteTimeLimit(0);
@@ -224,7 +224,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
 	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
 	}
-	
+
 	WhiteboardUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
 	    WhiteboardSession session = user.getSession();

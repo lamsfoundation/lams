@@ -4,9 +4,9 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:Notebook title="${sessionMap.title}"
-	toolSessionID="${sessionMap.toolSessionID}"
-	instructions="${sessionMap.reflectInstructions}"
-	isNextActivityButtonSupported="true"
-	isLastActivity="${sessionMap.isLastActivity}"
-	nextActivityButtonLabelKey="label.finish"
-	notebookLabelKey="title.reflection"/>
+               toolSessionID="${sessionMap.toolSessionID}"
+               instructions="${sessionMap.reflectInstructions}"
+               isNextActivityButtonSupported="true"
+               isLastActivity="${sessionMap.isLastActivity}"
+               nextActivityButtonLabelKey="label.finish"
+               notebookLabelKey="title.reflection"/>

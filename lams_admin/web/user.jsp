@@ -525,10 +525,9 @@
 			</div>
 
 
-			<c:if test="${isAppadmin}">
 			<div class="row">
 				<div class="col-6 offset-3 text-end">
-					<c:if test="${not empty userForm.userId}">
+					<c:if test="${isAppadmin and not empty userForm.userId}">
 						<a	href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}"
 							  class="btn btn-primary float-start">
 							<fmt:message key="admin.user.changePassword" />
@@ -542,8 +541,6 @@
 								value="<fmt:message key="admin.save" />" />
 				</div>
 			</div>
-			</c:if>
-
 
 			</form:form>
 			<!-- End of panel -->

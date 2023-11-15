@@ -25,7 +25,7 @@ import reactor.util.annotation.Nullable;
 
 /**
  *
- * {@link InnerProducer} is a {@link reactor.core.Scannable} {@link Subscription} that produces
+ * {@link InnerProducer} is a {@link Scannable} {@link Subscription} that produces
  * data to an {@link #actual()} {@link Subscriber}
  *
  * @param <O> output operator produced type

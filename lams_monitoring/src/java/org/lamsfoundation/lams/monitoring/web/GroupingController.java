@@ -114,8 +114,6 @@ public class GroupingController {
 
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	boolean displayReturnToMonitoringLink = WebUtil.readBooleanParam(request, "displayReturnToMonitoringLink",
-		false);
 	Activity activity = monitoringService.getActivityById(activityID);
 
 	Grouping grouping = null;
@@ -128,8 +126,7 @@ public class GroupingController {
 
 	if (!forcePrintView) {
 	    return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "grouping/viewGroupings.do?lessonID="
-		    + lessonId + "&activityID=" + activityID + "&displayReturnToMonitoringLink="
-		    + displayReturnToMonitoringLink;
+		    + lessonId + "&activityID=" + activityID;
 	}
 
 	request.setAttribute(AttributeNames.PARAM_ACTIVITY_ID, activityID);

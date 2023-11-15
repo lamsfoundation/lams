@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import reactor.core.publisher.Sinks.EmitResult;
 import reactor.util.annotation.Nullable;
 import reactor.util.context.Context;
 
-final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements InternalManySink<T>, Subscription, ContextHolder {
+final class SinkManyUnicastNoBackpressure<T> extends Flux<T> implements InternalManySink<T>, Subscription, ContextHolder {
 
-	public static <E> UnicastManySinkNoBackpressure<E> create() {
-		return new UnicastManySinkNoBackpressure<>();
+	public static <E> SinkManyUnicastNoBackpressure<E> create() {
+		return new SinkManyUnicastNoBackpressure<>();
 	}
 
 	enum State {
@@ -45,20 +45,20 @@ final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements Internal
 	volatile State state;
 
 	@SuppressWarnings("rawtypes")
-	private static final AtomicReferenceFieldUpdater<UnicastManySinkNoBackpressure, State> STATE = AtomicReferenceFieldUpdater.newUpdater(
-			UnicastManySinkNoBackpressure.class,
+	private static final AtomicReferenceFieldUpdater<SinkManyUnicastNoBackpressure, State> STATE = AtomicReferenceFieldUpdater.newUpdater(
+			SinkManyUnicastNoBackpressure.class,
 			State.class,
 			"state"
 	);
 
 	private volatile CoreSubscriber<? super T> actual = null;
 
-	volatile long requested;
+	volatile long                                                      requested;
 	@SuppressWarnings("rawtypes")
-	static final AtomicLongFieldUpdater<UnicastManySinkNoBackpressure> REQUESTED =
-			AtomicLongFieldUpdater.newUpdater(UnicastManySinkNoBackpressure.class, "requested");
+	static final AtomicLongFieldUpdater<SinkManyUnicastNoBackpressure> REQUESTED =
+			AtomicLongFieldUpdater.newUpdater(SinkManyUnicastNoBackpressure.class, "requested");
 
-	UnicastManySinkNoBackpressure() {
+	SinkManyUnicastNoBackpressure() {
 		STATE.lazySet(this, State.INITIAL);
 	}
 
@@ -106,24 +106,24 @@ final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements Internal
 	}
 
 	@Override
-	public Sinks.EmitResult tryEmitNext(T t) {
+	public EmitResult tryEmitNext(T t) {
 		Objects.requireNonNull(t, "t");
 
 		switch (state) {
 			case INITIAL:
-				return Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER;
+				return EmitResult.FAIL_ZERO_SUBSCRIBER;
 			case SUBSCRIBED:
 				if (requested == 0L) {
-					return Sinks.EmitResult.FAIL_OVERFLOW;
+					return EmitResult.FAIL_OVERFLOW;
 				}
 
 				actual.onNext(t);
 				Operators.produced(REQUESTED, this, 1);
-				return Sinks.EmitResult.OK;
+				return EmitResult.OK;
 			case TERMINATED:
-				return Sinks.EmitResult.FAIL_TERMINATED;
+				return EmitResult.FAIL_TERMINATED;
 			case CANCELLED:
-				return Sinks.EmitResult.FAIL_CANCELLED;
+				return EmitResult.FAIL_CANCELLED;
 			default:
 				throw new IllegalStateException();
 		}
@@ -136,18 +136,18 @@ final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements Internal
 			State s = this.state;
 			switch (s) {
 				case INITIAL:
-					return Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER;
+					return EmitResult.FAIL_ZERO_SUBSCRIBER;
 				case SUBSCRIBED:
 					if (STATE.compareAndSet(this, s, State.TERMINATED)) {
 						actual.onError(t);
 						actual = null;
-						return Sinks.EmitResult.OK;
+						return EmitResult.OK;
 					}
 					continue;
 				case TERMINATED:
-					return Sinks.EmitResult.FAIL_TERMINATED;
+					return EmitResult.FAIL_TERMINATED;
 				case CANCELLED:
-					return Sinks.EmitResult.FAIL_CANCELLED;
+					return EmitResult.FAIL_CANCELLED;
 				default:
 					throw new IllegalStateException();
 			}
@@ -160,7 +160,7 @@ final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements Internal
 			State s = this.state;
 			switch (s) {
 				case INITIAL:
-					return Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER;
+					return EmitResult.FAIL_ZERO_SUBSCRIBER;
 				case SUBSCRIBED:
 					if (STATE.compareAndSet(this, s, State.TERMINATED)) {
 						actual.onComplete();
@@ -169,9 +169,9 @@ final class UnicastManySinkNoBackpressure<T> extends Flux<T> implements Internal
 					}
 					continue;
 				case TERMINATED:
-					return Sinks.EmitResult.FAIL_TERMINATED;
+					return EmitResult.FAIL_TERMINATED;
 				case CANCELLED:
-					return Sinks.EmitResult.FAIL_CANCELLED;
+					return EmitResult.FAIL_CANCELLED;
 				default:
 					throw new IllegalStateException();
 			}

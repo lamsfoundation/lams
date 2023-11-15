@@ -68,7 +68,7 @@ final class FluxDelaySubscription<T, U> extends InternalFluxOperator<T, T>
 	static final class DelaySubscriptionOtherSubscriber<T, U>
 			extends Operators.DeferredSubscription implements InnerOperator<U, T> {
 
-		final Consumer<FluxDelaySubscription.DelaySubscriptionOtherSubscriber<T, U>> source;
+		final Consumer<DelaySubscriptionOtherSubscriber<T, U>> source;
 
 		final CoreSubscriber<? super T> actual;
 
@@ -77,7 +77,7 @@ final class FluxDelaySubscription<T, U> extends InternalFluxOperator<T, T>
 		boolean done;
 
 		DelaySubscriptionOtherSubscriber(CoreSubscriber<? super T> actual,
-				Consumer<FluxDelaySubscription.DelaySubscriptionOtherSubscriber<T, U>> source) {
+				Consumer<DelaySubscriptionOtherSubscriber<T, U>> source) {
 			this.actual = actual;
 			this.source = source;
 		}

@@ -550,7 +550,8 @@
 								<i class="fa fa-font"></i>
 								<span><fmt:message key="authoring.fla.rename.button" /></span>
 							</button>
-							<span id="ldStoreDialogModifiedDateSpan" class="loffset20"></span>
+							<span id="ldStoreDialogModifiedDateSpan" class="loffset20"
+								  title="<fmt:message key="label.learning.design.last.modified" />"></span>
 
 							<label for="ldStoreDialogReadOnlyCheckbox" id="ldStoreDialogReadOnlyLabel" class="loffset10">
 								<input type="checkbox" id="ldStoreDialogReadOnlyCheckbox" />

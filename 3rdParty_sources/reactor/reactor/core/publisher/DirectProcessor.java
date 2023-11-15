@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ import reactor.util.context.Context;
  */
 @Deprecated
 public final class DirectProcessor<T> extends FluxProcessor<T, T>
-		implements DirectInnerContainer<T> {
+	implements DirectInnerContainer<T> {
 
 	/**
 	 * Create a new {@link DirectProcessor}
@@ -106,7 +106,7 @@ public final class DirectProcessor<T> extends FluxProcessor<T, T>
 	private volatile     DirectInner<T>[]                                           subscribers = SinkManyBestEffort.EMPTY;
 	@SuppressWarnings("rawtypes")
 	private static final AtomicReferenceFieldUpdater<DirectProcessor, DirectInner[]>SUBSCRIBERS =
-			AtomicReferenceFieldUpdater.newUpdater(DirectProcessor.class, DirectInner[].class, "subscribers");
+		AtomicReferenceFieldUpdater.newUpdater(DirectProcessor.class, DirectInner[].class, "subscribers");
 
 	Throwable error;
 
@@ -137,7 +137,7 @@ public final class DirectProcessor<T> extends FluxProcessor<T, T>
 	@Override
 	public void onComplete() {
 		//no particular error condition handling for onComplete
-		@SuppressWarnings("unused") Sinks.EmitResult emitResult = tryEmitComplete();
+		@SuppressWarnings("unused") EmitResult emitResult = tryEmitComplete();
 	}
 
 	private void emitComplete() {
@@ -165,13 +165,13 @@ public final class DirectProcessor<T> extends FluxProcessor<T, T>
 	}
 
 	private void emitError(Throwable error) {
-		Sinks.EmitResult result = tryEmitError(error);
+		EmitResult result = tryEmitError(error);
 		if (result == EmitResult.FAIL_TERMINATED) {
 			Operators.onErrorDroppedMulticast(error, subscribers);
 		}
 	}
 
-	private Sinks.EmitResult tryEmitError(Throwable t) {
+	private EmitResult tryEmitError(Throwable t) {
 		Objects.requireNonNull(t, "t");
 
 		@SuppressWarnings("unchecked")
@@ -185,7 +185,7 @@ public final class DirectProcessor<T> extends FluxProcessor<T, T>
 		for (DirectInner<?> s : inners) {
 			s.emitError(t);
 		}
-		return Sinks.EmitResult.OK;
+		return EmitResult.OK;
 	}
 
 	private void emitNext(T value) {
@@ -226,13 +226,13 @@ public final class DirectProcessor<T> extends FluxProcessor<T, T>
 			return EmitResult.FAIL_TERMINATED;
 		}
 		if (inners == SinkManyBestEffort.EMPTY) {
-			return Sinks.EmitResult.FAIL_ZERO_SUBSCRIBER;
+			return EmitResult.FAIL_ZERO_SUBSCRIBER;
 		}
 
 		for (DirectInner<T> s : inners) {
 			s.directEmitNext(t);
 		}
-		return Sinks.EmitResult.OK;
+		return EmitResult.OK;
 	}
 
 	@Override

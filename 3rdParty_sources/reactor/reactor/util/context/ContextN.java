@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2015-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,14 +143,14 @@ final class ContextN extends LinkedHashMap<Object, Object>
 
 	@Override
 	public Stream<Entry<Object, Object>> stream() {
-		return entrySet().stream().map(AbstractMap.SimpleImmutableEntry::new);
+		return entrySet().stream().map(SimpleImmutableEntry::new);
 	}
 
 	@Override
 	public Context putAllInto(Context base) {
-		if (base instanceof ContextN) {
+		if (base instanceof CoreContext) {
 			ContextN newContext = new ContextN(base.size() + this.size());
-			newContext.putAll((Map<Object, Object>) base);
+			((CoreContext) base).unsafePutAllInto(newContext);
 			newContext.putAll((Map<Object, Object>) this);
 			return newContext;
 		}
@@ -163,6 +163,20 @@ final class ContextN extends LinkedHashMap<Object, Object>
 	@Override
 	public void unsafePutAllInto(ContextN other) {
 		other.putAll((Map<Object, Object>) this);
+	}
+
+	/**
+	 * This method is part of the {@link Map} API. As this is an internal
+	 * implementation detail, no validation of the {@link Map} keys or values is
+	 * performed. I.e. the caller must ensure they are not null, otherwise this
+	 * {@link Context} will have disallowed mappings.
+	 * Despite being public, this API is not exposed to end users and can be used
+	 * internally for means of populating the inner contents of {@link ContextN}.
+	 * 
+	 * @param m mappings to be stored in this map
+	 */
+	public void putAll(Map<?, ?> m) {
+		super.putAll(m);
 	}
 
 	@Override
@@ -181,6 +195,17 @@ final class ContextN extends LinkedHashMap<Object, Object>
 			other.stream().sequential().forEach(newContext);
 		}
 
+		return newContext;
+	}
+
+	@Override
+	public Context putAllMap(Map<?, ?> from) {
+		if (from.isEmpty()) {
+			return this;
+		}
+
+		ContextN newContext = new ContextN(this);
+		from.forEach(newContext);
 		return newContext;
 	}
 

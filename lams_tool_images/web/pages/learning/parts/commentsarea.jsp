@@ -21,15 +21,15 @@
 		var pathToImageFolder = "${lams}images/css/";
 		
 		//vars for rating.js
-		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+		YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 		COMMENTS_MIN_WORDS_LIMIT = ${sessionMap.commentsMinWordsLimit},
 		MAX_RATES = ${imageGallery.maximumRates},
 		MIN_RATES = ${imageGallery.minimumRates},
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>',
+		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.image.comment.blank"/></spring:escapeBody>',
+		WARN_MIN_NUMBER_WORDS_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>',
 		ALLOW_RERATE = false,
 		SESSION_ID = ${toolSessionID};
 	</script>
@@ -50,10 +50,10 @@
 	function afterVotingSubmit(responseText, statusText)  {
 		var votingFormLabel;
 		if ($('#voting-form-checkbox').is(':checked')) {
-			votingFormLabel = "<fmt:message key='label.learning.unvote'/>";					
+			votingFormLabel = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.unvote'/></spring:escapeBody>";					
 				 
 		} else {
-			votingFormLabel = "<fmt:message key='label.learning.vote.here'/>";
+			votingFormLabel = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.vote.here'/></spring:escapeBody>";
 		}
 		$('#voting-form-label').text(votingFormLabel);
 	}

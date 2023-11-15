@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ import reactor.util.context.Context;
  * @author Simon Baslé
  */
 final class SinkManyBestEffort<T> extends Flux<T>
-		implements InternalManySink<T>, Scannable,
-		           DirectInnerContainer<T> {
+		implements InternalManySink<T>, Scannable, DirectInnerContainer<T> {
 
 	static final DirectInner[] EMPTY      = new DirectInner[0];
 	static final DirectInner[] TERMINATED = new DirectInner[0];
@@ -215,7 +214,13 @@ final class SinkManyBestEffort<T> extends Flux<T>
 		}
 	}
 
-	@Override
+	/**
+	 * Add a new {@link DirectInner} to this publisher.
+	 *
+	 * @param s the new {@link DirectInner} to add
+	 *
+	 * @return {@code true} if the inner could be added, {@code false} if the publisher cannot accept new subscribers
+	 */
 	public boolean add(DirectInner<T> s) {
 		DirectInner<T>[] a = subscribers;
 		if (a == TERMINATED) {
@@ -240,8 +245,13 @@ final class SinkManyBestEffort<T> extends Flux<T>
 		}
 	}
 
+	/**
+	 * Remove an {@link DirectInner} from this publisher. Does nothing if the inner is not currently managed
+	 * by the publisher.
+	 *
+	 * @param s the  {@link DirectInner} to remove
+	 */
 	@SuppressWarnings("unchecked")
-	@Override
 	public void remove(DirectInner<T> s) {
 		DirectInner<T>[] a = subscribers;
 		if (a == TERMINATED || a == EMPTY) {
@@ -382,4 +392,3 @@ final class SinkManyBestEffort<T> extends Flux<T>
 	}
 
 }
-

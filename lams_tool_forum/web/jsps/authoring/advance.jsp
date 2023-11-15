@@ -220,13 +220,13 @@
 		var errors = '';
 		var num = parseFloat(this.value);
 		if (isNaN(num)) {
-			errors = "<fmt:message key="js.error.invalid.number"/>\n";
+			errors = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='js.error.invalid.number'/></spring:escapeBody>\n";
 		} else if (num <= min) {
-			errors = "<fmt:message key="js.error.min.number"/>";
+			errors = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='js.error.min.number'/></spring:escapeBody>";
 		}
 
 		if (errors) {
-			alert("<fmt:message key="js.error.title"/>\n" + errors);
+			alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='js.error.title'/></spring:escapeBody>\n" + errors);
 		}
 	}
 
@@ -275,7 +275,7 @@
 				maxCharacters.value = minCharacters.value;
 			}
 
-			alert('<fmt:message key="js.error.validate.posting.number"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.posting.number"/></spring:escapeBody>');
 		}
 	}
 
@@ -291,7 +291,7 @@
 				maxReplyDropDown.value = minReplyDropDown.value;
 			}
 
-			alert('<fmt:message key="js.error.validate.reply.number"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.reply.number"/></spring:escapeBody>');
 		}
 	}
 
@@ -307,7 +307,7 @@
 				maxRateDropDown.value = minRateDropDown.value;
 			}
 
-			alert('<fmt:message key="js.error.validate.number"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.number"/></spring:escapeBody>');
 		}
 	}
 

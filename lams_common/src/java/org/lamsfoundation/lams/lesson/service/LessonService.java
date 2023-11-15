@@ -23,19 +23,11 @@
 
 package org.lamsfoundation.lams.lesson.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ChosenGrouper;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouper;
 import org.lamsfoundation.lams.learningdesign.Grouping;
@@ -61,13 +53,24 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 /**
  * Access the general lesson details.
  *
  * A lesson has three different "lists" of learners.
  * <OL>
- * <LI>The learners who are in the learner group attached to the lesson. This is fixed when the lesson is started and is
- * a list of all the learners who could ever participate in to the lesson. This is available via lesson.getAllLearners()
+ * <LI>The learners who are in the learner group attached to the lesson. This is fixed when the lesson is started and
+ * is
+ * a list of all the learners who could ever participate in to the lesson. This is available via
+ * lesson.getAllLearners()
  * <LI>The learners who have started the lesson. They may or may not be logged in currently, or if they are logged in
  * they may or may not be doing this lesson. This is available via getActiveLessonLearners().
  * </OL>
@@ -76,7 +79,6 @@ import org.lamsfoundation.lams.util.MessageService;
  * the functionality at present. If this is required later it should be combined with the user's shared session logic
  * and will need to purge users who haven't done anything for a while - otherwise a user whose PC has crashed and then
  * never returns to a lesson will staying in the cache forever.
- *
  */
 public class LessonService implements ILessonService {
     private static Logger log = Logger.getLogger(LessonService.class);
@@ -191,8 +193,9 @@ public class LessonService implements ILessonService {
 	    }
 
 	} else {
-	    String error = "The method performGrouping supports only grouping methods where the grouper decides the groups (currently only RandomGrouping). Called with a groupingActivity with the wrong grouper "
-		    + groupingActivity.getActivityId();
+	    String error =
+		    "The method performGrouping supports only grouping methods where the grouper decides the groups (currently only RandomGrouping). Called with a groupingActivity with the wrong grouper "
+			    + groupingActivity.getActivityId();
 	    LessonService.log.error(error);
 	    throw new LessonServiceException(error);
 	}
@@ -246,9 +249,10 @@ public class LessonService implements ILessonService {
     }
 
     @Override
-    public void performGrouping(Grouping grouping, Long groupId, List learners) throws LessonServiceException {
+    public void performGrouping(Grouping grouping, Long groupId, List learners, boolean forceChosenGrouping)
+	    throws LessonServiceException {
 	if (grouping != null) {
-	    Grouper grouper = grouping.getGrouper();
+	    Grouper grouper = forceChosenGrouping ? new ChosenGrouper() : grouping.getGrouper();
 	    if (grouper != null) {
 		grouper.setCommonMessageService(messageService);
 		try {
@@ -259,8 +263,9 @@ public class LessonService implements ILessonService {
 		groupingDAO.update(grouping);
 	    }
 	} else {
-	    String error = "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a grouping with the wrong grouper "
-		    + grouping;
+	    String error =
+		    "The method performChosenGrouping supports only grouping methods where the supplied list should be used as a single group (currently only ChosenGrouping). Called with a grouping with the wrong grouper "
+			    + grouping;
 	    LessonService.log.error(error);
 	    throw new LessonServiceException(error);
 	}
@@ -466,8 +471,8 @@ public class LessonService implements ILessonService {
 	int numberOfLearners = lessonClass.setLearners(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log
-		    .debug("Set " + numberOfLearners + " learners in lessonClass " + lessonClass.getGroupingId());
+	    LessonService.log.debug(
+		    "Set " + numberOfLearners + " learners in lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -546,8 +551,8 @@ public class LessonService implements ILessonService {
 	    lessonClassDAO.updateLessonClass(lessonClass);
 	}
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log
-		    .debug("Added " + numAdded + " staff members to lessonClass " + lessonClass.getGroupingId());
+	    LessonService.log.debug(
+		    "Added " + numAdded + " staff members to lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -557,8 +562,8 @@ public class LessonService implements ILessonService {
 	int numberOfStaff = lessonClass.setStaffMembers(users);
 	lessonClassDAO.updateLessonClass(lessonClass);
 	if (LessonService.log.isDebugEnabled()) {
-	    LessonService.log
-		    .debug("Set " + numberOfStaff + " staff members in lessonClass " + lessonClass.getGroupingId());
+	    LessonService.log.debug(
+		    "Set " + numberOfStaff + " staff members in lessonClass " + lessonClass.getGroupingId());
 	}
     }
 
@@ -605,8 +610,8 @@ public class LessonService implements ILessonService {
 	    if (progresses != null) {
 		for (LearnerProgress progress : progresses) {
 		    if (LessonService.log.isDebugEnabled()) {
-			LessonService.log
-				.debug("Processing learner progress learner " + progress.getUser().getUserId());
+			LessonService.log.debug(
+				"Processing learner progress learner " + progress.getUser().getUserId());
 		    }
 
 		    boolean recordUpdated = false;
@@ -724,8 +729,8 @@ public class LessonService implements ILessonService {
 		Boolean lessonCompleted = (Boolean) tuple[4];
 		lessonCompleted = lessonCompleted == null ? false : lessonCompleted.booleanValue();
 		Boolean enableLessonNotifications = (Boolean) tuple[5];
-		enableLessonNotifications = enableLessonNotifications == null ? false
-			: enableLessonNotifications.booleanValue();
+		enableLessonNotifications =
+			enableLessonNotifications == null ? false : enableLessonNotifications.booleanValue();
 		Boolean dependent = (Boolean) tuple[6];
 		dependent = dependent == null ? false : dependent.booleanValue();
 		Boolean scheduledFinish = (Boolean) tuple[7];
@@ -805,8 +810,8 @@ public class LessonService implements ILessonService {
 	Lesson lesson = getLesson(completedLessonId);
 	if (lesson != null) {
 	    for (Lesson succeedingLesson : lesson.getSucceedingLessons()) {
-		if (succeedingLesson.isLessonAccessibleForLearner()
-			&& checkLessonReleaseConditions(succeedingLesson.getLessonId(), learnerId)) {
+		if (succeedingLesson.isLessonAccessibleForLearner() && checkLessonReleaseConditions(
+			succeedingLesson.getLessonId(), learnerId)) {
 		    releasedSucceedingLessons.add(succeedingLesson);
 		}
 	    }

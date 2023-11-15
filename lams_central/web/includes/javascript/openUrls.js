@@ -194,3 +194,11 @@ function openCustom(url) {
 		}
 	}
 }
+
+function openTeamworkMonitorWindow (organisationId){
+	location.href = '/lams/teamwork/organisation.do?organisationId=' + organisationId;
+}
+
+function openTeamworkLearnerWindow (){
+	location.href = '/lams/teamwork/learner.do';
+}

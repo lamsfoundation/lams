@@ -23,17 +23,6 @@
 
 package org.lamsfoundation.lams.util;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jboss.as.controller.client.ModelControllerClient;
@@ -42,16 +31,12 @@ import org.jboss.dmr.ModelNode;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import org.quartz.*;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.io.IOException;
+import java.net.ConnectException;
+import java.util.*;
 
 /**
  * Configuration Object
@@ -71,6 +56,7 @@ public class Configuration implements InitializingBean {
 
     public static final String LTI_ADVANTAGE_MODULE_CLASS = "org.lamsfoundation.lams.lti.advantage.util.LtiAdvantageUtil";
     public static final String AI_MODULE_CLASS = "org.lamsfoundation.lams.ai.util.QuestionOpenAiParser";
+    public static final String TEAMWORK_MODULE_CLASS = "org.lamsfoundation.lams.teamwork.TeamworkConstants";
 
     private static Map<String, ConfigurationItem> items = null;
 

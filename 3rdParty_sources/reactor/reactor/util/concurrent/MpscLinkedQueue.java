@@ -63,7 +63,7 @@ final class MpscLinkedQueue<E> extends AbstractQueue<E> implements BiPredicate<E
 	 * This works because each producer is guaranteed to 'plant' a new node and link the old node. No 2
 	 * producers can get the same producer node as part of XCHG guarantee.
 	 *
-	 * @see java.util.Queue#offer(java.lang.Object)
+	 * @see java.util.Queue#offer(Object)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -92,7 +92,7 @@ final class MpscLinkedQueue<E> extends AbstractQueue<E> implements BiPredicate<E
 	 * This works because each producer is guaranteed to 'plant' a new node and link the old node. No 2
 	 * producers can get the same producer node as part of XCHG guarantee.
 	 *
-	 * @see java.util.Queue#offer(java.lang.Object)
+	 * @see java.util.Queue#offer(Object)
 	 *
 	 * @param e1 first element to offer
 	 * @param e2 second element to offer

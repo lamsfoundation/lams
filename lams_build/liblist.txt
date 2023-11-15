@@ -64,9 +64,9 @@ odmg              odmg-3.0.jar                          3.0
 
 passpol			  passpol-0.7.1-SNAPSHOT.jar			0.7.1				   Apache License 2.0			 Codahale						  For checking for weak or compromised password. Recompiled manually with Java 11.
 
-reactive-streams  reactive-streams-1.0.3.jar			1.0.3		   	   	   Public Domain			 	 Reactive StreamsVMWare			  Reactive protocol
+reactive-streams  reactive-streams-1.0.4.jar			1.0.4		   	   	   Public Domain			 	 Reactive StreamsVMWare			  Reactive protocol
 
-reactor			  reactor-core-3.4.12.jar				3.4.12			   	   Apache License 2.0			 VMWare							  Reactive backend
+reactor			  reactor-core-3.5.11.jar				3.5.11			   	   Apache License 2.0			 VMWare							  Reactive backend
 
 quartz			  quartz-2.2.3.jar						2.2.3			   	   Apache License 2.0			 Terracotta						  For running scheduled jobs
 

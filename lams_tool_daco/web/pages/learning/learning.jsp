@@ -51,14 +51,9 @@
 		var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
 	 	var EXE_STRING = '${EXE_STRING}';
 	 	
-		<fmt:message key="errors.maxfilesize" var="LABEL_MAX_FILE_SIZE_VAR"><param>{0}</param></fmt:message>
-		var LABEL_MAX_FILE_SIZE = '<c:out value="${LABEL_MAX_FILE_SIZE_VAR}" />';
-		
-		<fmt:message key="error.attachment.executable" var="LABEL_NOT_ALLOWED_EXE_VAR"/>
-		var LABEL_NOT_ALLOWED_EXE = '<c:out value="${LABEL_NOT_ALLOWED_EXE_VAR}" />';	
-
-		<fmt:message key="error.attachment.must.be.image" var="LABEL_NOT_ALLOWED_FORMAT_VAR"/>
-		var LABEL_NOT_ALLOWED_FORMAT = '<c:out value="${LABEL_NOT_ALLOWED_FORMAT_VAR}" />';	
+		var LABEL_MAX_FILE_SIZE = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message></spring:escapeBody>';
+		var LABEL_NOT_ALLOWED_EXE = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>';
+		var LABEL_NOT_ALLOWED_FORMAT = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.must.be.image"/></spring:escapeBody>';
 
     </script>
     <lams:JSImport src="includes/javascript/dacoLearning.js" relative="true" />

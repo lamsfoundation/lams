@@ -23,23 +23,9 @@
 
 package org.lamsfoundation.lams.learning.web.controller;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
@@ -52,7 +38,6 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.ScheduleGateActivity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dto.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.dto.GateActivityDTO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
@@ -76,6 +61,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,12 +73,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TimeZone;
 
 /**
  * <p>
@@ -152,17 +149,22 @@ public class LearnerController {
 		(LearnerActivityCompleteFluxItem item, LearnerActivityCompleteFluxItem key) ->
 			item.getLessonId() == key.getLessonId() && item.getUserId() == key.getUserId(),
 		(LearnerActivityCompleteFluxItem item) -> {
-		    ObjectNode responseJSON = null;
 		    try {
-			responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
-			if (responseJSON != null) {
-			    return UriUtils.encode(responseJSON.toString(), StandardCharsets.UTF_8.toString());
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+			ObjectNode responseJSON = null;
+			try {
+			    responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
+			    if (responseJSON != null) {
+				return UriUtils.encode(responseJSON.toString(), StandardCharsets.UTF_8.toString());
+			    }
+			} catch (Exception e) {
+			    log.error("Error while getting learner timeline flux", e);
 			}
-		    } catch (Exception e) {
-			log.error("Error while getting learner timeline flux", e);
+			return "";
+		    } finally {
+			HibernateSessionManager.closeSession();
 		    }
-		    return "";
-
 		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
@@ -477,125 +479,127 @@ public class LearnerController {
 	    }
 	}
 
-	    Long activityMaxMark = lamsCoreToolService.getActivityMaxPossibleMark(activity.getActivityId());
-	    if (activityMaxMark != null) {
-		activityJSON.put("maxMark", activityMaxMark);
-	    }
-	    if (activity.getDuration() != null) {
-		activityJSON.put("duration", DateUtil.convertTimeToString(activity.getDuration()));
-	    }
-
-	    activityJSON.put("type", type);
-	    activityJSON.put("isGrouping", actType.contains("grouping"));
-
-	    if (activity.getChildActivities() != null) {
-		for (ActivityURL childActivity : activity.getChildActivities()) {
-		    activityJSON.withArray("childActivities")
-			    .add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId,
-				    monitorMode));
-		}
-	    }
-
-	    return activityJSON;
+	Long activityMaxMark = lamsCoreToolService.getActivityMaxPossibleMark(activity.getActivityId());
+	if (activityMaxMark != null) {
+	    activityJSON.put("maxMark", activityMaxMark);
+	}
+	if (activity.getDuration() != null) {
+	    activityJSON.put("duration", DateUtil.convertTimeToString(activity.getDuration()));
 	}
 
-	private ObjectNode getProgressBarMessages () {
-	    ObjectNode progressBarMessages = JsonNodeFactory.instance.objectNode();
-	    for (String key : MONITOR_MESSAGE_KEYS) {
-		String value = messageService.getMessage(key);
-		progressBarMessages.put(key, value);
+	activityJSON.put("type", type);
+	activityJSON.put("isGrouping", actType.contains("grouping"));
+
+	if (activity.getChildActivities() != null) {
+	    for (ActivityURL childActivity : activity.getChildActivities()) {
+		activityJSON.withArray("childActivities")
+			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId,
+				monitorMode));
 	    }
-	    for (String key : LEARNER_MESSAGE_KEYS) {
-		String value = messageService.getMessage(key);
-		progressBarMessages.put(key, value);
-	    }
-	    return progressBarMessages;
 	}
 
-	/**
-	 * Gets the lesson details based on lesson id or the current tool session
-	 */
-	@RequestMapping("/getLessonDetails") @ResponseBody public String getLessonDetails (HttpServletRequest
-	request, HttpServletResponse response) throws IOException {
-
-	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	    Lesson lesson = null;
-
-	    Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
-	    if (lessonID != null) {
-		lesson = lessonService.getLesson(lessonID);
-
-	    } else {
-		Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-		ToolSession toolSession = lamsToolService.getToolSession(toolSessionId);
-		lesson = toolSession.getLesson();
-	    }
-
-	    responseJSON.put(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
-	    responseJSON.put(AttributeNames.PARAM_TITLE, lesson.getLessonName());
-	    responseJSON.put("allowRestart", lesson.getAllowLearnerRestart());
-	    responseJSON.put(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
-	    responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
-
-	    response.setContentType("application/json;charset=utf-8");
-
-	    return responseJSON.toString();
-	}
-
-	@RequestMapping("/isNextGateActivityOpen") @ResponseBody public String isNextGateActivityOpen
-	(@RequestParam(required = false) Long toolSessionId, @RequestParam(required = false) Long
-	activityId, HttpSession session, Locale locale){
-
-	    UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    if (userDto == null) {
-		throw new IllegalArgumentException("No user is logged in");
-	    }
-
-	    Integer userId = userDto.getUserID();
-	    GateActivityDTO gateDto = null;
-	    if (toolSessionId != null) {
-		gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
-	    } else if (activityId != null) {
-		gateDto = learnerService.isNextGateActivityOpenByActivityId(userId, activityId);
-	    } else {
-		throw new IllegalArgumentException("Either tool session ID or activity ID has to be provided");
-	    }
-
-	    ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	    if (gateDto == null) {
-		responseJSON.put("status", "open");
-	    } else {
-		responseJSON.put("status", "closed");
-
-		String message = null;
-		GateActivity gate = gateDto.getGate();
-		if (gate.isScheduleGate()) {
-		    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
-		    if (!Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
-			Lesson lesson = gate.getLearningDesign().getLessons().iterator().next();
-			User user = userManagementService.getUserById(userId);
-			TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
-
-			Calendar openTime = new GregorianCalendar(userTimeZone);
-			Date lessonStartTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone,
-				lesson.getStartDateTime());
-			openTime.setTime(lessonStartTime);
-			openTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
-			String openDateString = DateUtil.convertToStringForJSON(openTime.getTime(), locale);
-			message = messageService.getMessage("label.gate.closed.preceding.activity.schedule",
-				new Object[] { openDateString });
-		    }
-		} else if (gate.isConditionGate()) {
-		    message = messageService.getMessage("label.gate.closed.preceding.activity.condition");
-		}
-
-		if (message == null) {
-		    message = messageService.getMessage("label.gate.closed.preceding.activity");
-		}
-
-		responseJSON.put("message", message);
-	    }
-
-	    return responseJSON.toString();
-	}
+	return activityJSON;
     }
+
+    private ObjectNode getProgressBarMessages() {
+	ObjectNode progressBarMessages = JsonNodeFactory.instance.objectNode();
+	for (String key : MONITOR_MESSAGE_KEYS) {
+	    String value = messageService.getMessage(key);
+	    progressBarMessages.put(key, value);
+	}
+	for (String key : LEARNER_MESSAGE_KEYS) {
+	    String value = messageService.getMessage(key);
+	    progressBarMessages.put(key, value);
+	}
+	return progressBarMessages;
+    }
+
+    /**
+     * Gets the lesson details based on lesson id or the current tool session
+     */
+    @RequestMapping("/getLessonDetails")
+    @ResponseBody
+    public String getLessonDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	Lesson lesson = null;
+
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	if (lessonID != null) {
+	    lesson = lessonService.getLesson(lessonID);
+
+	} else {
+	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	    ToolSession toolSession = lamsToolService.getToolSession(toolSessionId);
+	    lesson = toolSession.getLesson();
+	}
+
+	responseJSON.put(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
+	responseJSON.put(AttributeNames.PARAM_TITLE, lesson.getLessonName());
+	responseJSON.put("allowRestart", lesson.getAllowLearnerRestart());
+	responseJSON.put(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
+	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
+
+	response.setContentType("application/json;charset=utf-8");
+
+	return responseJSON.toString();
+    }
+
+    @RequestMapping("/isNextGateActivityOpen")
+    @ResponseBody
+    public String isNextGateActivityOpen(@RequestParam(required = false) Long toolSessionId,
+	    @RequestParam(required = false) Long activityId, HttpSession session, Locale locale) {
+
+	UserDTO userDto = (UserDTO) session.getAttribute(AttributeNames.USER);
+	if (userDto == null) {
+	    throw new IllegalArgumentException("No user is logged in");
+	}
+
+	Integer userId = userDto.getUserID();
+	GateActivityDTO gateDto = null;
+	if (toolSessionId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByToolSessionId(userId, toolSessionId);
+	} else if (activityId != null) {
+	    gateDto = learnerService.isNextGateActivityOpenByActivityId(userId, activityId);
+	} else {
+	    throw new IllegalArgumentException("Either tool session ID or activity ID has to be provided");
+	}
+
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (gateDto == null) {
+	    responseJSON.put("status", "open");
+	} else {
+	    responseJSON.put("status", "closed");
+
+	    String message = null;
+	    GateActivity gate = gateDto.getGate();
+	    if (gate.isScheduleGate()) {
+		ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
+		if (!Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
+		    Lesson lesson = gate.getLearningDesign().getLessons().iterator().next();
+		    User user = userManagementService.getUserById(userId);
+		    TimeZone userTimeZone = TimeZone.getTimeZone(user.getTimeZone());
+
+		    Calendar openTime = new GregorianCalendar(userTimeZone);
+		    Date lessonStartTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone,
+			    lesson.getStartDateTime());
+		    openTime.setTime(lessonStartTime);
+		    openTime.add(Calendar.MINUTE, scheduleGate.getGateStartTimeOffset().intValue());
+		    String openDateString = DateUtil.convertToStringForJSON(openTime.getTime(), locale);
+		    message = messageService.getMessage("label.gate.closed.preceding.activity.schedule",
+			    new Object[] { openDateString });
+		}
+	    } else if (gate.isConditionGate()) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity.condition");
+	    }
+
+	    if (message == null) {
+		message = messageService.getMessage("label.gate.closed.preceding.activity");
+	    }
+
+	    responseJSON.put("message", message);
+	}
+
+	return responseJSON.toString();
+    }
+}
