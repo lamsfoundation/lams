@@ -47,6 +47,7 @@
         <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
         <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
+        <lams:JSImport src="includes/javascript/websocket.js" />
         <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
         <lams:JSImport src="includes/javascript/dialog5.js" />
         <lams:JSImport src="includes/javascript/common.js" />
@@ -54,6 +55,8 @@
         <script>
             const LAMS_URL = '<lams:LAMSURL/>',
                 decoderDiv = $('<div />');
+            var commandWebsocketHookTrigger = null,
+                commandWebsocketHook = null;
 
             $(document).ready(function (){
                 const toolSessionID = ${empty lessonID ? toolSessionID : 'null'},
