@@ -101,6 +101,12 @@
 	}
 </script>
 
+<c:if test="${peerreview.rubricsRequireRatings}">
+	<lams:Alert5 type="info" id="info-assign-all-rubrics-pivot" close="true">
+		<fmt:message key="label.rating.rubrics.require.ratings.tooltip.learner" />
+	</lams:Alert5>
+</c:if>
+
 <div class="collapsable-icon-left">
 	<button id="expand-all-button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" onClick="javascript:expandAllRubricsCards()">
 		<fmt:message key="label.rating.rubrics.expand.all" />

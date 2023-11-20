@@ -90,17 +90,22 @@
 	}
 
 	function expandAllRubricsUserCards(){
-		var isCollapsing = $("#expand-all-button").hasClass("collapsed") ? "show" : "hide";
+		let isCollapsing = $("#expand-all-button").hasClass("collapsed") ? "show" : "hide";
 		$("#expand-all-button").toggleClass("collapsed");
 		$('.collapse').collapse(isCollapsing);
 	}
 
 	function isRatingMissing() {
 		let criterionTables = $('.rubrics-table');
-		return $('.col.text-bg-success', criterionTables).length !== $('.row:not(.rubrics-table-header)', criterionTables).length
-			- criterionTables.length;
+		return $('.col.text-bg-success', criterionTables).length !== $('.row:not(.rubrics-table-header)', criterionTables).length;
 	}
 </script>
+
+<c:if test="${peerreview.rubricsRequireRatings}">
+	<lams:Alert5 type="info" id="info-assign-all-rubrics" close="true">
+		<fmt:message key="label.rating.rubrics.require.ratings.tooltip.learner" />
+	</lams:Alert5>
+</c:if>
 
 <div class="collapsable-icon-left">
 	<button id="expand-all-button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" onClick="javascript:expandAllRubricsUserCards()">
@@ -129,7 +134,7 @@
 	       <div id="collapse${ratingDto.itemId}" class="collapse" aria-labelledby="heading${ratingDto.itemId}">
 				<div class="ltable rubrics-table mb-0">
 						<div class="row rubrics-table-header m-0">
-							<%-- Each answer column has the same length, all remaining space is take by the question column --%>
+							<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
 							<div class="col"></div>
 							<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
 								<div class="col">
