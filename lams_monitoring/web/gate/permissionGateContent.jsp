@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <lams:html>
     <lams:head>
-    	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+    	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	
     	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>

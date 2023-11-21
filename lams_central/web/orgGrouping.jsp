@@ -18,11 +18,10 @@
 	<lams:head>
 		<title><c:out value="${title}" /></title>
 
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/orgGrouping.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>

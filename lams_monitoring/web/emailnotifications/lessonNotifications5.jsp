@@ -5,9 +5,9 @@
 <lams:html>
 <lams:head>
 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/tempus-dominus.min.css">
 	<style type="text/css">

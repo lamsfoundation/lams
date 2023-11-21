@@ -27,9 +27,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:head>
 		<title><fmt:message key="monitoring.gallery.walk.cluster.view"/></title>
 
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<style>
 			.group-item {
 				min-width: 20rem;
@@ -41,11 +40,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				border-bottom: none !important;
 			}
 		</style>
+		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	</lams:head>
 
 	<body class="component">
-	<lams:Page5 type="monitor" title="${title}">
+	<lams:Page5 type="admin" title="${title}">
 
 		<div class="d-flex flex-wrap">
 			<c:choose>

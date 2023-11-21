@@ -18,11 +18,9 @@
 				</c:if>
 			</title>
 		</c:if>
-		
-        <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-        <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-        <link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+
         <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
 		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>

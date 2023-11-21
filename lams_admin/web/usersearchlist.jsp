@@ -11,13 +11,12 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.tablesorter.theme.bootstrap5.css">
 	<link type="text/css"  href="<lams:LAMSURL/>css/jquery.tablesorter.pager5.css" rel="stylesheet">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<style>
 		#tablesorter thead .disabled {
 			display: none

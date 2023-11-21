@@ -15,11 +15,10 @@
 	<lams:head>
 		<title>${title}</title>
 
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/groups.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
@@ -112,7 +111,7 @@
 	</lams:head>
 
 	<body class="component my-2">
-	<lams:Page5 title="${title}" type="monitoring">
+	<lams:Page5 title="${title}" type="admin">
 		<c:if test="${not empty lessonID}">
 			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lessonID}">
 				<i class="fa-solid fa-arrow-left"></i>&nbsp;<fmt:message key="label.grouping.return.to.monitoring"/>

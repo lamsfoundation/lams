@@ -13,18 +13,17 @@
 	<head>
 		<meta charset="utf-8" />
 		<title><fmt:message key="monitor.title" /></title>
-
 		<link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
+		
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+		<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/vertical-timeline.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/x-editable.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/tempus-dominus.min.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>gradebook/includes/css/gradebook.css" />
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-		<link rel="stylesheet" href="<lams:WebAppURL/>css/components-monitoring.css">
 
 		<lams:css suffix="chart"/>
 

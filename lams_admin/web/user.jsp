@@ -22,29 +22,18 @@
 			</c:set>
 		</c:if>
 		<title>${title}</title>
-		<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico"
-			  type="image/x-icon" />
+		<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-		<link rel="stylesheet"
-			  href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-		<link rel="stylesheet"
-			  href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css"
-			  type="text/css" media="screen">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css"
-			  type="text/css" media="screen">
+		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
 
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript"
-				src="/lams/includes/javascript/jquery-ui.js"></script>
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-		<script type="text/javascript"
-				src="/lams/includes/javascript/portrait5.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+		<script type="text/javascript" src="/lams/includes/javascript/portrait5.js"></script>
 
 		<script type="text/javascript">
 			var mustHaveUppercase = ${mustHaveUppercase},
