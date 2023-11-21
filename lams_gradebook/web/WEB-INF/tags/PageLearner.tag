@@ -36,12 +36,10 @@
         <c:if test="${not empty refresh}">
         	<meta http-equiv="refresh" content="${refresh}">
         </c:if>
-
         <link rel="icon" type="image/x-icon" href="<lams:LAMSURL/>images/svg/lamsv5_logo.svg">
-        <link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-        <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-        <link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+        
         <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
+        <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
@@ -51,7 +49,6 @@
         <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
         <lams:JSImport src="includes/javascript/dialog5.js" />
         <lams:JSImport src="includes/javascript/common.js" />
-
         <script>
             const LAMS_URL = '<lams:LAMSURL/>',
                 decoderDiv = $('<div />');
@@ -191,5 +188,4 @@
     </div>
 
     </body>
-
 </lams:html>

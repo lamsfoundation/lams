@@ -310,11 +310,11 @@ When true, hides the names and groups the comments.  -->
 						<%-- Each answer column has the same length, all remaining space is taken by the question column --%>
 						<div class="col"></div>
 						<c:forEach var="columnHeader" items="${criteriaRatings.ratingCriteria.rubricsColumnHeaders}" varStatus="columnStatus">
-							<div class="col">
+							<div class="col text-center">
 								(${columnStatus.count})&nbsp;<c:out value="${columnHeader}" escapeXml="false"/>
 							</div>
 							<c:if test="${not columnStatus.last and rubricsInBetweenColumns}">
-								<div class="col">
+								<div class="col text-center">
 									<i>(${columnStatus.count + 0.5})&nbsp;<fmt:message key="label.rating.rubrics.in.between" /></i>
 								</div>
 							</c:if>
@@ -343,7 +343,7 @@ When true, hides the names and groups the comments.  -->
 								<c:set var="rowRateCount" value="${rowRateCount + rateCount}" />
 								<c:set var="rowRateValue" value="${rowRateValue + rateCount * columnOrderId.count}" />
 
-								<div class="col rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>  px-1">
+								<div class="col text-center rubrics-description-cell <c:if test="${rateCount > 0}">text-bg-success</c:if>  px-1">
 									<c:out value="${column.name}" escapeXml="false" />
 									
 									<c:if test="${rateCount > 0}">
