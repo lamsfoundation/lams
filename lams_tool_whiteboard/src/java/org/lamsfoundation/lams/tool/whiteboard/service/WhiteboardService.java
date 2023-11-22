@@ -335,7 +335,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	Long userSessionId =
 		ratingUserId == null || !whiteboard.isGalleryWalkStarted() || !whiteboard.isGalleryWalkEditEnabled()
 			? null
-			: getUserByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
+			: getLearnerByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
 	for (WhiteboardSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
