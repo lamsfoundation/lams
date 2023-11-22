@@ -22,17 +22,6 @@
 
 package org.lamsfoundation.lams.admin.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -45,6 +34,7 @@ import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
+import org.lamsfoundation.lams.timezone.Timezone;
 import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
@@ -67,6 +57,17 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * <p>
@@ -104,7 +105,7 @@ public class ImportService implements IImportService {
     private static final short DAY_PHONE = 16;
     private static final short EVE_PHONE = 17;
     private static final short MOB_PHONE = 18;
-    private static final short FAX = 19;
+    private static final short TIME_ZONE = 19;
 
     // spreadsheet column indexes for userorgrole spreadsheet
     private static final short ORGANISATION = 1;
@@ -329,8 +330,10 @@ public class ImportService implements IImportService {
 		    service.saveUser(user);
 		    successful++;
 		    writeAuditLog(user, userDTO);
-		    ImportService.log.debug("Row " + i + " saved user: " + user.getLogin()
-			    + (generatedPassword.length() > 0 ? " with a generated password" : ""));
+		    ImportService.log.debug(
+			    "Row " + i + " saved user: " + user.getLogin() + (generatedPassword.length() > 0
+				    ? " with a generated password"
+				    : ""));
 		    if (sendEmail) {
 			sendUserImportPasswordChangeEmail(user);
 		    }
@@ -412,9 +415,9 @@ public class ImportService implements IImportService {
 		    messageService.getMessage("user.import.password.change.email.content.start",
 			    new Object[] { user.getFirstName() + " " + user.getLastName() }));
 
-	    StringBuilder changePasswordLink = new StringBuilder("<a href=\"")
-		    .append(Configuration.get(ConfigurationKeys.SERVER_URL)).append("forgotPasswordChange.jsp?key=")
-		    .append(key).append("\">")
+	    StringBuilder changePasswordLink = new StringBuilder("<a href=\"").append(
+			    Configuration.get(ConfigurationKeys.SERVER_URL)).append("forgotPasswordChange.jsp?key=").append(key)
+		    .append("\">")
 		    .append(messageService.getMessage("user.import.password.change.email.content.link.label"))
 		    .append("</a>");
 
@@ -430,8 +433,9 @@ public class ImportService implements IImportService {
 
 	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER);
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_END_PLACEHOLDER.length();
-	    content.replace(placeholderStart, placeholderEnd, messageService.getMessage(
-		    "user.import.password.change.email.content.end", new Object[] { serverLink.toString() }));
+	    content.replace(placeholderStart, placeholderEnd,
+		    messageService.getMessage("user.import.password.change.email.content.end",
+			    new Object[] { serverLink.toString() }));
 
 	    placeholderStart = content.indexOf(USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER);
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_THANKS_PLACEHOLDER.length();
@@ -527,9 +531,8 @@ public class ImportService implements IImportService {
     private boolean isAppadmin(String sessionId) {
 	UserDTO userDTO = (UserDTO) SessionManager.getSession(sessionId).getAttribute(AttributeNames.USER);
 	return service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
-		Role.APPADMIN)
-		|| service.isUserInRole(userDTO.getUserID(), service.getRootOrganisation().getOrganisationId(),
-			Role.SYSADMIN);
+		Role.APPADMIN) || service.isUserInRole(userDTO.getUserID(),
+		service.getRootOrganisation().getOrganisationId(), Role.SYSADMIN);
     }
 
     /*
@@ -701,11 +704,30 @@ public class ImportService implements IImportService {
 	user.setDayPhone(parseStringCell(row.getCell(ImportService.DAY_PHONE)));
 	user.setEveningPhone(parseStringCell(row.getCell(ImportService.EVE_PHONE)));
 	user.setMobilePhone(parseStringCell(row.getCell(ImportService.MOB_PHONE)));
-	user.setFax(parseStringCell(row.getCell(ImportService.FAX)));
 	user.setDisabledFlag(false);
 	user.setCreateDate(new Date());
-	user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
 	user.setFirstLogin(true);
+
+	// convert timezone like "Europe/Warsaw" to "Etc/GMT-1", if provided
+	String timeZoneColumn = parseStringCell(row.getCell(ImportService.TIME_ZONE));
+	TimeZone javaTimeZone = TimeZone.getTimeZone(timeZoneColumn);
+	Timezone userTimezone = timezoneService.getServerTimezone();
+	if (javaTimeZone != null) {
+	    int offset = javaTimeZone.getRawOffset() / 3600000;
+	    String lamsTimezoneName = "Etc/GMT";
+	    if (offset > 0) {
+		lamsTimezoneName += "-" + offset;
+	    } else if (offset < 0) {
+		lamsTimezoneName += "+" + Math.abs(offset);
+	    }
+	    for (Timezone lamsTimezone : timezoneService.getDefaultTimezones()) {
+		if (lamsTimezone.getTimezoneId().equalsIgnoreCase(lamsTimezoneName)) {
+		    userTimezone = lamsTimezone;
+		    break;
+		}
+	    }
+	}
+	user.setTimeZone(userTimezone.getTimezoneId());
 
 	service.updatePassword(user, password);
 
@@ -788,8 +810,8 @@ public class ImportService implements IImportService {
 		if ((cell.getStringCellValue() != null) || (cell.getStringCellValue().trim().length() != 0)) {
 		    emptyRow = false;
 		} else {
-		    ImportService.log
-			    .debug("Couldn't find any roles in spreadsheet column index " + ImportService.ROLES);
+		    ImportService.log.debug(
+			    "Couldn't find any roles in spreadsheet column index " + ImportService.ROLES);
 		    return null;
 		}
 		roleDescription = cell.getStringCellValue().trim();
