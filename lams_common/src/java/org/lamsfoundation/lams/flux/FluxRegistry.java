@@ -1,14 +1,13 @@
 package org.lamsfoundation.lams.flux;
 
+import org.apache.log4j.Logger;
+import reactor.core.publisher.Flux;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-
-import org.apache.log4j.Logger;
-
-import reactor.core.publisher.Flux;
 
 public class FluxRegistry {
     private static Logger log = Logger.getLogger(FluxMap.class.getName());
@@ -27,6 +26,9 @@ public class FluxRegistry {
 	    return sink;
 	}
 	sink = new SharedSink<>(sinkName);
+	if (log.isDebugEnabled()) {
+	    log.debug("Created new sink for name \"" + sinkName + "\"");
+	}
 	sinkRegistry.put(sinkName, sink);
 	return sink;
     }
@@ -47,6 +49,9 @@ public class FluxRegistry {
 	}
 	if (!sourceSinkBindings.containsKey(targetSinkName)) {
 	    sourceSinkBindings.put(targetSinkName, emitTransformer);
+	    if (log.isDebugEnabled()) {
+		log.debug("Bound sink with name \"" + sourceSinkName + " to sink with name \"" + targetSinkName + "\"");
+	    }
 	}
     }
 
@@ -65,9 +70,12 @@ public class FluxRegistry {
 	if (itemEqualsPredicate == null) {
 	    itemEqualsPredicate = (item, key) -> item.equals(key);
 	}
-	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink.getFlux(), itemEqualsPredicate, fetchFunction,
-		throttleSeconds, timeoutSeconds);
+	FluxMap<T, String> fluxMap = new FluxMap<>(fluxName, sink, itemEqualsPredicate, fetchFunction, throttleSeconds,
+		timeoutSeconds);
 	fluxRegistry.put(fluxName, fluxMap);
+	if (log.isDebugEnabled()) {
+	    log.debug("Initialised FluxMap for \"" + fluxName + "\"");
+	}
     }
 
     @SuppressWarnings({ "unchecked" })
