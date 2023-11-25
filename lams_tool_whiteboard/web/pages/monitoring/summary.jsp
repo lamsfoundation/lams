@@ -61,6 +61,10 @@
 		margin-bottom: 20px;
 	}
 
+	.whiteboard-monitoring-summary #gallery-walk-skip {
+		margin-top: 20px;
+	}
+
 	.whiteboard-monitoring-summary #gallery-walk-rating-table th {
 		font-weight: bold;
 		font-style: normal;
@@ -379,6 +383,30 @@
 		});
 	}
 
+	function skipGalleryWalk(){
+        if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
+			return;
+		}
+
+		$.ajax({
+			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${whiteboard.contentId}
+			},
+			'success' : function(){
+				<c:choose>
+				<c:when test="${isTbl}">
+				// reload current tab with Whiteboard summary
+				loadTab(null, null, false);
+				</c:when>
+				<c:otherwise>
+				location.reload();
+				</c:otherwise>
+				</c:choose>
+			}
+		});
+	}
+
 	function finishGalleryWalk(){
 		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
@@ -538,6 +566,13 @@
 				</button>
 
 				<br>
+
+				<button id="gallery-walk-skip" type="button"
+						class="btn btn-danger
+				        	   ${not whiteboard.galleryWalkStarted and not whiteboard.galleryWalkFinished ? '' : 'hidden'}"
+						onClick="javascript:skipGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.skip" />
+				</button>
 
 				<button id="gallery-walk-learner-edit" type="button"
 						class="btn btn-default ${not whiteboard.galleryWalkEditEnabled and (whiteboard.galleryWalkStarted or whiteboard.galleryWalkFinished) ? '' : 'hidden'}"
