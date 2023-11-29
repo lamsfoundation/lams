@@ -22,8 +22,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="WebAppURL"><lams:WebAppURL/></c:set>
+<c:set var="title">
+	<c:choose>
+		<c:when test="${not empty gateForm.gate.title}">
+			${gateForm.gate.title}
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="label.schedule.gate.title"/>
+		</c:otherwise>
+	</c:choose>
+</c:set>
 
-<lams:PageLearner title="${gateForm.gate.title}" toolSessionID="" lessonID="${gateForm.lessonID}"
+<lams:PageLearner title="${title}" toolSessionID="" lessonID="${gateForm.lessonID}"
 		refresh="60;URL=${WebAppURL}/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID}">
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>	
