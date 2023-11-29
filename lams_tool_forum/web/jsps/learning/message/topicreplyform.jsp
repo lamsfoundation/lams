@@ -6,7 +6,7 @@
 	</label>
 	<form:input cssClass="form-control" path="message.subject" value="${message.subject}" maxlength="60" />
 
-	<lams:errors path="message.subject"/>
+	<lams:errors5 path="message.subject"/>
 </div>
 
 <div class="mb-3">
@@ -28,7 +28,7 @@
 		<script>
 			initFileUpload('${messageForm.tmpFileUploadId}', true, '<lams:user property="localeLanguage"/>');
 		</script>
- 		<lams:errors path="message.attachments"/>
+ 		<lams:errors5 path="message.attachments"/>
 	</div>
 	
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>

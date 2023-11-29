@@ -87,7 +87,7 @@
 	<%@ include file="websocket.jsp"%>	
 
 <div id="container-main">
-	<lams:errors/>
+	<lams:errors5/>
 	
 	<div id="instructions" class="instructions">
 		<c:out value="${dokumaran.description}" escapeXml="false" />

@@ -614,7 +614,7 @@
             <fmt:message key="warn.mark.hedging.wrong.total" />
         </lams:Alert5>
 
-        <lams:errors/>
+        <lams:errors5/>
 
         <%@ include file="parts/paging.jsp"%>
 

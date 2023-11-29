@@ -21,7 +21,7 @@
 		<fmt:message key="activity.title" />
 	</h1>
 	
-	<lams:errors/>
+	<lams:errors5/>
 	
 	<div class="activity-bottom-buttons">
 		<form:form modelAttribute="messageForm" action="/learner.do" target="_self" onsubmit="disableFinishButton();" id="messageForm">

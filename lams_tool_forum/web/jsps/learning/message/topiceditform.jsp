@@ -6,7 +6,7 @@
     </label>
     <form:input cssClass="form-control" value="${message.subject}" path="message.subject" maxlength="60"/> &nbsp;
 
-	<lams:errors path="message.subject"/>
+	<lams:errors5 path="message.subject"/>
 </div>
 
 <div class="mb-3">

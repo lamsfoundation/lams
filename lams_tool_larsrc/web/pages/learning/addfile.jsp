@@ -13,7 +13,7 @@
 	</div>
 	<div class="card-body">
 	
-	<lams:errors/>
+	<lams:errors5/>
 	
 	<form:form action="saveOrUpdateItem.do" method="post" modelAttribute="resourceItemForm" id="resourceItemForm" focus="title">
 		<form:hidden path="itemType" id="itemType" />

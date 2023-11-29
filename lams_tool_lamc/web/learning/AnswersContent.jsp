@@ -150,7 +150,7 @@
 				<form:hidden path="userOverPassMark" />
 				<form:hidden path="passMarkApplicable" />
 
-				<lams:errors/>
+				<lams:errors5/>
 
 				<c:choose>
 					<c:when test="${sessionMap.content.questionsSequenced && hasEditRight}">

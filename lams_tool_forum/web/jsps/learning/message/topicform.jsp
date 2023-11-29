@@ -5,7 +5,7 @@
     	<fmt:message key="message.label.subject" />
     </label>
     <form:input value="${message.subject}" path="message.subject" maxlength="60" cssClass="form-control"/>
-    <lams:errors path="message.subject"/>
+    <lams:errors5 path="message.subject"/>
 </div>
 
 <div class="mb-3">

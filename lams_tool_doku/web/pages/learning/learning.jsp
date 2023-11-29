@@ -234,7 +234,7 @@
             </lams:Alert5>
         </c:if>
 
-        <lams:errors/>
+        <lams:errors5/>
 
         <div id="instructions" class="instructions">
             <c:out value="${dokumaran.description}" escapeXml="false" />

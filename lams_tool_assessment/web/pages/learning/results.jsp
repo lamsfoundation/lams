@@ -101,7 +101,7 @@
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
-		<lams:errors/>
+		<lams:errors5/>
 		
 		<c:if test="${not empty result}">
 			<%@ include file="results/attemptsummary.jsp"%>

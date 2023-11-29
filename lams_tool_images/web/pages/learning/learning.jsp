@@ -183,7 +183,7 @@
             </lams:Alert5>
         </c:if>
 
-        <lams:errors/>
+        <lams:errors5/>
 
             <%--Main image---------------------------------------------------%>
         <div class="card lcard">

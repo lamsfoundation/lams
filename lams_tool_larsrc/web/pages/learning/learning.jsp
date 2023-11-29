@@ -272,7 +272,7 @@
             </lams:Alert5>
         </c:if>
 
-        <lams:errors/>
+        <lams:errors5/>
 
         <!--  Instructions -->
         <div id="instructions" class="instructions">
