@@ -89,10 +89,6 @@
 		<form:hidden path="toolSessionID" />
 		<form:hidden path="contentEditable" value="${contentEditable}" />
 
-		<div id="instructions" class="instructions">
-			<c:out value="${notebookDTO.instructions}" escapeXml="false" />
-		</div>
-
 		<!-- Notifications and warnings -->
 		<c:if test="${not empty notebookDTO.submissionDeadline}">
 			<lams:Alert5 id="submissionDeadline" type="info" close="true">
@@ -122,6 +118,10 @@
 				<fmt:message>message.learner.blank.alertforceResponse</fmt:message>
 			</lams:Alert5>
 		</c:if>
+
+		<div id="instructions" class="instructions">
+			<c:out value="${notebookDTO.instructions}" escapeXml="false" />
+		</div>
 
 		<!-- Form -->
 		<div class="card lcard">

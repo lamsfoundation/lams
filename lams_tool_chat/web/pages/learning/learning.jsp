@@ -31,11 +31,7 @@
 	<lams:JSImport src="includes/javascript/learning.js" relative="true" />
 	
 	<div id="container-main">
-		<div id="instructions" class="instructions">
-			<c:out value="${chatDTO.instructions}" escapeXml="false" />
-		</div>
-		
-		<!-- Announcements and advanced settings -->
+		<!-- Announcements -->
 		<c:if test="${chatDTO.lockOnFinish}">
 			<lams:Alert5 id="lockWhenFinished" type="info" close="true">
 				<c:choose>
@@ -58,6 +54,10 @@
 				</fmt:message>
 			</lams:Alert5>
 		</c:if>
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${chatDTO.instructions}" escapeXml="false" />
+		</div>
 		
 		<!-- chat UI -->
 		<div class="row">

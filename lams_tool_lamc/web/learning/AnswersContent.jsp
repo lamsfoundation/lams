@@ -114,10 +114,6 @@
       </script>
 
 	<div id="container-main">
-		<div id="instructions" class="instructions">
-			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-		</div>
-
 		<!-- Announcements and advanced settings -->
 		<c:if test="${not empty submissionDeadline}">
 			<lams:Alert5 close="false" id="submissionDeadline" type="danger">
@@ -139,6 +135,10 @@
 			<lams:LeaderDisplay idName="leader-info" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.userId}" />
 		</c:if>
 		<!-- End announcements and advanced settings -->
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+		</div>
 
 		<div id="questions">
 			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="displayMc.do" enctype="multipart/form-data"

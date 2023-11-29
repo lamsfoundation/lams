@@ -134,12 +134,8 @@
         }
     </script>
     <div id="container-main">
-
-            <%--Advanced settings and notices-----------------------------------%>
-        <div id="instructions" class="instructions">
-            <c:out value="${imageGallery.instructions}" escapeXml="false"/>
-        </div>
-
+		<%--Advanced settings and notices-----------------------------------%>
+		
         <c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
             <lams:Alert5 type="danger" id="lock-on-finish" close="false">
                 <c:choose>
@@ -185,14 +181,18 @@
 
         <lams:errors5/>
 
-            <%--Main image---------------------------------------------------%>
+        <div id="instructions" class="instructions">
+            <c:out value="${imageGallery.instructions}" escapeXml="false"/>
+        </div>
+
+        <%--Main image---------------------------------------------------%>
         <div class="card lcard">
             <div class="card-body">
                 <div class="fotorama-container">
                     <div class="fotorama"></div>
                 </div>
 
-                    <%--Comments & Ranking/Voting area-------------------------------%>
+                <%--Comments & Ranking/Voting area-------------------------------%>
                 <div id="image-info">
                     <%@ include file="/pages/learning/parts/commentsarea.jsp"%>
                 </div>
@@ -203,7 +203,7 @@
             <div id="new-image-input-area" class="mt-4"></div>
         </c:if>
 
-            <%--Reflection--------------------------------------------------%>
+        <%--Reflection--------------------------------------------------%>
 
         <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
             <lams:NotebookReedit
@@ -213,7 +213,7 @@
                     notebookHeaderLabelKey="title.reflection"/>
         </c:if>
 
-            <%--Bottom buttons-------------------------------------------%>
+        <%--Bottom buttons-------------------------------------------%>
 
         <c:if test="${mode != 'teacher'}">
             <div class="activity-bottom-buttons" id="learner-submit"

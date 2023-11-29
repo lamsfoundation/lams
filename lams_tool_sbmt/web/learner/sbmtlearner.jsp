@@ -39,9 +39,6 @@
     </c:choose>
 
     <div id="container-main">
-        <div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
-            <c:out value="${sessionMap.instruction}" escapeXml="false" />
-        </div>
 
         <div id="notices">
             <!-- notices and announcements -->
@@ -104,6 +101,10 @@
 
         <div id="errors">
             <lams:errors5/>
+        </div>
+        
+        <div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
+            <c:out value="${sessionMap.instruction}" escapeXml="false" />
         </div>
 
         <div id="uploader">

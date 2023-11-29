@@ -598,10 +598,6 @@
             </lams:Alert5>
         </c:if>
 
-        <div id="instructions" class="instructions">
-            <c:out value="${assessment.instructions}" escapeXml="false"/>
-        </div>
-
         <lams:Alert5 id="warning-answers-required" type="warning" close="true">
             <fmt:message key="warn.answers.required" />
         </lams:Alert5>
@@ -615,6 +611,10 @@
         </lams:Alert5>
 
         <lams:errors5/>
+
+        <div id="instructions" class="instructions">
+            <c:out value="${assessment.instructions}" escapeXml="false"/>
+        </div>
 
         <%@ include file="parts/paging.jsp"%>
 

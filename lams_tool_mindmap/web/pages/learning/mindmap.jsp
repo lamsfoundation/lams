@@ -52,10 +52,6 @@
 			<input type="hidden" name="toolContentId" value="${toolContentID}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />
-				
-			<div id="instructions" class="instructions">
-				<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
-			</div>
 			
 			<%--Advanced settings and notices-----------------------------------%>
 			
@@ -79,6 +75,10 @@
 				  	</fmt:message>
 				 </lams:Alert5>
 			 </c:if>
+				
+			<div id="instructions" class="instructions">
+				<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
+			</div>
 				
 			<%--MindMup -----------------------------------%>
 			<%@ include file="/common/mapjs.jsp"%>

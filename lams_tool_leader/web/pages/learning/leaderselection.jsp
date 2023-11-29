@@ -63,14 +63,11 @@
     <div id="container-main">
         <c:choose>
             <c:when test="${not empty groupLeader}">
-                <lams:LeaderDisplay
-                        username="${groupLeader.firstName} ${groupLeader.lastName}"
-                        userId="${groupLeader.userId}" />
+                <lams:LeaderDisplay username="${groupLeader.firstName} ${groupLeader.lastName}" userId="${groupLeader.userId}" />
             </c:when>
             <c:otherwise>
                 <fmt:message key="label.no.leader.yet.title" var="alertTitle"/>
-                <lams:Alert5 type="warning" id="no-leader" close="false"
-                             title="${alertTitle}">
+                <lams:Alert5 type="warning" id="no-leader" close="false" title="${alertTitle}">
                     <fmt:message key="label.no.leader.yet.body" />
                 </lams:Alert5>
             </c:otherwise>

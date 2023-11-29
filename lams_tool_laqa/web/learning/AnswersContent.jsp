@@ -24,6 +24,29 @@
 	</style>
 	
 	<div id="container-main">
+		<!-- Advanced settings and notices -->
+
+		<c:if test="${generalLearnerFlowDTO.noReeditAllowed}">
+			<lams:Alert5 type="danger" id="noRedosAllowed" close="false">
+				<fmt:message key="label.noredo.enabled" />
+			</lams:Alert5>
+		</c:if>
+
+		<c:if test="${not empty sessionMap.submissionDeadline}">
+			<lams:Alert5 type="danger" id="submission-deadline" close="false">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${sessionMap.submissionDeadline}" />
+					</fmt:param>
+				</fmt:message>
+			</lams:Alert5>
+		</c:if>
+
+		<c:if test="${isLeadershipEnabled}">
+			<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
+		</c:if>
+
+		<!-- End advanced settings and notices -->
 
 		<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.instructions'/>">
 			<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
@@ -32,30 +55,6 @@
 		<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
 		<form:form action="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential' ? 'getNextQuestion.do' : 'submitAnswersContent.do'}"
 				   method="POST" target="_self" id="qaLearningForm" modelAttribute="qaLearningForm">
-
-			<!-- Advanced settings and notices -->
-
-			<c:if test="${generalLearnerFlowDTO.noReeditAllowed}">
-				<lams:Alert5 type="danger" id="noRedosAllowed" close="false">
-					<fmt:message key="label.noredo.enabled" />
-				</lams:Alert5>
-			</c:if>
-
-			<c:if test="${not empty sessionMap.submissionDeadline}">
-				<lams:Alert5 type="danger" id="submission-deadline" close="false">
-					<fmt:message key="authoring.info.teacher.set.restriction">
-						<fmt:param>
-							<lams:Date value="${sessionMap.submissionDeadline}" />
-						</fmt:param>
-					</fmt:message>
-				</lams:Alert5>
-			</c:if>
-
-			<c:if test="${isLeadershipEnabled}">
-				<lams:LeaderDisplay idName="leader-enabled" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.queUsrId}"/>
-			</c:if>
-
-			<!-- End advanced settings and notices -->
 			<form:hidden path="toolSessionID" id="tool-session-id" />
 			<form:hidden path="userID" />
 			<form:hidden path="sessionMapID" />

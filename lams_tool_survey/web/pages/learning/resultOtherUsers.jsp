@@ -94,15 +94,15 @@
 	</script>
 
 	<div id="container-main">
-		<div id="instructions" class="instructions">
-			<c:out value="${sessionMap.instructions}" escapeXml="false" />
-		</div>
-
 		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
 			<lams:Alert5 id="activityLocked" type="info" close="true">
 				<fmt:message key="message.activityLocked" />
 			</lams:Alert5>
 		</c:if>
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${sessionMap.instructions}" escapeXml="false" />
+		</div>
 
 		<%-- user personal results--%>
 		<div class="card-subheader mb-4">

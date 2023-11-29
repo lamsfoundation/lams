@@ -35,10 +35,6 @@
     </script>
 
 	<div id="container-main">
-		<div id="instructions" class="instructions">
-			<c:out value="${sessionMap.instructions}" escapeXml="false" />
-		</div>
-
 		<c:if test="${sessionMap.lockOnFinish and sessionMap.mode != 'teacher'}">
 			<c:choose>
 				<c:when test="${sessionMap.showOtherUsersAnswers}">
@@ -81,6 +77,10 @@
 				</c:otherwise>
 			</c:choose>
 		</c:if>
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${sessionMap.instructions}" escapeXml="false" />
+		</div>
 
 		<c:forEach var="element" items="${sessionMap.questionList}">
 			<div class="card lcard">

@@ -22,11 +22,11 @@
 	</script>
 
 	<div id="container-main">
+		<lams:errors5/>
+		
 		<div id="instructions" class="instructions">
 			<c:out value="${contentDTO.instructions}" escapeXml="false" />
 		</div>
-	
-		<lams:errors5/>
 		
 		<c:if test="${not skipContent}">
 			<c:choose>

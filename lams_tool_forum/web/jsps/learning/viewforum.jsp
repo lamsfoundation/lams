@@ -50,10 +50,6 @@
     <script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>
 
     <div id="container-main">
-        <div id="instructions" class="instructions">
-            <c:out value="${sessionMap.instruction}" escapeXml="false" />
-        </div>
-
         <!-- Announcements and advanced settings -->
         <c:if test="${not empty sessionMap.submissionDeadline}">
             <lams:Alert5 id="submissionDeadline" type="info" close="true">
@@ -133,6 +129,10 @@
         </c:if>
 
         <lams:errors5/>
+        
+        <div id="instructions" class="instructions">
+            <c:out value="${sessionMap.instruction}" escapeXml="false" />
+        </div>
 
         <!-- main UI -->
         <%@ include file="/jsps/learning/message/topiclist.jsp"%>

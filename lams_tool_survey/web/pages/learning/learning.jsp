@@ -35,10 +35,6 @@
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="position" />
 			<form:hidden path="currentIdx" />
-
-			<div id="instructions" class="instructions">
-				<c:out value="${sessionMap.instructions}" escapeXml="false" />
-			</div>
 			
 			<c:if test="${not empty sessionMap.submissionDeadline}">
 				<lams:Alert5 id="submissionDeadline" type="info" close="true">
@@ -49,6 +45,10 @@
 					</fmt:message>
 				</lams:Alert5>
 			</c:if>
+
+			<div id="instructions" class="instructions">
+				<c:out value="${sessionMap.instructions}" escapeXml="false" />
+			</div>
 			
 			<c:choose>
 				<%-- Show on one page or when learner does not choose edit one question --%>

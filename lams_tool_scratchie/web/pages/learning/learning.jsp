@@ -523,10 +523,6 @@
             </lams:Alert5>
         </c:if>
 
-        <div id="instructions" class="instructions">
-            <c:out value="${scratchie.instructions}" escapeXml="false" />
-        </div>
-
         <c:if test="${not empty sessionMap.submissionDeadline}">
             <lams:Alert5 id="submissionDeadline" close="true" type="info">
                 <fmt:message key="authoring.info.teacher.set.restriction">
@@ -549,6 +545,10 @@
         </c:if>
 
         <lams:errors5/>
+
+        <div id="instructions" class="instructions">
+            <c:out value="${scratchie.instructions}" escapeXml="false" />
+        </div>
 
         <div id="questionListArea">
             <%@ include file="questionlist.jsp"%>
