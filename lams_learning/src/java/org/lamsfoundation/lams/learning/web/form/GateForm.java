@@ -23,7 +23,6 @@ public class GateForm {
 //    used for updating the the progress bar
     private Integer version;
     private String progressSummary;
-    private Boolean monitorCanOpenGate;
 
     public GateActivity getGate() {
 	return gate;
@@ -127,14 +126,6 @@ public class GateForm {
 
     public void setProgressSummary(String progressSummary) {
 	this.progressSummary = progressSummary;
-    }
-
-    public Boolean getMonitorCanOpenGate() {
-	return monitorCanOpenGate;
-    }
-
-    public void setMonitorCanOpenGate(Boolean monitorCanOpenGate) {
-	this.monitorCanOpenGate = monitorCanOpenGate;
     }
 
     public String getKey() {

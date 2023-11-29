@@ -35,16 +35,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		refresh="60;URL=${WebAppURL}/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID }">
 
 	<div id="container-main">
-		
 		<lams:Alert5 type="info" id="waiting-at-the-gate">
 			<fmt:message key="label.synch.gate.message" />
-			
-			<div class="text-center">
-				<fmt:message key="label.gate.waiting.learners">
-					<fmt:param value="${gateForm.waitingLearners}" />
-					<fmt:param value="${gateForm.totalLearners}" />
-				</fmt:message>
-			</div>
+			&thinsp;
+			<fmt:message key="label.gate.waiting.learners">
+				<fmt:param value="${gateForm.waitingLearners}" />
+				<fmt:param value="${gateForm.totalLearners}" />
+			</fmt:message>
+			<br>
+			<fmt:message key="label.gate.refresh.message" />
 		</lams:Alert5>
 		
 		<%@ include file="gateDescription.jsp"%>

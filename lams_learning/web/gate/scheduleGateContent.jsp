@@ -66,6 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:otherwise>
 				</c:choose>
 			</div>
+			<fmt:message key="label.gate.refresh.message" />
 		</lams:Alert5>
 
 		<%@ include file="gateDescription.jsp"%>

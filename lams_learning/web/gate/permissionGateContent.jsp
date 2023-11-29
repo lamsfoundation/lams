@@ -37,6 +37,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div id="container-main">
 		<lams:Alert5 type="info" id="permission-gate">
 			<fmt:message key="label.permission.gate.message" />
+			<br>
+			<fmt:message key="label.gate.refresh.message" />
 		</lams:Alert5>
 		
 		<%@ include file="gateDescription.jsp"%>
