@@ -10,6 +10,14 @@
 	background-color: shade-color($secondary, 20%);
 }
 
+.instructions {
+	margin-bottom: 1.5rem;
+	padding-bottom: 0.5rem;
+    padding-top: 1rem;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
 /* For Boostrap 3 & 5 compability */
 .img-responsive {
   max-width: 100%;

@@ -81,8 +81,6 @@
 				</div>
 			</c:forEach>
 
-			<hr class="msg-hr" />
-
 			<div class="activity-bottom-buttons">
 				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 					<button name="viewAllResults" type="button" onclick="submitMethod('storeAllResults');"

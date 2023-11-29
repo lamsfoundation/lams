@@ -133,7 +133,7 @@
 
 						<!-- Rating limits info -->
 						<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
-							<lams:Alert5 id="rating-info" type="info" close="true">
+							<lams:Alert5 id="rating-info" type="warning" close="true">
 								<c:choose>
 									<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
 										<fmt:message key="label.rate.limits.reminder">
@@ -228,7 +228,8 @@
 
 		<!-- buttons -->
 		<c:if test="${mode != 'teacher'}">
-			<div class="activity-bottom-buttons" id="learner-submit">
+			<div class="activity-bottom-buttons">
+				<span id="learner-submit">
 				<c:choose>
 					<c:when test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight && !generalLearnerFlowDTO.isLearnerFinished}">
 						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
@@ -250,6 +251,7 @@
 						</button>
 					</c:when>
 				</c:choose>
+				</span>
 
 				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
 					<button name="redoQuestions" type="button" class="btn btn-secondary btn-icon-return me-2"
@@ -485,11 +487,11 @@
 					cssDisabled: 'disabled'
 				})
 
-						// bind to pager events
-						.bind('pagerInitialized pagerComplete', function(event, options){
-							initializeJRating();
-							jQuery("time.timeago").timeago();
-						});
+				// bind to pager events
+				.bind('pagerInitialized pagerComplete', function(event, options){
+					initializeJRating();
+					jQuery("time.timeago").timeago();
+				});
 			});
 
 		});
