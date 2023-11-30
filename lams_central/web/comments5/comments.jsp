@@ -19,7 +19,7 @@
 	$(document).ready(function() {
 		scrollDoneCallback();
 
-		$('#sortMenu').change(function() {
+		$("#commentDiv").on("change", "#sortMenu", function() {
 			var url = "<lams:LAMSURL />comments/viewTopic.do?newUI=true&sessionMapID=${sessionMapID}&sticky=true&sortBy="
 					+ $(this).find("option:selected").attr('value');
 			reloadDivs(url);
