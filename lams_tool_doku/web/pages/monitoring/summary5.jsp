@@ -331,7 +331,7 @@
 		});
 	}
 
-	function startGalleryWalk(){
+	function skipGalleryWalk(){
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
 			return;
 		}
