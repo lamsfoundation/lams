@@ -13,6 +13,9 @@
 	#background-color[disabled] {
 	    pointer-events: auto !important;
 	}
+	.minicolors-swatch.minicolors-sprite.minicolors-input-swatch {
+		margin-left: 0.5rem;
+	}
 </style>
 
 <lams:JSImport src="includes/javascript/websocket.js" />

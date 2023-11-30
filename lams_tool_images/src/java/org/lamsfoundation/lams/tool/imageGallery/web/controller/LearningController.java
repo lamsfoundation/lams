@@ -520,45 +520,43 @@ public class LearningController {
 	    }
 
 	    igService.uploadImageGalleryItemFile(image, files[0]);
-	} else {
-	    throw new ServletException("Can not access upload dir");
-	}
 
-	FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
+	    FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
 
-	String title = imageForm.getTitle();
-	if (StringUtils.isBlank(title)) {
-	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();
-	    imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
+	    String title = imageForm.getTitle();
+	    if (StringUtils.isBlank(title)) {
+		Long nextImageTitleNumber = imageGallery.getNextImageTitle();
+		imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
 
-	    title = igService.generateNextImageTitle(nextImageTitleNumber);
-	}
-	image.setTitle(title);
-
-	image.setCreateBy(user);
-	image.setDescription(imageForm.getDescription());
-	image.setCreateByAuthor(mode.isTeacher());
-	image.setHide(false);
-
-	// setting SequenceId
-	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
-	int maxSeq = 0;
-	for (ImageGalleryItem dbImage : imageList) {
-	    if (dbImage.getSequenceId() > maxSeq) {
-		maxSeq = dbImage.getSequenceId();
+		title = igService.generateNextImageTitle(nextImageTitleNumber);
 	    }
-	}
-	maxSeq++;
-	image.setSequenceId(maxSeq);
+	    image.setTitle(title);
 
-	imageList.add(image);
-	igService.saveOrUpdateImageGallery(imageGallery);
+	    image.setCreateBy(user);
+	    image.setDescription(imageForm.getDescription());
+	    image.setCreateByAuthor(mode.isTeacher());
+	    image.setHide(false);
 
-	igService.saveOrUpdateImageGalleryItem(image);
+	    // setting SequenceId
+	    Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
+	    int maxSeq = 0;
+	    for (ImageGalleryItem dbImage : imageList) {
+		if (dbImage.getSequenceId() > maxSeq) {
+		    maxSeq = dbImage.getSequenceId();
+		}
+	    }
+	    maxSeq++;
+	    image.setSequenceId(maxSeq);
 
-	// notify teachers
-	if (mode.isLearner() && imageGallery.isNotifyTeachersOnImageSumbit()) {
-	    igService.notifyTeachersOnImageSumbit(toolSessionId, user);
+	    imageList.add(image);
+	    igService.saveOrUpdateImageGallery(imageGallery);
+
+	    igService.saveOrUpdateImageGalleryItem(image);
+
+	    // notify teachers
+	    if (mode.isLearner() && imageGallery.isNotifyTeachersOnImageSumbit()) {
+		igService.notifyTeachersOnImageSumbit(toolSessionId, user);
+	    }
 	}
     }
 }
