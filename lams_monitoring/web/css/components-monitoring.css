@@ -11,7 +11,7 @@ body.component .dialogContainer .dialogListItem {
 	height: 3rem;
 	border-color: var(--bs-gray-300);
 	border-bottom-width: 2px;
-    cursor: pointer;
+	cursor: pointer;
 }
 
 body.component .dialogContainer .dialogListItem:hover {
@@ -36,7 +36,7 @@ body.component .dialogContainer .dialogListItem .portrait-sm + .portrait-sm-line
 }
 
 body.component .dialogContainer .dialogListItem.dialogListItemSelected {
-    background-color: rgba(0, 145, 74, 0.1) !important;
+	background-color: rgba(0, 145, 74, 0.1) !important;
 }
 
 body.component .dialogContainer #classMonitorSearchRow {
@@ -71,19 +71,19 @@ body.component #sequenceInfoDialog {
 
 .monitoring-page-wrapper #sequenceSearchPhrase {
 	width: 15rem;
-} 
+}
 
 .monitoring-page-wrapper #sequenceSearchPhraseButton {
 	border: none;
 	height: 3rem;
-} 
+}
 
 .monitoring-page-wrapper #sequenceSearchPhraseClearIcon {
 	display: none;
 }
 
 .monitoring-page-wrapper .component-sidebar.active.expanded {
-	width: 25rem;	
+	width: 25rem;
 }
 
 .monitoring-page-wrapper .component-sidebar.active.expanded ~ .monitoring-page-content.active {
@@ -161,7 +161,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #sequence-tab-content {
-	text-align: center;	
+	text-align: center;
 }
 
 .monitoring-page-wrapper #sequence-tab-content .countdown-timeout {
@@ -203,7 +203,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #sequence-tab-content #required-tasks .dropdown-menu {
-	padding: 0;	
+	padding: 0;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #required-tasks .dropdown-item {
@@ -224,7 +224,6 @@ body.component #sequenceInfoDialog {
 	width: 100%;
 	display: flex;
 	overflow: auto;
-	justify-content: center;
 	align-items: center;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -238,7 +237,7 @@ body.component #sequenceInfoDialog {
 .monitoring-page-wrapper #sequence-tab-content #canvas-container.svg-learner-draggable-area.force-completing,
 .monitoring-page-wrapper #sequence-tab-content #canvas-container.svg-learner-draggable-area.force-completing div#sequenceCanvas svg.svg-learning-design,
 .monitoring-page-wrapper #sequence-tab-content #canvas-container.svg-learner-draggable-area.force-completing div#sequenceCanvas svg.svg-learning-design * {
-	cursor: wait !important;	
+	cursor: wait !important;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas div.learner-icon-container {
@@ -263,12 +262,12 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched
-	{
+{
 	border: none;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas div.portrait-generic-sm.learner-icon.learner-searched::before
-	{
+{
 	border: red 3px solid;
 	border-radius: 25px;
 }
@@ -282,6 +281,7 @@ body.component #sequenceInfoDialog {
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas svg.svg-learning-design {
 	display: block;
 	overflow: visible;
+	margin: auto;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas svg.svg-learning-design g.gate svg {
@@ -345,7 +345,7 @@ body.component #sequenceInfoDialog {
 }
 
 .monitoring-page-wrapper #learners-accordion .no-progress {
-	display: none;	
+	display: none;
 	text-align: center;
 	position: relative;
 	top: 33%;
