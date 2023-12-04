@@ -27,7 +27,8 @@
 </script>
 
 <%-- For AEs tab the panes are defined in TBL monitor, for IRA we need to define it here --%>
-<div class="container-fluid" ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }>
+<div ${isIraAssessment ? 'id="assessment-pane-' += toolContentID += '"' : '' }
+		class="container-fluid ${isIraAssessment ? 'assessment-questions-pane-ira' : ''}">
 
 	<c:if test="${isIraAssessment}">
 		<div class="row">

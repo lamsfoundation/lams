@@ -7,11 +7,12 @@
 		// show details button needs to be set in the page which included this page
 		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&bootstrap5=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
 						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, function(){
-			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane'),
+			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane').length 
+					? $(this).closest('.assessment-questions-pane') : $('.assessment-questions-pane-ira'),
 				// are any correct/groups buttons clickable?
 				discloseAllCorrectEnabled = false,
 				discloseAllGroupsEnabled = false; 
-			
+
 			// disclose correct/group answers on click
 			$('.disclose-button-group .btn', assessmentQuestionsPane).not('[disabled]').each(function(){
 				let button = $(this),

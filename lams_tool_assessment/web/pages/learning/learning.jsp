@@ -19,9 +19,9 @@
 <!-- hasEditRight=${hasEditRight} -->
 
 <lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
+    <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
     <link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
-    <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
     <c:if test="${not empty codeStyles}">
         <link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
         <link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
