@@ -34,6 +34,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:PageLearner title="${title}" toolSessionID="" lessonID="${gateForm.lessonID}"
 		refresh="60;URL=${WebAppURL}/gate/knockGate.do?activityID=${gateForm.activityID}&lessonID=${gateForm.lessonID}">
 	<script>
+		$(document).ready(function(){
+			$('#passwordField').keypress(function(e) {
+			    if (e.which == '13') {
+			        $("#submit-form-button").trigger('click');
+			    }
+			})
+		});
+	
 		function customSubmitGateForm(){
 			$('#key').val($('#passwordField').val());
 			return true;
