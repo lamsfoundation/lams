@@ -13,23 +13,26 @@
 	border: 0;
 }
 
+/*----------countdown growl----------------*/
 .jGrowl {
   	font-size: 22px;
   	font-family: $font-family-base;
   	margin-left: 120px;
 }
 .jGrowl-notification {
-	opacity: .6;
+	opacity: .8;
 	border-radius: 10px;
-	width: 230px;
+	width: 400px;
 	margin: 10px 20px;
 	background: #eedc94 url(#{$url_css_directory}/check48.png) no-repeat 10px 10px;
+	padding-bottom: 20px;
 }
 .jGrowl-message {
 	padding-left: 60px;
 	padding-top: 5px;
 }
 
+/*----------  ----------------*/
 .question-etherpad-container {
 	padding: 0 15px;
 }

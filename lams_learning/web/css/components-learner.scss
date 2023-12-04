@@ -293,6 +293,7 @@ div.growlUI h1,div.growlUI h2 {
 	font-size: medium;
 }
 
+/*----------.div-hover----------------*/
 .div-hover>div {
 	align-items: center;
 	border-top: 1px solid #ddd;
@@ -302,6 +303,7 @@ div.growlUI h1,div.growlUI h2 {
 	background-color: var(--bs-gray-200);
 }
 
+/*----------.sbox----------------*/
 .sbox {
   border-bottom: 2px solid $gray-lighter;
   border-radius: 0px;
