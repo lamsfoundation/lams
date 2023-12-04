@@ -86,9 +86,7 @@
 </script>
 
 <div class="card-subheader" id="instructions-${questionIndex}">
-	<label for="essay-question${questionIndex}">
-		<fmt:message key="label.learning.short.answer.answer" />
-	</label>
+	<fmt:message key="label.learning.short.answer.answer" />
 </div>
 
 <div>

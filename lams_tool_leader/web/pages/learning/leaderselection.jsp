@@ -134,7 +134,7 @@
                         <c:out value="${content.instructions}" escapeXml="false" />
                     </div>
 
-                    <div class="ltable table-hover mt-3">
+                    <div class="ltable table-hover mt-n4">
                         <div class="card-header">
                             <fmt:message key="label.users.from.group" />
                         </div>
