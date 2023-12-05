@@ -14,6 +14,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	learnersTabSortedByProgress = false,
 // currently opened EventSources
 	eventSources = [],
+
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
@@ -23,7 +24,7 @@ var currentTab = sessionStorage.getItem("lamsMonitoringCurrentTab") || 'sequence
 	popupWidth = 1280,
 	popupHeight = 720,
 
-// cached gate icon data 
+// cached gate icon data
 	gateOpenIconPath   = 'images/svg/gateOpen.svg',
 	gateOpenIconData   = null,
 
@@ -347,7 +348,7 @@ function initCommonElements(){
 
 	$('#openImButton').click(openChatWindow);
 
-	//enable renaming of lesson title  
+	//enable renaming of lesson title
 	$('#lesson-name').editable({
 		type: 'text',
 		pk: lessonId,
@@ -724,10 +725,12 @@ function loadTab(tabName, button) {
 			break;
 
 		case 'aes': {
-			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?'
-				+ '&aeToolContentIds='+ aeToolContentIds
-				+ '&aeToolTypes=' + aeToolTypes
-				+ '&aeActivityTitles=' + encodeURIComponent(aeActivityTitles));
+			tabContent.load(LAMS_URL + 'monitoring/tblmonitor/aes.do?',
+				{
+					aeToolContentIds: aeToolContentIds,
+					aeToolTypes: aeToolTypes,
+					aeActivityTitles: aeActivityTitles
+				});
 			searchStudentWidget.hide();
 		}
 			break;
@@ -854,6 +857,7 @@ function applyStateChange(state, method, newLessonEndDate) {
 	if (newLessonEndDate) {
 		params.lessonEndDate = newLessonEndDate;
 	}
+
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring/' + method + ".do",
 		data: params,
@@ -926,55 +930,55 @@ function drawLessonCompletionChart(){
 					},
 					plugins : {
 						tooltip : {
-						enabled : true,
-						callbacks: {
+							enabled : true,
+							callbacks: {
 								label : function(context) {
 									let index =  context.dataIndex,
 
 										rawData = context.chart.lessonCompletionChartRawData,
 										percent = context.dataset.data,
 
-									label = labels[index],
-									value = percent[index],
-									rawValue = rawData[index];
+										label = labels[index],
+										value = percent[index],
+										rawValue = rawData[index];
 
 									return " " + rawValue + " (" + value + "%)";
+								}
 							}
-						}
-					},
-					legend : {
-						position: 'bottom',
-						align: 'start',
-						labels : {
+						},
+						legend : {
+							position: 'bottom',
+							align: 'start',
+							labels : {
 								font : {
 									size: 15
 								},
-							generateLabels : function(chart) {
-								var data = chart.data;
-								if (data.labels.length && data.datasets.length) {
-									return data.labels.map(function(label, i) {
-										let meta = chart.getDatasetMeta(0),
-											style = meta.controller.getStyle(i),
-											value = data.datasets[0].data[i],
-											rawData = chart.lessonCompletionChartRawData || raw,
-											rawValue = rawData[i];
+								generateLabels : function(chart) {
+									var data = chart.data;
+									if (data.labels.length && data.datasets.length) {
+										return data.labels.map(function(label, i) {
+											let meta = chart.getDatasetMeta(0),
+												style = meta.controller.getStyle(i),
+												value = data.datasets[0].data[i],
+												rawData = chart.lessonCompletionChartRawData || raw,
+												rawValue = rawData[i];
 
-										return {
-											text: label + ": " + rawValue + " (" + value + "%)",
-											fillStyle: style.backgroundColor,
-											strokeStyle: style.borderColor,
-											lineWidth: 0,
-											hidden: isNaN(value) || meta.data[i].hidden,
+											return {
+												text: label + ": " + rawValue + " (" + value + "%)",
+												fillStyle: style.backgroundColor,
+												strokeStyle: style.borderColor,
+												lineWidth: 0,
+												hidden: isNaN(value) || meta.data[i].hidden,
 
-											// Extra data used for toggling the
-											// correct item
-											index: i
-										};
-									});
+												// Extra data used for toggling the
+												// correct item
+												index: i
+											};
+										});
+									}
+									return [];
 								}
-								return [];
 							}
-						}
 						}
 					}
 				}
@@ -983,7 +987,7 @@ function drawLessonCompletionChart(){
 			lessonCompletionChart.lessonCompletionChartRawData = raw;
 			chartDiv.data('chart', lessonCompletionChart);
 		}
-		});
+	});
 }
 
 function checkScheduleDate(startDateString, endDateString) {
@@ -1601,6 +1605,18 @@ function updateSequenceTab() {
 				$.each(response.timeLimits, function(){
 					// it is a list of tool content IDs to which the dashboard will react and update time limits
 					timeLimitFluxUrl += 'toolContentIds=' + this.toolContentId + '&';
+				});
+
+				// remove from eventSources items which contain "getTimeUpdateFlux" in the URL
+				$.each(eventSources, function(index, eventSource){
+					if (eventSource.url.indexOf('getTimeLimitUpdateFlux.do') > -1) {
+						try {
+							eventSource.close();
+						} catch(e) {
+							console.error("Error while closing Event Source", e);
+						}
+						eventSources.splice(index, 1);
+					}
 				});
 
 				openEventSource(timeLimitFluxUrl,
@@ -2365,7 +2381,7 @@ function fillClassList(role, disableCreator) {
  * Adds/removes a Learner/Monitor to/from the class.
  */
 function editClassMember(userCheckbox){
-	var data = {
+	var data={
 		'lessonID' : lessonId,
 		'userID'   : userCheckbox.closest('.dialogListItem').attr('userId'),
 		'role'     : userCheckbox.parents('table.dialogTable')
@@ -3083,10 +3099,19 @@ function dblTap(elem, dblClickFunction) {
 	});
 }
 
-function openEventSource(url, onMessageFunction) {
+function openEventSource(url, onMessageFunction, skipExisting) {
+	if (skipExisting) {
+		for (let i = 0; i < eventSources.length; i++) {
+			if (eventSources[i].url === url) {
+				return eventSources[i];
+			}
+		}
+	}
+
 	const eventSource = new EventSource(url);
 	eventSources.push(eventSource);
 	eventSource.onmessage = onMessageFunction;
+	return eventSource;
 }
 
 function clearEventSources() {

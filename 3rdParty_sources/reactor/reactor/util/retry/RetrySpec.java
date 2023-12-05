@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
 /**
@@ -35,8 +36,8 @@ import reactor.util.context.ContextView;
  * Only errors that match the {@link #filter(Predicate)} are retried (by default all), up to {@link #maxAttempts(long)} times.
  * <p>
  * When the maximum attempt of retries is reached, a runtime exception is propagated downstream which
- * can be pinpointed with {@link reactor.core.Exceptions#isRetryExhausted(Throwable)}. The cause of
- * the last attempt's failure is attached as said {@link reactor.core.Exceptions#retryExhausted(String, Throwable) retryExhausted}
+ * can be pinpointed with {@link Exceptions#isRetryExhausted(Throwable)}. The cause of
+ * the last attempt's failure is attached as said {@link Exceptions#retryExhausted(String, Throwable) retryExhausted}
  * exception's cause. This can be customized with {@link #onRetryExhaustedThrow(BiFunction)}.
  * <p>
  * Additionally, to help dealing with bursts of transient errors in a long-lived Flux as if each burst
@@ -302,10 +303,10 @@ public final class RetrySpec extends Retry {
 	 * Set the generator for the {@link Exception} to be propagated when the maximum amount of retries
 	 * is exhausted. By default, throws an {@link Exceptions#retryExhausted(String, Throwable)} with the
 	 * message reflecting the total attempt index, transient attempt index and maximum retry count.
-	 * The cause of the last {@link reactor.util.retry.Retry.RetrySignal} is also added as the exception's cause.
+	 * The cause of the last {@link RetrySignal} is also added as the exception's cause.
 	 *
 	 * @param retryExhaustedGenerator the {@link Function} that generates the {@link Throwable} for the last
-	 * {@link reactor.util.retry.Retry.RetrySignal}
+	 * {@link RetrySignal}
 	 * @return a new copy of the {@link RetrySpec} which can either be further configured or used as {@link Retry}
 	 */
 	public RetrySpec onRetryExhaustedThrow(BiFunction<RetrySpec, RetrySignal, Throwable> retryExhaustedGenerator) {
@@ -323,8 +324,8 @@ public final class RetrySpec extends Retry {
 
 	/**
 	 * Set the transient error mode, indicating that the strategy being built should use
-	 * {@link reactor.util.retry.Retry.RetrySignal#totalRetriesInARow()} rather than
-	 * {@link reactor.util.retry.Retry.RetrySignal#totalRetries()}.
+	 * {@link RetrySignal#totalRetriesInARow()} rather than
+	 * {@link RetrySignal#totalRetries()}.
 	 * Transient errors are errors that could occur in bursts but are then recovered from by
 	 * a retry (with one or more onNext signals) before another error occurs.
 	 * <p>
@@ -353,25 +354,30 @@ public final class RetrySpec extends Retry {
 
 	@Override
 	public Flux<Long> generateCompanion(Flux<RetrySignal> flux) {
-		return flux.concatMap(retryWhenState -> {
-			//capture the state immediately
-			RetrySignal copy = retryWhenState.copy();
-			Throwable currentFailure = copy.failure();
-			long iteration = isTransientErrors ? copy.totalRetriesInARow() : copy.totalRetries();
+		return Flux.deferContextual(cv ->
+			flux
+					.contextWrite(cv)
+					.concatMap(retryWhenState -> {
+						//capture the state immediately
+						RetrySignal copy = retryWhenState.copy();
+						Throwable currentFailure = copy.failure();
+						long iteration = isTransientErrors ? copy.totalRetriesInARow() : copy.totalRetries();
 
-			if (currentFailure == null) {
-				return Mono.error(new IllegalStateException("RetryWhenState#failure() not expected to be null"));
-			}
-			else if (!errorFilter.test(currentFailure)) {
-				return Mono.error(currentFailure);
-			}
-			else if (iteration >= maxAttempts) {
-				return Mono.error(retryExhaustedGenerator.apply(this, copy));
-			}
-			else {
-				return applyHooks(copy, Mono.just(iteration), doPreRetry, doPostRetry, asyncPreRetry, asyncPostRetry);
-			}
-		});
+						if (currentFailure == null) {
+							return Mono.error(new IllegalStateException("RetryWhenState#failure() not expected to be null"));
+						}
+						else if (!errorFilter.test(currentFailure)) {
+							return Mono.error(currentFailure);
+						}
+						else if (iteration >= maxAttempts) {
+							return Mono.error(retryExhaustedGenerator.apply(this, copy));
+						}
+						else {
+							return applyHooks(copy, Mono.just(iteration), doPreRetry, doPostRetry, asyncPreRetry, asyncPostRetry, cv);
+						}
+					})
+					.onErrorStop()
+		);
 	}
 
 	//===================
@@ -383,7 +389,8 @@ public final class RetrySpec extends Retry {
 			final Consumer<RetrySignal> doPreRetry,
 			final Consumer<RetrySignal> doPostRetry,
 			final BiFunction<RetrySignal, Mono<Void>, Mono<Void>> asyncPreRetry,
-			final BiFunction<RetrySignal, Mono<Void>, Mono<Void>> asyncPostRetry) {
+			final BiFunction<RetrySignal, Mono<Void>, Mono<Void>> asyncPostRetry,
+			final ContextView cv) {
 		if (doPreRetry != NO_OP_CONSUMER) {
 			try {
 				doPreRetry.accept(copyOfSignal);
@@ -404,6 +411,6 @@ public final class RetrySpec extends Retry {
 		Mono<Void> preRetryMono = asyncPreRetry == NO_OP_BIFUNCTION ? Mono.empty() : asyncPreRetry.apply(copyOfSignal, Mono.empty());
 		Mono<Void> postRetryMono = asyncPostRetry != NO_OP_BIFUNCTION ? asyncPostRetry.apply(copyOfSignal, postRetrySyncMono) : postRetrySyncMono;
 
-		return preRetryMono.then(originalCompanion).flatMap(postRetryMono::thenReturn);
+		return preRetryMono.then(originalCompanion).flatMap(postRetryMono::thenReturn).contextWrite(cv);
 	}
 }

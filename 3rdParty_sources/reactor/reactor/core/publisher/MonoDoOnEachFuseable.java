@@ -23,7 +23,7 @@ import reactor.core.CoreSubscriber;
 import reactor.core.Fuseable;
 
 /**
- * Peek into the lifecycle events and signals of a sequence, {@link reactor.core.Fuseable}
+ * Peek into the lifecycle events and signals of a sequence, {@link Fuseable}
  * version of {@link MonoDoOnEach}.
  *
  * @param <T> the value type

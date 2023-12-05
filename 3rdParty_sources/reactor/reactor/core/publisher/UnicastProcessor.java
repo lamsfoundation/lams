@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ import reactor.util.context.Context;
  *
  * @param <T> the input and output type
  * @deprecated to be removed in 3.5, prefer clear cut usage of {@link Sinks} through
- * variations under {@link reactor.core.publisher.Sinks.UnicastSpec Sinks.many().unicast()}.
+ * variations under {@link Sinks.UnicastSpec Sinks.many().unicast()}.
  */
 @Deprecated
 public final class UnicastProcessor<T> extends FluxProcessor<T, T>
@@ -262,7 +262,7 @@ public final class UnicastProcessor<T> extends FluxProcessor<T, T>
 		doTerminate();
 
 		drain(null);
-		return Sinks.EmitResult.OK;
+		return EmitResult.OK;
 	}
 
 	@Override
@@ -271,9 +271,9 @@ public final class UnicastProcessor<T> extends FluxProcessor<T, T>
 	}
 
 	@Override
-	public Sinks.EmitResult tryEmitError(Throwable t) {
+	public EmitResult tryEmitError(Throwable t) {
 		if (done) {
-			return Sinks.EmitResult.FAIL_TERMINATED;
+			return EmitResult.FAIL_TERMINATED;
 		}
 		if (cancelled) {
 			return EmitResult.FAIL_CANCELLED;

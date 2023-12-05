@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.stream.Stream;
 
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import reactor.core.CorePublisher;
@@ -37,7 +38,7 @@ import reactor.util.context.Context;
 
 // NextProcessor extends a deprecated class but is itself not deprecated and is here to stay, hence the following line is ok.
 @SuppressWarnings("deprecation")
-class NextProcessor<O> extends MonoProcessor<O> {
+class NextProcessor<O> extends MonoProcessor<O> implements CoreSubscriber<O>, reactor.core.Disposable, Scannable {
 
 	/**
 	 * This boolean indicates a usage as `Mono#share()` where, for alignment with Flux#share(), the removal of all
@@ -46,6 +47,42 @@ class NextProcessor<O> extends MonoProcessor<O> {
 	final boolean isRefCounted;
 
 	volatile NextInner<O>[] subscribers;
+
+	/**
+	 * Block the calling thread indefinitely, waiting for the completion of this {@link NextProcessor}. If the
+	 * {@link NextProcessor} is completed with an error a RuntimeException that wraps the error is thrown.
+	 *
+	 * @return the value of this {@link NextProcessor}
+	 */
+	@Override
+	@Nullable
+	public O block() {
+		return block(null);
+	}
+
+	@Override
+	public boolean isDisposed() {
+		return isTerminated();
+	}
+
+	//TODO reintroduce the boolean getters below once MonoProcessor is removed again
+//	/**
+//	 * Indicates whether this {@link NextProcessor} has been completed with an error.
+//	 *
+//	 * @return {@code true} if this {@link NextProcessor} was completed with an error, {@code false} otherwise.
+//	 */
+//	public final boolean isError() {
+//		return getError() != null;
+//	}
+//
+//	/**
+//	 * Indicates whether this {@link NextProcessor} has been successfully completed a value.
+//	 *
+//	 * @return {@code true} if this {@link NextProcessor} is successful, {@code false} otherwise.
+//	 */
+//	public final boolean isSuccess() {
+//		return isTerminated() && !isError();
+//	}
 
 	@SuppressWarnings("rawtypes")
 	static final AtomicReferenceFieldUpdater<NextProcessor, NextInner[]> SUBSCRIBERS =
@@ -82,6 +119,17 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		SUBSCRIBERS.lazySet(this, source != null ? EMPTY_WITH_SOURCE : EMPTY);
 	}
 
+	/**
+	 * For testing purpose.
+	 * <p>
+	 * Returns the value that completed this {@link NextProcessor}. Returns {@code null} if the {@link NextProcessor} has not been completed. If the
+	 * {@link NextProcessor} is completed with an error a RuntimeException that wraps the error is thrown.
+	 *
+	 * @return the value that completed the {@link NextProcessor}, or {@code null} if it has not been completed
+	 *
+	 * @throws RuntimeException if the {@link NextProcessor} was completed with an error
+	 */
+	@Nullable
 	@Override
 	public O peek() {
 		if (!isTerminated()) {
@@ -101,6 +149,15 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		return null;
 	}
 
+	/**
+		 * Block the calling thread for the specified time, waiting for the completion of this {@link NextProcessor}. If the
+		 * {@link NextProcessor} is completed with an error a RuntimeException that wraps the error is thrown.
+		 *
+		 * @param timeout the timeout value as a {@link Duration}
+		 *
+		 * @return the value of this {@link NextProcessor} or {@code null} if the timeout is reached and the {@link NextProcessor} has
+		 * not completed
+		 */
 	@Override
 	@Nullable
 	public O block(@Nullable Duration timeout) {
@@ -128,7 +185,7 @@ class NextProcessor<O> extends MonoProcessor<O> {
 					return value;
 				}
 				if (timeout != null && delay < System.nanoTime()) {
-					cancel();
+					doCancel();
 					throw new IllegalStateException("Timeout on Mono blocking read");
 				}
 
@@ -150,9 +207,9 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		@SuppressWarnings("unused") EmitResult emitResult = tryEmitValue(null);
 	}
 
-	void emitEmpty(Sinks.EmitFailureHandler failureHandler) {
+	void emitEmpty(EmitFailureHandler failureHandler) {
 		for (;;) {
-			Sinks.EmitResult emitResult = tryEmitValue(null);
+			EmitResult emitResult = tryEmitValue(null);
 			if (emitResult.isSuccess()) {
 				return;
 			}
@@ -212,7 +269,7 @@ class NextProcessor<O> extends MonoProcessor<O> {
 	}
 
 	@SuppressWarnings("unchecked")
-	Sinks.EmitResult tryEmitError(Throwable cause) {
+	EmitResult tryEmitError(Throwable cause) {
 		Objects.requireNonNull(cause, "onError cannot be null");
 
 		if (UPSTREAM.getAndSet(this, Operators.cancelledSubscription()) == Operators.cancelledSubscription()) {
@@ -304,11 +361,21 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		return EmitResult.OK;
 	}
 
+	@Nullable
 	@Override
 	public Object scanUnsafe(Attr key) {
 		if (key == Attr.PARENT)
 			return subscription;
-		return super.scanUnsafe(key);
+		//touch guard
+		boolean t = isTerminated();
+
+		if (key == Attr.TERMINATED) return t;
+		if (key == Attr.CANCELLED) return !t && subscription == Operators.cancelledSubscription();
+		if (key == Attr.ERROR) return getError();
+		if (key == Attr.PREFETCH) return Integer.MAX_VALUE;
+		if (key == Attr.RUN_STYLE) return Attr.RunStyle.SYNC;
+
+		return null;
 	}
 
 	@Override
@@ -316,6 +383,11 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		return Operators.multiSubscribersContext(subscribers);
 	}
 
+	/**
+	 * Return the number of active {@link Subscriber} or {@literal -1} if untracked.
+	 *
+	 * @return the number of active {@link Subscriber} or {@literal -1} if untracked
+	 */
 	@Override
 	public long downstreamCount() {
 		return subscribers.length;
@@ -351,6 +423,10 @@ class NextProcessor<O> extends MonoProcessor<O> {
 	// This method is inherited from a deprecated class and will be removed in 3.5.
 	@SuppressWarnings("deprecation")
 	public void cancel() {
+		doCancel();
+	}
+
+	void doCancel() { //TODO compare with the cancellation in remove(), do we need both approaches?
 		if (isTerminated()) {
 			return;
 		}
@@ -380,11 +456,22 @@ class NextProcessor<O> extends MonoProcessor<O> {
 		return subscription == Operators.cancelledSubscription() && !isTerminated();
 	}
 
+	/**
+	 * Indicates whether this {@link NextProcessor} has been terminated by the
+	 * source producer with a success or an error.
+	 *
+	 * @return {@code true} if this {@link NextProcessor} is successful, {@code false} otherwise.
+	 */
 	@Override
 	public boolean isTerminated() {
 		return subscribers == TERMINATED;
 	}
 
+	/**
+	 * Return the produced {@link Throwable} error if any or null
+	 *
+	 * @return the produced {@link Throwable} error if any or null
+	 */
 	@Nullable
 	@Override
 	public Throwable getError() {

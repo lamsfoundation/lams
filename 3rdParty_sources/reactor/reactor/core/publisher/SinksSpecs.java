@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@ import reactor.core.publisher.Sinks.Empty;
 import reactor.core.publisher.Sinks.Many;
 import reactor.core.publisher.Sinks.One;
 import reactor.core.scheduler.Scheduler;
+import reactor.util.concurrent.Queues;
 
 final class SinksSpecs {
 
-	static final Sinks.RootSpec UNSAFE_ROOT_SPEC  = new RootSpecImpl(false);
-	static final Sinks.RootSpec DEFAULT_ROOT_SPEC = new RootSpecImpl(true);
+	static final Sinks.RootSpec  UNSAFE_ROOT_SPEC = new UnsafeSpecImpl();
+	static final DefaultSinksSpecs DEFAULT_SINKS    = new DefaultSinksSpecs();
 
 	abstract static class AbstractSerializedSink {
 
@@ -61,39 +62,24 @@ final class SinksSpecs {
 		}
 	}
 
-	static final class RootSpecImpl implements Sinks.RootSpec,
-	                                     Sinks.ManySpec,
-	                                     Sinks.MulticastSpec,
-	                                     Sinks.MulticastReplaySpec {
 
-		final boolean serialized;
-		final Sinks.UnicastSpec unicastSpec; //needed because UnicastSpec method names overlap with MulticastSpec
+	static final class UnsafeSpecImpl
+		implements Sinks.RootSpec, Sinks.ManySpec, Sinks.ManyWithUpstreamUnsafeSpec, Sinks.MulticastSpec, Sinks.MulticastReplaySpec {
 
-		RootSpecImpl(boolean serialized) {
-			this.serialized = serialized;
-			//there will only be as many instances of UnicastSpecImpl as there are RootSpecImpl instances (2)
-			this.unicastSpec = new UnicastSpecImpl(serialized);
+		final Sinks.UnicastSpec unicastSpec;
+
+		UnsafeSpecImpl() {
+			this.unicastSpec = new UnicastSpecImpl(false);
 		}
 
-		<T, EMPTY extends Empty<T> & ContextHolder> Empty<T> wrapEmpty(EMPTY original) {
-			if (serialized) {
-				return new SinkEmptySerialized<>(original, original);
-			}
-			return original;
+		@Override
+		public <T> Empty<T> empty() {
+			return new SinkEmptyMulticast<>();
 		}
 
-		<T, ONE extends One<T> & ContextHolder> One<T> wrapOne(ONE original) {
-			if (serialized) {
-				return new SinkOneSerialized<>(original, original);
-			}
-			return original;
-		}
-
-		<T, MANY extends Many<T> & ContextHolder> Many<T> wrapMany(MANY original) {
-			if (serialized) {
-				return new SinkManySerialized<>(original, original);
-			}
-			return original;
+		@Override
+		public <T> One<T> one() {
+			return new SinkOneMulticast<>();
 		}
 
 		@Override
@@ -102,12 +88,137 @@ final class SinksSpecs {
 		}
 
 		@Override
-		public <T> Empty<T> empty() {
-			return wrapEmpty(new SinkEmptyMulticast<>());
+		public Sinks.UnicastSpec unicast() {
+			return this.unicastSpec;
 		}
 
 		@Override
-		public <T> One<T> one() {
+		public Sinks.MulticastSpec multicast() {
+			return this;
+		}
+
+		@Override
+		public Sinks.MulticastReplaySpec replay() {
+			return this;
+		}
+
+		@Override
+		public Sinks.ManyWithUpstreamUnsafeSpec manyWithUpstream() {
+			return this;
+		}
+
+		@Override
+		public <T> Many<T> onBackpressureBuffer() {
+			return new SinkManyEmitterProcessor<>(true, Queues.SMALL_BUFFER_SIZE);
+		}
+
+		@Override
+		public <T> Many<T> onBackpressureBuffer(int bufferSize) {
+			return new SinkManyEmitterProcessor<>(true, bufferSize);
+		}
+
+		@Override
+		public <T> Many<T> onBackpressureBuffer(int bufferSize, boolean autoCancel) {
+			return new SinkManyEmitterProcessor<>(autoCancel, bufferSize);
+		}
+
+		@Override
+		public <T> Many<T> directAllOrNothing() {
+			return new SinkManyBestEffort<>(true);
+		}
+
+		@Override
+		public <T> Many<T> directBestEffort() {
+			return new SinkManyBestEffort<>(false);
+		}
+
+		@Override
+		public <T> Many<T> all() {
+			return SinkManyReplayProcessor.create();
+		}
+
+		@Override
+		public <T> Many<T> all(int batchSize) {
+			return SinkManyReplayProcessor.create(batchSize);
+		}
+
+		@Override
+		public <T> Many<T> latest() {
+			return SinkManyReplayProcessor.cacheLast();
+		}
+
+		@Override
+		public <T> Many<T> latestOrDefault(T value) {
+			return SinkManyReplayProcessor.cacheLastOrDefault(value);
+		}
+
+		@Override
+		public <T> Many<T> limit(int historySize) {
+			return SinkManyReplayProcessor.create(historySize);
+		}
+
+		@Override
+		public <T> Many<T> limit(Duration maxAge) {
+			return SinkManyReplayProcessor.createTimeout(maxAge);
+		}
+
+		@Override
+		public <T> Many<T> limit(Duration maxAge, Scheduler scheduler) {
+			return SinkManyReplayProcessor.createTimeout(maxAge, scheduler);
+		}
+
+		@Override
+		public <T> Many<T> limit(int historySize, Duration maxAge) {
+			return SinkManyReplayProcessor.createSizeAndTimeout(historySize, maxAge);
+		}
+
+		@Override
+		public <T> Many<T> limit(int historySize, Duration maxAge, Scheduler scheduler) {
+			return SinkManyReplayProcessor.createSizeAndTimeout(historySize, maxAge, scheduler);
+		}
+
+		@Override
+		public <T> Sinks.ManyWithUpstream<T> multicastOnBackpressureBuffer() {
+			return new SinkManyEmitterProcessor<>(true, Queues.SMALL_BUFFER_SIZE);
+		}
+
+		@Override
+		public <T> Sinks.ManyWithUpstream<T> multicastOnBackpressureBuffer(int bufferSize, boolean autoCancel) {
+			return new SinkManyEmitterProcessor<>(autoCancel, bufferSize);
+		}
+	}
+
+	//Note: RootSpec is now reserved for Sinks.unsafe()
+	static final class DefaultSinksSpecs implements Sinks.ManySpec, Sinks.MulticastSpec, Sinks.MulticastReplaySpec {
+
+		final Sinks.UnicastSpec unicastSpec; //needed because UnicastSpec method names overlap with MulticastSpec
+
+		DefaultSinksSpecs() {
+			//there will only one instance of serialized UnicastSpecImpl as there is only one instance of  SafeRootSpecImpl
+			this.unicastSpec = new UnicastSpecImpl(true);
+		}
+
+		<T, EMPTY extends Empty<T> & ContextHolder> Empty<T> wrapEmpty(EMPTY original) {
+			return new SinkEmptySerialized<>(original, original);
+		}
+
+		<T, ONE extends One<T> & ContextHolder> One<T> wrapOne(ONE original) {
+			return new SinkOneSerialized<>(original, original);
+		}
+
+		<T, MANY extends Many<T> & ContextHolder> Many<T> wrapMany(MANY original) {
+			return new SinkManySerialized<>(original, original);
+		}
+
+		Sinks.ManySpec many() {
+			return this;
+		}
+
+		<T> Empty<T> empty() {
+			return wrapEmpty(new SinkEmptyMulticast<>());
+		}
+
+		<T> One<T> one() {
 			return wrapOne(new SinkOneMulticast<>());
 		}
 
@@ -128,23 +239,17 @@ final class SinksSpecs {
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer() {
-			@SuppressWarnings("deprecation") // EmitterProcessor will be removed in 3.5.
-			final EmitterProcessor<T> original = EmitterProcessor.create();
-			return wrapMany(original);
+			return wrapMany(new SinkManyEmitterProcessor<>(true, Queues.SMALL_BUFFER_SIZE));
 		}
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer(int bufferSize) {
-			@SuppressWarnings("deprecation") // EmitterProcessor will be removed in 3.5.
-			final EmitterProcessor<T> original = EmitterProcessor.create(bufferSize);
-			return wrapMany(original);
+			return wrapMany(new SinkManyEmitterProcessor<>(true, bufferSize));
 		}
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer(int bufferSize, boolean autoCancel) {
-			@SuppressWarnings("deprecation") // EmitterProcessor will be removed in 3.5.
-			final EmitterProcessor<T> original = EmitterProcessor.create(bufferSize, autoCancel);
-			return wrapMany(original);
+			return wrapMany(new SinkManyEmitterProcessor<>(autoCancel, bufferSize));
 		}
 
 		@Override
@@ -162,29 +267,25 @@ final class SinksSpecs {
 
 		@Override
 		public <T> Many<T> all() {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.create();
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.create();
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> all(int batchSize) {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5
-			final ReplayProcessor<T> original = ReplayProcessor.create(batchSize, true);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.create(batchSize, true);
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> latest() {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.cacheLast();
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.cacheLast();
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> latestOrDefault(T value) {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.cacheLastOrDefault(value);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.cacheLastOrDefault(value);
 			return wrapMany(original);
 		}
 
@@ -193,22 +294,19 @@ final class SinksSpecs {
 			if (historySize <= 0) {
 				throw new IllegalArgumentException("historySize must be > 0");
 			}
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.create(historySize);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.create(historySize);
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> limit(Duration maxAge) {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.createTimeout(maxAge);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.createTimeout(maxAge);
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> limit(Duration maxAge, Scheduler scheduler) {
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.createTimeout(maxAge, scheduler);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.createTimeout(maxAge, scheduler);
 			return wrapMany(original);
 		}
 
@@ -217,8 +315,7 @@ final class SinksSpecs {
 			if (historySize <= 0) {
 				throw new IllegalArgumentException("historySize must be > 0");
 			}
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.createSizeAndTimeout(historySize, maxAge);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.createSizeAndTimeout(historySize, maxAge);
 			return wrapMany(original);
 		}
 
@@ -227,8 +324,7 @@ final class SinksSpecs {
 			if (historySize <= 0) {
 				throw new IllegalArgumentException("historySize must be > 0");
 			}
-			@SuppressWarnings("deprecation") // ReplayProcessor will be removed in 3.5.
-			final ReplayProcessor<T> original = ReplayProcessor.createSizeAndTimeout(historySize, maxAge, scheduler);
+			final SinkManyReplayProcessor<T> original = SinkManyReplayProcessor.createSizeAndTimeout(historySize, maxAge, scheduler);
 			return wrapMany(original);
 		}
 	}
@@ -250,30 +346,26 @@ final class SinksSpecs {
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer() {
-			@SuppressWarnings("deprecation") // UnicastProcessor will be removed in 3.5.
-			final UnicastProcessor<T> original = UnicastProcessor.create();
+			final SinkManyUnicast<T> original = SinkManyUnicast.create();
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer(Queue<T> queue) {
-			@SuppressWarnings("deprecation") // UnicastProcessor will be removed in 3.5.
-			final UnicastProcessor<T> original = UnicastProcessor.create(queue);
+			final SinkManyUnicast<T> original = SinkManyUnicast.create(queue);
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> onBackpressureBuffer(Queue<T> queue, Disposable endCallback) {
-			@SuppressWarnings("deprecation") // UnicastProcessor will be removed in 3.5.
-			final UnicastProcessor<T> original = UnicastProcessor.create(queue, endCallback);
+			final SinkManyUnicast<T> original = SinkManyUnicast.create(queue, endCallback);
 			return wrapMany(original);
 		}
 
 		@Override
 		public <T> Many<T> onBackpressureError() {
-			final UnicastManySinkNoBackpressure<T> original = UnicastManySinkNoBackpressure.create();
+			final SinkManyUnicastNoBackpressure<T> original = SinkManyUnicastNoBackpressure.create();
 			return wrapMany(original);
 		}
 	}
 }
-

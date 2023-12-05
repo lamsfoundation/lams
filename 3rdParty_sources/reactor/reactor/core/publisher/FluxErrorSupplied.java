@@ -25,7 +25,7 @@ import reactor.core.Fuseable;
 
 /**
  * Emits a generated {@link Throwable} instance to Subscribers, lazily generated via a
- * provided {@link java.util.function.Supplier}.
+ * provided {@link Supplier}.
  *
  * @param <T> the value type
  *

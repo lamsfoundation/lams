@@ -23,18 +23,11 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -86,11 +79,17 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of the IMindmapService interface. As a requirement, all LAMS tool's service bean must implement
@@ -133,8 +132,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (MindmapService.logger.isDebugEnabled()) {
-	    MindmapService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    MindmapService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	MindmapSession session = new MindmapSession();
@@ -222,8 +222,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (MindmapService.logger.isDebugEnabled()) {
-	    MindmapService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    MindmapService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -290,7 +291,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	List childMindmapNodes = getMindmapNodeByParentId(fromMindmapNode.getNodeId(), fromContent.getUid());
 
 	if ((childMindmapNodes != null) && (childMindmapNodes.size() > 0)) {
-	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext();) {
+	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext(); ) {
 		MindmapNode childMindmapNode = (MindmapNode) iterator.next();
 		cloneMindmapNodesForRuntime(childMindmapNode, toMindmapNode, fromContent, toContent);
 	    }
@@ -342,7 +343,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	List mindmapNodes = getMindmapNodeByParentId(rootNodeId, mindmapId);
 
 	if ((mindmapNodes != null) && (mindmapNodes.size() > 0)) {
-	    for (Iterator iterator = mindmapNodes.iterator(); iterator.hasNext();) {
+	    for (Iterator iterator = mindmapNodes.iterator(); iterator.hasNext(); ) {
 		MindmapNode mindmapNode = (MindmapNode) iterator.next();
 
 		String mindmapUserName = null;
@@ -361,8 +362,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		    edit = mindmapUser.equals(mindmapNode.getUser()) ? 1 : 0;
 		}
 
-		NodeModel nodeModel = new NodeModel(new NodeConceptModel(mindmapNode.getUniqueId(),
-			mindmapNode.getText(), mindmapNode.getColor(), mindmapUserName, edit));
+		NodeModel nodeModel = new NodeModel(
+			new NodeConceptModel(mindmapNode.getUniqueId(), mindmapNode.getText(), mindmapNode.getColor(),
+				mindmapUserName, edit));
 
 		rootNodeModel.addNode(nodeModel);
 		getMindmapXMLFromDatabase(mindmapNode.getNodeId(), mindmapId, nodeModel, mindmapUser, isMonitor,
@@ -376,7 +378,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public void getChildMindmapNodes(List<NodeModel> branches, MindmapNode rootMindmapNode, MindmapUser mindmapUser,
 	    Mindmap mindmap, MindmapSession mindmapSession) {
-	for (Iterator<NodeModel> iterator = branches.iterator(); iterator.hasNext();) {
+	for (Iterator<NodeModel> iterator = branches.iterator(); iterator.hasNext(); ) {
 	    NodeModel nodeModel = iterator.next();
 	    NodeConceptModel nodeConceptModel = nodeModel.getConcept();
 	    // saving branch
@@ -438,14 +440,14 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (MindmapService.logger.isDebugEnabled()) {
-	    MindmapService.logger
-		    .debug("Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
+	    MindmapService.logger.debug(
+		    "Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
 	if (mindmap == null) {
-	    MindmapService.logger
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    MindmapService.logger.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -457,8 +459,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    for (MindmapNode node : nodes) {
 		List<MindmapNode> descendants = new LinkedList<>();
 		if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
-			&& !nodesToDelete.contains(node)
-			&& userOwnsChildrenNodes(node, userId.longValue(), descendants)) {
+			&& !nodesToDelete.contains(node) && userOwnsChildrenNodes(node, userId.longValue(),
+			descendants)) {
 		    // reverse so leafs are first and nodes closer to root are last
 		    descendants.add(node);
 		    nodesToDelete.addAll(descendants);
@@ -490,8 +492,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	List<MindmapNode> children = mindmapNodeDAO.getMindmapNodeByParentIdMindmapIdSessionId(node.getNodeId(),
 		node.getMindmap().getUid(), node.getSession().getSessionId());
 	for (MindmapNode child : children) {
-	    boolean userOwnsChild = (child.getUser() != null) && child.getUser().getUserId().equals(userId)
-		    && userOwnsChildrenNodes(child, userId, descendants);
+	    boolean userOwnsChild =
+		    (child.getUser() != null) && child.getUser().getUserId().equals(userId) && userOwnsChildrenNodes(
+			    child, userId, descendants);
 	    if (!userOwnsChild) {
 		return false;
 	    }
@@ -504,9 +507,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
@@ -526,8 +529,9 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	    String rootMindmapUser = getMindmapMessageService().getMessage("node.instructor.label");
 
-	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
-		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
+	    NodeModel rootNodeModel = new NodeModel(
+		    new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode.getText(),
+			    rootMindmapNode.getColor(), rootMindmapUser, 1));
 	    NodeModel currentNodeModel = getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmap.getUid(),
 		    rootNodeModel, null, false, false, false);
 
@@ -550,7 +554,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
@@ -741,7 +745,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     @Override
     public MindmapUser getUserByLoginAndSessionId(String login, long toolSessionId) {
 	List<User> user = mindmapUserDAO.findByProperty(User.class, "login", login);
-	return user.isEmpty() ? null
+	return user.isEmpty()
+		? null
 		: mindmapUserDAO.getByUserIdAndSessionId(user.get(0).getUserId().longValue(), toolSessionId);
     }
 
@@ -1015,7 +1020,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
     // ****************** REST methods *************************
@@ -1118,8 +1124,8 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	}
 
 	if (criteria.isEmpty()) {
-	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
-		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria.getRatingCriteriaInstance(
+		    RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
 	    criterion.setTitle(mindmapMessageService.getMessage("label.pad.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
@@ -1132,7 +1138,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public void startGalleryWalk(long toolContentId) throws IOException {
+    public void startGalleryWalk(long toolContentId) {
 	Mindmap mindmap = getMindmapByContentId(toolContentId);
 	if (!mindmap.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -1151,7 +1157,30 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
-    public void finishGalleryWalk(long toolContentId) throws IOException {
+    public void skipGalleryWalk(long toolContentId) {
+	Mindmap mindmap = getMindmapByContentId(toolContentId);
+	if (!mindmap.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is not enabled for Mindmap with tool content ID " + toolContentId);
+	}
+	if (mindmap.isGalleryWalkStarted()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already started for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	if (mindmap.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already finished for Mindmap with tool content ID "
+			    + toolContentId);
+	}
+	mindmap.setGalleryWalkEnabled(false);
+	mindmapDAO.update(mindmap);
+
+	sendGalleryWalkRefreshRequest(mindmap);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) {
 	Mindmap mindmap = getMindmapByContentId(toolContentId);
 	if (!mindmap.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(

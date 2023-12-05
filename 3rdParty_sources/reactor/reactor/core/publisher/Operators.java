@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -582,7 +582,7 @@ public abstract class Operators {
 	}
 
   /**
-   * Invoke a (local or global) hook that processes elements that remains in an {@link java.util.Iterator}.
+   * Invoke a (local or global) hook that processes elements that remains in an {@link Iterator}.
    * Since iterators can be infinite, this method requires that you explicitly ensure the iterator is
    * {@code knownToBeFinite}. Typically, operating on an {@link Iterable} one can get such a
    * guarantee by looking at the {@link Iterable#spliterator() Spliterator's} {@link Spliterator#getExactSizeIfKnown()}.
@@ -618,11 +618,48 @@ public abstract class Operators {
 		}
 	}
 
+
+	/**
+	 * Invoke a (local or global) hook that processes elements that remains in an {@link Spliterator}.
+	 * Since spliterators can be infinite, this method requires that you explicitly ensure the spliterator is
+	 * {@code knownToBeFinite}. Typically, one can get such a guarantee by looking at the {@link Spliterator#getExactSizeIfKnown()}.
+	 *
+	 * @param multiple the {@link Spliterator} whose remainder to discard
+	 * @param knownToBeFinite is the caller guaranteeing that the iterator is finite and can be iterated over
+	 * @param context the {@link Context} in which to look for local hook
+	 * @see #onDiscard(Object, Context)
+	 * @see #onDiscardMultiple(Collection, Context)
+	 * @see #onDiscardQueueWithClear(Queue, Context, Function)
+	 */
+	public static void onDiscardMultiple(@Nullable Spliterator<?> multiple, boolean knownToBeFinite, Context context) {
+		if (multiple == null) return;
+		if (!knownToBeFinite) return;
+
+		Consumer<Object> hook = context.getOrDefault(Hooks.KEY_ON_DISCARD, null);
+		if (hook != null) {
+			try {
+				multiple.forEachRemaining(o -> {
+					if (o != null) {
+						try {
+							hook.accept(o);
+						}
+						catch (Throwable t) {
+							log.warn("Error while discarding element from an Spliterator, continuing with next element", t);
+						}
+					}
+				});
+			}
+			catch (Throwable t) {
+				log.warn("Error while discarding Spliterator, stopping", t);
+			}
+		}
+	}
+
 	/**
 	 * An unexpected exception is about to be dropped.
 	 * <p>
 	 * If no hook is registered for {@link Hooks#onErrorDropped(Consumer)}, the dropped
-	 * error is logged at ERROR level and thrown (via {@link Exceptions#bubble(Throwable)}.
+	 * error is logged at ERROR level.
 	 *
 	 * @param e the dropped exception
 	 * @param context a context that might hold a local error consumer
@@ -746,7 +783,7 @@ public abstract class Operators {
 	 * operator. This exception denotes that an execution was rejected by a
 	 * {@link reactor.core.scheduler.Scheduler}, notably when it was already disposed.
 	 * <p>
-	 * Wrapping is done by calling both {@link Exceptions#bubble(Throwable)} and
+	 * Wrapping is done by calling both {@link Exceptions#failWithRejected(Throwable)} and
 	 * {@link #onOperatorError(Subscription, Throwable, Object, Context)}.
 	 *
 	 * @param original the original execution error
@@ -1114,7 +1151,7 @@ public abstract class Operators {
 			T value, String stepName){
 		return new ScalarSubscription<>(subscriber, value, stepName);
 	}
-	
+
 	/**
 	 * Safely gate a {@link Subscriber} by making sure onNext signals are delivered
 	 * sequentially (serialized).
@@ -1304,16 +1341,16 @@ public abstract class Operators {
 	}
 
 	/**
-	 * If the actual {@link CoreSubscriber} is not {@link reactor.core.Fuseable.ConditionalSubscriber},
+	 * If the actual {@link CoreSubscriber} is not {@link Fuseable.ConditionalSubscriber},
 	 * it will apply an adapter which directly maps all
-	 * {@link reactor.core.Fuseable.ConditionalSubscriber#tryOnNext(Object)} to
+	 * {@link Fuseable.ConditionalSubscriber#tryOnNext(Object)} to
 	 * {@link Subscriber#onNext(Object)}
 	 * and always returns true as the result
 	 *
 	 * @param <T> passed subscriber type
 	 *
 	 * @param actual the {@link Subscriber} to adapt
-	 * @return a potentially adapted {@link reactor.core.Fuseable.ConditionalSubscriber}
+	 * @return a potentially adapted {@link Fuseable.ConditionalSubscriber}
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Fuseable.ConditionalSubscriber<? super  T> toConditionalSubscriber(CoreSubscriber<? super T> actual) {
@@ -1732,14 +1769,13 @@ public abstract class Operators {
 	/**
 	 * A Subscriber/Subscription barrier that holds a single value at most and properly gates asynchronous behaviors
 	 * resulting from concurrent request or cancel and onXXX signals.
-	 * Publisher Operators using this Subscriber can be fused (implement Fuseable).
 	 *
 	 * @param <I> The upstream sequence type
 	 * @param <O> The downstream sequence type
 	 */
 	public static class MonoSubscriber<I, O>
 			implements InnerOperator<I, O>,
-			           Fuseable, //for constants only
+			           Fuseable,
 			           QueueSubscription<O> {
 
 		protected final CoreSubscriber<? super O> actual;
@@ -1776,7 +1812,6 @@ public abstract class Operators {
 
 		@Override
 		public final void clear() {
-			STATE.lazySet(this, FUSED_CONSUMED);
 			this.value = null;
 		}
 
@@ -1790,18 +1825,6 @@ public abstract class Operators {
 		public final void complete(@Nullable O v) {
 			for (; ; ) {
 				int state = this.state;
-				if (state == FUSED_EMPTY) {
-					setValue(v);
-					//sync memory since setValue is non volatile
-					if (STATE.compareAndSet(this, FUSED_EMPTY, FUSED_READY)) {
-						Subscriber<? super O> a = actual;
-						a.onNext(v);
-						a.onComplete();
-						return;
-					}
-					//refresh state if race occurred so we test if cancelled in the next comparison
-					state = this.state;
-				}
 
 				// if state is >= HAS_CANCELLED or bit zero is set (*_HAS_VALUE) case, return
 				if ((state & ~HAS_REQUEST_NO_VALUE) != 0) {
@@ -1850,7 +1873,7 @@ public abstract class Operators {
 
 		@Override
 		public final boolean isEmpty() {
-			return this.state != FUSED_READY;
+			return true;
 		}
 
 		@Override
@@ -1877,11 +1900,6 @@ public abstract class Operators {
 		@Override
 		@Nullable
 		public final O poll() {
-			if (STATE.compareAndSet(this, FUSED_READY, FUSED_CONSUMED)) {
-				O v = value;
-				value = null;
-				return v;
-			}
 			return null;
 		}
 
@@ -1893,8 +1911,7 @@ public abstract class Operators {
 					if (s == CANCELLED) {
 						return;
 					}
-					// if the any bits 1-31 are set, we are either in fusion mode (FUSED_*)
-					// or request has been called (HAS_REQUEST_*)
+					// if any bits 1-31 are set, request(n) has been called (HAS_REQUEST_*)
 					if ((s & ~NO_REQUEST_HAS_VALUE) != 0) {
 						return;
 					}
@@ -1917,10 +1934,6 @@ public abstract class Operators {
 
 		@Override
 		public int requestFusion(int mode) {
-			if ((mode & ASYNC) != 0) {
-				STATE.lazySet(this, FUSED_EMPTY);
-				return ASYNC;
-			}
 			return NONE;
 		}
 
@@ -1963,22 +1976,156 @@ public abstract class Operators {
 		/**
 		 * Indicates the Subscription has been cancelled.
 		 */
-		static final int CANCELLED = 4;
-		/**
-		 * Indicates this Subscription is in fusion mode and is currently empty.
-		 */
-		static final int FUSED_EMPTY    = 8;
-		/**
-		 * Indicates this Subscription is in fusion mode and has a value.
-		 */
-		static final int FUSED_READY    = 16;
-		/**
-		 * Indicates this Subscription is in fusion mode and its value has been consumed.
-		 */
-		static final int FUSED_CONSUMED = 32;
+		static final int CANCELLED         = 4;
+
 		@SuppressWarnings("rawtypes")
-		static final AtomicIntegerFieldUpdater<MonoSubscriber> STATE =
+		static final AtomicIntegerFieldUpdater<MonoSubscriber> STATE                =
 				AtomicIntegerFieldUpdater.newUpdater(MonoSubscriber.class, "state");
+	}
+
+
+	static abstract class BaseFluxToMonoOperator<I, O> implements InnerOperator<I, O>,
+	                                                              Fuseable,
+			                                                      QueueSubscription<I> {
+		final CoreSubscriber<? super O> actual;
+
+		Subscription s;
+
+		boolean hasRequest;
+
+		volatile int state;
+		@SuppressWarnings("rawtypes")
+		static final AtomicIntegerFieldUpdater<BaseFluxToMonoOperator> STATE =
+				AtomicIntegerFieldUpdater.newUpdater(BaseFluxToMonoOperator.class, "state");
+
+		BaseFluxToMonoOperator(CoreSubscriber<? super O> actual) {
+			this.actual = actual;
+		}
+
+		@Override
+		@Nullable
+		public Object scanUnsafe(Attr key) {
+			if (key == Attr.PREFETCH) return 0;
+			if (key == Attr.PARENT) return s;
+			if (key == Attr.RUN_STYLE) return RunStyle.SYNC;
+
+			return InnerOperator.super.scanUnsafe(key);
+		}
+
+		@Override
+		public final CoreSubscriber<? super O> actual() {
+			return this.actual;
+		}
+
+		@Override
+		public void onSubscribe(Subscription s) {
+			if (Operators.validate(this.s, s)) {
+				this.s = s;
+
+				actual.onSubscribe(this);
+			}
+		}
+
+		@Override
+		public void request(long n) {
+			if (!hasRequest) {
+				hasRequest = true;
+
+				final int state = this.state;
+				if ((state & 1) == 1) {
+					return;
+				}
+
+				if (STATE.compareAndSet(this, state, state | 1)) {
+					if (state == 0) {
+						s.request(Long.MAX_VALUE);
+					}
+					else {
+						// completed before request means source was empty
+						final O value = accumulatedValue();
+
+						if (value == null) {
+							return;
+						}
+
+						this.actual.onNext(value);
+						this.actual.onComplete();
+					}
+				}
+			}
+		}
+
+		@Override
+		public void cancel() {
+			s.cancel();
+		}
+
+		final void completePossiblyEmpty() {
+			if (hasRequest) {
+				final O value = accumulatedValue();
+
+				if (value == null) {
+					return;
+				}
+
+				this.actual.onNext(value);
+				this.actual.onComplete();
+				return;
+			}
+
+			final int state = this.state;
+			if (state == 0 && STATE.compareAndSet(this, 0, 2)) {
+				return;
+			}
+
+			final O value = accumulatedValue();
+
+			if (value == null) {
+				return;
+			}
+
+			this.actual.onNext(value);
+			this.actual.onComplete();
+		}
+
+		/**
+		 * This method is being called either during onComplete invocation in case request
+		 * has happened before, or during request invocation in case onComplete with no
+		 * values has happened before.
+		 * <p>
+		 * <b>Note</b>, this method expectedly returns null if cancellation happened
+		 * before
+		 * </p>
+		 *
+		 * @return accumulated/default value or null if cancelled before
+		 */
+		@Nullable
+		abstract O accumulatedValue();
+
+		@Override
+		public final I poll() {
+			return null;
+		}
+
+		@Override
+		public final int requestFusion(int requestedMode) {
+			return Fuseable.NONE;
+		}
+
+		@Override
+		public final int size() {
+			return 0;
+		}
+
+		@Override
+		public final boolean isEmpty() {
+			return true;
+		}
+
+		@Override
+		public final void clear() {
+
+		}
 	}
 
 
@@ -2284,7 +2431,7 @@ public abstract class Operators {
 	                    }
 	                } else if (mr != 0L && a != null) {
 	                    requestAmount = addCap(requestAmount, mr);
-	                    alreadyInRequestAmount += mr; 
+	                    alreadyInRequestAmount += mr;
 	                    requestTarget = a;
 	                }
 	            }
@@ -2458,7 +2605,7 @@ public abstract class Operators {
 
 	/**
 	 * This class wraps any non-conditional {@link CoreSubscriber<T>} so the delegate
-	 * can have an emulation of {@link reactor.core.Fuseable.ConditionalSubscriber<T>}
+	 * can have an emulation of {@link Fuseable.ConditionalSubscriber<T>}
 	 * behaviors
 	 *
 	 * @param <T> passed subscriber type

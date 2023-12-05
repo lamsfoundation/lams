@@ -1,5 +1,5 @@
 ﻿function removeGrouping(groupingId) {
-	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
+	if (confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
 		//dynamically create a form and submit it
 		var form = $('<form method="post" action="' +  LAMS_URL + 'grouping/removeGrouping.do"></form>');
 
@@ -7,6 +7,12 @@
 		form.append(hiddenField);
 
 		hiddenField = $('<input type="hidden" name="groupingId" value="' + groupingId + '"></input>');
+		form.append(hiddenField);
+
+		hiddenField = $('<input type="hidden" name="lessonID" value="' + lessonId + '"></input>');
+		form.append(hiddenField);
+
+		hiddenField = $('<input type="hidden" name="activityID" value="' + activityId + '"></input>');
 		form.append(hiddenField);
 
 		hiddenField = $('<input type="hidden" name="' + csrfTokenName + '" value="' + csrfTokenValue + '"></input>');

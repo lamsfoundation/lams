@@ -393,7 +393,7 @@ public class ScratchieServiceImpl
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	Scratchie scratchie = getScratchieByContentId(toolContentId);
 	int learnersStarted = scratchieUserDao.countUsersByContentId(toolContentId);
-	if (learnersStarted == 1 && scratchie.getRelativeTimeLimit() == 0 && scratchie.getAbsoluteTimeLimit() > 0
+	if (learnersStarted > 0 && scratchie.getRelativeTimeLimit() == 0 && scratchie.getAbsoluteTimeLimit() > 0
 		&& scratchie.getAbsoluteTimeLimitFinish() == null) {
 	    scratchie.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(scratchie.getAbsoluteTimeLimit()));
 	    scratchie.setAbsoluteTimeLimit(0);

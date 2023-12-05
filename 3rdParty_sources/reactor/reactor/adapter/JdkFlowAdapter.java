@@ -57,9 +57,9 @@ public abstract class JdkFlowAdapter {
 	}
 
 	private static class FlowPublisherAsFlux<T> extends Flux<T> implements Scannable {
-        private final java.util.concurrent.Flow.Publisher<T> pub;
+        private final Flow.Publisher<T> pub;
 
-        private FlowPublisherAsFlux(java.util.concurrent.Flow.Publisher<T> pub) {
+        private FlowPublisherAsFlux(Flow.Publisher<T> pub) {
             this.pub = pub;
         }
 

@@ -37,6 +37,7 @@
 					organisationId = <c:out value="${empty organisationID ? param.organisationID : organisationID}" />,
 					targetOrganisationId = '${targetOrganisationId}',
 					lessonId = '<c:out value="${param.lessonID}" />',
+					activityId = '<c:out value="${param.activityID}" />',
 					csrfTokenName = '<csrf:tokenname/>',
 					csrfTokenValue = '<csrf:tokenvalue/>',
 					LAMS_URL = '<lams:LAMSURL/>',
@@ -83,10 +84,10 @@
 				<c:forEach var="grouping" items="${groupings}">
 					<%-- In lesson mode do not show groupings with zero groups --%>
 					<c:if test="${not lessonMode or grouping.groupCount > 0}">
-						<li id="grouping-${grouping.groupingId}" class="grouping list-group-item fw-bold"
-							onClick="javascript:${groupingMethod}(${grouping.groupingId})">
+						<li id="grouping-${grouping.groupingId}" class="grouping list-group-item fw-bold">
 							<div class="row">
-								<div class="col-10">
+								<div class="col-10 groupingName"
+									 onClick="javascript:${groupingMethod}(${grouping.groupingId})">
 									<c:out value="${grouping.name}" />
 								</div>
 								<div class="col-1">
@@ -95,10 +96,8 @@
 										</span>
 								</div>
 								<div class="col-1 text-end">
-									<c:if test="${not lessonMode}">
-										<i class="removeGroupingButton fa fa-remove fa-lg" title="<fmt:message key='label.course.groups.remove.tooltip' />"
-										   onClick="javascript:removeGrouping(${grouping.groupingId})" ></i>
-									</c:if>
+									<i class="removeGroupingButton text-danger fa-solid fa-trash-can fa-lg" title="<fmt:message key='label.course.groups.remove.tooltip' />"
+									   onClick="javascript:removeGrouping(${grouping.groupingId})" ></i>
 								</div>
 							</div>
 						</li>

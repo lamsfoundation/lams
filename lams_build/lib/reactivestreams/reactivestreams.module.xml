@@ -29,6 +29,6 @@
    </properties>
     
   <resources>
-    <resource-root path="reactive-streams-1.0.3.jar"/>
+    <resource-root path="reactive-streams-1.0.4.jar"/>
   </resources>
 </module>

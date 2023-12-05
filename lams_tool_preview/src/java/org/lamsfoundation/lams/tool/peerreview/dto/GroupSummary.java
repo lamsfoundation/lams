@@ -22,6 +22,8 @@
 
 package org.lamsfoundation.lams.tool.peerreview.dto;
 
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
+
 public class GroupSummary implements Comparable<GroupSummary> {
 
     private Long sessionId;
@@ -54,24 +56,9 @@ public class GroupSummary implements Comparable<GroupSummary> {
 
     @Override
     public int compareTo(GroupSummary o) {
-	String name1 = this.sessionName.toLowerCase();
-	String name2 = o.sessionName.toLowerCase();
-	String nameWithoutNumbers1 = name1.replaceAll("\\d+", "");
-	String nameWithoutNumbers2 = name2.replaceAll("\\d+", "");
-	if (!nameWithoutNumbers1.equals(nameWithoutNumbers2)) {
-	    return name1.compareTo(name2);
+	if (o == null) {
+	    return 1;
 	}
-	String numbers1 = name1.replaceAll("\\D+", "");
-	String numbers2 = name2.replaceAll("\\D+", "");
-	if (numbers1.length() == 0 || numbers2.length() == 0) {
-	    return name1.compareTo(name2);
-	}
-	try {
-	    Long num1 = Long.parseLong(numbers1);
-	    Long num2 = Long.parseLong(numbers2);
-	    return num1.compareTo(num2);
-	} catch (Exception e) {
-	    return name1.compareTo(name2);
-	}
+	return PeerreviewSession.SESSION_NAME_COMPARATOR.compare(sessionName, o.getSessionName());
     }
 }

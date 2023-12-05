@@ -18,9 +18,13 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
-	<!-- Existing WildFly task executor for Spring async request processing. It is fetched by JNDI from JEE7+ platform. -->
-	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor" />
-	
+	<!-- Separate task executor for all async requests.
+	     Its has got core pool size of 1 (maybe it should be the number of cores),
+	     unbounded max thread pool size
+	     and queue capacity of 0 so tasks never wait and always create new threads when there are no available ones -->
+	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="queueCapacity" value="0" />
+	</bean>
 	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	

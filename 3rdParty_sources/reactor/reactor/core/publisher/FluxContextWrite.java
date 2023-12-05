@@ -46,7 +46,7 @@ final class FluxContextWrite<T> extends InternalFluxOperator<T, T> implements Fu
 
 	@Override
 	public Object scanUnsafe(Attr key) {
-		if (key == Scannable.Attr.RUN_STYLE) return Attr.RunStyle.SYNC;
+		if (key == Attr.RUN_STYLE) return Attr.RunStyle.SYNC;
 		return super.scanUnsafe(key);
 	}
 
@@ -79,7 +79,7 @@ final class FluxContextWrite<T> extends InternalFluxOperator<T, T> implements Fu
 			if (key == Attr.PARENT) {
 				return s;
 			}
-			if (key == Scannable.Attr.RUN_STYLE) {
+			if (key == Attr.RUN_STYLE) {
 			    return Attr.RunStyle.SYNC;
 			}
 			return InnerOperator.super.scanUnsafe(key);

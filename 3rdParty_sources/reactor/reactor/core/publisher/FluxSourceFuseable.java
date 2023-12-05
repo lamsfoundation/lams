@@ -77,9 +77,9 @@ final class FluxSourceFuseable<I> extends Flux<I> implements Fuseable, SourcePro
 
 	@Override
 	@Nullable
-	public Object scanUnsafe(Scannable.Attr key) {
-		if (key == Scannable.Attr.PREFETCH) return getPrefetch();
-		if (key == Scannable.Attr.PARENT) return source;
+	public Object scanUnsafe(Attr key) {
+		if (key == Attr.PREFETCH) return getPrefetch();
+		if (key == Attr.PARENT) return source;
 		if (key == Attr.RUN_STYLE) return Scannable.from(source).scanUnsafe(key);
 		return null;
 	}

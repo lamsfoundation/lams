@@ -696,12 +696,17 @@ public class MonitoringService implements IMonitoringFullService {
 
     @Override
     public void startLesson(long lessonId, Integer userId) {
+	startLesson(lessonId, userId, false);
+    }
+
+    @Override
+    public void startLesson(long lessonId, Integer userId, boolean skipSecurityCheck) {
 	if (MonitoringService.log.isDebugEnabled()) {
 	    MonitoringService.log.debug("=============Starting Lesson " + lessonId + "==============");
 	}
 	// we get the lesson just created
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (requestedLesson.getOrganisation() != null) {
+	if (!skipSecurityCheck && requestedLesson.getOrganisation() != null) {
 	    // preview does not have organisation set, so this security check still needs improvement
 	    securityService.ensureLessonMonitor(lessonId, userId, "start lesson");
 	}

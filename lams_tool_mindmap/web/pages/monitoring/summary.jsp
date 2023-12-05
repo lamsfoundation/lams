@@ -21,6 +21,10 @@
 		margin-top: 20px;
 		margin-bottom: 20px;
 	}
+
+	#gallery-walk-skip {
+		margin-top: 20px;
+	}
 	
 	#gallery-walk-rating-table th {
 		font-weight: bold;
@@ -112,7 +116,23 @@
 			}
 		});
 	}
-	
+
+	function skipGalleryWalk(){
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
+			return;
+		}
+
+		$.ajax({
+			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dto.toolContentId}
+			},
+			'success' : function(){
+				location.reload();
+			}
+		});
+	}
+
 	function finishGalleryWalk(){
 		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
@@ -202,7 +222,14 @@
 			</button>
 			
 			<br>
-						
+
+			<button id="gallery-walk-skip" type="button"
+					  class="btn btn-danger
+							   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+					  onClick="javascript:skipGalleryWalk()">
+				  <fmt:message key="monitoring.summary.gallery.walk.skip" />
+			</button>
+
 			<button id="gallery-walk-learner-edit" type="button"
 			        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
 			        onClick="javascript:enableGalleryWalkLearnerEdit()">

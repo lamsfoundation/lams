@@ -34,7 +34,20 @@ import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -62,14 +75,24 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.*;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 
@@ -83,8 +106,20 @@ import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -102,6 +137,10 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
+
+    @Autowired
+    @Qualifier("serverTaskExecutor")
+    private ThreadPoolTaskExecutor serverTaskExecutor;
 
     @Autowired
     private ILogEventService logEventService;
@@ -146,8 +185,8 @@ public class MonitoringController {
 		FluxMap.STANDARD_TIMEOUT);
 	FluxRegistry.initFluxMap(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME,
 		CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME,
-		(Collection<Long> key, Collection<Long> item) -> key.containsAll(item), toolContentIds -> "doRefresh",
-		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		(Collection<Long> key, Collection<Long> item) -> !Collections.disjoint(key, item),
+		toolContentIds -> "doRefresh", FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {
@@ -967,6 +1006,13 @@ public class MonitoringController {
     @RequestMapping("/monitorLesson")
     public String monitorLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
+	if (log.isDebugEnabled()) {
+	    // temporary (?) debugging information on thread pool used for async requests
+	    StringBuilder executorLog = new StringBuilder();
+	    executorLog.append("Active thread count: " + serverTaskExecutor.getActiveCount());
+	    executorLog.append(" / Pool size: " + serverTaskExecutor.getPoolSize());
+	    log.debug(executorLog.toString());
+	}
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	LessonDetailsDTO lessonDTO = lessonService.getLessonDetails(lessonId);

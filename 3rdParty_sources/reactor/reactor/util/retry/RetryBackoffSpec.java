@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.annotation.Nullable;
+import reactor.util.context.Context;
 import reactor.util.context.ContextView;
 
 /**
@@ -47,8 +48,8 @@ import reactor.util.context.ContextView;
  * Only errors that match the {@link #filter(Predicate)} are retried (by default all),
  * and the number of attempts can also limited with {@link #maxAttempts(long)}.
  * When the maximum attempt of retries is reached, a runtime exception is propagated downstream which
- * can be pinpointed with {@link reactor.core.Exceptions#isRetryExhausted(Throwable)}. The cause of
- * the last attempt's failure is attached as said {@link reactor.core.Exceptions#retryExhausted(String, Throwable) retryExhausted}
+ * can be pinpointed with {@link Exceptions#isRetryExhausted(Throwable)}. The cause of
+ * the last attempt's failure is attached as said {@link Exceptions#retryExhausted(String, Throwable) retryExhausted}
  * exception's cause. This can be customized with {@link #onRetryExhaustedThrow(BiFunction)}.
  * <p>
  * Additionally, to help dealing with bursts of transient errors in a long-lived Flux as if each burst
@@ -371,14 +372,14 @@ public final class RetryBackoffSpec extends Retry {
 	 * Set the generator for the {@link Exception} to be propagated when the maximum amount of retries
 	 * is exhausted. By default, throws an {@link Exceptions#retryExhausted(String, Throwable)} with the
 	 * message reflecting the total attempt index, transient attempt index and maximum retry count.
-	 * The cause of the last {@link reactor.util.retry.Retry.RetrySignal} is also added
+	 * The cause of the last {@link RetrySignal} is also added
 	 * as the exception's cause.
 	 *
 	 *
 	 * @param retryExhaustedGenerator the {@link Function} that generates the {@link Throwable} for the last
-	 * {@link reactor.util.retry.Retry.RetrySignal}
+	 * {@link RetrySignal}
 	 * @return a new copy of the {@link RetryBackoffSpec} which can either be further
-	 * configured or used as {@link reactor.util.retry.Retry}
+	 * configured or used as {@link Retry}
 	 */
 	public RetryBackoffSpec onRetryExhaustedThrow(BiFunction<RetryBackoffSpec, RetrySignal, Throwable> retryExhaustedGenerator) {
 		return new RetryBackoffSpec(
@@ -399,8 +400,8 @@ public final class RetryBackoffSpec extends Retry {
 
 	/**
 	 * Set the transient error mode, indicating that the strategy being built should use
-	 * {@link reactor.util.retry.Retry.RetrySignal#totalRetriesInARow()} rather than
-	 * {@link reactor.util.retry.Retry.RetrySignal#totalRetries()}.
+	 * {@link RetrySignal#totalRetriesInARow()} rather than
+	 * {@link RetrySignal#totalRetries()}.
 	 * Transient errors are errors that could occur in bursts but are then recovered from by
 	 * a retry (with one or more onNext signals) before another error occurs.
 	 * <p>
@@ -539,69 +540,72 @@ public final class RetryBackoffSpec extends Retry {
 	@Override
 	public Flux<Long> generateCompanion(Flux<RetrySignal> t) {
 		validateArguments();
-		return t.concatMap(retryWhenState -> {
-			//capture the state immediately
-			RetrySignal copy = retryWhenState.copy();
-			Throwable currentFailure = copy.failure();
-			long iteration = isTransientErrors ? copy.totalRetriesInARow() : copy.totalRetries();
+		return Flux.deferContextual(cv ->
+		   t.contextWrite(cv)
+			.concatMap(retryWhenState -> {
+				//capture the state immediately
+				RetrySignal copy = retryWhenState.copy();
+				Throwable currentFailure = copy.failure();
+				long iteration = isTransientErrors ? copy.totalRetriesInARow() : copy.totalRetries();
 
-			if (currentFailure == null) {
-				return Mono.error(new IllegalStateException("Retry.RetrySignal#failure() not expected to be null"));
-			}
+				if (currentFailure == null) {
+					return Mono.error(new IllegalStateException("Retry.RetrySignal#failure() not expected to be null"));
+				}
 
-			if (!errorFilter.test(currentFailure)) {
-				return Mono.error(currentFailure);
-			}
+				if (!errorFilter.test(currentFailure)) {
+					return Mono.error(currentFailure);
+				}
 
-			if (iteration >= maxAttempts) {
-				return Mono.error(retryExhaustedGenerator.apply(this, copy));
-			}
+				if (iteration >= maxAttempts) {
+					return Mono.error(retryExhaustedGenerator.apply(this, copy));
+				}
 
-			Duration nextBackoff;
-			try {
-				nextBackoff = minBackoff.multipliedBy((long) Math.pow(2, iteration));
-				if (nextBackoff.compareTo(maxBackoff) > 0) {
+				Duration nextBackoff;
+				try {
+					nextBackoff = minBackoff.multipliedBy((long) Math.pow(2, iteration));
+					if (nextBackoff.compareTo(maxBackoff) > 0) {
+						nextBackoff = maxBackoff;
+					}
+				}
+				catch (ArithmeticException overflow) {
 					nextBackoff = maxBackoff;
 				}
-			}
-			catch (ArithmeticException overflow) {
-				nextBackoff = maxBackoff;
-			}
 
-			//short-circuit delay == 0 case
-			if (nextBackoff.isZero()) {
-				return RetrySpec.applyHooks(copy, Mono.just(iteration),
-						syncPreRetry, syncPostRetry, asyncPreRetry, asyncPostRetry);
-			}
+				//short-circuit delay == 0 case
+				if (nextBackoff.isZero()) {
+					return RetrySpec.applyHooks(copy, Mono.just(iteration),
+							syncPreRetry, syncPostRetry, asyncPreRetry, asyncPostRetry, cv);
+				}
 
-			ThreadLocalRandom random = ThreadLocalRandom.current();
+				ThreadLocalRandom random = ThreadLocalRandom.current();
 
-			long jitterOffset;
-			try {
-				jitterOffset = nextBackoff.multipliedBy((long) (100 * jitterFactor))
-				                          .dividedBy(100)
-				                          .toMillis();
-			}
-			catch (ArithmeticException ae) {
-				jitterOffset = Math.round(Long.MAX_VALUE * jitterFactor);
-			}
-			long lowBound = Math.max(minBackoff.minus(nextBackoff)
-			                                     .toMillis(), -jitterOffset);
-			long highBound = Math.min(maxBackoff.minus(nextBackoff)
-			                                    .toMillis(), jitterOffset);
+				long jitterOffset;
+				try {
+					jitterOffset = nextBackoff.multipliedBy((long) (100 * jitterFactor))
+							.dividedBy(100)
+							.toMillis();
+				}
+				catch (ArithmeticException ae) {
+					jitterOffset = Math.round(Long.MAX_VALUE * jitterFactor);
+				}
+				long lowBound = Math.max(minBackoff.minus(nextBackoff)
+						.toMillis(), -jitterOffset);
+				long highBound = Math.min(maxBackoff.minus(nextBackoff)
+						.toMillis(), jitterOffset);
 
-			long jitter;
-			if (highBound == lowBound) {
-				if (highBound == 0) jitter = 0;
-				else jitter = random.nextLong(highBound);
-			}
-			else {
-				jitter = random.nextLong(lowBound, highBound);
-			}
-			Duration effectiveBackoff = nextBackoff.plusMillis(jitter);
-			return RetrySpec.applyHooks(copy, Mono.delay(effectiveBackoff,
-					backoffSchedulerSupplier.get()),
-					syncPreRetry, syncPostRetry, asyncPreRetry, asyncPostRetry);
-		});
+				long jitter;
+				if (highBound == lowBound) {
+					if (highBound == 0) jitter = 0;
+					else jitter = random.nextLong(highBound);
+				}
+				else {
+					jitter = random.nextLong(lowBound, highBound);
+				}
+				Duration effectiveBackoff = nextBackoff.plusMillis(jitter);
+				return RetrySpec.applyHooks(copy, Mono.delay(effectiveBackoff, backoffSchedulerSupplier.get()),
+						syncPreRetry, syncPostRetry, asyncPreRetry, asyncPostRetry, cv);
+			})
+		    .onErrorStop()
+		);
 	}
 }

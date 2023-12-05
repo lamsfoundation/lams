@@ -83,7 +83,7 @@ final class GroupedLiftFuseable<K, I, O> extends GroupedFlux<K, O>
 
 		Objects.requireNonNull(input, "Lifted subscriber MUST NOT be null");
 
-		if (actual instanceof Fuseable.QueueSubscription
+		if (actual instanceof QueueSubscription
 				&& !(input instanceof QueueSubscription)) {
 			//user didn't produce a QueueSubscription, original was one
 			input = new FluxHide.SuppressFuseableSubscriber<>(input);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2018-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import static reactor.core.publisher.FluxMetrics.*;
  * @author Simon Baslé
  * @author Stephane Maldini
  */
+@Deprecated
 final class FluxMetricsFuseable<T> extends InternalFluxOperator<T, T> implements Fuseable {
 
 	final String        name;
@@ -71,13 +72,13 @@ final class FluxMetricsFuseable<T> extends InternalFluxOperator<T, T> implements
 	 * subsequences immediately upstream of it, so Counters would be a bit irrelevant. We however want to instrument
 	 * onNext counts.
 	 */
-	static final class MetricsFuseableSubscriber<T> extends FluxMetrics.MetricsSubscriber<T>
+	static final class MetricsFuseableSubscriber<T> extends MetricsSubscriber<T>
 			implements Fuseable, QueueSubscription<T> {
 
 		int mode;
 
 		@Nullable
-		Fuseable.QueueSubscription<T> qs;
+		QueueSubscription<T> qs;
 
 		MetricsFuseableSubscriber(CoreSubscriber<? super T> actual,
 				MeterRegistry registry,

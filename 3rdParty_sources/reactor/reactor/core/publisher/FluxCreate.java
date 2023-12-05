@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2016-2023 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import reactor.core.publisher.FluxSink.OverflowStrategy;
 import reactor.util.annotation.Nullable;
 import reactor.util.concurrent.Queues;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Provides a multi-valued sink API for a callback that is called for each individual
@@ -57,7 +58,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 	final CreateMode createMode;
 
 	FluxCreate(Consumer<? super FluxSink<T>> source,
-			FluxSink.OverflowStrategy backpressure,
+			OverflowStrategy backpressure,
 			CreateMode createMode) {
 		this.source = Objects.requireNonNull(source, "source");
 		this.backpressure = Objects.requireNonNull(backpressure, "backpressure");
@@ -138,8 +139,14 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		}
 
 		@Override
+		@Deprecated
 		public Context currentContext() {
 			return sink.currentContext();
+		}
+
+		@Override
+		public ContextView contextView() {
+			return sink.contextView();
 		}
 
 		@Override
@@ -261,7 +268,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 
 		@Override
 		public FluxSink<T> onRequest(LongConsumer consumer) {
-			sink.onRequest(consumer, consumer, sink.requested);
+			sink.onPushPullRequest(consumer);
 			return this;
 		}
 
@@ -327,8 +334,14 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		}
 
 		@Override
+		@Deprecated
 		public Context currentContext() {
 			return sink.currentContext();
+		}
+
+		@Override
+		public ContextView contextView() {
+			return sink.contextView();
 		}
 
 		@Override
@@ -396,6 +409,8 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		static final Disposable TERMINATED = OperatorDisposables.DISPOSED;
 		static final Disposable CANCELLED  = Disposables.disposed();
 
+		static final LongConsumer NOOP_CONSUMER = n -> {};
+
 		final CoreSubscriber<? super T> actual;
 		final Context                   ctx;
 
@@ -421,10 +436,19 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		BaseSink(CoreSubscriber<? super T> actual) {
 			this.actual = actual;
 			this.ctx = actual.currentContext();
+			REQUESTED.lazySet(this, Long.MIN_VALUE);
 		}
 
 		@Override
+		@Deprecated
 		public Context currentContext() {
+			//we cache the context for hooks purposes, but this forces to go through the
+			// chain when queried for context, in case downstream can update the Context...
+			return actual.currentContext();
+		}
+
+		@Override
+		public ContextView contextView() {
 			//we cache the context for hooks purposes, but this forces to go through the
 			// chain when queried for context, in case downstream can update the Context...
 			return actual.currentContext();
@@ -479,7 +503,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 
 		@Override
 		public long requestedFromDownstream() {
-			return requested;
+			return requested & Long.MAX_VALUE;
 		}
 
 		void onCancel() {
@@ -498,12 +522,15 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		@Override
 		public final void request(long n) {
 			if (Operators.validate(n)) {
-				Operators.addCap(REQUESTED, this, n);
+				long s = addCap(this, n);
 
-				LongConsumer consumer = requestConsumer;
-				if (n > 0 && consumer != null && !isCancelled()) {
-					consumer.accept(n);
+				if (hasRequestConsumer(s)) {
+					LongConsumer consumer = requestConsumer;
+					if (!isCancelled()) {
+						consumer.accept(n);
+					}
 				}
+
 				onRequestedFromDownstream();
 			}
 		}
@@ -520,20 +547,29 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		@Override
 		public FluxSink<T> onRequest(LongConsumer consumer) {
 			Objects.requireNonNull(consumer, "onRequest");
-			onRequest(consumer, n -> {
-			}, Long.MAX_VALUE);
+			onPushRequest(consumer);
 			return this;
 		}
 
-		protected void onRequest(LongConsumer initialRequestConsumer,
-				LongConsumer requestConsumer,
-				long value) {
+		protected void onPushRequest(LongConsumer initialRequestConsumer) {
+			if (!REQUEST_CONSUMER.compareAndSet(this, null, NOOP_CONSUMER)) {
+				throw new IllegalStateException(
+						"A consumer has already been assigned to consume requests");
+			}
+
+			// do not change real flag since real consumer is technically absent
+			initialRequestConsumer.accept(Long.MAX_VALUE);
+		}
+
+		protected void onPushPullRequest(LongConsumer requestConsumer) {
 			if (!REQUEST_CONSUMER.compareAndSet(this, null, requestConsumer)) {
 				throw new IllegalStateException(
 						"A consumer has already been assigned to consume requests");
 			}
-			else if (value > 0) {
-				initialRequestConsumer.accept(value);
+
+			long initialRequest = markRequestConsumerSet(this);
+			if (initialRequest > 0) {
+				requestConsumer.accept(initialRequest);
 			}
 		}
 
@@ -586,7 +622,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		public Object scanUnsafe(Attr key) {
 			if (key == Attr.TERMINATED) return disposable == TERMINATED;
 			if (key == Attr.CANCELLED) return disposable == CANCELLED;
-			if (key == Attr.REQUESTED_FROM_DOWNSTREAM) return requested;
+			if (key == Attr.REQUESTED_FROM_DOWNSTREAM) return requestedFromDownstream();
 			if (key == Attr.RUN_STYLE) return Attr.RunStyle.ASYNC;
 
 			return InnerProducer.super.scanUnsafe(key);
@@ -595,6 +631,54 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 		@Override
 		public String toString() {
 			return "FluxSink";
+		}
+
+		static <T> void produced(BaseSink<T> instance, long toSub) {
+			long s, r, u;
+			do {
+				s = instance.requested;
+				r = s & Long.MAX_VALUE;
+				if (r == 0 || r == Long.MAX_VALUE) {
+					return;
+				}
+				u = Operators.subOrZero(r, toSub);
+			} while (!REQUESTED.compareAndSet(instance, s, u | (s & Long.MIN_VALUE)));
+		}
+
+
+		static <T> long addCap(BaseSink<T> instance, long toAdd) {
+			long r, u, s;
+			for (;;) {
+				s = instance.requested;
+				r = s & Long.MAX_VALUE;
+				if (r == Long.MAX_VALUE) {
+					return s;
+				}
+				u = Operators.addCap(r, toAdd);
+				if (REQUESTED.compareAndSet(instance, s, u | (s & Long.MIN_VALUE))) {
+					return s;
+				}
+			}
+		}
+
+		static <T> long markRequestConsumerSet(BaseSink<T> instance) {
+			long u, s;
+			for (;;) {
+				s = instance.requested;
+
+				if (hasRequestConsumer(s)) {
+					return s;
+				}
+
+				u = s & Long.MAX_VALUE;
+				if (REQUESTED.compareAndSet(instance, s, u)) {
+					return u;
+				}
+			}
+		}
+
+		static boolean hasRequestConsumer(long requestedState) {
+			return (requestedState & Long.MIN_VALUE) == 0;
 		}
 	}
 
@@ -618,8 +702,9 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 			actual.onNext(t);
 
 			for (; ; ) {
-				long r = requested;
-				if (r == 0L || REQUESTED.compareAndSet(this, r, r - 1)) {
+				long s = requested;
+				long r = s & Long.MAX_VALUE;
+				if (r == 0L || REQUESTED.compareAndSet(this, s, (r - 1) | (s & Long.MIN_VALUE))) {
 					return this;
 				}
 			}
@@ -644,9 +729,9 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 				return this;
 			}
 
-			if (requested != 0) {
+			if (requestedFromDownstream() != 0) {
 				actual.onNext(t);
-				Operators.produced(REQUESTED, this, 1);
+				produced(this, 1);
 			}
 			else {
 				onOverflow();
@@ -755,7 +840,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 			final Queue<T> q = queue;
 
 			for (; ; ) {
-				long r = requested;
+				long r = requestedFromDownstream();
 				long e = 0L;
 
 				while (e != r) {
@@ -823,7 +908,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 				}
 
 				if (e != 0) {
-					Operators.produced(REQUESTED, this, e);
+					produced(this, e);
 				}
 
 				if (WIP.decrementAndGet(this) == 0) {
@@ -915,7 +1000,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 			final AtomicReference<T> q = queue;
 
 			for (; ; ) {
-				long r = requested;
+				long r = requestedFromDownstream();
 				long e = 0L;
 
 				while (e != r) {
@@ -985,7 +1070,7 @@ final class FluxCreate<T> extends Flux<T> implements SourceProducer<T> {
 				}
 
 				if (e != 0) {
-					Operators.produced(REQUESTED, this, e);
+					produced(this, e);
 				}
 
 				if (WIP.decrementAndGet(this) == 0) {
