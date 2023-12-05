@@ -238,7 +238,7 @@
 						RANGE_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${RANGE_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
 						<fmt:message key="authoring.fla.exact.condition.description" var="EXACT_CONDITION_DESCRIPTION_VAR"/>
 						EXACT_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${EXACT_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
-						<fmt:message key="authoring.fla.less.conditiondescription" var="LESS_CONDITION_DESCRIPTION_VAR"/>
+						<fmt:message key="authoring.fla.less.condition.description" var="LESS_CONDITION_DESCRIPTION_VAR"/>
 						LESS_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${LESS_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
 						<fmt:message key="authoring.fla.greater.condition.description" var="GREATER_CONDITION_DESCRIPTION_VAR"/>
 						GREATER_CONDITION_DESCRIPTION : '<spring:escapeBody javaScriptEscape="true">${GREATER_CONDITION_DESCRIPTION_VAR}</spring:escapeBody>',
