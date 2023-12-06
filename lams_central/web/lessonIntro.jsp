@@ -2,12 +2,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
-<lams:html>
-<lams:head>
-	<TITLE><fmt:message key="title.learner.window"/></TITLE>
-	<lams:css/>
-	
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>	
+<c:set var="title"><c:out value="${lesson.lessonName}" escapeXml="true"/></c:set>
+<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true">
 	<c:if test="${displayDesignImage}">
 		<script>
 		var originalThumbnailWidth = 0,
@@ -66,33 +62,24 @@
 		}
 		</script>
 	</c:if>	
-</lams:head>
 
-<body class="stripes">
-	
-	<c:set var="title"><c:out value="${lesson.lessonName}" escapeXml="true"/></c:set>
-	<lams:Page type="learner" title="${title}">
-		
-		<p><c:out value="${lesson.lessonDescription}" escapeXml="false"/></p>	
+	<div id="container-main">
+		<div id="instructions" class="instructions">
+			<c:out value="${lesson.lessonDescription}" escapeXml="false"/>
+		</div>	
 	
 		<c:if test="${displayDesignImage}">
-			<div id="sequence-preview" class="voffset10 text-center">
+			<div id="sequence-preview" class="mt-2 text-center">
 				<i id="ldScreenshotLoading" class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
     			<div id="ldCannotLoadSVG" style="display:none" ><fmt:message key="error.cannot.load.thumbnail" /></div>
     			<div id="ldSVG" style="display:none" ></div>
 			</div>
 		</c:if>
 			
-		<div class="voffset10 pull-right">
+		<div class="activity-bottom-buttons">
 			<a href="${lams}home/learner.do?lessonID=${lesson.lessonId}&isLessonIntroWatched=true" class="btn btn-primary na">
-				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
+				<fmt:message key="label.start.lesson" />
 			</a>
 		</div>
-	
-		<div id="footer"></div>
-	
-	</lams:Page>
-
-</BODY>
-	
-</lams:html>
+	</div>
+</lams:PageLearner>
