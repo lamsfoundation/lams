@@ -156,10 +156,7 @@ public class CommentController {
 	sessionMap.put(CommentConstants.ATTR_ROOT_COMMENT_UID, rootComment.getUid());
 
 	prepareViewTopicData(request, sessionMap, pageSize, sortBy, true);
-
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
-	String viewDir = newUI ? "comments5" : "comments";
-	return viewDir + "/comments";
+	return "comments/comments";
     }
 
     private void throwException(String msg, String loginName, Long externalId, Integer externalType,
@@ -212,10 +209,7 @@ public class CommentController {
 	}
 
 	prepareViewTopicData(request, sessionMap, pageSize, sortBy, sticky);
-
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
-	String viewDir = newUI ? "comments5" : "comments";
-	return viewDir + (sticky ? "/allviewwrapper" : "/topicviewwrapper");
+	return "comments" + (sticky ? "/allviewwrapper" : "/topicviewwrapper");
     }
 
     private void prepareViewTopicData(HttpServletRequest request, SessionMap<String, Object> sessionMap,
@@ -298,10 +292,7 @@ public class CommentController {
 
 	// don't want to try to scroll as this is a single thread, completely displayed.
 	request.setAttribute(CommentConstants.ATTR_NO_MORE_PAGES, true);
-
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
-	String viewDir = newUI ? "comments5" : "comments";
-	return viewDir + "/topicviewwrapper";
+	return "comments/topicviewwrapper";
     }
 
     /**
@@ -391,10 +382,7 @@ public class CommentController {
 		request.getParameter(CommentConstants.ATTR_SESSION_MAP_ID));
 	request.setAttribute(CommentConstants.ATTR_PARENT_COMMENT_ID,
 		request.getParameter(CommentConstants.ATTR_PARENT_COMMENT_ID));
-
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
-	String viewDir = newUI ? "comments5" : "comments";
-	return viewDir + "/reply";
+	return "comments/reply";
     }
 
     /**
@@ -482,10 +470,7 @@ public class CommentController {
 	request.setAttribute(CommentConstants.ATTR_COMMENT_ID, commentId);
 	request.setAttribute(CommentConstants.ATTR_COMMENT, comment);
 	request.setAttribute(CommentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
-	String viewDir = newUI ? "comments5" : "comments";
-	return viewDir + "/edit";
+	return "comments/edit";
     }
 
     /**

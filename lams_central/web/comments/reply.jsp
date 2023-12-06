@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
@@ -51,7 +52,6 @@
 				reloadThread(
 					response,
 					'<lams:LAMSURL />',
-					false,
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>',
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>'
 				);
@@ -68,43 +68,36 @@
 	}
 </script>
 
-<div class="comment-entry form-group voffset5">
-	<form id="replyForm" method="GET"
-		action="<lams:LAMSURL />comments/replyTopicInline.do">
-		<textarea class="form-control" id="replyFormBody"
-			maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
-			class="comment"></textarea>
-		<input type="hidden" id="sessionMapID" name="sessionMapID"
-			value="${sessionMapID}" /> <input type="hidden" id="parentUid"
-			name="parentUid" value="${parentUid}" />
+<div class="card lcard m-2">
+<div class="card-body">
+<div class="comment-entry form-group">
+	<form id="replyForm" method="GET" action="<lams:LAMSURL />comments/replyTopicInline.do">
+		<textarea class="form-control my-2" id="replyFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
+			class="comment"
+		></textarea>
+		<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" /> 
+		<input type="hidden" id="parentUid" name="parentUid" value="${parentUid}" />
 
-		<div class="row voffset5">
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		<div class="mt-3">
+			<div class="clearfix">
+				<button type="button" onclick="javascript:replyFormSubmit();" class="btn btn-sm btn-secondary float-end btn-icon-comment" id="replyCommentSubmitButton">
+					<fmt:message key="label.post" />
+				</button>
+				
+				<button type="button" onclick="javascript:cancelReply();" class="btn btn-sm btn-secondary btn-icon-cancel float-end me-2">
+					<fmt:message key="label.cancel" />
+				</button>
+			</div>
 
-		<c:choose>
-	 	<c:when test="${sessionMap.anonymous}">
-	 	<%-- Post Anonymously? --%>
-		<div class="col-xs-12 col-sm-6">
-			<c:set var="anonymousCheckboxChecked" value=""/>
-			<c:set var="anonymousCheckboxName" value="commentAnonymousReply"/>
-			<%@include file="anonymouscheckbox.jsp" %>
-	 	</div>
-	
-		<%-- Cancel / Edit Buttons --%>
-		<div class="col-xs-12 col-sm-6">
-		</c:when>
-		<c:otherwise>
-		<div class="col-xs-12">
-		</c:otherwise>
-		</c:choose>
-		<a href="#nogo" onclick="javascript:replyFormSubmit();"
-			class="btn btn-xs btn-primary pull-right" id="replyCommentSubmitButton"> <fmt:message
-				key="label.post" />
-		</a>&nbsp; <a href="#nogo" onclick="javascript:cancelReply();"
-			class="btn btn-xs btn-primary pull-right roffset5"> <fmt:message
-				key="label.cancel" />
-		</a>
+			<%-- Post Anonymously? --%>
+			<c:if test="${sessionMap.anonymous}">
+				<c:set var="anonymousCheckboxChecked" value="" />
+				<c:set var="anonymousCheckboxName" value="commentAnonymousReply" />
+				<%@include file="anonymouscheckbox.jsp"%>
+			</c:if>
 		</div>
-	
+
 	</form>
+</div>
+</div>
 </div>
