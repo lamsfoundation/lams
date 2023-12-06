@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="firstName"><lams:user property="firstName"/></c:set>
 <c:set var="title"><fmt:message key="gradebook.lesson.complete" /></c:set>
 
-<lams:PageLearner toolSessionID="" lessonID="${lessonID}">
+<lams:PageLearner toolSessionID="" lessonID="${lessonID}" title="${title}" hideTitle="true">
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
 		.grid-holder .ui-jqgrid {
