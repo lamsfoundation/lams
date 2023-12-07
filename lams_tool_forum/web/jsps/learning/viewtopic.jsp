@@ -55,21 +55,21 @@
 						<fmt:message key="label.postingLimits.topic.reminder">
 							<fmt:param value="${sessionMap.minimumReply}" />
 							<fmt:param value="${sessionMap.maximumReply}" />
-							<fmt:param value="${numOfPosts}" />
+							<fmt:param value="<span id='numOfPosts'>${numOfPosts}</span>" />
 							<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 						</fmt:message>
 					</c:if>
 					<c:if test="${(sessionMap.minimumReply ne 0 and sessionMap.maximumReply eq 0)}">
 						<fmt:message key="label.postingLimits.topic.reminder.min">
 							<fmt:param value="${sessionMap.minimumReply}" />
-							<fmt:param value="${numOfPosts}" />
+							<fmt:param value="<span id='numOfPosts'>${numOfPosts}</span>" />
 							<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 						</fmt:message>
 					</c:if>
 					<c:if test="${(sessionMap.minimumReply eq 0 and sessionMap.maximumReply ne 0)}">
 						<fmt:message key="label.postingLimits.topic.reminder.max">
 							<fmt:param value="${sessionMap.maximumReply}" />
-							<fmt:param value="${numOfPosts}" />
+							<fmt:param value="<span id='numOfPosts'>${numOfPosts}</span>" />
 							<fmt:param value="${sessionMap.maximumReply - numOfPosts}" />
 						</fmt:message>
 					</c:if>

@@ -108,7 +108,10 @@
                             if ( response.noMorePosts ) {
                                 $('.replybutton').hide();
                             }
-
+                            
+                            //update alert info
+                            let numOfPosts = eval($("#numOfPosts").text());
+                            $("#numOfPosts").text(numOfPosts + 1);
 
                         } else {
                             // No new id? Validation failed!
