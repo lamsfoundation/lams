@@ -16,99 +16,99 @@
 <c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
 
 <lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
+	<lams:head>
+		<title><fmt:message key="label.learning.title" /></title>
 
-	<!-- ********************  CSS ********************** -->
-	<lams:css />
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
-	<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
-	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
-	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
+		<!-- ********************  CSS ********************** -->
+		<lams:css />
+		<link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
+		<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+		<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
+		<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 
-	<!-- ********************  javascript ********************** -->
-	<lams:JSImport src="includes/javascript/common.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script>
-		//Resolve name collision between jQuery UI and Twitter Bootstrap
-		$.widget.bridge('uitooltip', $.ui.tooltip);
-	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-	<script type="text/javascript">
-		var isScratching = false,
-			requireAllAnswers = <c:out value="${scratchie.requireAllAnswers}" />;
-		
-		$(document).ready(function(){
-			//handler for VSA input fields
-			$('.submit-user-answer-input').keypress(function(event){
-				var keycode = (event.keyCode ? event.keyCode : event.which);
-				if(keycode == '13') {
+		<!-- ********************  javascript ********************** -->
+		<lams:JSImport src="includes/javascript/common.js" />
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+		<script>
+			//Resolve name collision between jQuery UI and Twitter Bootstrap
+			$.widget.bridge('uitooltip', $.ui.tooltip);
+		</script>
+		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+		<script type="text/javascript">
+			var isScratching = false,
+					requireAllAnswers = <c:out value="${scratchie.requireAllAnswers}" />;
+
+			$(document).ready(function(){
+				//handler for VSA input fields
+				$('.submit-user-answer-input').keypress(function(event){
+					var keycode = (event.keyCode ? event.keyCode : event.which);
+					if(keycode == '13') {
+						var itemUid = $(this).data("item-uid");
+						scratchVsa(itemUid);
+						return false;
+					}
+				});
+
+				//handler for VSA submit buttons
+				$(".submit-user-answer").on('click', function(){
 					var itemUid = $(this).data("item-uid");
 					scratchVsa(itemUid);
 					return false;
-				}
-			});
-
-			//handler for VSA submit buttons
-			$(".submit-user-answer").on('click', function(){
-				var itemUid = $(this).data("item-uid");
-				scratchVsa(itemUid);
-				return false;
-			});
-
-			//autocomplete for VSA
-			$('.ui-autocomplete-input').each(function(){
-				$(this).autocomplete({
-					'source' : '<c:url value="/learning/vsaAutocomplete.do"/>?itemUid=' + $(this).data("item-uid"),
-					'delay'  : 500,
-					'minLength' : 3
 				});
-			});
-			
-			// show etherpads only on Discussion expand
-			$('.question-etherpad-collapse').on('show.bs.collapse', function(){
-				var etherpad = $('.etherpad-container', this);
-				if (!etherpad.hasClass('initialised')) {
-					var id = etherpad.attr('id'),
-						groupId = id.substring('etherpad-container-'.length);
-					etherpadInitMethods[groupId]();
-				}
-			});
-			
-			<c:if test="${scratchie.revealOnDoubleClick}">
+
+				//autocomplete for VSA
+				$('.ui-autocomplete-input').each(function(){
+					$(this).autocomplete({
+						'source' : '<c:url value="/learning/vsaAutocomplete.do"/>?itemUid=' + $(this).data("item-uid"),
+						'delay'  : 500,
+						'minLength' : 3
+					});
+				});
+
+				// show etherpads only on Discussion expand
+				$('.question-etherpad-collapse').on('show.bs.collapse', function(){
+					var etherpad = $('.etherpad-container', this);
+					if (!etherpad.hasClass('initialised')) {
+						var id = etherpad.attr('id'),
+								groupId = id.substring('etherpad-container-'.length);
+						etherpadInitMethods[groupId]();
+					}
+				});
+
+				<c:if test="${scratchie.revealOnDoubleClick}">
 				$('.scratchie-link').on('touchend', function(){
 					if (!this.hasAttribute('onDblClick')) {
 						return;
 					}
-					
+
 					// allow single touch scratching on iPads even if double click scratching is enabled
 					var itemUid = $(this).data('itemUid'),
-						optionUid = $(this).data('optionUid');
+							optionUid = $(this).data('optionUid');
 					scratchMcq(itemUid, optionUid);
 				});
-			</c:if>
+				</c:if>
 
 
-			
-			// hide Finish button for non-leaders until leader finishes
-			if (${hideFinishButton}) {
-				$("#finishButton").hide();
-			} else if (requireAllAnswers) {
-				checkAllCorrectMcqAnswersFound();
-			}
 
-			<%-- Connect to command websocket only if it is learner UI --%>
-			<c:if test="${mode == 'learner'}">
+				// hide Finish button for non-leaders until leader finishes
+				if (${hideFinishButton}) {
+					$("#finishButton").hide();
+				} else if (requireAllAnswers) {
+					checkAllCorrectMcqAnswersFound();
+				}
+
+				<%-- Connect to command websocket only if it is learner UI --%>
+				<c:if test="${mode == 'learner'}">
 				// command websocket stuff for refreshing
 				// trigger is an unique ID of page and action that command websocket code in Page.tag recognises
 				commandWebsocketHookTrigger = 'scratchie-leader-change-refresh-${toolSessionID}';
@@ -116,213 +116,214 @@
 				commandWebsocketHook = function() {
 					location.reload();
 				};
-			</c:if>
+				</c:if>
 
-			//initialize tooltips showing user names next to confidence levels
-			$('[data-toggle="tooltip"]').tooltip();
-		});
+				//initialize tooltips showing user names next to confidence levels
+				$('[data-toggle="tooltip"]').tooltip();
+			});
 
-		//scratch image (used by both scratchMcq() and scratchVsa())
-		function scratchImage(itemUid, optionUid, isCorrect) {
-			// first show animation, then put static image
-			var imageSuffix = isCorrect ? 'correct' : 'wrong';
-			var image = $('#image-' + itemUid + '-' + optionUid);
+			//scratch image (used by both scratchMcq() and scratchVsa())
+			function scratchImage(itemUid, optionUid, isCorrect) {
+				// first show animation, then put static image
+				var imageSuffix = isCorrect ? 'correct' : 'wrong';
+				var image = $('#image-' + itemUid + '-' + optionUid);
 
-			//show VSA question image 
-			if (image.css('visibility') != 'visible') {
-				image.css('visibility', 'visible');
+				//show VSA question image
+				if (image.css('visibility') != 'visible') {
+					image.css('visibility', 'visible');
+				}
+
+				image.on('load', function(){
+					var image = $(this).off("load");
+					// show static image after animation
+					setTimeout(
+							function(){
+								image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
+							},
+							1300
+					);
+				}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
 			}
-			
-			image.on('load', function(){
-	    		var image = $(this).off("load");
-	    		// show static image after animation
-	    		setTimeout(
-	    			function(){
-	    				image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
-	    			}, 
-	    			1300
-	    		);
-	    	}).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
-		}
 
-		//scratch MCQ answer
-		function scratchMcq(itemUid, optionUid){
-			if (isScratching) {
-				// do not allow parallel scratching
-				return;
-			}
-			
-			isScratching = true;
-	        $.ajax({
-	            url: '<c:url value="/learning/recordItemScratched.do"/>',
-	            data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
-	            dataType: 'json',
-	            type: 'post',
-	            success: function (json) {
-		            if (json == null) {
-		            	return false;
-		            }
-		            	
-		            scratchImage(itemUid, optionUid, json.optionCorrect);
-		            	
-		            if (json.optionCorrect) {
-		            	//disable scratching
-		            	$("[id^=imageLink-" + itemUid + "]").removeAttr('onClick').removeAttr('onDblClick'); 
-		            	$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
-		            	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+			//scratch MCQ answer
+			function scratchMcq(itemUid, optionUid){
+				if (isScratching) {
+					// do not allow parallel scratching
+					return;
+				}
 
-		            	checkAllCorrectMcqAnswersFound();
-		            } else {
-		            	var id = '-' + itemUid + '-' + optionUid;
-		            	$('#imageLink' + id).removeAttr('onclick');
-		            	$('#imageLink' + id).css('cursor','default');
-		            }
+				isScratching = true;
+				$.ajax({
+					url: '<c:url value="/learning/recordItemScratched.do"/>',
+					data: 'sessionMapID=${sessionMapID}&optionUid=' + optionUid + '&itemUid=' + itemUid,
+					dataType: 'json',
+					type: 'post',
+					success: function (json) {
+						if (json == null) {
+							return false;
+						}
 
-	            },
-	            complete : function(){
-    				// enable scratching again
-    				isScratching = false;
-	            }
-	       	});
-		}
+						scratchImage(itemUid, optionUid, json.optionCorrect);
 
-		//scratch VSA answer
-		function scratchVsa(itemUid) {
-			var input = $("#input-" + itemUid),
-				answer = input.val();
+						if (json.optionCorrect) {
+							//disable scratching
+							$("[id^=imageLink-" + itemUid + "]").removeAttr('onClick').removeAttr('onDblClick');
+							$("[id^=imageLink-" + itemUid + "]").css('cursor','default');
+							$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+							if (requireAllAnswers) {
+								checkAllCorrectMcqAnswersFound();
+							}
+						} else {
+							var id = '-' + itemUid + '-' + optionUid;
+							$('#imageLink' + id).removeAttr('onclick');
+							$('#imageLink' + id).css('cursor','default');
+						}
 
-			if (answer == "") {
-				return;
-			}
-			
-			if (isScratching) {
-				// do not allow parallel scratching
-				return;
-			}
-			
-			isScratching = true;
-
-			$.ajax({
-		    	url: '<c:url value="/learning/recordVsaAnswer.do"/>',
-		        data: {
-		           	sessionMapID: "${sessionMapID}", 
-		           	itemUid: itemUid,
-		           	answer: answer 
-				},
-		        dataType: 'json',
-		        type: 'post',
-		        success: function (json) {
-			    	if (json == null) {
-			           	return false;
-			        }
-
-			    	var loggedAnswerHash = json.loggedAnswerHash,
-			    		isAnswerUnique = loggedAnswerHash == -1,
-			    		answerHashToScratch = isAnswerUnique ? hashCode(answer) : loggedAnswerHash
-					    trId = "#tr-" + itemUid + "-" + answerHashToScratch;
-
-			    	//if answer was not provided yet, add it to the list
-			    	if (isAnswerUnique) {
-						paintNewVsaAnswer(itemUid, answer);
+					},
+					complete : function(){
+						// enable scratching again
+						isScratching = false;
 					}
+				});
+			}
 
-			    	var isScrathed = $(trId + ' img[src*="scratchie-correct.png"], ' + trId + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
-			    	//highlight already scratched answer
-			    	if (isScrathed) {
-						var tableRowTohighlight = $(trId, "#scratches-" + itemUid);
-						$([document.documentElement, document.body]).animate(
-							{
-						       	scrollTop: tableRowTohighlight.offset().top
-						   	}, 
-						   	1000, 
-						   	function() {
-						   		tableRowTohighlight.effect("highlight", 1500);
-						   	}
-						);
+			//scratch VSA answer
+			function scratchVsa(itemUid) {
+				var input = $("#input-" + itemUid),
+						answer = input.val();
 
-			    	//scratch it otherwise
-		        	} else {
-				        scratchImage(itemUid, answerHashToScratch, json.isAnswerCorrect);
-				            	
-				        if (json.isAnswerCorrect) {
-				           	//disable further answering
-				           	$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
-					            
-					        //disable submit button
-				           	$("#type-your-answer-" + itemUid).hide();
-				        }
+				if (answer == "") {
+					return;
+				}
+
+				if (isScratching) {
+					// do not allow parallel scratching
+					return;
+				}
+
+				isScratching = true;
+
+				$.ajax({
+					url: '<c:url value="/learning/recordVsaAnswer.do"/>',
+					data: {
+						sessionMapID: "${sessionMapID}",
+						itemUid: itemUid,
+						answer: answer
+					},
+					dataType: 'json',
+					type: 'post',
+					success: function (json) {
+						if (json == null) {
+							return false;
+						}
+
+						var loggedAnswerHash = json.loggedAnswerHash,
+								isAnswerUnique = loggedAnswerHash == -1,
+								answerHashToScratch = isAnswerUnique ? hashCode(answer) : loggedAnswerHash
+						trId = "#tr-" + itemUid + "-" + answerHashToScratch;
+
+						//if answer was not provided yet, add it to the list
+						if (isAnswerUnique) {
+							paintNewVsaAnswer(itemUid, answer);
+						}
+
+						var isScrathed = $(trId + ' img[src*="scratchie-correct.png"], ' + trId + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
+						//highlight already scratched answer
+						if (isScrathed) {
+							var tableRowTohighlight = $(trId, "#scratches-" + itemUid);
+							$([document.documentElement, document.body]).animate(
+									{
+										scrollTop: tableRowTohighlight.offset().top
+									},
+									1000,
+									function() {
+										tableRowTohighlight.effect("highlight", 1500);
+									}
+							);
+
+							//scratch it otherwise
+						} else {
+							scratchImage(itemUid, answerHashToScratch, json.isAnswerCorrect);
+
+							if (json.isAnswerCorrect) {
+								//disable further answering
+								$("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+
+								//disable submit button
+								$("#type-your-answer-" + itemUid).hide();
+							}
+						}
+					},
+					complete : function(){
+						// enable scratching again
+						isScratching = false;
 					}
-		        },
-	            complete : function(){
-    				// enable scratching again
-    				isScratching = false;
-	            }
-	       	});
+				});
 
-	        //blank input field
-			input.val("");
-		}
+				//blank input field
+				input.val("");
+			}
 
-		//add new VSA answer to the table (required in case user entered answer not present in the previous answers)
-		function paintNewVsaAnswer(itemUid, answer) {
-			var optionsLength = $("table#scratches-" + itemUid + " tr").length;
-			var idSuffix = '-' + itemUid + '-' + hashCode(answer);
-			
-			var trElem = 
-				'<tr id="tr' + idSuffix + '">' +
-					'<td style="width: 40px; border: none;">' +
+			//add new VSA answer to the table (required in case user entered answer not present in the previous answers)
+			function paintNewVsaAnswer(itemUid, answer) {
+				var optionsLength = $("table#scratches-" + itemUid + " tr").length;
+				var idSuffix = '-' + itemUid + '-' + hashCode(answer);
+
+				var trElem =
+						'<tr id="tr' + idSuffix + '">' +
+						'<td style="width: 40px; border: none;">' +
 						'<img src="<lams:WebAppURL/>includes/images/answer-' + optionsLength + '.png" class="scartchie-image" id="image' + idSuffix + '" />' +
-					'</td>' +
+						'</td>' +
 
-					'<td class="answer-with-confidence-level-portrait">' +
+						'<td class="answer-with-confidence-level-portrait">' +
 						'<div class="answer-description">' +
-							xmlEscape(answer) +
+						xmlEscape(answer) +
 						'</div>' +
 						'<hr class="hr-confidence-level" />' +
 						'<div style="padding-bottom: 10px;">' +
-							'<lams:Portrait userId="${sessionMap.groupLeaderUserId}"/>' +
+						'<lams:Portrait userId="${sessionMap.groupLeaderUserId}"/>' +
 						'</div>' +
-					'</td>' +
-				'</tr>';
-			$("table#scratches-" + itemUid).append(trElem);
-		}
-
-		function checkAllCorrectMcqAnswersFound() {
-            var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
-			if (numberOfAvailableScratches > 0) {
-	            $('#finishButton').prop('disabled', true).css('pointer-events', 'none')
-	            				  .parent().attr('data-title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.require.all.answers" /></spring:escapeBody>')
-				  				  		   .tooltip();
-			} else {
-				$('#finishButton').prop('disabled', false)
-								  .css('pointer-events', 'auto')
-								  .parent().tooltip('destroy');
+						'</td>' +
+						'</tr>';
+				$("table#scratches-" + itemUid).append(trElem);
 			}
-		}
 
-		function xmlEscape(value) {
-			return value.replace(/&/g, '&amp;')
-            	.replace(/</g, '&lt;')
-            	.replace(/>/g, '&gt;')
-            	.replace(/"/g, '&#034;')
-            	.replace(/'/g, '&#039;');
-		}
+			function checkAllCorrectMcqAnswersFound() {
+				var numberOfAvailableScratches = $('[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}]').length;
+				if (numberOfAvailableScratches > 0) {
+					$('#finishButton').prop('disabled', true).css('pointer-events', 'none')
+							.parent().attr('data-title', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.learning.require.all.answers" /></spring:escapeBody>')
+							.tooltip();
+				} else {
+					$('#finishButton').prop('disabled', false)
+							.css('pointer-events', 'auto')
+							.parent().tooltip('destroy');
+				}
+			}
 
-		//a direct replacement for Java's String.hashCode() method 
-		function hashCode(str) {
-			var hash = 0;
-		    if (str.length == 0) {
-		        return hash;
-		    }
-		    for (var i = 0; i < str.length; i++) {
-		        var char = str.charCodeAt(i);
-		        hash = ((hash<<5)-hash)+char;
-		        hash = hash & hash; // Convert to 32bit integer
-		    }
-		    return hash;
-		}
+			function xmlEscape(value) {
+				return value.replace(/&/g, '&amp;')
+						.replace(/</g, '&lt;')
+						.replace(/>/g, '&gt;')
+						.replace(/"/g, '&#034;')
+						.replace(/'/g, '&#039;');
+			}
 
-		<c:if test="${mode != 'teacher'}">
+			//a direct replacement for Java's String.hashCode() method
+			function hashCode(str) {
+				var hash = 0;
+				if (str.length == 0) {
+					return hash;
+				}
+				for (var i = 0; i < str.length; i++) {
+					var char = str.charCodeAt(i);
+					hash = ((hash<<5)-hash)+char;
+					hash = hash & hash; // Convert to 32bit integer
+				}
+				return hash;
+			}
+
+			<c:if test="${mode != 'teacher'}">
 			$(document).ready(function(){
 				// time limit feature
 				initWebsocket('scratchieTimeLimit${scratchie.contentId}',
@@ -379,22 +380,22 @@
 			});
 
 			function displayCountdown(secondsLeft){
-				var countdown = '<div id="countdown"></div>' 
+				var countdown = '<div id="countdown"></div>'
 				$.blockUI({
-					message: countdown, 
+					message: countdown,
 					showOverlay: false,
 					focusInput: false,
-					css: { 
+					css: {
 						top: '40px',
 						left: '',
 						right: '0%',
-				        opacity: '.8', 
-				        width: '230px',
-				        cursor: 'default',
-				        border: 'none'
-			        }   
+						opacity: '.8',
+						width: '230px',
+						cursor: 'default',
+						border: 'none'
+					}
 				});
-				
+
 				$('#countdown').countdown({
 					until: '+' + secondsLeft +'S',
 					format: 'hMS',
@@ -416,74 +417,74 @@
 							document.location.reload();
 							return;
 						}
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' }); 
-				        
-				        setTimeout(function() { 
-					        if (${isUserLeader}) {
-						    	finish(true);
-					        } else {
-					        	location.reload();
-						    }
-				        }, 4000);
+						$.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.time.is.over" /></spring:escapeBody></h1>' });
+
+						setTimeout(function() {
+							if (${isUserLeader}) {
+								finish(true);
+							} else {
+								location.reload();
+							}
+						}, 4000);
 					},
 					description: "<div id='countdown-label'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody></div>"
 				});
 			}
-		</c:if>
-			
-		
-		//autosave feature
-		<c:if test="${isUserLeader && (mode != 'teacher')}">
+			</c:if>
+
+
+			//autosave feature
+			<c:if test="${isUserLeader && (mode != 'teacher')}">
 			var autosaveInterval = "60000"; // 60 seconds interval
 			window.setInterval(learnerAutosave,	autosaveInterval);
-			
+
 			function learnerAutosave(isCommand){
-                // isCommand means that the autosave was triggered by force complete or another command websocket message
-			    // in this case do not check multiple tabs open, just autosave
-			    if (!isCommand) {
-				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
-				  if (!shouldAutosave) {
-					return;
-				  }
-			    }
-			    
+				// isCommand means that the autosave was triggered by force complete or another command websocket message
+				// in this case do not check multiple tabs open, just autosave
+				if (!isCommand) {
+					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+					if (!shouldAutosave) {
+						return;
+					}
+				}
+
 				//ajax form submit
 				$('#burning-questions').ajaxSubmit({
 					url: "<lams:WebAppURL/>learning/autosaveBurningQuestions.do?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
-	                success: function() {
-		                $.jGrowl(
-		                	"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions.autosaved' /></spring:escapeBody>",
-		                	{ life: 2000, closeTemplate: '' }
-		                );
-	                }
+					success: function() {
+						$.jGrowl(
+								"<i class='fa fa-lg fa-floppy-o'></i> <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions.autosaved' /></spring:escapeBody>",
+								{ life: 2000, closeTemplate: '' }
+						);
+					}
 				});
 			}
-		</c:if>
+			</c:if>
 
-		function finish(isTimelimitExpired) {
-			var method = $("#method").val();
-			
-			var proceed = true;
-			// ask for leave confirmation only if time limit is not expired
-			if (!isTimelimitExpired) {
-				var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]:visible").length;
-				proceed = numberOfAvailableScratches == 0 || 
-						  confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.one.or.more.questions.not.completed'/></spring:escapeBody>");	
-			}
-			
-			if (proceed) {
-				document.getElementById("finishButton").disabled = true;
+			function finish(isTimelimitExpired) {
+				var method = $("#method").val();
 
-		        var myForm = $('#burning-questions');
-		        myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
-		        myForm.submit();
+				var proceed = true;
+				// ask for leave confirmation only if time limit is not expired
+				if (!isTimelimitExpired) {
+					var numberOfAvailableScratches = $("[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}], [id^=type-your-answer-]:visible").length;
+					proceed = numberOfAvailableScratches == 0 ||
+							confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.one.or.more.questions.not.completed'/></spring:escapeBody>");
+				}
+
+				if (proceed) {
+					document.getElementById("finishButton").disabled = true;
+
+					var myForm = $('#burning-questions');
+					myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
+					myForm.submit();
+				}
+
+				return false;
 			}
-			
-			return false;
-		}
-    </script>
-</lams:head>
-<body class="stripes">
+		</script>
+	</lams:head>
+	<body class="stripes">
 
 	<lams:Page type="learner" title="${scratchie.title}">
 
@@ -499,7 +500,7 @@
 				</lams:Alert>
 			</div>
 		</c:if>
-		
+
 		<c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
 			<div class="row no-gutter voffset20">
 				<div class="col-xs-12 col-sm-offset-3 col-sm-6">
@@ -523,13 +524,13 @@
 				</fmt:message>
 			</lams:Alert>
 		</c:if>
-		
+
 		<c:if test="${mode != 'teacher'}">
-			<div id="timelimit-start-dialog"> 
-		        <h4>
-		        	<fmt:message key='label.are.you.ready' />
-		        </h4>
-		        <button name="ok" id="timelimit-start-ok" class="button">
+			<div id="timelimit-start-dialog">
+				<h4>
+					<fmt:message key='label.are.you.ready' />
+				</h4>
+				<button name="ok" id="timelimit-start-ok" class="button">
 					<fmt:message key='label.ok' />
 				</button>
 			</div>
@@ -543,5 +544,5 @@
 
 		<div id="footer"></div>
 	</lams:Page>
-</body>
+	</body>
 </lams:html>
