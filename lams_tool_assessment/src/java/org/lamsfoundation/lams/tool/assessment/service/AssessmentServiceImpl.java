@@ -1681,8 +1681,11 @@ public class AssessmentServiceImpl
 
 	    sessionIdToUsersMap.put(sessionId, users);
 	}
+	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
+	questionReferences.addAll(assessment.getQuestionReferences());
 
-	for (AssessmentQuestion question : assessment.getQuestions()) {
+	for (QuestionReference questionReference : questionReferences) {
+	    AssessmentQuestion question = questionReference.getQuestion();
 	    Long questionUid = question.getUid();
 	    QuestionSummary questionSummary = new QuestionSummary(question);
 
