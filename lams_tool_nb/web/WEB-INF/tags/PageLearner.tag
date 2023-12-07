@@ -85,17 +85,19 @@
     <body class="component">
 	    <div class="component-page-wrapper">
 	    	<c:if test="${showHeader}">
-				<div class="offcanvas offcanvas-start" tabindex="-1" id="component-offcanvas" aria-label="Side menu">
+				<div class="offcanvas offcanvas-start" tabindex="-1" id="component-offcanvas" aria-label="<fmt:message key='label.side.menu' />">
 					<div class="offcanvas-body">
-						<button type="button" class="btn-close float-end" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+						<button type="button" class="btn-close float-end" data-bs-dismiss="offcanvas" 
+								aria-label="<fmt:message key='label.close' />" 
+								title="<fmt:message key='label.close' />"></button>
 						
 			            <span class="lams-logo mt-3">
-			                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="LAMS logo" aria-hidden="false"/>
+			                <img src="<lams:LAMSURL/>images/svg/lamsv5_logo.svg" alt="<fmt:message key='label.lams.logo' />" aria-hidden="false"/>
 			            </span>
 					
 			            <div id="offcanvas-support-bar" class="offcanvas-bar lcard d-none pb-3">
 			                <div class="offcanvas-title py-3">
-			                	Support activities
+			                	<fmt:message key='label.support.activities'/>
 			                </div>
 			                <ul id="support-bar-items" class="progress-bar-items list-group text-start">
 			                </ul>
@@ -103,7 +105,7 @@
 			
 						<div class="offcanvas-bar lcard pb-3">
 				            <div class="offcanvas-title py-3" id="offcanvas-progress-bar-title">
-				            	My progress
+				            	<fmt:message key='label.my.progress'/>
 				            </div>
 				            <ul id="progress-bar-items" class="progress-bar-items list-group text-start">
 				            </ul>
@@ -113,7 +115,9 @@
 			</c:if>
 	
 			<div class="component-page-content">
-	            <a href="#component-main-content" class="visually-hidden-focusable p-2">Skip to main content</a>
+	            <a href="#component-main-content" class="visually-hidden-focusable p-2">
+	            	<fmt:message key='label.skip.to.main.content'/>
+	            </a>
 	
 				<c:if test="${showHeader}">
 		            <header id="header" class="d-flex justify-content-between" role="banner">
@@ -122,39 +126,41 @@
 									data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 									aria-controls="component-offcanvas"
 									aria-labelledby="offcanvas-progress-bar-title"
-									title="Your lesson completion">
+									title="<fmt:message key='label.your.lesson.completion'/>">
 								<i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
 							</button>
 		
-		                    <h1 id="lesson-name" title="Lesson name"></h1>
+		                    <h1 id="lesson-name" title="<fmt:message key='label.lesson.name'/>"></h1>
 		                </div>
 		                
 		                <div class="top-menu">
 		                    <button id="profile-picture" class="no-decoration px-3" type="button"
-		                            onclick="javascript:showMyPortraitDialog()" title="Your portrait" >
-		                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="Your profile portrait">
+		                            onclick="javascript:showMyPortraitDialog()" title="<fmt:message key='label.your.portrait'/>" >
+		                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="<fmt:message key='label.your.portrait'/>">
 		                    </button>
 		                    
 		                    <button type="button" id="progress-bar-widget" class="no-decoration d-none d-sm-none d-md-block"
-		                    		data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
+		                    		data-bs-toggle="offcanvas" 
+		                    		data-bs-target="#component-offcanvas"
 									aria-controls="component-offcanvas"
 									aria-labelledby="offcanvas-progress-bar-title"
-									title="Your lesson completion">
+									title="<fmt:message key='label.your.lesson.completion'/>">
 		                        <div class="row m-0">
 		                            <div class="col-6 text-start p-0">
-		                                Progress
+		                                <fmt:message key='label.progress'/>
 		                            </div>
-		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value">
-		                            </div>
+		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value"></div>
 		                        </div>
 		                        <div class="progress mt-1 mb-2">
-		                            <div class="progress-bar bg-success" role="progressbar" aria-label="Progress bar widget"
-		                                 aria-valuemin="0" aria-valuemax="100"></div>
-		                        </div>
+		                        	<div class="progress-bar bg-success" role="progressbar"
+		                            		aria-valuemin="0" 
+		                        			aria-valuemax="100"></div>
+		                    	</div>
 		                    </button>
 		                    
 		                    <c:if test="${not isIntegrationLogin}">
-		                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" title="Close and return to the course page"></a>
+		                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" 
+		                    			title="<fmt:message key='label.close.and.return'/>"></a>
 		                    </c:if>
 		                </div>
 		            </header>
@@ -163,7 +169,7 @@
 	            <main class="p-3" id="component-main-content" tabindex="-1">
 	                <c:if test="${not empty title && !hideTitle}">
 	                    <${showHeader ? 'h2' : 'h1'} class="mb-3">
-	                    	<span title="Activity name">
+	                    	<span title="<fmt:message key='label.activity.name'/>">
 	                    		<c:out value="${title}" escapeXml="true" />
 	                    	</span>
 	                    </${showHeader ? 'h2' : 'h1'} >
@@ -181,23 +187,26 @@
 		                <div class="modal-body">
 		                </div>
 		                <div class="modal-footer">
-		                    <button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
-		                    <button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+		                    <button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">
+		                    	<fmt:message key='label.cancel'/>
+		                    </button>
+		                    <button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">
+		                    	<fmt:message key='label.confirm'/>
+		                    </button>
 		                </div>
 		            </div>
 		        </div>
 		    </div>
 		
-		    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container">
-		    </div>
+		    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toast-container"></div>
 		
 		    <div id="toast-template" class="toast align-items-center bg-white" role="alert" aria-live="assertive" aria-atomic="true">
 		        <div class="d-flex">
 		            <div class="toast-body"></div>
-		            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+		            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" 
+		            		aria-label="<fmt:message key='label.close'/>"></button>
 		        </div>
 		    </div>
 	    </c:if>
-
     </body>
 </lams:html>
