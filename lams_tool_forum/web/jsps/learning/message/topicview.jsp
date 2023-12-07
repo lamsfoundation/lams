@@ -13,14 +13,18 @@
 <c:set var="prompt">
     <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.showhide.prompt" /></spring:escapeBody>
 </c:set>
-<c:set var="tableCommand">expandable:true,initialState:'expanded',
+<c:set var="tableCommand">
+	expandable:true,
+	initialState:'expanded',
     expanderTemplate:'<button type="button" class="btn btn-sm btn-light py-0 mb-2 ms-2"><span style="margin-left:20px">${prompt}</span></button>',
-    stringCollapse:'${hide}',stringExpand:'${show}',
-    clickableNodeNames:true,indent:${indent},
+    stringCollapse:'${hide}',
+    stringExpand:'${show}',
+    clickableNodeNames:false,
+    indent:${indent},
     onNodeInitialized:function() {
-    if (this.level() >= 2) {
-    this.collapse();
-    }
+    	if (this.level() >= 2) {
+    		this.collapse();
+    	}
     }
 </c:set>
 
