@@ -43,6 +43,7 @@
 									<c:choose>
 										<c:when test="${question.type == 1}">
 											type="radio"
+											onclick="emptyTextarea('${question.uid}');"
 										</c:when>
 										<c:when test="${question.type == 2}">
 											type="checkbox"

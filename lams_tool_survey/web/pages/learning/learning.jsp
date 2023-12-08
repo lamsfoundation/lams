@@ -19,9 +19,16 @@
 		}
 
 		function singleChoice(choiceName) {
+			//remove checked from radio buttons on selecting textarea 
 			var rs = document.getElementsByName(choiceName);
-			for (idx = 0; idx < rs.length; idx++)
+			for (idx = 0; idx < rs.length; idx++) {
 				rs[idx].checked = false;
+			}
+		}
+
+		//remove content from textarea on selecting related radio button
+		function emptyTextarea(questionUid) {
+			$("textarea[name='optionText" + questionUid + "']").val('');
 		}
 		
 		function disableButtons() {
