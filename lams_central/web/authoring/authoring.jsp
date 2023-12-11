@@ -314,8 +314,7 @@
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right desktopButton">
 				<c:if test="${isAiEnabled}">
-					<li id="useAiTbl" onClick="javascript:MenuLib.useAiToCreateLearningDesign('tbl')"><a href="#"><i class="fa fa-microchip text-primary"></i> <fmt:message key="authoring.fla.page.menu.new.ai.tbl" /></a></li>
-					<li id="useAiCbl" onClick="javascript:MenuLib.useAiToCreateLearningDesign('cbl')"><a href="#"><i class="fa fa-microchip text-primary"></i> <fmt:message key="authoring.fla.page.menu.new.ai.cbl" /></a></li>
+					<li id="useAi" onClick="javascript:MenuLib.useAiToCreateLearningDesign()"><a href="#"><i class="fa fa-microchip text-primary"></i> <fmt:message key="authoring.fla.page.menu.new.ai" /></a></li>
 				</c:if>
 				<li id="useTemplate" onClick="javascript:MenuLib.useTemplateToCreateLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.new.template" /></a></li>
 			</ul>

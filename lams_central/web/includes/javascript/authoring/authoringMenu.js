@@ -559,7 +559,7 @@ var MenuLib = {
 	/**
 	 * Opens a pop up for AI window that generates a learning design
 	 */
-	useAiToCreateLearningDesign : function(pedagogy){
+	useAiToCreateLearningDesign : function(){
 		if (layout.modified && !confirm(LABELS.CLEAR_CANVAS_CONFIRM)) {
 			return;
 		}
@@ -587,7 +587,7 @@ var MenuLib = {
 					var dialog = $(this);
 					// load contents after opening the dialog
 					$('iframe', dialog).attr('id','aiWizardModal')
-						.attr('src', LAMS_URL + 'ai/authoring/' + pedagogy + '/lessonWizard.do')
+						.attr('src', LAMS_URL + 'ai/authoring/lessonWizardChoosePedagogy.jsp')
 						.on('load', function(){
 							// override the close function so it works with the dialog, not window
 							this.contentWindow.closeWindow = function(){
