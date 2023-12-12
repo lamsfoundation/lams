@@ -298,7 +298,7 @@ function listCompletionChartLearners(chartPlaceholder) {
 
 	var position = this.chart.canvas.getBoundingClientRect();
 	tooltipEl.css({
-		'left': position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60 + 'px',
-		'top': Math.max(10, position.top + window.pageYOffset + tooltipModel.caretY - tooltipEl.height() / 2) + 'px',
+		'left' : Math.max(120, position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60) + 'px',
+		'top'  : Math.max(10, position.top + window.pageYOffset + tooltipModel.caretY - tooltipEl.height() / 2) + 'px',
 	});
 }
