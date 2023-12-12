@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+	
 <c:if test="${isQuestionEtherpadEnabled and not empty allGroupUsers}">
 	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
 	<c:set var="questionEtherpadContent">
@@ -22,7 +22,7 @@
 	       </c:if>
 		
 			<c:if test="${(sessionMap.userFinished && (mode == 'teacher')) || showResults}">
-				<div class="badge bg-success float-end item-score p-2">
+				<div class="badge bg-success float-end item-score p-2 px-4">
 					<fmt:message key="label.score" />&nbsp;${item.mark}
 				</div>
 			</c:if>
@@ -34,52 +34,66 @@
 			</div>
 	
 			<c:choose>
+			<%-- 1:TYPE_MULTIPLE_CHOICE, 8:TYPE_MARK_HEDGING --%>
 			<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 				<div class="table div-hover scratches mt-4">
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-						<div id="tr${optionDto.qbOptionUid}" class="row mx-2x">
+						<c:set var="svgId" value="${item.uid}-${optionDto.qbOptionUid}"/>
+						
+						<div id="tr${optionDto.qbOptionUid}" class="row">
 							<div class="scartchie-image-col">
 								<c:choose>
 									<c:when test="${optionDto.scratched && optionDto.correct}">
-										<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image" alt="<fmt:message key='label.correct'/>"
-											 id="image-${item.uid}-${optionDto.qbOptionUid}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="correct"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+										</jsp:include>
 									</c:when>
+									
 									<c:when test="${optionDto.scratched && !optionDto.correct}">
-										<img src="<lams:WebAppURL/>includes/images/scratchie-wrong.png" class="scartchie-image" alt="<fmt:message key='label.incorrect'/>"
-											 id="image-${item.uid}-${optionDto.qbOptionUid}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="incorrect"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+										</jsp:include>
 									</c:when>
+									
 									<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
-										<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image" alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
-											 id="image-${item.uid}-${optionDto.qbOptionUid}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="letter"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+											<jsp:param name="letter" value="${status.index}"/>
+										</jsp:include>
 									</c:when>
+									
 									<c:otherwise>
-										<a href="#" role="button" 
-											id="imageLink-${item.uid}-${optionDto.qbOptionUid}" class="scratchie-link"
-											data-item-uid="${item.uid}"
-											data-option-uid="${optionDto.qbOptionUid}"
-											aria-labelledby="answer-description-${optionDto.qbOptionUid}"
-											aria-controls="image-${item.uid}-${optionDto.qbOptionUid}"
-											<c:choose>
-										    	<c:when test="${scratchie.revealOnDoubleClick}">
-										    		onDblClick=
-										    	</c:when>
-										    	<c:otherwise>
-										    		onClick=
-										    	</c:otherwise>
-										    </c:choose>
-										    <%-- call this function either on click or double click --%>
-										    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;"> 
-												<img aria-live="polite"
-													src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png"
-													alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
-													class="scartchie-image"
-													id="image-${item.uid}-${optionDto.qbOptionUid}" />
+										<a href="#" role="button"
+												id="imageLink-${svgId}" class="scratchie-link"
+												data-item-uid="${item.uid}"
+												data-option-uid="${optionDto.qbOptionUid}"
+												aria-labelledby="answer-description-${optionDto.qbOptionUid}"
+												aria-controls="svg-${svgId}"
+												<c:choose>
+											    	<c:when test="${scratchie.revealOnDoubleClick}">
+											    		onDblClick=
+											    	</c:when>
+											    	<c:otherwise>
+											    		onClick=
+											    	</c:otherwise>
+											    </c:choose>
+											    <%-- call this function either on click or double click --%>
+											    "scratchMcq(${item.uid}, ${optionDto.qbOptionUid}); return false;">
+											<jsp:include page='parts/scratchieSvg.jsp'>
+												<jsp:param name="type" value="full"/>
+												<jsp:param name="svgId" value="${svgId}"/>
+												<jsp:param name="letter" value="${status.index}"/>
+											    <jsp:param name="isHidden" value="false"/>
+											</jsp:include>
 										</a>
 									</c:otherwise>
 								</c:choose> 
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div class="text-center  m-1 badge text-bg-success bg-opacity-75">
+									<div class="text-center badge text-bg-success bg-opacity-75 m-1 mx-2 px-3">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>
@@ -111,31 +125,41 @@
 				</div>
 			</c:when>
 			
+			<%-- 3:TYPE_VERY_SHORT_ANSWERS --%>
 			<c:otherwise>
-				<div id="scratches-${item.uid}" class="scratches table">
+				<div id="vsa-${item.uid}" class="div-hover scratches my-4">
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
-						<div id="tr-${item.uid}-${optionDto.answerHash}" class="row mx-2">
+						<c:set var="svgId" value="${item.uid}-${optionDto.answerHash}"/>
 						
+						<div id="tr-${item.uid}-${optionDto.answerHash}" class="row">
 							<div class="scartchie-image-col">
 								<c:choose>
 									<c:when test="${optionDto.scratched && optionDto.correct}">
-										<img src="<lams:WebAppURL/>includes/images/scratchie-correct.png" class="scartchie-image" alt="<fmt:message key='label.correct'/>"
-											 id="image-${item.uid}-${optionDto.answerHash}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="correct"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+										</jsp:include>
 									</c:when>
+									
 									<c:when test="${optionDto.scratched && !optionDto.correct}">
-										<img src="<lams:WebAppURL/>includes/images/scratchie-wrong.png" class="scartchie-image" alt="<fmt:message key='label.incorrect'/>"
-											 id="image-${item.uid}-${optionDto.answerHash}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="incorrect"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+										</jsp:include>
 									</c:when>
+									
 									<c:otherwise>
-										<img src="<lams:WebAppURL/>includes/images/answer-${status.index + 1}.png" class="scartchie-image" alt="<fmt:message key='label.monitoring.summary.answer'/> ${status.index + 1}"
-											id="image-${item.uid}-${optionDto.answerHash}" 
-											<c:if test="${!sessionMap.userFinished && !item.unraveled && (mode != 'teacher') && !showResults}">style="visibility: hidden;"</c:if>
-											/>
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="full"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+											<jsp:param name="letter" value="${status.index}"/>
+										    <jsp:param name="isHidden" value="${!sessionMap.userFinished && !item.unraveled && (mode != 'teacher') && !showResults}"/>
+										</jsp:include>
 									</c:otherwise>
 								</c:choose>
 								
 								<c:if test="${(showResults || mode == 'teacher') && (optionDto.attemptOrder != -1)}">
-									<div class="text-center m-1 badge text-bg-success bg-opacity-75">
+									<div class="text-center badge text-bg-success bg-opacity-75 m-1 mx-2 px-3">
 										<fmt:message key="label.choice.number">
 											<fmt:param>${optionDto.attemptOrder}</fmt:param>
 										</fmt:message>
@@ -173,7 +197,8 @@
 								<c:if test="${item.qbQuestion.autocompleteEnabled}">ui-autocomplete-input</c:if>"
 								style="display: inline-block; width: 70%;" data-item-uid="${item.uid}" aria-labelledby="type-your-answer-descr-${item.uid}"/>
 									
-							<button class="btn btn-secondary btn-sm submit-user-answer" data-item-uid="${item.uid}" >
+							<button class="btn btn-secondary btn-sm submit-user-answer ms-1" data-item-uid="${item.uid}" >
+								<i class="fa-solid fa-circle-play me-1"></i>
 								<fmt:message key="label.button.submit" />
 							</button>
 						</div>		

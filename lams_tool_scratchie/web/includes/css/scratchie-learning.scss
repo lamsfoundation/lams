@@ -9,10 +9,6 @@
 	margin-left: -1rem;
 }
 
-.scartchie-image {
-	border: 0;
-}
-
 /*----------countdown growl----------------*/
 .jGrowl {
   	font-size: 22px;
@@ -106,3 +102,52 @@ hr.hr-confidence-level {
 	visibility: hidden;
 	height: 0px;	
 }
+
+/*----------Scratchie SVG----------------*/
+@keyframes reveal-tick {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+.icon-mask,
+.letter-mask {
+	stroke-dasharray: 12296;
+	stroke-dashoffset: 12296;
+}
+
+.scratched {
+
+	.icon-mask,
+	.letter-mask {
+		stroke-dashoffset: 0;
+	}
+}
+
+.show-tick .icon-mask,
+.show-tick .letter-mask,
+.show-cross .icon-mask,
+.show-cross .letter-mask {
+	animation: reveal-tick 2s ease-in-out both;
+}
+
+.show-tick .cross-icon {
+	opacity: 0;
+}
+
+.show-cross .tick-icon {
+	opacity: 0;
+}
+
+.scartchie-image-col {
+	text-align: right;
+	
+	a {
+		padding: 0;
+	}
+	svg {
+		margin: 0 -0.5rem 0 0.5rem;
+		padding: initial;
+	}
+}
+

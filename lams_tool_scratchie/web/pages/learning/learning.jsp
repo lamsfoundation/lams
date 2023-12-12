@@ -113,29 +113,17 @@
             $('[data-bs-toggle="tooltip"]').tooltip();
         });
 
-        //scratch image (used by both scratchMcq() and scratchVsa())
+        //Scratch SVG. Function is used by both scratchMcq() and scratchVsa().
         function scratchImage(itemUid, optionUid, isCorrect) {
             // first show animation, then put static image
-            var imageSuffix = isCorrect ? 'correct' : 'wrong';
-            var image = $('#image-' + itemUid + '-' + optionUid);
+            var svg = $('#svg-' + itemUid + '-' + optionUid);
 
             //show VSA question image
-            if (image.css('visibility') != 'visible') {
-                image.css('visibility', 'visible');
+            if (svg.css('visibility') != 'visible') {
+            	svg.css('visibility', 'visible');
             }
 
-            image.on('load', function(){
-                var image = $(this).off("load");
-                // show static image after animation
-                setTimeout(
-                    function(){
-                        image.attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + ".png");
-                        image.attr("alt", isCorrect ? '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.correct.answer" /></spring:escapeBody>' :
-                            '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.incorrect.answer" /></spring:escapeBody>');
-                    },
-                    1300
-                );
-            }).attr("src", "<lams:WebAppURL/>includes/images/scratchie-" + imageSuffix + "-animation.gif");
+            svg.addClass("show-" + (isCorrect ? 'tick' : 'cross'));
         }
 
         //scratch MCQ answer
@@ -161,13 +149,13 @@
                     //disable scratching
                     var imageLinkIds = json.optionCorrect ? "[id^=imageLink-" + itemUid + "]" : '#imageLink' + '-' + itemUid + '-' + optionUid;
                     var imageLinks = $(imageLinkIds);
-                    imageLinks.removeAttr('onClick').removeAttr('onDblClick');
+                    imageLinks.removeAttr("href").removeAttr('onClick').removeAttr('onDblClick');
                     imageLinks.css('cursor', 'default');
                     imageLinks.attr('aria-disabled', 'true');
 
                     if (json.optionCorrect) {
-                        //fade all realted images
-                        $("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+                        //fade all related images
+                        $("[id^=svg-" + itemUid + "]").not("#svg-" + itemUid + "-" + optionUid).fadeTo(1300, 0.3);
 
                         //enable Finish button
                         checkAllCorrectMcqAnswersFound();
@@ -221,10 +209,10 @@
                         paintNewVsaAnswer(itemUid, answer);
                     }
 
-                    var isScrathed = $(trId + ' img[src*="scratchie-correct.png"], ' + trId + ' img[src*="scratchie-wrong.png"]', "#scratches-" + itemUid).length > 0;
+                    var isScrathed = $(trId + ' .scratched,' + trId + ' .show-tick,' + trId + ' .show-cross', "#vsa-" + itemUid).length > 0;
                     //highlight already scratched answer
                     if (isScrathed) {
-                        var tableRowTohighlight = $(trId, "#scratches-" + itemUid);
+                        var tableRowTohighlight = $(trId, "#vsa-" + itemUid);
                         $([document.documentElement, document.body]).animate(
                             {
                                 scrollTop: tableRowTohighlight.offset().top
@@ -235,13 +223,13 @@
                             }
                         );
 
-                        //scratch it otherwise
+                    //scratch it otherwise
                     } else {
                         scratchImage(itemUid, answerHashToScratch, json.isAnswerCorrect);
 
                         if (json.isAnswerCorrect) {
                             //disable further answering
-                            $("[id^=image-" + itemUid + "]").not("img[src*='scratchie-correct-animation.gif']").not("img[src*='scratchie-correct.gif']").fadeTo(1300, 0.3);
+                            $("[id^=svg-" + itemUid + "]").not("#svg-" + itemUid + "-" + answerHashToScratch).fadeTo(1300, 0.3);
 
                             //disable submit button
                             $("#type-your-answer-" + itemUid).hide();
@@ -260,26 +248,35 @@
 
         //add new VSA answer to the table (required in case user entered answer not present in the previous answers)
         function paintNewVsaAnswer(itemUid, answer) {
-            var optionsLength = $("#scratches #scratches-" + itemUid + " .row").length;
-            var idSuffix = '-' + itemUid + '-' + hashCode(answer);
+            var optionsLength = $("#vsa-" + itemUid + " .row").length;
+            var svgId = itemUid + '-' + hashCode(answer);
 
-            var trElem =
-                '<div id="tr' + idSuffix + '" class="row mx-2">' +
-                '<div class="scartchie-image-col">' +
-                '<img src="<lams:WebAppURL/>includes/images/answer-' + optionsLength + '.png" class="scartchie-image" id="image' + idSuffix + '" />' +
-                '</div>' +
-
-                '<div class="col answer-with-confidence-level-portrait">' +
-                '<div class="answer-description">' +
-                xmlEscape(answer) +
-                '</div>' +
-                '<hr class="hr-confidence-level" />' +
-                '<div style="padding-bottom: 10px;">' +
-                '<spring:escapeBody javaScriptEscape="true"><lams:Portrait userId="${sessionMap.groupLeaderUserId}"/></spring:escapeBody>' +
-                '</div>' +
-                '</div>' +
-                '</div>';
-            $(".table#scratches-" + itemUid).append(trElem);
+            //get SVG from .jsp
+            $.ajax({
+                type : "POST",
+                async: false,
+                url : '<c:url value="/pages/learning/parts/scratchieSvg.jsp"/>',
+                data : "type=full&svgId=" + svgId + "&letter=" + optionsLength + "&isHidden=false",
+                success : function(scratchieSvg) {
+                    var trElem =
+                        '<div id="tr-' + svgId + '" class="row">' +
+        	                '<div class="scartchie-image-col">' +
+        	                scratchieSvg +
+        	                '</div>' +
+        	
+        	                '<div class="col answer-with-confidence-level-portrait">' +
+        		                '<div class="answer-description">' +
+        		                	xmlEscape(answer) +
+        		                '</div>' +
+        		                '<hr class="hr-confidence-level" />' +
+        		                '<div style="padding-bottom: 10px;">' +
+        		                	'<spring:escapeBody javaScriptEscape="true"><lams:Portrait userId="${sessionMap.groupLeaderUserId}"/></spring:escapeBody>' +
+        		                '</div>' +
+        	                '</div>' +
+                        '</div>';
+                    $("#vsa-" + itemUid).append(trElem);
+                }
+            });
         }
 
         function checkAllCorrectMcqAnswersFound() {
