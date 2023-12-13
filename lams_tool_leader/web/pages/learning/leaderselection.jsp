@@ -121,11 +121,11 @@
     <div id="leaderSelectionDialog" class="modal fade" data-bs-keyboard="true" tabindex="-1" aria-labelledby="exampleModalLabel" aria-modal="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header text-bg-secondary">
-                    <h1 class="modal-title text-white fs-5" id="exampleModalLabel">
+                <div class="modal-header text-bg-warning">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">
                         <fmt:message key="label.are.you.going.to.be.leader" />
                     </h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">

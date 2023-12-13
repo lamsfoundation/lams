@@ -54,7 +54,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<div class="modal fade" id="confirmationModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
-	      <div class="modal-header bg-warning">
+	      <div class="modal-header text-bg-warning">
 	        	<div class="modal-title fs-4">
 	        		<i class="fa fa-sm fa-users"></i> 
 	        		<fmt:message key="label.group.confirm.header"/>
@@ -64,12 +64,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	      <div class="modal-body text-center" style="min-height: 60px;">
 	      </div>
 	      <div class="modal-footer" style="padding: 8px">
-	      		<button type="button" class="btn  btn-sm btn-secondary" data-bs-dismiss="modal"
+	      		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
 	        			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.cancel.button' /></span>">
+	        		<i class="fa fa-xmark fa-lg me-1"></i>                        
 	        		<fmt:message key="label.cancel.button" />
 	        	</button>
-				<button id="submitter" onclick="" class="btn btn-sm btn-primary"
+	        	
+				<button id="submitter" onclick="" class="btn btn-primary"
 						data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
+					<i class="fa fa-check fa-lg me-1"></i>
 					<fmt:message key="label.group.confirm.button"/>
 				</button>
 	      </div>
