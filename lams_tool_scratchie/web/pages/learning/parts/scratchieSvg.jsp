@@ -12,7 +12,7 @@
 			<c:when test="${param.type == 'incorrect'}">
 				<fmt:message key='label.incorrect.answer'/>
 			</c:when>
-			<c:otherwise}">
+			<c:otherwise>
 				<fmt:message key='label.monitoring.summary.answer'/> &#${param.letter + 65};
 			</c:otherwise>
 		</c:choose>
