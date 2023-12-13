@@ -52,32 +52,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<!-- Modal -->
 	<div class="modal fade" id="confirmationModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-	  <div class="modal-dialog">
-	    <div class="modal-content">
-	      <div class="modal-header text-bg-warning">
-	        	<div class="modal-title fs-4">
-	        		<i class="fa fa-sm fa-users"></i> 
-	        		<fmt:message key="label.group.confirm.header"/>
-	        	</div>
-	        	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body text-center" style="min-height: 60px;">
-	      </div>
-	      <div class="modal-footer" style="padding: 8px">
-	      		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-	        			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.cancel.button' /></span>">
-	        		<i class="fa fa-xmark fa-lg me-1"></i>                        
-	        		<fmt:message key="label.cancel.button" />
-	        	</button>
+	 	<div class="modal-dialog">
+	    	<div class="modal-content">
+				<div class="modal-header text-bg-warning">
+					<div class="modal-title fs-4">
+	        			<i class="fa fa-sm fa-users"></i> 
+	        			<fmt:message key="label.group.confirm.header"/>
+	        		</div>
+	        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      		</div>
+	      		
+				<div class="modal-body text-center" style="min-height: 60px;"></div>
+	      
+				<div class="modal-footer" style="padding: 8px">
+		      		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+		        			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.cancel.button' /></span>">
+		        		<i class="fa fa-xmark fa-lg me-1"></i>                        
+		        		<fmt:message key="label.cancel.button" />
+		        	</button>
 	        	
-				<button id="submitter" onclick="" class="btn btn-primary"
-						data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
-					<i class="fa fa-check fa-lg me-1"></i>
-					<fmt:message key="label.group.confirm.button"/>
-				</button>
-	      </div>
-	    </div>
-	  </div>
+					<button id="submitter" onclick="" class="btn btn-primary"
+							data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
+						<i class="fa fa-check fa-lg me-1"></i>
+						<fmt:message key="label.group.confirm.button"/>
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 	
 	<div id="container-main">
@@ -86,7 +87,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</div>
 	
 		<div class="table-responsive">
-			<div class="ltable">
+			<div class="ltable table-hover">
 				<div class="row">
 					<div class="col-3 first">
 						<fmt:message key="label.view.groups.title" />
@@ -102,7 +103,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</div>
 				
 				<c:forEach var="group" items="${groups}">
-					<div class="row">
+					<div class="row align-items-center">
 						<div class="col-sm-3 first">
 							<strong><c:out value="${group.groupName}" /></strong>
 						</div>
@@ -131,6 +132,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											data-bs-toggle="modal" data-bs-target="#confirmationModal" 
 											data-u="form${user.userID}${activityID}${group.groupID}" 
 											data-gn="<c:out value="${group.groupName}" />">
+										<i class="fa-regular fa-circle-check me-1"></i>
 										<fmt:message key="label.choose.group.button" />
 									</button>
 								</c:otherwise>							

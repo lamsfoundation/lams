@@ -30,39 +30,32 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '', ${optionsActivityForm.activityID}, finishActivity);
 		
-		function validate() {
-			var validated = false;
-		
-			var form = document.forms[0];
-			var elements = form.elements;
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].name == "activityID") {
-					if (elements[i].checked) {
-						validated = true;
-						break;
-					}
-				}
-			}
-			if (!validated) {
-				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.activity.options.noActivitySelected' /></spring:escapeBody>");
-				return false;
-			} else {
-				return true;
-			}
-		}
-		
 		function finishActivity() {
 			document.getElementById('messageForm').submit();
 		}
+
+		$(document).ready(function(){
+			$('#confirmationModal').on('show.bs.modal', function (event) {
+				var button = $(event.relatedTarget) 
+				var activityId = button.data('activity-id');
+				let activityName = $("#activity-name-" + activityId).text().trim();
+		
+				var modal = $(this);
+				let modalBodyText = '<fmt:message key="label.confirm.branch.selection.body"/>'.replace("{0}", activityName);
+				modal.find('.modal-body').html(modalBodyText);
+				modal.find('#submitter').click(function(){
+					$(this).parent().children('button').each(function(){
+						$(this).prop('disabled', true).html($(this).data('loadingText'));
+					});
+					
+					$("#activity-id").val(activityId);
+					document.getElementById('activityForm').submit();
+				});
+			})
+		})
 	</script>
 
 	<div id="container-main">
-		<c:if test="${not empty optionsActivityForm.description}">
-			<div id="instructions" class="instructions">
-				<c:out value="${optionsActivityForm.description}" />
-			</div>
-		</c:if>
-
 		<c:if test="${optionsActivityForm.minimum != 0 && !optionsActivityForm.minimumLimitReached}">
 			<lams:Alert5 id="min-liimt" close="false" type="danger">	
 				<c:choose>
@@ -121,75 +114,79 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</lams:Alert5>
 		</c:if>
 
-		<form:form action="ChooseActivity.do" modelAttribute="activityForm" method="post" onsubmit="return validate();">
-			<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
-			
-			<fieldset>
-				<legend class="visually-hidden">
+		<div id="instructions" class="instructions">
+			<c:choose>
+				<c:when test="${not empty optionsActivityForm.description}">
+					<c:out value="${optionsActivityForm.description}" />
+				</c:when>
+				<c:otherwise>
 					<fmt:message key="message.activity.options.noActivitySelected" />
-				</legend>
+				</c:otherwise>
+			</c:choose>
+		</div>
+
+		<form:form action="ChooseActivity.do" modelAttribute="activityForm" method="post" id="activityForm">
+			<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
+			<input type="hidden" name="activityID" id="activity-id">
 		
-				<div class="ltable table-stripped">
-					<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL">
-						<div class="row">
-							<div class="col">
-								<c:choose>
-									<c:when test="${not activityURL.complete and not optionsActivityForm.maxActivitiesReached}">
-										<div class="form-check">
-											<input type="radio" name="activityID" class="form-check-input" id="activityID-${activityURL.activityId}"
-													value="${activityURL.activityId}" onchange="$('#choose-branch-button').prop('disabled', false);">
-											<label class="form-check-label" for="activityID-${activityURL.activityId}">
-												<c:out value="${activityURL.title}" />
-											</label>
-										</div>
-									</c:when>
+			<div class="ltable no-header table-hover">
+				<c:forEach items="${optionsActivityForm.activityURLs}" var="activityURL">
+					<div class="row align-items-center">
+						<div class="col-sm">
+							<c:choose>
+								<c:when test="${not activityURL.complete and not optionsActivityForm.maxActivitiesReached}">
+									<div id="activity-name-${activityURL.activityId}">
+										<c:out value="${activityURL.title}" />
+									</div>
+								</c:when>
 									
-									<c:when test="${activityURL.complete}">
-										<div class="form-check">
-											<i class="fa fa-lg fa-check-circle text-success radio-button-offset" style="cursor: auto;"></i>
+								<c:when test="${activityURL.complete}">
+									<div class="ms-n3">
+										<i class="fa fa-lg fa-check-circle text-success radio-button-offset me-1" style="cursor: auto;"></i>
 										
-											<c:choose>
-												<c:when test="${not empty activityURL.url}">
-													<a href="${activityURL.url}"><c:out value="${activityURL.title}" /></a>
-												</c:when>
+										<c:choose>
+											<c:when test="${not empty activityURL.url}">
+												<a href="${activityURL.url}"><c:out value="${activityURL.title}" /></a>
+											</c:when>
 												
-												<c:when test="${empty activityURL.url}"><!-- sequence activity -->
-													<span class="text-muted">
-														<c:out value="${activityURL.title}" />
-													</span>
-													
-													<div class="ms-4">
-														<c:forEach items="${activityURL.childActivities}" var="childActivityURL">
-															<div>
-																<a href="${childActivityURL.url}"><c:out value="${childActivityURL.title}" /></a>
-															</div>
-														</c:forEach>
-													</div>
-												</c:when>
-											</c:choose>										
-										</div>
-									</c:when>
+											<c:when test="${empty activityURL.url}"><!-- sequence activity -->
+												<span class="text-muted">
+													<c:out value="${activityURL.title}" />
+												</span>
+												
+												<div class="ms-4 ps-1">
+													<c:forEach items="${activityURL.childActivities}" var="childActivityURL">
+														<div>
+															<a href="${childActivityURL.url}"><c:out value="${childActivityURL.title}" /></a>
+														</div>
+													</c:forEach>
+												</div>
+											</c:when>
+										</c:choose>										
+									</div>
+								</c:when>
 											
-									<c:otherwise>
-										<div class="form-check ms-3">
-											<c:out value="${activityURL.title}" />
-										</div>
-									</c:otherwise>
-								</c:choose>
-							</div>
+								<c:otherwise>
+									<div class="ms-3">
+										<c:out value="${activityURL.title}" />
+									</div>
+								</c:otherwise>
+							</c:choose>
 						</div>
-					</c:forEach>
-				</div>
-			</fieldset>
-		
-			<div class="float-end mb-3">
-				<c:if test="${!optionsActivityForm.maxActivitiesReached}">
-					<button id="choose-branch-button" class="btn btn-secondary" disabled="disabled">
-						<fmt:message key="label.activity.options.choose" />
-					</button>						
-				</c:if>
+
+						<c:if test="${!optionsActivityForm.maxActivitiesReached}">
+							<div class="col-sm-4">
+								<button type="button" id="choose-branch-button" class="btn btn-secondary float-end" 
+										data-bs-toggle="modal" data-bs-target="#confirmationModal" 
+										data-activity-id="${activityURL.activityId}">
+									<i class="fa-regular fa-circle-check me-1"></i>
+									<fmt:message key="label.activity.options.choose" />
+								</button>	
+							</div>					
+						</c:if>
+					</div>
+				</c:forEach>
 			</div>
-		
 		</form:form>
 		
 		<c:if test="${optionsActivityForm.minimumLimitReached or isPreview}">
@@ -213,6 +210,36 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</form:form>
 			</div>
 		</c:if>
-			
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="confirmationModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+	 	<div class="modal-dialog">
+	    	<div class="modal-content">
+				<div class="modal-header text-bg-warning">
+					<div class="modal-title fs-4">
+	        			<fmt:message key="label.confirm.branch.selection.header"/>
+	        		</div>
+	        		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      		</div>
+	      		
+				<div class="modal-body text-center" style="min-height: 60px;">
+				</div>
+	      
+				<div class="modal-footer" style="padding: 8px">
+		      		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+		        			data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.cancel.button' /></span>">
+		        		<i class="fa fa-xmark fa-lg me-1"></i>                        
+		        		<fmt:message key="label.cancel.button" />
+		        	</button>
+	        	
+					<button id="submitter" onclick="" class="btn btn-primary"
+							data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
+						<i class="fa fa-check fa-lg me-1"></i>
+						<fmt:message key="label.group.confirm.button"/>
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </lams:PageLearner>
