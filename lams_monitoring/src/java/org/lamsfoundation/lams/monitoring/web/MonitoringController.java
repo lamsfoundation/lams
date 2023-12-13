@@ -1075,14 +1075,16 @@ public class MonitoringController {
 	StringBuilder ldPathBuilder = new StringBuilder("/").append(learningDesign.getTitle());
 	WorkspaceFolder workspaceFolder = learningDesign.getWorkspaceFolder();
 	while (workspaceFolder != null) {
-	    if (workspaceFolder.getParentWorkspaceFolder() == null) {
-		ldPathBuilder.insert(0, messageService.getMessage("label.monitoring.learning.design.path.courses"));
-	    } else if (workspaceFolder.getWorkspaceFolderType().equals(WorkspaceFolder.RUN_SEQUENCES)) {
+	    if (workspaceFolder.getWorkspaceFolderType().equals(WorkspaceFolder.RUN_SEQUENCES)) {
 		ldPathBuilder.insert(0,
 			"/" + messageService.getMessage("label.monitoring.learning.design.path.run.sequences"));
 	    } else {
 		ldPathBuilder.insert(0, "/" + workspaceFolder.getName());
+		if (workspaceFolder.getParentWorkspaceFolder() == null) {
+		    ldPathBuilder.insert(0, messageService.getMessage("label.monitoring.learning.design.path.courses"));
+		}
 	    }
+
 	    workspaceFolder = workspaceFolder.getParentWorkspaceFolder();
 	}
 	request.setAttribute("ldPath", ldPathBuilder.toString());
