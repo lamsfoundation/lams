@@ -1080,12 +1080,14 @@ public class MonitoringController {
 			"/" + messageService.getMessage("label.monitoring.learning.design.path.run.sequences"));
 	    } else {
 		ldPathBuilder.insert(0, "/" + workspaceFolder.getName());
-		if (workspaceFolder.getParentWorkspaceFolder() == null) {
+		if (workspaceFolder.getParentWorkspaceFolder() == null || workspaceFolder.getParentWorkspaceFolder()
+			.getName().equalsIgnoreCase("root")) {
 		    ldPathBuilder.insert(0, messageService.getMessage("label.monitoring.learning.design.path.courses"));
+		    workspaceFolder = null;
 		}
 	    }
 
-	    workspaceFolder = workspaceFolder.getParentWorkspaceFolder();
+	    workspaceFolder = workspaceFolder == null ? null : workspaceFolder.getParentWorkspaceFolder();
 	}
 	request.setAttribute("ldPath", ldPathBuilder.toString());
 
