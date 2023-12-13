@@ -298,7 +298,7 @@ public class QbCollectionController {
 			.collect(Collectors.joining("<br>")) : null;
 
 		String[] data = { question.getQuestionId().toString(),
-			WebUtil.removeHTMLtags(question.getName()).trim(),
+			WebUtil.removeHTMLtags(question.getName() == null ? "" : question.getName()).trim(),
 			view.equalsIgnoreCase("version") ? null : question.getType().toString(),
 			question.getVersion().toString(), learningOutcomes, usage, uid, String.valueOf(hasVersions) };
 
