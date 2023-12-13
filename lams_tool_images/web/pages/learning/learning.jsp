@@ -83,7 +83,7 @@
                     img: "<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false",
                     full: "<lams:WebAppURL />download/?uuid=${image.originalFileDisplayUuid}&preferDownload=false",
                     id: '${image.uid}', // Custom anchor is used with the hash:true option.
-                    caption:'<div class="card-subheader">${image.titleEscaped}</div>' +
+                    caption:'<div class="card-subheader fw-bold fs-6">${image.titleEscaped}</div>' +
                         '<div>${image.descriptionEscaped}</div>'
                         <c:if test="${!image.createByAuthor && (image.createBy != null)}">
                         <c:set var="portrait"><lams:Portrait userId="${image.createBy.userId}"/></c:set>
