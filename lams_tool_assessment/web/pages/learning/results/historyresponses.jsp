@@ -5,7 +5,7 @@
 		<fmt:message key="label.learning.question.summary.history.responces" />
 	</div>
 
-	<div class="table-responsive table-sm ltable">
+	<div class="table-sm ltable">
 			<div class="row">
 				<div style="width: 70px">
 					#

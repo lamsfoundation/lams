@@ -6,7 +6,7 @@
 	</fmt:message>
 </div>
 
-<div class="table table-sm table-responsive div-hover px-3">
+<div class="table table-sm div-hover px-3">
 	<c:forEach var="option" items="${question.optionDtos}">
 		<div class="row">
 			<c:if test="${assessment.allowRightAnswersAfterQuestion || assessment.allowWrongAnswersAfterQuestion}">

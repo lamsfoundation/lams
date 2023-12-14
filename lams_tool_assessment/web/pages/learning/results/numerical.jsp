@@ -5,7 +5,7 @@
 		<fmt:message key="label.learning.short.answer.answer" />
 	</div>
 	
-	<div class="table-responsive mb-3 d-flex align-items-center">
+	<div class="mb-3 d-flex align-items-center">
 		<c:if test="${assessment.allowRightAnswersAfterQuestion || assessment.allowWrongAnswersAfterQuestion}">
 			<span class="complete-item-gif">
 				<c:if test="${assessment.allowRightAnswersAfterQuestion && question.answerBoolean}">

@@ -246,7 +246,7 @@
 							<fmt:message key="label.answer.justification" />
 						</div>
 
-						<div class="ltable table-responsive table-sm mb-2">
+						<div class="ltable table-sm mb-2">
 							<div class="row">
 								<div class="w-25">
 									<fmt:message key="monitoring.label.group" />
