@@ -1,20 +1,10 @@
 package org.lamsfoundation.lams.web.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Map;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.signup.model.SignupOrganisation;
 import org.lamsfoundation.lams.signup.service.ISignupService;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -33,6 +23,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/signup")
 public class SignupController {
@@ -43,8 +42,6 @@ public class SignupController {
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
-    @Autowired
-    private ITimezoneService timezoneService;
 
     @RequestMapping("init")
     public String execute(@ModelAttribute("SignupForm") SignupForm signupForm, HttpServletRequest request,
@@ -85,7 +82,7 @@ public class SignupController {
 		user.setLastName(signupForm.getLastName());
 		user.setEmail(signupForm.getEmail());
 		user.setCountry(signupForm.getCountry());
-		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
+		user.setTimeZone(TimeZoneUtil.getServerTimezone());
 
 		if (!ValidationUtil.isPasswordNotUserDetails(signupForm.getPassword(), user)) {
 		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));

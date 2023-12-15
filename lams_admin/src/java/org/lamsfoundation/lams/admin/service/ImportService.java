@@ -34,8 +34,7 @@ import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
-import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -67,7 +66,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * <p>
@@ -83,7 +81,6 @@ public class ImportService implements IImportService {
     private IUserManagementService service;
     private MessageService messageService;
     private ILogEventService logEventService;
-    private ITimezoneService timezoneService;
 
     // spreadsheet column indexes for user spreadsheet
     private static final short LOGIN = 0;
@@ -708,26 +705,9 @@ public class ImportService implements IImportService {
 	user.setCreateDate(new Date());
 	user.setFirstLogin(true);
 
-	// convert timezone like "Europe/Warsaw" to "Etc/GMT-1", if provided
 	String timeZoneColumn = parseStringCell(row.getCell(ImportService.TIME_ZONE));
-	TimeZone javaTimeZone = TimeZone.getTimeZone(timeZoneColumn);
-	Timezone userTimezone = timezoneService.getServerTimezone();
-	if (javaTimeZone != null) {
-	    int offset = javaTimeZone.getRawOffset() / 3600000;
-	    String lamsTimezoneName = "Etc/GMT";
-	    if (offset > 0) {
-		lamsTimezoneName += "-" + offset;
-	    } else if (offset < 0) {
-		lamsTimezoneName += "+" + Math.abs(offset);
-	    }
-	    for (Timezone lamsTimezone : timezoneService.getDefaultTimezones()) {
-		if (lamsTimezone.getTimezoneId().equalsIgnoreCase(lamsTimezoneName)) {
-		    userTimezone = lamsTimezone;
-		    break;
-		}
-	    }
-	}
-	user.setTimeZone(userTimezone.getTimezoneId());
+	user.setTimeZone(
+		TimeZoneUtil.isTimezoneValid(timeZoneColumn) ? timeZoneColumn : TimeZoneUtil.getServerTimezone());
 
 	service.updatePassword(user, password);
 
@@ -971,9 +951,5 @@ public class ImportService implements IImportService {
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
-    }
-
-    public void setTimezoneService(ITimezoneService timezoneService) {
-	this.timezoneService = timezoneService;
     }
 }

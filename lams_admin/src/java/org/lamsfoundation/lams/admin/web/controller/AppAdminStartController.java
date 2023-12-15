@@ -22,10 +22,6 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -37,6 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 /**
  * @author jliew
@@ -67,7 +66,6 @@ public class AppAdminStartController {
 
 	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)) {
 	    links = new ArrayList<>();
-	    links.add(new LinkBean("timezonemanagement/start.do", "admin.timezone.title"));
 	    links.add(new LinkBean("loginmaintain.do", "appadmin.maintain.loginpage"));
 	    links.add(new LinkBean("signupManagement/start.do", "admin.signup.title"));
 	    links.add(new LinkBean("policyManagement/list.do", "admin.policies.title"));

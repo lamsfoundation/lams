@@ -22,12 +22,6 @@
  */
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.admin.web.form.ConfigForm;
 import org.lamsfoundation.lams.config.ConfigurationItem;
@@ -36,6 +30,7 @@ import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.filter.AuditLogFilter;
@@ -47,6 +42,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * ConfigAction
@@ -80,6 +81,8 @@ public class ConfigController {
 	smtpAuthTypes.put("starttls", "STARTTLS");
 	smtpAuthTypes.put("ssl", "SSL");
 	request.setAttribute("smtpAuthTypes", smtpAuthTypes);
+
+	request.setAttribute("timezones", TimeZone.getAvailableIDs());
 
 	return "config/editconfig";
     }
@@ -132,6 +135,9 @@ public class ConfigController {
 			    .append("\" from \"").append(currentValue).append("\" to \"").append(newValue)
 			    .append("\", ");
 		}
+		if (key.equals(ConfigurationKeys.SERVER_TIMEZONE) && StringUtils.isBlank(newValue)) {
+		    newValue = null;
+		}
 		Configuration.updateItem(key, newValue);
 	    }
 	}
@@ -139,8 +145,8 @@ public class ConfigController {
 
 	if (changeLog.length() > 0) {
 	    // if there were any changes made, log it
-	    String changeLogString = changeLog.insert(0, "Configuration changed: ").substring(0,
-		    changeLog.length() - 2);
+	    String changeLogString = changeLog.insert(0, "Configuration changed: ")
+		    .substring(0, changeLog.length() - 2);
 	    logEventService.logEvent(LogEvent.TYPE_CONFIG_CHANGE, getUserId(), null, null, null, changeLogString);
 
 	    AuditLogFilter.log(AuditLogFilter.CONFIG_CHANGE_ACTION, changeLogString);

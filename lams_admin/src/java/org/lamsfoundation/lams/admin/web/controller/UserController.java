@@ -23,15 +23,6 @@
 
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.admin.web.dto.UserOrgRoleDTO;
@@ -40,10 +31,7 @@ import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
-import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -68,6 +56,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
+
 /**
  * @author Jun-Dir Liew
  */
@@ -83,8 +78,6 @@ public class UserController {
     private MessageService messageService;
     @Autowired
     private IThemeService themeService;
-    @Autowired
-    private ITimezoneService timezoneService;
     @Autowired
     private IUserManagementService userManagementService;
 
@@ -191,8 +184,7 @@ public class UserController {
 		log.debug(e);
 	    }
 
-	    Timezone serverTimezone = timezoneService.getServerTimezone();
-	    userForm.setTimeZone(serverTimezone.getTimezoneId());
+	    userForm.setTimeZone(TimeZoneUtil.getServerTimezone());
 	}
 	userForm.setOrgId(org == null ? null : org.getOrganisationId());
 
@@ -206,17 +198,7 @@ public class UserController {
 	    request.setAttribute("canSetTwoFactorAuthentication", true);
 	}
 
-	// Get all available time zones
-	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
-	for (Timezone availableTimeZone : availableTimeZones) {
-	    String timezoneId = availableTimeZone.getTimezoneId();
-	    TimezoneDTO timezoneDto = new TimezoneDTO();
-	    timezoneDto.setTimeZoneId(timezoneId);
-	    timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
-	    timezoneDtos.add(timezoneDto);
-	}
-	request.setAttribute("timezoneDtos", timezoneDtos);
+	request.setAttribute("timezones", TimeZone.getAvailableIDs());
 
 	// for breadcrumb links
 	if (org != null) {
