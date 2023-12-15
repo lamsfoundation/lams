@@ -41,7 +41,7 @@
         <c:if test="${allowComments}">
             <lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
                            toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}"
-                           anonymous="${anonymous}" bootstrap5="true"/>
+                           anonymous="${anonymous}"/>
         </c:if>
 
         <c:if test="${not nbLearnerForm.readOnly}">

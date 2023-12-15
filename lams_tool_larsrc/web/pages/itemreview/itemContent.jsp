@@ -106,7 +106,7 @@
 			<c:set var="accordianTitle"><fmt:message key="label.comments"/></c:set>
 			<lams:Comments toolSessionId="${toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
 						  embedInAccordian="true" accordionTitle="${accordianTitle}" mode="${mode}" toolItemId="${itemUid}"
-						  readOnly="${finishedLock}" bootstrap5="true"/>	
+						  readOnly="${finishedLock}"/>	
 		</c:if>
 	</c:if>	
 </div>

@@ -6,6 +6,6 @@
 <lams:PageLearner toolSessionID="${requestScope.toolSessionID}" title="${title}" hideHeader="true">
 	<div id="container-main">
 		<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>"
-				mode="teacher" anonymous="${anonymous}"  bootstrap5="true"/>
+				mode="teacher" anonymous="${anonymous}"/>
 	</div>
 </lams:PageLearner>
