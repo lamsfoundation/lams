@@ -230,7 +230,7 @@
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
 				<div class="burning-question-container mb-2 mt-4">
 					<button type="button" id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}"
-							class="btn btn-light btn-sm <c:if test="${empty item.burningQuestion}">collapsed</c:if>">
+							class="btn btn-light card-subheader <c:if test="${empty item.burningQuestion}">collapsed</c:if>">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>
 		  				<span class="if-not-collapsed"><i class="fa fa-xs fa-regular fa-square-minus" aria-hidden="true"></i></span>
 						<fmt:message key="label.burning.question" />

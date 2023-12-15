@@ -12,7 +12,7 @@
 	<c:if test="${isUserLeader && scratchie.burningQuestionsEnabled || (mode == 'teacher')}">
 		<div class="burning-question-container mb-3">
 			<button type="button" data-bs-toggle="collapse" data-bs-target="#burning-question-general"
-					class="btn btn-light btn-sm mb-2 <c:if test="${empty sessionMap.generalBurningQuestion}">collapsed</c:if>">
+					class="btn btn-light card-subheader mb-2 <c:if test="${empty sessionMap.generalBurningQuestion}">collapsed</c:if>">
 				<span class="if-collapsed">
 					<i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i>
 				</span>

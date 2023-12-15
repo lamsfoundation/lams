@@ -13,63 +13,88 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
             $('.component-page-wrapper .component-page-content #lesson-name').text(result.lessonName);
 
             // draw support activities if they exist
+            const ACTIVITY_ITEM_TEMPLATE = '<li><div class="row align-items-center"><div class="icon"></div><div class="col text-center"></div></div></li>';
             if (result.support) {
-                let supportBarItems = $('.component-page-wrapper .offcanvas #offcanvas-support-bar').removeClass('d-none')
-                    .find('#support-bar-items').empty();
+                let supportBarItems = $('.component-page-wrapper .offcanvas #offcanvas-support-bar')
+                	.removeClass('d-none')
+                    .find('#support-bar-items')
+                    .empty();
                 $.each(result.support, function (activityIndex, activityData) {
-                    let activityItem = $('<li>')
-                        .addClass('list-group-item list-group-item-action progress-bar-item-openable')
-                        .prepend('<i class="fa-solid fa-fw fa-up-right-from-square progress-bar-icon">').appendTo(supportBarItems);
-                    let activityLink = $('<a>').text(activityData.name).attr({
-                        'target': '_blank',
-                        'href': activityData.url,
-                        'role': 'menuitem',
-                        'title': 'Open completed activity'
-                    });
-                    activityItem.append(activityLink);
+                    let activityItem = $(ACTIVITY_ITEM_TEMPLATE)
+                        .addClass('list-group-item list-group-item-action progress-bar-item-openable').appendTo(supportBarItems),
+                        activityIcon = $('<i>').attr({
+	                        'class': 'fa-solid fa-fw fa-lg fa-up-right-from-square progress-bar-icon',
+	                        'title': LABEL_SUPPORT_ACTIVITY
+						}),
+                    	activityLink = $('<a>').text(activityData.name).attr({
+	                        'target': '_blank',
+	                        'href': activityData.url,
+	                        'role': 'menuitem',
+	                        'title': LABEL_CLICK_TO_OPEN
+	                    });
+	                $(".icon", activityItem).prepend(activityIcon);
+	                $(".col", activityItem).append(activityLink);
                 });
             }
 
             let progressBarItems = $('.component-page-wrapper .offcanvas #progress-bar-items').empty(),
                 completedActivityCount = 0;
             $.each(result.activities, function (activityIndex, activityData) {
-                let activityItem = $('<li>')
+                let activityItem = $(ACTIVITY_ITEM_TEMPLATE)
                 		.addClass('list-group-item list-group-item-action')
                 		.appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
-                    activityIcon = $('<i class="fa-solid fa-fw fa-lg progress-bar-icon"></i>');
+                    activityIcon = $('<i class="fa-fw fa-lg progress-bar-icon"></i>');
+                    $(".icon", activityItem).prepend(activityIcon);
 
+				//current
                 if (activityData.status === 0) {
-                    activityItem.addClass('active').text(activityName).prepend(activityIcon);
+                    activityItem.addClass('active');
+                    $(".col", activityItem).text(activityName);
                     if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-hourglass-half');
+                        activityIcon.addClass('fa-solid fa-unlock')
+                        			.attr('title', LABEL_CURRENT_GATE);
+                        
                     } else {
-                        activityIcon.addClass('fa-pen-to-square');
+                        activityIcon.addClass('fa-regular fa-pen-to-square')
+                        			.attr('title', LABEL_CURRENT_ACTIVITY);
                     }
+                
+                //completed
                 } else if (activityData.status === 1) {
                     completedActivityCount++;
 
-                    activityItem.addClass('progress-bar-item-complete').prepend(activityIcon);
+                    activityItem.addClass('progress-bar-item-complete');
                     if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-hourglass-full');
+                        activityIcon.addClass('fa-solid fa-lock-open')
+                        			.attr('title', LABEL_COMPLETED_GATE);
+                        
                     } else {
-                        activityIcon.addClass('fa-square-check');
+                        activityIcon.addClass('fa-solid fa-square-check')
+                        			.attr('title', LABEL_COMPLETED_ACTIVITY);
                     }
                     if (activityData.url) {
                         let activityLink = $('<a>').text(activityName).attr({
                             'target': '_blank',
                             'href': activityData.url,
                             'role': 'menuitem',
-                            'title': 'Open completed activity'
+                            'title': LABEL_CLICK_TO_OPEN
                         });
-                        activityItem.addClass('progress-bar-item-openable').append(activityLink);
+                        activityItem.addClass('progress-bar-item-openable');
+                        $(".col", activityItem).append(activityLink);
                     }
+                
+                //not yet finished
                 } else {
-                    activityItem.addClass('progress-bar-item-incomplete').text(activityName).prepend(activityIcon);
+                    activityItem.addClass('progress-bar-item-incomplete');
+                    $(".col", activityItem).text(activityName);
                     if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-hourglass-start');
+                        activityIcon.addClass('fa-solid fa-lock')
+                        			.attr('title', LABEL_NOT_STARTED_GATE);
+                        
                     } else {
-                        activityIcon.addClass('fa-square');
+                        activityIcon.addClass('fa-regular fa-square')
+                        			.attr('title', LABEL_NOT_STARTED_ACTIVITY);
                     }
                 }
             });
@@ -139,6 +164,7 @@ function initCommandWebsocket(lessonId) {
     });
 }
 
+//TODO:remove this not-used function
 function toggleProgressBar(forceClose) {
     let pageContent = $('.component-page-wrapper .component-page-content'),
         progressBar = $('.component-page-wrapper .offcanvas'),

@@ -2,6 +2,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
@@ -50,13 +51,21 @@
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
         <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
         <lams:JSImport src="includes/javascript/websocket.js" />
-        <lams:JSImport src="learning/includes/javascript/learnerPage.js" />
         <lams:JSImport src="includes/javascript/dialog5.js" />
         <lams:JSImport src="includes/javascript/common.js" />
         <c:if test="${showHeader}">
+        	<lams:JSImport src="learning/includes/javascript/learnerPage.js" />
 	        <script>
 	            const LAMS_URL = '<lams:LAMSURL/>',
-	                decoderDiv = $('<div />');
+	                decoderDiv = $('<div />'),
+	                LABEL_CLICK_TO_OPEN = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.click.to.open' /></spring:escapeBody>",
+	                LABEL_SUPPORT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.support.activity' /></spring:escapeBody>",
+	                LABEL_COMPLETED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.completed.activity' /></spring:escapeBody>",
+	                LABEL_CURRENT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.current.activity' /></spring:escapeBody>",
+	                LABEL_NOT_STARTED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.not.started.activity' /></spring:escapeBody>",
+	                LABEL_COMPLETED_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.completed.gate' /></spring:escapeBody>",
+	                LABEL_CURRENT_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.current.gate' /></spring:escapeBody>",
+	                LABEL_NOT_STARTED_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.not.started.gate' /></spring:escapeBody>";
 	            var commandWebsocketHookTrigger = null,
 	                commandWebsocketHook = null;
 	
@@ -87,7 +96,7 @@
 	    	<c:if test="${showHeader}">
 				<div class="offcanvas offcanvas-start" tabindex="-1" id="component-offcanvas" aria-label="<fmt:message key='label.side.menu' />">
 					<div class="offcanvas-body">
-						<button type="button" class="btn-close float-end" data-bs-dismiss="offcanvas" 
+						<button type="button" class="btn-close float-end me-1" data-bs-dismiss="offcanvas" 
 								aria-label="<fmt:message key='label.close' />" 
 								title="<fmt:message key='label.close' />"></button>
 						
@@ -103,7 +112,7 @@
 			                </ul>
 			            </div>
 			
-						<div class="offcanvas-bar lcard pb-3">
+						<div class="offcanvas-bar lcard pb-3 mb-3">
 				            <div class="offcanvas-title py-3" id="offcanvas-progress-bar-title">
 				            	<fmt:message key='label.my.progress'/>
 				            </div>

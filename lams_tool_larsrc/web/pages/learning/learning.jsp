@@ -314,7 +314,7 @@
                             <button type="button" onClick="javascript:completeItem(${item.uid})"
                                     class="complete-item-button btn btn-success no-shadow ms-2">
                                 <i class="fa-solid fa-pen-to-square fa-xl me-1"></i>
-                                <fmt:message key="label.completed" />
+                                <fmt:message key="label.mark.completed" />
                             </button>
                         </c:if>
 

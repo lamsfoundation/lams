@@ -147,7 +147,7 @@
 					if (eval(i.data("waiting-for-comment"))) {
 						i.parent().replaceWith( '<button type="button" onClick="javascript:completeItem(' + itemUid + ')" class="complete-item-button btn btn-success no-shadow">' + 
 											'<i class="fa-solid fa-pen-to-square fa-xl me-1"></i>' +
-											'<fmt:message key="label.completed" />' +
+											'<fmt:message key="label.mark.completed" />' +
 										'</button> '
 						);
 					}

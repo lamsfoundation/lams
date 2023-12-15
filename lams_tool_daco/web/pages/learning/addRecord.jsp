@@ -37,20 +37,22 @@
 		</lams:Alert5>
 	</c:if>
 	
-	<lams:Alert5 id="minRecords" type="info" close="true">		
-		<c:if test="${not (empty daco.minRecords or daco.minRecords eq 0)}">
-			<fmt:message key="error.record.notenough">
-				<fmt:param value="${daco.minRecords}" />
-			</fmt:message>
-		</c:if>
-					
-		<c:if test="${not (empty daco.maxRecords or daco.maxRecords eq 0)}">
-			<br />
-			<fmt:message key="error.record.toomuch">
-				<fmt:param value="${daco.maxRecords}" />
-			</fmt:message>
-		</c:if>
-	</lams:Alert5>
+	<c:if test="${not (empty daco.minRecords or daco.minRecords eq 0) || not (empty daco.maxRecords or daco.maxRecords eq 0)}">
+		<lams:Alert5 id="minRecords" type="info" close="true">		
+			<c:if test="${not (empty daco.minRecords or daco.minRecords eq 0)}">
+				<fmt:message key="error.record.notenough">
+					<fmt:param value="${daco.minRecords}" />
+				</fmt:message>
+			</c:if>
+						
+			<c:if test="${not (empty daco.maxRecords or daco.maxRecords eq 0)}">
+				<br />
+				<fmt:message key="error.record.toomuch">
+					<fmt:param value="${daco.maxRecords}" />
+				</fmt:message>
+			</c:if>
+		</lams:Alert5>
+	</c:if>
 
 	<c:if test="${not finishedLock }">
 	

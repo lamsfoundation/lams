@@ -190,7 +190,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</form:form>
 		
 		<c:if test="${optionsActivityForm.minimumLimitReached or isPreview}">
-			<div class="activity-bottom-buttons">
+			<div class="activity-bottom-buttons mt-5">
 				<form:form action="/lams/learning/CompleteActivity.do" modelAttribute="messageForm" method="post" id="messageForm">
 					<input type="hidden" name="lams_token" value="<c:out value='${lams_token}' />">
 					<input type="hidden" name="activityID" value="<c:out value='${optionsActivityForm.activityID}' />">

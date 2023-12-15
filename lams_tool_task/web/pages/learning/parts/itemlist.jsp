@@ -41,13 +41,14 @@
 								<button type="button" onClick="javascript:completeItem(${item.uid})"
 										class="complete-item-button btn btn-success no-shadow">
 									<i class="fa-solid fa-pen-to-square fa-xl me-1"></i>
-									<fmt:message key="label.completed" />
+									<fmt:message key="label.mark.completed" />
 								</button>
 							</c:when>
 
 							<c:otherwise>
 								<span class="text-bg-danger p-1 rounded-pill">
 									<i id="item-faminus-${item.uid}" class="fa fa-lg fa-minus" 
+											title="<fmt:message key="label.complete.required.activities" />"
 											data-waiting-for-comment="${(mode != 'teacher') && (not finishedLock) && (not taskList.sequentialOrder || itemDTO.previousTaskCompleted) 
 											&& !itemDTO.commentRequirementsMet && itemDTO.attachmentRequirementsMet}"></i>
 								</span>

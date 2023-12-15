@@ -56,7 +56,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				
 				<div>
 					<div class="table-responsive">
-						<div class="ltable table-stripped mb-0">
+						<div class="ltable table-striped mb-0">
 							<c:forEach var="group" items="${groups}">
 								<div class="row">
 									<div class="col-2">

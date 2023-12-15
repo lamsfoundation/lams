@@ -14,3 +14,7 @@ $enable-negative-margins:     true;
 :root {
 	--lams-background-gray: #e0e0e0; /* rgb(224, 224, 224) */
 }
+
+.offcanvas{
+	--bs-offcanvas-padding-x: 0.5rem;
+}
