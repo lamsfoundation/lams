@@ -85,7 +85,7 @@
 					<div class="row g-0"><div class="col-12"></div></div>
 					<lams:Comments toolSessionId="${toolSessionID}"
 								   toolSignature="lanb11" likeAndDislike="${likeAndDislike}" readOnly="true"
-								   pageSize="10" sortBy="1" bootstrap5="true"/>
+								   pageSize="10" sortBy="1"/>
 				</c:if>
 			</c:if>
 		

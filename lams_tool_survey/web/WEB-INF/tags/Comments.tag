@@ -15,7 +15,6 @@
 <%@ attribute name="sortBy" required="false" rtexprvalue="true"%>
 <%@ attribute name="embedInAccordian" required="false" rtexprvalue="true"%>
 <%@ attribute name="accordionTitle" required="false" rtexprvalue="true"%>
-<%@ attribute name="bootstrap5" required="false" rtexprvalue="true"%>
 
 <c:if test="${empty width}">
 	<c:set var="width" value="100%" />
@@ -73,7 +72,7 @@
 
 <script>
 	$(document).ready(function(){
-		var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&newUI=${bootstrap5}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
+		var url='<lams:LAMSURL/>comments/init.do?externalID=${toolSessionId}&externalSecondaryID=${toolItemId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}&anonymous=${anonymous}';
 		
 		<c:choose>
 			<c:when test="${embedInAccordian}">

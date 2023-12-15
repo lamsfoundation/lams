@@ -196,8 +196,8 @@
 					<div class="d-flex align-items-center">
 						<div class="flex-grow-1">
 							<textarea name="comment" rows="2" id="comment-textarea-${itemRatingDto.itemId}" class="form-control comment-textarea"
-									placeholder="<fmt:message key="label.comment.textarea.tip"/>"
-									aria-label="<fmt:message key="label.comment.textarea.tip"/>"></textarea>
+									placeholder="<fmt:message key="label.rating.textarea.tip"/>"
+									aria-label="<fmt:message key="label.rating.textarea.tip"/>"></textarea>
 						</div>
 						<div>
 							<button class="btn btn-secondary btn-sm add-comment add-comment-new ms-2"
