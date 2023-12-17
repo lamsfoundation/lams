@@ -211,28 +211,6 @@
 			</props>
 		</property>
 	</bean>
-	
-	<bean id="timezoneServiceTarget" class="org.lamsfoundation.lams.timezone.service.TimezoneService">
-		<property name="timezoneDAO"><ref bean="timezoneDAO"/></property>
-	</bean>
-	
-	<bean id="timezoneService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
-		<property name ="target"><ref bean="timezoneServiceTarget"/></property>
-		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="set*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean>
 
 	<bean id="signupServiceTarget" class="org.lamsfoundation.lams.signup.service.SignupService">
 		<property name="signupDAO"><ref bean="signupDAO" /></property>
@@ -720,11 +698,6 @@
 	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<!--  Timezone service related beans -->
-	<bean id="timezoneDAO" class="org.lamsfoundation.lams.timezone.dao.hibernate.TimezoneDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
 	
 	<!--  Signup service related beans -->
 	<bean id="signupDAO" class="org.lamsfoundation.lams.signup.dao.hibernate.SignupDAO">

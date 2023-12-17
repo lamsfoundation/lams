@@ -1,21 +1,20 @@
 package org.lamsfoundation.lams.web.filter;
 
-import java.io.IOException;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Logs requests to controllers with their parameters
@@ -34,7 +33,6 @@ public class AuditLogFilter extends OncePerRequestFilter {
     public static final String CALL_ACTION = "endpoint_call";
     public static final String CONFIG_CHANGE_ACTION = "configuration_change";
     public static final String LOGIN_PAGE_CHANGE_ACTION = "login_page_change";
-    public static final String TIMEZONE_CHANGE_ACTION = "timezone_change";
     public static final String ACCOUNT_LOCKED_ACTION = "account_lock";
     public static final String LOGIN_AS_ACTION = "login_as";
     public static final String SESSION_DELETE_ACTION = "session_delete";

@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.util;
  * Known keys for the configuration data.
  *
  * @author fmalikoff
- *
  */
 public class ConfigurationKeys {
 
@@ -253,6 +252,7 @@ public class ConfigurationKeys {
 
     // LDEV-4144
     public static String SHOW_TIMEZONE_WARNING = "ShowTimezoneWarning";
+    public static String SERVER_TIMEZONE = "ServerTimezone";
 
     // LDEV-4594 / LDEV-4583 Allow/Block access to index.do for integration learners. Default to false - do not allow direct access.
     public static String ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS = "AllowDirectAccessIntgrtnLrnr";

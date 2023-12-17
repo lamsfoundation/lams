@@ -54,7 +54,6 @@
 			 <!-- Below are immutable entities which can be kept in cache forever. -->
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.learningdesign.LearningLibrary.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.themes.Theme.expiration.max_idle">-1</prop>
-			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.timezone.Timezone.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.tool.Tool.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.tool.SystemTool.expiration.max_idle">-1</prop>
 			<prop key="hibernate.cache.infinispan.org.lamsfoundation.lams.usermanagement.AuthenticationMethodType.expiration.max_idle">-1</prop>

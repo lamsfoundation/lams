@@ -22,12 +22,21 @@
 
 package org.lamsfoundation.lams.usermanagement.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
+import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
+import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
+import org.lamsfoundation.lams.usermanagement.Role;
+import org.lamsfoundation.lams.usermanagement.SupportedLocale;
+import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.HashUtil;
+import org.lamsfoundation.lams.util.LanguageUtil;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -41,22 +50,12 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.Role;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
-import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.dto.BulkUpdateResultDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.HashUtil;
-import org.lamsfoundation.lams.util.LanguageUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author jliew
@@ -67,8 +66,6 @@ public class LdapService implements ILdapService {
     private Logger log = Logger.getLogger(LdapService.class);
 
     private IUserManagementService service;
-
-    private ITimezoneService timezoneService;
 
     private static final int BULK_UPDATE_CREATED = 0;
 
@@ -153,7 +150,7 @@ public class LdapService implements ILdapService {
 		user.setDisabledFlag(getDisabledBoolean(attrs));
 		user.setCreateDate(new Date());
 		user.setLocale(getLocale(map.get("locale")));
-		user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
+		user.setTimeZone(TimeZoneUtil.getServerTimezone());
 		user.setFirstLogin(true);
 		service.saveUser(user);
 		service.logUserCreated(user, (User) null);
@@ -619,9 +616,4 @@ public class LdapService implements ILdapService {
     public void setService(IUserManagementService service) {
 	this.service = service;
     }
-
-    public void setTimezoneService(ITimezoneService timezoneService) {
-	this.timezoneService = timezoneService;
-    }
-
 }

@@ -7,7 +7,6 @@
            				   
 	<bean id="ldapServiceTarget" class="org.lamsfoundation.lams.usermanagement.service.LdapService">
 		<property name="service"><ref bean="userManagementService"/></property>
-		<property name="timezoneService"><ref bean="timezoneService"/></property>
 	</bean>
 	
 	<bean id="ldapService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

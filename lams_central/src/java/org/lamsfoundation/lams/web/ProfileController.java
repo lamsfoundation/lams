@@ -22,15 +22,6 @@
  */
 package org.lamsfoundation.lams.web;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,10 +34,6 @@ import org.lamsfoundation.lams.policies.PolicyDTO;
 import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
-import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -69,6 +56,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
+
 /**
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
@@ -83,8 +77,6 @@ public class ProfileController {
     private ILearnerService learnerService;
     @Autowired
     private IThemeService themeService;
-    @Autowired
-    private ITimezoneService timezoneService;
     @Autowired
     @Qualifier("centralMessageService")
     private MessageService messageService;
@@ -264,19 +256,7 @@ public class ProfileController {
 	}
 	userForm.setUserTheme(userSelectedTheme);
 
-	List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
-	//TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<TimezoneDTO>(new TimezoneDTOComparator());
-	// Comparator to sort timezones by timezone id
-	TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
-
-	for (Timezone availableTimeZone : availableTimeZones) {
-	    String timezoneId = availableTimeZone.getTimezoneId();
-	    TimezoneDTO timezoneDto = new TimezoneDTO();
-	    timezoneDto.setTimeZoneId(timezoneId);
-	    timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
-	    timezoneDtos.add(timezoneDto);
-	}
-	request.setAttribute("timezoneDtos", timezoneDtos);
+	request.setAttribute("timezones", TimeZone.getAvailableIDs());
 
 	return "profile/editprofile";
     }

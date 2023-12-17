@@ -70,7 +70,7 @@ import org.lamsfoundation.lams.integration.util.IntegrationConstants;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -109,7 +109,6 @@ public class IntegrationService implements IIntegrationService {
     private IUserManagementService service;
     private ILessonService lessonService;
     private ILamsCoreToolService toolService;
-    private ITimezoneService timezoneService;
 
     /**
      * Returns integration server or LTI tool consumer by its human-entered server key/server id.
@@ -505,7 +504,7 @@ public class IntegrationService implements IIntegrationService {
 	    user.setCreateDate(new Date());
 	    user.setDisabledFlag(false);
 	    user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
-	    user.setTimeZone(timezoneService.getServerTimezone().getTimezoneId());
+	    user.setTimeZone(TimeZoneUtil.getServerTimezone());
 	    user.setTheme(service.getDefaultTheme());
 	    service.saveUser(user);
 	}
@@ -1205,9 +1204,4 @@ public class IntegrationService implements IIntegrationService {
     public void setToolService(ILamsCoreToolService toolService) {
 	this.toolService = toolService;
     }
-
-    public void setTimezoneService(ITimezoneService timezoneService) {
-	this.timezoneService = timezoneService;
-    }
-
 }

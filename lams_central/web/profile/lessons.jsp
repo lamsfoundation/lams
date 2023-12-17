@@ -68,7 +68,7 @@
 					</div>
 					
 					<div align="center">
-						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+						<button type="button" class="btn btn-sm btn-primary offset5" onclick="history.go(-1);">
 							<fmt:message key="label.return.to.myprofile" />
 						</button>
 					</div>
