@@ -54,8 +54,8 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$3RDPARTY_SOURCES_PROJECT_47$/spring" />
-      <root url="file://$3RDPARTY_SOURCES_PROJECT_47$/reactor" />
+      <root url="file://$3RDPARTY_SOURCES_PROJECT_48$/spring" />
+      <root url="file://$3RDPARTY_SOURCES_PROJECT_48$/reactor" />
     </SOURCES>
   </library>
 </component>
