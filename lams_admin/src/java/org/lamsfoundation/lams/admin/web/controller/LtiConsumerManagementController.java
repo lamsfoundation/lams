@@ -1,14 +1,5 @@
 package org.lamsfoundation.lams.admin.web.controller;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -16,10 +7,6 @@ import org.lamsfoundation.lams.admin.web.form.LtiConsumerForm;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.timezone.Timezone;
-import org.lamsfoundation.lams.timezone.dto.TimezoneDTO;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
-import org.lamsfoundation.lams.timezone.util.TimezoneIDComparator;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -27,9 +14,9 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.filter.AuditLogFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -38,6 +25,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * @author Andrey Balan
@@ -51,8 +45,6 @@ public class LtiConsumerManagementController {
     private IIntegrationService integrationService;
     @Autowired
     private IUserManagementService userManagementService;
-    @Autowired
-    private ITimezoneService timezoneService;
     @Autowired
     private ISecurityService securityService;
     @Autowired
@@ -105,17 +97,7 @@ public class LtiConsumerManagementController {
 	    request.setAttribute("locales", locales);
 
 	    request.setAttribute("countryCodes", LanguageUtil.getCountryCodes(false));
-
-	    List<Timezone> availableTimeZones = timezoneService.getDefaultTimezones();
-	    TreeSet<TimezoneDTO> timezoneDtos = new TreeSet<>(new TimezoneIDComparator());
-	    for (Timezone availableTimeZone : availableTimeZones) {
-		String timezoneId = availableTimeZone.getTimezoneId();
-		TimezoneDTO timezoneDto = new TimezoneDTO();
-		timezoneDto.setTimeZoneId(timezoneId);
-		timezoneDto.setDisplayName(TimeZone.getTimeZone(timezoneId).getDisplayName());
-		timezoneDtos.add(timezoneDto);
-	    }
-	    request.setAttribute("timezoneDtos", timezoneDtos);
+	    request.setAttribute("timezones", TimeZone.getAvailableIDs());
 	}
 
 	integrationService.clearLessonFinishUrlCache();

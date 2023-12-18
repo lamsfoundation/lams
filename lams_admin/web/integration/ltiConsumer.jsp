@@ -128,10 +128,8 @@
 						<div class="mb-3">
 							<label for="defaultTimeZone" class="form-label"><fmt:message key="admin.user.time.zone" /></label>
 							<form:select path="defaultTimeZone" cssClass="form-select">
-								<c:forEach items="${timezoneDtos}" var="timezoneDto">
-									<form:option value="${timezoneDto.timeZoneId}">
-										${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-									</form:option>
+								<c:forEach items="${timezones}" var="timezone">
+									<form:option value="${timezone}"><c:out value="${timezone}" /></form:option>
 								</c:forEach>
 							</form:select>
 							<lams:errors path="defaultTimeZone"/>

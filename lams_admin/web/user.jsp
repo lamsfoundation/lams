@@ -463,10 +463,8 @@
 								key="admin.user.time.zone" />:
 						</label>
 						<form:select path="timeZone" cssClass="form-select">
-							<c:forEach items="${timezoneDtos}" var="timezoneDto">
-								<form:option value="${timezoneDto.timeZoneId}">
-									${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-								</form:option>
+							<c:forEach items="${timezones}" var="timezone">
+								<form:option value="${timezone}"><c:out value="${timezone}" /></form:option>
 							</c:forEach>
 						</form:select>
 					</div>

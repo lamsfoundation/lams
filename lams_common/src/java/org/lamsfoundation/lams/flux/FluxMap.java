@@ -32,7 +32,7 @@ public class FluxMap<T, U> {
 
     // only for logging purposes
     private final String name;
-    private final Flux<T> source;
+    private final SharedSink<T> source;
     private final BiPredicate<T, T> itemEqualsPredicate;
     private final Function<T, U> fetchFunction;
     // default timeout is null, i.e. never expire
@@ -40,8 +40,8 @@ public class FluxMap<T, U> {
     // default throttle time is null, i.e. no throttling
     private final Integer throttleSeconds;
 
-    public FluxMap(String name, Flux<T> source, BiPredicate<T, T> itemEqualsPredicate, Function<T, U> fetchFunction,
-	    Integer throttleSeconds, Integer timeoutSeconds) {
+    public FluxMap(String name, SharedSink<T> source, BiPredicate<T, T> itemEqualsPredicate,
+	    Function<T, U> fetchFunction, Integer throttleSeconds, Integer timeoutSeconds) {
 	this.name = name;
 	this.source = source;
 	this.itemEqualsPredicate = itemEqualsPredicate;
@@ -66,7 +66,7 @@ public class FluxMap<T, U> {
 		}
 
 		// filter out signals which do not match the key
-		Flux<T> filteringFlux = source.filter(item -> itemEqualsPredicate.test(item, key));
+		Flux<T> filteringFlux = source.getFlux().filter(item -> itemEqualsPredicate.test(item, key));
 
 		// do not emit more often than this amount of time
 		if (throttleSeconds != null) {
@@ -79,10 +79,15 @@ public class FluxMap<T, U> {
 		filteringFlux = filteringFlux.handle((item, sink) -> {
 		    int counter = subscriberCounter.get();
 		    if (counter <= 0) {
-			if (log.isDebugEnabled()) {
-			    log.debug("Completing flux with no subscribers for \"" + name + "\" with key " + key);
-			}
+			// all subscribers are gone, complete the Flux
 			sink.complete();
+			// remove Flux from mapping
+			synchronized (map) {
+			    map.remove(key);
+			}
+			if (log.isDebugEnabled()) {
+			    log.debug("Removed flux with no subscribers for \"" + name + "\" with key " + key);
+			}
 			return;
 		    }
 		    sink.next(item);
@@ -99,9 +104,10 @@ public class FluxMap<T, U> {
 
 		    if (counter <= 0) {
 			if (log.isDebugEnabled()) {
-			    log.debug("Removing flux with no subscribers for \"" + name + "\" with key " + key);
+			    log.debug("No subscribers left for flux for \"" + name + "\" with key " + key);
 			}
-			map.remove(key);
+			// send final signal so Flux can complete
+			source.emit(key);
 		    }
 		};
 

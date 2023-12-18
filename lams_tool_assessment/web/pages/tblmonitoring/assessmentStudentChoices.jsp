@@ -6,6 +6,12 @@
 		overflow: auto;
 		min-width: 150px;
 	}
+
+	#questions-data .sticky-left-header {
+		position: sticky;
+		left: 0;
+		background-color: white;
+	}
 </style>
 
 <lams:JSImport src="includes/javascript/chart5.js" relative="true" />
@@ -121,9 +127,9 @@
 	<div class="row">
 		<div class="col-10 offset-1">
 			<div class="card">
-				<div class="card-body table-responsive pb-0">
+				<div class="card-body table-responsive p-0">
 
-					<table  id="questions-data" class="table table-responsive table-bordered table-hover table-condensed">
+					<table id="questions-data" class="table table-responsive table-bordered table-condensed p-2">
 						<thead>
 						<tr role="row" class="border-top-0">
 							<th></th>
@@ -142,7 +148,7 @@
 						<tbody>
 
 						<tr role="row">
-							<th><b>Question type</b></th>
+							<th class="sticky-left-header"><b>Question type</b></th>
 							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 								<td class="text-center">
 										${tblQuestionDto.questionTypeLabel}
@@ -151,7 +157,7 @@
 						</tr>
 
 						<tr>
-							<td><b>Correct answer</b></td>
+							<td class="sticky-left-header"><b>Correct answer</b></td>
 							<c:forEach var="tblQuestionDto" items="${questionDtos}" varStatus="i">
 								<td class="text-center">
 									<c:out value="${tblQuestionDto.correctAnswer}" escapeXml="false" />

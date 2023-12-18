@@ -238,7 +238,6 @@ body.component #sequenceInfoDialog {
 	width: 100%;
 	display: flex;
 	overflow: auto;
-	justify-content: center;
 	align-items: center;
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -296,6 +295,7 @@ body.component #sequenceInfoDialog {
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas svg.svg-learning-design {
 	display: block;
 	overflow: visible;
+	margin: auto;
 }
 
 .monitoring-page-wrapper #sequence-tab-content #canvas-container div#sequenceCanvas svg.svg-learning-design g.gate svg {

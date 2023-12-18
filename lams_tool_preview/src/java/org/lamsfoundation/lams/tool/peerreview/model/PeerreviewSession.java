@@ -23,7 +23,10 @@
 
 package org.lamsfoundation.lams.tool.peerreview.model;
 
+import org.lamsfoundation.lams.tool.peerreview.util.SessionNameComparator;
+
 import javax.persistence.*;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -33,7 +36,9 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "tl_laprev11_session")
-public class PeerreviewSession {
+public class PeerreviewSession implements Comparable<PeerreviewSession> {
+
+    public static final Comparator<String> SESSION_NAME_COMPARATOR = new SessionNameComparator();
 
     @Id
     @Column
@@ -154,5 +159,13 @@ public class PeerreviewSession {
 
     public void setEmailsSent(boolean emailsSent) {
 	this.emailsSent = emailsSent;
+    }
+
+    @Override
+    public int compareTo(PeerreviewSession o) {
+	if (o == null) {
+	    return 1;
+	}
+	return SESSION_NAME_COMPARATOR.compare(this.getSessionName(), o.getSessionName());
     }
 }

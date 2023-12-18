@@ -335,7 +335,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	Long userSessionId =
 		ratingUserId == null || !whiteboard.isGalleryWalkStarted() || !whiteboard.isGalleryWalkEditEnabled()
 			? null
-			: getUserByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
+			: getLearnerByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
 	for (WhiteboardSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
@@ -490,7 +490,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void startGalleryWalk(long toolContentId) throws IOException {
+    public void startGalleryWalk(long toolContentId) {
 	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
 	if (!whiteboard.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -509,7 +509,31 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void finishGalleryWalk(long toolContentId) throws IOException {
+    public void skipGalleryWalk(long toolContentId) {
+	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
+	if (!whiteboard.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is not enabled for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	if (whiteboard.isGalleryWalkStarted()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already started for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	if (whiteboard.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already finished for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	whiteboard.setGalleryWalkEnabled(false);
+	whiteboardDao.update(whiteboard);
+
+	sendGalleryWalkRefreshRequest(whiteboard);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) {
 	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
 	if (!whiteboard.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(

@@ -81,7 +81,7 @@
 		
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.password.change.screen" />', '430');
+			updateMyProfileDialogSettings('<fmt:message key="title.password.change.screen" />', '550');
 		});	
 	</script>
 </lams:head>
@@ -166,20 +166,19 @@
 							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="50"/>
 						</div>
-							
-						<div class="form-group" align="right">
-							<c:if test="${not passwordChangeActionForm.passwordExpired}">
-								<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
-									<fmt:message key="button.cancel"/>
-								</button>
-								&nbsp;&nbsp;
-							</c:if>
-							<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
-								<fmt:message key="button.save" />
-							</button>
-						</div>
 					</div>
 
+				</div>
+				<div class="form-group" align="right">
+					<c:if test="${not passwordChangeActionForm.passwordExpired}">
+						<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+							<fmt:message key="button.cancel"/>
+						</button>
+						&nbsp;&nbsp;
+					</c:if>
+					<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
+						<fmt:message key="button.save" />
+					</button>
 				</div>
 			</div>
 		</div>

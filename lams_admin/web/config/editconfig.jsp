@@ -67,6 +67,16 @@
 												</c:forEach>
 											</select>
 										</c:when>
+										<c:when test="${row.key == 'ServerTimezone'}">
+											<select name="value" class="form-control" id="${row.key}">
+												<option value="">---</option>
+												<c:forEach items="${timezones}" var="timezone">
+													<option value="${timezone}" ${timezone == row.value ? 'selected="selected"' : '' }>
+														<c:out value="${timezone}" />
+													</option>
+												</c:forEach>
+											</select>
+										</c:when>
 										<c:when test="${row.format==BOOLEAN}">
 											<select id="${row.key}" name="value" class="form-control">
 												<option value="true" ${row.value ? 'selected="selected"' : '' }>true</option>

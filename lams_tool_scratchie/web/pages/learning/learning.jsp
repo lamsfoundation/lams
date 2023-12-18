@@ -120,7 +120,7 @@
 
             //show VSA question image
             if (svg.css('visibility') != 'visible') {
-            	svg.css('visibility', 'visible');
+                svg.css('visibility', 'visible');
             }
 
             svg.addClass("show-" + (isCorrect ? 'tick' : 'cross'));
@@ -158,7 +158,9 @@
                         $("[id^=svg-" + itemUid + "]").not("#svg-" + itemUid + "-" + optionUid).fadeTo(1300, 0.3);
 
                         //enable Finish button
-                        checkAllCorrectMcqAnswersFound();
+                        if (requireAllAnswers) {
+                            checkAllCorrectMcqAnswersFound();
+                        }
                     }
 
                 },
@@ -223,7 +225,7 @@
                             }
                         );
 
-                    //scratch it otherwise
+                        //scratch it otherwise
                     } else {
                         scratchImage(itemUid, answerHashToScratch, json.isAnswerCorrect);
 
@@ -260,19 +262,19 @@
                 success : function(scratchieSvg) {
                     var trElem =
                         '<div id="tr-' + svgId + '" class="row">' +
-        	                '<div class="scartchie-image-col">' +
-        	                scratchieSvg +
-        	                '</div>' +
-        	
-        	                '<div class="col answer-with-confidence-level-portrait">' +
-        		                '<div class="answer-description">' +
-        		                	xmlEscape(answer) +
-        		                '</div>' +
-        		                '<hr class="hr-confidence-level" />' +
-        		                '<div style="padding-bottom: 10px;">' +
-        		                	'<spring:escapeBody javaScriptEscape="true"><lams:Portrait userId="${sessionMap.groupLeaderUserId}"/></spring:escapeBody>' +
-        		                '</div>' +
-        	                '</div>' +
+                        '<div class="scartchie-image-col">' +
+                        scratchieSvg +
+                        '</div>' +
+
+                        '<div class="col answer-with-confidence-level-portrait">' +
+                        '<div class="answer-description">' +
+                        xmlEscape(answer) +
+                        '</div>' +
+                        '<hr class="hr-confidence-level" />' +
+                        '<div style="padding-bottom: 10px;">' +
+                        '<spring:escapeBody javaScriptEscape="true"><lams:Portrait userId="${sessionMap.groupLeaderUserId}"/></spring:escapeBody>' +
+                        '</div>' +
+                        '</div>' +
                         '</div>';
                     $("#vsa-" + itemUid).append(trElem);
                 }
@@ -280,7 +282,7 @@
         }
 
         function checkAllCorrectMcqAnswersFound() {
-            var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
+			var numberOfAvailableScratches = $('[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}]').length;
             if (numberOfAvailableScratches > 0) {
                 $('#finishButton')
                     .prop('disabled', true)
@@ -483,7 +485,7 @@
             var proceed = true;
             // ask for leave confirmation only if time limit is not expired
             if (!isTimelimitExpired) {
-                var numberOfAvailableScratches = $("[id^=imageLink-][onclick], [id^=type-your-answer-]:visible").length;
+				var numberOfAvailableScratches = $("[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}], [id^=type-your-answer-]:visible").length;
                 proceed = numberOfAvailableScratches == 0 ||
                     confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.one.or.more.questions.not.completed'/></spring:escapeBody>");
             }

@@ -23,8 +23,5 @@
 		<property name="logEventService">
 			<ref bean="logEventService"/>
 		</property>
-   		<property name="timezoneService">
-   			<ref bean="timezoneService"/>
-   		</property>	
     </bean>
 </beans>
