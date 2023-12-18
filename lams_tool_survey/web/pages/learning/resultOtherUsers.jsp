@@ -113,8 +113,8 @@
 			<div class="card lcard mt-n3">
 				<div class="card-header">
 					<c:if test="${not question.optional}">
-						<abbr class="float-end" title="<fmt:message key='label.answer.required'/>"><i
-							class="fa fa-xs fa-asterisk text-danger float-end"></i>
+						<abbr class="float-end badge text-bg-danger" title="<fmt:message key='label.answer.required'/>"><i
+							class="fa fa-xs fa-asterisk"></i>
 						</abbr>
 					</c:if>
 

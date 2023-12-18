@@ -16,7 +16,7 @@
 
 <style>
 	<c:if test="${param.embedded and empty toolSessionID and (assessment.allowDiscloseAnswers or assessment.allowDiscussionSentiment)}">	
-		.panel-heading .asterisk {
+		.card-header .asterisk {
 			margin-right: 30px;
 		}
 	</c:if>

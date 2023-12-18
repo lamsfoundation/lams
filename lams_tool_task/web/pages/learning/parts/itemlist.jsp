@@ -21,14 +21,16 @@
 									[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
 								</span>
 							</c:if>
-							
-							<c:if test="${item.required}">
-								<i class="fa-solid fa-asterisk text-danger ms-2" title="<fmt:message key='label.monitoring.tasksummary.task.required.to.finish'/>"></i>
-							</c:if>
 						</button>
 					</span>
 					
 					<div class="float-end">
+						<c:if test="${item.required}">
+							<span class="badge text-bg-danger p-2 me-2">
+								<i class="fa-solid fa-asterisk" title="<fmt:message key='label.monitoring.tasksummary.task.required.to.finish'/>"></i>
+							</span>
+						</c:if>
+							
 						<c:choose>
 							<c:when test="${item.complete}">
 								<span class="text-bg-success p-2 shadow"> 

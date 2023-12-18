@@ -39,7 +39,7 @@
 					</c:if>
 										
 					<c:if test="${question.answerRequired}">
-						<span class="asterisk float-end"> 
+						<span class="asterisk float-end badge alert alert-warning m-1 p-1"> 
 							<i class="fa fa-asterisk text-danger"
 							title="<fmt:message key="label.answer.required"/>"
 							alt="<fmt:message key="label.answer.required"/>"></i>
