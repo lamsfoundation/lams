@@ -56,10 +56,6 @@ public interface NoticeboardConstants {
 
     public static final String AUTHOR_PAGE = "authoringContent";
 
-    public static final String DISPLAY_MESSAGE = "displayMessage";
-    public static final String DISPLAY_LEARNER_CONTENT = "displayLearnerContent";
-    public static final String REFLECT_ON_ACTIVITY = "reflectOnActivity";
-
     public static final String MONITOR_PAGE = "monitorPage";
     public static final String MONITOR_REFLECTION_PAGE = "monitorReflectionPage";
     public static final String MONITOR_COMMENTS_PAGE = "monitorCommentsPage";

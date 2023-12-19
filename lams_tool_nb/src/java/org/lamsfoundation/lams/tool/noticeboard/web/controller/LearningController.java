@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -182,24 +181,11 @@ public class LearningController {
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
-
 	Boolean userFinished = (nbUser != null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
 	request.setAttribute("userFinished", userFinished);
-
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, nbService.isLastActivity(toolSessionID));
 
-	/*
-	 * Checks to see if the runOffline flag is set.
-	 * If the particular flag is set, control is forwarded to jsp page
-	 * displaying to the user the message according to what flag is set.
-	 */
-	if (displayMessageToUser(nbContent, errorMap)) {
-	    request.setAttribute("errorMap", errorMap);
-	    return "message";
-	}
-
 	return "learnerContent";
-
     }
 
     @RequestMapping("/teacher")
@@ -214,7 +200,6 @@ public class LearningController {
 	    HttpServletResponse response) throws NbApplicationException {
 	NbLearnerForm.setMode("author");
 	return learner(NbLearnerForm, request, response);
-
     }
 
     /**
@@ -237,28 +222,6 @@ public class LearningController {
 	    default:
 		throw new NbApplicationException("Invalid flag");
 	}
-
-    }
-
-    /**
-     * <p>
-     * This methods checks the defineLater and runOffline flag. If defineLater flag is set, then a message is added to
-     * an ActionMessages object saying that the contents have not been defined yet. If the runOffline flag is set, a
-     * message is added to ActionMessages saying that the contents are not being run online. This method will return
-     * true if any one of the defineLater or runOffline flag is set. Otherwise false will be returned.
-     * </p>
-     */
-    private boolean displayMessageToUser(NoticeboardContent content, MultiValueMap<String, String> errorMap) {
-	boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
-	errorMap = new LinkedMultiValueMap<>();
-	if (isDefineLaterSet) {
-	    if (isDefineLaterSet) {
-		errorMap.add("GLOBAL", messageService.getMessage("message.defineLaterSet"));
-	    }
-	    return true;
-	} else {
-	    return false;
-	}
     }
 
     /**
@@ -268,7 +231,6 @@ public class LearningController {
     @RequestMapping("/finish")
     public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-
 	Long userID = getUserID(request);
 
 	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
