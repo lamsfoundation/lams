@@ -89,7 +89,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 			<c:if test="${finishedButton}">
 				<div class="activity-bottom-buttons">
-					<buttton type="submit" class="btn btn-primary na" id="finishButton"> 
+					<button type="submit" class="btn btn-primary na" id="finishButton"> 
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="label.submit.button" />
@@ -98,7 +98,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<fmt:message key="label.finish.button" />
 							</c:otherwise>
 						</c:choose>
-					</buttton>
+					</button>
 				</div>
 			</c:if>
 		</form:form>
