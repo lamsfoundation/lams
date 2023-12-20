@@ -27,6 +27,10 @@
 				background-color: initial;
 				border: none;
 			}
+			
+			.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
+			    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
+			}
 		</style>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
