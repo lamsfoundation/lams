@@ -165,6 +165,13 @@
 		</div>
 
 		<div class="checkbox">
+			<label for="shuffledAnswers">
+				<form:checkbox path="assessment.shuffledAnswers" id="shuffledAnswers"/>
+				<fmt:message key="label.authoring.advance.shuffle.answers" />
+			</label>
+		</div>
+
+		<div class="checkbox">
 			<label for="questions-numbering">
 				<form:checkbox path="assessment.numbered" id="questions-numbering"/>
 				<fmt:message key="label.authoring.advance.numbered.questions" />

@@ -23,14 +23,13 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.SortComparator;
+import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -47,14 +46,14 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.SortComparator;
-import org.lamsfoundation.lams.qb.model.QbToolQuestion;
-import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Assessment
@@ -117,6 +116,9 @@ public class Assessment implements Cloneable {
 
     @Column
     private boolean shuffled;
+
+    @Column(name = "shuffled_answers")
+    private boolean shuffledAnswers;
 
     @Column
     private boolean numbered;
@@ -725,6 +727,14 @@ public class Assessment implements Cloneable {
 
     public void setShuffled(boolean shuffled) {
 	this.shuffled = shuffled;
+    }
+
+    public boolean isShuffledAnswers() {
+	return shuffledAnswers;
+    }
+
+    public void setShuffledAnswers(boolean shuffledAnswers) {
+	this.shuffledAnswers = shuffledAnswers;
     }
 
     /**
