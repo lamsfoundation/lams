@@ -23,9 +23,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Assessment Form.
@@ -61,6 +61,7 @@ public class AssessmentForm {
 	assessment.setAllowWrongAnswersAfterQuestion(false);
 	assessment.setDefineLater(false);
 	assessment.setShuffled(false);
+	assessment.setShuffledAnswers(false);
 	assessment.setNumbered(false);
 	assessment.setDisplaySummary(false);
 	assessment.setReflectOnActivity(false);
