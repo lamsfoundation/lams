@@ -124,44 +124,42 @@
 							</ul>
 
 							<!-- display students answers -->
-							<div class="table-responsive">
-								<div class="card-subheader">
-									<fmt:message key="label.yourAnswers" />			
-								</div>
+							<div class="card-subheader">
+								<fmt:message key="label.yourAnswers" />			
+							</div>
 
-								<div class="row">
-									<!-- show right/wrong -->
-									<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-										<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
-											<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-												<c:choose>
-													<c:when test="${attemptEntry.value.qbOption.correct}">
-														<span class="text-bg-success badge ms-3" style="width: 40px;">
-															<i class="fa fa-check" style="font-size: 22px"></i>
-														</span>
-													</c:when>
-													<c:otherwise>
-														<span class="text-bg-danger badge ms-3" style="width: 40px;">
-															<i class="fa fa-times" style="font-size: 22px"></i>
-														</span>
-													</c:otherwise>
-												</c:choose>
-											</c:if>
-										</c:forEach>
-									</c:if>
-			
-									<!-- display student selection --> 
+							<div class="row">
+								<!-- show right/wrong -->
+								<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 									<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
 										<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
-											<div class="col">
-												<c:out value="${attemptEntry.value.qbOption.name}" escapeXml="false" />
-											</div>
+											<c:choose>
+												<c:when test="${attemptEntry.value.qbOption.correct}">
+													<span class="text-bg-success badge ms-3" style="width: 40px;">
+														<i class="fa fa-check" style="font-size: 22px"></i>
+													</span>
+												</c:when>
+												<c:otherwise>
+													<span class="text-bg-danger badge ms-3" style="width: 40px;">
+														<i class="fa fa-times" style="font-size: 22px"></i>
+													</span>
+												</c:otherwise>
+											</c:choose>
 										</c:if>
 									</c:forEach>
-								</div>
+								</c:if>
+			
+								<!-- display student selection --> 
+								<c:forEach var="attemptEntry" items="${mcGeneralLearnerFlowDTO.attemptMap}">
+									<c:if test="${requestScope.mainQueIndex == attemptEntry.key}">
+										<div class="col">
+											<c:out value="${attemptEntry.value.qbOption.name}" escapeXml="false" />
+										</div>
+									</c:if>
+								</c:forEach>
+							</div>
 											
-								<c:if test="${sessionMap.content.enableConfidenceLevels}">
-													
+							<c:if test="${sessionMap.content.enableConfidenceLevels}">
 									<div class="bootstrap-slider mt-3">
 										<div class="card-subheader">
 											<label for="confidenceLevel${queIndex}">
@@ -186,8 +184,7 @@
 											</c:forEach>
 										</div>
 									</div>
-								</c:if>
-							</div>
+							</c:if>
 						</c:if>
 					</c:forEach>
 

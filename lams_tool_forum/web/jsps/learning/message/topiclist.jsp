@@ -17,8 +17,7 @@
 	</div>
 	
 	<div class="card-body">
-		<div class="table-responsive">
-			<div id="topicTable" class="ltable table-hover">
+		<div id="topicTable" class="ltable table-hover">
 				<div class="row">
 					<div class="col-5 flex-fill"><fmt:message key="lable.topic.title.subject" /></div>
 					<div class="col-2"><fmt:message key="lable.topic.title.startedby" /></div>
@@ -106,7 +105,6 @@
 						</c:if>
 					</div>
 				</c:forEach>
-			</div>
 		</div>
 	</div>
 </div>

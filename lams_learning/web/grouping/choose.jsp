@@ -86,61 +86,59 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<fmt:message key="label.learner.choice.group.message" />
 		</div>
 	
-		<div class="table-responsive">
-			<div class="ltable table-hover">
-				<div class="row">
-					<div class="col-3 first">
-						<fmt:message key="label.view.groups.title" />
-					</div>
+		<div class="ltable table-hover">
+			<div class="row">
+				<div class="col-3 first">
+					<fmt:message key="label.view.groups.title" />
+				</div>
 					
-					<div class="col-7">
+				<div class="col-7">
+					<c:if test="${viewStudentsBeforeSelection && !RestrictedGroupUserNames}">
+						<fmt:message key="label.view.groups.learners" />
+					</c:if>
+				</div>
+					
+				<div class="col-2"></div>
+			</div>
+				
+			<c:forEach var="group" items="${groups}">
+				<div class="row align-items-center">
+					<div class="col-sm-3 first">
+						<strong><c:out value="${group.groupName}" /></strong>
+					</div>
+						
+					<div class="col-sm-7">
 						<c:if test="${viewStudentsBeforeSelection && !RestrictedGroupUserNames}">
-							<fmt:message key="label.view.groups.learners" />
+							<c:forEach items="${group.userList}" var="user">
+								<div name="u-${user.userID}" class="user-container">
+									<lams:Portrait userId="${user.userID}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
+								</div>
+							</c:forEach>
 						</c:if>
 					</div>
-					
-					<div class="col-2"></div>
-				</div>
-				
-				<c:forEach var="group" items="${groups}">
-					<div class="row align-items-center">
-						<div class="col-sm-3 first">
-							<strong><c:out value="${group.groupName}" /></strong>
-						</div>
 						
-						<div class="col-sm-7">
-							<c:if test="${viewStudentsBeforeSelection && !RestrictedGroupUserNames}">
-								<c:forEach items="${group.userList}" var="user">
-									<div name="u-${user.userID}" class="user-container">
-										<lams:Portrait userId="${user.userID}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
-									</div>
-								</c:forEach>
-							</c:if>
-						</div>
-						
-						<div class="col-sm-2 text-end">
-							<c:choose>
-								<c:when test="${not empty maxLearnersPerGroup and fn:length(group.userList)>=maxLearnersPerGroup}">
-									<fmt:message key="label.learner.choice.group.full" />
-								</c:when>
+					<div class="col-sm-2 text-end">
+						<c:choose>
+							<c:when test="${not empty maxLearnersPerGroup and fn:length(group.userList)>=maxLearnersPerGroup}">
+								<fmt:message key="label.learner.choice.group.full" />
+							</c:when>
 								
-								<c:otherwise>
-									<form:form action="learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
-										 modelAttribute="groupingForm" id="form${user.userID}${activityID}${group.groupID}" >
-									</form:form>							
-									<button type="button" class="btn btn-sm btn-primary" 
-											data-bs-toggle="modal" data-bs-target="#confirmationModal" 
-											data-u="form${user.userID}${activityID}${group.groupID}" 
-											data-gn="<c:out value="${group.groupName}" />">
-										<i class="fa-regular fa-circle-check me-1"></i>
-										<fmt:message key="label.choose.group.button" />
-									</button>
-								</c:otherwise>							
-							</c:choose>
-						</div>
+							<c:otherwise>
+								<form:form action="learnerChooseGroup.do?userId=${user.userID}&activityID=${activityID}&groupId=${group.groupID}"
+									 modelAttribute="groupingForm" id="form${user.userID}${activityID}${group.groupID}" >
+								</form:form>							
+								<button type="button" class="btn btn-sm btn-primary" 
+										data-bs-toggle="modal" data-bs-target="#confirmationModal" 
+										data-u="form${user.userID}${activityID}${group.groupID}" 
+										data-gn="<c:out value="${group.groupName}" />">
+									<i class="fa-regular fa-circle-check me-1"></i>
+									<fmt:message key="label.choose.group.button" />
+								</button>
+							</c:otherwise>							
+						</c:choose>
 					</div>
-				</c:forEach>
-			</div>
+				</div>
+			</c:forEach>
 		</div>
 	</div>
 </lams:PageLearner>

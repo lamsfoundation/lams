@@ -93,9 +93,8 @@
 			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
 		</div>
 
-		<div class="table-responsive">
-			<div class="div-hover">
-				<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
+		<div class="div-hover">
+			<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
 				<div class="row">
 					<div class="col">
 						<lams:Portrait userId="${ratingDto.itemId}"/>
@@ -120,13 +119,11 @@
 						</c:choose>
 					</div>
 				</div>
-				</c:forEach>
-			</div>
+			</c:forEach>
 		</div>
 
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
 			<div class="m-3">
-			
 				<div>
 					<label for="justify" class="fst-italic">
 						<fmt:message key="label.justify.hedging.marks" />

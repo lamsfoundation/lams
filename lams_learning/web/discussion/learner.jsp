@@ -158,7 +158,7 @@
 
 	<div id="discussion-sentiment-widget-content" class="collapse" role="tabpanel"
        	 aria-labelledby="discussion-sentiment-widget-heading">
-       	 <div class="ltable table-responsive">
+       	 <div class="ltable">
 	       	 <div class="row">
 	       	 	<div class="discussion-sentiment-widget-option-stay text-bg-warning col">
 	       	 		<fmt:message key="label.discussion.stay.header" />

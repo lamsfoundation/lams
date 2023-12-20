@@ -32,7 +32,7 @@
 				</c:if>
 			</div>
 
-			<div class="card-body table-responsive">					
+			<div class="card-body">					
 				<div class="mb-3">
 		           	<c:out value="${answerDto.questionDescription}" escapeXml="false" />
 				</div>
