@@ -240,7 +240,7 @@ public class LearningController {
 		errorMap = new LinkedMultiValueMap<>();
 		request.setAttribute("errorMap", errorMap);
 	    }
-	    errorMap.add("GLOBAL", e.getMessage());
+	    errorMap.add("GLOBAL", e.getMessage() == null ? e.toString() : e.getMessage());
 	    request.setAttribute("skipContent", true);
 	}
 	return "pages/learning/learning";
