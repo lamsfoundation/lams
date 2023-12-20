@@ -140,7 +140,7 @@
 						</c:when>
 						
 						<c:otherwise>
-							<button id="finishButton" name="FinishButton" class="btn btn-primary na">
+							<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
 								<c:choose>
 									<c:when test="${sessionMap.isLastActivity}">
 										<fmt:message key="label.submit" />
@@ -155,7 +155,7 @@
 				</c:if>
 				
 				<c:if test="${isResubmitAllowed && hasEditRight}">
-					<button type="submit" onclick="resubmit()" class="btn btn-secondary btn-icon-return me-2">
+					<button type="button" onclick="resubmit()" class="btn btn-secondary btn-icon-return me-2">
 						<fmt:message key="label.learning.resubmit" />
 					</button>
 				</c:if>

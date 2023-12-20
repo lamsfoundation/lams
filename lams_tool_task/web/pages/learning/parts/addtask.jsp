@@ -56,11 +56,11 @@
 
 				<div class="mt-3 float-end">
 					<lams:ImgButtonWrapper>
-						<button onclick="cancel();" class="btn btn-sm btn-secondary btn-disable-on-submit btn-icon-cancel"> 
+						<button type="button" onclick="cancel();" class="btn btn-sm btn-secondary btn-disable-on-submit btn-icon-cancel"> 
 							<fmt:message key="label.cancel" />
 						</button>
 						
-						<button onclick="saveTask()" class="btn btn-sm btn-secondary btn-disable-on-submit"> 
+						<button type="button" onclick="saveTask()" class="btn btn-sm btn-secondary btn-disable-on-submit"> 
 							<i class="fa fa-plus"></i>
 							<fmt:message key="button.add" />
 						</button>

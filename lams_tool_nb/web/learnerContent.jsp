@@ -48,12 +48,12 @@
             <div class="activity-bottom-buttons">
                 <c:choose>
                     <c:when test="${reflectOnActivity}">
-                        <button class="btn btn-primary na" onclick="submitForm('reflect')">
+                        <button type="button" class="btn btn-primary na" onclick="submitForm('reflect')">
                             <fmt:message key="button.continue" />
                         </button>
                     </c:when>
                     <c:otherwise>
-                        <button id="finishButton" class="btn btn-primary na">
+                        <button type="button" id="finishButton" class="btn btn-primary na">
                             <c:choose>
                                 <c:when test="${isLastActivity}">
                                     <fmt:message key="button.submit" />

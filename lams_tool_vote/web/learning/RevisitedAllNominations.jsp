@@ -81,7 +81,7 @@
 				</button>
 
 				<c:if test="${hasEditRight}">
-					<button type="submit" name="redoQuestionsOk"
+					<button type="button" name="redoQuestionsOk"
 						class="btn btn-secondary btn-icon-return me-2"
 						onclick="submitMethod('redoQuestionsOk');">
 						<fmt:message key="label.retake" />

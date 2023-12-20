@@ -36,13 +36,13 @@
 		<c:choose>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
 				<input type="hidden" name="method" id="method" value="newReflection">
-				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary na">
+				<button type="button" name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary na">
 					<fmt:message key="label.continue" />
 				</button>
 			</c:when>
 			<c:otherwise>
 				<input type="hidden" name="method" id="method" value="showResults">
-				<button name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary na">
+				<button type="button" name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary na">
 					<fmt:message key="label.submit" />
 				</button>
 			</c:otherwise>

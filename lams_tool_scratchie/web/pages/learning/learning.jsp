@@ -537,7 +537,7 @@
                 <h4 id="are-you-ready">
                     <fmt:message key='label.are.you.ready' />
                 </h4>
-                <button name="ok" id="timelimit-start-ok" class="button">
+                <button type="button" name="ok" id="timelimit-start-ok" class="button">
                     <fmt:message key='label.ok' />
                 </button>
             </div>

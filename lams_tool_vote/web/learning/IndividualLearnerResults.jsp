@@ -75,7 +75,7 @@
 					</c:if>
 
 					<c:if test="${hasEditRight}">
-						<button type="submit" name="redoQuestions"
+						<button type="button" name="redoQuestions"
 							class="btn btn-sm btn-secondary btn-icon-return float-end mt-2"
 							onclick="submitMethod('redoQuestions');">
 							<fmt:message key="label.retake" />
@@ -87,7 +87,7 @@
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${voteLearningForm.showResults=='true'}">
-						<button type="submit" name="viewAllResults" class="btn btn-primary na" onclick="submitMethod('viewAllResults');">
+						<button type="button" name="viewAllResults" class="btn btn-primary na" onclick="submitMethod('viewAllResults');">
 							<fmt:message key="label.overAllResults" />
 						</button>
 					</c:when>
@@ -106,7 +106,7 @@
 					</c:when>
 	
 					<c:otherwise>
-						<button type="submit" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
+						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:otherwise>

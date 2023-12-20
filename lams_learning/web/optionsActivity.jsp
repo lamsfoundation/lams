@@ -233,7 +233,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		        		<fmt:message key="label.cancel.button" />
 		        	</button>
 	        	
-					<button id="submitter" onclick="" class="btn btn-primary"
+					<button type="button" id="submitter" class="btn btn-primary"
 							data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key='label.group.confirm.button' /></span>">
 						<i class="fa fa-check fa-lg me-1"></i>
 						<fmt:message key="label.group.confirm.button"/>

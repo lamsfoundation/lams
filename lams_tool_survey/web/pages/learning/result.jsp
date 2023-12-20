@@ -158,21 +158,19 @@
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
-						<button property="otherUsersAnswersButton" onclick="return showOtherUsersAnswers()"
-							class="btn btn-primary na">
+						<button type="button" name="otherUsersAnswersButton" onclick="showOtherUsersAnswers()" class="btn btn-primary na">
 							<fmt:message key="label.view.all.responses" />
 						</button>
 					</c:when>
 
 					<c:when test="${sessionMap.reflectOn}">
-						<button property="ContinueButton" onclick="return continueReflect()"
-							class="btn btn-primary na">
+						<button type="button" name="ContinueButton" onclick="continueReflect()" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton" class="btn btn-primary na">
+						<button type="button" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />

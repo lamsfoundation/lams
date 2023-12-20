@@ -218,18 +218,18 @@
 					</c:if>
 	
 					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
-						<button onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
+						<button type="button" onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
 							<fmt:message key="label.continue" />
 						</button>
 					</c:if>
 	
 					<c:if test="${voteLearningForm.lockOnFinish != 'true' && hasEditRight}">
-						<button class="btn btn-secondary btn-icon-return me-2" onclick="submitMethod('redoQuestionsOk');">
+						<button type="button" class="btn btn-secondary btn-icon-return me-2" onclick="submitMethod('redoQuestionsOk');">
 							<fmt:message key="label.retake" />
 						</button>
 					</c:if>
 					
-					<button class="btn btn-secondary btn-icon-refresh me-2" onclick="submitMethod('viewAllResults');">
+					<button type="button" class="btn btn-secondary btn-icon-refresh me-2" onclick="submitMethod('viewAllResults');">
 						<fmt:message key="label.refresh" />
 					</button>
 				</div>

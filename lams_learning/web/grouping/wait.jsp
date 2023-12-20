@@ -42,7 +42,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="force" value="${groupingForm.previewLesson}" />
 		
 			<div class="activity-bottom-buttons">
-				<button class="btn btn-primary na">
+				<button type="submit" class="btn btn-primary na">
 					<fmt:message key="label.next.button" />
 				</button>
 			</div>

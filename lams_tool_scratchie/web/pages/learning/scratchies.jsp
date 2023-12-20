@@ -197,7 +197,7 @@
 								<c:if test="${item.qbQuestion.autocompleteEnabled}">ui-autocomplete-input</c:if>"
 								style="display: inline-block; width: 70%;" data-item-uid="${item.uid}" aria-labelledby="type-your-answer-descr-${item.uid}"/>
 									
-							<button class="btn btn-secondary btn-sm submit-user-answer ms-1" data-item-uid="${item.uid}" >
+							<button type="button" class="btn btn-secondary btn-sm submit-user-answer ms-1" data-item-uid="${item.uid}" >
 								<i class="fa-solid fa-circle-play me-1"></i>
 								<fmt:message key="label.button.submit" />
 							</button>

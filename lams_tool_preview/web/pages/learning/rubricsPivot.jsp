@@ -108,7 +108,7 @@
 </c:if>
 
 <div class="collapsable-icon-left">
-	<button id="expand-all-button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" onClick="javascript:expandAllRubricsCards()">
+	<button type="button" id="expand-all-button" class="btn btn-secondary collapsed" data-bs-toggle="collapse" onClick="javascript:expandAllRubricsCards()">
 		<fmt:message key="label.rating.rubrics.expand.all" />
 	</button>
 </div>

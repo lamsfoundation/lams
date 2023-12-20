@@ -49,7 +49,7 @@
 </c:if>
 
 <div class="btn-group-sm mt-2 float-end">
-	<button name="goback" id="cancelButton" onclick="javascript:cancelReply();" class="btn btn-secondary btn-icon-cancel me-2">
+	<button type="button" name="goback" id="cancelButton" onclick="javascript:cancelReply();" class="btn btn-secondary btn-icon-cancel me-2">
 		<fmt:message key="button.cancel" />
 	</button>
 	

@@ -258,7 +258,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<button type="submit" id="finishButton" onclick="return finishSession()" class="btn btn-primary na">
+						<button type="button" id="finishButton" onclick="return finishSession()" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
 									<fmt:message key="label.submit" />

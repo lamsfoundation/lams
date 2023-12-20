@@ -11,7 +11,7 @@
 		</lams:Alert5>
 
 		<div class="activity-bottom-buttons">
-			<button name="refreshButton" onclick="javascript:location.reload();" class="btn btn-primary btn-icon-refresh">
+			<button type="button" name="refreshButton" onclick="javascript:location.reload();" class="btn btn-primary btn-icon-refresh">
 				<fmt:message key="label.refresh" />
 			</button>
 		</div>

@@ -289,8 +289,7 @@
                         </button>
                     </c:when>
                     <c:otherwise>
-                        <button type="button" id="finishButton"
-                                class="btn btn-primary btn-disable-on-submit na
+                        <button type="button" id="finishButton" class="btn btn-primary btn-disable-on-submit na
 								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
                             <c:choose>
                                 <c:when test="${isLastActivity}">

@@ -73,7 +73,9 @@
 
 	<body>	
 		<c:if test="${printMode}">
-			<button class="btn btn-primary" id="print-button" onClick="javascript:window.print()"><fmt:message key='button.print' /></button>
+			<button type="button" class="btn btn-primary" id="print-button" onClick="javascript:window.print()">
+				<fmt:message key='button.print' />
+			</button>
 		</c:if>
 		<%-- MindMap ---------------------------------------%>
 		<%@ include file="/common/mapjs.jsp"%>
