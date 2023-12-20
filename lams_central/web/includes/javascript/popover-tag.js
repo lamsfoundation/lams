@@ -33,7 +33,7 @@ $(document).ready(function() {
 					popover.attr('aria-label', title);
 					// put title text on the left and a close button on the right
 					title = '<div style="display: flex; justify-content: space-between;"><span>' + title + 
-							'</span><button type="buttton" class="btn-close" aria-label="Close" tabindex="0"></button>';
+							'</span><button type="button" class="btn-close" aria-label="Close" tabindex="0"></button>';
 					popover.data('titlePresent', true);
 				}
 				
@@ -92,7 +92,7 @@ $(document).ready(function() {
 				// if there is not title then we need to put close button directly on content
 				if (content && !popover.data('titlePresent')) {
 					content = '<div class="d-flex flex-column">'
-							  + '<button type="buttton" class="btn-close align-self-end" aria-label="Close" tabindex="0"></button>'
+							  + '<button type="button" class="btn-close align-self-end" aria-label="Close" tabindex="0"></button>'
 					          + content + '</div>';
 				}
 				
