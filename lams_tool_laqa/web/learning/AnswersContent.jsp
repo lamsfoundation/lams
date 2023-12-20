@@ -48,7 +48,7 @@
 
 		<!-- End advanced settings and notices -->
 
-		<div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.instructions'/>">
+		<div id="instructions" class="instructions">
 			<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 		</div>
 

@@ -159,7 +159,7 @@
 
 	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 	    <div class="card lcard">
-	       <div class="card-header" id="heading${groupSummary.sessionId}">
+	       <div class="card-header">
 	       	<span class="card-title collapsable-icon-left">
 	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}" 
 						aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}">
@@ -175,9 +175,7 @@
 			</span>
 	       </div>
 	       
-	       <div id="collapse${groupSummary.sessionId}" class="card-body collapse whiteboard-collapse" 
-	       	    aria-labelledby="heading${groupSummary.sessionId}">
-	       	    
+	       <div id="collapse${groupSummary.sessionId}" class="card-body collapse whiteboard-collapse">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 	       	    	<div class="gallery-walk-rating-comment-container">

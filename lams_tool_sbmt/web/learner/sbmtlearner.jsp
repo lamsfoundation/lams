@@ -103,7 +103,7 @@
             <lams:errors5/>
         </div>
         
-        <div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
+        <div id="instructions" class="instructions">
             <c:out value="${sessionMap.instruction}" escapeXml="false" />
         </div>
 
@@ -218,7 +218,7 @@
 
                                         <div>
                                             <!--The description of the File -->
-                                            <div id="fileDescription" aria-label="<fmt:message key='label.learner.fileDescription' />">
+                                            <div id="fileDescription">
                                                 <lams:out value="${file.fileDescription}" escapeHtml="true" />
                                             </div>
 

@@ -128,7 +128,7 @@
 
 	<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}" varStatus="status">
 	    <div class="card lcard">
-	       <div class="card-header" id="heading${mindmapSession.sessionID}">
+	       <div class="card-header">
 	       	<span class="card-title collapsable-icon-left">
 	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${mindmapSession.sessionID}" 
 						aria-expanded="false" aria-controls="collapse${mindmapSession.sessionID}"
@@ -145,8 +145,7 @@
 			</span>
 	       </div>
 	       
-	       <div id="collapse${mindmapSession.sessionID}" class="card-body collapse mindmap-collapse" 
-	       	    aria-labelledby="heading${mindmapSession.sessionID}">
+	       <div id="collapse${mindmapSession.sessionID}" class="card-body collapse mindmap-collapse">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not mindmapDTO.galleryWalkReadOnly and (mindmapDTO.galleryWalkFinished or mode == 'teacher' or toolSessionID != mindmapSession.sessionID)}">
 	       	    	<div class="gallery-walk-rating-comment-container">

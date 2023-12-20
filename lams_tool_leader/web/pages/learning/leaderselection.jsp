@@ -26,7 +26,6 @@
                 $("#leaderSelectionDialog").modal('show');
             }
 
-
             initWebsocket('leaderSelection${toolSessionID}',
                 '<lams:WebAppURL />'.replace('http', 'ws')
                 + 'learningWebsocket?toolSessionID=${toolSessionID}',
@@ -130,7 +129,7 @@
 
                 <div class="modal-body">
                     <!-- begin -->
-                    <div id="instructions" class="instructions" aria-label="<fmt:message key='label.authoring.basic.instruction'/>">
+                    <div id="instructions" class="instructions pt-0">
                         <c:out value="${content.instructions}" escapeXml="false" />
                     </div>
 

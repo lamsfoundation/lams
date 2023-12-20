@@ -121,7 +121,7 @@
 	<c:forEach var="ratingDto" items="${exampleRatings}" varStatus="learnerOrderId">
 			
 	    <div class="card lcard rubrics-user-card">
-	       <div class="card-header collapsable-icon-left" id="heading${ratingDto.itemId}">
+	       <div class="card-header collapsable-icon-left">
 	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${ratingDto.itemId}" 
 						aria-expanded="false" aria-controls="collapse${ratingDto.itemId}" data-parent="#rubrics-users-cards"
 				>
@@ -131,7 +131,7 @@
 				</button>
 	       </div>
 	       
-	       <div id="collapse${ratingDto.itemId}" class="collapse" aria-labelledby="heading${ratingDto.itemId}">
+	       <div id="collapse${ratingDto.itemId}" class="collapse">
 				<div class="ltable rubrics-table mb-0">
 						<div class="row rubrics-table-header m-0">
 							<%-- Each answer column has the same length, all remaining space is taken by the question column --%>

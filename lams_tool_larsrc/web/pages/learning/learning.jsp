@@ -326,8 +326,7 @@
                     </div>
                 </div>
 
-                <div id="collapse${item.uid}" data-item-uid="${item.uid}" class="item-collapse card-collapse collapse"
-                     role="tabpanel" aria-labelledby="heading${item.uid}"></div>
+                <div id="collapse${item.uid}" data-item-uid="${item.uid}" class="item-collapse card-collapse collapse"></div>
             </div>
         </c:forEach>
 

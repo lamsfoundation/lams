@@ -13,8 +13,7 @@
 </c:if>
 
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
-	<div class="card lcard mt-4" id="question${questionNumber.count}" aria-label="question">
-		
+	<div class="card lcard mt-4" id="question${questionNumber.count}">
 		<div class="card-header" id="questionTitle${questionNumber.count}">
 	        ${questionNumber.count})&nbsp;
 	        <c:if test="${not sessionMap.hideTitles}">

@@ -124,7 +124,7 @@
 		<c:set var="criteria" value="${criteriaDto.ratingCriteria}" />
 		
 	    <div class="lcard card rubrics-row-card">
-	       <div class="card-header collapsable-icon-left" id="heading${criteria.ratingCriteriaId}">
+	       <div class="card-header collapsable-icon-left">
 	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${criteria.ratingCriteriaId}" 
 						aria-expanded="false" aria-controls="collapse${criteria.ratingCriteriaId}" data-parent="#rubrics-rows-cards"
 				>
@@ -133,7 +133,7 @@
 				</button>
 	       </div>
 	       
-	       <div id="collapse${criteria.ratingCriteriaId}" class="collapse" aria-labelledby="heading${criteria.ratingCriteriaId}">
+	       <div id="collapse${criteria.ratingCriteriaId}" class="collapse">
 				<div class="ltable rubrics-table">
 					<div class="row rubrics-table-header m-0">
 						<%-- Learner profile pictures and names --%>

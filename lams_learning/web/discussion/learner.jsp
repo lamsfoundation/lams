@@ -143,11 +143,11 @@
 </script>
 
 <div class="card lcard" >
-	<div class="card-header text-bg-secondary" id="discussion-sentiment-widget-heading">
+	<div class="card-header text-bg-secondary">
 		<span class="card-title">
 			<button type="button" data-bs-toggle="collapse" 
-				class="btn btn-light collapsed"
-				data-bs-target="#discussion-sentiment-widget-content"> 
+					class="btn btn-light collapsed"
+					data-bs-target="#discussion-sentiment-widget-content"> 
 				<i class="fa fa-comments"></i> 
 				<span id="discussion-sentiment-widget-title"> 
 					<fmt:message key="label.discussion.header" />
@@ -156,8 +156,7 @@
 		</span>
 	</div>
 
-	<div id="discussion-sentiment-widget-content" class="collapse" role="tabpanel"
-       	 aria-labelledby="discussion-sentiment-widget-heading">
+	<div id="discussion-sentiment-widget-content" class="collapse">
        	 <div class="ltable">
 	       	 <div class="row">
 	       	 	<div class="discussion-sentiment-widget-option-stay text-bg-warning col">

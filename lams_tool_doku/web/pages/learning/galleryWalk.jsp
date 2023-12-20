@@ -141,7 +141,7 @@
 
 	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 		<div class="card lcard">
-			<div class="card-header" id="heading${groupSummary.sessionId}">
+			<div class="card-header">
 		       	<span class="card-title collapsable-icon-left">
 		       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}" 
 							aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}">
@@ -157,8 +157,7 @@
 				</span>
 			</div>
 			
-			<div id="collapse${groupSummary.sessionId}" class="card-body collapse etherpad-collapse" 
-		       	    aria-labelledby="heading${groupSummary.sessionId}">
+			<div id="collapse${groupSummary.sessionId}" class="card-body collapse etherpad-collapse">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 		       	<c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 		       	   	<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
