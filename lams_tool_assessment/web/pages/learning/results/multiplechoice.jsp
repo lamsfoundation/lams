@@ -46,7 +46,7 @@
 							<c:choose>
 								<c:when test="${question.multipleAnswersAllowed}">
 									<input type="checkbox" name="question${questionIndex}_${option.displayOrder}" id="option-${questionIndex}-${option.uid}" 
-										class="form-check-input" 
+										class="form-check-input" style="opacity:1"
 										value="${true}"
 										<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 										disabled="disabled"
@@ -54,7 +54,7 @@
 								</c:when>
 								<c:otherwise>
 									<input type="radio" name="question${questionIndex}" id="option-${questionIndex}-${option.uid}"
-										class="form-check-input" 
+										class="form-check-input" style="opacity:1"
 										value="${option.displayOrder}"
 				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 				 						disabled="disabled"
@@ -63,7 +63,7 @@
 							</c:choose>
 						</c:if>
 							
-						<label class="form-check-label" for="option-${questionIndex}-${option.uid}">
+						<label class="form-check-label" for="option-${questionIndex}-${option.uid}" style="opacity:1">
 							<c:if test="${question.prefixAnswersWithLetters}">
 					 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
 			 	            </c:if>	
