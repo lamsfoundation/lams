@@ -100,7 +100,8 @@
 		</c:forEach>
 
 		<script type="text/javascript">
-			var skipValidation = false;
+			var skipValidation = false,
+				isResubmitAllowed = ${empty isResubmitAllowed ? false : isResubmitAllowed};
 
 			$(document).ready(function(){
 				//if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
@@ -359,8 +360,11 @@
 					});
 				}
 
-				// only if time limit is not expired
-				if (!isTimelimitExpired && !validateAnswers()) {
+				// validate only if time limit is not expired
+				// otherwise confirm with learner that he wants to submit
+				if (!isTimelimitExpired && (!validateAnswers()
+						|| (!isResubmitAllowed &&
+								!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.submit.all.confirm'/></spring:escapeBody>")))) {
 					return;
 				}
 
