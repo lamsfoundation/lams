@@ -52,6 +52,10 @@
 		display: inline-block;
 		margin-left: 5px;
 	}
+
+	#time-limit-widget .time-limit-widget-individual-row {
+		border-top: thin solid #ddd;
+	}
 </style>
 
 <script>
@@ -384,6 +388,8 @@
 		} else {
 			counters.countdown('resume');
 		}
+
+		refreshInidividualTimeLimits();
 	}
 
 	function timeLimitFinishNow(){
@@ -448,7 +454,10 @@
 			},
 			success : function(users) {
 				// remove existing time limits
+				$('.time-limit-widget-individual-counter').countdown('destroy');
 				$('.individual-time-limit-row', table).remove();
+				let timeLimitWidget = $('#time-limit-widget'),
+						individualExtensionContainer = $('#time-limit-widget-individual', timeLimitWidget).empty();
 
 				if (!users) {
 					return;
@@ -467,6 +476,25 @@
 					$('.individual-time-limit-value', row).text(this.adjustment);
 
 					row.removeClass('hidden');
+
+					if (this.adjustment === 0){
+						return true;
+					}
+					let secondsLeft = absoluteTimeLimitFinish - Math.round(now / 1000) + this.adjustment * 60;
+					if (secondsLeft <= 0){
+						return true;
+					}
+
+					let widgetRow = $('<div class="row time-limit-widget-individual-row"></div>').appendTo(individualExtensionContainer);
+					$('<div class="col-xs-6"></div>').text(this.name).appendTo(widgetRow);
+					$('<div class="col-xs-6 time-limit-widget-individual-counter"></div>').appendTo(widgetRow)
+							.countdown({
+								until: '+' + secondsLeft +'S',
+								format: 'hMS',
+								compact: true,
+								alwaysExpire : true,
+								expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
+							});
 				});
 			}
 		});
@@ -764,6 +792,9 @@
 						onClick="scrollToTimeLimitPanel()">
 					<fmt:message key="label.monitoring.time.limit.show.controls"/>
 				</button>
+			</div>
+
+			<div id="time-limit-widget-individual" class="expired-hide-container">
 			</div>
 		</div>
 	</div>
