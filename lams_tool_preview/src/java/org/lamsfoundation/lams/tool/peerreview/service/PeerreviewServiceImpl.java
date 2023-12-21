@@ -903,9 +903,15 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Peerreview content for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Peerreview completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Peerreview content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
@@ -914,20 +920,27 @@ public class PeerreviewServiceImpl
 	    return;
 	}
 
-	ratingService.removeUserCommitsByContent(toolContentId, userId);
+	if (!resetActivityCompletionOnly) {
+	    ratingService.removeUserCommitsByContent(toolContentId, userId);
+	}
 
 	List<PeerreviewSession> sessions = peerreviewSessionDao.getByContentId(toolContentId);
 	for (PeerreviewSession session : sessions) {
 	    PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			PeerreviewConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    peerreviewUserDao.update(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    PeerreviewConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
+		    }
 
-		peerreviewUserDao.delete(user);
+		    peerreviewUserDao.delete(user);
+		}
 	    }
 	}
     }

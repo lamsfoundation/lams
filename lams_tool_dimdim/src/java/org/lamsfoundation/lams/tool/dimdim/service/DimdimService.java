@@ -24,10 +24,6 @@
 
 package org.lamsfoundation.lams.tool.dimdim.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -38,6 +34,10 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
 
 public class DimdimService implements ToolSessionManager, ToolContentManager {
 
@@ -80,12 +80,12 @@ public class DimdimService implements ToolSessionManager, ToolContentManager {
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -108,7 +108,8 @@ public class DimdimService implements ToolSessionManager, ToolContentManager {
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
     }
 
     @Override
@@ -145,6 +146,7 @@ public class DimdimService implements ToolSessionManager, ToolContentManager {
     public boolean isReadOnly(Long toolContentId) {
 	return false;
     }
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	return null;

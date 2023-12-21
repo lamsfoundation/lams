@@ -23,10 +23,6 @@
 /* $$Id$$ */
 package org.eucm.lams.tool.eadventure.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -37,6 +33,10 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
 
 public class EadventureServiceImpl implements ToolContentManager, ToolSessionManager {
 
@@ -74,17 +74,17 @@ public class EadventureServiceImpl implements ToolContentManager, ToolSessionMan
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -107,7 +107,8 @@ public class EadventureServiceImpl implements ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
     }
 
     @Override
@@ -144,7 +145,7 @@ public class EadventureServiceImpl implements ToolContentManager, ToolSessionMan
     public boolean isReadOnly(Long toolContentId) {
 	return false;
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	return null;

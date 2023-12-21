@@ -23,16 +23,6 @@
 
 package org.lamsfoundation.lams.tool.spreadsheet.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -68,6 +58,16 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author Andrey Balan
@@ -308,8 +308,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		// send marks to gradebook where applicable
 		if (mark.getMarks() != null) {
 		    Double doubleMark = mark.getMarks().doubleValue();
-		    toolService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId,
-			    false);
+		    toolService.updateActivityMark(doubleMark, null, user.getUserId().intValue(), sessionId, false);
 		}
 	    }
 	}
@@ -319,12 +318,12 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -540,9 +539,15 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Spreadsheet contents for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Spreadsheet completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Spreadsheet content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	List<SpreadsheetSession> sessions = spreadsheetSessionDao.getByContentId(toolContentId);
@@ -550,19 +555,23 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    SpreadsheetUser user = spreadsheetUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		user.setSessionFinished(false);
-		if (user.getUserModifiedSpreadsheet() != null) {
-		    spreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
-			    user.getUserModifiedSpreadsheet().getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    spreadsheetUserDao.saveObject(user);
+		} else {
+		    if (user.getUserModifiedSpreadsheet() != null) {
+			spreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
+				user.getUserModifiedSpreadsheet().getUid());
+		    }
 
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SpreadsheetConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    SpreadsheetConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
+		    spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
+		}
 	    }
 	}
     }
@@ -595,8 +604,9 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	} else {
 	    log.error("Fail to leave tool Session.Could not find shared spreadsheet " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared spreadsheet session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared spreadsheet session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -632,12 +642,12 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -678,7 +688,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	SpreadsheetUser learner = getUserByIDAndSession(learnerId, toolSessionId);
@@ -686,7 +696,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 }

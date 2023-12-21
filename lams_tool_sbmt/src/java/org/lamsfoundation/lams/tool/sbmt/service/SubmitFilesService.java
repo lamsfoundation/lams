@@ -23,25 +23,8 @@
 
 package org.lamsfoundation.lams.tool.sbmt.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -94,8 +77,24 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * @author Manpreet Minhas
@@ -139,8 +138,8 @@ public class SubmitFilesService
 
 	@Override
 	public int compare(FileDetailsDTO o1, FileDetailsDTO o2) {
-	    if ((o1 != null) && (o2 != null) && (o1.getDateOfSubmission() != null)
-		    && (o2.getDateOfSubmission() != null)) {
+	    if ((o1 != null) && (o2 != null) && (o1.getDateOfSubmission() != null) && (o2.getDateOfSubmission()
+		    != null)) {
 		// don't use Date.comparaTo() directly, because the date could be Timestamp or Date (depeneds the object
 		// is persist or not)
 		return (o1.getDateOfSubmission().getTime() - o2.getDateOfSubmission().getTime()) > 0 ? 1 : -1;
@@ -223,33 +222,47 @@ public class SubmitFilesService
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Submit Files content for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Submit Files completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug(
+			"Removing Submit Files content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	List<SubmitFilesSession> sessions = submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId);
 	for (SubmitFilesSession session : sessions) {
-	    List<SubmissionDetails> submissions = submissionDetailsDAO.getBySessionAndLearner(session.getSessionID(),
-		    userId);
-	    submissionDetailsDAO.deleteAll(submissions);
+	    if (!resetActivityCompletionOnly) {
+		List<SubmissionDetails> submissions = submissionDetailsDAO.getBySessionAndLearner(
+			session.getSessionID(), userId);
+		submissionDetailsDAO.deleteAll(submissions);
+	    }
 
 	    SubmitUser user = submitUserDAO.getLearner(session.getSessionID(), userId);
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionID(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SbmtConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    submitFilesContentDAO.delete(entry);
+		if (resetActivityCompletionOnly) {
+		    user.setFinished(false);
+		    submitUserDAO.update(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionID(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    SbmtConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			submitFilesContentDAO.delete(entry);
+		    }
+
+		    toolService.removeActivityMark(user.getUserID(), session.getSessionID());
+
+		    if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
+			session.setGroupLeader(null);
+			submitFilesSessionDAO.update(session);
+		    }
+
+		    submitUserDAO.delete(user);
 		}
-
-		toolService.removeActivityMark(user.getUserID(), session.getSessionID());
-
-		if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
-		    session.setGroupLeader(null);
-		    submitFilesSessionDAO.update(session);
-		}
-
-		submitUserDAO.delete(user);
 	    }
 	}
     }
@@ -480,8 +493,9 @@ public class SubmitFilesService
 	} else {
 	    log.error("Fail to leave tool Session.Could not find submit file " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find submit file session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find submit file session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -798,10 +812,10 @@ public class SubmitFilesService
      * Calculate user's total mark and push it to gradebook.
      *
      * @param updateMarksForAllSessionUsers
-     *            whether we should update marks for all users in a session
+     * 	whether we should update marks for all users in a session
      * @param session
      * @param reportID
-     *            applicable only in case of updateMarksForAllSessionUsers is false
+     * 	applicable only in case of updateMarksForAllSessionUsers is false
      */
     private void recalculateUserTotalMarks(boolean updateMarksForAllSessionUsers, SubmitFilesSession session,
 	    Long reportID) {
@@ -853,8 +867,8 @@ public class SubmitFilesService
 
 	// push outputs to gradebook
 	for (Integer userId : userIdToTotalMarkMap.keySet()) {
-	    Double userTotalMark = userIdToTotalMarkMap.get(userId) == null ? null
-		    : userIdToTotalMarkMap.get(userId).doubleValue();
+	    Double userTotalMark =
+		    userIdToTotalMarkMap.get(userId) == null ? null : userIdToTotalMarkMap.get(userId).doubleValue();
 	    toolService.updateActivityMark(userTotalMark, null, userId, sessionID, false);
 	}
     }
@@ -970,8 +984,9 @@ public class SubmitFilesService
 
 	//audit log event
 	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionID() + ")";
-	String message = messageService.getMessage("tool.display.name") + ". "
-		+ messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	String message =
+		messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released",
+			new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, content.getContentID(), null, message);
     }
 
@@ -995,8 +1010,8 @@ public class SubmitFilesService
 		notificationMessageParameters[0] = details.getFilePath();
 		notificationMessageParameters[1] = details.getDateOfSubmission();
 		notificationMessageParameters[2] = report.getMarks();
-		notificationMessage
-			.append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		notificationMessage.append(
+			getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
 		notificationMessages.put(userId, notificationMessage);
 	    }
 	}
@@ -1194,7 +1209,7 @@ public class SubmitFilesService
 
     /**
      * @param submitFilesContentDAO
-     *            The submitFilesContentDAO to set.
+     * 	The submitFilesContentDAO to set.
      */
     public void setSubmitFilesContentDAO(ISubmitFilesContentDAO submitFilesContentDAO) {
 	this.submitFilesContentDAO = submitFilesContentDAO;
@@ -1202,7 +1217,7 @@ public class SubmitFilesService
 
     /**
      * @param submitFilesReportDAO
-     *            The submitFilesReportDAO to set.
+     * 	The submitFilesReportDAO to set.
      */
     public void setSubmitFilesReportDAO(ISubmitFilesReportDAO submitFilesReportDAO) {
 	this.submitFilesReportDAO = submitFilesReportDAO;
@@ -1210,7 +1225,7 @@ public class SubmitFilesService
 
     /**
      * @param submitFilesSessionDAO
-     *            The submitFilesSessionDAO to set.
+     * 	The submitFilesSessionDAO to set.
      */
     public void setSubmitFilesSessionDAO(ISubmitFilesSessionDAO submitFilesSessionDAO) {
 	this.submitFilesSessionDAO = submitFilesSessionDAO;
@@ -1218,7 +1233,7 @@ public class SubmitFilesService
 
     /**
      * @param submissionDetailsDAO
-     *            The submissionDetailsDAO to set.
+     * 	The submissionDetailsDAO to set.
      */
     public void setSubmissionDetailsDAO(ISubmissionDetailsDAO submissionDetailsDAO) {
 	this.submissionDetailsDAO = submissionDetailsDAO;
@@ -1226,7 +1241,7 @@ public class SubmitFilesService
 
     /**
      * @param sbmtToolContentHandler
-     *            The sbmtToolContentHandler to set.
+     * 	The sbmtToolContentHandler to set.
      */
     public void setSbmtToolContentHandler(IToolContentHandler sbmtToolContentHandler) {
 	this.sbmtToolContentHandler = sbmtToolContentHandler;
@@ -1234,7 +1249,7 @@ public class SubmitFilesService
 
     /**
      * @param learnerDAO
-     *            The learnerDAO to set.
+     * 	The learnerDAO to set.
      */
     public void setSubmitUserDAO(ISubmitUserDAO learnerDAO) {
 	submitUserDAO = learnerDAO;
@@ -1408,8 +1423,9 @@ public class SubmitFilesService
     public void changeLeaderForGroup(long toolSessionId, int leaderUserId) {
 	SubmitFilesSession session = getSessionById(toolSessionId);
 	if (session.getStatus() != null && session.getStatus().equals(SubmitFilesSession.COMPLETED)) {
-	    throw new java.security.InvalidParameterException("Attempting to assing a new leader with user ID "
-		    + leaderUserId + " to a finished session wtih ID " + toolSessionId);
+	    throw new java.security.InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	SubmitUser existingLeader = session.getGroupLeader();

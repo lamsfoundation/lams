@@ -222,11 +222,14 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ZoomService.logger.isDebugEnabled()) {
-	    ZoomService.logger.debug(
-		    "Resetting Web Conference completion flag for user ID " + userId + " and toolContentId "
-			    + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug("Resetting Zoom completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Zoom content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Zoom zoom = getZoomByContentId(toolContentId);
@@ -239,7 +242,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	for (ZoomSession session : zoom.getZoomSessions()) {
 	    for (ZoomUser user : session.getZoomUsers()) {
 		if (user.getUserId().equals(userId)) {
-		    if (user.getNotebookEntryUID() != null) {
+		    if (!resetActivityCompletionOnly && user.getNotebookEntryUID() != null) {
 			NotebookEntry entry = coreNotebookService.getEntry(user.getNotebookEntryUID());
 			zoomDAO.delete(entry);
 			user.setNotebookEntryUID(null);

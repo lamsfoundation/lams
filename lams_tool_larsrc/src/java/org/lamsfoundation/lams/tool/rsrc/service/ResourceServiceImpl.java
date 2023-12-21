@@ -23,26 +23,9 @@
 
 package org.lamsfoundation.lams.tool.rsrc.service;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -101,9 +84,25 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * @author Dapeng.Ni
@@ -453,7 +452,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+		    Date postedDate = (entry.getLastModified() != null)
+			    ? entry.getLastModified()
 			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflections.add(ref);
@@ -474,9 +474,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    ResourceUser user = visit.getUser();
 	    user.setAccessDate(visit.getAccessDate());
 	    user.setCompleteDate(visit.getCompleteDate());
-	    Date timeTaken = ((visit.getCompleteDate() != null) && (visit.getAccessDate() != null))
-		    ? new Date(visit.getCompleteDate().getTime() - visit.getAccessDate().getTime())
-		    : null;
+	    Date timeTaken = ((visit.getCompleteDate() != null) && (visit.getAccessDate() != null)) ? new Date(
+		    visit.getCompleteDate().getTime() - visit.getAccessDate().getTime()) : null;
 	    user.setTimeTaken(timeTaken);
 	    userList.add(user);
 	}
@@ -559,14 +558,13 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	ResourceUser resourceUser = item.getCreateBy();
 	ResourceSession session = resourceUser.getSession();
 
-	String userName = new StringBuilder()
-		.append(StringUtils.isBlank(resourceUser.getFirstName()) ? "" : resourceUser.getFirstName() + " ")
+	String userName = new StringBuilder().append(
+			StringUtils.isBlank(resourceUser.getFirstName()) ? "" : resourceUser.getFirstName() + " ")
 		.append(StringUtils.isBlank(resourceUser.getLastName()) ? "" : resourceUser.getLastName() + " ")
 		.append("(").append(resourceUser.getLoginName()).append(")").toString();
-	String resourceType = getLocalisedMessage(
-		item.getType() == ResourceConstants.RESOURCE_TYPE_URL ? "label.authoring.basic.resource.url"
-			: "label.authoring.basic.resource.file",
-		new Object[] {});
+	String resourceType = getLocalisedMessage(item.getType() == ResourceConstants.RESOURCE_TYPE_URL
+		? "label.authoring.basic.resource.url"
+		: "label.authoring.basic.resource.file", new Object[] {});
 
 	String url = null;
 	StringBuilder link = new StringBuilder("<a href='");
@@ -725,9 +723,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
      *
      * @param key
-     *            key of the message
+     * 	key of the message
      * @param args
-     *            arguments for the message
+     * 	arguments for the message
      * @return message content
      */
     private String getLocalisedMessage(String key, Object[] args) {
@@ -929,9 +927,16 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Share Resources completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Share Resources content for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    }
 	}
 
 	Resource resource = resourceDao.getByContentId(toolContentId);
@@ -940,25 +945,28 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    return;
 	}
 
-	Iterator<ResourceItem> itemIterator = resource.getResourceItems().iterator();
-	while (itemIterator.hasNext()) {
-	    ResourceItem item = itemIterator.next();
-	    ResourceItemVisitLog visitLog = resourceItemVisitDao.getResourceItemLog(item.getUid(), userId.longValue());
-	    if (visitLog != null) {
-		resourceItemVisitDao.removeObject(ResourceItemVisitLog.class, visitLog.getUid());
-	    }
-
-	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
-		if (item.getFileUuid() != null) {
-		    try {
-			resourceToolContentHandler.deleteFile(item.getFileUuid());
-		    } catch (Exception e) {
-			throw new ToolException("Error while removing Share Resources file UUID " + item.getFileUuid(),
-				e);
-		    }
+	if (!resetActivityCompletionOnly) {
+	    Iterator<ResourceItem> itemIterator = resource.getResourceItems().iterator();
+	    while (itemIterator.hasNext()) {
+		ResourceItem item = itemIterator.next();
+		ResourceItemVisitLog visitLog = resourceItemVisitDao.getResourceItemLog(item.getUid(),
+			userId.longValue());
+		if (visitLog != null) {
+		    resourceItemVisitDao.removeObject(ResourceItemVisitLog.class, visitLog.getUid());
 		}
-		resourceItemDao.removeObject(ResourceItem.class, item.getUid());
-		itemIterator.remove();
+
+		if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		    if (item.getFileUuid() != null) {
+			try {
+			    resourceToolContentHandler.deleteFile(item.getFileUuid());
+			} catch (Exception e) {
+			    throw new ToolException(
+				    "Error while removing Share Resources file UUID " + item.getFileUuid(), e);
+			}
+		    }
+		    resourceItemDao.removeObject(ResourceItem.class, item.getUid());
+		    itemIterator.remove();
+		}
 	    }
 	}
 
@@ -966,13 +974,18 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	for (ResourceSession session : sessions) {
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ResourceConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    resourceDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    resourceUserDao.saveObject(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    ResourceConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			resourceDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		resourceUserDao.removeObject(ResourceUser.class, user.getUid());
+		    resourceUserDao.removeObject(ResourceUser.class, user.getUid());
+		}
 	    }
 	}
     }
@@ -1005,8 +1018,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	} else {
 	    log.error("Fail to leave tool Session.Could not find shared resources " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared resource session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared resource session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }

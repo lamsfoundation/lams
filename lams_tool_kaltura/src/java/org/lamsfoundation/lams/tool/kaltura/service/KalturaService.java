@@ -21,12 +21,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.kaltura.service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
 
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -38,6 +33,10 @@ import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
 
 /**
  * An implementation of the IKalturaService interface.
@@ -90,7 +89,7 @@ public class KalturaService implements ToolSessionManager, ToolContentManager {
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -113,7 +112,8 @@ public class KalturaService implements ToolSessionManager, ToolContentManager {
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
     }
 
     @Override

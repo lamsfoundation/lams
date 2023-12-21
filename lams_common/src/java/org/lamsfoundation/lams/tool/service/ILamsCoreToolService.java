@@ -23,10 +23,6 @@
 
 package org.lamsfoundation.lams.tool.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.SortedMap;
-
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -46,6 +42,10 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.DataIntegrityViolationException;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.SortedMap;
 
 /**
  * <p>
@@ -169,9 +169,9 @@ public interface ILamsCoreToolService {
     /**
      * Ask an activity to delete content entered by the given user, if exists.
      *
-     * @return whether the activity should be persisted afterwards
+     * @return whether the activity should be persisted afterward
      */
-    boolean removeLearnerContent(Activity activity, User learner) throws ToolException;
+    boolean removeLearnerContent(Activity activity, User learner, boolean resetActivityCompletionOnly) throws ToolException;
 
     /**
      * Checks whether the activity's read-only flag can be reset.
