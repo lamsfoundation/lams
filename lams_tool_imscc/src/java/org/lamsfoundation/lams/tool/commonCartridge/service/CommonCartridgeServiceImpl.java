@@ -23,22 +23,6 @@
 
 package org.lamsfoundation.lams.tool.commonCartridge.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -87,10 +71,24 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 /**
- *
  * @author Andrey Balan
- *
  */
 public class CommonCartridgeServiceImpl implements ICommonCartridgeService, ToolContentManager, ToolSessionManager {
     static Logger log = Logger.getLogger(CommonCartridgeServiceImpl.class.getName());
@@ -376,8 +374,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public List<CommonCartridgeUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
-	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao
-		.getCommonCartridgeItemLogBySession(sessionId, itemUid);
+	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao.getCommonCartridgeItemLogBySession(
+		sessionId, itemUid);
 	List<CommonCartridgeUser> userList = new ArrayList(logList.size());
 	for (CommonCartridgeItemVisitLog visit : logList) {
 	    CommonCartridgeUser user = visit.getUser();
@@ -613,8 +611,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    CommonCartridgeUser user = commonCartridgeUserDao
-		    .getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
+	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndContentID(
+		    new Long(newUserUid.longValue()), toolContentId);
 	    if (user == null) {
 		user = new CommonCartridgeUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
@@ -740,10 +738,17 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+
 	if (log.isDebugEnabled()) {
-	    log.debug(
-		    "Removing Common Cartridge content for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Common Cartridge completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Common Cartridge content for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    }
 	}
 
 	CommonCartridge cartridge = commonCartridgeDao.getByContentId(toolContentId);
@@ -752,42 +757,48 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    return;
 	}
 
-	Iterator<CommonCartridgeItem> itemIterator = cartridge.getCommonCartridgeItems().iterator();
-	while (itemIterator.hasNext()) {
-	    CommonCartridgeItem item = itemIterator.next();
-	    CommonCartridgeItemVisitLog visitLog = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(item.getUid(),
-		    userId.longValue());
-	    if (visitLog != null) {
-		commonCartridgeItemVisitDao.removeObject(CommonCartridgeItemVisitLog.class, visitLog.getUid());
-	    }
-
-	    if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
-		if (item.getFileUuid() != null) {
-		    try {
-			commonCartridgeToolContentHandler.deleteFile(item.getFileUuid());
-		    } catch (Exception e) {
-			throw new ToolException("Error while removing Common Cartridge file UUID " + item.getFileUuid(),
-				e);
-		    }
+	if (!resetActivityCompletionOnly) {
+	    Iterator<CommonCartridgeItem> itemIterator = cartridge.getCommonCartridgeItems().iterator();
+	    while (itemIterator.hasNext()) {
+		CommonCartridgeItem item = itemIterator.next();
+		CommonCartridgeItemVisitLog visitLog = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(
+			item.getUid(), userId.longValue());
+		if (visitLog != null) {
+		    commonCartridgeItemVisitDao.removeObject(CommonCartridgeItemVisitLog.class, visitLog.getUid());
 		}
-		commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, item.getUid());
-		itemIterator.remove();
+
+		if (!item.isCreateByAuthor() && item.getCreateBy().getUserId().equals(userId.longValue())) {
+		    if (item.getFileUuid() != null) {
+			try {
+			    commonCartridgeToolContentHandler.deleteFile(item.getFileUuid());
+			} catch (Exception e) {
+			    throw new ToolException(
+				    "Error while removing Common Cartridge file UUID " + item.getFileUuid(), e);
+			}
+		    }
+		    commonCartridgeItemDao.removeObject(CommonCartridgeItem.class, item.getUid());
+		    itemIterator.remove();
+		}
 	    }
 	}
 
 	List<CommonCartridgeSession> sessions = commonCartridgeSessionDao.getByContentId(toolContentId);
-
 	for (CommonCartridgeSession session : sessions) {
 	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			CommonCartridgeConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    commonCartridgeDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    commonCartridgeUserDao.saveObject(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    CommonCartridgeConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			commonCartridgeDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUid());
+		    commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUid());
+		}
 	    }
 	}
     }

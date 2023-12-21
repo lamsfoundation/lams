@@ -154,9 +154,8 @@ public class LearningController {
 	request.setAttribute("reflectOnActivity", mindmap.isReflectOnActivity());
 
 	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, mindmapUser, mode.toString(),
-		!(mode.equals(ToolAccessMode.TEACHER)
-			|| (mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity())),
-		request);
+		!(mode.equals(ToolAccessMode.TEACHER) || (mindmap.isLockOnFinished()
+			&& mindmapUser.isFinishedActivity())), request);
 
 	if (mindmap.isGalleryWalkStarted()) {
 	    mindmapService.fillGalleryWalkRatings(mindmapDTO, mindmapUser.getUserId());
@@ -197,8 +196,8 @@ public class LearningController {
 	    List rootNodeList = mindmapService.getRootNodeByMindmapIdAndUserId(mindmap.getUid(), mindmapUser.getUid());
 
 	    if ((rootNodeList == null) || (rootNodeList.size() == 0)) {
-		MindmapNode fromMindmapNode = (MindmapNode) mindmapService
-			.getAuthorRootNodeByMindmapId(mindmap.getUid()).get(0);
+		MindmapNode fromMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(
+			mindmap.getUid()).get(0);
 		cloneMindmapNodesForRuntime(fromMindmapNode, null, mindmap, mindmap, mindmapUser, mindmapSession);
 	    }
 	} else {
@@ -206,8 +205,8 @@ public class LearningController {
 	    List rootNodeList = mindmapService.getAuthorRootNodeBySessionId(toolSessionID);
 
 	    if ((rootNodeList == null) || (rootNodeList.size() == 0)) {
-		MindmapNode fromMindmapNode = (MindmapNode) mindmapService
-			.getAuthorRootNodeByMindmapId(mindmap.getUid()).get(0);
+		MindmapNode fromMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(
+			mindmap.getUid()).get(0);
 		cloneMindmapNodesForRuntime(fromMindmapNode, null, mindmap, mindmap, null, mindmapSession);
 	    }
 
@@ -232,7 +231,7 @@ public class LearningController {
 		fromContent.getUid());
 
 	if ((childMindmapNodes != null) && (childMindmapNodes.size() > 0)) {
-	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext();) {
+	    for (Iterator iterator = childMindmapNodes.iterator(); iterator.hasNext(); ) {
 		MindmapNode childMindmapNode = (MindmapNode) iterator.next();
 		cloneMindmapNodesForRuntime(childMindmapNode, toMindmapNode, fromContent, toContent, user, session);
 	    }
@@ -266,8 +265,8 @@ public class LearningController {
 	NotifyResponseJSON notifyResponse = null;
 
 	MindmapUser currentUser = mindmapService.getUserByUID(userId);
-	if (currentUser == null
-		|| (mindmapSession.getMindmap().isLockOnFinished() && currentUser.isFinishedActivity())) {
+	if (currentUser == null || (mindmapSession.getMindmap().isLockOnFinished()
+		&& currentUser.isFinishedActivity())) {
 	    notifyResponse = new NotifyResponseJSON(0, null, null);
 	}
 
@@ -322,8 +321,9 @@ public class LearningController {
 		MindmapNode parentNode = mindmapService.getMindmapNodeByUniqueIdSessionId(parentNodeId, mindmapId,
 			toolSessionId);
 		if (parentNode == null) {
-		    LearningController.log.error("notifyServerAction(): Unable to find parent node: " + parentNodeId
-			    + " toolSessionId " + toolSessionId);
+		    LearningController.log.error(
+			    "notifyServerAction(): Unable to find parent node: " + parentNodeId + " toolSessionId "
+				    + toolSessionId);
 		}
 
 		mindmapService.saveMindmapNode(null, parentNode, uniqueId,
@@ -425,36 +425,48 @@ public class LearningController {
 	} else {
 	    mindmapNodeList = mindmapService.getRootNodeByMindmapIdAndUserId(mindmapId, userId);
 	}
-
-	if ((mindmapNodeList != null) && (mindmapNodeList.size() > 0)) {
-	    MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
-
-	    String mindmapUserName = null;
-	    if (rootMindmapNode.getUser() == null) {
-		mindmapUserName = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
-	    } else {
-		mindmapUserName = rootMindmapNode.getUser().getFirstName() + " "
-			+ rootMindmapNode.getUser().getLastName();
+	if (mindmapNodeList == null || mindmapNodeList.size() == 0) {
+	    // this happens when a session was not created and Gallery Walk was already started
+	    MindmapSession mindmapSession = mindmapService.getSessionBySessionId(toolSessionId);
+	    if (mindmapSession == null) {
+		throw new IllegalArgumentException("Unable to find Mindmap session with id " + toolSessionId);
 	    }
-
-	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
-		    rootMindmapNode.getText(), rootMindmapNode.getColor(), mindmapUserName, 0));
-
-	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
-		    mindmapId, rootNodeModel, mindmapUser, monitoring, false,
-		    mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity());
-
-	    ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
-	    jsonObject.set("mindmap", new RootJSON(currentNodeModel, mindmap.isMultiUserMode()));
-	    // adding lastActionId
-	    if (mindmap.isMultiUserMode()) {
-		Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);
-		jsonObject.put("lastActionId", lastActionId);
-	    }
-	    response.setContentType("application/json;charset=UTF-8");
-	    return jsonObject.toString();
+	    MindmapNode fromMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid())
+		    .get(0);
+	    cloneMindmapNodesForRuntime(fromMindmapNode, null, mindmap, mindmap, null, mindmapSession);
+	    mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapSession(mindmapId, toolSessionId);
 	}
-	return null;
+
+	if (mindmapNodeList == null || mindmapNodeList.size() == 0) {
+	    return null;
+	}
+
+	MindmapNode rootMindmapNode = (MindmapNode) mindmapNodeList.get(0);
+	String mindmapUserName = null;
+	if (rootMindmapNode.getUser() == null) {
+	    mindmapUserName = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
+	} else {
+	    mindmapUserName = rootMindmapNode.getUser().getFirstName() + " " + rootMindmapNode.getUser().getLastName();
+	}
+
+	NodeModel rootNodeModel = new NodeModel(
+		new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode.getText(),
+			rootMindmapNode.getColor(), mindmapUserName, 0));
+
+	NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(), mindmapId,
+		rootNodeModel, mindmapUser, monitoring, false,
+		mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity());
+
+	ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
+	jsonObject.set("mindmap", new RootJSON(currentNodeModel, mindmap.isMultiUserMode()));
+	// adding lastActionId
+	if (mindmap.isMultiUserMode()) {
+	    Long lastActionId = mindmapService.getLastGlobalIdByMindmapId(mindmap.getUid(), toolSessionId);
+	    jsonObject.put("lastActionId", lastActionId);
+	}
+	response.setContentType("application/json;charset=UTF-8");
+	return jsonObject.toString();
+
     }
 
     @RequestMapping("/saveLastMindmapChanges")
@@ -487,9 +499,9 @@ public class LearningController {
 
 	NodeModel rootNodeModel = RootJSON.toNodeModel(mindmapContent);
 	if (rootNodeModel == null) {
-	    String error = new StringBuilder("Unable to save mindmap for session:")
-		    .append(mindmapSession.getSessionName()).append("(").append(mindmapSession.getSessionId())
-		    .append(") user:").append(mindmapUser.getLoginName()).append("(" + mindmapUser.getUserId())
+	    String error = new StringBuilder("Unable to save mindmap for session:").append(
+			    mindmapSession.getSessionName()).append("(").append(mindmapSession.getSessionId()).append(") user:")
+		    .append(mindmapUser.getLoginName()).append("(" + mindmapUser.getUserId())
 		    .append("). No root node. JSON: ").append(mindmapContent).toString();
 	    throw new IOException(error);
 	}
@@ -498,8 +510,8 @@ public class LearningController {
 	List<NodeModel> branches = rootNodeModel.getBranch();
 
 	// saving root Node into database
-	MindmapNode rootMindmapNode = (MindmapNode) mindmapService
-		.getRootNodeByMindmapIdAndUserId(mindmap.getUid(), mindmapUser.getUid()).get(0);
+	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getRootNodeByMindmapIdAndUserId(mindmap.getUid(),
+		mindmapUser.getUid()).get(0);
 	rootMindmapNode = mindmapService.saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
 		nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, mindmapSession);
 
@@ -512,8 +524,9 @@ public class LearningController {
 	    mindmapService.getChildMindmapNodes(branches, rootMindmapNode, mindmapUser, mindmap, mindmapSession);
 	}
 
-	nodesToDeleteCondition += mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid()
-		+ " and user_id = " + mindmapUser.getUid();
+	nodesToDeleteCondition +=
+		mindmapService.getNodesToDeleteCondition() + " and mindmap_id = " + mindmap.getUid() + " and user_id = "
+			+ mindmapUser.getUid();
 	mindmapService.deleteNodes(nodesToDeleteCondition);
 
 	return rootMindmapNode.getNodeId();
@@ -652,8 +665,9 @@ public class LearningController {
 	MindmapSession session = mindmapService.getSessionBySessionId(toolSessionID);
 	Mindmap mindmap = session.getMindmap();
 	MindmapUser user = getCurrentUser(toolSessionID, false);
-	boolean contentEditable = mindmap.isGalleryWalkEditEnabled() && user != null
-		&& user.getMindmapSession().getSessionId().equals(toolSessionID);
+	boolean contentEditable =
+		mindmap.isGalleryWalkEditEnabled() && user != null && user.getMindmapSession().getSessionId()
+			.equals(toolSessionID);
 	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, user,
 		user == null ? ToolAccessMode.TEACHER.toString() : ToolAccessMode.LEARNER.toString(), contentEditable,
 		request);

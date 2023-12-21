@@ -23,17 +23,16 @@
 
 package org.lamsfoundation.lams.tool;
 
-import java.util.SortedMap;
-
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+
+import java.util.SortedMap;
 
 /**
  * Tool interface that defines the contract regarding tool content manipulation.
  *
  * @author Jacky Fang 2004-12-7
  * @author Fiona Malikoff May 2005
- *
  */
 public interface ToolContentManager {
 
@@ -43,11 +42,11 @@ public interface ToolContentManager {
      * the default content id.
      *
      * @param fromContentId
-     *            the original tool content id.
+     * 	the original tool content id.
      * @param toContentId
-     *            the destination tool content id.
+     * 	the destination tool content id.
      * @throws ToolException
-     *             if an error occurs e.g. defaultContent is missing
+     * 	if an error occurs e.g. defaultContent is missing
      */
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
@@ -57,11 +56,11 @@ public interface ToolContentManager {
      * Monitor.
      *
      * @param toolContentId
-     *            the tool content id of the tool content to be changed.
+     * 	the tool content id of the tool content to be changed.
      * @throws DataMissingException
-     *             if no tool content matches the toolContentId
+     * 	if no tool content matches the toolContentId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     public void resetDefineLater(Long toolContentId) throws DataMissingException, ToolException;
 
@@ -72,24 +71,25 @@ public interface ToolContentManager {
      * repository. If no matching data exists, the tool should return without throwing an exception.
      *
      * @param toolContentId
-     *            the requested tool content id.
+     * 	the requested tool content id.
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     public void removeToolContent(Long toolContentId) throws ToolException;
 
     /**
      * Removes content previously added by the given user.
      */
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException;
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException;
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     public void exportToolContent(Long toolContentId, String toPath) throws DataMissingException, ToolException;
 
@@ -97,7 +97,7 @@ public interface ToolContentManager {
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException;
@@ -110,7 +110,7 @@ public interface ToolContentManager {
      *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition.
      *
-     *         Added in LAMS 2.1
+     * 	Added in LAMS 2.1
      */
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
 	    throws ToolException;

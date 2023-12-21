@@ -23,15 +23,8 @@
 
 package org.lamsfoundation.lams.tool.wiki.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -75,8 +68,14 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * An implementation of the IWikiService interface.
@@ -328,10 +327,15 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (WikiService.logger.isDebugEnabled()) {
-	    WikiService.logger
-		    .debug("Removing Wiki contents for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug(
+			"Resetting Wiki completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Wiki content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Wiki wiki = wikiDAO.getByContentId(toolContentId);
@@ -353,10 +357,12 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	    WikiUser user = wikiUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			WikiConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    wikiDAO.delete(entry);
+		if (!resetActivityCompletionOnly) {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    WikiConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			wikiDAO.delete(entry);
+		    }
 		}
 		user.setFinishedActivity(false);
 		// user.setWikiEdits(0);

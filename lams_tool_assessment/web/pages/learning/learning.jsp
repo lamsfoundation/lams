@@ -67,7 +67,8 @@
         </c:choose>
     </c:forEach>
     <script type="text/javascript">
-        var skipValidation = false;
+        var skipValidation = false,
+            isResubmitAllowed = ${empty isResubmitAllowed ? false : isResubmitAllowed};
 
         $(document).ready(function(){
             //if isLeadershipEnabled - enable/disable submit buttons for hedging marks type of questions
@@ -112,32 +113,32 @@
             }
 
             initWebsocket('assessmentTimeLimit${sessionMap.assessment.contentId}',
-                    '<lams:WebAppURL />'.replace('http', 'ws')
-                    + 'learningWebsocket?toolContentID=${sessionMap.assessment.contentId}',
-                    function (e) {
-                        // read JSON object
-                        var input = JSON.parse(e.data);
+                '<lams:WebAppURL />'.replace('http', 'ws')
+                + 'learningWebsocket?toolContentID=${sessionMap.assessment.contentId}',
+                function (e) {
+                    // read JSON object
+                    var input = JSON.parse(e.data);
 
-                        if (input.clearTimer == true) {
-                            // teacher stopped the timer, destroy it
-                            $('#countdown').countdown('destroy').remove();
+                    if (input.clearTimer == true) {
+                        // teacher stopped the timer, destroy it
+                        $('#countdown').countdown('destroy').remove();
+                    } else {
+                        // teacher updated the timer
+                        var secondsLeft = +input.secondsLeft,
+                            counterInitialised = $('#countdown').length > 0;
+
+                        if (counterInitialised) {
+                            // just set the new time
+                            $('#countdown').countdown('option', 'until', secondsLeft + 'S');
                         } else {
-                            // teacher updated the timer
-                            var secondsLeft = +input.secondsLeft,
-                                    counterInitialised = $('#countdown').length > 0;
-
-                            if (counterInitialised) {
-                                // just set the new time
-                                $('#countdown').countdown('option', 'until', secondsLeft + 'S');
-                            } else {
-                                // initialise the timer
-                                displayCountdown(secondsLeft);
-                            }
+                            // initialise the timer
+                            displayCountdown(secondsLeft);
                         }
+                    }
 
-                        // reset ping timer
-                        websocketPing('assessmentTimeLimit${sessionMap.assessment.contentId}', true);
-                    });
+                    // reset ping timer
+                    websocketPing('assessmentTimeLimit${sessionMap.assessment.contentId}', true);
+                });
 
             //autocomplete for VSA
             $('.ui-autocomplete-input').each(function(){
@@ -191,7 +192,7 @@
             return totalSelected;
         }
 
-			var counterInitialised = false;
+        var counterInitialised = false;
 
         function displayCountdown(secondsLeft){
             var countdown = '<div id="countdown" role="timer"></div>' +
@@ -345,9 +346,12 @@
                 });
             }
 
-            // only if time limit is not expired
-            if (!isTimelimitExpired && !validateAnswers()) {
-                return;
+            // validate only if time limit is not expired
+            // otherwise confirm with learner that he wants to submit
+            if (!isTimelimitExpired && (!validateAnswers()
+                    || (!isResubmitAllowed &&
+                            !confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.submit.all.confirm'/></spring:escapeBody>")))) {
+            return;
             }
 
             disableButtons();

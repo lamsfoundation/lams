@@ -54,6 +54,7 @@
 			absoluteTimeLimitFinish = <c:out value="${empty param.absoluteTimeLimitFinish ? 'null' : param.absoluteTimeLimitFinish}" />;
 
 	$(document).ready(function(){
+
 		let timeLimitWidget = $('#time-limit-widget'),
 				timeLimitContent = $('#time-limit-widget-content', timeLimitWidget)
 						.on('hidden.bs.collapse', function () {
@@ -375,6 +376,8 @@
 		} else {
 			counters.countdown('resume');
 		}
+
+		refreshInidividualTimeLimits();
 	}
 
 	function timeLimitFinishNow(){
@@ -439,14 +442,18 @@
 			},
 			success : function(users) {
 				// remove existing time limits
+				$('.time-limit-widget-individual-counter').countdown('destroy');
 				$('.individual-time-limit-row', table).remove();
+				let timeLimitWidget = $('#time-limit-widget'),
+						individualExtensionContainer = $('#time-limit-widget-individual', timeLimitWidget).empty();
 
 				if (!users) {
 					return;
 				}
 
-				var template = $('#individual-time-limit-template-row'),
+				let template = $('#individual-time-limit-template-row'),
 						now = new Date().getTime();
+
 				$.each(users, function(){
 					var row = template.clone()
 							.attr('id', 'individual-time-limit-row-' + this.userId)
@@ -456,8 +463,26 @@
 							.appendTo(table);
 					$('.individual-time-limit-user-name', row).text(this.name);
 					$('.individual-time-limit-value', row).text(this.adjustment);
-
 					row.removeClass('d-none');
+
+					if (this.adjustment === 0){
+						return true;
+					}
+					let secondsLeft = absoluteTimeLimitFinish - Math.round(now / 1000) + this.adjustment * 60;
+					if (secondsLeft <= 0){
+						return true;
+					}
+
+					let widgetRow = $('<div class="row border-top"></div>').appendTo(individualExtensionContainer);
+					$('<div class="col"></div>').text(this.name).appendTo(widgetRow);
+					$('<div class="col time-limit-widget-individual-counter"></div>').appendTo(widgetRow)
+							.countdown({
+								until: '+' + secondsLeft +'S',
+								format: 'hMS',
+								compact: true,
+								alwaysExpire : true,
+								expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
+							});
 				});
 			}
 		});
@@ -652,6 +677,7 @@
 						<span class="input-group-text bg-white border-start-0">
 					    	<i class="fa-solid fa-fw fa-magnifying-glass"></i>
 					    </span>
+					</div>
 				</td>
 				<td colspan="3"></td>
 			</tr>
@@ -710,6 +736,7 @@
 
 	<div id="time-limit-widget-content" class="collapse card-body" role="tabpanel"
 		 aria-labelledby="time-limit-widget-heading">
+
 		<div class="expired-hide-container">
 			<button class="btn btn-sm btn-success" id="time-limit-widget-add-1-minute"
 					onClick="updateTimeLimit('absolute', null, 1)">
@@ -729,6 +756,9 @@
 					onClick="scrollToTimeLimitPanel()">
 				<fmt:message key="label.monitoring.time.limit.show.controls"/>
 			</button>
+		</div>
+
+		<div id="time-limit-widget-individual" class="expired-hide-container">
 		</div>
 	</div>
 </div>

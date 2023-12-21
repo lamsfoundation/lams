@@ -22,27 +22,9 @@
 
 package org.lamsfoundation.lams.tool.vote.service;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -104,9 +86,25 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
@@ -236,8 +234,9 @@ public class VoteService
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	VoteSession session = getSessionBySessionId(toolSessionId);
 	if (VoteAppConstants.COMPLETED.equals(session.getSessionStatus())) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	VoteQueUsr existingLeader = session.getGroupLeader();
@@ -503,7 +502,8 @@ public class VoteService
 	    // open votes
 	    if (voteContent.isAllowText()) {
 		int userEnteredVotesCount = allSessionsVotesCount - totalStandardVotesCount;
-		double voteRate = (userEnteredVotesCount != 0) ? ((userEnteredVotesCount * 100) / allSessionsVotesCount)
+		double voteRate = (userEnteredVotesCount != 0)
+			? ((userEnteredVotesCount * 100) / allSessionsVotesCount)
 			: 0;
 		totalMapVoteRates.put(mapIndex, voteRate);
 	    }
@@ -601,8 +601,8 @@ public class VoteService
 			(totalVotes != 0) ? ((nomination.getNumberOfVotes() * 100) / totalVotes) : 0d);
 	    }
 	    totalSessionDTO.setOpenTextNumberOfVotes(totalOpenVotes);
-	    totalSessionDTO
-		    .setOpenTextPercentageOfVotes((totalVotes != 0) ? ((totalOpenVotes * 100) / totalVotes) : 0d);
+	    totalSessionDTO.setOpenTextPercentageOfVotes(
+		    (totalVotes != 0) ? ((totalOpenVotes * 100) / totalVotes) : 0d);
 	    sessionDTOs.add(totalSessionDTO);
 	}
 
@@ -615,7 +615,7 @@ public class VoteService
      * the number of people already known to the tool.
      *
      * @param voteSessionId
-     *            The tool session id
+     * 	The tool session id
      */
     private int getVoteSessionPotentialLearnersCount(Long sessionUid) {
 	VoteSession session = voteSessionDAO.getVoteSessionByUID(sessionUid);
@@ -699,8 +699,8 @@ public class VoteService
 	    }
 
 	    if (monitoredUserContainerDTOs.size() > 0) {
-		Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringController
-			.convertToVoteMonitoredUserDTOMap(monitoredUserContainerDTOs);
+		Map<String, VoteMonitoredUserDTO> mapMonitoredUserContainerDTO = MonitoringController.convertToVoteMonitoredUserDTOMap(
+			monitoredUserContainerDTOs);
 
 		voteMonitoredAnswersDTO.setQuestionAttempts(mapMonitoredUserContainerDTO);
 		monitoredAnswersDTOs.add(voteMonitoredAnswersDTO);
@@ -715,10 +715,11 @@ public class VoteService
 	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
 
 	if (userID == null) {
-	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
+	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions()
+		    .iterator(); sessionIter.hasNext(); ) {
 		VoteSession voteSession = sessionIter.next();
 
-		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
+		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext(); ) {
 		    VoteQueUsr user = userIter.next();
 
 		    NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
@@ -738,9 +739,10 @@ public class VoteService
 		}
 	    }
 	} else {
-	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
+	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions()
+		    .iterator(); sessionIter.hasNext(); ) {
 		VoteSession voteSession = sessionIter.next();
-		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
+		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext(); ) {
 		    VoteQueUsr user = userIter.next();
 		    if (user.getQueUsrId().equals(userID)) {
 			NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
@@ -881,9 +883,9 @@ public class VoteService
 	Set<VoteQueContent> questions = voteContent.getVoteQueContents();
 
 	// should we add questions from data flow from other activities?
-	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject())
-		&& ((voteContent.getMaxExternalInputs() == null) || (voteContent.getExternalInputsAdded() == null)
-			|| (voteContent.getExternalInputsAdded() < voteContent.getMaxExternalInputs()))) {
+	if (Boolean.TRUE.equals(voteContent.getAssignedDataFlowObject()) && (
+		(voteContent.getMaxExternalInputs() == null) || (voteContent.getExternalInputsAdded() == null) || (
+			voteContent.getExternalInputsAdded() < voteContent.getMaxExternalInputs()))) {
 	    // If we are using tool input, we need to get it now and
 	    // create questions. Once they are created, they will be not altered, no matter if another learner gets to
 	    // this point and the tool input changed
@@ -1008,9 +1010,7 @@ public class VoteService
 			}
 		    }
 		}
-	    }
-
-	    else if (value instanceof SimpleURL[]) {
+	    } else if (value instanceof SimpleURL[]) {
 		// the input is a list of strings (questions, for example)
 		int nominationIndex = voteContent.getVoteQueContents().size() + 1;
 		SimpleURL[] userUrls = (SimpleURL[]) value;
@@ -1069,8 +1069,8 @@ public class VoteService
     private static boolean isNominationExists(VoteQueContent nomination, Set<VoteQueContent> existingNominations) {
 	if ((existingNominations != null) && (nomination != null)) {
 	    for (VoteQueContent existingNomination : existingNominations) {
-		if ((existingNomination.getQuestion() != null)
-			&& existingNomination.getQuestion().equals(nomination.getQuestion())) {
+		if ((existingNomination.getQuestion() != null) && existingNomination.getQuestion()
+			.equals(nomination.getQuestion())) {
 		    return true;
 		}
 	    }
@@ -1252,8 +1252,7 @@ public class VoteService
 	} catch (DataAccessException e) {
 	    throw new VoteApplicationException(
 		    "Exception occured when lams is getting vote voteUsrRespDAO by user id and que content id: "
-			    + e.getMessage(),
-		    e);
+			    + e.getMessage(), e);
 	}
     }
 
@@ -1383,9 +1382,14 @@ public class VoteService
 
     // @SuppressWarnings("unchecked")
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Vote attempts for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		logger.debug("Resetting Vote completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Vote attempts for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	VoteContent voteContent = voteContentDAO.getVoteContentByContentId(toolContentId);
@@ -1397,15 +1401,20 @@ public class VoteService
 	for (VoteSession session : voteContent.getVoteSessions()) {
 	    VoteQueUsr user = voteUserDAO.getVoteUserBySession(userId.longValue(), session.getUid());
 	    if (user != null) {
-		voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
+		if (resetActivityCompletionOnly) {
+		    user.setResponseFinalised(false);
+		    voteUserDAO.updateVoteUser(user);
+		} else {
+		    voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
 
-		NotebookEntry entry = getEntry(session.getVoteSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			VoteAppConstants.MY_SIGNATURE, userId);
-		if (entry != null) {
-		    voteContentDAO.delete(entry);
+		    NotebookEntry entry = getEntry(session.getVoteSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    VoteAppConstants.MY_SIGNATURE, userId);
+		    if (entry != null) {
+			voteContentDAO.delete(entry);
+		    }
+
+		    voteUserDAO.removeVoteUser(user);
 		}
-
-		voteUserDAO.removeVoteUser(user);
 	    }
 	}
     }
@@ -1735,9 +1744,8 @@ public class VoteService
     /******** Tablesorter methods ************/
     /**
      * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.
-     * This is
-     * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
-     * the values for the whole class, not just the group.
+     * This is unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then
+     * you get the values for the whole class, not just the group.
      *
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
@@ -1820,7 +1828,7 @@ public class VoteService
 
     /**
      * @param voteToolContentHandler
-     *            The voteToolContentHandler to set.
+     * 	The voteToolContentHandler to set.
      */
     public void setVoteToolContentHandler(IToolContentHandler voteToolContentHandler) {
 	this.voteToolContentHandler = voteToolContentHandler;
@@ -1835,7 +1843,7 @@ public class VoteService
 
     /**
      * @param voteContentDAO
-     *            The voteContentDAO to set.
+     * 	The voteContentDAO to set.
      */
     public void setVoteContentDAO(IVoteContentDAO voteContentDAO) {
 	this.voteContentDAO = voteContentDAO;
@@ -1850,7 +1858,7 @@ public class VoteService
 
     /**
      * @param voteQueContentDAO
-     *            The voteQueContentDAO to set.
+     * 	The voteQueContentDAO to set.
      */
     public void setVoteQueContentDAO(IVoteQueContentDAO voteQueContentDAO) {
 	this.voteQueContentDAO = voteQueContentDAO;
@@ -1865,7 +1873,7 @@ public class VoteService
 
     /**
      * @param voteSessionDAO
-     *            The voteSessionDAO to set.
+     * 	The voteSessionDAO to set.
      */
     public void setVoteSessionDAO(IVoteSessionDAO voteSessionDAO) {
 	this.voteSessionDAO = voteSessionDAO;
@@ -1880,7 +1888,7 @@ public class VoteService
 
     /**
      * @param voteUserDAO
-     *            The voteUserDAO to set.
+     * 	The voteUserDAO to set.
      */
     public void setVoteUserDAO(IVoteUserDAO voteUserDAO) {
 	this.voteUserDAO = voteUserDAO;
@@ -1895,7 +1903,7 @@ public class VoteService
 
     /**
      * @param voteUsrAttemptDAO
-     *            The voteUsrAttemptDAO to set.
+     * 	The voteUsrAttemptDAO to set.
      */
     public void setVoteUsrAttemptDAO(IVoteUsrAttemptDAO voteUsrAttemptDAO) {
 	this.voteUsrAttemptDAO = voteUsrAttemptDAO;
@@ -1910,7 +1918,7 @@ public class VoteService
 
     /**
      * @param logEventService
-     *            The logEventService to set.
+     * 	The logEventService to set.
      */
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
@@ -1933,7 +1941,7 @@ public class VoteService
 
     /**
      * @param coreNotebookService
-     *            The coreNotebookService to set.
+     * 	The coreNotebookService to set.
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -1957,7 +1965,7 @@ public class VoteService
 
     /**
      * @param messageService
-     *            The MessageService to set.
+     * 	The MessageService to set.
      */
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;

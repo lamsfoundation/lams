@@ -984,10 +984,15 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (DokumaranService.log.isDebugEnabled()) {
-	    DokumaranService.log.debug(
-		    "Removing Dokumaran content for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug(
+			"Resetting Dokumaran completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		log.debug("Removing Dokumaran content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Dokumaran dokumaran = dokumaranDao.getByContentId(toolContentId);
@@ -1002,13 +1007,18 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    DokumaranUser user = dokumaranUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			DokumaranConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    dokumaranDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    dokumaranUserDao.saveObject(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    DokumaranConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			dokumaranDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		dokumaranUserDao.removeObject(DokumaranUser.class, user.getUid());
+		    dokumaranUserDao.removeObject(DokumaranUser.class, user.getUid());
+		}
 	    }
 	}
     }

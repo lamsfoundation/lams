@@ -988,10 +988,15 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (WhiteboardService.log.isDebugEnabled()) {
-	    WhiteboardService.log.debug(
-		    "Removing Whiteboard content for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Whiteboard completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Whiteboard content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Whiteboard whiteboard = whiteboardDao.getByContentId(toolContentId);
@@ -1006,13 +1011,18 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    WhiteboardUser user = whiteboardUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			WhiteboardConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    whiteboardDao.deleteById(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    whiteboardUserDao.update(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    WhiteboardConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			whiteboardDao.deleteById(NotebookEntry.class, entry.getUid());
+		    }
 
-		whiteboardUserDao.deleteById(WhiteboardUser.class, user.getUid());
+		    whiteboardUserDao.deleteById(WhiteboardUser.class, user.getUid());
+		}
 	    }
 	}
     }
@@ -1121,8 +1131,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     // *****************************************************************************
-    // set methods for Spring Bean
-    // *****************************************************************************
+// set methods for Spring Bean
+// *****************************************************************************
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }

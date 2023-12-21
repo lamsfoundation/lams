@@ -23,17 +23,6 @@
 
 package org.lamsfoundation.lams.tool.daco.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -77,6 +66,17 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * @author Dapeng.Ni
@@ -323,8 +323,8 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    String fileName = file.getOriginalFilename();
 	    String fileType = file.getContentType();
 	    // For file only upload one sigle file
-	    if ((answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE)
-		    || (answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_IMAGE)) {
+	    if ((answer.getQuestion().getType() == DacoConstants.QUESTION_TYPE_FILE) || (answer.getQuestion().getType()
+		    == DacoConstants.QUESTION_TYPE_IMAGE)) {
 		NodeKey nodeKey = processFile(file);
 		answer.setFileUuid(nodeKey.getNodeId());
 		answer.setFileVersionId(nodeKey.getVersion());
@@ -495,7 +495,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 			summary.setQuestionUid(question.getUid());
 			result.add(summary);
 		    }
-			break;
+		    break;
 		    case DacoConstants.QUESTION_TYPE_RADIO:
 		    case DacoConstants.QUESTION_TYPE_DROPDOWN:
 		    case DacoConstants.QUESTION_TYPE_CHECKBOX: {
@@ -511,7 +511,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 			}
 			result.add(summary);
 		    }
-			break;
+		    break;
 		    default:
 			result.add(null);
 			break;
@@ -690,10 +690,12 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    session.setStatus(DacoConstants.SESSION_COMPLETED);
 	    dacoSessionDao.saveObject(session);
 	} else {
-	    DacoServiceImpl.log.error("Fail to leave tool Session.Could not find shared daco "
-		    + "session by given session id: " + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared daco session by given session id: " + toolSessionId);
+	    DacoServiceImpl.log.error(
+		    "Fail to leave tool Session.Could not find shared daco " + "session by given session id: "
+			    + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared daco session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -796,33 +798,45 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (DacoServiceImpl.log.isDebugEnabled()) {
-	    DacoServiceImpl.log
-		    .debug("Removing Daco data for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Daco completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		DacoServiceImpl.log.debug(
+			"Removing Daco data for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
+
 	List<DacoSession> sessions = dacoSessionDao.getByContentId(toolContentId);
 	for (DacoSession session : sessions) {
 	    DacoUser user = dacoUserDao.getUserByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		for (DacoAnswer answer : user.getAnswers()) {
-		    if (answer.getFileUuid() != null) {
-			try {
-			    dacoToolContentHandler.deleteFile(answer.getFileUuid());
-			} catch (Exception e) {
-			    throw new ToolException("Error while removing Daco file", e);
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    dacoUserDao.saveObject(user);
+		} else {
+		    for (DacoAnswer answer : user.getAnswers()) {
+			if (answer.getFileUuid() != null) {
+			    try {
+				dacoToolContentHandler.deleteFile(answer.getFileUuid());
+			    } catch (Exception e) {
+				throw new ToolException("Error while removing Daco file", e);
+			    }
 			}
+			dacoAnswerDao.removeObject(DacoAnswer.class, answer.getUid());
 		    }
-		    dacoAnswerDao.removeObject(DacoAnswer.class, answer.getUid());
-		}
 
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			DacoConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    dacoDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    DacoConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			dacoDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		dacoUserDao.removeObject(DacoUser.class, user.getUid());
+		    dacoUserDao.removeObject(DacoUser.class, user.getUid());
+		}
 	    }
 	}
     }

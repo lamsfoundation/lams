@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.tool.service;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.confidencelevel.VsaAnswerDTO;
@@ -74,8 +67,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
+
 /**
- *
  * @author Jacky Fang
  * @version 1.1
  * @since 2005-2-23
@@ -108,7 +107,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     /**
      * @param toolSessionDAO
-     *            The toolSessionDAO to set.
+     * 	The toolSessionDAO to set.
      */
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {
 	this.toolSessionDAO = toolSessionDAO;
@@ -124,7 +123,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
     /**
      * @param contentIDGenerator
-     *            The contentIDGenerator to set.
+     * 	The contentIDGenerator to set.
      */
     public void setContentIDGenerator(ToolContentIDGenerator contentIDGenerator) {
 	this.contentIDGenerator = contentIDGenerator;
@@ -201,8 +200,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    sessionManager.createToolSession(toolSession.getToolSessionId(), toolSession.getToolSessionName(),
 		    activity.getToolContentId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to create tool session. ToolActivity "
-		    + activity;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to create tool session. ToolActivity "
+			    + activity;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	}
@@ -226,8 +226,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy/update the tool content. ToolActivity "
-		    + toolActivity;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to copy/update the tool content. ToolActivity "
+			    + toolActivity;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	}
@@ -240,8 +241,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throws DataMissingException, ToolException {
 	ToolContent toolContent = toolContentDAO.find(ToolContent.class, toolContentId);
 	if (toolContent == null) {
-	    String error = "The toolContentID " + toolContentId
-		    + " is not valid. No such record exists on the database.";
+	    String error =
+		    "The toolContentID " + toolContentId + " is not valid. No such record exists on the database.";
 	    log.error(error);
 	    throw new DataMissingException(error);
 	}
@@ -263,8 +264,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		contentManager.copyToolContent(toolContentId, newToolcontentID);
 	    }
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "
-		    + toolContentId;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to copy the tool content. ToolContentId "
+			    + toolContentId;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	}
@@ -278,23 +280,27 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
 	    contentManager.removeToolContent(toolActivity.getToolContentId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete the tool content. ToolActivity "
-		    + toolActivity;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to delete the tool content. ToolActivity "
+			    + toolActivity;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	}
     }
 
     @Override
-    public boolean removeLearnerContent(Activity activity, User learner) throws ToolException {
+    public boolean removeLearnerContent(Activity activity, User learner, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (activity.isToolActivity()) {
 	    ToolActivity toolActivity = (ToolActivity) activity;
 	    try {
 		ToolContentManager contentManager = (ToolContentManager) findToolService(toolActivity.getTool());
-		contentManager.removeLearnerContent(toolActivity.getToolContentId(), learner.getUserId());
+		contentManager.removeLearnerContent(toolActivity.getToolContentId(), learner.getUserId(),
+			resetActivityCompletionOnly);
 	    } catch (NoSuchBeanDefinitionException e) {
-		String message = "A tool which is defined in the database appears to missing from the classpath. Unable to delete learner content. ToolActivity "
-			+ toolActivity;
+		String message =
+			"A tool which is defined in the database appears to missing from the classpath. Unable to delete learner content. ToolActivity "
+				+ toolActivity;
 		log.error(message, e);
 		throw new ToolException(message, e);
 	    }
@@ -367,8 +373,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	ToolContent toolContent = toolContentDAO.find(ToolContent.class, toolContentId);
 	if (toolContent == null) {
-	    String error = "The toolContentID " + toolContentId
-		    + " is not valid. No such record exists on the database.";
+	    String error =
+		    "The toolContentID " + toolContentId + " is not valid. No such record exists on the database.";
 	    log.error(error);
 	    throw new DataMissingException(error);
 	}
@@ -384,8 +390,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(tool);
 	    return contentManager.getToolOutputDefinitions(toolContentId, definitionType);
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
-		    + toolContentId;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
+			    + toolContentId;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -404,8 +411,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		definitionType);
 	ToolContent toolContent = toolContentDAO.find(ToolContent.class, inputToolContentId);
 	if (toolContent == null) {
-	    String error = "The toolContentID " + inputToolContentId
-		    + " is not valid. No such record exists on the database.";
+	    String error =
+		    "The toolContentID " + inputToolContentId + " is not valid. No such record exists on the database.";
 	    log.error(error);
 	    throw new DataMissingException(error);
 	}
@@ -447,8 +454,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 	    return definitions;
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
-		    + inputToolContentId;
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output definitions. ToolContentId "
+			    + inputToolContentId;
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -491,8 +499,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    Long longLearnerId = learnerId != null ? learnerId.longValue() : null;
 	    return sessionManager.getToolOutput(conditionName, toolSession.getToolSessionId(), longLearnerId);
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "
-		    + toolSession.getToolSessionId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "
+			    + toolSession.getToolSessionId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -523,8 +532,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
 	    return sessionManager.getToolOutputs(conditionName, toolActivity.getToolContentId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to grt the tol output. toolActivity "
-		    + toolActivity.getActivityId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to grt the tol output. toolActivity "
+			    + toolActivity.getActivityId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -562,8 +572,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ICommonAssessmentService sessionManager = (ICommonAssessmentService) findToolService(tool);
 	    return sessionManager.getVSAnswers(toolSession.getToolSessionId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
-		    + toolSession.getToolActivity().getActivityId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
+			    + toolSession.getToolActivity().getActivityId();
 	    LamsCoreToolService.log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -594,8 +605,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
 	    return sessionManager.getConfidenceLevels(toolSession.getToolSessionId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
-		    + toolSession.getToolActivity().getActivityId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to get the tool output. toolActivity "
+			    + toolSession.getToolActivity().getActivityId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -625,8 +637,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    //we get leader from the current tool rather than LeaderSelection tool in order to avoid making redundant calls to DB
 	    return sessionManager.isUserGroupLeader(learner.getUserId().longValue(), toolSession.getToolSessionId());
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to check whether user is a leader. toolSession "
-		    + toolSession.getToolSessionId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to check whether user is a leader. toolSession "
+			    + toolSession.getToolSessionId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (AbstractMethodError e) {
@@ -657,8 +670,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
 	    sessionManager.forceCompleteUser(toolSession.getToolSessionId(), learner);
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to force complete activity. toolSession "
-		    + toolSession.getToolSessionId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to force complete activity. toolSession "
+			    + toolSession.getToolSessionId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -698,8 +712,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    Long longLearnerId = learnerId != null ? new Long(learnerId.longValue()) : null;
 	    return sessionManager.getToolOutput(names, toolSession.getToolSessionId(), longLearnerId);
 	} catch (NoSuchBeanDefinitionException e) {
-	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "
-		    + toolSession.getToolSessionId();
+	    String message =
+		    "A tool which is defined in the database appears to missing from the classpath. Unable to gt the tol output. toolSession "
+			    + toolSession.getToolSessionId();
 	    log.error(message, e);
 	    throw new ToolException(message, e);
 	} catch (java.lang.AbstractMethodError e) {
@@ -811,7 +826,8 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 		if (!(activity instanceof ToolActivity)) {
 
 		}
-		ToolActivity toolActivity = (ToolActivity) (activity instanceof ToolActivity ? activity
+		ToolActivity toolActivity = (ToolActivity) (activity instanceof ToolActivity
+			? activity
 			: activityDAO.getActivityByActivityId(activity.getActivityId()));
 		toolActivities.add(toolActivity);
 	    }
@@ -965,9 +981,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	ToolSession toolSession = this.getToolSessionByActivity(learner, activity);
 
 	if (toolSession == null) {
-	    String error = "Unable to set up url as session does not exist. Activity "
-		    + (activity != null ? activity.getActivityId() + ":" + activity.getTitle() : "null") + " learner "
-		    + (learner != null ? learner.getUserId() + ":" + learner.getLogin() : "null");
+	    String error = "Unable to set up url as session does not exist. Activity " + (activity != null ?
+		    activity.getActivityId() + ":" + activity.getTitle() : "null") + " learner " + (learner != null ?
+		    learner.getUserId() + ":" + learner.getLogin() : "null");
 	    log.error(error);
 	    throw new LamsToolServiceException(error);
 	}

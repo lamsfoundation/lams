@@ -104,6 +104,7 @@ public class QbCollectionController {
 	model.addAttribute("questionCount", qbService.getCountCollectionQuestions(collectionUid, null));
 	model.addAttribute("isQtiExportEnabled", Configuration.getAsBoolean(ConfigurationKeys.QB_QTI_ENABLE));
 	model.addAttribute("isAiEnabled", Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS));
+	model.addAttribute("isAppadmin", securityService.isAppadmin(userId, "access QB collection", true));
 	return "qb/collection";
     }
 
@@ -335,7 +336,7 @@ public class QbCollectionController {
 	if (userId == null) {
 	    return false;
 	}
-	if (securityService.isAppadmin(userId, "acess QB collection", true)) {
+	if (securityService.isAppadmin(userId, "access QB collection", true)) {
 	    return true;
 	}
 	Collection<QbCollection> collections = qbService.getUserCollections(userId);

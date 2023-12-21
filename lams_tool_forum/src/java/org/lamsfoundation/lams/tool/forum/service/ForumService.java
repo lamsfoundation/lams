@@ -23,23 +23,8 @@
 
 package org.lamsfoundation.lams.tool.forum.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -105,13 +90,25 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
- *
  * @author Steve.Ni
- *
  * @version $Revision$
  */
 public class ForumService implements IForumService, ToolContentManager, ToolSessionManager, ToolRestManager {
@@ -372,8 +369,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// get root topic and create record in MessageSeq table
 	MessageSeq parentSeq = messageSeqDao.getByTopicId(parent.getUid());
 	if (parentSeq == null) {
-	    ForumService.log
-		    .error("Message Sequence table is broken becuase topic " + parent + " can not get Sequence Record");
+	    ForumService.log.error(
+		    "Message Sequence table is broken becuase topic " + parent + " can not get Sequence Record");
 	}
 	Message root = parentSeq.getRootMessage();
 	MessageSeq msgSeq = new MessageSeq();
@@ -641,8 +638,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		    notificationMessageParameters[0] = message.getSubject();
 		    notificationMessageParameters[1] = message.getUpdated();
 		    notificationMessageParameters[2] = report.getMark();
-		    notificationMessage
-			    .append(getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
+		    notificationMessage.append(
+			    getLocalisedMessage("event.mark.release.mark", notificationMessageParameters));
 		    notificationMessages.put(user.getUserId().intValue(), notificationMessage);
 		}
 	    }
@@ -659,8 +656,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
 	//audit log event
 	String sessionName = session.getSessionName() + " (toolSessionId=" + session.getSessionId() + ")";
-	String message = messageService.getMessage("tool.display.name") + ". "
-		+ messageService.getMessage("msg.mark.released", new String[] { sessionName });
+	String message =
+		messageService.getMessage("tool.display.name") + ". " + messageService.getMessage("msg.mark.released",
+			new String[] { sessionName });
 	logEventService.logToolEvent(LogEvent.TYPE_TOOL_MARK_RELEASED, forum.getContentId(), null, message);
 
     }
@@ -707,6 +705,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     // ***************************************************************************************************************
     // Private methods
     // ***************************************************************************************************************
+
     /**
      * @param map
      * @return
@@ -905,16 +904,21 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+
 	// do not remove learner content if it was set up so in appadmin tool management
 	ForumConfigItem keepLearnerContent = getConfigItem(ForumConfigItem.KEY_KEEP_LEARNER_CONTENT);
 	if (Boolean.valueOf(keepLearnerContent.getConfigValue())) {
 	    return;
 	}
-
-	if (ForumService.log.isDebugEnabled()) {
-	    ForumService.log.debug(
-		    "Hiding or removing Forum messages for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Forum completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		log.debug("Hiding or removing Forum messages for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    }
 	}
 	List<ForumToolSession> sessionList = forumToolSessionDao.getByContentId(toolContentId);
 
@@ -922,36 +926,38 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    Long sessionId = session.getSessionId();
 	    ForumUser user = forumUserDao.getByUserIdAndSessionId(userId.longValue(), sessionId);
 	    if (user != null) {
-		List<Message> messages = messageDao.getByUserAndSession(user.getUid(), sessionId);
-		Iterator<Message> messageIterator = messages.iterator();
-		while (messageIterator.hasNext()) {
-		    Message message = messageIterator.next();
-
-		    if (userOwnMessageTree(message, user.getUid())) {
-			messageSeqDao.deleteByTopicId(message.getUid());
-			Timestamp timestamp = timestampDao.getTimestamp(message.getUid(), user.getUid());
-			if (timestamp != null) {
-			    timestampDao.delete(timestamp);
-			}
-			messageDao.delete(message.getUid());
-			messageIterator.remove();
-		    } else {
-			message.setHideFlag(true);
-			messageDao.update(message);
-		    }
-		}
-
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ForumConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    // hopefully it understands NotebookEntries
-		    activityDAO.delete(entry);
-		}
-
 		user.setSessionFinished(false);
-		forumUserDao.save(user);
 
-		toolService.removeActivityMark(userId, session.getSessionId());
+		if (!resetActivityCompletionOnly) {
+		    List<Message> messages = messageDao.getByUserAndSession(user.getUid(), sessionId);
+		    Iterator<Message> messageIterator = messages.iterator();
+		    while (messageIterator.hasNext()) {
+			Message message = messageIterator.next();
+
+			if (userOwnMessageTree(message, user.getUid())) {
+			    messageSeqDao.deleteByTopicId(message.getUid());
+			    Timestamp timestamp = timestampDao.getTimestamp(message.getUid(), user.getUid());
+			    if (timestamp != null) {
+				timestampDao.delete(timestamp);
+			    }
+			    messageDao.delete(message.getUid());
+			    messageIterator.remove();
+			} else {
+			    message.setHideFlag(true);
+			    messageDao.update(message);
+			}
+		    }
+
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    ForumConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			// hopefully it understands NotebookEntries
+			activityDAO.delete(entry);
+		    }
+		    toolService.removeActivityMark(userId, session.getSessionId());
+		}
+
+		forumUserDao.save(user);
 	    }
 	}
     }
@@ -1108,8 +1114,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// also clone author created topic from this forum tool content!!!
 	// this can avoid topic record information conflict when multiple sessions are against same tool content
 	// for example, the reply number maybe various for different sessions.
-	ForumService.log.debug("Clone tool content [" + forum.getContentId() + "] topics for session ["
-		+ session.getSessionId() + "]");
+	ForumService.log.debug(
+		"Clone tool content [" + forum.getContentId() + "] topics for session [" + session.getSessionId()
+			+ "]");
 	Set<Message> contentTopics = forum.getMessages();
 	if ((contentTopics != null) && (contentTopics.size() > 0)) {
 	    for (Message msg : contentTopics) {
@@ -1143,10 +1150,12 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	if (session != null) {
 	    forumToolSessionDao.saveOrUpdate(session);
 	} else {
-	    ForumService.log.error("Fail to leave tool Session.Could not find submit file "
-		    + "session by given session id: " + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find submit file session by given session id: " + toolSessionId);
+	    ForumService.log.error(
+		    "Fail to leave tool Session.Could not find submit file " + "session by given session id: "
+			    + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find submit file session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -1506,9 +1515,11 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 
 	forum.setAllowAnonym(JsonUtil.optBoolean(toolContentJSON, "allowAnonym", Boolean.FALSE));
-	forum.setAllowEdit(JsonUtil.optBoolean(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default
+	forum.setAllowEdit(
+		JsonUtil.optBoolean(toolContentJSON, "allowEdit", Boolean.TRUE)); // defaults to true in the default
 	// entry in the db
-	forum.setAllowNewTopic(JsonUtil.optBoolean(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the
+	forum.setAllowNewTopic(
+		JsonUtil.optBoolean(toolContentJSON, "allowNewTopic", Boolean.TRUE)); // defaults to true in the
 	// default entry in the db
 	forum.setAllowRateMessages(JsonUtil.optBoolean(toolContentJSON, "allowRateMessages", Boolean.FALSE));
 	forum.setAllowRichEditor(JsonUtil.optBoolean(toolContentJSON, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));
@@ -1518,8 +1529,9 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	forum.setLimitedMaxCharacters(JsonUtil.optBoolean(toolContentJSON, "limitedMaxCharacters", Boolean.TRUE));
 	forum.setLimitedMinCharacters(JsonUtil.optBoolean(toolContentJSON, "limitedMinCharacters", Boolean.FALSE));
 	forum.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, "lockWhenFinished", Boolean.FALSE));
-	forum.setMaxCharacters(JsonUtil.optInt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the
-											 // default entry in the db.
+	forum.setMaxCharacters(
+		JsonUtil.optInt(toolContentJSON, "maxCharacters", 5000)); // defaults to 5000 chars in the
+	// default entry in the db.
 	forum.setMaximumRate(JsonUtil.optInt(toolContentJSON, "maximumRate", 0));
 	forum.setMaximumReply(JsonUtil.optInt(toolContentJSON, "maximumReply", 0));
 	forum.setMinCharacters(JsonUtil.optInt(toolContentJSON, "minCharacters", 0));

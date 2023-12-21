@@ -23,13 +23,7 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedMap;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -62,7 +56,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedMap;
 
 /**
  * An implementation of the ILeaderselectionService interface.
@@ -95,8 +93,9 @@ public class LeaderselectionService
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	LeaderselectionSession session = new LeaderselectionSession();
@@ -218,7 +217,10 @@ public class LeaderselectionService
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	// effect is the same whether resetActivityCompletionOnly is true or false
+
 	if (logger.isDebugEnabled()) {
 	    logger.debug(
 		    "Removing Leader Selection state for user ID " + userId + " and toolContentId " + toolContentId);
@@ -343,8 +345,9 @@ public class LeaderselectionService
     @Override
     public boolean isUserLeader(Long userId, Long toolSessionId) {
 	if ((userId == null) || (toolSessionId == null)) {
-	    throw new LeaderselectionException("Wrong parameters supplied: userId or toolSessionId is null. SessionId="
-		    + toolSessionId + " UserId=" + userId);
+	    throw new LeaderselectionException(
+		    "Wrong parameters supplied: userId or toolSessionId is null. SessionId=" + toolSessionId
+			    + " UserId=" + userId);
 	}
 
 	LeaderselectionSession session = getSessionBySessionId(toolSessionId);
@@ -357,12 +360,12 @@ public class LeaderselectionService
     public List<LeaderselectionUser> getUsersBySession(Long toolSessionId) {
 	return leaderselectionUserDAO.getBySessionId(toolSessionId);
     }
-    
+
     @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
     }
-    
+
     @Override
     public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
 	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
@@ -445,7 +448,8 @@ public class LeaderselectionService
     @Override
     public LeaderselectionUser getUserByLoginAndSessionId(String login, long toolSessionId) {
 	List<User> user = leaderselectionUserDAO.findByProperty(User.class, "login", login);
-	return user.isEmpty() ? null
+	return user.isEmpty()
+		? null
 		: leaderselectionUserDAO.getByUserIdAndSessionId(user.get(0).getUserId().longValue(), toolSessionId);
     }
 
@@ -593,13 +597,15 @@ public class LeaderselectionService
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
     // ****************** REST methods *************************
 
     /**
-     * Rest call to create a new Learner Selection content. Required fields in toolContentJSON: "title", "instructions".
+     * Rest call to create a new Learner Selection content. Required fields in toolContentJSON: "title",
+     * "instructions".
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {

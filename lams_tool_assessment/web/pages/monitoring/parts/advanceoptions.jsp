@@ -57,7 +57,24 @@
 				</c:choose>	
 			</td>
 		</tr>
-		
+
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.shuffle.answers" />
+			</td>
+
+			<td>
+				<c:choose>
+					<c:when test="${assessment.shuffledAnswers}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				<fmt:message key="label.authoring.advance.numbered.questions" />

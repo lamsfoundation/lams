@@ -23,20 +23,8 @@
 
 package org.lamsfoundation.lams.tool.survey.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -83,8 +71,19 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author Dapeng.Ni
@@ -404,8 +403,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public SortedMap<SurveySession, List<AnswerDTO>> getSummary(Long toolContentId) {
 
-	SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<>(
-		new SurveySessionComparator());
+	SortedMap<SurveySession, List<AnswerDTO>> summary = new TreeMap<>(new SurveySessionComparator());
 
 	Survey survey = surveyDao.getByContentId(toolContentId);
 	// get all question under this survey
@@ -459,7 +457,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      * Creates data for export methods. Suitable both for single/multiple users
      *
      * @param sessionToUsersMap
-     *            map containing all session to users pairs that require data to be exported
+     * 	map containing all session to users pairs that require data to be exported
      * @return
      */
     private SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> getExportSummary(
@@ -479,8 +477,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	// traverse all sessions
 	for (SurveySession session : sessionToUsersMap.keySet()) {
 
-	    SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<>(
-		    new QuestionsComparator());
+	    SortedMap<SurveyQuestion, List<AnswerDTO>> questionMap = new TreeMap<>(new QuestionsComparator());
 
 	    // traverse all questions
 	    for (SurveyQuestion question : questions) {
@@ -548,7 +545,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -779,28 +776,39 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (SurveyServiceImpl.log.isDebugEnabled()) {
-	    SurveyServiceImpl.log
-		    .debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Survey completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		log.debug("Removing Survey answers for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
-	List<SurveyAnswer> answers = surveyAnswerDao.getByToolContentIdAndUserId(toolContentId, userId.longValue());
-	for (SurveyAnswer answer : answers) {
-	    surveyAnswerDao.removeObject(SurveyAnswer.class, answer.getUid());
+	if (!resetActivityCompletionOnly) {
+	    List<SurveyAnswer> answers = surveyAnswerDao.getByToolContentIdAndUserId(toolContentId, userId.longValue());
+	    for (SurveyAnswer answer : answers) {
+		surveyAnswerDao.removeObject(SurveyAnswer.class, answer.getUid());
+	    }
 	}
 
 	List<SurveySession> sessions = surveySessionDao.getByContentId(toolContentId);
 	for (SurveySession session : sessions) {
 	    SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SurveyConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    surveyDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    surveyUserDao.saveObject(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    SurveyConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			surveyDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
 
-		surveyUserDao.removeObject(SurveyUser.class, user.getUid());
+		    surveyUserDao.removeObject(SurveyUser.class, user.getUid());
+		}
 	    }
 	}
     }
@@ -864,7 +872,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -962,7 +970,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
@@ -980,7 +989,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
      * strings, which are the answer text. A question may also have the optional fields: allowOtherTextEntry (default
      * false), required (default true)
      *
-     * There should be at least one question object in the Questions array and at least one option in the Options array.
+     * There should be at least one question object in the Questions array and at least one option in the Options
+     * array.
      */
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, ObjectNode toolContentJSON) {

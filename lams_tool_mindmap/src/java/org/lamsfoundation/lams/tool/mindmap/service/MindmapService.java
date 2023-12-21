@@ -438,10 +438,15 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (MindmapService.logger.isDebugEnabled()) {
-	    MindmapService.logger.debug(
-		    "Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug(
+			"Resetting Mindmap completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Mindmap content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Mindmap mindmap = mindmapDAO.getByContentId(toolContentId);
@@ -451,36 +456,39 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return;
 	}
 
-	List<MindmapNode> nodesToDelete = new LinkedList<>();
-	for (MindmapSession session : mindmap.getMindmapSessions()) {
-	    List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
-		    userId.longValue());
+	if (!resetActivityCompletionOnly) {
+	    List<MindmapNode> nodesToDelete = new LinkedList<>();
+	    for (MindmapSession session : mindmap.getMindmapSessions()) {
+		List<MindmapNode> nodes = mindmapNodeDAO.getMindmapNodesBySessionIdAndUserId(session.getSessionId(),
+			userId.longValue());
 
-	    for (MindmapNode node : nodes) {
-		List<MindmapNode> descendants = new LinkedList<>();
-		if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
-			&& !nodesToDelete.contains(node) && userOwnsChildrenNodes(node, userId.longValue(),
-			descendants)) {
-		    // reverse so leafs are first and nodes closer to root are last
-		    descendants.add(node);
-		    nodesToDelete.addAll(descendants);
+		for (MindmapNode node : nodes) {
+		    List<MindmapNode> descendants = new LinkedList<>();
+		    if ((node.getUser() != null) && node.getUser().getUserId().equals(userId.longValue())
+			    && !nodesToDelete.contains(node) && userOwnsChildrenNodes(node, userId.longValue(),
+			    descendants)) {
+			// reverse so leafs are first and nodes closer to root are last
+			descendants.add(node);
+			nodesToDelete.addAll(descendants);
+		    }
 		}
 	    }
-	}
 
-	for (MindmapNode node : nodesToDelete) {
-	    mindmapNodeDAO.delete(node);
+	    for (MindmapNode node : nodesToDelete) {
+		mindmapNodeDAO.delete(node);
+	    }
 	}
-
 	for (MindmapSession session : mindmap.getMindmapSessions()) {
 	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		if (user.getEntryUID() != null) {
-		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
-		    mindmapDAO.delete(entry);
-		}
+		if (!resetActivityCompletionOnly) {
+		    if (user.getEntryUID() != null) {
+			NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+			mindmapDAO.delete(entry);
+		    }
 
-		user.setEntryUID(null);
+		    user.setEntryUID(null);
+		}
 		user.setFinishedActivity(false);
 		mindmapDAO.update(user);
 	    }
@@ -794,7 +802,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.logEventService = logEventService;
     }
 
-    // =========================================================================================
+// =========================================================================================
     /* Used by Spring to "inject" the linked objects */
 
     public IMindmapDAO getMindmapDAO() {
@@ -1024,7 +1032,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
-    // ****************** REST methods *************************
+// ****************** REST methods *************************
 
     /**
      * Used by the Rest calls to create content. Creates default nodes as seen when first opening authoring. Mandatory
