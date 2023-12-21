@@ -19,6 +19,11 @@
 <lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
 	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 	<lams:css suffix="jquery.jRating"/>
+	<style>
+		.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
+		    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
+		}
+	</style>
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
@@ -26,10 +31,6 @@
 			pre {
 				background-color: initial;
 				border: none;
-			}
-			
-			.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
-			    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
 			}
 		</style>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
