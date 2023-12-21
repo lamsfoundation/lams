@@ -34,6 +34,18 @@
 		  visibility: hidden;
 		}
 		
+		#burning-questions-container {
+			.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
+				padding: 1rem;
+			}
+			.ui-jqgrid-title {
+				font-size: 1.2rem !important;
+			}
+			.ui-jqgrid .ui-jqgrid-labels th.ui-th-column, .ui-jqgrid .ui-jqgrid-legacy-subgrid .ui-th-subgrid, .ui-jqgrid-labels .ui-th-column-header {
+				text-align: left;
+			}
+		}
+		
 		/* hide edit button background */
 		div.btn.ui-inline-edit {
 			background-color:rgba(0, 0, 0, 0) !important;
@@ -108,11 +120,9 @@
 					}
 				});
 			}
-
 		}
 	
 		$(document).ready(function(){
-			
 			<!-- Display burningQuestionItemDtos -->
 			<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 				<c:set var="scratchieItem" value="${burningQuestionItemDto.scratchieItem}"/>
@@ -131,14 +141,14 @@
 						'isUserAuthor',
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.burning.questions' /></spring:escapeBody>",
-						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like' /></spring:escapeBody>",
-						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.count' /></spring:escapeBody>"
+						"",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.like' /></spring:escapeBody>"
 					],
 				   	colModel:[
 				   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 				   		{name:'isUserAuthor', width:0, hidden: true},
 				   		{name:'groupName', index:'groupName', width:100, title: false},
-				   		{name:'burningQuestion', index:'burningQuestion', width:501, edittype: 'textarea', title: false, editoptions:{rows:"8"},
+				   		{name:'burningQuestion', index:'burningQuestion', width:401, edittype: 'textarea', title: false, editoptions:{rows:"8"},
 					   		formatter:function(cellvalue, options, rowObject, event) {
 					   			if (event == "edit") {
 					   				cellvalue = cellvalue.replace(/\n/g, '\n<br>');
@@ -159,32 +169,36 @@
 				   	            return ${isUserLeader} && eval(item.isUserAuthor);
 				   	        }
 						},
-				   		{name:'like', index:'like', width:60, align: "center", 
+				   		{name:'like', index:'like', width:30, align: "right", 
 					   		formatter:function(cellvalue, options, rowObject) {
 								return cellvalue;
 			   				}
 						},
-				   		{name:'count', index:'count', width:50, align:"right", title: false}
+				   		{name:'count', index:'count', width:40, align:"left", title: false}
 				   	],
-                    caption: <c:choose>
-								<%-- General burning question --%>
-								<c:when test="${scratchieItemUid == 0}">"<c:out value='${scratchieItem.qbQuestion.name}' />"
-								</c:when>
-								<c:otherwise>
-									<%-- Regular burning question --%>
-									<c:choose>
-										<%-- If we hide titles, we just display a link for "Question 1)" --%>
-										<c:when test="${sessionMap.hideTitles}">
-										 	"<a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.question'/></spring:escapeBody>&nbsp;${i.count})</a>"
-										</c:when>
-										<%-- If we show titles, we display question number and then a link with question title --%>
-										<c:otherwise>
-			"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape='true'><c:out value='${scratchieItem.qbQuestion.name}' /></spring:escapeBody></a>"
-										</c:otherwise>
-									</c:choose>
-								</c:otherwise>
-							</c:choose> 
-							+ " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
+                    caption: 
+                        <c:choose>
+							<%-- General burning question --%>
+							<c:when test="${scratchieItemUid == 0}">
+								"<c:out value='${scratchieItem.qbQuestion.name}' />"
+							</c:when>
+							
+							<c:otherwise>
+								<%-- Regular burning question --%>
+								<c:choose>
+									<%-- If we hide titles, we just display a link for "Question 1)" --%>
+									<c:when test="${sessionMap.hideTitles}">
+									 	"<a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.question'/></spring:escapeBody>&nbsp;${i.count})</a>"
+									</c:when>
+									
+									<%-- If we show titles, we display question number and then a link with question title --%>
+									<c:otherwise>
+										"${i.count}) <a href='#questionTitle${i.count}' class='bq-title'><spring:escapeBody javaScriptEscape='true'><c:out value='${scratchieItem.qbQuestion.name}' /></spring:escapeBody></a>"
+									</c:otherwise>
+								</c:choose>
+							</c:otherwise>
+						</c:choose> 
+						+ " <span class='small'>[${fn:length(burningQuestionItemDto.burningQuestionDtos)}]</span>",
                     editurl: '<c:url value="/learning/editBurningQuestion.do"/>?sessionId=${toolSessionID}&itemUid=${scratchieItemUid}',
 	  				inlineEditing: { keys: true, defaultFocusField: "burningQuestion", focusField: "burningQuestion" },
 	  				onSelectRow: function (rowid, status, e) {
@@ -382,9 +396,9 @@
             </div>
             
 			<div id="burning-questions-container">
-				<div class="lead mb-2">
+				<h3>
 					<fmt:message key="label.burning.questions" />
-				</div>
+				</h3>
 
 				<c:forEach var="burningQuestionItemDto" items="${burningQuestionItemDtos}" varStatus="i">
 					<c:if test="${not empty burningQuestionItemDto.burningQuestionDtos}">
