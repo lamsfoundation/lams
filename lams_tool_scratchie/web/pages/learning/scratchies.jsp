@@ -73,6 +73,7 @@
 												aria-controls="svg-${svgId}"
 												<c:choose>
 											    	<c:when test="${scratchie.revealOnDoubleClick}">
+											    		onClick="return false;" 
 											    		onDblClick=
 											    	</c:when>
 											    	<c:otherwise>

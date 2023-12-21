@@ -517,8 +517,8 @@
         </c:if>
 
         <c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
-            <lams:Alert5 type="warning" id="reveal-double-click-warning" close="false">
-                <i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> <fmt:message key="label.learning.reveal.double.click" />
+            <lams:Alert5 type="info" id="reveal-double-click-warning" close="false">
+                <fmt:message key="label.learning.reveal.double.click" />
             </lams:Alert5>
         </c:if>
 
