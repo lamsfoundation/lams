@@ -1,8 +1,5 @@
-	<script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
-	<lams:JSImport src="includes/javascript/ranking.js" relative="true" />
-
-	<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
-	<c:choose>
+<%-- Build up the divs now and the ordering, then include the divs in the body and trigger the ordering in document.ready --%>
+<c:choose>
 	<c:when test="${finishedLock}">
 		<c:set var="rowdrop"></c:set>
 		<c:set var="itemdrop"></c:set>
@@ -11,21 +8,34 @@
 		<c:set var="rowdrop">dropzone</c:set>
 		<c:set var="itemdrop">item draggable</c:set>
 	</c:otherwise>
-	</c:choose>
+</c:choose>
 	
-	<c:set var="itemDivs"></c:set>
-	<c:set var="javascriptReady"></c:set>	
-	<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
-		<c:set var="itemDivs">${itemDivs} <div id="item${ratingDto.itemId}" class="${itemdrop}">${ratingDto.itemDescription}</div></c:set>
-		<c:if test="${ratingDto.userRating > 0}">
-			<c:set var="javascriptReady">${javascriptReady} rankedArray[${ratingDto.userRating}]='item${ratingDto.itemId}';</c:set>		
-		</c:if>
-	</c:forEach>
-	
-	<script type="text/javascript">
+<c:set var="itemDivs"></c:set>
+<c:set var="javascriptReady"></c:set>	
+<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
+	<c:set var="itemDivs">
+		${itemDivs} 
+		<li id="item${ratingDto.itemId}" class="${itemdrop} list-group-item">
+			${ratingDto.itemDescription}
+		</li>
+	</c:set>
+	<c:if test="${ratingDto.userRating > 0}">
+		<c:set var="javascriptReady">${javascriptReady} rankedArray[${ratingDto.userRating}]='item${ratingDto.itemId}';</c:set>		
+	</c:if>
+</c:forEach>
 
+<style>
+	#lastEntry {
+		padding-top:10px;
+		padding-bottom:10px;
+		list-style-type: none;
+	}
+</style>
+
+<script type="text/javascript" src="${lams}includes/javascript/interact.min.js"></script>
+<lams:JSImport src="includes/javascript/ranking.js" relative="true" />
+<script type="text/javascript">
 		var learners;
-		
 		$(document).ready(function(){
 			
 			var rankedArray = new Array();
@@ -50,7 +60,6 @@
 
 		});
 		
-
 		function testButtons() {
 			if ( learners.children.length == 0 ) {
 				showButtons();
@@ -60,10 +69,13 @@
 		}
 		
 		function updateAddLabel() {
-			if ( learners.children == undefined || learners.children.length == 0  ) {
-		    	$('#lastEntry').html('<fmt:message key="label.alllearnersadded"/>');
-			} else {
-				$('#lastEntry').html('<fmt:message key="label.addlearnerhere"/>');
+			const label = ( learners.children == undefined || learners.children.length == 0  ) ?
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.alllearnersadded"/></spring:escapeBody>' :
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.addlearnerhere"/></spring:escapeBody>';						 
+		    $('#lastEntry').html(label);
+
+		    if ( learners.children == undefined || learners.children.length == 0  ) {
+		    	$('#lastEntry').toggleClass("text-muted text-success").effect("highlight", {}, 3000);
 			}
 		}
 			
@@ -91,7 +103,7 @@
 			hideButtons();
 
 			if ( learners.children.length > 0 ) {
-				alert('<fmt:message key="error.assign.rankAll"/>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.assign.rankAll"/></spring:escapeBody>');
 				return false;
 			}
 
@@ -121,36 +133,48 @@
 		function cancel() {
 			document.location.href='<c:url value="/learning/refresh.do?sessionMapID=${sessionMapID}"/>';
 		}
+</script>
 
-    </script>
+<c:if test="${notcomplete}">
+	<lams:Alert5 type="danger" id="warn-assign-rankAll" close="true">
+		<fmt:message key="error.assign.rankAll" />
+	</lams:Alert5>
+</c:if>
+<lams:Alert5 type="info" id="info-assign-rankAll" close="false">
+	<fmt:message key="label.assign.rankAll"/>
+</lams:Alert5>
 
-	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
+<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="get" id="editForm">
+	<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+	<input type="hidden" name="toolContentId" value="${toolContentId}"/>
+	<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
+	<input type="hidden" name="next" id="next" value=""/>
+	
+	<div class="card lcard">
+		<div class="card-header">
+			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+		</div>
 
-		<c:if test="${notcomplete}">
-			<span class="alert"><fmt:message key="error.assign.rankAll"/></span><br/>
-		</c:if>
-		<span id="instructions"><strong><fmt:message key="label.assign.rankAll">
-			</fmt:message></strong>
-		</span>
-
-		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-		<input type="hidden" name="toolContentId" value="${toolContentId}"/>
-		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
-		<input type="hidden" name="next" id="next" value=""/>
-
-		<div class="row voffset10">
+		<div class="row m-2 mb-4">
 			<div class="col-sm-6">
-				<strong><fmt:message key="label.ranked"></fmt:message></strong>
-				<div id="ranked"><div id="lastEntry" class="${rowdrop}" style="padding-top:10px;padding-bottom:10px"><fmt:message key="label.addlearnerhere"></fmt:message></div></div>
+				<strong><fmt:message key="label.ranked"/></strong>
+				
+				<ul id="ranked" class="list-group mt-2">
+					<li id="lastEntry" class="${rowdrop} text-muted">
+						<fmt:message key="label.addlearnerhere"/>
+					</li>
+				</ul>
 			</div>
 			
 			<div class="col-sm-6">
-				<div  class="${rowdrop}" id="unranked"><strong><fmt:message key="label.unranked"></fmt:message></strong></div>
-				<div id="learners">
-					${itemDivs}
+				<div class="${rowdrop} fw-bold" id="unranked">
+					<fmt:message key="label.unranked"/>
 				</div>
+				
+				<ul id="learners" class="list-group mt-2">
+					${itemDivs}
+				</ul>
 			</div>
 		</div>
-	
-		</form>
-		
+	</div>
+</form>

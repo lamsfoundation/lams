@@ -138,6 +138,7 @@ public class LearningController implements SbmtConstants {
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 	sessionMap.put(SbmtConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(SbmtConstants.ATTR_INSTRUCTION, content.getInstruction());
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 
 	// if content in use, return special page.
 	if (content.isDefineLater()) {
@@ -182,7 +183,6 @@ public class LearningController implements SbmtConstants {
 	// check whehter finish lock is on/off
 	boolean lock = content.isLockOnFinished() && learner.isFinished();
 
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
 	sessionMap.put(SbmtConstants.ATTR_USE_SEL_LEADER, content.isUseSelectLeaderToolOuput());
@@ -533,7 +533,7 @@ public class LearningController implements SbmtConstants {
      * Display empty reflection form.
      */
     @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 //		ISubmitFilesService submitFilesService = getService();
@@ -571,7 +571,7 @@ public class LearningController implements SbmtConstants {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("refForm") ReflectionForm refForm, HttpServletRequest request,
+    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 	Integer userId = refForm.getUserID();
 

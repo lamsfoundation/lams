@@ -1,4 +1,6 @@
 /bin/
 /build/
 /.sass-cache/
-/web/css/*.css
+/web/css/components-learner.css
+/web/css/kumalive.css
+/web/css/presence.css

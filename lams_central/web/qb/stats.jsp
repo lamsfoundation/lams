@@ -62,8 +62,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
 	<script type="text/javascript">
 		var permanentRemove = '${permanentRemove}' == 'true',
 			permanentRemovePossible = '${permanentRemovePossible}' == 'true',
@@ -98,10 +98,10 @@
 		function removeCollectionQuestion(collectionUid) {
 			if (permanentRemove) {
 				if (!permanentRemovePossible) {
-					alert('<fmt:message key="error.qb.permanent.remove" />');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.qb.permanent.remove" /></spring:escapeBody>');
 					return;
 				}
-				if (!confirm('<fmt:message key="label.qb.permanent.remove.confirm" />')){
+				if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.qb.permanent.remove.confirm" /></spring:escapeBody>')){
 					return;
 				}
 			}

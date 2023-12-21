@@ -1,38 +1,41 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${assessment.allowHistoryResponses && (fn:length(question.questionResults) > 1)}">
-	<h5 class="text-muted"><fmt:message key="label.learning.question.summary.history.responces" /></h5>
+	<div class="card-subheader mt-2">
+		<fmt:message key="label.learning.question.summary.history.responces" />
+	</div>
 
-	<table class="table table-striped text-muted">
-		<tr>
-			<th style="width: 70px">
-				#
-			</th>		
-			<th style="width: 25%">
-				<fmt:message key="label.learning.summary.completed.on" />
-			</th>
-			<th>
-				<fmt:message key="label.learning.question.summary.response" />
-			</th>
-			<c:if test="${assessment.allowGradesAfterAttempt}">			
-				<th style="width: 70px" >
-					<fmt:message key="label.authoring.basic.list.header.mark" />
-				</th>	
-			</c:if>		
-		</tr>
+	<div class="table-sm ltable">
+			<div class="row">
+				<div style="width: 70px">
+					#
+				</div>		
+				<div class="w-25">
+					<fmt:message key="label.learning.summary.completed.on" />
+				</div>
+				<div class="col">
+					<fmt:message key="label.learning.question.summary.response" />
+				</div>
+				<c:if test="${assessment.allowGradesAfterAttempt}">			
+					<div style="width: 70px" >
+						<fmt:message key="label.authoring.basic.list.header.mark" />
+					</div>	
+				</c:if>		
+			</div>
+		
 		<c:forEach var="item" items="${question.questionResults}" varStatus="status">
 			<c:set var="questionResult" value="${item[0]}" />
 			<c:set var="currentAssessmentResult" value="${item[1]}" />
-			<tr>
-				<td>
+			<div class="row">
+				<div style="width: 70px">
 					${status.index + 1} 
-				</td>
-				<td>
+				</div>
+				<div class="w-25">
 					<div>
 						<lams:Date value="${currentAssessmentResult.finishDate}" timeago="true"/> 
 					</div>
-				</td>					
-				<td>
+				</div>					
+				<div class="col">
 					<c:choose>
 						<c:when test="${question.type == 1}">
 							<c:forEach var="option" items="${question.optionDtos}">
@@ -44,27 +47,25 @@
 							</c:forEach>						
 						</c:when>
 						<c:when test="${question.type == 2}">
-							<table style="padding: 0px; margin: 0px; border: none; " cellspacing="0" cellpadding="0">
-								<c:forEach var="option" items="${question.optionDtos}">
-									<tr>
-										<td style="width:40%; background: none; padding: 0px; margin: 0px; border: none;">
-											${option.matchingPair}
-										</td>
-										<td style="background: none; padding: 0px; margin: 0px; border: none; vertical-align: middle;">
-											- 
-											<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
-												<c:if test="${option.uid == optionAnswer.optionUid}">
-													<c:forEach var="questionOption2" items="${question.optionDtos}">
-														<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
-															${questionOption2.name}
-														</c:if>
-													</c:forEach>
-												</c:if>
-											</c:forEach>										
-										</td>
-									</tr>
-								</c:forEach>
-							</table>
+							<c:forEach var="option" items="${question.optionDtos}">
+								<div class="row" style="border: none;">
+									<div style="width: 40%;">
+										${option.matchingPair}
+									</div>
+									<div class="col">
+										-
+										<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
+											<c:if test="${option.uid == optionAnswer.optionUid}">
+												<c:forEach var="questionOption2" items="${question.optionDtos}">
+													<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
+														${questionOption2.name}
+													</c:if>
+												</c:forEach>
+											</c:if>
+										</c:forEach>
+									</div>
+								</div>
+							</c:forEach>
 						</c:when>
 						<c:when test="${question.type == 3}">
 							${questionResult.answer}
@@ -94,16 +95,16 @@
 							</c:forEach>
 						</c:when>
 					</c:choose>
-				</td>
+				</div>
 				<c:if test="${assessment.allowGradesAfterAttempt}">
-					<td style="padding-left: 0px;" >
-						<div style="text-align: center;">
+					<div style="width: 70px; padding-left: 0px;" >
+						<div class="text-center">
 							<fmt:formatNumber value="${questionResult.mark}" maxFractionDigits="3"/>
 						</div>
-					</td>
+					</div>
 				</c:if>		
-			</tr>
+			</div>
 		</c:forEach>
-
 	</table>
+	</div>
 </c:if>							

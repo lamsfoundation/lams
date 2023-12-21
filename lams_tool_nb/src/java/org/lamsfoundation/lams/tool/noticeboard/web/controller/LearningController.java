@@ -62,14 +62,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * Creation Date: 27-06-05
  *
- * The learner url can be of three modes learner, teacher or author. Depending on
- * what mode was set, it will trigger the corresponding action. If the mode parameter
- * is missing or a key is not found in the keymap, it will call the unspecified method
- * which defaults to the learner action.
+ * The learner url can be of three modes learner, teacher or author. Depending on what mode was set, it will trigger the
+ * corresponding action. If the mode parameter is missing or a key is not found in the keymap, it will call the
+ * unspecified method which defaults to the learner action.
  *
  * <p>
- * The difference between author mode (which is basically the preview)
- * is that if the defineLater flag is set, it will not be able to see the noticeboard screen
+ * The difference between author mode (which is basically the preview) is that if the defineLater flag is set, it will
+ * not be able to see the noticeboard screen
  * </p>
  */
 @Controller
@@ -108,14 +107,8 @@ public class LearningController {
 	return WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
     }
 
-    public String unspecified(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	return learner(NbLearnerForm, request, response);
-    }
-
     @RequestMapping("/learner")
-    public String learner(@ModelAttribute NbLearnerForm NbLearnerForm, HttpServletRequest request,
+    public String learner(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	NoticeboardContent nbContent = null;
@@ -123,7 +116,7 @@ public class LearningController {
 
 	MultiValueMap<String, String> errorMap = new LinkedMultiValueMap<>();
 
-	Long toolSessionID = Long.valueOf(NbLearnerForm.getToolSessionID());
+	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
 
 	if (toolSessionID == null) {
 	    String error = "Unable to continue. The parameters tool session id is missing";
@@ -141,14 +134,15 @@ public class LearningController {
 	}
 
 	if (isFlagSet(nbContent, NoticeboardConstants.FLAG_DEFINE_LATER)) {
+	    request.setAttribute(NoticeboardConstants.TOOL_SESSION_ID, toolSessionID);
 	    return "defineLater";
 	}
 
 	boolean readOnly = false;
-	if (NbLearnerForm.getMode() == null) {
-	    NbLearnerForm.setMode(ToolAccessMode.LEARNER.toString());
+	if (nbLearnerForm.getMode() == null) {
+	    nbLearnerForm.setMode(ToolAccessMode.LEARNER.toString());
 	}
-	ToolAccessMode mode = WebUtil.getToolAccessMode(NbLearnerForm.getMode());
+	ToolAccessMode mode = WebUtil.getToolAccessMode(nbLearnerForm.getMode());
 	Long userID = null;
 	if (mode == ToolAccessMode.LEARNER || mode == ToolAccessMode.AUTHOR) {
 	    userID = getUserID(request);
@@ -175,7 +169,7 @@ public class LearningController {
 	    readOnly = true;
 	}
 
-	NbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
+	nbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
 
 	NotebookEntry notebookEntry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
@@ -187,24 +181,11 @@ public class LearningController {
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
-
 	Boolean userFinished = (nbUser != null && NoticeboardUser.COMPLETED.equals(nbUser.getUserStatus()));
 	request.setAttribute("userFinished", userFinished);
-
 	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, nbService.isLastActivity(toolSessionID));
 
-	/*
-	 * Checks to see if the runOffline flag is set.
-	 * If the particular flag is set, control is forwarded to jsp page
-	 * displaying to the user the message according to what flag is set.
-	 */
-	if (displayMessageToUser(nbContent, errorMap)) {
-	    request.setAttribute("errorMap", errorMap);
-	    return "message";
-	}
-
 	return "learnerContent";
-
     }
 
     @RequestMapping("/teacher")
@@ -219,13 +200,12 @@ public class LearningController {
 	    HttpServletResponse response) throws NbApplicationException {
 	NbLearnerForm.setMode("author");
 	return learner(NbLearnerForm, request, response);
-
     }
 
     /**
      * <p>
-     * Performs a check on the flag indicated by <code>flag</code>
-     * In this noticeboard tool, there are 3 possible flags:
+     * Performs a check on the flag indicated by <code>flag</code> In this noticeboard tool, there are 3 possible
+     * flags:
      * <li>defineLater</li>
      * <li>contentInUse</li>
      * <br>
@@ -242,41 +222,15 @@ public class LearningController {
 	    default:
 		throw new NbApplicationException("Invalid flag");
 	}
-
     }
 
     /**
-     * <p>
-     * This methods checks the defineLater and runOffline flag.
-     * If defineLater flag is set, then a message is added to an ActionMessages
-     * object saying that the contents have not been defined yet. If the runOffline
-     * flag is set, a message is added to ActionMessages saying that the contents
-     * are not being run online.
-     * This method will return true if any one of the defineLater or runOffline flag is set.
-     * Otherwise false will be returned.
-     * </p>
-     */
-    private boolean displayMessageToUser(NoticeboardContent content, MultiValueMap<String, String> errorMap) {
-	boolean isDefineLaterSet = isFlagSet(content, NoticeboardConstants.FLAG_DEFINE_LATER);
-	errorMap = new LinkedMultiValueMap<>();
-	if (isDefineLaterSet) {
-	    if (isDefineLaterSet) {
-		errorMap.add("GLOBAL", messageService.getMessage("message.defineLaterSet"));
-	    }
-	    return true;
-	} else {
-	    return false;
-	}
-    }
-
-    /**
-     * Indicates that the user has finished viewing the noticeboard.
-     * The session is set to complete and leaveToolSession is called.
+     * Indicates that the user has finished viewing the noticeboard. The session is set to complete and leaveToolSession
+     * is called.
      */
     @RequestMapping("/finish")
     public String finish(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IOException {
-
 	Long userID = getUserID(request);
 
 	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
@@ -307,10 +261,10 @@ public class LearningController {
 		if (entry == null) {
 		    // create new entry
 		    nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getReflectionText());
+			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getEntryText());
 		} else {
 		    // update existing entry
-		    entry.setEntry(nbLearnerForm.getReflectionText());
+		    entry.setEntry(nbLearnerForm.getEntryText());
 		    entry.setLastModified(new Date());
 		    nbService.updateEntry(entry);
 		}
@@ -339,8 +293,8 @@ public class LearningController {
     }
 
     /**
-     * Indicates that the user has finished viewing the noticeboard, and will be
-     * passed onto the Notebook reflection screen.
+     * Indicates that the user has finished viewing the noticeboard, and will be passed onto the Notebook reflection
+     * screen.
      */
     @RequestMapping(path = "/reflect", method = RequestMethod.POST)
     public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {

@@ -63,14 +63,15 @@ function definePortrait( portraitId, userId, size, round, LAMS_URL, portraitLoca
 
 // define a small header with the portrait and two lines of text next to portrait
 function definePortraitMiniHeader(portraitId, userId, LAMS_URL, line1, line2, portraitOnRight, otherClasses) {
-	var html = '<div';
-	if ( otherClasses )
-		html += ' class="' + otherClasses + '"';
-	html += '>';
-	html += definePortrait(portraitId, userId, "small", true, LAMS_URL, portraitOnRight ? "pull-right" : "pull-left roffset5");
-	html += '<span>' + line1 + '</span>';
-	html += '<br/><span style="font-size: smaller">' + line2 + '</span>';
-	html += '</div>';
+	var html = 
+			'<div' + (otherClasses ? ' class="' + otherClasses + '"' : '') + '>' +
+				'<div class="float-start me-2">' +
+			 		definePortrait(portraitId, userId, "small", true, LAMS_URL, portraitOnRight ? "pull-right" : "pull-left roffset5") +
+			 	'</div>' +
+				'<span>' + line1 + '</span>' +
+				'<br/>' + 
+				'<span style="font-size: smaller">' + line2 + '</span>' +
+			'</div>';
 	return html;
 }
 

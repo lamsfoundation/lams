@@ -22,10 +22,13 @@
 
 package org.lamsfoundation.lams.tool.peerreview.dto;
 
+import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
+
 public class GroupSummary implements Comparable<GroupSummary> {
 
     private Long sessionId;
     private String sessionName;
+    private boolean emailsSent;
 
     public Long getSessionId() {
 	return sessionId;
@@ -43,15 +46,19 @@ public class GroupSummary implements Comparable<GroupSummary> {
 	this.sessionName = sessionName;
     }
 
+    public boolean isEmailsSent() {
+	return emailsSent;
+    }
+
+    public void setEmailsSent(boolean emailsSent) {
+	this.emailsSent = emailsSent;
+    }
+
     @Override
     public int compareTo(GroupSummary o) {
-	String name1 = this.sessionName.replaceAll("\\D+", "");
-	String name2 = o.sessionName.replaceAll("\\D+", "");
-	if (name1.length() == 0 || name2.length() == 0) {
-	    return name1.compareTo(name2);
+	if (o == null) {
+	    return 1;
 	}
-	Long num1 = Long.parseLong(name1);
-	Long num2 = Long.parseLong(name2);
-	return num1.compareTo(num2);
+	return PeerreviewSession.SESSION_NAME_COMPARATOR.compare(sessionName, o.getSessionName());
     }
 }

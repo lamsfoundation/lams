@@ -11,7 +11,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
 	<lams:JSImport src="includes/javascript/blockexportbutton.js" relative="true" />
@@ -72,11 +72,11 @@
 				multiPageSelection : true,
 				colNames:[
 					'', 
-					"<fmt:message key="gradebook.columntitle.lessonName"/>", 
-					"<fmt:message key="gradebook.columntitle.subGroup"/>", 
-					"<fmt:message key="gradebook.columntitle.startDate"/>", 
-					"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
-			    	"<fmt:message key="gradebook.columntitle.averageMark"/>"
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.lessonName"/></spring:escapeBody>", 
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.subGroup"/></spring:escapeBody>", 
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.startDate"/></spring:escapeBody>", 
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageTimeTaken"/></spring:escapeBody>", 
+			    	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageMark"/></spring:escapeBody>"
 				],
 			    colModel:[
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -88,7 +88,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#organisationGrid").clearGridData();
-			   	 	alert("<fmt:message key="gradebook.error.loaderror"/>");
+			   	 	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -114,13 +114,13 @@
 						 rowNum:10,
 					     colNames: [
 					     	'',
-					     	"<fmt:message key="gradebook.columntitle.learnerName"/>",
-					     	"<fmt:message key="gradebook.columntitle.progress"/>", 
-					     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-					    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
-					    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
-					     	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-			    			"<fmt:message key="gradebook.columntitle.mark"/>",
+					     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.learnerName"/></spring:escapeBody>",
+					     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.progress"/></spring:escapeBody>", 
+					     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.timeTaken"/></spring:escapeBody>", 
+					    	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.startDate"/></spring:escapeBody>", 
+					    	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.completeDate"/></spring:escapeBody>", 
+					     	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.lessonFeedback"/></spring:escapeBody>", 
+			    			"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.mark"/></spring:escapeBody>",
 			    			'portraitId'
 					     ],
 					     colModel:[
@@ -136,7 +136,7 @@
 					     ],
 					     loadError: function(xhr,st,err) {
 				    		jQuery("#"+subgrid_table_id).clearGridData();
-				    		alert("<fmt:message key="gradebook.error.loaderror"/>");
+				    		alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 				    	 },
 				    	 formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 if (cellname == "mark") {
@@ -188,7 +188,7 @@
 				guiStyle: "bootstrap",
 				iconSet: 'fontAwesome',
 				autoencode:false,
-				caption: "<fmt:message key="gradebook.gridtitle.learner.view"/>",
+				caption: "<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.gridtitle.learner.view"/></spring:escapeBody>",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />gradebook/gradebook/getUserGridData.do?view=listView&organisationID=${organisationID}",
 			    height: "100%",
@@ -202,7 +202,7 @@
 			    rowNum:10,
 			    colNames:[
 					'',
-					"<fmt:message key="gradebook.columntitle.learnerName"/>",
+					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.learnerName"/></spring:escapeBody>",
 					'portraitId'
 			    ],
 			    colModel:[
@@ -212,7 +212,7 @@
 			    ],
 			    loadError: function(xhr,st,err) {
 			    	jQuery("#userView").clearGridData();
-			    	alert("<fmt:message key="gradebook.error.loaderror"/>");
+			    	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 			    },
 			    subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
@@ -236,16 +236,16 @@
 						     cellurl: "", //will be updated dynamically
 						     colNames: [
 								'', 
-								"<fmt:message key="gradebook.columntitle.lessonName"/>", 
-								"<fmt:message key="gradebook.columntitle.subGroup"/>", 
-								"<fmt:message key="gradebook.columntitle.progress"/>", 
-								"<fmt:message key="gradebook.columntitle.startDate"/>", 
-								"<fmt:message key="gradebook.columntitle.completeDate"/>", 
-								"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
-								"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
-								"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
-								"<fmt:message key="gradebook.columntitle.averageMark"/>", 
-								"<fmt:message key="gradebook.columntitle.mark"/>"
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.lessonName"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.subGroup"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.progress"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.startDate"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.completeDate"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.lessonFeedback"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageTimeTaken"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.timeTaken"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.averageMark"/></spring:escapeBody>", 
+								"<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.columntitle.mark"/></spring:escapeBody>"
 						     ],
 						     colModel: [
 								{name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
@@ -262,7 +262,7 @@
 						     ],
 						     loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgrid_table_id).clearGridData();
-						    	alert("<fmt:message key="gradebook.error.loaderror"/>");
+						    	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="gradebook.error.loaderror"/></spring:escapeBody>");
 						     },
 						     formatCell: function(rowid, cellname,value, iRow, iCol) {
 					    	 	if (cellname == "mark") {
@@ -302,7 +302,7 @@
 					    	 		var currRowData = jQuery("#"+subgrid_table_id).getRowData(rowid);
 						     		if (currRowData['marksAvailable'] != null && currRowData['marksAvailable'] != "") {
 						     			if (parseFloat(value) > parseFloat(currRowData['marksAvailable'])){
-						     				displayCellErrorMessage(jQuery("#"+subgrid_table_id)[0], iRow, iCol, "<fmt:message key="label.error"/>", "<fmt:message key="error.markhigher"/>", "<fmt:message key="label.ok"/>");
+						     				displayCellErrorMessage(jQuery("#"+subgrid_table_id)[0], iRow, iCol, "<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.error"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key="error.markhigher"/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.ok"/></spring:escapeBody>");
 						     				jQuery("#"+subgrid_table_id).restoreCell( iRow, iCol);
 						     				throw("Mark must be lower than maximum mark");
 						     			}
@@ -327,7 +327,7 @@
 						     	$("#organisationGrid").trigger("reloadGrid");
 						     },
 						     errorCell: function(serverresponse, status) {
-						     	alert("<fmt:message key="error.cellsave"/>");
+						     	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="error.cellsave"/></spring:escapeBody>");
 						     },
 							 gridComplete: function(){
 								processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );

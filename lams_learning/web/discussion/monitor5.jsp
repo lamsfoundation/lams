@@ -167,8 +167,8 @@
 												  ],
 								borderWidth : 0,
 							} ],
-							labels : [ '<fmt:message key="label.discussion.stay.header" />',
-									   '<fmt:message key="label.discussion.move.header" />']
+							labels : [ '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.discussion.stay.header" /></spring:escapeBody>',
+									   '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.discussion.move.header" /></spring:escapeBody>']
 						},
 						options : {
 							layout : {
@@ -229,8 +229,7 @@
 
 
 <div class="card discussion-sentiment-chart-card">
-	<div class="card-header"
-		 id="discussion-sentiment-chart-card-header-${idSuffix}">
+	<div class="card-header">
        	<div class="mt-2">
 	    	<i class="fa fa-comments"></i>
 	    	<fmt:message key="label.discussion.header" />
@@ -248,8 +247,7 @@
 		</div>
     </div>
 
-    <div id="discussion-sentiment-chart-card-content-${idSuffix}" class="card-body container-fluid"
-       	 aria-labelledby="discussion-sentiment-chart-card-header-${idSuffix}">
+    <div id="discussion-sentiment-chart-card-content-${idSuffix}" class="card-body container-fluid">
 		<div class="row">
 			<div class="col-xs-12 col-sm-6" id="discussion-sentiment-chart-cell-${idSuffix}">
 			</div>

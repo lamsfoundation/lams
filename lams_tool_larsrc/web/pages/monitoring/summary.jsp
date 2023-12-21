@@ -17,11 +17,11 @@
 		ALLOW_RERATE = false; 
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js" ></script>
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
+<lams:JSImport src="includes/javascript/portrait.js" />
 <script type="text/javascript">
 	$(document).ready(function(){
 		
@@ -43,17 +43,17 @@
 				iconSet: 'fontAwesome',
 			   	colNames:['#',
 						'itemUid',
-						"<fmt:message key="monitoring.label.title" />",
-						"<fmt:message key="monitoring.label.type" />",
-					    "<fmt:message key="monitoring.label.suggest" />",
-					    "<fmt:message key="monitoring.label.views" />",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.title' /></spring:escapeBody>",
+						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.type' /></spring:escapeBody>",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.suggest' /></spring:escapeBody>",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.views' /></spring:escapeBody>",
 						<c:if test="${groupSummary.allowRating}">
-					    "<fmt:message key="label.rating" />",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.rating' /></spring:escapeBody>",
 					   	</c:if>
 						<c:if test="${groupSummary.allowComments}">
-					    "<fmt:message key="label.comments" />",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.comments' /></spring:escapeBody>",
 					   	</c:if>
-					    "<fmt:message key="monitoring.label.actions" />" 
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.actions' /></spring:escapeBody>" 
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
@@ -92,10 +92,10 @@
 						iconSet: 'fontAwesome',
 						colNames: [
 						   '',
-						   "<fmt:message key="monitoring.label.user.name"/>",
-						   "<fmt:message key="monitoring.label.access.time"/>", 
-						   "<fmt:message key="monitoring.label.complete.time"/>", 
-						   "<fmt:message key="monitoring.label.time.taken"/>",
+						   "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.user.name'/></spring:escapeBody>",
+						   "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.access.time'/></spring:escapeBody>", 
+						   "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.complete.time'/></spring:escapeBody>", 
+						   "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.time.taken'/></spring:escapeBody>",
 						   'portraitId'
 						],
 						colModel:[
@@ -108,7 +108,7 @@
 						],
 						loadError: function(xhr,st,err) {
 						    	jQuery("#"+subgridTableId).clearGridData();
-						    	jQuery.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.loaderror"/>", "<fmt:message key="label.ok"/>");
+						    	jQuery.jgrid.info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
 					    },
 						loadComplete: function () {
 					   	 	initializePortraitPopover('<lams:LAMSURL/>');
@@ -223,13 +223,13 @@
             type: 'post',
             success: function () {
             	if (isHideItem) {
-            		linkObject.innerHTML = '<fmt:message key='monitoring.label.show' />' ;
+            		linkObject.innerHTML = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.show" /></spring:escapeBody>' ;
             		linkObject.onclick = function (){
             			changeItemVisibility(this, itemUid, toolSessionId, false); 
             			return false;
             		}
             	} else {
-            		linkObject.innerHTML = '<fmt:message key='monitoring.label.hide' />' ;
+            		linkObject.innerHTML = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.hide" /></spring:escapeBody>' ;
             		linkObject.onclick = function (){
             			changeItemVisibility(this, itemUid, toolSessionId, true); 
             			return false;

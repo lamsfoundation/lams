@@ -11,7 +11,7 @@
 <!-- ********************  CSS ********************** -->
 <lams:css />
 <!DOCTYPE c:set PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><!-- ********************  javascript ********************** -->
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
@@ -25,7 +25,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
@@ -33,5 +33,3 @@
 <link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet">
-
-

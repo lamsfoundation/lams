@@ -19,13 +19,13 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css/>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+	<lams:JSImport src="includes/javascript/upload.js" />
 	<script type="text/javascript">
 		function removeMarkFile() {
-			var answer = confirm("<fmt:message key="message.monitor.mark.confirmDeleteFile"/>");
+			var answer = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.monitor.mark.confirmDeleteFile'/></spring:escapeBody>");
 			if (answer) {	
 				document.getElementById("method").value = "removeMarkFile";
 				document.getElementById("updateMarkForm").submit();
@@ -37,8 +37,8 @@
 			var files = fileSelect.files;
 			if (files.length > 0) {
 				var file = files[0];
-				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
-						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+				if ( ! validateShowErrorNotExecutable(file, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.attachment.executable"/></spring:escapeBody>', false, '${EXE_FILE_TYPES}')
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="errors.maxfilesize"/></spring:escapeBody>') ) {
 					return false;
 				}
 			}

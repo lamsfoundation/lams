@@ -5,13 +5,14 @@
 		var toolContentId = resultsPane.data('toolContentId');
 		// load an embedded results list
 		// show details button needs to be set in the page which included this page
-		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&newUI=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
+		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&bootstrap5=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
 						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, function(){
-			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane'),
+			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane').length 
+					? $(this).closest('.assessment-questions-pane') : $('.assessment-questions-pane-ira'),
 				// are any correct/groups buttons clickable?
 				discloseAllCorrectEnabled = false,
 				discloseAllGroupsEnabled = false; 
-			
+
 			// disclose correct/group answers on click
 			$('.disclose-button-group .btn', assessmentQuestionsPane).not('[disabled]').each(function(){
 				let button = $(this),
@@ -24,12 +25,12 @@
 				
 				
 				button.click(function(event) {	
-					showConfirm(isCorrectButton ? "<fmt:message key='message.disclose.correct.answers' />"
-								: "<fmt:message key='message.disclose.groups.answers' />", function(){
+					showConfirm(isCorrectButton ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.answers' /></spring:escapeBody>"
+								: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.groups.answers' /></spring:escapeBody>", function(){
 						// check if correct answers are disclosed before groups' answers
 						if (isCorrectButton &&
 							!button.closest('.disclose-button-group').find('.disclose-groups-button').is('[disabled]')) {
-								showConfirm("<fmt:message key='message.disclose.correct.before.groups.answers' />", function(){
+								showConfirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.before.groups.answers' /></spring:escapeBody>", function(){
 									discloseAnswers(button, resultsPane, true);
 								});
 						} else {
@@ -46,7 +47,7 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allCorrectButton.click(function(){
-						showConfirm("<fmt:message key='message.disclose.all.correct.answers' />", function(){
+						showConfirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.all.correct.answers' /></spring:escapeBody>", function(){
 							// check if correct answers are disclosed before groups' answers
 							let discloseFunction = function(){
 								let nonDisclosedQuestions = $('.disclose-correct-button', assessmentQuestionsPane).not('[disabled]'),
@@ -59,7 +60,7 @@
 							};
 							
 							if (!$('.disclose-all-groups-button', assessmentQuestionsPane).is('[disabled]')) {
-								showConfirm("<fmt:message key='message.disclose.correct.before.groups.answers' />", discloseFunction);
+								showConfirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.before.groups.answers' /></spring:escapeBody>", discloseFunction);
 								return;
 							}
 							
@@ -76,7 +77,7 @@
 				// do not add a handler twice
 				if (!isRefresh) {
 					allGroupsButton.click(function(){
-						showConfirm("<fmt:message key='message.disclose.all.groups.answers' />", function(){
+						showConfirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.all.groups.answers' /></spring:escapeBody>", function(){
 							let nonDisclosedQuestions = $('.disclose-groups-button', assessmentQuestionsPane).not('[disabled]'),
 			    				lastQuestionUid = nonDisclosedQuestions.last().closest('.disclose-button-group').attr('questionUid');
 							nonDisclosedQuestions.each(function() {

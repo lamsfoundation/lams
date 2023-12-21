@@ -23,29 +23,11 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -64,6 +46,7 @@ import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -83,9 +66,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -198,10 +198,12 @@ public class MonitoringController {
 	// identify sorting type
 	int sorting = LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
 	if (isSortFirstName != null) {
-	    sorting = isSortFirstName.equals(1) ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
+	    sorting = isSortFirstName.equals(1)
+		    ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
 		    : LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
 	} else if (isSortLastName != null) {
-	    sorting = isSortLastName.equals(1) ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
+	    sorting = isSortLastName.equals(1)
+		    ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
 		    : LEARNER_MARKS_SORTING_LAST_NAME_ASC;
 	}
 
@@ -226,9 +228,8 @@ public class MonitoringController {
 	    responsedata.put("total_rows", users.size());
 
 	    ToolSession toolSession = toolService.getToolSessionById(toolSessionId);
-	    Map<Integer, Double> gradebookUserActivities = gradebookService
-		    .getGradebookUserActivities(toolSession.getToolActivity().getActivityId()).stream()
-		    .filter(g -> g.getMark() != null)
+	    Map<Integer, Double> gradebookUserActivities = gradebookService.getGradebookUserActivities(
+			    toolSession.getToolActivity().getActivityId()).stream().filter(g -> g.getMark() != null)
 		    .collect(Collectors.toMap(g -> g.getLearner().getUserId(), GradebookUserActivity::getMark));
 
 	    WhiteboardUser leader = users.get(0).getSession().getGroupLeader();
@@ -289,6 +290,13 @@ public class MonitoringController {
 	whiteboardService.startGalleryWalk(toolContentId);
     }
 
+    @RequestMapping("/skipGalleryWalk")
+    private void skipGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, WhiteboardConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	whiteboardService.skipGalleryWalk(toolContentId);
+    }
+
     @RequestMapping("/finishGalleryWalk")
     private void finishGalleryWalk(HttpServletRequest request) throws IOException {
 	Long toolContentId = WebUtil.readLongParam(request, WhiteboardConstants.ATTR_TOOL_CONTENT_ID, false);
@@ -306,21 +314,31 @@ public class MonitoringController {
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(toolContentId);
 	whiteboard.setRelativeTimeLimit(relativeTimeLimit);
+	whiteboard.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	whiteboard.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	whiteboard.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
+		? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
+
+	// update monitoring UI where time limits are reflected on dashboard
+	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
 	whiteboardService.saveOrUpdate(whiteboard);
     }
 
@@ -340,8 +358,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty()
-			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase()
+			.contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());

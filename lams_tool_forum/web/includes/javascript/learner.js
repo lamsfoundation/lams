@@ -1,5 +1,4 @@
 function removeAtt(mapID){
-				
 	$("#itemAttachmentArea").load(
 		removeItemAttachmentUrl + "?sessionMapID="+ mapID,
 		{
@@ -7,7 +6,6 @@ function removeAtt(mapID){
 			reqID: (new Date()).getTime()
 		}
 	);
-				
 }
 			
 function validateForm() {

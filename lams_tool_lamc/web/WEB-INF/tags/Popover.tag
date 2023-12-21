@@ -12,18 +12,18 @@
 <c:set var="popoverId">lams-popover-<%= java.lang.Math.round(java.lang.Math.random() * 1000) %></c:set>
 
 <a class="lams-popover" id="${popoverId}"
-   <%-- Add any other Boostrap Popover attributes that have been added to the tage --%>
-   <c:forEach items="${dynamicAttributesVar}" var="att"> 
-   		${att.key} = '${att.value}' 
-   </c:forEach> 
+<%-- Add any other Boostrap Popover attributes that have been added to the tage --%>
+<c:forEach items="${dynamicAttributesVar}" var="att">
+	${att.key} = '${att.value}'
+</c:forEach>
 ></a>
 
 <%-- Content is provided in a separate, hidden box next to the popover icon--%>
-<span  id="${popoverId}-content" class="lams-popover-content d-none">
+<span  id="${popoverId}-content" class="lams-popover-content d-none hidden">
     <%-- Set up title, if any --%>
    	<c:if test="${not empty titleKey}">
-   		<span class="lams-popover-title"><fmt:message key="${titleKey}" /></span>
-   	</c:if>
+		<span class="lams-popover-title"><fmt:message key="${titleKey}" /></span>
+	</c:if>
    	 <%-- Set up content, if any --%>
 	<span class="lams-popover-body">
 		<jsp:doBody />

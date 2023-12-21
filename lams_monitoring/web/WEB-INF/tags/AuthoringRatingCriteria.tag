@@ -9,6 +9,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %> 
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-function" prefix="fn" %>
 <c:set var="lams"><lams:LAMSURL/></c:set>
@@ -132,12 +133,12 @@ $(document).ready(function() {
 		    		
 		})).append(jQuery('<td/>', {
 			width: '40px',
-			html: '<div class="arrow-up fa fa-long-arrow-up fa-pull-left" title="<fmt:message key="${upLabel}"/>" />' + 
-		    		'<div class="arrow-down fa fa-long-arrow-down fa-pull-right" title="<fmt:message key="${downLabel}"/>" />'
+			html: '<div class="arrow-up fa fa-long-arrow-up fa-pull-left" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${upLabel}"/></spring:escapeBody>" />' + 
+		    		'<div class="arrow-down fa fa-long-arrow-down fa-pull-right" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${downLabel}"/></spring:escapeBody>" />'
 		    		
 		})).append(jQuery('<td/>', {
 			width: '20px',
-			html: '<i class="fa fa-times" title="<fmt:message key="${deleteLabel}"/>"></i>'
+			html: '<i class="fa fa-times" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="${deleteLabel}"/></spring:escapeBody>"></i>'
 		})).appendTo('#criterias-table');
 		
 		reactivateArrows();
@@ -257,7 +258,7 @@ $(document).ready(function() {
 				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
 			}
 
-			alert('<fmt:message key="js.warning.max.min.limit"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.warning.max.min.limit"/></spring:escapeBody>');
 		}
 	}
 </script>

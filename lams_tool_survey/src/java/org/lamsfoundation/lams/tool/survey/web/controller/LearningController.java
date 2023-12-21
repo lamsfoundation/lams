@@ -469,15 +469,9 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(value = "/finish")
-    private String finish(HttpServletRequest request) {
+    private void finish(HttpServletRequest request, HttpServletResponse response) throws IOException, SurveyApplicationException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -488,29 +482,16 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = surveyService.finishToolSession(sessionId, userID);
-	    request.setAttribute(SurveyConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (SurveyApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = surveyService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(value = "/newReflection")
     private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
@@ -542,16 +523,10 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(value = "/submitReflection", method = RequestMethod.POST)
-    private String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    HttpServletRequest request) {
+    private void submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, SurveyApplicationException {
 	Integer userId = messageForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
@@ -574,7 +549,8 @@ public class LearningController {
 	    surveyService.updateEntry(entry);
 	}
 	request.setAttribute("messageForm", messageForm);
-	return finish(request);
+	
+	finish(request, response);
     }
 
     // *************************************************************************************
@@ -593,7 +569,6 @@ public class LearningController {
 	SurveyAnswer answer = getAnswerFromPage(request, answerDto, sessionID);
 	answerDto.setAnswer(answer);
 	validateAnswers(request, answerDto, errorMap, answer);
-
     }
 
     /**

@@ -4,8 +4,8 @@
 <lams:html>
 <lams:head>
 	<c:remove var="notifyCloseURL" scope="session" />
-	       	
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		function closeWindow() {
 			if (window.parent.ActivityLib) {

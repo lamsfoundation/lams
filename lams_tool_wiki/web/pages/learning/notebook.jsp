@@ -16,8 +16,8 @@
 		</title>
 		<lams:css/>
 	
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-		<script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
+		<lams:JSImport src="includes/javascript/wikiCommon.js" relative="true" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
@@ -45,19 +45,21 @@
 				<div class="panel">
 					<lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true" />
 				</div>
-				<div class="form-group">
+				<div class="mb-3">
 					<textarea id="focused" rows="4" name="entryText" class="form-control">${learningForm.entryText}</textarea>
 		
-					<a href="#nogo" class="btn btn-primary voffset5 pull-right na" id="finishButton">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
-					</a>
+					<div class="activity-bottom-buttons">
+						<a href="#nogo" class="btn btn-primary na" id="finishButton">
+							<c:choose>
+								<c:when test="${isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</a>
+					</div>
 				</div>
 			</form:form>
 		</lams:Page>

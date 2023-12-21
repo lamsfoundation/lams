@@ -3,7 +3,6 @@
 <%@ page import="org.lamsfoundation.lams.rating.model.RatingCriteria" %>
 
 <c:set var="lams"><lams:LAMSURL/></c:set>
-
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="peerreview" value="${sessionMap.peerreview}" />
@@ -16,7 +15,6 @@
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
 <c:set var="isHedging" value="<%=RatingCriteria.RATING_STYLE_HEDGING%>"/>
 <c:set var="isRubrics" value="<%=RatingCriteria.RATING_STYLE_RUBRICS%>"/>
-
 <c:choose>
 	<c:when test="${peerreview.showRatingsLeftForUser || peerreview.reflectOnActivity}">
 		<c:set var="finishButtonLabel"><fmt:message key="label.continue" /></c:set>
@@ -29,23 +27,18 @@
 	</c:otherwise>
 </c:choose>
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	
-	<lams:css/>
+<lams:PageLearner title="${peerreview.title}" toolSessionID="${toolSessionId}">
+	<!-- ********************  CSS ********************** -->
 	<link rel="stylesheet" href="<lams:WebAppURL/>/includes/css/learning.css">
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script src="${lams}includes/javascript/jquery.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
-	
+	<!-- ********************  javascript ********************** -->
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		function hideButtons() {
-			$("#buttonNextPrevDiv").css("visibility", "hidden");
+			$("#button-next-prev-area button").prop('disabled', true);
 		}	
 		function showButtons() {
-			$("#buttonNextPrevDiv").css("visibility", "visible");
+			$("#button-next-prev-area button").prop('disabled', false);
 		}	
 
  		function finishSession(){
@@ -71,12 +64,11 @@
 			hideButtons();
 			document.location.href='<c:url value="/learning/nextPrev.do?sessionMapID=${sessionMapID}&criteriaId=${criteriaRatings.ratingCriteria.ratingCriteriaId}&next='+next+'"/>';
 		}
-     </script>
-</lams:head>
-<body class="stripes">
-	<lams:Page type="learner" title="${peerreview.title}">
+	</script>
+
+	<div id="container-main">
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
-			<lams:Alert type="danger" id="warn-lock" close="false">
+			<lams:Alert5 type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
 						<fmt:message key="message.activityLocked"/>
@@ -85,89 +77,93 @@
 						<fmt:message key="message.warnLockOnFinish" ><fmt:param>${finishButtonLabel}</fmt:param></fmt:message>
 					</c:otherwise>
 				</c:choose>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
-		<div class="panel">
-			<p><c:out value="${peerreview.instructions}" escapeXml="false"/><p>
+		<div id="instructions" class="instructions">
+			<c:out value="${peerreview.instructions}" escapeXml="false" />
+
 			<c:if test="${numCriteria > 1}">
-				<p><fmt:message key="label.step"><fmt:param>${stepNumber}</fmt:param><fmt:param>${numCriteria}</fmt:param></fmt:message></p>
-		 	</c:if> 
-		</div>
-		<div class="panel">
-		<c:choose>
-		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">
-			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
-			<%@ include file="comment.jsp" %>
-		</c:when>
-		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isStar}">
-			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
-			<%@ include file="star.jsp" %>
-		</c:when>
-		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
-			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
-			<c:choose>
-			<c:when test="${rateAllUsers > 0}">
-			<%@ include file="rankall.jsp" %>
-			</c:when>
-			<c:otherwise>
-			<%@ include file="ranking.jsp" %>
-			</c:otherwise>
-			</c:choose>		
-		</c:when>
-		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isHedging}">
-			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
-			<%@ include file="hedging.jsp" %>
-		</c:when>
-		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
-			<c:choose>
-				<c:when test="${peerreview.rubricsView eq 2}">
-					<%@ include file="rubricsPivot.jsp" %>
-				</c:when>
-				<c:otherwise>
-					<%@ include file="rubrics.jsp" %>
-				</c:otherwise>
-			</c:choose>
-		</c:when>
-		</c:choose>		
-		</div>
-	
-		<c:choose>	
-			<c:when test="${finishedLock || mode == 'teacher'}">
-				<c:set var="method">nextPrev</c:set>
-			</c:when>
-			<c:otherwise>
-				<c:set var="method">submitEntry</c:set>
-			</c:otherwise>
-		</c:choose>
-
-		<div class="voffset5" id="buttondiv">
-		
-		<div class=" pull-left">		
-		<span id="refreshButton" class="btn btn-default" onclick="javascript:refresh();"><fmt:message key="label.refresh"/></span>
+				<div>
+					<fmt:message key="label.step">
+						<fmt:param>${stepNumber}</fmt:param>
+						<fmt:param>${numCriteria}</fmt:param>
+					</fmt:message>
+				</div>
+			</c:if>
 		</div>
 		
-		<div class="pull-right" id="buttonNextPrevDiv">		
-		<c:if test="${stepNumber > 1}">
-			<button type="button" id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></button>
-		</c:if>
 		<c:choose>
-			<c:when test="${stepNumber == numCriteria}">
-				<button type="button" id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</button>
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">					
+				<%@ include file="comment.jsp"%>
 			</c:when>
-			<c:otherwise>
-				<button type="button" id="finishButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></button>
-			</c:otherwise>
+				
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isStar}">
+				<%@ include file="star.jsp"%>
+			</c:when>
+				
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
+				<c:choose>
+					<c:when test="${rateAllUsers > 0}">
+						<%@ include file="rankall.jsp"%>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="ranking.jsp"%>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
+				
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isHedging}">
+				<%@ include file="hedging.jsp"%>
+			</c:when>
+				
+			<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRubrics}">
+				<c:choose>
+					<c:when test="${peerreview.rubricsView eq 2}">
+						<%@ include file="rubricsPivot.jsp"%>
+					</c:when>
+					<c:otherwise>
+						<%@ include file="rubrics.jsp"%>
+					</c:otherwise>
+				</c:choose>
+			</c:when>
 		</c:choose>
-		</div>
-		</div>				
-	
-	</lams:Page>
-	<!--closes content-->
 
-	<div id="footer">
+		<div class="activity-bottom-buttons">
+			<div id="button-next-prev-area">
+				<c:choose>	
+					<c:when test="${finishedLock || mode == 'teacher'}">
+						<c:set var="method">nextPrev</c:set>
+					</c:when>
+					<c:otherwise>
+						<c:set var="method">submitEntry</c:set>
+					</c:otherwise>
+				</c:choose>
+				
+				<c:if test="${stepNumber > 1}">
+					<button type="button" id="prevButton" class="btn btn-secondary btn-icon-previous me-1" onclick="javascript:${method}(false);">
+						<fmt:message key="label.previous"/>
+					</button>
+				</c:if>
+				
+				<c:choose>
+					<c:when test="${stepNumber == numCriteria}">
+						<button type="button" id="finishButton" class="btn btn-primary btn-icon-next" onclick="javascript:${method}(true);">
+							${finishButtonLabel}
+						</button>
+					</c:when>
+					<c:otherwise>
+						<button type="button" id="finishButton" class="btn btn-primary btn-icon-next" onclick="javascript:${method}(true);">
+							<fmt:message key="label.next"/>
+						</button>
+					</c:otherwise>
+				</c:choose>
+			</div>
+						
+			<button type="button" id="refreshButton" class="btn btn-secondary btn-icon-refresh me-2" onclick="javascript:refresh();">
+				<fmt:message key="label.refresh"/>
+			</button>
+		</div>			
+	
 	</div>
-	<!--closes footer-->
-
-</body>
-</lams:html>
+</lams:PageLearner>

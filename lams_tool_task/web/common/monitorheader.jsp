@@ -11,7 +11,7 @@
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <!-- ********************  javascript ********************** -->
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
@@ -20,7 +20,4 @@
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-	
-
-	
+<lams:JSImport src="includes/javascript/portrait.js" />

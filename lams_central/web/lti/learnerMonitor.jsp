@@ -26,8 +26,8 @@
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
 	
 </lams:head>
 

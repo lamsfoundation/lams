@@ -11,7 +11,7 @@
 	    var reqIDVar = new Date();
 		var param = "?<csrf:token/>&toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
 		url = url + param;
-		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+		return downloadFile(url, 'messageArea_Busy', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.summary.downloaded"/></spring:escapeBody>', 'messageArea', 'btn-disable-on-submit');
 	}
 </script>
 

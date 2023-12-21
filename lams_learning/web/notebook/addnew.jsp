@@ -33,7 +33,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:css />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		function doSubmit(signature) {
 			document.getElementById("notebookForm").signature.value = signature;

@@ -23,10 +23,6 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
@@ -37,6 +33,10 @@ import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.usermanagement.User;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface IWhiteboardService extends ICommonToolService {
 
@@ -127,9 +127,11 @@ public interface IWhiteboardService extends ICommonToolService {
      */
     WhiteboardUser getUser(Long uid);
 
-    void startGalleryWalk(long toolContentId) throws IOException;
+    void startGalleryWalk(long toolContentId);
 
-    void finishGalleryWalk(long toolContentId) throws IOException;
+    void skipGalleryWalk(long toolContentId);
+
+    void finishGalleryWalk(long toolContentId);
 
     void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
 

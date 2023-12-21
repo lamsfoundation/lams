@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.taskList.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.Date;
@@ -340,7 +341,7 @@ public class LearningController implements TaskListConstants {
      */
     @RequestMapping("/finish")
     public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	// auto run mode, when use finish the only one taskList item, mark it as complete then finish this activity as well
 	String taskListItemUid = request.getParameter(TaskListConstants.PARAM_ITEM_UID);
 	if (taskListItemUid != null) {
@@ -352,20 +353,15 @@ public class LearningController implements TaskListConstants {
 	    return "pages/learning/learning";
 	}
 
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = user.getUserID().longValue();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = user.getUserID().longValue();
 
-	    SessionMap<String, Object> sessionMap = getSessionMap(request);
-	    Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	    String nextActivityUrl = taskListService.finishToolSession(sessionId, userID);
-	    request.setAttribute(TaskListConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (TaskListException e) {
-	    log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	String nextActivityUrl = taskListService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
+	return null;
     }
 
     /**
@@ -560,7 +556,7 @@ public class LearningController implements TaskListConstants {
      */
     @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	Integer userId = reflectionForm.getUserID();
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);

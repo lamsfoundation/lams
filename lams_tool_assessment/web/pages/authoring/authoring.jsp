@@ -32,7 +32,7 @@
         function validateForm() {
             //check with a teacher whether he forgot to add questions to the question bank
             var referenceCount = $("#referencesTable tr").length - 1;
-			if ((referenceCount == 0) && !confirm("<fmt:message key="label.no.questions.in.question.bank"/>")) {
+			if ((referenceCount == 0) && !confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.no.questions.in.question.bank'/></spring:escapeBody>")) {
 				return false;
 			}
 

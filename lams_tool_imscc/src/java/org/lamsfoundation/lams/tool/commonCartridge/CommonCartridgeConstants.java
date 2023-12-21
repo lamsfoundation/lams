@@ -78,8 +78,6 @@ public class CommonCartridgeConstants {
 
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
     public static final String ATTR_USER_LIST = "userList";

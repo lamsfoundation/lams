@@ -98,6 +98,8 @@ public class BranchingActivityController {
 	    branchingForm.setProgressID(learnerProgress.getLearnerProgressId());
 	    branchingForm.setShowFinishButton(Boolean.TRUE);
 	    branchingForm.setTitle(activity.getTitle());
+	    // lessonId needed for the progress bar
+	    request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 
 	    if (learnerProgress.getLesson().isPreviewLesson()) {
 
@@ -135,8 +137,6 @@ public class BranchingActivityController {
 		} else if (branchingActivity.isToolBranchingActivity()) {
 		    branchingForm.setType(BranchingActivity.TOOL_BASED_TYPE);
 		}
-		// lessonId needed for the progress bar
-		request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 	    } else {
 		// forward to the sequence activity.
 		if (log.isDebugEnabled()) {

@@ -10,10 +10,9 @@
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
@@ -64,6 +63,16 @@
 												<c:forEach items="${smtpAuthTypes}" var="authType">
 													<option value="${authType.key}" ${authType.key == row.value ? 'selected="selected"' : '' }>
 														${authType.value}
+													</option>
+												</c:forEach>
+											</select>
+										</c:when>
+										<c:when test="${row.key == 'ServerTimezone'}">
+											<select name="value" class="form-control" id="${row.key}">
+												<option value="">---</option>
+												<c:forEach items="${timezones}" var="timezone">
+													<option value="${timezone}" ${timezone == row.value ? 'selected="selected"' : '' }>
+														<c:out value="${timezone}" />
 													</option>
 												</c:forEach>
 											</select>

@@ -23,31 +23,14 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -63,12 +46,7 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
-import org.lamsfoundation.lams.tool.ToolCompletionStatus;
-import org.lamsfoundation.lams.tool.ToolContentManager;
-import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
-import org.lamsfoundation.lams.tool.ToolSessionManager;
+import org.lamsfoundation.lams.tool.*;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -87,13 +65,17 @@ import org.lamsfoundation.lams.tool.whiteboard.web.controller.LearningWebsocketS
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.FileUtil;
-import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
-import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.*;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class WhiteboardService implements IWhiteboardService, ToolContentManager, ToolSessionManager {
     private static Logger log = Logger.getLogger(WhiteboardService.class.getName());
@@ -183,8 +165,9 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	WhiteboardSession session = getWhiteboardSessionBySessionId(toolSessionId);
 	if (WhiteboardConstants.COMPLETED == session.getStatus()) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	WhiteboardUser existingLeader = session.getGroupLeader();
@@ -222,14 +205,37 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
+	int learnersStarted = 0;
+	Whiteboard whiteboard = null;
+	for (WhiteboardSession whiteboardSession : whiteboardSessionDao.getByContentId(toolContentId)) {
+	    if (whiteboard == null) {
+		whiteboard = whiteboardSession.getWhiteboard();
+	    }
+	    learnersStarted += whiteboardUserDao.getBySessionID(whiteboardSession.getSessionId()).size();
+	    if (learnersStarted > 1) {
+		break;
+	    }
+	}
+	if (learnersStarted > 0 && whiteboard.getRelativeTimeLimit() == 0 && whiteboard.getAbsoluteTimeLimit() > 0
+		&& whiteboard.getAbsoluteTimeLimitFinish() == null) {
+	    whiteboard.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(whiteboard.getAbsoluteTimeLimit()));
+	    whiteboard.setAbsoluteTimeLimit(0);
+	    whiteboardDao.update(whiteboard);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	}
+
 	WhiteboardUser user = getUserByIDAndContent(Long.valueOf(userId), toolContentId);
 	if (user != null) {
 	    WhiteboardSession session = user.getSession();
-	    Whiteboard whiteboard = session.getWhiteboard();
 
-	    LocalDateTime launchedDate = LocalDateTime.now();
-	    user.setTimeLimitLaunchedDate(launchedDate);
-	    whiteboardUserDao.update(user);
+	    LocalDateTime launchedDate = user.getTimeLimitLaunchedDate();
+	    if (launchedDate == null) {
+		launchedDate = LocalDateTime.now();
+		user.setTimeLimitLaunchedDate(launchedDate);
+		whiteboardUserDao.update(user);
+	    }
+
 	    // if the user is not a leader, store his launch date, but return null so the leader's launch date is in use
 	    if (!whiteboard.isUseSelectLeaderToolOuput() || (session.getGroupLeader() != null
 		    && session.getGroupLeader().getUserId().equals(Long.valueOf(userId)))) {
@@ -326,9 +332,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 
 	List<SessionDTO> groupList = new ArrayList<>();
-	Long userSessionId = ratingUserId == null || !whiteboard.isGalleryWalkStarted()
-		|| !whiteboard.isGalleryWalkEditEnabled() ? null
-			: getUserByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
+	Long userSessionId =
+		ratingUserId == null || !whiteboard.isGalleryWalkStarted() || !whiteboard.isGalleryWalkEditEnabled()
+			? null
+			: getLearnerByIDAndContent(ratingUserId, contentId).getSession().getSessionId();
 	for (WhiteboardSession session : sessionList) {
 	    // one new group for one session.
 	    SessionDTO group = new SessionDTO();
@@ -339,10 +346,10 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
 	    String wid = whiteboard.getContentId() + "-" + session.getSessionId();
 	    wid = getWhiteboardPrefixedId(wid);
-	    
+
 	    // show read only pad if it is a learner and no reedit was enabled
-	    if (ratingUserId != null && (userSessionId == null || !session.getSessionId().equals(userSessionId)
-		    || (whiteboard.isUseSelectLeaderToolOuput() && (session.getGroupLeader() == null
+	    if (ratingUserId != null && (userSessionId == null || !session.getSessionId().equals(userSessionId) || (
+		    whiteboard.isUseSelectLeaderToolOuput() && (session.getGroupLeader() == null
 			    || !session.getGroupLeader().getUserId().equals(ratingUserId))))) {
 		wid = getWhiteboardReadOnlyWid(wid);
 	    }
@@ -396,7 +403,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+		    Date postedDate = (entry.getLastModified() != null)
+			    ? entry.getLastModified()
 			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflections.add(ref);
@@ -438,8 +446,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
     @Override
     public Grouping getGrouping(long toolContentId) {
-	ToolActivity toolActivity = (ToolActivity) userManagementService
-		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
+	ToolActivity toolActivity = (ToolActivity) userManagementService.findByProperty(ToolActivity.class,
+		"toolContentId", toolContentId).get(0);
 	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
     }
 
@@ -467,8 +475,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	}
 
 	if (criteria.isEmpty()) {
-	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria
-		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    ToolActivityRatingCriteria criterion = (ToolActivityRatingCriteria) RatingCriteria.getRatingCriteriaInstance(
+		    RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
 	    criterion.setTitle(messageService.getMessage("label.pad.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
@@ -482,7 +490,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void startGalleryWalk(long toolContentId) throws IOException {
+    public void startGalleryWalk(long toolContentId) {
 	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
 	if (!whiteboard.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -501,7 +509,31 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     }
 
     @Override
-    public void finishGalleryWalk(long toolContentId) throws IOException {
+    public void skipGalleryWalk(long toolContentId) {
+	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
+	if (!whiteboard.isGalleryWalkEnabled()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is not enabled for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	if (whiteboard.isGalleryWalkStarted()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already started for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	if (whiteboard.isGalleryWalkFinished()) {
+	    throw new IllegalArgumentException(
+		    "Can not skip Gallery Walk as it is already finished for Whiteboard with tool content ID "
+			    + toolContentId);
+	}
+	whiteboard.setGalleryWalkEnabled(false);
+	whiteboardDao.update(whiteboard);
+
+	sendGalleryWalkRefreshRequest(whiteboard);
+    }
+
+    @Override
+    public void finishGalleryWalk(long toolContentId) {
 	Whiteboard whiteboard = getWhiteboardByContentId(toolContentId);
 	if (!whiteboard.isGalleryWalkEnabled()) {
 	    throw new IllegalArgumentException(
@@ -552,8 +584,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     @Override
     public String getWhiteboardServerUrl() throws WhiteboardApplicationException {
 	WhiteboardConfigItem whiteboardServerUrlConfigItem = getConfigItem(WhiteboardConfigItem.KEY_SERVER_URL);
-	if (whiteboardServerUrlConfigItem == null
-		|| StringUtils.isBlank(whiteboardServerUrlConfigItem.getConfigValue())) {
+	if (whiteboardServerUrlConfigItem == null || StringUtils.isBlank(
+		whiteboardServerUrlConfigItem.getConfigValue())) {
 	    throw new WhiteboardApplicationException(
 		    "Whiteboard server URL is not configured on appadmin tool management page");
 	}
@@ -575,8 +607,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    return null;
 	}
 	WhiteboardConfigItem whiteboardAccessTokenConfigItem = getConfigItem(WhiteboardConfigItem.KEY_ACCESS_TOKEN);
-	if (whiteboardAccessTokenConfigItem == null
-		|| StringUtils.isBlank(whiteboardAccessTokenConfigItem.getConfigValue())) {
+	if (whiteboardAccessTokenConfigItem == null || StringUtils.isBlank(
+		whiteboardAccessTokenConfigItem.getConfigValue())) {
 	    return null;
 	}
 	// sourceWid is present when we want to copy content from other canvas
@@ -958,14 +990,14 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (WhiteboardService.log.isDebugEnabled()) {
-	    WhiteboardService.log
-		    .debug("Removing Whiteboard content for user ID " + userId + " and toolContentId " + toolContentId);
+	    WhiteboardService.log.debug(
+		    "Removing Whiteboard content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Whiteboard whiteboard = whiteboardDao.getByContentId(toolContentId);
 	if (whiteboard == null) {
-	    WhiteboardService.log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    WhiteboardService.log.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -1002,7 +1034,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isSessionFinished()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
@@ -1022,8 +1055,8 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    session.setStatus(WhiteboardConstants.COMPLETED);
 	    whiteboardSessionDao.update(session);
 	} else {
-	    WhiteboardService.log
-		    .error("Fail to leave tool Session. Could not find Whiteboard session by given session id: "
+	    WhiteboardService.log.error(
+		    "Fail to leave tool Session. Could not find Whiteboard session by given session id: "
 			    + toolSessionId);
 	    throw new DataMissingException(
 		    "Fail to leave tool Session. Could not find Whiteboard session by given session id: "

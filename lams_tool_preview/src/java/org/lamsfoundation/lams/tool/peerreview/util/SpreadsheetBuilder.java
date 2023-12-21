@@ -1,17 +1,5 @@
 package org.lamsfoundation.lams.tool.peerreview.util;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
@@ -30,11 +18,23 @@ import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 /**
- * Creates a Spreadsheet that reports the averages, with each team/group shown on a separate worksheet.
- * Calculates averages for each rating and for each user. The SPA factor then calculates the user's overall average
- * against the team average.
- * Has a empty Mark column so that the teacher can add a manual mark if they want.
+ * Creates a Spreadsheet that reports the averages, with each team/group shown on a separate worksheet. Calculates
+ * averages for each rating and for each user. The SPA factor then calculates the user's overall average against the
+ * team average. Has a empty Mark column so that the teacher can add a manual mark if they want.
  */
 public class SpreadsheetBuilder {
     private Peerreview peerreview;
@@ -67,7 +67,7 @@ public class SpreadsheetBuilder {
 	// populate the header row
 	generateTitleRow();
 
-	List<PeerreviewSession> sessions = peerreviewSessionDao.getByContentId(peerreview.getContentId());
+	Set<PeerreviewSession> sessions = new TreeSet<>(peerreviewSessionDao.getByContentId(peerreview.getContentId()));
 
 	ExcelSheet allLearnersSheet = null;
 	if (sessions.size() > 1) {
@@ -80,7 +80,7 @@ public class SpreadsheetBuilder {
 
 	    List<ExcelCell> allLearnersTitleCells = new LinkedList<>();
 	    for (ExcelCell cell : titleRow.getCells()) {
-		if (allLearnersTitleCells.size() == 2) {
+		if (allLearnersTitleCells.size() == 3) {
 		    // same cells as in groups' tab header row, plus Group column
 		    ExcelCell groupCell = new ExcelCell(service.getLocalisedMessage("label.group", null), true,
 			    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
@@ -100,7 +100,7 @@ public class SpreadsheetBuilder {
 		for (ExcelRow userRow : userRows) {
 		    List<ExcelCell> allLearnersUserCells = new LinkedList<>();
 		    for (ExcelCell cell : userRow.getCells()) {
-			if (allLearnersUserCells.size() == 2) {
+			if (allLearnersUserCells.size() == 3) {
 			    // same cells as in groups' tab header row, plus Group column
 			    ExcelCell groupCell = new ExcelCell(session.getSessionName());
 			    allLearnersUserCells.add(groupCell);
@@ -123,6 +123,8 @@ public class SpreadsheetBuilder {
      */
     private void generateTitleRow() {
 	titleRow = new ExcelRow();
+	titleRow.addCell(service.getLocalisedMessage("label.user.name", null), true,
+		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	titleRow.addCell(service.getLocalisedMessage("label.first.name", null), true,
 		ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	titleRow.addCell(service.getLocalisedMessage("label.last.name", null), true,
@@ -135,7 +137,8 @@ public class SpreadsheetBuilder {
 		// for each rubrics we separate its rows with a left border
 		Integer ratingCriteriaGroupId = criteria.getRatingCriteriaGroupId();
 		int[] borders = null;
-		if (ratingCriteriaGroupId == null ? previousRatingCriteriaGroupId != null
+		if (ratingCriteriaGroupId == null
+			? previousRatingCriteriaGroupId != null
 			: !ratingCriteriaGroupId.equals(previousRatingCriteriaGroupId)) {
 		    borders = new int[] { ExcelCell.BORDER_STYLE_BOTTOM_THIN, ExcelCell.BORDER_STYLE_LEFT_THIN };
 		} else {
@@ -200,8 +203,8 @@ public class SpreadsheetBuilder {
 	    for (ItemRatingCriteriaDTO itemRatingCriteriaDTO : ratingDto.getCriteriaDtos()) {
 		if (itemRatingCriteriaDTO.getAverageRatingAsNumber() != null
 			&& !itemRatingCriteriaDTO.getAverageRatingAsNumber().equals(0)) {
-		    Integer criteriaIndex = criteriaIndexMap
-			    .get(itemRatingCriteriaDTO.getRatingCriteria().getRatingCriteriaId());
+		    Integer criteriaIndex = criteriaIndexMap.get(
+			    itemRatingCriteriaDTO.getRatingCriteria().getRatingCriteriaId());
 		    double db = itemRatingCriteriaDTO.getAverageRatingAsNumber().doubleValue();
 		    userRowData[criteriaIndex] = roundTo2Places(db);
 		    criteriaMarkSum[criteriaIndex] += db;
@@ -214,6 +217,7 @@ public class SpreadsheetBuilder {
 	    Long userId = ratingDto.getItemId();
 
 	    PeerreviewUser user = userMap.get(userId);
+	    userRow.addCell(StringEscapeUtils.escapeCsv(user.getLoginName()));
 	    userRow.addCell(StringEscapeUtils.escapeCsv(user.getFirstName()));
 	    userRow.addCell(StringEscapeUtils.escapeCsv(user.getLastName()));
 
@@ -229,6 +233,7 @@ public class SpreadsheetBuilder {
 	ExcelRow avgRow = new ExcelRow();
 	avgRow.addCell(service.getLocalisedMessage("label.average", null), true);
 	avgRow.addEmptyCell();
+	avgRow.addEmptyCell();
 	double averageMarkSum = 0D;
 	for (int i = 0; i < criteriaMarkSum.length - 1; i++) {
 	    if (criteriaMarkCount[i] > 0) {
@@ -239,23 +244,23 @@ public class SpreadsheetBuilder {
 		avgRow.addEmptyCell();
 	    }
 	}
-	Double finalGroupAverage = countNonCommentCriteria > 0
-		? roundTo2Places(averageMarkSum / countNonCommentCriteria)
-		: 0D;
+	Double finalGroupAverage =
+		countNonCommentCriteria > 0 ? roundTo2Places(averageMarkSum / countNonCommentCriteria) : 0D;
 	avgRow.addCell(finalGroupAverage, true);
 
 	// the map is: itemId (who was rated) -> userId (who rated) -> rating from all categories
-	Map<Long, Map<Long, Set<Rating>>> ratings = ratingService
-		.getRatingsByCriteriasAndItems(criteriaIndexMap.keySet(), userMap.keySet()).stream()
-		.filter(rating -> rating.getRating() != null)
-		.collect(Collectors.groupingBy(Rating::getItemId, Collectors
-			.groupingBy(rating -> rating.getLearner().getUserId().longValue(), Collectors.toSet())));
+	Map<Long, Map<Long, Set<Rating>>> ratings = ratingService.getRatingsByCriteriasAndItems(
+			criteriaIndexMap.keySet(), userMap.keySet()).stream().filter(rating -> rating.getRating() != null)
+		.collect(Collectors.groupingBy(Rating::getItemId,
+			Collectors.groupingBy(rating -> rating.getLearner().getUserId().longValue(),
+				Collectors.toSet())));
 
 	// Combine rated rows with rows with users not yet rated, to make up complete list, and write out to rowList.
 	for (PeerreviewUser user : users) {
 	    ExcelRow userRow = userRowMap.get(user.getUserId());
 	    if (userRow == null) {
 		userRow = sessionSheet.initRow();
+		userRow.addCell(StringEscapeUtils.escapeCsv(user.getLoginName()));
 		userRow.addCell(StringEscapeUtils.escapeCsv(user.getFirstName()));
 		userRow.addCell(StringEscapeUtils.escapeCsv(user.getLastName()));
 	    } else {
@@ -289,11 +294,11 @@ public class SpreadsheetBuilder {
 
 		    pa = peerRatingCriteriaCount == 0 ? null : roundTo2Places(sumPeerRatings / peerRatingCriteriaCount);
 		    if (peerreview.isSelfReview()) {
-			sa = selfRatingCriteriaCount == 0 ? null
+			sa = selfRatingCriteriaCount == 0
+				? null
 				: roundTo2Places(sumSelfRatings / selfRatingCriteriaCount);
-			sapa = sumPeerRatings > 0
-				? roundTo2Places(Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount)))
-				: 0;
+			sapa = sumPeerRatings > 0 ? roundTo2Places(
+				Math.sqrt(sumSelfRatings / (sumPeerRatings / peerRatingCount))) : 0;
 		    }
 		}
 
@@ -363,6 +368,7 @@ public class SpreadsheetBuilder {
 		ExcelRow commentRow = sessionSheet.initRow();
 		Long commentingUserId = ((BigInteger) comment[0]).longValue();
 		PeerreviewUser commentingUser = userMap.get(commentingUserId);
+		commentRow.addCell(StringEscapeUtils.escapeCsv(commentingUser.getLoginName()));
 		commentRow.addCell(StringEscapeUtils.escapeCsv(commentingUser.getFirstName()));
 		commentRow.addCell(StringEscapeUtils.escapeCsv(commentingUser.getLastName()));
 		commentRow.addCell(StringUtils.replace((String) comment[1], "<BR>", "\n"));

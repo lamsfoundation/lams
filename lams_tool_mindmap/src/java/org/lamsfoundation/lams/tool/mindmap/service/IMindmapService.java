@@ -23,9 +23,7 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.thoughtworks.xstream.XStream;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
@@ -38,7 +36,8 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.thoughtworks.xstream.XStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Defines the services available to the web layer from the Mindmap Service
@@ -141,9 +140,11 @@ public interface IMindmapService extends ICommonToolService {
 
     void createGalleryWalkRatingCriterion(long toolContentId);
 
-    void startGalleryWalk(long toolContentId) throws IOException;
+    void startGalleryWalk(long toolContentId);
 
-    void finishGalleryWalk(long toolContentId) throws IOException;
+    void skipGalleryWalk(long toolContentId);
+
+    void finishGalleryWalk(long toolContentId);
 
     void enableGalleryWalkLearnerEdit(long toolContentId) throws IOException;
 }

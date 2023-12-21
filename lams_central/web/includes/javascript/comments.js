@@ -24,7 +24,7 @@
         	if ( ! threadDiv) {
         		alert(savedCannotRedisplayMessage);
        		} else {
-    			var loadString = lamsUrl+"comments/viewTopicThread.do?&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
+    			var loadString = lamsUrl+"comments/viewTopicThread.do?sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&commentUid="+commentUid;
     			$.ajaxSetup({ cache: true });
 				$(threadDiv).load(loadString, function() {
 					// expand up to the reply - in case it is buried down in a lot of replies

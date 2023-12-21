@@ -21,22 +21,22 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript">
-		const VALIDATION_ERROR_LABEL = "<fmt:message key='error.form.validation.error'/>";
-		const VALIDATION_ERRORS_LABEL = "<fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message>";
+		const VALIDATION_ERROR_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.error'/></spring:escapeBody>";
+		const VALIDATION_ERRORS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.errors'><fmt:param >{errors_counter}</fmt:param></fmt:message></spring:escapeBody>";
 	</script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-question.js"></script>
+	<lams:JSImport src="includes/javascript/qb-question.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.highlight.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/qb-search.js"></script>
+	<lams:JSImport src="includes/javascript/qb-search.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap-select.js"></script>
     <script  type="text/javascript">
 		$(document).ready(function(){
@@ -114,7 +114,7 @@
 			    },
 			   	colNames:[
 				   	'questionUid',
-					'<fmt:message key="label.authoring.basic.list.header.question"/>',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.authoring.basic.list.header.question"/></spring:escapeBody>',
 					'questionDescription'
 				],
 			   	colModel:[
@@ -133,7 +133,7 @@
 			    loadError: function(xhr,textStatus,errorThrown) {
 			    	$("#questions-grid").clearGridData();
 			    	//display warning message
-			    	$(this).jqGrid("displayErrorMessage", "<fmt:message key="error.loaderror"/>");
+			    	$(this).jqGrid("displayErrorMessage", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.loaderror'/></spring:escapeBody>");
 			    }
 			})
 			.navGrid("#questions-grid-pager", {edit:false,add:false,del:false,search:false});	

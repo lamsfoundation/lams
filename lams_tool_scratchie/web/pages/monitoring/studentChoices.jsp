@@ -4,7 +4,8 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${scratchie.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimit" value="${scratchie.absoluteTimeLimit}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${scratchie.absoluteTimeLimitFinishSeconds}"/>
 	<c:param name="relativeTimeLimit" value="${scratchie.relativeTimeLimit}"/>
 	<c:param name="isTbl" value="${isTbl}" />
 	<c:param name="controllerContext" value="tool/lascrt11/monitoring" />
@@ -57,7 +58,7 @@
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.plugin.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/common.js"></script>
+<lams:JSImport src="includes/javascript/common.js" />
 <script>
 	$(document).ready(function(){
 		$('#time-limit-panel-placeholder').load('${timeLimitPanelUrl}');

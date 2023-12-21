@@ -22,29 +22,18 @@
 			</c:set>
 		</c:if>
 		<title>${title}</title>
-		<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico"
-			  type="image/x-icon" />
+		<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-		<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-		<link rel="stylesheet"
-			  href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-		<link rel="stylesheet"
-			  href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css"
-			  type="text/css" media="screen">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css"
-			  type="text/css" media="screen">
+		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
 
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript"
-				src="/lams/includes/javascript/jquery-ui.js"></script>
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-		<script type="text/javascript"
-				src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-		<script type="text/javascript"
-				src="/lams/includes/javascript/portrait5.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+		<script type="text/javascript" src="/lams/includes/javascript/portrait5.js"></script>
 
 		<script type="text/javascript">
 			var mustHaveUppercase = ${mustHaveUppercase},
@@ -474,10 +463,8 @@
 								key="admin.user.time.zone" />:
 						</label>
 						<form:select path="timeZone" cssClass="form-select">
-							<c:forEach items="${timezoneDtos}" var="timezoneDto">
-								<form:option value="${timezoneDto.timeZoneId}">
-									${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-								</form:option>
+							<c:forEach items="${timezones}" var="timezone">
+								<form:option value="${timezone}"><c:out value="${timezone}" /></form:option>
 							</c:forEach>
 						</form:select>
 					</div>
@@ -525,10 +512,9 @@
 			</div>
 
 
-			<c:if test="${isAppadmin}">
 			<div class="row">
 				<div class="col-6 offset-3 text-end">
-					<c:if test="${not empty userForm.userId}">
+					<c:if test="${isAppadmin and not empty userForm.userId}">
 						<a	href="<lams:LAMSURL/>admin/userChangePass.jsp?userId=${userForm.userId}&login=${userForm.login}"
 							  class="btn btn-primary float-start">
 							<fmt:message key="admin.user.changePassword" />
@@ -542,8 +528,6 @@
 								value="<fmt:message key="admin.save" />" />
 				</div>
 			</div>
-			</c:if>
-
 
 			</form:form>
 			<!-- End of panel -->

@@ -14,7 +14,6 @@
 		<div class="${ratingStarsClass} rating-stars-new" data-average="${msgDto.averageRating}" data-id="${messageId}"></div>
 		
 		<div class="rating-stars-caption">
-		
 			<fmt:message key="label.learning.number.of.votes" >
 				<fmt:param>
 					<span id="averageRating${messageId}">
@@ -25,7 +24,6 @@
 					<span id="numberOfVotes${messageId}">${msgDto.numberOfVotes}</span>
 				</fmt:param>
 			</fmt:message>
-			
 		</div>
 	</div>
 </c:if>

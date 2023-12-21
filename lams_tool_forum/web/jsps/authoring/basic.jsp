@@ -53,7 +53,7 @@
 	var topicListTargetDiv = "messageListArea";
 	function deleteTopic(topicIndex, sessionMapID){
 
-		var	deletionConfirmed = confirm("<fmt:message key='label.authoring.basic.do.you.want.to.delete'></fmt:message>");
+		var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.basic.do.you.want.to.delete'/></spring:escapeBody>");
 		
 		if (deletionConfirmed) {
 			var url = "<c:url value="/authoring/deleteTopic.do"/>?<csrf:token/>";

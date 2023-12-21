@@ -1,0 +1,336 @@
+@import "../../../lams_central/web/css/components.scss";
+@import "_lams_variables.scss"; 
+
+.component-page-wrapper h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+    color: var(--bs-gray-dark);
+}
+
+.component-page-wrapper h1, .h1 {
+    font-size: calc(1.2rem + 1vw);
+}
+
+.component-page-wrapper h2, .h2 {
+    font-size: calc(1.2rem + 0.7vw);
+}
+
+.component-page-wrapper h3, .h3 {
+    font-size: calc(1.2rem + 0.5vw);
+}
+
+.component-page-wrapper h4, .h4 {
+    font-size: calc(1.1rem + 0.3vw);
+}
+
+.component-page-wrapper h5, .h5 {
+    font-size: 1.1rem;
+}
+
+.component-page-wrapper h6, .h6 {
+    font-size: 1rem;
+}
+
+.component-page-wrapper #hamb {
+	font-size: 2rem;
+	color: var(--bs-blue);
+    font-size: 1.8rem;
+	margin-bottom: -0.5rem;
+}
+
+.component-page-wrapper .offcanvas-body {
+	text-align: -webkit-center;
+	text-align: -moz-center;
+	overflow-x: hidden;
+}
+
+.component-page-wrapper .component-page-content #header {
+    box-shadow: 0px 1px 0px var(--bs-gray-400);
+}
+
+.component-page-wrapper .component-page-content #header>div:first-child {
+	margin-top: -0.35rem;
+    margin-bottom: 0.35rem;
+}
+
+.component-page-wrapper .component-page-content #lesson-name {
+    margin-left: 1rem;
+    margin-top: .6rem;
+}
+
+.component-page-wrapper .top-menu #progress-bar-widget {
+    min-width: 10rem;
+    margin: 0rem 1.5rem;
+    padding: 0;
+}
+
+.component-page-wrapper .top-menu #progress-bar-widget .progress {
+    height: .5rem;
+    background-color: var(--bs-gray-400);
+}
+
+.component-page-wrapper .top-menu #progress-bar-widget .progress .progress-bar {
+    background-color: var(--bs-blue);
+}
+
+.component-page-wrapper .top-menu #return-to-index {
+	margin-top: 0.8rem;
+}
+
+
+
+
+.component-page-wrapper .offcanvas {
+	text-align: center;
+	transition: all .3s ease;
+}
+
+.component-page-wrapper .offcanvas .lams-logo {
+	display: block;
+	width: 3.6rem;
+	margin-bottom: 2rem;
+}
+
+
+
+
+.component-page-wrapper .offcanvas {
+    top: 4.5rem;
+	width: 20rem;
+    max-width: 70rem;
+    border-radius: 0 1.2rem 0 0;
+    border: thin solid var(--bs-gray-400);
+    box-shadow: 0px 3px 6px var(--bs-gray-400);
+}
+
+.component-page-wrapper .offcanvas .offcanvas-title {
+	font-weight: 500;
+    color: rgb(5, 112, 213);
+}
+
+.component-page-wrapper .offcanvas .offcanvas-bar {
+	background-color: var(--bs-gray-200);
+    border-radius: 1.2rem;
+}
+
+.component-page-wrapper .offcanvas.active {
+    left: 1rem;
+}
+
+.component-page-wrapper .offcanvas .progress-bar-items > li a {
+    color: var(--bs-gray-dark);
+}
+
+.component-page-wrapper .offcanvas .progress-bar-items > li > .progress-bar-icon {
+    margin-right: .5rem;
+}
+
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-incomplete,
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-incomplete > .progress-bar-icon {
+    color: var(--bs-gray-700);
+}
+
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-complete,
+.component-page-wrapper .offcanvas .progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
+    color: var(--bs-green);
+}
+
+#component-offcanvas .list-group-item {
+	padding: 0;
+
+	.icon {
+		display: flex;
+		align-items: center;
+		align-self: stretch;
+		width: 35px;
+		background-color: rgba(211,211,211,0.17);
+		padding: 22px 30px 22px 15px;
+		margin-left: 12px;
+	}
+	
+	.col {
+		padding-left: 0.2rem;
+    	padding-right: 1rem;
+	}
+}
+
+.component-page-wrapper .activity-bottom-buttons {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row-reverse;
+	clear: both;
+}
+
+.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
+    box-shadow: 0px 3px 6px var(--bs-gray-400);
+}
+
+.component-page-wrapper .btn:focus {
+    box-shadow: var(--bs-btn-focus-box-shadow);
+}
+
+.component-page-wrapper #progress-bar-widget {
+    font-size: 0.90rem;
+}
+
+.wave-orange {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2Q1NmExMSIgd2lkdGg9IjEyNDAiIGhlaWdodD0iMzA0IiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6IiBmaWxsPSIjZjkzIi8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.wave-blue {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMwOTRiYWMiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.wave-purple {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiM1ZDM3YTIiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.wave-green {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjQwIiBoZWlnaHQ9IjMwNCIgIGZpbGw9IiMyMjhjM2EiIGZpbGwtcnVsZT0iZXZlbm9kZCIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.wave-pink {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2ZmOTdmZiIgaGVpZ2h0PSIzMDQiIHdpZHRoPSIxMjQwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMCAwaDEyMzguMDk1djI5Ni40NzdjLTM0My40NDggMjYuMTYxLTMwNS44MTYtMjQuODYxLTYxOS4wNDgtMTcuOTA3UzI5MS45OSAzMTUuNzg4IDAgMjc4LjU3VjB6IiBvcGFjaXR5PSIuMTUiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.wave-red {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2MwMCIgaGVpZ2h0PSIzMDQiIHdpZHRoPSIxMjQwIiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMCAwaDEyMzguMDk1djI5Ni40NzdjLTM0My40NDggMjYuMTYxLTMwNS44MTYtMjQuODYxLTYxOS4wNDgtMTcuOTA3UzI5MS45OSAzMTUuNzg4IDAgMjc4LjU3VjB6IiBvcGFjaXR5PSIuMTUiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6Ii8+PC9zdmc+");
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top;
+    padding: 5% 0 12% 0;
+    margin: -16px
+}
+
+.lcard {
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 0rem;
+    border-bottom-right-radius: 1.25rem;
+    border: 0;
+    margin-bottom: 2rem;
+    @extend .shadow;
+}
+
+.lcard>.card-header {
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 0rem;
+    font-size: 1.3rem;
+    padding: 1rem;
+    @extend .text-bg-secondary;
+}
+
+.font-size-init {
+	font-size: initial;
+}
+
+/* Assessment and Scratchie Countdown - growl settings need to be moved too */
+#timelimit-start-dialog {
+	display:none; cursor: default; padding: 10px;
+}
+#timelimit-start-dialog h1{
+	padding-bottom: 10px;
+}
+#countdown {
+	width: 150px; position: absolute; font-size: 110%; font-style: italic; color: $brand-success;
+}
+#countdown-label {
+	font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color: $brand-success;
+}
+#timelimit-expired {
+	font-size: 145%; padding: 15px;
+}
+
+// fotorama used for image gallery
+.fotorama__thumb {
+    background-color: $gray-base;
+}
+.fotorama__wrap {
+	margin: auto;
+}
+.fotorama__caption {
+	text-align: left;
+}
+.fotorama__thumb-border {
+	border-color: $a-link-default !important;
+}
+
+.fotorama-container {
+	text-align: center;
+	padding-top: 10px;
+}
+// end fotorama
+
+
+/* Growl functionality, jquery.blockUI (version: 2.38) */
+.growlUI {
+	width: auto;
+	padding: 0px;
+}
+
+div.growlUI h1,div.growlUI h2 {
+	color: white;
+	padding: 0px;
+	margin: 5px;
+	text-align: center;
+	font-size: medium;
+}
+
+/*----------.div-hover----------------*/
+.div-hover>div {
+	align-items: center;
+	border-top: 1px solid #ddd;
+	padding: 12px;
+}
+.div-hover>div:hover{
+	background-color: var(--bs-gray-200);
+}
+
+/*----------.sbox----------------*/
+.sbox {
+  border-bottom: 2px solid $gray-lighter;
+  border-radius: 0px;
+}
+.sbox-body {
+  padding: 5px;
+}
+.sbox-heading {
+  padding: 3px 5px;
+  border-bottom: 1px solid $gray-lighter;
+  border-top-right-radius: $border-radius-small;
+  border-top-left-radius: $border-radius-small;
+}

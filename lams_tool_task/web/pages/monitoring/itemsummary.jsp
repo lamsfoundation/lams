@@ -29,11 +29,11 @@
 				   	guiStyle: "bootstrap",
 					iconSet: 'fontAwesome',
 				   	colNames:[
-							"<fmt:message key="label.monitoring.tasksummary.user" />",
-							"<fmt:message key="label.monitoring.tasksummary.completed" />",
-							"<fmt:message key="label.monitoring.tasksummary.time.and.date" />"
+							"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.tasksummary.user' /></spring:escapeBody>",
+							"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.tasksummary.completed' /></spring:escapeBody>",
+							"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.tasksummary.time.and.date' /></spring:escapeBody>"
 							<c:if test="${item.commentsAllowed || item.filesAllowed}">
-								,'<fmt:message key="label.monitoring.tasksummary.comments.files" />'
+								,'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.tasksummary.comments.files" /></spring:escapeBody>'
 							</c:if>
 					],
 				   	colModel:[
@@ -46,7 +46,7 @@
 				   	],
 				   	loadError: function(xhr,st,err) {
 				   		jQuery("#group${sessionDto.sessionId}").clearGridData();
-				   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+				   		info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
 				   	}
 				})
 				.jqGrid('filterToolbar', { 

@@ -1,5 +1,4 @@
-	<script type="text/javascript">
-	
+<script type="text/javascript">	
 		var currentMark = 0;
 		
 		$(document).ready(function(){
@@ -20,7 +19,6 @@
 			} else {
 				hideButtons();
 			}
-
 		} 		
 				
 		function submitEntry(next){
@@ -38,7 +36,7 @@
 				$("#editForm").submit();
 				}
 			} else {
-				alert('<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message></spring:escapeBody>');
 			}
 		}
 		
@@ -52,7 +50,7 @@
 					wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 				    
 			    if(wordCount < wordLimit){
-			    	var alertMessage = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>';
+			    	var alertMessage = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>';
 					alert( alertMessage.replace("{1}", wordCount));
 					return false;
 				}
@@ -65,41 +63,51 @@
 		function cancel() {
 			document.location.href='<c:url value="/learning/refresh.do?sessionMapID=${sessionMapID}"/>';
 		}
-    </script>
+</script>
 
-	<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="post" id="editForm">
-
-		<c:if test="${notcomplete}">
-			<lams:Alert type="danger" id="warn-assign-more" close="true">
-				<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>
-			</lams:Alert>
-		</c:if>
-		<span id="instructions"><strong><fmt:message key="label.assign.marks">
+<c:if test="${notcomplete}">
+	<lams:Alert5 type="danger" id="warn-assign-more" close="true">
+		<fmt:message key="error.assign.marks">
 			<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
-			<fmt:param><span id="totalMark">0</span></fmt:param>
-			</fmt:message></strong>
-		</span>
+		</fmt:message>
+	</lams:Alert5>
+</c:if>
 
-		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-		<input type="hidden" name="toolContentId" value="${toolContentId}"/>
-		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
-		<input type="hidden" name="next" id="next" value=""/>
+<lams:Alert5 type="info" id="assign-mark-info" close="false">
+	<fmt:message key="label.assign.marks">
+		<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
+		<fmt:param>
+			<span id="totalMark">0</span>
+		</fmt:param>
+	</fmt:message>
+</lams:Alert5>
 
-		<div class="table-responsive">
-			<table class="table table-hover table-condensed">
-				<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
-				<tr>
-					<td>
-						<lams:Portrait userId="${ratingDto.itemId}"/><span class="portrait-sm-lineheight">${ratingDto.itemDescription}</span>
-						
-					</td>
-					<td style="width: 100px;">
+<form action="<c:url value="/learning/submitRankingHedging.do?"/>" method="post" id="editForm">
+	<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+	<input type="hidden" name="toolContentId" value="${toolContentId}"/>
+	<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
+	<input type="hidden" name="next" id="next" value=""/>
+		
+	<div class="card lcard">
+		<div class="card-header">
+			<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+		</div>
+
+		<div class="div-hover">
+			<c:forEach var="ratingDto" items="${criteriaRatings.ratingDtos}">
+				<div class="row">
+					<div class="col">
+						<lams:Portrait userId="${ratingDto.itemId}"/>
+						<span class="portrait-sm-lineheight ms-2" id="username-${ratingDto.itemId}">${ratingDto.itemDescription}</span>
+					</div>
+					
+					<div style="width: 100px;">
 						<c:choose>
 						<c:when test="${finishedLock}">
 							${ratingDto.userRating}
 						</c:when>
 						<c:otherwise>
-							<select name="mark${ratingDto.itemId}" class="mark-hedging-select">
+							<select name="mark${ratingDto.itemId}" class="mark-hedging-select form-select" aria-labelledby="assign-mark-info username-${ratingDto.itemId}">
 								<c:if test="${isEditingDisabled || question.responseSubmitted}">disabled="disabled"</c:if>				
 								<c:forEach var="i" begin="0" end="${criteriaRatings.ratingCriteria.maxRating}">
 									<option
@@ -109,25 +117,37 @@
 							</select>
 						</c:otherwise>
 						</c:choose>
-					</td>
-				</tr>
-				</c:forEach>
-			</table>
+					</div>
+				</div>
+			</c:forEach>
 		</div>
 
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-			<div class="form-group">
-			<h4><label for="justify" class="voffset10"><fmt:message key="label.justify.hedging.marks" /></label></h4>
-			<c:choose>
-			<c:when test="${finishedLock}">
-				<span>${criteriaRatings.justificationComment}</span>
-			</c:when>
-			<c:otherwise>
-				<textarea id="justify" name="justify" rows="4" cols="60" class="mark-hedging-select form-control" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
-			</c:otherwise>
-			</c:choose>
+			<div class="m-3">
+				<div>
+					<label for="justify" class="fst-italic">
+						<fmt:message key="label.justify.hedging.marks" />
+					</label>
+				</div>
+				<c:if test="${criteriaRatings.ratingCriteria.commentsMinWordsLimit != 0}">
+					<lams:Alert5 type="info" id="commentsMinWordsLimit-info" close="false">
+						<fmt:message key="label.minimum.number.words">
+							<fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/>
+						</fmt:message>
+					</lams:Alert5>
+				</c:if>
+				
+				<c:choose>
+					<c:when test="${finishedLock}">
+						<span>${criteriaRatings.justificationComment}</span>
+					</c:when>
+					<c:otherwise>
+						<textarea id="justify" name="justify" rows="4" cols="60"
+							class="mark-hedging-select form-control" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</c:if>
-	
-	</form>
+	</div>
+</form>
 		

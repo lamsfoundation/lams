@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -213,15 +215,10 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    private String finish(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm, HttpServletRequest request) {
+    private String finish(HttpServletRequest request, HttpServletResponse response)
+	    throws CommonCartridgeApplicationException, IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
@@ -249,19 +246,13 @@ public class LearningController {
 	}
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = commonCartridgeService.finishToolSession(sessionId, userID);
-	    request.setAttribute(CommonCartridgeConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (CommonCartridgeApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = commonCartridgeService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
+	return null;
     }
 
     /**
@@ -305,16 +296,10 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
     private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) {
+	    HttpServletRequest request, HttpServletResponse response) throws CommonCartridgeApplicationException, IOException {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
@@ -337,7 +322,7 @@ public class LearningController {
 	    commonCartridgeService.updateEntry(entry);
 	}
 
-	return finish(reflectionForm, request);
+	return finish(request, response);
     }
 
     // *************************************************************************************

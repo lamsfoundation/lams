@@ -1,118 +1,124 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="mcqInstructions">
+	<c:choose>
+		<c:when test="${question.multipleAnswersAllowed}">
+			<fmt:message key="label.learning.choose.at.least.one.answer" />
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="label.learning.choose.one.answer" />
+		</c:otherwise>
+	</c:choose>
+</c:set>
 
 <c:if test="${not empty toolSessionID}">
-	<div class="question-type">
-		<c:choose>
-			<c:when test="${question.multipleAnswersAllowed}">
-				<fmt:message key="label.learning.choose.at.least.one.answer" />
-			</c:when>
-			<c:otherwise>
-				<fmt:message key="label.learning.choose.one.answer" />
-			</c:otherwise>
-		</c:choose>
+	<div class="card-subheader">
+		${mcqInstructions}
 	</div>
 </c:if>
 
-<div class="table-responsive">
-	<table class="table table-hover table-condensed">
+<fieldset>
+	<legend class="visually-hidden">
+		${mcqInstructions}
+	</legend>
+
+	<div class="table-sm div-hover">
 		<c:forEach var="option" items="${question.optionDtos}" varStatus="answerStatus">
-			<c:set var="isCorrect" 
-				   value="${(assessment.allowDiscloseAnswers 
+			<c:set var="isCorrect" value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowRightAnswersAfterQuestion)
 				    		 && (option.maxMark > 0)}" />
-			<c:set var="isWrong"
-				   value="${(assessment.allowDiscloseAnswers 
+			<c:set var="isWrong" value="${(assessment.allowDiscloseAnswers 
 				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
 				    		&& (option.maxMark <= 0)}" />
-			<tr ${isCorrect ? 'class="bg-success"' : '' }>
-				<td class="complete-item-gif">
+	
+			<div class="row ${isCorrect ? 'text-success' : '' }">
+				<div class="complete-item-gif">
 				    <c:if test="${option.answerBoolean && isCorrect}">
 					    <i class="fa fa-check text-success"></i>
 		            </c:if>
 				    <c:if test="${option.answerBoolean && isWrong}">
 					    <i class="fa fa-times text-danger"></i>	
-				    </c:if>			
-                </td>
-				<td class="${question.prefixAnswersWithLetters?'has-radio-button-prefix':'has-radio-button'}">
-					<c:if test="${not empty toolSessionID}">
-						<c:choose>
-							<c:when test="${question.multipleAnswersAllowed}">
-								<input type="checkbox" name="question${status.index}_${option.displayOrder}" value="${true}"
-			 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-									disabled="disabled"
-								/>
-							</c:when>
-							<c:otherwise>
-								<input type="radio" name="question${status.index}" value="${option.displayOrder}"
-			 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-			 						disabled="disabled"
-								/>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
+					</c:if>			
+				</div>
+	                
+				<div class="col">
+					<div class="form-check ms-3">
+						<c:if test="${not empty toolSessionID}">
+							<c:choose>
+								<c:when test="${question.multipleAnswersAllowed}">
+									<input type="checkbox" name="question${questionIndex}_${option.displayOrder}" id="option-${questionIndex}-${option.uid}" 
+										class="form-check-input" style="opacity:1"
+										value="${true}"
+										<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+										disabled="disabled"
+									/>
+								</c:when>
+								<c:otherwise>
+									<input type="radio" name="question${questionIndex}" id="option-${questionIndex}-${option.uid}"
+										class="form-check-input" style="opacity:1"
+										value="${option.displayOrder}"
+				 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
+				 						disabled="disabled"
+									/>
+								</c:otherwise>
+							</c:choose>
+						</c:if>
+							
+						<label class="form-check-label" for="option-${questionIndex}-${option.uid}" style="opacity:1">
+							<c:if test="${question.prefixAnswersWithLetters}">
+					 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
+			 	            </c:if>	
+			 	                
+			 	            <c:out value="${option.name}" escapeXml="false" />
+		 	            </label>
+	 	            </div>
+				</div>
 					
-					<c:if test="${question.prefixAnswersWithLetters}">
-			 			&nbsp;${option.formatPrefixLetter(answerStatus.index)}
- 	                </c:if>	
-				</td>
-				
-				<td ${question.prefixAnswersWithLetters?'class="has-radio-button-prefix-answer"':''}">
-					<c:out value="${option.name}" escapeXml="false" />
-				</td>
-				
 				<c:if test="${assessment.allowQuestionFeedback}">
-					<td width=30%;">
+					<div style="width:30%;">
 						<c:if test="${option.answerBoolean}">
 							<c:out value="${option.feedback}" escapeXml="false" />
 						</c:if>
-					</td>		
+					</div>		
 				</c:if>
 				
-			</tr>
-			
-			<c:if test="${assessment.allowDiscloseAnswers && question.groupsAnswersDisclosed && fn:length(sessions) > 1}">
-				<c:set var="teams" value="" />
-				<c:forEach var="session" items="${sessions}" varStatus="sessionStatus">
-					<%-- Now groups other than this one --%>
-					<c:if test="${sessionMap.toolSessionID != session.sessionId}">
-						<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
-						<c:set var="sessionResults" 
-							   value="${questionSummaries[question.uid].questionResultsPerSession[sessionStatus.index]}" />
-						<c:set var="sessionResults"
-						 	   value="${sessionResults[fn:length(sessionResults)-1]}" />
-						<c:forEach var="sessionOption" items="${sessionResults.optionAnswers}">
-							<c:if test="${sessionOption.answerBoolean && option.uid == sessionOption.optionUid}">
-								<c:set var="teams">
-									${teams}
-									<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
-									<c:out value="${session.sessionName}" escapeXml="true"/>&nbsp;
-									<c:if test="${not empty sessionResults.justification}">
-										<lams:Popover titleKey="label.answer.justification">
-							          		<c:out value='${sessionResults.justification}' />
-							          	</lams:Popover>
-									</c:if>
-								</c:set>
-							</c:if>
-						</c:forEach>
-					</c:if>
-				</c:forEach>
-				<c:if test="${not empty teams}">
-					<tr class="selected-by-groups" >
-						<td ${isCorrect ? "class='bg-success'" : "" }></td>
-						<td ${isCorrect ? "class='bg-success'" : "" }></td>
-						<td colspan="2" ${isCorrect ? "class='bg-success'" : "" }>
-							<span >
+				<c:if test="${assessment.allowDiscloseAnswers && question.groupsAnswersDisclosed && fn:length(sessions) > 1}">
+					<c:set var="teams" value="" />
+					<c:forEach var="session" items="${sessions}" varStatus="sessionStatus">
+						<%-- Now groups other than this one --%>
+						<c:if test="${sessionMap.toolSessionID != session.sessionId}">
+							<%-- Get the needed piece of information from a complicated questionSummaries structure --%>
+							<c:set var="sessionResults" value="${questionSummaries[question.uid].questionResultsPerSession[sessionStatus.index]}" />
+							<c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
+							<c:forEach var="sessionOption" items="${sessionResults.optionAnswers}">
+								<c:if test="${sessionOption.answerBoolean && option.uid == sessionOption.optionUid}">
+									<c:set var="teams">
+										${teams}
+										<lams:Portrait userId="${session.groupLeader.userId}"/>&nbsp;
+										<c:out value="${session.sessionName}" escapeXml="true"/>&nbsp;
+										<c:if test="${not empty sessionResults.justification}">
+											<lams:Popover titleKey="label.answer.justification">
+								          		<c:out value='${sessionResults.justification}' />
+								          	</lams:Popover>
+										</c:if>
+									</c:set>
+								</c:if>
+							</c:forEach>
+						</c:if>
+					</c:forEach>
+						
+					<c:if test="${not empty teams}">
+						<div class="selected-by-groups mt-2">
+							<div class="${isCorrect ? 'text-success' : '' }">
 								<fmt:message key="label.learning.summary.selected.by" />
-							</span>
-							${teams}
-						</td>
-					</tr>
+								${teams}
+							</div>
+						</div>
+					</c:if>
 				</c:if>
-			</c:if>
-			
+			</div>
 		</c:forEach>
-	</table>
-</div>
+	</div>
+</fieldset>
 
 <c:if test="${assessment.allowQuestionFeedback}">
 	<div class="feedback">

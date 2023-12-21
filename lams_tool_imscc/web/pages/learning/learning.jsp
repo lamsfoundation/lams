@@ -56,7 +56,7 @@
 		<lams:errors/>
 
 		<div class="table-responsive">
-			<table class="table table-hover table-condensed">
+			<table class="table table-hover table-sm">
 				<thead>
 					<tr>
 						<th width="70%">
@@ -92,7 +92,7 @@
 		<%--Reflection--------------------------------------------------%>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default voffset10">
+			<div class="panel panel-default mt-2">
 				
 				<div class="panel-heading panel-title">
 					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
@@ -109,7 +109,7 @@
 					</c:choose>
 	
 					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-default loffset10">
+						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-secondary ms-2">
 							<fmt:message key="label.edit" />
 						</button>
 					</c:if>
@@ -120,7 +120,7 @@
 		<%--Finish buttons--------------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="voffset10 pull-right">
+			<div class="mt-2 float-end">
 				<c:choose>
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary">

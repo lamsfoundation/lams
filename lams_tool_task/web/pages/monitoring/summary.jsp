@@ -24,12 +24,12 @@
 				iconSet: 'fontAwesome',
 			   	colNames:[
 						'userUid'
-						,"<fmt:message key="label.monitoring.summary.user" />"
+						,"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user' /></spring:escapeBody>"
 						<c:forEach var="item" items="${sessionDto.taskListItems}">
 							,'<a href="javascript:;" onclick="return summaryTask(${item.uid})"><c:out value="${item.title}" escapeXml="true"/></a>'
 						</c:forEach>
 						<c:if test="${sessionMap.monitorVerificationRequired}">
-							,'<fmt:message key="label.monitoring.summary.confirm.completion" />'
+							,'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.confirm.completion" /></spring:escapeBody>'
 						</c:if>
 						,'portraitId'
 				],
@@ -46,7 +46,7 @@
 			   	],
 			   	loadError: function(xhr,st,err) {
 			   		jQuery("#group${sessionDto.sessionId}").clearGridData();
-			   		info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
+			   		info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='gradebook.error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
 			   	},
 			    loadComplete: function () {
 			   	 	initializePortraitPopover('<lams:LAMSURL/>');

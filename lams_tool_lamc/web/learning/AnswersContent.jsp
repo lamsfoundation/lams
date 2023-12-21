@@ -8,11 +8,7 @@
 <c:set var="isPrefixAnswersWithLetters" value="${sessionMap.content.prefixAnswersWithLetters}" scope="request" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
-	<lams:css />
-	<link rel="stylesheet" type="text/css" href="${lams}css/bootstrap-slider.css" />
+<lams:PageLearner title="${mcGeneralLearnerFlowDTO.activityTitle}" toolSessionID="${mcLearningForm.toolSessionID}">
 	<style media="screen,projection" type="text/css">
 		div.growlUI h1, div.growlUI h2 {
 			color: white;
@@ -20,20 +16,14 @@
 			text-align: center;
 			font-size: 18px;
 		}
+		.card-subheader { 
+			font-style: italic;
+		}
 	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap-slider.js"></script>
 	<script type="text/javaScript">
-
-		$(document).ready(function() {
-			//initialize bootstrap-sliders if "Enable confidence level" option is ON
-			$('.bootstrap-slider').bootstrapSlider();
-		});
-
         //autoSaveAnswers if hasEditRight
         if (${hasEditRight}) {
           var interval = "30000"; // = 30 seconds
@@ -108,7 +98,6 @@
         }
 
         function checkLeaderProgress() {
-
           $.ajax({
             async: false,
             url: '<c:url value="/learning/checkLeaderProgress.do"/>',
@@ -122,37 +111,36 @@
 			}
 		  });
         }
-
       </script>
-</lams:head>
 
-<body class="stripes">
-
-	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}" formID="mcLearningForm">
-
-		<div class="panel">
-			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
-		</div>
-
+	<div id="container-main">
 		<!-- Announcements and advanced settings -->
 		<c:if test="${not empty submissionDeadline}">
-			<lams:Alert close="false" id="submissionDeadline" type="danger">
+			<lams:Alert5 close="false" id="submissionDeadline" type="danger">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
 						<lams:Date value="${submissionDeadline}" />
 					</fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 
 		<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true' && mcGeneralLearnerFlowDTO.passMark != '0'}">
-			<lams:Alert close="true" id="passingMark" type="info">
+			<lams:Alert5 close="true" id="passingMark" type="info">
 				<fmt:message key="label.learner.message" /> ( <c:out value="${mcGeneralLearnerFlowDTO.passMark}" /> )
-			</lams:Alert>
+			</lams:Alert5>
+		</c:if>
+
+		<c:if test="${isLeadershipEnabled}">
+			<lams:LeaderDisplay idName="leader-info" username="${sessionMap.groupLeader.fullname}" userId="${sessionMap.groupLeader.userId}" />
 		</c:if>
 		<!-- End announcements and advanced settings -->
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${mcGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
+		</div>
 
-		<div class="form-group">
+		<div id="questions">
 			<form:form id="mcLearningForm" modelAttribute="mcLearningForm" action="displayMc.do" enctype="multipart/form-data"
 				method="POST" target="_self">
 				<form:hidden path="toolContentID" />
@@ -162,15 +150,7 @@
 				<form:hidden path="userOverPassMark" />
 				<form:hidden path="passMarkApplicable" />
 
-				<lams:errors/>
-
-				<c:if test="${isLeadershipEnabled}">
-					<h4>
-						<fmt:message key="label.group.leader">
-							<fmt:param><c:out value="${sessionMap.groupLeader.fullname}" escapeXml="true"/></fmt:param>
-						</fmt:message>
-					</h4>
-				</c:if>
+				<lams:errors5/>
 
 				<c:choose>
 					<c:when test="${sessionMap.content.questionsSequenced && hasEditRight}">
@@ -182,7 +162,5 @@
 				</c:choose>
 			</form:form>
 		</div>
-	</lams:Page>
-</body>
-</lams:html>
-
+	</div>
+</lams:PageLearner>

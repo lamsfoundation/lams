@@ -61,10 +61,10 @@
 		<i class="fa fa-upload"></i> <fmt:message key="${fileInputMessageKey}"/>
 	</button>
 	<input type="file" id="${fileFieldId}" name="${fileFieldname}" class="fileUpload d-none"> 
-	<input type="text" id="${fileInputNameFieldname}" disabled="disabled" placeholder="File not selected" class="form-control d-none input-sm w-25 ms-1">
+	<input type="text" id="${fileInputNameFieldname}" disabled="disabled" placeholder="File not selected" class="form-control d-none form-control-sm w-25 ms-1">
 </div>
 <c:if test="${uploadInfoMessageKey ne '-'}">
-<p class="help-block"><fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message></p>					
+<p class="form-text"><fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message></p>					
 </c:if>
 <div id="${errorMsgDiv}" class="text-danger" style="display:none"></div>			
 

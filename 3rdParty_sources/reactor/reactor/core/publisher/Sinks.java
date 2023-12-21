@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 VMware Inc. or its affiliates, All Rights Reserved.
+ * Copyright (c) 2020-2022 VMware Inc. or its affiliates, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package reactor.core.publisher;
 import java.time.Duration;
 import java.util.Queue;
 
+import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 
 import reactor.core.Disposable;
@@ -34,7 +35,7 @@ import reactor.util.context.Context;
  * semantics. These standalone sinks expose {@link Many#tryEmitNext(Object) tryEmit} methods that return an {@link EmitResult} enum,
  * allowing to atomically fail in case the attempted signal is inconsistent with the spec and/or the state of the sink.
  * <p>
- * This class exposes a collection of ({@link Sinks.Many} builders and {@link Sinks.One} factories. Unless constructed through the
+ * This class exposes a collection of ({@link Many} builders and {@link One} factories. Unless constructed through the
  * {@link #unsafe()} spec, these sinks are thread safe in the sense that they will detect concurrent access and fail fast on one of
  * the attempts. {@link #unsafe()} sinks on the other hand are expected to be externally synchronized (typically by being called from
  * within a Reactive Streams-compliant context, like a {@link Subscriber} or an operator, which means it is ok to remove the overhead
@@ -49,39 +50,39 @@ public final class Sinks {
 	}
 
 	/**
-	 * A {@link Sinks.Empty} which exclusively produces one terminal signal: error or complete.
+	 * A {@link Empty} which exclusively produces one terminal signal: error or complete.
 	 * It has the following characteristics:
 	 * <ul>
 	 *     <li>Multicast</li>
 	 *     <li>Backpressure : this sink does not need any demand since it can only signal error or completion</li>
 	 *     <li>Replaying: Replay the terminal signal (error or complete).</li>
 	 * </ul>
-	 * Use {@link Sinks.Empty#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
+	 * Use {@link Empty#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
 	 *
-	 * @return a new {@link Sinks.Empty}
+	 * @return a new {@link Empty}
 	 * @see RootSpec#empty()
 	 */
-	public static <T> Sinks.Empty<T> empty() {
-		return SinksSpecs.DEFAULT_ROOT_SPEC.empty();
+	public static <T> Empty<T> empty() {
+		return SinksSpecs.DEFAULT_SINKS.empty();
 	}
 
 	/**
-	 * A {@link Sinks.One} that works like a conceptual promise: it can be completed
+	 * A {@link One} that works like a conceptual promise: it can be completed
 	 * with or without a value at any time, but only once. This completion is replayed to late subscribers.
-	 * Calling {@link One#tryEmitValue(Object)} (or {@link One#emitValue(Object, Sinks.EmitFailureHandler)}) is enough and will
+	 * Calling {@link One#tryEmitValue(Object)} (or {@link One#emitValue(Object, EmitFailureHandler)}) is enough and will
 	 * implicitly produce a {@link Subscriber#onComplete()} signal as well.
 	 * <p>
 	 * Use {@link One#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
 	 *
-	 * @return a new {@link Sinks.One}
+	 * @return a new {@link One}
 	 * @see RootSpec#one()
 	 */
-	public static <T> Sinks.One<T> one() {
-		return SinksSpecs.DEFAULT_ROOT_SPEC.one();
+	public static <T> One<T> one() {
+		return SinksSpecs.DEFAULT_SINKS.one();
 	}
 
 	/**
-	 * Help building {@link Sinks.Many} sinks that will broadcast multiple signals to one or more {@link Subscriber}.
+	 * Help building {@link Many} sinks that will broadcast multiple signals to one or more {@link Subscriber}.
 	 * <p>
 	 * Use {@link Many#asFlux()} to expose the {@link Flux} view of the sink to the downstream consumers.
 	 *
@@ -89,12 +90,12 @@ public final class Sinks {
 	 * @see RootSpec#many()
 	 */
 	public static ManySpec many() {
-		return SinksSpecs.DEFAULT_ROOT_SPEC.many();
+		return SinksSpecs.DEFAULT_SINKS.many();
 	}
 
 	/**
 	 * Return a {@link RootSpec root spec} for more advanced use cases such as building operators.
-	 * Unsafe {@link Sinks.Many}, {@link Sinks.One} and {@link Sinks.Empty} are not serialized nor thread safe,
+	 * Unsafe {@link Many}, {@link One} and {@link Empty} are not serialized nor thread safe,
 	 * which implies they MUST be externally synchronized so as to respect the Reactive Streams specification.
 	 * This can typically be the case when the sinks are being called from within a Reactive Streams-compliant context,
 	 * like a {@link Subscriber} or an operator. In turn, this allows the sinks to have less overhead, since they
@@ -107,7 +108,7 @@ public final class Sinks {
 	}
 
 	/**
-	 * Represents the immediate result of an emit attempt (eg. in {@link Sinks.Many#tryEmitNext(Object)}.
+	 * Represents the immediate result of an emit attempt (eg. in {@link Many#tryEmitNext(Object)}.
 	 * This does not guarantee that a signal is consumed, it simply refers to the sink state when an emit method is invoked.
 	 * This is a particularly important distinction with regard to {@link #FAIL_CANCELLED} which means the sink is -now-
 	 * interrupted and emission can't proceed. Consequently, it is possible to emit a signal and obtain an "OK" status even
@@ -223,7 +224,25 @@ public final class Sinks {
 	}
 
 	/**
-	 * A handler supporting the emit API (eg. {@link Many#emitNext(Object, Sinks.EmitFailureHandler)}),
+	 *
+	 * @author Animesh Chaturvedi
+	 */
+	static class OptimisticEmitFailureHandler implements EmitFailureHandler {
+
+		private final long deadline;
+
+		OptimisticEmitFailureHandler(Duration duration){
+			this.deadline = System.nanoTime() + duration.toNanos();
+		}
+
+		@Override
+		public boolean onEmitFailure(SignalType signalType, EmitResult emitResult) {
+			return emitResult.equals(EmitResult.FAIL_NON_SERIALIZED) && (System.nanoTime() < this.deadline);
+		}
+	}
+
+	/**
+	 * A handler supporting the emit API (eg. {@link Many#emitNext(Object, EmitFailureHandler)}),
 	 * checking non-successful emission results from underlying {@link Many#tryEmitNext(Object) tryEmit}
 	 * API calls to decide whether or not such calls should be retried.
 	 * Other than instructing to retry, the handlers are allowed to have side effects
@@ -243,6 +262,24 @@ public final class Sinks {
 		EmitFailureHandler FAIL_FAST = (signalType, emission) -> false;
 
 		/**
+		 * Create an {@link EmitFailureHandler} which will busy loop in case of concurrent use
+		 * of the sink ({@link EmitResult#FAIL_NON_SERIALIZED}, up to a deadline.
+		 * The deadline is computed immediately from the current time (construction time)
+		 * + provided {@link Duration}.
+		 * <p>
+		 * As a result there will always be some delay between this computation and the actual first
+		 * use of the handler (at a minimum, the time it takes for the first sink emission attempt).
+		 * Consider this when choosing the {@link Duration}, and probably prefer something above 100ms,
+		 * and don't cache the returning handler for later usage.
+		 *
+		 * @param duration {@link Duration} for the deadline
+		 * @return an optimistic and bounded busy-looping {@link EmitFailureHandler}
+		 */
+		static EmitFailureHandler busyLooping(Duration duration){
+			return new OptimisticEmitFailureHandler(duration);
+		}
+
+		/**
 		 * Decide whether the emission should be retried, depending on the provided {@link EmitResult}
 		 * and the type of operation that was attempted (represented as a {@link SignalType}).
 		 * Side effects are allowed.
@@ -254,65 +291,74 @@ public final class Sinks {
 		boolean onEmitFailure(SignalType signalType, EmitResult emitResult);
 	}
 
+	//implementation note: this should now only be implemented by the Sinks.unsafe() path
 	/**
-	 * Provides a choice of {@link Sinks.One}/{@link Sinks.Empty} factories and
-	 * {@link Sinks.ManySpec further specs} for {@link Sinks.Many}.
+	 * Provides a choice of {@link One}/{@link Empty} factories and
+	 * {@link ManySpec further specs} for {@link Many}.
 	 */
 	public interface RootSpec {
 
 		/**
-		 * A {@link Sinks.Empty} which exclusively produces one terminal signal: error or complete.
+		 * A {@link Empty} which exclusively produces one terminal signal: error or complete.
 		 * It has the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Backpressure : this sink does not need any demand since it can only signal error or completion</li>
 		 *     <li>Replaying: Replay the terminal signal (error or complete).</li>
 		 * </ul>
-		 * Use {@link Sinks.Empty#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
+		 * Use {@link Empty#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
 		 */
-		<T> Sinks.Empty<T> empty();
+		<T> Empty<T> empty();
 
 		/**
-		 * A {@link Sinks.One} that works like a conceptual promise: it can be completed
+		 * A {@link One} that works like a conceptual promise: it can be completed
 		 * with or without a value at any time, but only once. This completion is replayed to late subscribers.
-		 * Calling {@link One#emitValue(Object, Sinks.EmitFailureHandler)} (or
+		 * Calling {@link One#emitValue(Object, EmitFailureHandler)} (or
 		 * {@link One#tryEmitValue(Object)}) is enough and will implicitly produce
 		 * a {@link Subscriber#onComplete()} signal as well.
 		 * <p>
 		 * Use {@link One#asMono()} to expose the {@link Mono} view of the sink to downstream consumers.
 		 */
-		<T> Sinks.One<T> one();
+		<T> One<T> one();
 
 		/**
-		 * Help building {@link Sinks.Many} sinks that will broadcast multiple signals to one or more {@link Subscriber}.
+		 * Help building {@link Many} sinks that will broadcast multiple signals to one or more {@link Subscriber}.
 		 * <p>
 		 * Use {@link Many#asFlux()} to expose the {@link Flux} view of the sink to the downstream consumers.
 		 *
 		 * @return {@link ManySpec}
 		 */
 		ManySpec many();
+
+		/**
+		 * Help building {@link ManyWithUpstream} sinks that can also be {@link ManyWithUpstream#subscribeTo(Publisher) subscribed to}
+		 * an upstream {@link Publisher}. This is an advanced use case, see {@link ManyWithUpstream#subscribeTo(Publisher)}.
+		 *
+		 * @return a {@link ManyWithUpstreamUnsafeSpec}
+		 */
+		ManyWithUpstreamUnsafeSpec manyWithUpstream();
 	}
 
 	/**
-	 * Provides {@link Sinks.Many} specs for sinks which can emit multiple elements
+	 * Provides {@link Many} specs for sinks which can emit multiple elements
 	 */
 	public interface ManySpec {
 		/**
-		 * Help building {@link Sinks.Many} that will broadcast signals to a single {@link Subscriber}
+		 * Help building {@link Many} that will broadcast signals to a single {@link Subscriber}
 		 *
 		 * @return {@link UnicastSpec}
 		 */
 		UnicastSpec unicast();
 
 		/**
-		 * Help building {@link Sinks.Many} that will broadcast signals to multiple {@link Subscriber}
+		 * Help building {@link Many} that will broadcast signals to multiple {@link Subscriber}
 		 *
 		 * @return {@link MulticastSpec}
 		 */
 		MulticastSpec multicast();
 
 		/**
-		 * Help building {@link Sinks.Many} that will broadcast signals to multiple {@link Subscriber} with the ability to retain
+		 * Help building {@link Many} that will broadcast signals to multiple {@link Subscriber} with the ability to retain
 		 * and replay all or an arbitrary number of elements.
 		 *
 		 * @return {@link MulticastReplaySpec}
@@ -321,74 +367,17 @@ public final class Sinks {
 	}
 
 	/**
-	 * Provides unicast: 1 sink, 1 {@link Subscriber}
+	 * Instead of {@link Sinks#unsafe() unsafe} flavors of {@link Many}, this spec provides {@link ManyWithUpstream}
+	 * implementations. These additionally support being subscribed to an upstream {@link Publisher}, at most once.
+	 * Please note that when this is done, one MUST stop using emit/tryEmit APIs, reserving signal creation to be the
+	 * sole responsibility of the upstream {@link Publisher}.
+	 * <p>
+	 * As the number of such implementations is deliberately kept low, this spec doesn't further distinguish between
+	 * multicast/unicast/replay categories other than in method naming.
 	 */
-	public interface UnicastSpec {
-
+	public interface ManyWithUpstreamUnsafeSpec {
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
-		 * <ul>
-		 *     <li><strong>Unicast</strong>: contrary to most other {@link Sinks.Many}, the
-		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
-		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
-		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
-		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered and will
-		 *     be replayed once the {@link Subscriber} subscribes.</li>
-		 * </ul>
-		 */
-		<T> Sinks.Many<T> onBackpressureBuffer();
-
-		/**
-		 * A {@link Sinks.Many} with the following characteristics:
-		 * <ul>
-		 *     <li><strong>Unicast</strong>: contrary to most other {@link Sinks.Many}, the
-		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
-		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
-		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
-		 *    <li>Without {@link Subscriber}: depending on the queue, all elements pushed to this sink are remembered and will
-		 * 		  be replayed once the {@link Subscriber} subscribes.</li>
-		 * </ul>
-		 *
-		 * @param queue an arbitrary queue to use that must at least support Single Producer / Single Consumer semantics
-		 */
-		<T> Sinks.Many<T> onBackpressureBuffer(Queue<T> queue);
-
-		/**
-		 * A {@link Sinks.Many} with the following characteristics:
-		 * <ul>
-		 *     <li><strong>Unicast</strong>: contrary to most other {@link Sinks.Many}, the
-		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
-		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
-		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
-		 *     <li>Without {@link Subscriber}: depending on the queue, all elements pushed to this sink are remembered and will
-		 *     be replayed once the {@link Subscriber} subscribes.</li>
-		 * </ul>
-		 *
-		 * @param queue an arbitrary queue to use that must at least support Single Producer / Single Consumer semantics
-		 * @param endCallback when a terminal signal is observed: error, complete or cancel
-		 */
-		<T> Sinks.Many<T> onBackpressureBuffer(Queue<T> queue, Disposable endCallback);
-
-		/**
-		 * A {@link Sinks.Many} with the following characteristics:
-		 * <ul>
-		 *     <li><strong>Unicast</strong>: contrary to most other {@link Sinks.Many}, the
-		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
-		 *     <li>Backpressure : this sink honors downstream demand of the Subscriber, and will emit {@link Subscriber#onError(Throwable)} if there is a mismatch.</li>
-		 *     <li>Replaying: No replay. Only forwards to a {@link Subscriber} the elements that have been
-		 *     pushed to the sink AFTER this subscriber was subscribed.</li>
-		 * </ul>
-		 */
-		<T> Sinks.Many<T> onBackpressureError();
-	}
-
-	/**
-	 * Provides multicast : 1 sink, N {@link Subscriber}
-	 */
-	public interface MulticastSpec {
-
-		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link ManyWithUpstream} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@link Queues#SMALL_BUFFER_SIZE}
@@ -396,7 +385,7 @@ public final class Sinks {
 		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
 		 *     of multiple subscribers.<br>If the difference between multiple subscribers is greater than {@link Queues#SMALL_BUFFER_SIZE}:
 		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
-		 * 	        <li>{@link Many#emitNext(Object, Sinks.EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, Sinks.EmitFailureHandler) emitting}
+		 * 	        <li>{@link Many#emitNext(Object, EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, EmitFailureHandler) emitting}
 		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
 		 * 	   </li>
 		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
@@ -406,10 +395,10 @@ public final class Sinks {
 		 * <p>
 		 * <img class="marble" src="doc-files/marbles/sinkWarmup.svg" alt="">
 		 */
-		<T> Sinks.Many<T> onBackpressureBuffer();
+		<T> ManyWithUpstream<T> multicastOnBackpressureBuffer();
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link ManyWithUpstream} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@code bufferSize}
@@ -417,30 +406,7 @@ public final class Sinks {
 		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
 		 *     of multiple subscribers.<br>If the difference between multiple subscribers is too high compared to {@code bufferSize}:
 		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
-		 *          <li>{@link Many#emitNext(Object, Sinks.EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, Sinks.EmitFailureHandler) emitting}
-		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
-		 *     </li>
-		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
-		 *     the elements that have been pushed to the sink AFTER this subscriber was subscribed, or elements
-		 *     that have been buffered due to backpressure/warm up.</li>
-		 * </ul>
-		 * <p>
-		 * <img class="marble" src="doc-files/marbles/sinkWarmup.svg" alt="">
-		 *
-		 * @param bufferSize the maximum queue size
-		 */
-		<T> Sinks.Many<T> onBackpressureBuffer(int bufferSize);
-
-		/**
-		 * A {@link Sinks.Many} with the following characteristics:
-		 * <ul>
-		 *     <li>Multicast</li>
-		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@code bufferSize}
-		 *     elements pushed via {@link Many#tryEmitNext(Object)} before the first {@link Subscriber} is registered.</li>
-		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
-		 *     of multiple subscribers.<br>If the difference between multiple subscribers is too high compared to {@code bufferSize}:
-		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
-		 *          <li>{@link Many#emitNext(Object, Sinks.EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, Sinks.EmitFailureHandler) emitting}
+		 *          <li>{@link Many#emitNext(Object, EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, EmitFailureHandler) emitting}
 		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
 		 *     </li>
 		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
@@ -453,10 +419,146 @@ public final class Sinks {
 		 * @param bufferSize the maximum queue size
 		 * @param autoCancel should the sink fully shutdowns (not publishing anymore) when the last subscriber cancels
 		 */
-		<T> Sinks.Many<T> onBackpressureBuffer(int bufferSize, boolean autoCancel);
+		<T> ManyWithUpstream<T> multicastOnBackpressureBuffer(int bufferSize, boolean autoCancel);
+	}
+
+	/**
+	 * Provides unicast: 1 sink, 1 {@link Subscriber}
+	 */
+	public interface UnicastSpec {
 
 		/**
-		 A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li><strong>Unicast</strong>: contrary to most other {@link Many}, the
+		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
+		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
+		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
+		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered and will
+		 *     be replayed once the {@link Subscriber} subscribes.</li>
+		 * </ul>
+		 */
+		<T> Many<T> onBackpressureBuffer();
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li><strong>Unicast</strong>: contrary to most other {@link Many}, the
+		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
+		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
+		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
+		 *    <li>Without {@link Subscriber}: depending on the queue, all elements pushed to this sink are remembered and will
+		 * 		  be replayed once the {@link Subscriber} subscribes.</li>
+		 * </ul>
+		 *
+		 * @param queue an arbitrary queue to use that must at least support Single Producer / Single Consumer semantics
+		 */
+		<T> Many<T> onBackpressureBuffer(Queue<T> queue);
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li><strong>Unicast</strong>: contrary to most other {@link Many}, the
+		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
+		 *     <li>Backpressure : this sink honors downstream demand of its single {@link Subscriber}.</li>
+		 *     <li>Replaying: non-applicable, since only one {@link Subscriber} can register.</li>
+		 *     <li>Without {@link Subscriber}: depending on the queue, all elements pushed to this sink are remembered and will
+		 *     be replayed once the {@link Subscriber} subscribes.</li>
+		 * </ul>
+		 *
+		 * @param queue an arbitrary queue to use that must at least support Single Producer / Single Consumer semantics
+		 * @param endCallback when a terminal signal is observed: error, complete or cancel
+		 */
+		<T> Many<T> onBackpressureBuffer(Queue<T> queue, Disposable endCallback);
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li><strong>Unicast</strong>: contrary to most other {@link Many}, the
+		 *     {@link Flux} view rejects {@link Subscriber subscribers} past the first one.</li>
+		 *     <li>Backpressure : this sink honors downstream demand of the Subscriber, and will emit {@link Subscriber#onError(Throwable)} if there is a mismatch.</li>
+		 *     <li>Replaying: No replay. Only forwards to a {@link Subscriber} the elements that have been
+		 *     pushed to the sink AFTER this subscriber was subscribed.</li>
+		 * </ul>
+		 */
+		<T> Many<T> onBackpressureError();
+	}
+
+	/**
+	 * Provides multicast : 1 sink, N {@link Subscriber}
+	 */
+	public interface MulticastSpec {
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li>Multicast</li>
+		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@link Queues#SMALL_BUFFER_SIZE}
+		 *     elements pushed via {@link Many#tryEmitNext(Object)} before the first {@link Subscriber} is registered.</li>
+		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
+		 *     of multiple subscribers.<br>If the difference between multiple subscribers is greater than {@link Queues#SMALL_BUFFER_SIZE}:
+		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
+		 * 	        <li>{@link Many#emitNext(Object, EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, EmitFailureHandler) emitting}
+		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
+		 * 	   </li>
+		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
+		 *     the elements that have been pushed to the sink AFTER this subscriber was subscribed, or elements
+		 *     that have been buffered due to backpressure/warm up.</li>
+		 * </ul>
+		 * <p>
+		 * <img class="marble" src="doc-files/marbles/sinkWarmup.svg" alt="">
+		 */
+		<T> Many<T> onBackpressureBuffer();
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li>Multicast</li>
+		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@code bufferSize}
+		 *     elements pushed via {@link Many#tryEmitNext(Object)} before the first {@link Subscriber} is registered.</li>
+		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
+		 *     of multiple subscribers.<br>If the difference between multiple subscribers is too high compared to {@code bufferSize}:
+		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
+		 *          <li>{@link Many#emitNext(Object, EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, EmitFailureHandler) emitting}
+		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
+		 *     </li>
+		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
+		 *     the elements that have been pushed to the sink AFTER this subscriber was subscribed, or elements
+		 *     that have been buffered due to backpressure/warm up.</li>
+		 * </ul>
+		 * <p>
+		 * <img class="marble" src="doc-files/marbles/sinkWarmup.svg" alt="">
+		 *
+		 * @param bufferSize the maximum queue size
+		 */
+		<T> Many<T> onBackpressureBuffer(int bufferSize);
+
+		/**
+		 * A {@link Many} with the following characteristics:
+		 * <ul>
+		 *     <li>Multicast</li>
+		 *     <li>Without {@link Subscriber}: warm up. Remembers up to {@code bufferSize}
+		 *     elements pushed via {@link Many#tryEmitNext(Object)} before the first {@link Subscriber} is registered.</li>
+		 *     <li>Backpressure : this sink honors downstream demand by conforming to the lowest demand in case
+		 *     of multiple subscribers.<br>If the difference between multiple subscribers is too high compared to {@code bufferSize}:
+		 *          <ul><li>{@link Many#tryEmitNext(Object) tryEmitNext} will return {@link EmitResult#FAIL_OVERFLOW}</li>
+		 *          <li>{@link Many#emitNext(Object, EmitFailureHandler) emitNext} will terminate the sink by {@link Many#emitError(Throwable, EmitFailureHandler) emitting}
+		 *          an {@link Exceptions#failWithOverflow() overflow error}.</li></ul>
+		 *     </li>
+		 *     <li>Replaying: No replay of values seen by earlier subscribers. Only forwards to a {@link Subscriber}
+		 *     the elements that have been pushed to the sink AFTER this subscriber was subscribed, or elements
+		 *     that have been buffered due to backpressure/warm up.</li>
+		 * </ul>
+		 * <p>
+		 * <img class="marble" src="doc-files/marbles/sinkWarmup.svg" alt="">
+		 *
+		 * @param bufferSize the maximum queue size
+		 * @param autoCancel should the sink fully shutdowns (not publishing anymore) when the last subscriber cancels
+		 */
+		<T> Many<T> onBackpressureBuffer(int bufferSize, boolean autoCancel);
+
+		/**
+		 A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: fail fast on {@link Many#tryEmitNext(Object) tryEmitNext}.</li>
@@ -472,12 +574,12 @@ public final class Sinks {
 		 * <img class="marble" src="doc-files/marbles/sinkDirectAllOrNothing.svg" alt="">
 		 *
 		 * @param <T> the type of elements to emit
-		 * @return a multicast {@link Sinks.Many} that "drops" in case any subscriber is too slow
+		 * @return a multicast {@link Many} that "drops" in case any subscriber is too slow
 		 */
-		<T> Sinks.Many<T> directAllOrNothing();
+		<T> Many<T> directAllOrNothing();
 
 		/**
-		 A {@link Sinks.Many} with the following characteristics:
+		 A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: fail fast on {@link Many#tryEmitNext(Object) tryEmitNext}.</li>
@@ -493,9 +595,9 @@ public final class Sinks {
 		 * <img class="marble" src="doc-files/marbles/sinkDirectBestEffort.svg" alt="">
 		 *
 		 * @param <T> the type of elements to emit
-		 * @return a multicast {@link Sinks.Many} that "drops" in case of no demand from any subscriber
+		 * @return a multicast {@link Many} that "drops" in case of no demand from any subscriber
 		 */
-		<T> Sinks.Many<T> directBestEffort();
+		<T> Many<T> directBestEffort();
 	}
 
 	/**
@@ -503,7 +605,7 @@ public final class Sinks {
 	 */
 	public interface MulticastReplaySpec {
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered,
@@ -512,10 +614,10 @@ public final class Sinks {
 		 *     <li>Replaying: all elements pushed to this sink are replayed to new subscribers.</li>
 		 * </ul>
 		 */
-		<T> Sinks.Many<T> all();
+		<T> Many<T> all();
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered,
@@ -525,10 +627,10 @@ public final class Sinks {
 		 * </ul>
 		 * @param batchSize the underlying buffer will optimize storage by linked arrays of given size
 		 */
-		<T> Sinks.Many<T> all(int batchSize);
+		<T> Many<T> all(int batchSize);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: the latest element pushed to this sink are remembered,
@@ -537,10 +639,10 @@ public final class Sinks {
 		 *     <li>Replaying: the latest element pushed to this sink is replayed to new subscribers.</li>
 		 * </ul>
 		 */
-		<T> Sinks.Many<T> latest();
+		<T> Many<T> latest();
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: the latest element pushed to this sink are remembered,
@@ -551,10 +653,10 @@ public final class Sinks {
 		 *
 		 * @param value default value if there is no latest element to replay
 		 */
-		<T> Sinks.Many<T> latestOrDefault(T value);
+		<T> Many<T> latestOrDefault(T value);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: up to {@code historySize} elements pushed to this sink are remembered,
@@ -569,10 +671,10 @@ public final class Sinks {
 		 *
 		 * @param historySize maximum number of elements able to replayed, strictly positive
 		 */
-		<T> Sinks.Many<T> limit(int historySize);
+		<T> Many<T> limit(int historySize);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered until their {@code maxAge} is reached,
@@ -584,10 +686,10 @@ public final class Sinks {
 		 *
 		 * @param maxAge maximum retention time for elements to be retained
 		 */
-		<T> Sinks.Many<T> limit(Duration maxAge);
+		<T> Many<T> limit(Duration maxAge);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: all elements pushed to this sink are remembered until their {@code maxAge} is reached,
@@ -601,10 +703,10 @@ public final class Sinks {
 		 * @param maxAge maximum retention time for elements to be retained
 		 * @param scheduler a {@link Scheduler} to derive the time from
 		 */
-		<T> Sinks.Many<T> limit(Duration maxAge, Scheduler scheduler);
+		<T> Many<T> limit(Duration maxAge, Scheduler scheduler);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: up to {@code historySize} elements pushed to this sink are remembered,
@@ -621,10 +723,10 @@ public final class Sinks {
 		 * @param historySize maximum number of elements able to replayed, strictly positive
 		 * @param maxAge maximum retention time for elements to be retained
 		 */
-		<T> Sinks.Many<T> limit(int historySize, Duration maxAge);
+		<T> Many<T> limit(int historySize, Duration maxAge);
 
 		/**
-		 * A {@link Sinks.Many} with the following characteristics:
+		 * A {@link Many} with the following characteristics:
 		 * <ul>
 		 *     <li>Multicast</li>
 		 *     <li>Without {@link Subscriber}: up to {@code historySize} elements pushed to this sink are remembered,
@@ -642,7 +744,7 @@ public final class Sinks {
 		 * @param maxAge maximum retention time for elements to be retained
 		 * @param scheduler a {@link Scheduler} to derive the time from
 		 */
-		<T> Sinks.Many<T> limit(int historySize, Duration maxAge, Scheduler scheduler);
+		<T> Many<T> limit(int historySize, Duration maxAge, Scheduler scheduler);
 	}
 
 	/**
@@ -716,7 +818,7 @@ public final class Sinks {
 		 *     </li>
 		 *     <li>
 		 *         {@link EmitResult#FAIL_OVERFLOW}: discard the value ({@link Operators#onDiscard(Object, Context)})
-		 *         then call {@link #emitError(Throwable, Sinks.EmitFailureHandler)} with a {@link Exceptions#failWithOverflow(String)} exception.
+		 *         then call {@link #emitError(Throwable, EmitFailureHandler)} with a {@link Exceptions#failWithOverflow(String)} exception.
 		 *     </li>
 		 *     <li>
 		 *         {@link EmitResult#FAIL_CANCELLED}: discard the value ({@link Operators#onDiscard(Object, Context)}).
@@ -853,9 +955,36 @@ public final class Sinks {
 		/**
 		 * Return a {@link Flux} view of this sink. Every call returns the same instance.
 		 *
-		 * @return the {@link Flux} view associated to this {@link Sinks.Many}
+		 * @return the {@link Flux} view associated to this {@link Many}
 		 */
 		Flux<T> asFlux();
+	}
+
+	/**
+	 * A {@link Many} which additionally allows being subscribed to an upstream {@link Publisher},
+	 * which is an advanced pattern requiring external synchronization. See {@link #subscribeTo(Publisher)}} for more details.
+	 *
+	 * @param <T> the type of data emitted by the sink
+	 */
+	public interface ManyWithUpstream<T> extends Many<T> {
+
+		/**
+		 * Explicitly subscribe this {@link Many} to an upstream {@link Publisher} without
+		 * exposing it as a {@link Subscriber} at all.
+		 * <p>
+		 * Note that when this is done, one MUST stop using emit/tryEmit APIs, reserving signal
+		 * creation to be the sole responsibility of the upstream {@link Publisher}.
+		 * <p>
+		 * The returned {@link Disposable} provides a way of both unsubscribing from the upstream
+		 * and terminating the sink: currently registered subscribers downstream receive an {@link Subscriber#onError(Throwable) onError}
+		 * signal with a {@link java.util.concurrent.CancellationException} and further attempts at subscribing
+		 * to the sink will trigger a similar signal immediately (in which case the returned {@link Disposable} might be no-op).
+		 * <p>
+		 * Any attempt at subscribing the same {@link ManyWithUpstream} multiple times throws an {@link IllegalStateException}
+		 * indicating that the subscription must be unique.
+		 */
+		Disposable subscribeTo(Publisher<? extends T> upstream);
+
 	}
 
 	/**
@@ -877,7 +1006,7 @@ public final class Sinks {
 		 * example of how each of these can be dealt with, to decide if the emit API would be a good enough fit instead.
 		 *
 		 * @return an {@link EmitResult}, which should be checked to distinguish different possible failures
-		 * @see #emitEmpty(Sinks.EmitFailureHandler)
+		 * @see #emitEmpty(EmitFailureHandler)
 		 * @see Subscriber#onComplete()
 		 */
 		EmitResult tryEmitEmpty();
@@ -891,7 +1020,7 @@ public final class Sinks {
 		 *
 		 * @param error the exception to signal, not null
 		 * @return an {@link EmitResult}, which should be checked to distinguish different possible failures
-		 * @see #emitError(Throwable, Sinks.EmitFailureHandler)
+		 * @see #emitError(Throwable, EmitFailureHandler)
 		 * @see Subscriber#onError(Throwable)
 		 */
 		EmitResult tryEmitError(Throwable error);
@@ -1006,7 +1135,7 @@ public final class Sinks {
 		/**
 		 * Return a {@link Mono} view of this sink. Every call returns the same instance.
 		 *
-		 * @return the {@link Mono} view associated to this {@link Sinks.One}
+		 * @return the {@link Mono} view associated to this {@link One}
 		 */
 		Mono<T> asMono();
 	}
@@ -1035,7 +1164,7 @@ public final class Sinks {
 		 *
 		 * @param value the value to emit and complete with, or {@code null} to only trigger an onComplete
 		 * @return an {@link EmitResult}, which should be checked to distinguish different possible failures
-		 * @see #emitValue(Object, Sinks.EmitFailureHandler)
+		 * @see #emitValue(Object, EmitFailureHandler)
 		 * @see Subscriber#onNext(Object)
 		 * @see Subscriber#onComplete()
 		 */
@@ -1061,7 +1190,7 @@ public final class Sinks {
 		 *     </li>
 		 *     <li>
 		 *         {@link EmitResult#FAIL_OVERFLOW}: discard the value ({@link Operators#onDiscard(Object, Context)})
-		 *         then call {@link #emitError(Throwable, Sinks.EmitFailureHandler)} with a {@link Exceptions#failWithOverflow(String)} exception.
+		 *         then call {@link #emitError(Throwable, EmitFailureHandler)} with a {@link Exceptions#failWithOverflow(String)} exception.
 		 *     </li>
 		 *     <li>
 		 *         {@link EmitResult#FAIL_CANCELLED}: discard the value ({@link Operators#onDiscard(Object, Context)}).

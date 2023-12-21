@@ -103,15 +103,15 @@ public class LearningController {
 
 	Pixlr pixlr = pixlrSession.getPixlr();
 
-	// check defineLater
-	if (pixlr.isDefineLater()) {
-	    return "pages/learning/defineLater";
-	}
-
 	// set mode, toolSessionID and PixlrDTO
 	request.setAttribute("mode", mode.toString());
 	request.setAttribute("toolSessionID", toolSessionID);
 	learningForm.setToolSessionID(toolSessionID);
+
+	// check defineLater
+	if (pixlr.isDefineLater()) {
+	    return "pages/learning/defineLater";
+	}
 
 	PixlrDTO pixlrDTO = new PixlrDTO(pixlr);
 	request.setAttribute("pixlrDTO", pixlrDTO);

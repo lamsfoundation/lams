@@ -13,15 +13,15 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css/>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>	
 	<script type="text/javascript" src="${tool}includes/javascript/marks.js"></script>
 	<script type="text/javascript">
 		//constants for marks.js
-		var LABEL_DELETE = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
-		var LABEL_RESTORE = '<fmt:message key="message.monitor.confirm.original.learner.file.restore"/>';
+		var LABEL_DELETE = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.monitor.confirm.original.learner.file.delete" /></spring:escapeBody>';
+		var LABEL_RESTORE = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.monitor.confirm.original.learner.file.restore" /></spring:escapeBody>';
 		var MONITOR_URL = "<c:url value="/monitoring"/>";
 		
 		function updateMark(detailId,reportId,sessionId,userId){

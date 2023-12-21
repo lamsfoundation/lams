@@ -23,32 +23,12 @@
 
 package org.lamsfoundation.lams.tool.zoom.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TimeZone;
-import java.util.TreeMap;
-
-import javax.net.ssl.HttpsURLConnection;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.integration.security.RandomPasswordGenerator;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -61,7 +41,6 @@ import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -78,14 +57,20 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import sun.net.www.protocol.https.HttpsURLConnectionImpl;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 
 /**
  * An implementation of the IZoomService interface.
@@ -109,12 +94,16 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     private ICoreNotebookService coreNotebookService;
 
+    private static String TOKEN_CACHE = null;
+    private static long TOKEN_CACHE_EXPIRE = 0;
+
     /* Methods from ToolSessionManager */
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ZoomService.logger.isDebugEnabled()) {
-	    ZoomService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    ZoomService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	ZoomSession session = new ZoomSession();
@@ -139,7 +128,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @SuppressWarnings("rawtypes")
     @Override
-    public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
+    public ToolSessionExportOutputData exportToolSession(java.util.List toolSessionIds)
 	    throws DataMissingException, ToolException {
 	return null;
     }
@@ -150,8 +139,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     @Override
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, Long toolSessionId, Long learnerId) {
-	return new TreeMap<>();
+    public java.util.SortedMap<String, org.lamsfoundation.lams.tool.ToolOutput> getToolOutput(
+	    java.util.List<String> names, Long toolSessionId, Long learnerId) {
+	return new java.util.TreeMap<>();
     }
 
     @Override
@@ -160,12 +150,13 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     @Override
-    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<>();
+    public java.util.List<org.lamsfoundation.lams.tool.ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new java.util.ArrayList<>();
     }
 
     @Override
-    public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
+    public java.util.List<org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO> getConfidenceLevels(
+	    Long toolSessionId) {
 	return null;
     }
 
@@ -185,8 +176,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (ZoomService.logger.isDebugEnabled()) {
-	    ZoomService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    ZoomService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -219,8 +211,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	}
 
 	for (ZoomSession session : zoom.getZoomSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ZoomConstants.TOOL_SIGNATURE);
+	    java.util.List<org.lamsfoundation.lams.notebook.model.NotebookEntry> entries = coreNotebookService.getEntry(
+		    session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ZoomConstants.TOOL_SIGNATURE);
 	    for (NotebookEntry entry : entries) {
 		coreNotebookService.deleteEntry(entry);
 	    }
@@ -232,14 +224,15 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
 	if (ZoomService.logger.isDebugEnabled()) {
-	    ZoomService.logger.debug("Resetting Web Conference completion flag for user ID " + userId
-		    + " and toolContentId " + toolContentId);
+	    ZoomService.logger.debug(
+		    "Resetting Web Conference completion flag for user ID " + userId + " and toolContentId "
+			    + toolContentId);
 	}
 
 	Zoom zoom = getZoomByContentId(toolContentId);
 	if (zoom == null) {
-	    ZoomService.logger
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ZoomService.logger.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -262,9 +255,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
 
     @Override
@@ -293,7 +286,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
@@ -336,9 +329,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Long toolContentId, int definitionType)
-	    throws ToolException {
-	return new TreeMap<>();
+    public java.util.SortedMap<String, org.lamsfoundation.lams.tool.ToolOutputDefinition> getToolOutputDefinitions(
+	    Long toolContentId, int definitionType) throws ToolException {
+	return new java.util.TreeMap<>();
     }
 
     @Override
@@ -380,7 +373,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     }
 
     public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
+	java.util.List<org.lamsfoundation.lams.notebook.model.NotebookEntry> list = coreNotebookService.getEntry(id,
+		idType, signature, userID);
 	if ((list == null) || list.isEmpty()) {
 	    return null;
 	} else {
@@ -437,7 +431,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public Zoom getZoomByContentId(Long toolContentID) {
-	List<Zoom> list = zoomDAO.findByProperty(Zoom.class, "toolContentId", toolContentID);
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.Zoom> list = zoomDAO.findByProperty(Zoom.class,
+		"toolContentId", toolContentID);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -463,7 +458,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomSession getSessionBySessionId(Long toolSessionId) {
-	List<ZoomSession> list = zoomDAO.findByProperty(ZoomSession.class, "sessionId", toolSessionId);
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomSession> list = zoomDAO.findByProperty(
+		ZoomSession.class, "sessionId", toolSessionId);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -474,10 +470,11 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomUser getUserByUserIdAndSessionId(Integer userId, Long toolSessionId) {
-	Map<String, Object> map = new HashMap<>();
+	java.util.Map<String, Object> map = new java.util.HashMap<>();
 	map.put("userId", userId);
 	map.put("zoomSession.sessionId", toolSessionId);
-	List<ZoomUser> list = zoomDAO.findByProperties(ZoomUser.class, map);
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomUser> list = zoomDAO.findByProperties(ZoomUser.class,
+		map);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -488,7 +485,8 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     @SuppressWarnings("unchecked")
     public ZoomUser getUserByUID(Long uid) {
-	List<ZoomUser> list = zoomDAO.findByProperty(ZoomUser.class, "uid", uid);
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomUser> list = zoomDAO.findByProperty(ZoomUser.class,
+		"uid", uid);
 	if (list.isEmpty()) {
 	    return null;
 	} else {
@@ -528,8 +526,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 		"Setting the reflective field on a zoom. This doesn't make sense as the zoom is for reflection and we don't reflect on reflection!");
 	Zoom zoom = getZoomByContentId(toolContentId);
 	if (zoom == null) {
-	    throw new DataMissingException("Unable to set reflective data titled " + title
-		    + " on activity toolContentId " + toolContentId + " as the tool content does not exist.");
+	    throw new DataMissingException(
+		    "Unable to set reflective data titled " + title + " on activity toolContentId " + toolContentId
+			    + " as the tool content does not exist.");
 	}
 
 	zoom.setReflectOnActivity(Boolean.TRUE);
@@ -594,19 +593,20 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
     @Override
     public Boolean chooseApi(Long zoomUid) throws IOException {
 	Zoom zoom = (Zoom) zoomDAO.find(Zoom.class, zoomUid);
-	List<ZoomApi> apis = getApis();
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomApi> apis = getApis();
 	if (apis.isEmpty()) {
 	    return null;
 	}
 	ZoomApi chosenApi = null;
-	TreeMap<String, ZoomApi> liveApis = new TreeMap<>();
+	java.util.TreeMap<String, org.lamsfoundation.lams.tool.zoom.model.ZoomApi> liveApis = new java.util.TreeMap<>();
 	for (ZoomApi api : apis) {
 	    String meetingListURL = "users/" + api.getEmail() + "/meetings?type=live";
 	    HttpURLConnection connection = ZoomService.getZoomConnection(meetingListURL, "GET", null, api);
@@ -656,7 +656,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	ObjectNode bodyJSON = JsonNodeFactory.instance.objectNode();
 	Date currentTime = new Date();
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+	sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
 	String startTime = sdf.format(currentTime);
 	bodyJSON.put("topic", zoom.getTitle());
 	bodyJSON.put("type", 2);
@@ -718,25 +718,27 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<ZoomApi> getApis() {
+    public java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomApi> getApis() {
 	return zoomDAO.findAll(ZoomApi.class);
     }
 
     @Override
-    public void saveApis(List<ZoomApi> apis) {
-	List<ZoomApi> existingApis = getApis();
-	Set<Long> delete = new HashSet<>();
-	Set<String> saved = new HashSet<>();
+    public void saveApis(java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomApi> apis) {
+	java.util.List<org.lamsfoundation.lams.tool.zoom.model.ZoomApi> existingApis = getApis();
+	java.util.Set<Long> delete = new java.util.HashSet<>();
+	java.util.Set<String> saved = new java.util.HashSet<>();
 	for (ZoomApi existingApi : existingApis) {
 	    boolean found = false;
 	    for (ZoomApi api : apis) {
 		if (existingApi.getEmail().equalsIgnoreCase(api.getEmail())) {
 		    found = true;
 		    saved.add(api.getEmail());
-		    if (!existingApi.getKey().equals(api.getKey())
-			    || !existingApi.getSecret().equals(api.getSecret())) {
-			existingApi.setKey(api.getKey());
-			existingApi.setSecret(api.getSecret());
+		    if (!existingApi.getAccountId().equals(api.getAccountId()) || !existingApi.getClientId()
+			    .equals(api.getClientId()) || !existingApi.getClientSecret()
+			    .equals(api.getClientSecret())) {
+			existingApi.setAccountId(api.getAccountId());
+			existingApi.setClientId(api.getClientId());
+			existingApi.setClientSecret(api.getClientSecret());
 			zoomDAO.update(existingApi);
 		    }
 		    break;
@@ -750,7 +752,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    zoomDAO.deleteById(ZoomApi.class, uidToDelete);
 	}
 	for (ZoomApi api : apis) {
-	    if (!saved.contains(api.getEmail())) {
+	    if (!saved.contains(api.getClientId())) {
 		zoomDAO.insert(api);
 	    }
 	}
@@ -758,24 +760,40 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     @Override
     public boolean pingZoomApi(Long uid) throws IOException {
-	ZoomApi api = (ZoomApi) zoomDAO.find(ZoomApi.class, uid);
+	ZoomApi api = zoomDAO.find(ZoomApi.class, uid);
 	HttpURLConnection connection = ZoomService.getZoomConnection("users/email?email=" + api.getEmail(), "GET", null,
 		api);
+
 	ObjectNode resultJSON = ZoomService.getReponse(connection);
 	return resultJSON != null && JsonUtil.optBoolean(resultJSON, "existed_email", false);
     }
 
-    private static String generateJWT(ZoomApi api) {
-	Date expiration = new Date(System.currentTimeMillis() + ZoomConstants.JWT_EXPIRATION_MILISECONDS);
-	return Jwts.builder().setHeaderParam("typ", "JWT").setIssuer(api.getKey()).setExpiration(expiration)
-		.signWith(SignatureAlgorithm.HS256, api.getSecret().getBytes()).compact();
+    private static String generateToken(ZoomApi api) throws IOException {
+	if (TOKEN_CACHE == null || TOKEN_CACHE_EXPIRE < System.currentTimeMillis()) {
+	    TOKEN_CACHE = null;
+
+	    String clientEncoded = Base64.getEncoder()
+		    .encodeToString((api.getClientId() + ":" + api.getClientSecret()).getBytes());
+
+	    HttpsURLConnection connection = (HttpsURLConnection) HttpUrlConnectionUtil.getConnection(
+		    ZoomConstants.ZOOM_TOKEN_URL + "?grant_type=account_credentials&account_id=" + api.getAccountId());
+	    connection.setRequestMethod("POST");
+	    connection.setRequestProperty("Authorization", "Basic " + clientEncoded);
+
+	    ObjectNode responseJSON = getReponse(connection);
+	    TOKEN_CACHE = JsonUtil.optString(responseJSON, "access_token");
+	    TOKEN_CACHE_EXPIRE =
+		    System.currentTimeMillis() + JsonUtil.optInt(responseJSON, "expires_in", 0) * 1000 - 10000;
+	}
+
+	return TOKEN_CACHE;
     }
 
     private static HttpURLConnection getZoomConnection(String urlSuffix, String method, String body, ZoomApi api)
 	    throws IOException {
-	HttpsURLConnection connection = (HttpsURLConnection) HttpUrlConnectionUtil
-		.getConnection(ZoomConstants.ZOOM_API_URL + urlSuffix);
-	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateJWT(api));
+	HttpsURLConnection connection = (HttpsURLConnection) HttpUrlConnectionUtil.getConnection(
+		ZoomConstants.ZOOM_API_URL + urlSuffix);
+	connection.setRequestProperty("Authorization", "Bearer " + ZoomService.generateToken(api));
 	switch (method) {
 	    case "PATCH":
 		ZoomService.setRequestMethod(connection, method);
@@ -878,9 +896,9 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    }
 
 	    if (logger.isDebugEnabled()) {
-		logger.debug("Server response: " + code
-			+ (responseMessage == null ? "" : " " + connection.getResponseMessage())
-			+ (response == null ? "" : " " + response));
+		logger.debug("Server response: " + code + (responseMessage == null
+			? ""
+			: " " + connection.getResponseMessage()) + (response == null ? "" : " " + response));
 	    }
 	} finally {
 	    connection.disconnect();

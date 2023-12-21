@@ -19,13 +19,12 @@
 	<c:set var="title"><fmt:message key="appadmin.import.groups.title"/></c:set>
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<link href="<lams:LAMSURL/>css/uppy.min.css" rel="stylesheet" type="text/css" />
 	<link href="<lams:LAMSURL/>css/uppy.custom.css" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
@@ -39,6 +38,9 @@
 		</c:when>
 		<c:when test="${language eq 'el'}">
 			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/uppy/el_GR.min.js"></script>
+		</c:when>
+		<c:when test="${language eq 'it'}">
+			<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/uppy/it_IT.min.js"></script>
 		</c:when>
 	</c:choose>
 	
@@ -75,9 +77,10 @@
 				  };
 			  
 			  switch(language) {
-			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break; 
-				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break; 
-				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break; 
+			  	case 'es' : uppyProperties.locale = Uppy.locales.es_ES; break;
+				case 'fr' : uppyProperties.locale = Uppy.locales.fr_FR; break;
+				case 'el' : uppyProperties.locale = Uppy.locales.el_GR; break;
+				case 'it' : uppyProperties.locale = Uppy.locales.it_IT; break;
 			  }
 			  
 			  
@@ -94,7 +97,7 @@
 			  uppy.use(Uppy.DragDrop, {
 				  target: '#file-upload-area',
 				  inline: true,
-				  height: 150,
+				  height: 200,
 				  width: '100%'
 				});
 
@@ -186,7 +189,7 @@
 		<form:hidden path="orgId" />
 		<form:hidden path="tmpFileUploadId" />
 				
-		<div id="file-upload-area" class="voffset20"></div>
+		<div id="file-upload-area" class="my-3 mx-5"></div>
 		
 		<div class="mt-3 text-end">
 		<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary"><fmt:message key="admin.cancel"/></a>

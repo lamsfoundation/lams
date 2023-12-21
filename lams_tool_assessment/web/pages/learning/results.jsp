@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="assessment" value="${sessionMap.assessment}" />
+<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
+<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
+<c:set var="hasEditRight" value="${sessionMap.hasEditRight}" />
+<c:set var="result" value="${sessionMap.assessmentResult}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+<lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
+	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 	<lams:css suffix="jquery.jRating"/>
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
@@ -15,25 +27,11 @@
 				background-color: initial;
 				border: none;
 			}
+			
+			.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
+			    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
+			}
 		</style>
-	</c:if>
-	
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="assessment" value="${sessionMap.assessment}" />
-	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
-	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
-	<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-	<c:set var="result" value="${sessionMap.assessmentResult}" />
-	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
-	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-		
-	<c:if test="${not empty codeStyles}">
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
 	</c:if>
@@ -51,7 +49,6 @@
 			</c:when>
 		</c:choose>
 	</c:forEach>
-	
 	<c:if test="${not empty codeStyles}">
 		<script type="text/javascript">
 			// initialise syntax highlighter depending on programming language in data-lang attribute
@@ -61,7 +58,6 @@
 		</script>
 	</c:if>
 	
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
 	<script type="text/javascript">
 		 checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
 			 document.location.href ='<c:url value="/learning/finish.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}';
@@ -87,44 +83,40 @@
 			return false;			
 		}
     </script>
-</lams:head>
-<body class="stripes">
-
-	<lams:Page type="learner" title="${assessment.title}">
-		
+	
+	<div id="container-main">
 		<c:if test="${not empty sessionMap.submissionDeadline && (sessionMap.mode == 'author' || sessionMap.mode == 'learner')}">
-			<lams:Alert id="submission-deadline" type="info" close="true">
+			<lams:Alert5 id="submission-deadline" type="info" close="true">
 				<fmt:message key="authoring.info.teacher.set.restriction" >
 					<fmt:param><lams:Date value="${sessionMap.submissionDeadline}" /></fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${sessionMap.isUserFailed}">
-			<lams:Alert id="passing-mark-not-reached" type="warning" close="true">
+			<lams:Alert5 id="passing-mark-not-reached" type="warning" close="true">
 				<fmt:message key="label.learning.havent.reached.passing.mark">
 					<fmt:param>${assessment.passingMark}</fmt:param>
 				</fmt:message>
-			</lams:Alert>
+			</lams:Alert5>
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled and not empty sessionMap.groupLeader}">
 			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
-		<lams:errors/>
-		<br>
+		<lams:errors5/>
 		
 		<c:if test="${not empty result}">
 			<%@ include file="results/attemptsummary.jsp"%>
 		</c:if>
 		
 		<c:if test="${assessment.displaySummary}">
-			<div class="panel">
+			<div id="instructions" class="instructions">
 				<c:out value="${assessment.instructions}" escapeXml="false"/>
 			</div>
 
-			<div class="form-group">
+			<div id="all-questions">
 				<%@ include file="results/allquestions.jsp"%>
 				
 				<%@ include file="parts/paging.jsp"%>
@@ -133,82 +125,45 @@
 		
 		<%-- Reflection entry --%>
 		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight)}">
-		 	 <div class="panel panel-default">
-	
-				<div class="panel-heading panel-title">
-			 		<fmt:message key="label.export.reflection" />
-			 	</div>
-				 	
-			 	<div class="panel-body">
-				 	<div class="panel">
-				 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-					</div>
-						
-					<div class="form-group">
-						<c:choose>
-							<c:when test="${empty sessionMap.reflectEntry}">
-								<p>
-									<em> <fmt:message key="message.no.reflection.available" />	</em>
-								</p>
-							</c:when>
-							<c:otherwise>
-								<p>
-									<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-								</p>
-							</c:otherwise>
-						</c:choose>
-			
-						<c:if test="${(mode != 'teacher') && hasEditRight}">
-							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-sm btn-default pull-left voffset10">
-								<fmt:message key="label.edit" />
-							</button>
-						</c:if>
-					</div>
-		
-				</div>
-			</div>
+			<lams:NotebookReedit
+				reflectInstructions="${sessionMap.reflectInstructions}"
+				reflectEntry="${sessionMap.reflectEntry}"
+				isEditButtonEnabled="${(mode != 'teacher') && isUserLeader}"
+				notebookHeaderLabelKey="label.export.reflection"/>
 		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
-			<div class="space-bottom-top align-right">
-				<c:if test="${isResubmitAllowed && hasEditRight}">
-					<button type="submit" onclick="resubmit()" class="btn btn-default">
-						<fmt:message key="label.learning.resubmit" />
-					</button>
-				</c:if>	
-						
+			<div class="activity-bottom-buttons">
 				<c:if test="${!sessionMap.isUserFailed}">
 					<c:choose>
 						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
 							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-primary voffset10 pull-right na">
+									class="btn btn-primary na">
 								<fmt:message key="label.continue" />
 							</button>
 						</c:when>
 						
 						<c:otherwise>
-							<button id="finishButton"
-							        name="FinishButton"
-									class="btn btn-primary voffset10 pull-right na">
-								<span class="nextActivity">
-									<c:choose>
-										<c:when test="${sessionMap.isLastActivity}">
-											<fmt:message key="label.submit" />
-										</c:when>
-										<c:otherwise>
-							 				<fmt:message key="label.finished" />
-										</c:otherwise>
-									</c:choose>
-		 						</span>
+							<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
+								<c:choose>
+									<c:when test="${sessionMap.isLastActivity}">
+										<fmt:message key="label.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="label.finished" />
+									</c:otherwise>
+								</c:choose>
 							</button>
 						</c:otherwise>
 					</c:choose>
 				</c:if>
+				
+				<c:if test="${isResubmitAllowed && hasEditRight}">
+					<button type="button" onclick="resubmit()" class="btn btn-secondary btn-icon-return me-2">
+						<fmt:message key="label.learning.resubmit" />
+					</button>
+				</c:if>
 			</div>
 		</c:if>
-
-	</lams:Page>
-
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

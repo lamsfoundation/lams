@@ -106,8 +106,9 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 	TimeCache existingTimeSettings = new TimeCache();
 
-	existingTimeSettings.absoluteTimeLimit = scratchie.getAbsoluteTimeLimit();
+	existingTimeSettings.absoluteTimeLimitFinish = scratchie.getAbsoluteTimeLimitFinish();
 	existingTimeSettings.relativeTimeLimit = scratchie.getRelativeTimeLimit() * 60;
+	existingTimeSettings.absoluteTimeLimit = scratchie.getAbsoluteTimeLimit() * 60;
 	existingTimeSettings.timeLimitAdjustment = new HashMap<>();
 
 	Map<Long, LocalDateTime> sessionLaunchDates = new HashMap<>();

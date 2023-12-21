@@ -23,39 +23,31 @@
 
 package org.lamsfoundation.lams.monitoring.web;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.InvalidParameterException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.IAuthoringService;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
+import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.*;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.ContributionTypes;
+import org.lamsfoundation.lams.learningdesign.GateActivity;
+import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupingActivity;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -79,6 +71,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -93,6 +86,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,12 +94,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.InvalidParameterException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Vector;
 
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
@@ -123,6 +137,10 @@ public class MonitoringController {
     private static final int LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT = 53;
     private static final int LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT = 7;
     private static final int USER_PAGE_SIZE = 10;
+
+    @Autowired
+    @Qualifier("serverTaskExecutor")
+    private ThreadPoolTaskExecutor serverTaskExecutor;
 
     @Autowired
     private ILogEventService logEventService;
@@ -167,8 +185,8 @@ public class MonitoringController {
 		FluxMap.STANDARD_TIMEOUT);
 	FluxRegistry.initFluxMap(MonitoringConstants.TIME_LIMIT_REFRESH_FLUX_NAME,
 		CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME,
-		(Collection<Long> key, Collection<Long> item) -> key.containsAll(item), toolContentIds -> "doRefresh",
-		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		(Collection<Long> key, Collection<Long> item) -> !Collections.disjoint(key, item),
+		toolContentIds -> "doRefresh", FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     private Integer getUserId() {
@@ -369,7 +387,8 @@ public class MonitoringController {
 	boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
-	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
+	Long precedingLessonId = precedingLessonEnable
+		? WebUtil.readLongParam(request, "precedingLessonId", true)
 		: null;
 	boolean timeLimitEnable = WebUtil.readBooleanParam(request, "timeLimitEnable", false);
 	Integer timeLimitDays = WebUtil.readIntParam(request, "timeLimitDays", true);
@@ -397,10 +416,10 @@ public class MonitoringController {
 	    String staffGroupName = organisation.getName() + " staff";
 
 	    // either all users participate in a lesson, or we split them among instances
-	    List<User> lessonInstanceLearners = splitNumberLessons == null ? learners
-		    : new ArrayList<>((learners.size() / splitNumberLessons) + 1);
-	    for (int lessonIndex = 1; lessonIndex <= (splitNumberLessons == null ? 1
-		    : splitNumberLessons); lessonIndex++) {
+	    List<User> lessonInstanceLearners =
+		    splitNumberLessons == null ? learners : new ArrayList<>((learners.size() / splitNumberLessons) + 1);
+	    for (int lessonIndex = 1;
+		    lessonIndex <= (splitNumberLessons == null ? 1 : splitNumberLessons); lessonIndex++) {
 		String lessonInstanceName = lessonName;
 		String learnerGroupInstanceName = learnerGroupName;
 		String staffGroupInstanceName = staffGroupName;
@@ -411,16 +430,16 @@ public class MonitoringController {
 		    learnerGroupInstanceName += " " + lessonIndex;
 		    staffGroupInstanceName += " " + lessonIndex;
 		    lessonInstanceLearners.clear();
-		    for (int learnerIndex = lessonIndex - 1; learnerIndex < learners
-			    .size(); learnerIndex += splitNumberLessons) {
+		    for (int learnerIndex = lessonIndex - 1;
+			    learnerIndex < learners.size(); learnerIndex += splitNumberLessons) {
 			lessonInstanceLearners.add(learners.get(learnerIndex));
 		    }
 		}
 
 		if (log.isDebugEnabled()) {
-		    log.debug("Creating lesson "
-			    + (splitNumberLessons == null ? "" : "(" + lessonIndex + "/" + splitNumberLessons + ") ")
-			    + "\"" + lessonInstanceName + "\"");
+		    log.debug("Creating lesson " + (splitNumberLessons == null
+			    ? ""
+			    : "(" + lessonIndex + "/" + splitNumberLessons + ") ") + "\"" + lessonInstanceName + "\"");
 		}
 
 		Lesson lesson = null;
@@ -493,8 +512,8 @@ public class MonitoringController {
 	    return;
 	}
 	Lesson lesson = lessonService.getLesson(lessonId);
-	Vector<User> learners = userManagementService
-		.getUsersFromOrganisationByRole(lesson.getOrganisation().getOrganisationId(), Role.LEARNER, true);
+	Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(
+		lesson.getOrganisation().getOrganisationId(), Role.LEARNER, true);
 	lessonService.addLearners(lesson, learners);
     }
 
@@ -773,7 +792,8 @@ public class MonitoringController {
 		orderAscending);
 
 	// if the result is less then page size, then no need for full check of user count
-	Integer userCount = users.size() < MonitoringController.USER_PAGE_SIZE ? users.size()
+	Integer userCount = users.size() < MonitoringController.USER_PAGE_SIZE
+		? users.size()
 		: userManagementService.getCountRoleForOrg(lesson.getOrganisation().getOrganisationId(),
 			isMonitor ? Role.ROLE_MONITOR : Role.ROLE_LEARNER, searchPhrase);
 
@@ -890,8 +910,9 @@ public class MonitoringController {
 	    log.info((add ? "Added a " : "Removed a ") + role + " with ID " + userId + (add ? " to" : " from")
 		    + " lesson " + lessonId);
 	} else {
-	    log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID " + userId
-		    + (add ? " to" : " from") + " lesson " + lessonId);
+	    log.warn("Failed when trying to " + (add ? "add a " : "remove a ") + role + " with ID " + userId + (add
+		    ? " to"
+		    : " from") + " lesson " + lessonId);
 	}
     }
 
@@ -929,8 +950,8 @@ public class MonitoringController {
 	String languageOutput = "<xml><language>";
 
 	for (int i = 0; i < languageCollection.size(); i++) {
-	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>"
-		    + messageService.getMessage(languageCollection.get(i)) + "</name></entry>";
+	    languageOutput += "<entry key='" + languageCollection.get(i) + "'><name>" + messageService.getMessage(
+		    languageCollection.get(i)) + "</name></entry>";
 	}
 
 	languageOutput += "</language></xml>";
@@ -985,6 +1006,13 @@ public class MonitoringController {
     @RequestMapping("/monitorLesson")
     public String monitorLesson(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException, ServletException {
+	if (log.isDebugEnabled()) {
+	    // temporary (?) debugging information on thread pool used for async requests
+	    StringBuilder executorLog = new StringBuilder();
+	    executorLog.append("Active thread count: " + serverTaskExecutor.getActiveCount());
+	    executorLog.append(" / Pool size: " + serverTaskExecutor.getPoolSize());
+	    log.debug(executorLog.toString());
+	}
 
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	LessonDetailsDTO lessonDTO = lessonService.getLessonDetails(lessonId);
@@ -1018,15 +1046,16 @@ public class MonitoringController {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
-	boolean enableLiveEdit = organisation.getEnableLiveEdit()
-		&& userManagementService.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
+	boolean enableLiveEdit =
+		organisation.getEnableLiveEdit() && userManagementService.isUserInRole(user.getUserID(),
+			organisation.getOrganisationId(), Role.AUTHOR);
 	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("lesson", lessonDTO);
 	boolean isTBLSequence = learningDesignService.isTBLSequence(lessonDTO.getLearningDesignID());
 	request.setAttribute("isTBLSequence", isTBLSequence);
 	if (isTBLSequence) {
-	    Map<String, Object> activityTypesMeta = learningDesignService
-		    .getAvailableTBLActivityTypes(lessonDTO.getLearningDesignID());
+	    Map<String, Object> activityTypesMeta = learningDesignService.getAvailableTBLActivityTypes(
+		    lessonDTO.getLearningDesignID());
 	    for (Entry<String, Object> entry : activityTypesMeta.entrySet()) {
 		request.setAttribute(entry.getKey(), entry.getValue());
 	    }
@@ -1039,6 +1068,34 @@ public class MonitoringController {
 	    }
 	    request.setAttribute("burningQuestionsEnabled", burningQuestionsEnabled);
 	}
+
+	// build path to learning design in authoring
+	// it gets displayed in Edit tab at the bottom
+	LearningDesign learningDesign = learningDesignService.getLearningDesign(lessonDTO.getLearningDesignID());
+	StringBuilder ldPathBuilder = new StringBuilder("/").append(learningDesign.getTitle());
+	WorkspaceFolder workspaceFolder = learningDesign.getWorkspaceFolder();
+	while (workspaceFolder != null) {
+	    if (workspaceFolder.getWorkspaceFolderType().equals(WorkspaceFolder.RUN_SEQUENCES)) {
+		ldPathBuilder.insert(0,
+			"/" + messageService.getMessage("label.monitoring.learning.design.path.run.sequences"));
+	    } else {
+		ldPathBuilder.insert(0, "/" + workspaceFolder.getName());
+		if (workspaceFolder.getParentWorkspaceFolder() == null || workspaceFolder.getParentWorkspaceFolder()
+			.getName().equalsIgnoreCase("root")) {
+		    ldPathBuilder.insert(0, messageService.getMessage("label.monitoring.learning.design.path.courses"));
+		    workspaceFolder = null;
+		}
+	    }
+
+	    workspaceFolder = workspaceFolder == null ? null : workspaceFolder.getParentWorkspaceFolder();
+	}
+	request.setAttribute("ldPath", ldPathBuilder.toString());
+
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, learningDesign.getContentFolderID());
+
+	boolean isIntegrationOrganisation = !userManagementService.findByProperty(ExtCourseClassMap.class,
+		"organisation", organisation).isEmpty();
+	request.setAttribute("isIntegrationOrganisation", isIntegrationOrganisation);
 
 	return "monitor";
     }
@@ -1137,8 +1194,8 @@ public class MonitoringController {
 	responseJSON.put("lessonName", HtmlUtils.htmlEscape(lesson.getLessonName()));
 	responseJSON.put("lessonInstructions", learningDesign.getDescription());
 
-	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
-		: lesson.getStartDateTime();
+	Date startOrScheduleDate =
+		lesson.getStartDateTime() == null ? lesson.getScheduleStartDate() : lesson.getStartDateTime();
 	Date finishDate = lesson.getScheduleEndDate();
 	DateFormat indfm = null;
 
@@ -1173,6 +1230,13 @@ public class MonitoringController {
 	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount;
 
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+
+	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
+	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
+	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	notStartedJSON.put("raw", notCompletedLearnersCount);
+	responseJSON.withArray("data").add(notStartedJSON);
+
 	ObjectNode startedJSON = JsonNodeFactory.instance.objectNode();
 	startedJSON.put("name", messageService.getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
@@ -1184,12 +1248,6 @@ public class MonitoringController {
 	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
 	completedJSON.put("raw", completedLearnersCount);
 	responseJSON.withArray("data").add(completedJSON);
-
-	ObjectNode notStartedJSON = JsonNodeFactory.instance.objectNode();
-	notStartedJSON.put("name", messageService.getMessage("lesson.chart.not.completed"));
-	notStartedJSON.put("value", Math.round(notCompletedLearnersCount.doubleValue() / possibleLearnersCount * 100));
-	notStartedJSON.put("raw", notCompletedLearnersCount);
-	responseJSON.withArray("data").add(notStartedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
@@ -1246,15 +1304,15 @@ public class MonitoringController {
 	    // find leaders from Leader Selection Tool
 	    if (activity.isToolActivity()) {
 		ToolActivity toolActivity = (ToolActivity) activity;
-		if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
-			.equals(toolActivity.getTool().getToolSignature())) {
+		if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE.equals(
+			toolActivity.getTool().getToolSignature())) {
 		    leaders.addAll(lamsToolService.getLeaderUserId(activity.getActivityId()));
 		}
 	    }
 	}
 
-	Map<Long, Integer> learnerCounts = monitoringService
-		.getCountLearnersCurrentActivities(activityIds.toArray(new Long[activityIds.size()]));
+	Map<Long, Integer> learnerCounts = monitoringService.getCountLearnersCurrentActivities(
+		activityIds.toArray(new Long[activityIds.size()]));
 
 	ArrayNode activitiesJSON = JsonNodeFactory.instance.arrayNode();
 	for (Activity activity : activities) {
@@ -1275,10 +1333,10 @@ public class MonitoringController {
 		activityJSON.put("x", MonitoringController.getActivityCoordinate(ba.getStartXcoord()));
 		activityJSON.put("y", MonitoringController.getActivityCoordinate(ba.getStartYcoord()));
 	    } else if (activity.isOptionsWithSequencesActivity()) {
-		activityJSON.put("x", MonitoringController
-			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
-		activityJSON.put("y", MonitoringController
-			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartYcoord()));
+		activityJSON.put("x", MonitoringController.getActivityCoordinate(
+			((OptionsWithSequencesActivity) activity).getStartXcoord()));
+		activityJSON.put("y", MonitoringController.getActivityCoordinate(
+			((OptionsWithSequencesActivity) activity).getStartYcoord()));
 	    } else if ((parentActivity != null) && (parentActivity.isOptionsActivity()
 		    || parentActivity.isParallelActivity() || parentActivity.isFloatingActivity())) {
 		// Optional Activity children had coordinates relative to parent
@@ -1318,7 +1376,7 @@ public class MonitoringController {
 		// insert the searched learner as the first one
 		if ((searchedLearnerProgress != null) && (searchedLearnerProgress.getCurrentActivity() != null)
 			&& activity.getActivityId()
-				.equals(searchedLearnerProgress.getCurrentActivity().getActivityId())) {
+			.equals(searchedLearnerProgress.getCurrentActivity().getActivityId())) {
 		    // put the searched learner in front
 		    latestLearners = MonitoringController.insertHighlightedLearner(searchedLearnerProgress.getUser(),
 			    latestLearners, MonitoringController.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
@@ -1478,8 +1536,8 @@ public class MonitoringController {
 		    result = true;
 		} else if (precedingActivity.isComplexActivity()) {
 		    // check descendants of a complex activity
-		    ComplexActivity complexActivity = (ComplexActivity) monitoringService
-			    .getActivityById(precedingActivity.getActivityId());
+		    ComplexActivity complexActivity = (ComplexActivity) monitoringService.getActivityById(
+			    precedingActivity.getActivityId());
 		    if (containsActivity(complexActivity, activityAid, monitoringService)) {
 			result = true;
 		    }
@@ -1502,8 +1560,8 @@ public class MonitoringController {
 		return true;
 	    }
 	    if (childActivity.isComplexActivity()) {
-		ComplexActivity childComplexActivity = (ComplexActivity) monitoringService
-			.getActivityById(childActivity.getActivityId());
+		ComplexActivity childComplexActivity = (ComplexActivity) monitoringService.getActivityById(
+			childActivity.getActivityId());
 		if (containsActivity(childComplexActivity, targetActivityId, monitoringService)) {
 		    return true;
 		}
@@ -1659,8 +1717,8 @@ public class MonitoringController {
     @RequestMapping(path = "/isLearningDesignHasGroupings", method = RequestMethod.GET)
     @ResponseBody
     public String isLearningDesignHasGroupings(@RequestParam long learningDesignId) {
-	List<GroupingActivity> groupingActivities = monitoringService
-		.getGroupingActivitiesByLearningDesignId(learningDesignId);
+	List<GroupingActivity> groupingActivities = monitoringService.getGroupingActivitiesByLearningDesignId(
+		learningDesignId);
 	for (GroupingActivity activity : groupingActivities) {
 	    if (!activity.getCreateGrouping().isUsedForBranching()) {
 		return Boolean.TRUE.toString();
@@ -1700,17 +1758,17 @@ public class MonitoringController {
 	    List<ContributeActivityDTO> resultContributeActivities = new ArrayList<>();
 	    for (ContributeActivityDTO contributeActivity : contributeActivities) {
 		if (contributeActivity.getContributeEntries() != null) {
-		    Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity
-			    .getContributeEntries().iterator();
+		    Iterator<ContributeActivityDTO.ContributeEntry> entryIterator = contributeActivity.getContributeEntries()
+			    .iterator();
 		    while (entryIterator.hasNext()) {
 			ContributeActivityDTO.ContributeEntry contributeEntry = entryIterator.next();
 
 			// extra filtering for chosen branching: do not show in Sequence tab if all users were assigned
-			if (skipCompletedBranching
-				&& ContributionTypes.CHOSEN_BRANCHING.equals(contributeEntry.getContributionType())) {
+			if (skipCompletedBranching && ContributionTypes.CHOSEN_BRANCHING.equals(
+				contributeEntry.getContributionType())) {
 			    Set<User> learners = new HashSet<>(lesson.getLessonClass().getLearners());
-			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService
-				    .getActivityById(contributeActivity.getActivityID());
+			    ChosenBranchingActivity branching = (ChosenBranchingActivity) monitoringService.getActivityById(
+				    contributeActivity.getActivityID());
 			    for (SequenceActivity branch : (Set<SequenceActivity>) (Set<?>) branching.getActivities()) {
 				Group group = branch.getSoleGroupForBranch();
 				if (group != null) {
@@ -1760,8 +1818,8 @@ public class MonitoringController {
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	Activity firstActivity = activityDAO.getActivityByActivityId(
+		lesson.getLearningDesign().getFirstActivity().getActivityId());
 	List<Activity> activities = new ArrayList<>();
 	sortActivitiesByLearningDesignOrder(firstActivity, activities);
 
@@ -1778,8 +1836,8 @@ public class MonitoringController {
 	    Set<SequenceActivity> sequenceActivities = new TreeSet<>(new ActivityOrderComparator());
 	    sequenceActivities.addAll((Set<SequenceActivity>) (Set<?>) branchingActivity.getActivities());
 	    for (Activity sequenceActivityNotInitialized : sequenceActivities) {
-		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService
-			.getActivityById(sequenceActivityNotInitialized.getActivityId());
+		SequenceActivity sequenceActivity = (SequenceActivity) monitoringService.getActivityById(
+			sequenceActivityNotInitialized.getActivityId());
 		Set<Activity> childActivities = new TreeSet<>(new ActivityOrderComparator());
 		childActivities.addAll(sequenceActivity.getActivities());
 

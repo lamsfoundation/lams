@@ -33,7 +33,7 @@
 			</div>
 			
 			<div id="saveCancelButtons" class="voffset10"> 
-				<a href="javascript:window.close()" class="btn btn-default"><fmt:message key="button.close" /></a>
+				<a href="javascript:window.close()" class="btn btn-secondary"><fmt:message key="button.close" /></a>
 			</div>
 		
 		<div id="footer"></div>

@@ -30,7 +30,7 @@
 		
 		var containsConditions = document.getElementById("conditionTable").rows.length > 0;
 		if (containsConditions) {
-			deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.deletion.affect.conditions"></fmt:message>");
+			deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.deletion.affect.conditions'/></spring:escapeBody>");
  		}
 		
 		if (deletionConfirmed) {

@@ -23,19 +23,8 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.web.controller;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -68,8 +57,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * @author Steve.Ni
@@ -93,10 +86,8 @@ public class LearningController {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
      * @throws EtherpadException
-     *
      * @throws DokumaranConfigurationException
      * @throws URISyntaxException
-     *
      */
     @RequestMapping("/start")
     private String start(HttpServletRequest request, HttpServletResponse response)
@@ -106,16 +97,18 @@ public class LearningController {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(DokumaranConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 
 	Long toolSessionId = WebUtil.readLongParam(request, DokumaranConstants.PARAM_TOOL_SESSION_ID);
 	Dokumaran dokumaran = dokumaranService.getDokumaranBySessionId(toolSessionId);
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 	sessionMap.put(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
 	boolean isFirstTimeAccess = false;
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
 	// get back login user DTO
 	HttpSession ss = SessionManager.getSession();
 	UserDTO currentUserDto = null;
@@ -156,14 +149,12 @@ public class LearningController {
 	}
 
 	boolean isUserLeader = (user != null) && dokumaranService.isUserLeader(leaders, user.getUserId());
-	boolean hasEditRight = !dokumaran.isUseSelectLeaderToolOuput()
-		|| dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
+	boolean hasEditRight =
+		!dokumaran.isUseSelectLeaderToolOuput() || dokumaran.isUseSelectLeaderToolOuput() && isUserLeader;
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(DokumaranConstants.ATTR_REFLECTION_ON, dokumaran.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, dokumaranService.isLastActivity(toolSessionId));
 	sessionMap.put(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
 	// get the API key from the config table and add it to the session
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
@@ -203,13 +194,17 @@ public class LearningController {
 	}
 
 	if (dokumaran.isGalleryWalkStarted()) {
+	    if (dokumaran.getGalleryWalkClusterSize() > 0 && session.getGalleryWalkCluster().isEmpty()) {
+		dokumaranService.assignSessionsForGalleryWalk(dokumaran.getContentId());
+	    }
+
 	    List<SessionDTO> groupList = null;
 	    try {
-		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUid());
 	    } catch (HibernateOptimisticLockingFailureException e) {
 		log.warn("Ignoring error caused probably by creating Gallery Walk criteria", e);
 		// simply run the transaction again
-		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUserId());
+		groupList = dokumaranService.getSummary(dokumaran.getContentId(), user.getUid());
 	    }
 	    request.setAttribute(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
 
@@ -297,21 +292,14 @@ public class LearningController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
 	return responseJSON.toString();
     }
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    private String finish(HttpServletRequest request) {
+    private void finish(HttpServletRequest request, HttpServletResponse response) throws IOException, DokumaranApplicationException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -323,29 +311,16 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = dokumaranService.finishToolSession(sessionId, userID);
-	    request.setAttribute(DokumaranConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (DokumaranApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = dokumaranService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/newReflection")
@@ -376,16 +351,10 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) {
+    private void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, DokumaranApplicationException {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, DokumaranConstants.ATTR_SESSION_MAP_ID);
@@ -408,7 +377,7 @@ public class LearningController {
 	    dokumaranService.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************

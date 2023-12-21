@@ -18,9 +18,13 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 	
-	<!-- Existing WildFly task executor for Spring async request processing. It is fetched by JNDI from JEE7+ platform. -->
-	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.DefaultManagedTaskExecutor" />
-	
+	<!-- Separate task executor for all async requests.
+	     Its has got core pool size of 1 (maybe it should be the number of cores),
+	     unbounded max thread pool size
+	     and queue capacity of 0 so tasks never wait and always create new threads when there are no available ones -->
+	<bean id="serverTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="queueCapacity" value="0" />
+	</bean>
 	
 	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
 	
@@ -204,28 +208,6 @@
 				<prop key="get*">PROPAGATION_REQUIRED</prop>
 				<prop key="removeTheme">PROPAGATION_REQUIRED</prop>
 				<prop key="store*">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean>
-	
-	<bean id="timezoneServiceTarget" class="org.lamsfoundation.lams.timezone.service.TimezoneService">
-		<property name="timezoneDAO"><ref bean="timezoneDAO"/></property>
-	</bean>
-	
-	<bean id="timezoneService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
-		<property name ="target"><ref bean="timezoneServiceTarget"/></property>
-		<property name="proxyTargetClass"><value>true</value></property> 
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="set*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>
@@ -716,11 +698,6 @@
 	<bean id="userOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.UserOrganisationDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
-	
-	<!--  Timezone service related beans -->
-	<bean id="timezoneDAO" class="org.lamsfoundation.lams.timezone.dao.hibernate.TimezoneDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
 	
 	<!--  Signup service related beans -->
 	<bean id="signupDAO" class="org.lamsfoundation.lams.signup.dao.hibernate.SignupDAO">

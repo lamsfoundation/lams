@@ -4,6 +4,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <lams:html>
 <lams:head>
@@ -42,7 +43,7 @@
 			    rowNum			   : 10,
 				colNames : [
 					'#',
-					'<fmt:message key="label.kumalive.report.full.name"/>'
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.kumalive.report.full.name"/></spring:escapeBody>'
 				],
 			    colModel : [
 					{
@@ -60,9 +61,9 @@
 				gridComplete : unblockExportButtons,
 			    loadError : function(xhr,st,err) {
 			    	$("#organisationGrid").clearGridData();
-			    	$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
-	    					'<fmt:message key="message.kumalive.report.load.error"/>',
-	    					'<fmt:message key="button.kumalive.ok"/>');
+			    	$.jgrid.info_dialog('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.title"/></spring:escapeBody>', 
+	    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.report.load.error"/></spring:escapeBody>',
+	    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="button.kumalive.ok"/></spring:escapeBody>');
 			    },
 			    // subgrid for learners who replied to questions during Kumalive
 			    subGrid: true,
@@ -96,7 +97,7 @@
 				                datatype 	: 'json',
 				                url 		: "<lams:LAMSURL />learning/kumalive/getReportKumaliveData.do?kumaliveId="
 					                			+ kumaliveId,
-				                colNames 	: ['<fmt:message key="label.kumalive.report.full.name"/>'].concat(columnNames),
+				                colNames 	: ['<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.kumalive.report.full.name"/></spring:escapeBody>'].concat(columnNames),
 				                colModel 	: [
 								      		   {
 												'name'  : 'name', 
@@ -113,9 +114,9 @@
 								sortname 	: "name", 
 								loadError 	: function(xhr,st,err) {
 						    		$("#" + user_subgrid_table_id).clearGridData();
-						    		$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
-								    					'<fmt:message key="message.kumalive.report.load.error"/>',
-								    					'<fmt:message key="button.kumalive.ok"/>');
+						    		$.jgrid.info_dialog('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.title"/></spring:escapeBody>', 
+								    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.report.load.error"/></spring:escapeBody>',
+								    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="button.kumalive.ok"/></spring:escapeBody>');
 						    	},
 						    	// subgrid of scores (marks) for the given learner
 						    	subGrid: true,
@@ -145,9 +146,9 @@
 									    shrinkToFit : true,
 										loadError 	: function(xhr,st,err) {
 								    		$("#" + score_subgrid_table_id).clearGridData();
-								    		$.jgrid.info_dialog('<fmt:message key="error.title"/>', 
-							    					'<fmt:message key="message.kumalive.report.load.error"/>',
-							    					'<fmt:message key="button.kumalive.ok"/>');
+								    		$.jgrid.info_dialog('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.title"/></spring:escapeBody>', 
+							    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.report.load.error"/></spring:escapeBody>',
+							    					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="button.kumalive.ok"/></spring:escapeBody>');
 								    	}
 						            });
 								}

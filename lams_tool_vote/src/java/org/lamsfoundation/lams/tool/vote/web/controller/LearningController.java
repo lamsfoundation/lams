@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.util.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -708,7 +710,6 @@ public class LearningController implements VoteAppConstants {
 
 	Map<String, String> mapQuestions = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
-
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
 	VoteQueUsr user = null;
@@ -720,11 +721,12 @@ public class LearningController implements VoteAppConstants {
 	    user = getCurrentUser(toolSessionID);
 	}
 
+	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
+
 	// check if there is submission deadline
 	Date submissionDeadline = voteContent.getSubmissionDeadline();
-
 	if (submissionDeadline != null) {
-
 	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, submissionDeadline);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -739,12 +741,8 @@ public class LearningController implements VoteAppConstants {
 	    }
 	}
 
-	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-
 	/* find out if the content is being modified at the moment. */
 	if (voteContent.isDefineLater()) {
-
 	    return "/learning/defineLater";
 	}
 
@@ -755,8 +753,14 @@ public class LearningController implements VoteAppConstants {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
-
-		Set<VoteQueUsr> groupUsers = voteSession.getVoteQueUsers();
+		Set<VoteQueUsr> groupVoteUsers = voteSession.getVoteQueUsers();
+		List<User> groupUsers = groupVoteUsers.stream().map(qaUser -> {
+		    User userI = new User();
+		    userI.setUserId(qaUser.getQueUsrId().intValue());
+		    userI.setFirstName(qaUser.getFullname());
+	            return userI;
+	        }).collect(Collectors.toList());
+		
 		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, voteContent);

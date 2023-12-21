@@ -22,24 +22,9 @@
  */
 package org.lamsfoundation.lams.authoring.template.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.service.AuthoringService;
 import org.lamsfoundation.lams.authoring.service.IAuthoringFullService;
@@ -77,23 +62,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class for actions processing Learning Design templates.
  *
  * A little history: This code was written when we were still using Struts but we were phasing it out. So it was written
- * with the
- * minimal of Struts code, which was then swapped to being the minimal Spring MVC. Now we are using Spring MVC it would
- * be nice to convert to using more Spring MVC features rather than adding parts piecemeal as the template pages
- * become more complicated. Rather than relying on the web page to keep all the data and doing ajax updates, it would be
- * nice to have a session form or the like backing the page. It would make it easier to have the templates load an
- * existing
- * design from the database for modification and make the processing when the template is saved so it doesn't do one
- * huge
- * parse in one go.
+ * with the minimal of Struts code, which was then swapped to being the minimal Spring MVC. Now we are using Spring MVC
+ * it would be nice to convert to using more Spring MVC features rather than adding parts piecemeal as the template
+ * pages become more complicated. Rather than relying on the web page to keep all the data and doing ajax updates, it
+ * would be nice to have a session form or the like backing the page. It would make it easier to have the templates load
+ * an existing design from the database for modification and make the processing when the template is saved so it
+ * doesn't do one huge parse in one go.
  *
  * Would also be nice to stop hardcoding the icons!
  *
@@ -206,12 +196,12 @@ public abstract class LdTemplateController {
     /**
      * If you have a CKEditor in your template interface, you should set up an "init" forward for your servlet in
      * response to this call (e.g. pbl.do?method=init) and it should forward to your JSP form. Calling this method sets
-     * up the contentFolderID needed by the CKEditor to support image upload. The fields that match these values
-     * are in init.jsp and should be included in the JSP form. The JSP should then call the unspecified
-     * method (e.g. pbl.do) to process the form.
+     * up the contentFolderID needed by the CKEditor to support image upload. The fields that match these values are in
+     * init.jsp and should be included in the JSP form. The JSP should then call the unspecified method (e.g. pbl.do) to
+     * process the form.
      *
-     * If you wish to set up other values in the initialisation that are form specific, override this method
-     * in your servlet, remembering to call this method.
+     * If you wish to set up other values in the initialisation that are form specific, override this method in your
+     * servlet, remembering to call this method.
      */
     @RequestMapping("/init")
     public String init(HttpServletRequest request) throws Exception {
@@ -230,8 +220,8 @@ public abstract class LdTemplateController {
 	    throws Exception;
 
     /**
-     * Creates transitions between activities in the order they were created.
-     * Simple version used if no sequence activities are used.
+     * Creates transitions between activities in the order they were created. Simple version used if no sequence
+     * activities are used.
      */
     protected ArrayNode createTransitions(AtomicInteger maxUIID, ArrayNode activities) {
 	ArrayNode transitions = JsonNodeFactory.instance.arrayNode();
@@ -239,10 +229,9 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Creates transitions between activities in the order they were created.
-     * Complex version used if sequence activities are used - then the top level activities go in one set and each
-     * sequence
-     * activity is its own set of activities.
+     * Creates transitions between activities in the order they were created. Complex version used if sequence
+     * activities are used - then the top level activities go in one set and each sequence activity is its own set of
+     * activities.
      */
     protected ArrayNode createTransitions(AtomicInteger maxUIID, Set<ArrayNode> setsOfActivities) {
 	ArrayNode transitions = JsonNodeFactory.instance.arrayNode();
@@ -255,8 +244,8 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Processes the transitions between activities within a sequence. This could be the overall
-     * sequence or activities within a SequenceActivity. The transitions parameter must not be null.
+     * Processes the transitions between activities within a sequence. This could be the overall sequence or activities
+     * within a SequenceActivity. The transitions parameter must not be null.
      */
     private ArrayNode createTransitions(ArrayNode transitions, AtomicInteger maxUIID, ArrayNode activities) {
 
@@ -266,8 +255,8 @@ public abstract class LdTemplateController {
 	    ObjectNode fromActivity = (ObjectNode) activities.get(activityIndex - 1);
 	    ObjectNode toActivity = (ObjectNode) activities.get(activityIndex);
 	    Integer parentType = JsonUtil.optInt(toActivity, PARENT_ACTIVITY_TYPE, (Integer) null);
-	    while ((activityIndex < activities.size()) && parentType != null
-		    && !parentType.equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
+	    while ((activityIndex < activities.size()) && parentType != null && !parentType.equals(
+		    Activity.SEQUENCE_ACTIVITY_TYPE)) {
 		activityIndex++;
 		toActivity = (ObjectNode) activities.get(activityIndex);
 		parentType = JsonUtil.optInt(toActivity, PARENT_ACTIVITY_TYPE, (Integer) null);
@@ -296,10 +285,9 @@ public abstract class LdTemplateController {
     protected static final int gateWidthOffset = 70;
 
     /**
-     * Calculate where to draw an activity. Aim for 4 activities per line. Returns Integer[x,y]
-     * Used when there is no hardcoding of location of activities.
-     * If some activities use hardcoding of layout, then see calcPositionNextRight(), calcPositionBelow()
-     * to calculate relative positions.
+     * Calculate where to draw an activity. Aim for 4 activities per line. Returns Integer[x,y] Used when there is no
+     * hardcoding of location of activities. If some activities use hardcoding of layout, then see
+     * calcPositionNextRight(), calcPositionBelow() to calculate relative positions.
      *
      * @return
      */
@@ -340,8 +328,8 @@ public abstract class LdTemplateController {
 
     /**
      * Create a title for this learning design, within the right length for the database. The userEnteredString is
-     * capitalised and whitespace is removed. The call to saveLearningDesign will make it unique by appending a date
-     * if needed.
+     * capitalised and whitespace is removed. The call to saveLearningDesign will make it unique by appending a date if
+     * needed.
      *
      * @param sequenceTitle
      * @param workspaceFolderID
@@ -360,9 +348,8 @@ public abstract class LdTemplateController {
      * Setup Learning Design JSON Data
      *
      * @throws IOException
+     * @throws HttpException
      * @
-     * @throws
-     *       HttpException
      */
     protected ObjectNode saveLearningDesign(String templateCode, String userEnteredTitleString,
 	    String userEnteredDescription, Integer workspaceFolderID, String contentFolderId, Integer maxUIID,
@@ -374,7 +361,7 @@ public abstract class LdTemplateController {
 	ldJSON.put(AuthoringJsonTags.WORKSPACE_FOLDER_ID, workspaceFolderID);
 	ldJSON.put(AuthoringJsonTags.COPY_TYPE, 1);
 	ldJSON.put(AuthoringJsonTags.TITLE, createTitle(templateCode, userEnteredTitleString, workspaceFolderID));
-	ldJSON.put(AuthoringJsonTags.DESCRIPTION, WebUtil.removeHTMLtags(userEnteredDescription));
+	ldJSON.put(AuthoringJsonTags.DESCRIPTION, userEnteredDescription);
 	ldJSON.put(AuthoringJsonTags.DESIGN_TYPE, templateCode.toLowerCase());
 	ldJSON.put(AuthoringJsonTags.MAX_ID, maxUIID);
 	ldJSON.put(AuthoringJsonTags.READ_ONLY, false);
@@ -540,8 +527,8 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Create a support activity group from already created activities. The support activities run outside the
-     * sequenced activities
+     * Create a support activity group from already created activities. The support activities run outside the sequenced
+     * activities
      */
     protected ObjectNode createSupportActivity(AtomicInteger uiid, int order, Integer[] layoutCoords) {
 	Integer[] pos = layoutCoords;
@@ -564,14 +551,12 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Create a sequence (or branch) activity, which is a single path that a user follows. This activity will go
-     * into a branching activity. If branchName is null then the branch will be "Branch <no>".
-     * The sequence activity has a circular dependence - to define the SequenceActivity you need the UIID of the first
-     * activity in the sequence. But the first activity in the sequence needs the SequenceActivity's UIID as its parent
-     * activity UIID.
-     * So "reserve" a uuid (using incrementAndGet()) in the template for the SequenceActivity, create the child activity
-     * (setting
-     * the parent activity as the reserved uiid) and then create the SequenceActivity using the reserved uiid.
+     * Create a sequence (or branch) activity, which is a single path that a user follows. This activity will go into a
+     * branching activity. If branchName is null then the branch will be "Branch <no>". The sequence activity has a
+     * circular dependence - to define the SequenceActivity you need the UIID of the first activity in the sequence. But
+     * the first activity in the sequence needs the SequenceActivity's UIID as its parent activity UIID. So "reserve" a
+     * uuid (using incrementAndGet()) in the template for the SequenceActivity, create the child activity (setting the
+     * parent activity as the reserved uiid) and then create the SequenceActivity using the reserved uiid.
      */
     protected ObjectNode createSequenceActivity(Integer reservedUiid, Integer parentUIID, Integer parentActivityType,
 	    Integer firstActivityUiid, int orderId, String branchName) {
@@ -591,8 +576,8 @@ public abstract class LdTemplateController {
 
     /**
      * Map a branch to a group. Creates JSON similar to:
-     * {"entryUIID":16,"groupUIID":11,"branchingActivityUIID":1,"sequenceActivityUIID":3}
-     * Note: it needs the UIID of the matching group, not of the grouping activity
+     * {"entryUIID":16,"groupUIID":11,"branchingActivityUIID":1,"sequenceActivityUIID":3} Note: it needs the UIID of the
+     * matching group, not of the grouping activity
      *
      * @
      */
@@ -608,15 +593,14 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Create the overall branching activity, which will have branch activities as its children.
-     * Branch selected based on a group.
+     * Create the overall branching activity, which will have branch activities as its children. Branch selected based
+     * on a group.
      *
      * The branching activity has a circular dependence - to define the BranchingActivity you need the UIID of the
-     * default branch (sequence).
-     * But the default sequence needs the BranchingActivity's UIID as its parent activity UIID.
-     * So "reserve" a uuid (using incrementAndGet()) in the template for the BranchingActivity, create the branches
-     * (setting
-     * the parent activity as the reserved uiid) and then create the BranchingActivity using the reserved uiid.
+     * default branch (sequence). But the default sequence needs the BranchingActivity's UIID as its parent activity
+     * UIID. So "reserve" a uuid (using incrementAndGet()) in the template for the BranchingActivity, create the
+     * branches (setting the parent activity as the reserved uiid) and then create the BranchingActivity using the
+     * reserved uiid.
      */
     protected ObjectNode createGroupBranchingActivity(Integer reservedUiid, Integer defaultBranchUiid,
 	    Integer groupingUiid, int order, Integer[] layoutCoords, Integer[] startCoords, Integer[] endCoords,
@@ -635,9 +619,9 @@ public abstract class LdTemplateController {
 //    }
 
     /**
-     * Create the overall branching activity, which will have branch activities as its children.
-     * Supports instructor's choice and grouped, but not based on learner output as conditions
-     * are not implemented in the REST authoring for the tools
+     * Create the overall branching activity, which will have branch activities as its children. Supports instructor's
+     * choice and grouped, but not based on learner output as conditions are not implemented in the REST authoring for
+     * the tools
      */
     private ObjectNode createBranchingActivity(Integer reservedUiid, Integer defaultBranchUiid, Integer groupingUiid,
 	    int order, Integer[] layoutCoords, Integer[] startCoords, Integer[] endCoords, String activityTitle,
@@ -692,7 +676,8 @@ public abstract class LdTemplateController {
 	activityJSON.put(AuthoringJsonTags.TOOL_ID, tool.getToolId());
 	activityJSON.put(AuthoringJsonTags.LEARNING_LIBRARY_ID, tool.getLearningLibraryId());
 	activityJSON.put(AuthoringJsonTags.TOOL_CONTENT_ID, toolContentID);
-	activityJSON.put(AuthoringJsonTags.GROUPING_SUPPORT_TYPE, 2); // based on values in lams_learning_activity field - this seem to be
+	activityJSON.put(AuthoringJsonTags.GROUPING_SUPPORT_TYPE,
+		2); // based on values in lams_learning_activity field - this seem to be
 	// 2 for all tools
 	activityJSON.put(AuthoringJsonTags.LIBRARY_IMAGE, toolIcon);
 	activityJSON.put(AuthoringJsonTags.XCOORD, pos[0]);
@@ -730,8 +715,7 @@ public abstract class LdTemplateController {
 
     /**
      * Helper method to create a chat tool content. Only title and instructions are needed but we support reflection,
-     * lock on
-     * finished and filterKeywords in case it is wanted. The keywords should be a comma deliminated string.
+     * lock on finished and filterKeywords in case it is wanted. The keywords should be a comma deliminated string.
      */
     protected Long createChatToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    String filterKeywords, String reflectionInstructions) throws IOException {
@@ -766,10 +750,10 @@ public abstract class LdTemplateController {
      * notifyTeachersOnForumPosting reflectInstructions, reflectOnActivity, submissionDeadline
      *
      * @param limitedMaxCharacters
-     *            Should the maximum number of characters in a posting be limited
+     * 	Should the maximum number of characters in a posting be limited
      * @param maxCharacters
-     *            if limitedMaxCharacters == true then if maxCharacters == null let forum use default otherwise use the
-     *            value supplied.
+     * 	if limitedMaxCharacters == true then if maxCharacters == null let forum use default otherwise use the value
+     * 	supplied.
      */
     protected Long createForumToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    boolean allowRichTextEditor, boolean allowNewTopic, boolean allowRateMessages, boolean allowUpload,
@@ -1003,8 +987,8 @@ public abstract class LdTemplateController {
 
 	// TODO files - need to save it somehow, validate the file size, etc
 	if (type != LdTemplateController.RESOURCE_TYPE_URL) {
-	    LdTemplateController.log
-		    .warn("LD Templates not handling files yet - file, website & LO resources won't work. Filename "
+	    LdTemplateController.log.warn(
+		    "LD Templates not handling files yet - file, website & LO resources won't work. Filename "
 			    + file.getAbsoluteFile());
 	}
 	return item;
@@ -1061,7 +1045,7 @@ public abstract class LdTemplateController {
      */
     protected Long createScratchieToolContent(UserDTO user, String title, String instructions,
 	    boolean useSelectLeaderToolOuput, boolean enableDiscussionSentiment, Integer confidenceLevelsActivityUiid,
-	    ArrayNode questions) throws IOException {
+	    Long qbCollectionUid, ArrayNode questions) throws IOException {
 
 	ObjectNode toolContentJSON = AuthoringService.createStandardToolContent(title, instructions, null, null, null,
 		null);
@@ -1075,6 +1059,10 @@ public abstract class LdTemplateController {
 	for (int i = 0; i < questions.size(); i++) {
 	    ObjectNode question = (ObjectNode) questions.get(i);
 	    question.put("answerRequired", true);
+	}
+
+	if (qbCollectionUid != null) {
+	    toolContentJSON.put(RestTags.COLLECTION_UID, qbCollectionUid);
 	}
 
 	return authoringService.createToolContent(user, LdTemplateController.SCRATCHIE_TOOL_SIGNATURE, toolContentJSON);
@@ -1122,9 +1110,8 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Helper method to create a submit tool content. Another tool that caches user's login names and
-     * first/last names Mandatory fields: title & instructions; userDTO which gives user's firstName, lastName &
-     * loginName;
+     * Helper method to create a submit tool content. Another tool that caches user's login names and first/last names
+     * Mandatory fields: title & instructions; userDTO which gives user's firstName, lastName & loginName;
      */
     protected Long createSubmitToolContent(UserDTO user, String title, String instructions, boolean lockWhenFinished,
 	    Boolean limitUpload, Integer limitUploadNumber, String reflectionInstructions) throws IOException {
@@ -1151,8 +1138,8 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Helper method to create a survey tool content. Another tool that caches user's login names and
-     * first/last names! See the survey implementation for the full field list.
+     * Helper method to create a survey tool content. Another tool that caches user's login names and first/last names!
+     * See the survey implementation for the full field list.
      */
     protected Long createSurveyToolContent(UserDTO user, String title, String instructions, Boolean lockWhenFinished,
 	    ArrayNode questions) throws IOException {
@@ -1226,9 +1213,8 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Helper method to create a Peer Review tool content.
-     * Required fields in toolContentJSON: "title", "instructions", "questions", "firstName", "lastName", "lastName",
-     * "questions" and "references".
+     * Helper method to create a Peer Review tool content. Required fields in toolContentJSON: "title", "instructions",
+     * "questions", "firstName", "lastName", "lastName", "questions" and "references".
      *
      * The criterias entry should be ArrayNode as defined in PeerReviewCriters object.
      */
@@ -1285,11 +1271,9 @@ public abstract class LdTemplateController {
     }
 
     /**
-     *
      * /* ************************************** Service related methods **********************************************
      */
     /* ************************************** I18N related methods ************************************************* */
-
     protected final Tool getTool(String toolSignature) {
 	return toolDAO.getToolBySignature(toolSignature);
     }
@@ -1310,8 +1294,8 @@ public abstract class LdTemplateController {
     /********************************* Page Interaction Support *************************************/
 
     /**
-     * Specialised call to create a new question for the Assessment fields. Returns a fragment of HTML
-     * which sets up a new CKEditor. Defaults to essay. If questionType = "mcq" then it will do a multiple choice
+     * Specialised call to create a new question for the Assessment fields. Returns a fragment of HTML which sets up a
+     * new CKEditor. Defaults to essay. If questionType = "mcq" then it will do a multiple choice
      */
     @RequestMapping("/createAssessment")
     public String createAssessment(HttpServletRequest request) {
@@ -1513,9 +1497,9 @@ public abstract class LdTemplateController {
     }
 
     /**
-     * Specialised call to create a new question & options for the surveys tab. Returns a fragment of HTML
-     * which sets up a new CKEditor. Works with both mcquestion.jsp & surveyquestion.jsp. The template's
-     * struts action determines which jsp is used (see TBL and Inquiry uses).
+     * Specialised call to create a new question & options for the surveys tab. Returns a fragment of HTML which sets up
+     * a new CKEditor. Works with both mcquestion.jsp & surveyquestion.jsp. The template's struts action determines
+     * which jsp is used (see TBL and Inquiry uses).
      */
     @RequestMapping("/createQuestion")
     public String createQuestion(HttpServletRequest request) {
@@ -1579,9 +1563,8 @@ public abstract class LdTemplateController {
 
     /**
      * Specialised call to create a new option for a multiple choice question (mcoption.jsp), Survey question
-     * (surveyoption.jsp) or assessment multiple choice (assessmcq.jsp).
-     * Returns a fragment of HTML which sets up the editing field. The template's
-     * struts action determines which jsp is used (see TBL and Inquiry uses).
+     * (surveyoption.jsp) or assessment multiple choice (assessmcq.jsp). Returns a fragment of HTML which sets up the
+     * editing field. The template's struts action determines which jsp is used (see TBL and Inquiry uses).
      */
     @RequestMapping("/createOption")
     public String createOption(HttpServletRequest request) {
@@ -1614,7 +1597,8 @@ public abstract class LdTemplateController {
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
 	request.setAttribute("containingDivName", containingDivName);
-	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
+	return (useAssessmentVersion
+		? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
 
@@ -1660,7 +1644,8 @@ public abstract class LdTemplateController {
 	request.setAttribute("options", options);
 	request.setAttribute("optionCount", options.size());
 	request.setAttribute("containingDivName", WebUtil.readStrParam(request, "containingDivName", true));
-	return (useAssessmentVersion ? "authoring/template/tool/assessredooption"
+	return (useAssessmentVersion
+		? "authoring/template/tool/assessredooption"
 		: "authoring/template/tool/mcredooption");
     }
 
@@ -1710,8 +1695,8 @@ public abstract class LdTemplateController {
 //    }
 
     /**
-     * Specialised call to create a new rating criteria for the Peer Review fields. Returns a fragment of HTML
-     * which sets up the new fields.
+     * Specialised call to create a new rating criteria for the Peer Review fields. Returns a fragment of HTML which
+     * sets up the new fields.
      */
     @RequestMapping("/createRatingCriteria")
     public String createRatingCriteria(HttpServletRequest request) {

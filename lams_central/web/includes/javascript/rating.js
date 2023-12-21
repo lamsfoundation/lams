@@ -134,9 +134,6 @@ function initializeJRating() {
 	    				handleError();
 	    				return;
 	    			}
-	    			
-		  			// LDEV-4480 Acknowledgement when submitting a comment for a Q&A response 
-    				alert("Submitted the comment successfully.");
     				
     				if (refreshOnSubmit) {
 	    				// LDEV-5052 Refresh page and scroll to the given ID on comment submit

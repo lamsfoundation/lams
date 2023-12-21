@@ -33,7 +33,7 @@
 				iconSet: 'fontAwesome',
 			   	url: "<c:url value='/emailNotifications/getArchivedRecipients.do'/>?emailNotificationUid=" + notificationUid,
 				datatype: "json",
-			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
+				colNames: ['<spring:escapeBody javaScriptEscape="true"><fmt:message key="email.notifications.user.name" /></spring:escapeBody>'],
 			   	colModel:[
 			        {
 					   'name'     : 'name', 

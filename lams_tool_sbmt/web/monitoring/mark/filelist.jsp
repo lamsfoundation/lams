@@ -13,7 +13,7 @@
 	<div id="updateMarksButton" class="pull-right">
 		<a href="javascript:updateMark(${fileInfo.submissionID},${fileInfo.reportID},${toolSessionID},${fileInfo.owner.userID});" 
 				  name="submit" class="btn btn-xs btn-default">
-			<i class="fa fa-pencil-square-o" title="<fmt:message key="label.monitoring.updateMarks.button" />"></i> <span class="hidden-xs"><fmt:message key="label.monitoring.updateMarks.button" /></span>
+			<i class="fa fa-pencil-square-o" title="<fmt:message key="label.monitoring.updateMarks.button" />"></i> <span class="d-none d-sm-block"><fmt:message key="label.monitoring.updateMarks.button" /></span>
 		</a>
 	</div>	
 </dd>

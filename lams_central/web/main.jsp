@@ -31,68 +31,67 @@
 	<lams:JSImport src="includes/javascript/main.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',	
-			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
-				EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
+				EMAIL_NOTIFICATIONS_TITLE : '<spring:escapeBody javaScriptEscape="true">${EMAIL_NOTIFICATIONS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.remove.lesson.confirm1" var="REMOVE_LESSON_CONFIRM1_VAR"/>
-				REMOVE_LESSON_CONFIRM1 : decoderDiv.html('<c:out value="${REMOVE_LESSON_CONFIRM1_VAR}" />').text(),
+				REMOVE_LESSON_CONFIRM1 : '<spring:escapeBody javaScriptEscape="true">${REMOVE_LESSON_CONFIRM1_VAR}</spring:escapeBody>',
 				<fmt:message key="index.remove.lesson.confirm2" var="REMOVE_LESSON_CONFIRM2_VAR"/>
-				REMOVE_LESSON_CONFIRM2 : decoderDiv.html('<c:out value="${REMOVE_LESSON_CONFIRM2_VAR}" />').text(),
+				REMOVE_LESSON_CONFIRM2 : '<spring:escapeBody javaScriptEscape="true">${REMOVE_LESSON_CONFIRM2_VAR}</spring:escapeBody>',
 				<fmt:message key="label.enable.lesson.sorting" var="SORTING_ENABLE_VAR"/>
-				SORTING_ENABLE : '<c:out value="${SORTING_ENABLE_VAR}" />',
+				SORTING_ENABLE : '<spring:escapeBody javaScriptEscape="true">${SORTING_ENABLE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.disable.lesson.sorting" var="SORTING_DISABLE_VAR"/>
-				SORTING_DISABLE : '<c:out value="${SORTING_DISABLE_VAR}" />',
+				SORTING_DISABLE : '<spring:escapeBody javaScriptEscape="true">${SORTING_DISABLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.addlesson" var="ADD_LESSON_TITLE_VAR"/>
-				ADD_LESSON_TITLE : '<c:out value="${ADD_LESSON_TITLE_VAR}" />',
+				ADD_LESSON_TITLE : '<spring:escapeBody javaScriptEscape="true">${ADD_LESSON_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.single.activity.lesson.title" var="SINGLE_ACTIVITY_LESSON_TITLE_VAR"/>
-				SINGLE_ACTIVITY_LESSON_TITLE : '<c:out value="${SINGLE_ACTIVITY_LESSON_TITLE_VAR}" />',
+				SINGLE_ACTIVITY_LESSON_TITLE : '<spring:escapeBody javaScriptEscape="true">${SINGLE_ACTIVITY_LESSON_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.gradebook.course.title" var="GRADEBOOK_COURSE_TITLE_VAR"/>
-				GRADEBOOK_COURSE_TITLE : '<c:out value="${GRADEBOOK_COURSE_TITLE_VAR}" />',
+				GRADEBOOK_COURSE_TITLE : '<spring:escapeBody javaScriptEscape="true">${GRADEBOOK_COURSE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.gradebook.lesson.title" var="GRADEBOOK_LESSON_TITLE_VAR"/>
-				GRADEBOOK_LESSON_TITLE : '<c:out value="${GRADEBOOK_LESSON_TITLE_VAR}" />',
+				GRADEBOOK_LESSON_TITLE : '<spring:escapeBody javaScriptEscape="true">${GRADEBOOK_LESSON_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.gradebook.learner.title" var="GRADEBOOK_LEARNER_TITLE_VAR"/>
-				GRADEBOOK_LEARNER_TITLE : '<c:out value="${GRADEBOOK_LEARNER_TITLE_VAR}" />',
+				GRADEBOOK_LEARNER_TITLE : '<spring:escapeBody javaScriptEscape="true">${GRADEBOOK_LEARNER_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.conditions.title" var="CONDITIONS_TITLE_VAR"/>
-				CONDITIONS_TITLE : '<c:out value="${CONDITIONS_TITLE_VAR}" />',
+				CONDITIONS_TITLE : '<spring:escapeBody javaScriptEscape="true">${CONDITIONS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.search.lesson.title" var="SEARCH_LESSON_TITLE_VAR"/>
-				SEARCH_LESSON_TITLE : '<c:out value="${SEARCH_LESSON_TITLE_VAR}" />',
+				SEARCH_LESSON_TITLE : '<spring:escapeBody javaScriptEscape="true">${SEARCH_LESSON_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.course.groups.title" var="COURSE_GROUPS_TITLE_VAR"/>
-				COURSE_GROUPS_TITLE : '<c:out value="${COURSE_GROUPS_TITLE_VAR}" />',
+				COURSE_GROUPS_TITLE : '<spring:escapeBody javaScriptEscape="true">${COURSE_GROUPS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
-				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
+				NAVIGATE_AWAY_CONFIRM : '<spring:escapeBody javaScriptEscape="true">${NAVIGATE_AWAY_CONFIRM_VAR}</spring:escapeBody>',
 				<fmt:message key="authoring.fla.page.title" var="AUTHORING_TITLE_VAR"/>
-				AUTHORING_TITLE : '<c:out value="${AUTHORING_TITLE_VAR}" />',
+				AUTHORING_TITLE : '<spring:escapeBody javaScriptEscape="true">${AUTHORING_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.monitoring.title" var="MONITORING_TITLE_VAR"/>
-				MONITORING_TITLE : '<c:out value="${MONITORING_TITLE_VAR}" />',
+				MONITORING_TITLE : '<spring:escapeBody javaScriptEscape="true">${MONITORING_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.kumalive.rubric" var="KUMALIVE_RUBRICS_TITLE_VAR"/>
-				KUMALIVE_RUBRICS_TITLE : '<c:out value="${KUMALIVE_RUBRICS_TITLE_VAR}" />',
+				KUMALIVE_RUBRICS_TITLE : '<spring:escapeBody javaScriptEscape="true">${KUMALIVE_RUBRICS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.kumalive.report" var="KUMALIVE_REPORT_TITLE_VAR"/>
-				KUMALIVE_REPORT_TITLE : '<c:out value="${KUMALIVE_REPORT_TITLE_VAR}" />',
+				KUMALIVE_REPORT_TITLE : '<spring:escapeBody javaScriptEscape="true">${KUMALIVE_REPORT_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.private.notifications.title" var="PRIVATE_NOTIFICATIONS_TITLE_VAR"/>
-				PRIVATE_NOTIFICATIONS_TITLE : '<c:out value="${PRIVATE_NOTIFICATIONS_TITLE_VAR}" />',
+				PRIVATE_NOTIFICATIONS_TITLE : '<spring:escapeBody javaScriptEscape="true">${PRIVATE_NOTIFICATIONS_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.private.notifications.messages" var="PRIVATE_NOTIFICATIONS_MESSAGES_VAR"/>
-				PRIVATE_NOTIFICATIONS_MESSAGES : '<c:out value="${PRIVATE_NOTIFICATIONS_MESSAGES_VAR}" />',
+				PRIVATE_NOTIFICATIONS_MESSAGES : '<spring:escapeBody javaScriptEscape="true">${PRIVATE_NOTIFICATIONS_MESSAGES_VAR}</spring:escapeBody>',
 				<fmt:message key="label.private.notifications.read" var="PRIVATE_NOTIFICATIONS_READ_VAR"/>
-				PRIVATE_NOTIFICATIONS_READ : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_VAR}" />',
+				PRIVATE_NOTIFICATIONS_READ : '<spring:escapeBody javaScriptEscape="true">${PRIVATE_NOTIFICATIONS_READ_VAR}</spring:escapeBody>',
 				<fmt:message key="label.private.notifications.read.hint" var="PRIVATE_NOTIFICATIONS_READ_HINT_VAR"/>
-				PRIVATE_NOTIFICATIONS_READ_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_HINT_VAR}" />',
+				PRIVATE_NOTIFICATIONS_READ_HINT : '<spring:escapeBody javaScriptEscape="true">${PRIVATE_NOTIFICATIONS_READ_HINT_VAR}</spring:escapeBody>',
 				<fmt:message key="label.private.notifications.read.all.hint" var="PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR"/>
-				PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}" />',
+				PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<spring:escapeBody javaScriptEscape="true">${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}</spring:escapeBody>',
 				<fmt:message key="index.myprofile" var="MY_PROFILE_VAR"/>
-				MY_PROFILE : '<c:out value="${MY_PROFILE_VAR}" />',
+				MY_PROFILE : '<spring:escapeBody javaScriptEscape="true">${MY_PROFILE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.remove.org.favorite" var="REMOVE_ORG_FAVORITE_VAR"/>
-				REMOVE_ORG_FAVORITE : '<c:out value="${REMOVE_ORG_FAVORITE_VAR}" />',
+				REMOVE_ORG_FAVORITE : '<spring:escapeBody javaScriptEscape="true">${REMOVE_ORG_FAVORITE_VAR}</spring:escapeBody>',
 				<fmt:message key="label.mark.org.favorite" var="MARK_ORG_FAVORITE_VAR"/>
-				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />',
+				MARK_ORG_FAVORITE : '<spring:escapeBody javaScriptEscape="true">${MARK_ORG_FAVORITE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.kumalive" var="KUMALIVE_TITLE_VAR"/>
-				KUMALIVE_TITLE : '<c:out value="${KUMALIVE_TITLE_VAR}" />',
+				KUMALIVE_TITLE : '<spring:escapeBody javaScriptEscape="true">${KUMALIVE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.outcome.manage" var="OUTCOME_MANAGE_TITLE_VAR"/>
-				OUTCOME_MANAGE_TITLE : '<c:out value="${OUTCOME_MANAGE_TITLE_VAR}" />',
+				OUTCOME_MANAGE_TITLE : '<spring:escapeBody javaScriptEscape="true">${OUTCOME_MANAGE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="outcome.manage.title" var="OUTCOME_COURSE_MANAGE_TITLE_VAR"/>
-				OUTCOME_COURSE_MANAGE_TITLE : '<c:out value="${OUTCOME_COURSE_MANAGE_TITLE_VAR}" />',
+				OUTCOME_COURSE_MANAGE_TITLE : '<spring:escapeBody javaScriptEscape="true">${OUTCOME_COURSE_MANAGE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="index.organisation.link.success" var="ORG_LINK_COPY_SUCCESS_MESSAGE_VAR"/>
-				ORG_LINK_COPY_SUCCESS_MESSAGE : '<c:out value="${ORG_LINK_COPY_SUCCESS_MESSAGE_VAR}" />'
+				ORG_LINK_COPY_SUCCESS_MESSAGE : '<spring:escapeBody javaScriptEscape="true">${ORG_LINK_COPY_SUCCESS_MESSAGE_VAR}</spring:escapeBody>'
 			},
 			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 
@@ -213,6 +212,14 @@
 						</a>
 					</li>
 					
+					<c:if test="${showTeamworkLink}">
+						<li>
+							<a href="#" id="showTeamworkButton" onclick="javascript:openTeamworkLearnerWindow(); return false;">
+								<i class="fa fa-handshake-o"></i> <fmt:message key="index.teamwork"/>
+							</a>
+						</li>
+					</c:if>
+
 					<c:if test="${showQbCollectionsLink}">
 						<li>
 							<a href="#" id="showQbCollectionsButton" onclick="javascript:openQbCollections(); return false;">
@@ -220,7 +227,7 @@
 							</a>
 						</li>
 					</c:if>
-					
+
 					<c:forEach var="adminlink" items="${adminLinks}">
 						
 						<c:choose>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component inheritJdk="true">
-	<contentEntry url="file://$MODULE_DIR$"/>
+	<contentEntry url="file://$MODULE_DIR$">
+		<excludeFolder url="file://$MODULE_DIR$/build"/>
+		<excludeFolder url="file://$MODULE_DIR$/bin"/>
+	</contentEntry>
 	<lib name="commons-lang-2.6.jar" scope="COMPILE">
 		<srcroot url="file://$3RDPARTY_SOURCES_PROJECT_48$/commons-lang"/>
 	</lib>

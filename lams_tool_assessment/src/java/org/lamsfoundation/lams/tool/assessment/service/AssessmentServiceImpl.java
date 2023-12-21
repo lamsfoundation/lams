@@ -23,33 +23,10 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -62,6 +39,7 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
+import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -133,6 +111,7 @@ import org.lamsfoundation.lams.tool.service.IQbToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -141,20 +120,42 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.util.UriUtils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import reactor.core.publisher.Flux;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessmentService, ToolContentManager,
-	ToolSessionManager, ToolRestManager, IQbToolService {
+public class AssessmentServiceImpl
+	implements IAssessmentService, ICommonAssessmentService, ToolContentManager, ToolSessionManager,
+	ToolRestManager, IQbToolService {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -204,9 +205,32 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     public AssessmentServiceImpl() {
 	FluxRegistry.initFluxMap(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME,
-		AssessmentConstants.ANSWERS_UPDATED_SINK_NAME, null, (Long toolContentId) -> UriUtils
-			.encode(getCompletionChartsData(toolContentId), StandardCharsets.UTF_8.toString()),
-		FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			HibernateSessionManager.openSession();
+			return UriUtils.encode(getCompletionChartsData(toolContentId),
+				StandardCharsets.UTF_8.toString());
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.SHORT_THROTTLE, FluxMap.STANDARD_TIMEOUT);
+	FluxRegistry.bindSink(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME,
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
+	FluxRegistry.bindSink(AssessmentConstants.ANSWERS_UPDATED_SINK_NAME,
+		AssessmentConstants.COMPLETION_CHARTS_UPDATE_SINK_NAME, contentId -> contentId);
+
+	FluxRegistry.initFluxMap(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME,
+		AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, null, (Long toolContentId) -> {
+		    try {
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+
+			ObjectNode timeLimitSettingsJson = getTimeLimitSettingsJson(toolContentId);
+			return timeLimitSettingsJson.toString();
+		    } finally {
+			HibernateSessionManager.closeSession();
+		    }
+		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
     // *******************************************************************************
@@ -342,13 +366,27 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public LocalDateTime launchTimeLimit(long toolContentId, int userId) {
 	Assessment assessment = getAssessmentByContentId(toolContentId);
+	int learnersStarted = assessmentUserDao.getCountLearnersByContentId(toolContentId, null);
+	if (learnersStarted > 0 && assessment.getRelativeTimeLimit() == 0 && assessment.getAbsoluteTimeLimit() > 0
+		&& assessment.getAbsoluteTimeLimitFinish() == null) {
+	    assessment.setAbsoluteTimeLimitFinish(LocalDateTime.now().plusMinutes(assessment.getAbsoluteTimeLimit()));
+	    assessment.setAbsoluteTimeLimit(0);
+	    assessmentDao.saveObject(assessment);
+
+	    FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	    FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
+	}
+
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), Long.valueOf(userId));
 	if (lastResult == null) {
 	    return null;
 	}
-	LocalDateTime launchedDate = LocalDateTime.now();
-	lastResult.setTimeLimitLaunchedDate(launchedDate);
-	assessmentResultDao.saveObject(lastResult);
+	LocalDateTime launchedDate = lastResult.getTimeLimitLaunchedDate();
+	if (launchedDate == null) {
+	    launchedDate = LocalDateTime.now();
+	    lastResult.setTimeLimitLaunchedDate(launchedDate);
+	    assessmentResultDao.saveObject(lastResult);
+	}
 	return launchedDate;
     }
 
@@ -383,13 +421,28 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public int getCountUsersByContentId(Long contentId) {
-	return getCountUsersByContentId(contentId, null);
+    public int getCountLearnersByContentId(Long contentId) {
+	return getCountLearnersByContentId(contentId, null);
     }
 
     @Override
-    public int getCountUsersByContentId(Long contentId, String searchString) {
-	return assessmentUserDao.getCountUsersByContentId(contentId, searchString);
+    public int getCountLearnersByContentId(Long contentId, String searchString) {
+	return assessmentUserDao.getCountLearnersByContentId(contentId, searchString);
+    }
+
+    @Override
+    public ArrayNode getLearnersByContentIdJson(Long contentId) {
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	List<Object[]> learnersDetails = assessmentUserDao.getLearnersByContentIdForCompletionChart(contentId);
+	for (Object[] learnerDetails : learnersDetails) {
+	    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+	    learner.put("id", learnerDetails[0].toString());
+	    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1].toString());
+	    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2].toString());
+	    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3].toString());
+	    result.add(learner);
+	}
+	return result;
     }
 
     /**
@@ -402,12 +455,53 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     /**
-     * How many learners have already finished answering questions.
-     * They are either on results page or left the activity completely.
+     * How many learners can possibly access this activity
      */
     @Override
-    public int getCountLearnersWithFinishedCurrentAttempt(long contentId) {
-	return assessmentResultDao.countLastFinishedAssessmentResults(contentId);
+    public ArrayNode getLessonLearnersByContentIdJson(long contentId) {
+	long lessonId = lessonService.getLessonByToolContentId(contentId).getLessonId();
+	List<User> learners = lessonService.getLessonLearners(lessonId, null, null, null, true);
+
+	Grouping grouping = getGrouping(contentId);
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	for (User learner : learners) {
+	    ObjectNode learnerJson = JsonNodeFactory.instance.objectNode();
+	    learnerJson.put("id", learner.getUserId());
+	    learnerJson.put("name", learner.getFullName());
+	    learnerJson.put("portraitUuid",
+		    learner.getPortraitUuid() == null ? null : learner.getPortraitUuid().toString());
+	    if (grouping != null) {
+		Group group = grouping.getGroupBy(learner);
+		if (group != null) {
+		    learnerJson.put("group", group.getGroupName());
+		}
+	    }
+	    result.add(learnerJson);
+	}
+
+	return result;
+
+    }
+
+    /**
+     * Learners have already finished answering questions. They are either on results page or left the activity
+     * completely.
+     */
+    @Override
+    public ArrayNode getLearnersWithFinishedCurrentAttemptJson(long contentId) {
+	List<Object[]> learnersDetails = assessmentResultDao.getLearnersWithFinishedCurrentAttemptForCompletionChart(
+		contentId);
+	ArrayNode result = JsonNodeFactory.instance.arrayNode();
+	for (Object[] learnerDetails : learnersDetails) {
+	    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+	    learner.put("id", learnerDetails[0].toString());
+	    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1].toString());
+	    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2].toString());
+	    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3].toString());
+	    result.add(learner);
+	}
+
+	return result;
     }
 
     @Override
@@ -763,9 +857,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	}
 
-	boolean isAnswerModified = !Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean())
-		|| !Objects.equals(questionResult.getAnswerFloat(), questionDto.getAnswerFloat())
-		|| !Objects.equals(questionResult.getAnswer(), questionDto.getAnswer());
+	boolean isAnswerModified =
+		!Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean()) || !Objects.equals(
+			questionResult.getAnswerFloat(), questionDto.getAnswerFloat()) || !Objects.equals(
+			questionResult.getAnswer(), questionDto.getAnswer());
 
 	// store question answer values
 	questionResult.setAnswerBoolean(questionDto.getAnswerBoolean());
@@ -833,36 +928,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	return questionResult;
     }
 
-    private String getCompletionChartsData(long toolContentId) {
-	try {
-	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
-
-	    chartJson.put("possibleLearners", getCountLessonLearnersByContentId(toolContentId));
-	    chartJson.put("startedLearners", getCountUsersByContentId(toolContentId));
-	    chartJson.put("completedLearners", getCountLearnersWithFinishedCurrentAttempt(toolContentId));
-
-	    chartJson.put("sessionCount", getSessionsByContentId(toolContentId).size());
-	    Map<Integer, List<String[]>> answeredQuestionsByUsers = getAnsweredQuestionsByUsers(toolContentId);
-	    if (!answeredQuestionsByUsers.isEmpty()) {
-		chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
-		Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
-			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
-		chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
-	    }
-	    return chartJson.toString();
-	} catch (Exception e) {
-	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId);
-	    return "";
-	}
-    }
-
-    @Override
-    public Flux<String> getCompletionChartsDataFlux(long toolContentId) {
-	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
-    }
-
     /**
-     *
      * @return grade that user scored by answering that question
      */
     private void calculateAnswerMark(Long assessmentUid, Long userId, AssessmentQuestionResult questionResult,
@@ -932,9 +998,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
 			float answerFloat = Float.valueOf(questionDto.getAnswer());
-			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getNumericalOption()
-				- optionDto.getAcceptedError()))
-				&& (answerFloat <= (optionDto.getNumericalOption() + optionDto.getAcceptedError())));
+			isAnswerMatchedCurrentOption = (
+				(answerFloat >= (optionDto.getNumericalOption() - optionDto.getAcceptedError())) && (
+					answerFloat <= (optionDto.getNumericalOption()
+						+ optionDto.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
@@ -949,9 +1016,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
 				    isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getNumericalOption()
-					    - optionDto.getAcceptedError()))
-					    && (answerFloat <= (optionDto.getNumericalOption()
-						    + optionDto.getAcceptedError())));
+					    - optionDto.getAcceptedError())) && (answerFloat <= (
+					    optionDto.getNumericalOption() + optionDto.getAcceptedError())));
 				    if (isAnswerMatchedCurrentOption) {
 					break;
 				    }
@@ -970,8 +1036,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	} else if (questionDto.getType() == QbQuestion.TYPE_TRUE_FALSE) {
-	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer())
-		    && (questionDto.getAnswer() != null)) {
+	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer()) && (questionDto.getAnswer()
+		    != null)) {
 		mark = maxMark;
 	    }
 
@@ -1062,7 +1128,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult.getQuestionResults().stream()
 		.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
-	Map<Long, AssessmentQuestionResult> questionToFinishedResultMap = lastFinishedResult == null ? null
+	Map<Long, AssessmentQuestionResult> questionToFinishedResultMap = lastFinishedResult == null
+		? null
 		: lastFinishedResult.getQuestionResults().stream()
 			.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 
@@ -1070,8 +1137,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (QuestionDTO questionDto : questionsForOnePage) {
 
 		// load last finished results for hedging type of questions (in order to prevent retry)
-		AssessmentQuestionResult questionResult = (questionDto.getType() == QbQuestion.TYPE_MARK_HEDGING)
-			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)
+		AssessmentQuestionResult questionResult =
+			(questionDto.getType() == QbQuestion.TYPE_MARK_HEDGING) && (lastResult.getFinishDate() == null)
+				&& (lastFinishedResult != null)
 				? questionToFinishedResultMap.get(questionDto.getUid())
 				: questionToResultMap.get(questionDto.getUid());
 		if (questionResult != null) {
@@ -1263,7 +1331,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		if (entry != null) {
 		    ReflectDTO ref = new ReflectDTO(user);
 		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+		    Date postedDate = (entry.getLastModified() != null)
+			    ? entry.getLastModified()
 			    : entry.getCreateDate();
 		    ref.setDate(postedDate);
 		    reflectList.add(ref);
@@ -1304,6 +1373,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	} catch (ToolException e) {
 	    throw new AssessmentApplicationException(e);
 	}
+
+	FluxRegistry.emit(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME, assessment.getContentId());
+
 	return nextUrl;
     }
 
@@ -1415,7 +1487,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
-	long timeTaken = lastFinishedResult == null ? 0
+	long timeTaken = lastFinishedResult == null
+		? 0
 		: lastFinishedResult.getFinishDate().getTime() - lastFinishedResult.getStartDate().getTime();
 	userSummary.setTimeOfLastAttempt(new Date(timeTaken));
 	if (lastFinishedResult != null) {
@@ -1491,8 +1564,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	AssessmentQuestion question = assessmentQuestionDao.getByUid(questionUid);
 	QbQuestion qbQuestion = question.getQbQuestion();
 	boolean isVSA = question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS;
-	List<AssessmentQuestionResult> allQuestionResults = assessmentQuestionResultDao
-		.getQuestionResultsByQuestionUid(questionUid, !isVSA);
+	List<AssessmentQuestionResult> allQuestionResults = assessmentQuestionResultDao.getQuestionResultsByQuestionUid(
+		questionUid, !isVSA);
 
 	QuestionSummary questionSummary = new QuestionSummary(question);
 
@@ -1526,8 +1599,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     @Override
     public boolean recalculateMarksForVsaQuestion(Long toolQuestionUid, String answer) {
 	// get all user results
-	List<AssessmentResult> assessmentResults = assessmentResultDao
-		.getAssessmentResultsByQbToolQuestionAndAnswer(toolQuestionUid, answer);
+	List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResultsByQbToolQuestionAndAnswer(
+		toolQuestionUid, answer);
 	QbToolQuestion toolQuestion = assessmentResultDao.find(QbToolQuestion.class, toolQuestionUid);
 	Long qbQuestionUid = toolQuestion.getQbQuestion().getUid();
 	//stores userId->lastFinishedAssessmentResult
@@ -1545,8 +1618,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
 		if (questionResult.getQbQuestion().getUid().equals(qbQuestionUid)) {
 		    Float oldQuestionAnswerMark = questionResult.getMark();
-		    int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
-			    : questionResult.getMaxMark().intValue();
+		    int oldResultMaxMark =
+			    questionResult.getMaxMark() == null ? 0 : questionResult.getMaxMark().intValue();
 
 		    //actually recalculate marks
 		    QuestionDTO questionDto = new QuestionDTO(questionResult.getQbToolQuestion());
@@ -1608,8 +1681,11 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 	    sessionIdToUsersMap.put(sessionId, users);
 	}
+	Set<QuestionReference> questionReferences = new TreeSet<>(new SequencableComparator());
+	questionReferences.addAll(assessment.getQuestionReferences());
 
-	for (AssessmentQuestion question : assessment.getQuestions()) {
+	for (QuestionReference questionReference : questionReferences) {
+	    AssessmentQuestion question = questionReference.getQuestion();
 	    Long questionUid = question.getUid();
 	    QuestionSummary questionSummary = new QuestionSummary(question);
 
@@ -1830,8 +1906,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    boolean allowAnswerJustification = assessment.isAllowAnswerJustification();
 	    if (!allowAnswerJustification) {
 		for (AssessmentQuestion question : questions) {
-		    if (question.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
-			    && question.getQbQuestion().isHedgingJustificationEnabled()) {
+		    if (question.getType().equals(QbQuestion.TYPE_MARK_HEDGING) && question.getQbQuestion()
+			    .isHedgingJustificationEnabled()) {
 			allowAnswerJustification = true;
 			break;
 		    }
@@ -1921,8 +1997,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		QuestionSummary questionSummary = questionSummaries.get(question.getUid());
-		List<List<AssessmentQuestionResult>> allResultsForQuestion = questionSummary
-			.getQuestionResultsPerSession();
+		List<List<AssessmentQuestionResult>> allResultsForQuestion = questionSummary.getQuestionResultsPerSession();
 
 		int markCount = 0;
 		float markTotal = 0.0F;
@@ -1932,11 +2007,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    for (AssessmentQuestionResult questionResult : resultList) {
 			ExcelRow userResultRow = new ExcelRow();
 			userResultRow.addCell(questionResult.getQbQuestion().getName());
-			userResultRow.addCell(AssessmentServiceImpl
-				.getQuestionTypeLanguageLabel(questionResult.getQbQuestion().getType()));
+			userResultRow.addCell(AssessmentServiceImpl.getQuestionTypeLanguageLabel(
+				questionResult.getQbQuestion().getType()));
 			userResultRow.addCell(Float.valueOf(questionResult.getQbQuestion().getPenaltyFactor()));
 
-			Float maxMark = (questionResult.getMaxMark() == null) ? 0
+			Float maxMark = (questionResult.getMaxMark() == null)
+				? 0
 				: Float.valueOf(questionResult.getMaxMark());
 			userResultRow.addCell(maxMark);
 			userResultRow.addCell(questionResult.getUser().getLoginName());
@@ -1961,8 +2037,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 
 			} else {
-			    AssessmentExcelCell assessmentCell = AssessmentEscapeUtils
-				    .addResponseCellForExcelExport(questionResult, false);
+			    AssessmentExcelCell assessmentCell = AssessmentEscapeUtils.addResponseCellForExcelExport(
+				    questionResult, false);
 			    userResultRow.addCell(assessmentCell.value,
 				    assessmentCell.isHighlighted ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
 
@@ -1991,9 +2067,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			//mark
 			//calculating markCount & markTotal
 			if (questionResult.getMark() != null && questionResult.getFinishDate() != null) {
-			    userResultRow.addCell(questionResult.getMarkedBy() == null
-				    && question.getType().equals(QbQuestion.TYPE_ESSAY) ? "-"
-					    : questionResult.getMark().toString());
+			    userResultRow.addCell(questionResult.getMarkedBy() == null && question.getType()
+				    .equals(QbQuestion.TYPE_ESSAY) ? "-" : questionResult.getMark().toString());
 
 			    markCount++;
 			    markTotal += questionResult.getMark();
@@ -2002,8 +2077,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			}
 
 			if (allowAnswerJustification) {
-			    userResultRow.addCell(AssessmentEscapeUtils
-				    .escapeStringForExcelExport(questionResult.getJustification()));
+			    userResultRow.addCell(AssessmentEscapeUtils.escapeStringForExcelExport(
+				    questionResult.getJustification()));
 			}
 			userResultRow.addCell(
 				questionResult.getMarkedBy() == null ? "" : questionResult.getMarkedBy().getFullName());
@@ -2015,8 +2090,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		}
 
 		if (doSummaryTable) {
-		    questionSummarySheet
-			    .addRow(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
+		    questionSummarySheet.addRow(
+			    outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
 		    questionSummarySheet.addEmptyRow();
 		}
 		questionSummarySheet.getRows().addAll(questionSummaryTabTemp);
@@ -2129,8 +2204,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    userSummaryUserHeadersRow.addCell(getMessage("label.monitoring.summary.total"),
 		    ExcelCell.BORDER_STYLE_LEFT_THIN);
 
-	    List<AssessmentResult> assessmentResults = assessmentResultDao
-		    .getLastFinishedAssessmentResults(assessment.getContentId());
+	    List<AssessmentResult> assessmentResults = assessmentResultDao.getLastFinishedAssessmentResults(
+		    assessment.getContentId());
 	    Map<Long, AssessmentResult> userUidToResultMap = assessmentResults.stream()
 		    .collect(Collectors.toMap(r -> r.getUser().getUid(), r -> r));
 
@@ -2154,31 +2229,32 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    if (questionResults == null || questionResults.isEmpty()) {
 			continue;
 		    }
-		    Map<Long, AssessmentQuestionResult> questionResultsMap = questionResults.stream().collect(Collectors
-			    .toMap(questionResult -> questionResult.getQbToolQuestion().getUid(), Function.identity()));
+		    Map<Long, AssessmentQuestionResult> questionResultsMap = questionResults.stream().collect(
+			    Collectors.toMap(questionResult -> questionResult.getQbToolQuestion().getUid(),
+				    Function.identity()));
 
 		    // get information when a learner started interaction with given questions
-		    Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
-			    .getFirstLearnerInteractions(assessment.getContentId(),
-				    assessmentUser.getUserId().intValue());
+		    Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService.getFirstLearnerInteractions(
+			    assessment.getContentId(), assessmentUser.getUserId().intValue());
 
 		    // follow question reference ordering, to QbToolQuestion's
 		    for (QuestionReference questionReference : questionReferences) {
-			AssessmentQuestionResult questionResult = questionResultsMap
-				.get(questionReference.getQuestion().getUid());
+			AssessmentQuestionResult questionResult = questionResultsMap.get(
+				questionReference.getQuestion().getUid());
 			// mark
 			userResultRow.addCell(questionResult.getMark(), ExcelCell.BORDER_STYLE_LEFT_THIN);
 
 			// option chosen or full answer
-			AssessmentExcelCell assessmentCell = AssessmentEscapeUtils
-				.addResponseCellForExcelExport(questionResult, true);
+			AssessmentExcelCell assessmentCell = AssessmentEscapeUtils.addResponseCellForExcelExport(
+				questionResult, true);
 			userResultRow.addCell(assessmentCell.value,
 				assessmentCell.isHighlighted ? IndexedColors.GREEN : IndexedColors.AUTOMATIC);
 
 			// learner interaction
 			QbQuestion question = questionResult.getQbQuestion();
 			if (QbQuestion.TYPE_ESSAY == question.getType()) {
-			    userResultRow.addCell(questionResult.getMarkedBy() == null ? ""
+			    userResultRow.addCell(questionResult.getMarkedBy() == null
+				    ? ""
 				    : questionResult.getMarkedBy().getFullName());
 			    userResultRow.addCell(questionResult.getMarkerComment());
 			}
@@ -2187,7 +2263,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				|| QbQuestion.TYPE_TRUE_FALSE == question.getType();
 			if (addAnsweredDateColumn) {
 			    // only put interaction time into sheet if auto submit picked up answer
-			    LearnerInteractionEvent interaction = assessmentCell.value == null ? null
+			    LearnerInteractionEvent interaction = assessmentCell.value == null
+				    ? null
 				    : learnerInteractions.get(questionResult.getQbToolQuestion().getUid());
 			    if (interaction == null) {
 				userResultRow.addEmptyCell();
@@ -2204,14 +2281,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    switch (assessment.getConfidenceLevelsType()) {
 				case 2:
 				    confidenceLevel = new String[] { getMessage("label.not.confident"),
-					    getMessage("label.confident"),
-					    getMessage("label.very.confident") }[questionResult.getConfidenceLevel()
-						    / 5];
+					    getMessage("label.confident"), getMessage("label.very.confident") }[
+					    questionResult.getConfidenceLevel() / 5];
 				    break;
 				case 3:
 				    confidenceLevel = new String[] { getMessage("label.not.sure"),
-					    getMessage("label.sure"),
-					    getMessage("label.very.sure") }[questionResult.getConfidenceLevel() / 5];
+					    getMessage("label.sure"), getMessage("label.very.sure") }[
+					    questionResult.getConfidenceLevel() / 5];
 				    break;
 				default:
 				    confidenceLevel = questionResult.getConfidenceLevel() * 10 + "%";
@@ -2297,8 +2373,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 	} else if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
-	    Long submittedOptionUid = questionResult.getQbOption() == null ? null
-		    : questionResult.getQbOption().getUid();
+	    Long submittedOptionUid =
+		    questionResult.getQbOption() == null ? null : questionResult.getQbOption().getUid();
 	    if (submittedOptionUid != null) {
 		Integer currentCount = summaryOfAnswers.get(submittedOptionUid);
 		if (currentCount == null) {
@@ -2335,7 +2411,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		|| question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS
 		|| question.getType() == QbQuestion.TYPE_NUMERICAL) {
 	    for (QbOption option : question.getQbQuestion().getQbOptions()) {
-		Double optionPercentage = total == 0 || summaryOfAnswers.get(option.getUid()) == null ? 0
+		Double optionPercentage = total == 0 || summaryOfAnswers.get(option.getUid()) == null
+			? 0
 			: (double) summaryOfAnswers.get(option.getUid()) / total;
 		ExcelCell optionCell = summaryTableRow.addPercentageCell(optionPercentage);
 		if (option.getMaxMark() > 0) {
@@ -2344,11 +2421,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    }
 
 	} else {
-	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null ? 0
+	    Double correctPercentage = total == 0 || summaryOfAnswers.get(trueKey) == null
+		    ? 0
 		    : (double) summaryOfAnswers.get(trueKey) / total;
 	    ExcelCell correctCell = summaryTableRow.addPercentageCell(correctPercentage);
 
-	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null ? 0
+	    Double wrongPercentage = total == 0 || summaryOfAnswers.get(falseKey) == null
+		    ? 0
 		    : (double) summaryOfAnswers.get(falseKey) / total;
 	    ExcelCell wrongCell = summaryTableRow.addPercentageCell(wrongPercentage);
 
@@ -2398,8 +2477,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    // nothing to chagne
 	    return;
 	}
-	AssessmentQuestionResult questionResult = assessmentQuestionResultDao
-		.getAssessmentQuestionResultByUid(questionResultUid);
+	AssessmentQuestionResult questionResult = assessmentQuestionResultDao.getAssessmentQuestionResultByUid(
+		questionResultUid);
 	if (newMark != null) {
 	    float oldMark = questionResult.getMark();
 	    AssessmentResult assessmentResult = questionResult.getAssessmentResult();
@@ -2428,8 +2507,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    for (AssessmentUser user : users) {
 		Long userId = user.getUserId();
 
-		List<Object[]> questionResults = assessmentQuestionResultDao
-			.getAssessmentQuestionResultList(assessment.getUid(), userId, questionUid);
+		List<Object[]> questionResults = assessmentQuestionResultDao.getAssessmentQuestionResultList(
+			assessment.getUid(), userId, questionUid);
 
 		if ((questionResults == null) || questionResults.isEmpty()) {
 		    log.warn("User with uid: " + user.getUid()
@@ -2506,15 +2585,19 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 				if (((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
 					&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
 					//numbering
-					|| (oldOption.getNumericalOption() != newOption.getNumericalOption())
-					|| (oldOption.getAcceptedError() != newOption.getAcceptedError())
+					|| (oldOption.getNumericalOption() != newOption.getNumericalOption()) || (
+					oldOption.getAcceptedError() != newOption.getAcceptedError())
 					//option grade
 					|| (oldOption.getMaxMark() != newOption.getMaxMark())
 					//changed correct option
 					|| (oldOption.isCorrect() != newOption.isCorrect())) {
 				    isQuestionModified = true;
+				    break;
 				}
 			    }
+			}
+			if (isQuestionModified) {
+			    break;
 			}
 		    }
 		    if (oldOptions.size() != newOptions.size()) {
@@ -2533,8 +2616,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	Map<QuestionReference, Integer> modifiedReferences = new HashMap<>();
 	for (QuestionReference oldReference : oldReferences) {
 	    for (QuestionReference newReference : newReferences) {
-		if (oldReference.getUid().equals(newReference.getUid())
-			&& (oldReference.getMaxMark() != newReference.getMaxMark())) {
+		if (oldReference.getUid().equals(newReference.getUid()) && (oldReference.getMaxMark()
+			!= newReference.getMaxMark())) {
 		    modifiedReferences.put(newReference, oldReference.getMaxMark());
 		}
 	    }
@@ -2550,7 +2633,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		// get all finished user results
 		List<AssessmentResult> assessmentResults = assessmentResultDao.getAssessmentResults(assessmentUid,
 			user.getUserId());
-		AssessmentResult lastFinishedAssessmentResult = (assessmentResults.isEmpty()) ? null
+		AssessmentResult lastFinishedAssessmentResult = (assessmentResults.isEmpty())
+			? null
 			: assessmentResults.get(assessmentResults.size() - 1);
 
 		//add autosave assessmentResult as well
@@ -2569,8 +2653,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    for (AssessmentQuestionResult questionResult : questionResults) {
 			QbToolQuestion oldQuestion = questionResult.getQbToolQuestion();
 			Float oldQuestionAnswerMark = questionResult.getMark();
-			int oldResultMaxMark = questionResult.getMaxMark() == null ? 0
-				: questionResult.getMaxMark().intValue();
+			int oldResultMaxMark =
+				questionResult.getMaxMark() == null ? 0 : questionResult.getMaxMark().intValue();
 
 			//check whether according question was modified
 			for (AssessmentQuestion modifiedQuestion : modifiedQuestions) {
@@ -2590,20 +2674,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 				    //find according old qbOption
 				    QbOption oldOption = null;
+				    int oldOptionDisplayOrder = 1;
 				    for (QbOption oldOptionIter : oldQuestion.getQbQuestion().getQbOptions()) {
 					if (oldOptionIter.getUid().equals(oldOptionAnswer.getOptionUid())) {
 					    oldOption = oldOptionIter;
 					    break;
 					}
+					oldOptionDisplayOrder++;
 				    }
 
 				    if (oldOption != null) {
 					//update
+					int newOptionDisplayOrder = 1;
 					for (QbOption newOption : modifiedQuestion.getQbQuestion().getQbOptions()) {
-					    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+					    if (oldOptionDisplayOrder == newOptionDisplayOrder) {
 						oldOptionAnswer.setOptionUid(newOption.getUid());
 						break;
 					    }
+					    newOptionDisplayOrder++;
 					}
 				    }
 				}
@@ -2628,15 +2716,15 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			Long questionUid = questionResult.getQbToolQuestion().getUid();
 
 			for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
-			    if (!modifiedReference.isRandomQuestion()
-				    && questionUid.equals(modifiedReference.getQuestion().getUid())) {
+			    if (!modifiedReference.isRandomQuestion() && questionUid.equals(
+				    modifiedReference.getQuestion().getUid())) {
 				int newReferenceMaxMark = modifiedReference.getMaxMark();
 				int oldReferenceMaxMark = modifiedReferences.get(modifiedReference);
 
 				// update question answer's mark
 				Float oldQuestionAnswerMark = questionResult.getMark();
-				float newQuestionAnswerMark = (oldQuestionAnswerMark * newReferenceMaxMark)
-					/ oldReferenceMaxMark;
+				float newQuestionAnswerMark =
+					(oldQuestionAnswerMark * newReferenceMaxMark) / oldReferenceMaxMark;
 				questionResult.setMark(newQuestionAnswerMark);
 				questionResult.setMaxMark((float) newReferenceMaxMark);
 				assessmentQuestionResultDao.saveObject(questionResult);
@@ -2658,8 +2746,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    }
 			}
 		    }
-		    Collection<AssessmentQuestionResult> randomQuestionResults = CollectionUtils
-			    .subtract(questionResults, nonRandomQuestionResults);
+		    Collection<AssessmentQuestionResult> randomQuestionResults = CollectionUtils.subtract(
+			    questionResults, nonRandomQuestionResults);
 
 		    // [+] if the question reference mark is modified (in case of random question references)
 		    for (QuestionReference modifiedReference : modifiedReferences.keySet()) {
@@ -2676,8 +2764,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 				    // update question answer's mark
 				    Float oldQuestionResultMark = randomQuestionResult.getMark();
-				    float newQuestionResultMark = (oldQuestionResultMark * newReferenceMaxMark)
-					    / oldReferenceMaxMark;
+				    float newQuestionResultMark =
+					    (oldQuestionResultMark * newReferenceMaxMark) / oldReferenceMaxMark;
 				    randomQuestionResult.setMark(newQuestionResultMark);
 				    randomQuestionResult.setMaxMark((float) newReferenceMaxMark);
 				    assessmentQuestionResultDao.saveObject(randomQuestionResult);
@@ -2708,8 +2796,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    AssessmentResult lastFinishedAssessmentResult, float newAssessmentMark, int newAssessmentMaxMark,
 	    AssessmentUser user) {
 	// store new mark and maxMark if they were changed
-	if ((assessmentResult.getGrade() != newAssessmentMark)
-		|| (assessmentResult.getMaximumGrade() != newAssessmentMaxMark)) {
+	if ((assessmentResult.getGrade() != newAssessmentMark) || (assessmentResult.getMaximumGrade()
+		!= newAssessmentMaxMark)) {
 
 	    // marks can't be below zero
 	    newAssessmentMark = (newAssessmentMark < 0) ? 0 : newAssessmentMark;
@@ -2720,8 +2808,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	    assessmentResultDao.saveObject(assessmentResult);
 
 	    // if this is the last finished assessment result - propagade total mark to Gradebook
-	    if (lastFinishedAssessmentResult != null
-		    && lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
+	    if (lastFinishedAssessmentResult != null && lastFinishedAssessmentResult.getUid()
+		    .equals(assessmentResult.getUid())) {
 		toolService.updateActivityMark(Double.valueOf(newAssessmentMark), null, user.getUserId().intValue(),
 			user.getSession().getSessionId(), false);
 	    }
@@ -3109,7 +3197,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	}
 	// do not export time limits if the LD gets exported from a running sequence
 	toolContentObj.setTimeLimitAdjustments(null);
-	toolContentObj.setAbsoluteTimeLimit(null);
+	toolContentObj.setAbsoluteTimeLimitFinish(null);
 
 	try {
 	    exportContentService.exportToolContent(toolContentId, toolContentObj, assessmentToolContentHandler,
@@ -3305,8 +3393,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	} else {
 	    log.error("Fail to leave tool Session.Could not find shared assessment " + "session by given session id: "
 		    + toolSessionId);
-	    throw new DataMissingException("Fail to leave tool Session."
-		    + "Could not find shared assessment session by given session id: " + toolSessionId);
+	    throw new DataMissingException(
+		    "Fail to leave tool Session." + "Could not find shared assessment session by given session id: "
+			    + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
@@ -3369,17 +3458,18 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		    for (QbOption option : qbQuestion.getQbOptions()) {
 			for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-			    if (optionAnswer.getAnswerBoolean()
-				    && (optionAnswer.getOptionUid().equals(option.getUid()))) {
+			    if (optionAnswer.getAnswerBoolean() && (optionAnswer.getOptionUid()
+				    .equals(option.getUid()))) {
 				ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 
 				confidenceLevelDto.setUserId(user.getUserId().intValue());
-				String userName = StringUtils.isBlank(user.getFirstName())
-					&& StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
-						: user.getFirstName() + " " + user.getLastName();
+				String userName = StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(
+					user.getLastName())
+					? user.getLoginName()
+					: user.getFirstName() + " " + user.getLastName();
 				confidenceLevelDto.setUserName(userName);
-				confidenceLevelDto
-					.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
+				confidenceLevelDto.setPortraitUuid(
+					portraitUuid == null ? null : portraitUuid.toString());
 				confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
 
 				confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());
@@ -3396,8 +3486,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 
 			    confidenceLevelDto.setUserId(user.getUserId().intValue());
-			    String userName = StringUtils.isBlank(user.getFirstName())
-				    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+			    String userName =
+				    StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(user.getLastName())
+					    ? user.getLoginName()
 					    : user.getFirstName() + " " + user.getLastName();
 			    confidenceLevelDto.setUserName(userName);
 			    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
@@ -3466,8 +3557,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			//find and store optionUid
 			for (QbOption option : qbQuestion.getQbOptions()) {
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-				if (optionAnswer.getAnswerBoolean()
-					&& (optionAnswer.getOptionUid().equals(option.getUid()))) {
+				if (optionAnswer.getAnswerBoolean() && (optionAnswer.getOptionUid()
+					.equals(option.getUid()))) {
 				    Long optionUid = option.getUid();
 				    vsaAnswerDTO.setQbOptionUid(optionUid);
 				    break;
@@ -3478,8 +3569,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(user.getUserId().intValue());
-		    String userName = StringUtils.isBlank(user.getFirstName())
-			    && StringUtils.isBlank(user.getLastName()) ? user.getLoginName()
+		    String userName =
+			    StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(user.getLastName())
+				    ? user.getLoginName()
 				    : user.getFirstName() + " " + user.getLastName();
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
@@ -3496,8 +3588,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     /**
-     * Counts how many questions were answered correctly by the given user, regardless of the mark given.
-     * Currently it only works for MCQ and mark hedging questions.
+     * Counts how many questions were answered correctly by the given user, regardless of the mark given. Currently it
+     * only works for MCQ and mark hedging questions.
      */
     @Override
     public Integer countCorrectAnswers(long toolContentId, int userId) {
@@ -3729,8 +3821,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
      * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
      *
      * The references entry should be a ArrayNode containing JSON objects, which in turn must contain "displayOrder"
-     * (Integer), "questionDisplayOrder" (Integer - to match to the question). It may also have "maxMark" (Integer)
-     * and "randomQuestion" (Boolean)
+     * (Integer), "questionDisplayOrder" (Integer - to match to the question). It may also have "maxMark" (Integer) and
+     * "randomQuestion" (Boolean)
      *
      * @throws IOException
      */
@@ -3750,12 +3842,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	assessment.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	assessment.setAllowGradesAfterAttempt(
 		JsonUtil.optBoolean(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
-	assessment
-		.setAllowHistoryResponses(JsonUtil.optBoolean(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
+	assessment.setAllowHistoryResponses(
+		JsonUtil.optBoolean(toolContentJSON, "allowHistoryResponses", Boolean.FALSE));
 	assessment.setAllowOverallFeedbackAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowOverallFeedbackAfterQuestion", Boolean.FALSE));
-	assessment
-		.setAllowQuestionFeedback(JsonUtil.optBoolean(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
+	assessment.setAllowQuestionFeedback(
+		JsonUtil.optBoolean(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
 	assessment.setAllowDiscloseAnswers(JsonUtil.optBoolean(toolContentJSON, "allowDiscloseAnswers", Boolean.FALSE));
 	assessment.setAllowRightAnswersAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
@@ -3880,12 +3972,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    assessmentDao.insert(qbQuestion);
 		}
 
-		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE)
-			|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
+		if ((type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_MULTIPLE_CHOICE) || (type
+			== QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
 
 		    if (!questionJSONData.has(RestTags.ANSWERS)) {
-			throw new IOException("REST Authoring is missing answers for a question of type " + type
-				+ ". Data:" + toolContentJSON);
+			throw new IOException(
+				"REST Authoring is missing answers for a question of type " + type + ". Data:"
+					+ toolContentJSON);
 		    }
 
 		    List<QbOption> optionList = new ArrayList<>();
@@ -3923,7 +4016,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    qbQuestion.setQbOptions(optionList);
 		}
 
-		Long collectionUid = JsonUtil.optLong(questionJSONData, RestTags.COLLECTION_UID);
+		Long collectionUid = JsonUtil.optLong(toolContentJSON, RestTags.COLLECTION_UID);
 		if (collectionUid == null) {
 		    // if no collection UUID was specified, questions end up in user's private collection
 		    if (privateCollectionUUID == null) {
@@ -3932,9 +4025,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		    collectionUid = privateCollectionUUID;
 		}
 
-		boolean addToCollection = true;
+		boolean addToCollection = !isModification;
 		// check if it is the same collection - there is a good chance it is
-		if (collection == null || collectionUid != collection.getUid()) {
+		if (addToCollection && (collection == null || collectionUid != collection.getUid())) {
 		    collection = qbService.getCollection(collectionUid);
 		    if (collection == null) {
 			addToCollection = false;
@@ -3942,14 +4035,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			collectionUUIDs = qbService.getCollectionQuestions(collection.getUid()).stream()
 				.peek(q -> qbService.releaseFromCache(q)).filter(q -> q.getUuid() != null)
 				.collect(Collectors.mapping(q -> q.getUuid().toString(), Collectors.toSet()));
+			if (collectionUUIDs.contains(uuid)) {
+			    addToCollection = false;
+			}
 		    }
 		}
 
 		if (isModification) {
-		    if (collectionUUIDs != null) {
-			addToCollection &= !collectionUUIDs.contains(uuid);
-		    }
-
 		    int isModified = qbQuestion.isQbQuestionModified(oldQbQuestion);
 		    if (isModified == IQbService.QUESTION_MODIFIED_VERSION_BUMP) {
 			qbQuestion.clearID();
@@ -4020,8 +4112,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		AssessmentQuestion matchingQuestion = matchQuestion(newQuestionSet,
 			JsonUtil.optInt(referenceJSONData, "questionDisplayOrder"));
 		if (matchingQuestion == null) {
-		    throw new IOException("Unable to find matching question for displayOrder "
-			    + referenceJSONData.get("questionDisplayOrder") + ". Data:" + toolContentJSON);
+		    throw new IOException("Unable to find matching question for displayOrder " + referenceJSONData.get(
+			    "questionDisplayOrder") + ". Data:" + toolContentJSON);
 		}
 		reference.setQuestion(matchingQuestion);
 		// either take the parameter or get default question grade
@@ -4051,8 +4143,8 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     // TODO Implement REST support for all types and then remove checkType method
     void checkType(Integer type) throws IOException {
-	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE)
-		&& (type != QbQuestion.TYPE_MARK_HEDGING)) {
+	if ((type != QbQuestion.TYPE_ESSAY) && (type != QbQuestion.TYPE_MULTIPLE_CHOICE) && (type
+		!= QbQuestion.TYPE_MARK_HEDGING)) {
 	    throw new IOException(
 		    "Assessment Tool does not support REST Authoring for anything but Essay, Multiple Choice and Mark Hedging types. Found type "
 			    + type);
@@ -4096,9 +4188,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 
     @Override
     public Grouping getGrouping(long toolContentId) {
-	ToolActivity toolActivity = (ToolActivity) userManagementService
-		.findByProperty(ToolActivity.class, "toolContentId", toolContentId).get(0);
-	return toolActivity.getApplyGrouping() ? toolActivity.getGrouping() : null;
+	ToolActivity toolActivity = assessmentDao.findByProperty(ToolActivity.class, "toolContentId", toolContentId)
+		.get(0);
+	return toolActivity.getApplyGrouping() ? assessmentDao.find(Grouping.class,
+		toolActivity.getGrouping().getGroupingId()) : null;
     }
 
     @Override
@@ -4108,30 +4201,12 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
     }
 
     @Override
-    public Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId) {
-	Map<Integer, List<String[]>> answeredQuestions = assessmentResultDao.getAnsweredQuestionsByUsers(toolContentId);
-	if (answeredQuestions.isEmpty()) {
-	    return answeredQuestions;
-	}
-
-	Assessment assessment = getAssessmentByContentId(toolContentId);
-	int questionCount = assessment.getQuestions().size();
-
-	// list all question counts, from 0 to maximum possible questions
-	Map<Integer, List<String[]>> result = new TreeMap<>();
-	for (int i = 0; i <= questionCount; i++) {
-	    result.put(i, List.of());
-	}
-	result.putAll(answeredQuestions);
-	return result;
-    }
-
-    @Override
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	AssessmentSession session = getSessionBySessionId(toolSessionId);
 	if (AssessmentConstants.COMPLETED == session.getStatus()) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	AssessmentUser existingLeader = session.getGroupLeader();
@@ -4150,8 +4225,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 			+ toolSessionId);
 	    }
 	} else if (!newLeader.getSession().getSessionId().equals(toolSessionId)) {
-	    throw new InvalidParameterException("User with ID " + leaderUserId + " belongs to session with ID "
-		    + newLeader.getSession().getSessionId() + " and not to session with ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "User with ID " + leaderUserId + " belongs to session with ID " + newLeader.getSession()
+			    .getSessionId() + " and not to session with ID " + toolSessionId);
 	} else {
 	    AssessmentResult newLeaderResult = getLastAssessmentResult(assessment.getUid(), leaderUserId);
 	    if (newLeaderResult != null) {
@@ -4163,9 +4239,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 		existingLeader.getUserId());
 	if (existingLeaderResult != null) {
 	    if (existingLeaderResult.getFinishDate() != null) {
-		throw new InvalidParameterException("Attempting to assing a finished result of leader with user ID "
-			+ existingLeader.getUserId() + " to a new leader with user ID " + leaderUserId
-			+ " in session wtih ID " + toolSessionId);
+		throw new InvalidParameterException(
+			"Attempting to assing a finished result of leader with user ID " + existingLeader.getUserId()
+				+ " to a new leader with user ID " + leaderUserId + " in session wtih ID "
+				+ toolSessionId);
 	    }
 
 	    existingLeaderResult.setUser(newLeader);
@@ -4186,4 +4263,74 @@ public class AssessmentServiceImpl implements IAssessmentService, ICommonAssessm
 	jsonCommand.put("hookTrigger", "assessment-leader-triggered-refresh-" + toolSessionId);
 	learnerService.createCommandForLearners(assessment.getContentId(), userIds, jsonCommand.toString());
     }
+
+    private String getCompletionChartsData(long toolContentId) {
+	try {
+	    ObjectNode chartJson = JsonNodeFactory.instance.objectNode();
+
+	    chartJson.set("possibleLearners", getLessonLearnersByContentIdJson(toolContentId));
+	    chartJson.set("startedLearners", getLearnersByContentIdJson(toolContentId));
+	    chartJson.set("completedLearners", getLearnersWithFinishedCurrentAttemptJson(toolContentId));
+
+	    chartJson.put("sessionCount", getSessionsByContentId(toolContentId).size());
+	    Map<Integer, ArrayNode> answeredQuestionsByUsers = getAnsweredQuestionsByUsersJson(toolContentId);
+	    if (!answeredQuestionsByUsers.isEmpty()) {
+		chartJson.set("answeredQuestionsByUsers", JsonUtil.readObject(answeredQuestionsByUsers));
+		Map<Integer, Integer> answeredQuestionsByUsersCount = answeredQuestionsByUsers.entrySet().stream()
+			.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().size()));
+		chartJson.set("answeredQuestionsByUsersCount", JsonUtil.readObject(answeredQuestionsByUsersCount));
+	    }
+
+	    Assessment assessment = getAssessmentByContentId(toolContentId);
+	    chartJson.put("useLeader", assessment.isUseSelectLeaderToolOuput());
+	    chartJson.put("isGrouped", isGroupedActivity(toolContentId));
+
+	    return chartJson.toString();
+	} catch (Exception e) {
+	    log.error("Unable to fetch completion charts data for tool content ID " + toolContentId, e);
+	    return "";
+	}
+    }
+
+    private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
+	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	timeLimitSettings.put("relativeTimeLimit", assessment.getRelativeTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimit", assessment.getAbsoluteTimeLimit());
+	timeLimitSettings.put("absoluteTimeLimitFinish", assessment.getAbsoluteTimeLimitFinishSeconds());
+	return timeLimitSettings;
+    }
+
+    private Map<Integer, ArrayNode> getAnsweredQuestionsByUsersJson(long toolContentId) {
+	Map<Integer, List<String[]>> answeredQuestions = assessmentResultDao.getAnsweredQuestionsByUsersForCompletionChart(
+		toolContentId);
+	Map<Integer, ArrayNode> result = new TreeMap<>();
+	if (answeredQuestions.isEmpty()) {
+	    return result;
+	}
+
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	int questionCount = assessment.getQuestions().size();
+
+	// list all question counts, from 0 to maximum possible questions
+
+	for (int i = 0; i <= questionCount; i++) {
+	    ArrayNode learnersJson = JsonNodeFactory.instance.arrayNode();
+	    result.put(i, learnersJson);
+
+	    List<String[]> learnersDetails = answeredQuestions.get(i);
+	    if (learnersDetails != null) {
+		for (String[] learnerDetails : learnersDetails) {
+		    ObjectNode learner = JsonNodeFactory.instance.objectNode();
+		    learner.put("id", learnerDetails[0]);
+		    learner.put("portraitUuid", learnerDetails[1] == null ? null : learnerDetails[1]);
+		    learner.put("name", learnerDetails[2] == null ? "?" : learnerDetails[2]);
+		    learner.put("group", learnerDetails[3] == null ? null : learnerDetails[3]);
+		    learnersJson.add(learner);
+		}
+	    }
+	}
+	return result;
+    }
+
 }

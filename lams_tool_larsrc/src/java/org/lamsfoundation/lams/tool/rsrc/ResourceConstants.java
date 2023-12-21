@@ -39,13 +39,6 @@ public class ResourceConstants {
 
     public static final short RESOURCE_TYPE_WEBSITE = 3;
 
-    // for action forward name
-    public static final String SUCCESS = "success";
-
-    public static final String ERROR = "error";
-
-    public static final String DEFINE_LATER = "definelater";
-
     // for parameters' name
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 
@@ -95,8 +88,6 @@ public class ResourceConstants {
     public static final String ATTR_RATE_ITEMS = "rateItems";
 
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
-
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 

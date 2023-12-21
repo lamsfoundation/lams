@@ -27,20 +27,20 @@ select {
 			<tr>
 				<td><span id="existingLinkMenuLabel">&nbsp;</span></td>
 				<td></td>
-				<td><select name="existingWikiDropDownMenu"
-					id="existingWikiDropDownMenu">
-					<option value="noSelection">Please Select</option>
-					<script type="text/javascript">
-						<!--
-							var i;
-							for (i=0; i<wikiArray.length; ++i) 
-							{	
-								var wikiURL="javascript:changeWikiPage('" + wikiArray[i] + "')";
-								addOption(document.getElementById('existingWikiDropDownMenu'), prettyWikiLink(wikiArray[i]), wikiURL);
-							}
-						//-->		
-					</script>
-				</select>
+				<td>
+					<select name="existingWikiDropDownMenu" id="existingWikiDropDownMenu" class="form-select">
+						<option value="noSelection">Please Select</option>
+						<script type="text/javascript">
+							<!--
+								var i;
+								for (i=0; i<wikiArray.length; ++i) 
+								{	
+									var wikiURL="javascript:changeWikiPage('" + wikiArray[i] + "')";
+									addOption(document.getElementById('existingWikiDropDownMenu'), prettyWikiLink(wikiArray[i]), wikiURL);
+								}
+							//-->		
+						</script>
+					</select>
 				</td>
 			</tr>
 		</table>

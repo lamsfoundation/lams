@@ -7,7 +7,8 @@
 <c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${dokumaran.contentId}"/>
-	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimitSeconds}"/>
+	<c:param name="absoluteTimeLimitFinish" value="${dokumaran.absoluteTimeLimitFinishSeconds}"/>
+	<c:param name="absoluteTimeLimit" value="${dokumaran.absoluteTimeLimit}"/>
 	<c:param name="relativeTimeLimit" value="${dokumaran.relativeTimeLimit}"/>
 	<c:param name="isTbl" value="${isTbl}" />
 	<c:param name="controllerContext" value="tool/ladoku11/monitoring" />
@@ -50,9 +51,17 @@
 		width: 100%;
 	}
 
+	.doku-monitoring-summary #gallery-walk-show-clusters {
+		margin-top: 20px;
+	}
+
 	.doku-monitoring-summary #gallery-walk-learner-edit {
 		margin-top: 20px;
 		margin-bottom: 20px;
+	}
+
+	.doku-monitoring-summary #gallery-walk-skip {
+		margin-top: 20px;
 	}
 
 	.doku-monitoring-summary #gallery-walk-rating-table th {
@@ -114,9 +123,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
@@ -128,15 +137,15 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/etherpad.js" />
+<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/",
 			//vars for rating.js
-			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
@@ -160,7 +169,7 @@
 
 			//block #buttons
 			$(this).block({
-				message: '<h4 style="color:#fff";><fmt:message key="label.pad.started.fixing" /></h4>',
+				message: '<h4 style="color:#fff";><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.started.fixing" /></spring:escapeBody></h4>',
 				baseZ: 1000000,
 				fadeIn: 0,
 				css: {
@@ -184,8 +193,8 @@
 				data : 'toolSessionID=' + toolSessionId,
 				type: 'post',
 				success: function (response) {
-					button.parent().html('<fmt:message key="label.pad.fixed" />');
-					alert('<fmt:message key="label.pad.fixed" />');
+					button.parent().html('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.fixed" /></spring:escapeBody>');
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.fixed" /></spring:escapeBody>');
 				},
 				error: function (request, status, error) {
 					button.unblock();
@@ -258,11 +267,11 @@
 					type: 'post',
 					success : function (){
 						$this.closest('.marks-container').find('.copy-mark-button')
-						.data('mark', mark).show()
-						.find('.copy-mark-value').text(mark);
+								.data('mark', mark).show()
+								.find('.copy-mark-value').text(mark);
 					},
 					error: function (request, status, error) {
-						alert('<fmt:message key="messsage.monitoring.learner.marks.update.fail" />');
+						alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key="messsage.monitoring.learner.marks.update.fail" /></spring:escapeBody>');
 					}
 				});
 
@@ -317,11 +326,11 @@
 					}
 				}
 			})
-			.bind('pagerInitialized pagerComplete', function(event, options){
-				if ( options.totalRows == 0 ) {
-					$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
-				}
-			});
+					.bind('pagerInitialized pagerComplete', function(event, options){
+						if ( options.totalRows == 0 ) {
+							$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
+						}
+					});
 		});
 
 
@@ -344,7 +353,7 @@
 	}
 
 	function startGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.start.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
@@ -367,8 +376,32 @@
 		});
 	}
 
+	function skipGalleryWalk(){
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
+			return;
+		}
+
+		$.ajax({
+			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dokumaran.contentId}
+			},
+			'success' : function(){
+				<c:choose>
+				<c:when test="${isTbl}">
+				// reload current tab with Doku summary
+				loadTab(null, null, false);
+				</c:when>
+				<c:otherwise>
+				location.reload();
+				</c:otherwise>
+				</c:choose>
+			}
+		});
+	}
+
 	function finishGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
@@ -391,9 +424,12 @@
 		});
 	}
 
+	function openGalleryWalkClusters(){
+		window.open('<lams:WebAppURL/>monitoring/showGalleryWalkClusters.do?toolContentID=${dokumaran.contentId}', '_blank');
+	}
 
 	function enableGalleryWalkLearnerEdit(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
@@ -419,9 +455,9 @@
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
-		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
-			toolSessionID : toolSessionId
-		});
+				.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
+					toolSessionID : toolSessionId
+				});
 	}
 
 	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
@@ -449,7 +485,7 @@
 	}
 
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
@@ -531,8 +567,25 @@
 
 				<br>
 
+				<button id="gallery-walk-skip" type="button"
+						class="btn btn-danger
+						        	   ${not dokumaran.galleryWalkStarted and not dokumaran.galleryWalkFinished ? '' : 'hidden'}"
+						onClick="javascript:skipGalleryWalk()">
+					<fmt:message key="monitoring.summary.gallery.walk.skip" />
+				</button>
+
+				<button id="gallery-walk-show-clusters" type="button"
+						class="btn btn-default
+							${dokumaran.galleryWalkClusterSize > 0 and dokumaran.galleryWalkStarted ? '' : 'hidden'}"
+						onClick="javascript:openGalleryWalkClusters()">
+					<i class="fa fa-external-link" aria-hidden="true"></i>
+					<fmt:message key="monitoring.summary.gallery.walk.cluster.view.button" />
+				</button>
+
+				<br>
+
 				<button id="gallery-walk-learner-edit" type="button"
-						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and (dokumaran.galleryWalkStarted or dokumaran.galleryWalkFinished) ? '' : 'hidden'}"
+						class="btn btn-default ${not dokumaran.galleryWalkEditEnabled and dokumaran.galleryWalkStarted? '' : 'hidden'}"
 						onClick="javascript:enableGalleryWalkLearnerEdit()">
 					<fmt:message key="monitoring.summary.gallery.walk.learner.edit" />
 				</button>
@@ -613,6 +666,17 @@
 
 				</c:when>
 				<c:otherwise>
+					<c:if test="${not empty groupSummary.galleryWalkClusterMembers}">
+						<c:set var="clusterMemberLinks" value="" />
+						<c:forEach var="clusterMember" items="${groupSummary.galleryWalkClusterMembers}" varStatus="status">
+							<c:set var="clusterMemberLinks">${clusterMemberLinks}${status.first ? "" : ",&nbsp;"}
+								<a href="#heading${clusterMember.key}"><c:out value="${clusterMember.value}" /></a></c:set>
+						</c:forEach>
+						<span class="loffset5">
+							<fmt:message key="monitoring.summary.gallery.walk.cluster.members" />&nbsp;${clusterMemberLinks}
+						</span>
+					</c:if>
+
 					<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
 						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />
 					</c:if>

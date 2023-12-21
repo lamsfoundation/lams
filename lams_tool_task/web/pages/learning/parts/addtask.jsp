@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 <lams:head>
-	<%@ include file="/common/header.jsp"%>
+    <link rel="stylesheet" href="<lams:LAMSURL/>learning/css/components-learner.css">
+    <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	
+    <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+    <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+    <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+    <lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 		function disableButtons() {
 			$('.btn-disable-on-submit').prop('disabled', true);
@@ -23,39 +26,50 @@
 		}
 	</script>		
 </lams:head>
-<body>
+<body class="component">
+    <div class="component-page-wrapperx">
 
 	<form:form action="saveNewTask.do" modelAttribute="taskListItemForm" method="post" id="taskListItemForm">
 		<form:hidden path="mode" />
 		<form:hidden path="sessionMapID" />
 
-		<h5>
-			<fmt:message key="label.learning.new.task.details" />
-		</h5>
-		<lams:errors/>
+		<div class="card">
+			<div class="card-header">
+				<fmt:message key="label.learning.new.task.details" />
+			</div>
+			
+			<div class="card-body">
+				<lams:errors5/>
 
-		<div class="form-group">
-			<label for="taskTitle">
-			<fmt:message key="label.authoring.basic.resource.title.input" />
-			</label>
-			<form:input id="taskTitle" path="title" cssClass="form-control" tabindex="1" />
-		</div>
-		<div class="form-group">
-			<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<lams:textarea irows="5" tabindex="2" id="description" class="form-control" name="description"></lams:textarea>
+				<div class="mb-3">
+					<label for="taskTitle">
+						<fmt:message key="label.authoring.basic.resource.title.input" />
+					</label>
+					<form:input id="taskTitle" path="title" cssClass="form-control" />
+				</div>
+				<div class="mb-3">
+					<label for="description">
+						<fmt:message key="label.learning.comment.or.instruction" />
+					</label>
+					<lams:textarea irows="5" id="description" class="form-control" name="description"></lams:textarea>
+				</div>
+
+				<div class="mt-3 float-end">
+					<lams:ImgButtonWrapper>
+						<button type="button" onclick="cancel();" class="btn btn-sm btn-secondary btn-disable-on-submit btn-icon-cancel"> 
+							<fmt:message key="label.cancel" />
+						</button>
+						
+						<button type="button" onclick="saveTask()" class="btn btn-sm btn-secondary btn-disable-on-submit"> 
+							<i class="fa fa-plus"></i>
+							<fmt:message key="button.add" />
+						</button>
+					</lams:ImgButtonWrapper>
+				</div>
+			</div>
 		</div>
 	</form:form>
 
-	<div class="form-group">
-		<lams:ImgButtonWrapper>
-			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> 
-				<fmt:message key="label.cancel" />
-			</button>
-			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> 
-				<fmt:message key="button.add" />
-			</button>
-		</lams:ImgButtonWrapper>
 	</div>
-
 </body>
 </lams:html>

@@ -1,30 +1,30 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${not empty toolSessionID}">
-	<div class="question-type">
+	<div class="card-subheader">
 		<fmt:message key="label.learning.ordering.sort.answers" />
 	</div>
 </c:if>
 
-<div class="table-responsive">
-	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">
-			<tr>
-				<td class="complete-item-gif">
+<div class="div-hover table-sm">
+	<c:forEach var="option" items="${question.optionDtos}" varStatus="ordStatus">
+		<div class="row">			
+			<c:if test="${assessment.allowRightAnswersAfterQuestion || assessment.allowWrongAnswersAfterQuestion}">
+				<div class="complete-item-gif">
 					<c:if test="${assessment.allowRightAnswersAfterQuestion && (option.displayOrder == ordStatus.index)}">
 						<i class="fa fa-check text-success"></i>	
 					</c:if>
 					<c:if test="${assessment.allowWrongAnswersAfterQuestion && (option.displayOrder != ordStatus.index)}">
 						<i class="fa fa-times text-danger"></i>	
 					</c:if>			
-				</td>											
+				</div>
+			</c:if>										
 			
-				<td class="ordering-option">
-					<c:out value="${option.name}" escapeXml="false" />
-				</td>		
-			</tr>
-		</c:forEach>
-	</table>
+			<div class="col">
+				<c:out value="${option.name}" escapeXml="false" />
+			</div>		
+		</div>
+	</c:forEach>
 </div>
 	
 <c:if test="${assessment.allowQuestionFeedback}">

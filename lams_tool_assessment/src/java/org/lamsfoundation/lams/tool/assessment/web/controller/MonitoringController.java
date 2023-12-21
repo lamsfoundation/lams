@@ -23,33 +23,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxRegistry;
@@ -111,13 +87,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -224,7 +220,7 @@ public class MonitoringController {
 		displayStudentChoices = false;
 	    }
 
-	    if (question.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS) {
+	    if (question.getType().equals(QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		vsaPresent = true;
 	    }
 	}
@@ -235,7 +231,7 @@ public class MonitoringController {
 	if (displayStudentChoices) {
 	    request.setAttribute("maxOptionsInQuestion", maxOptionsInQuestion);
 
-	    int totalNumberOfUsers = service.getCountUsersByContentId(contentId);
+	    int totalNumberOfUsers = service.getCountLearnersByContentId(contentId);
 
 	    Set<QuestionDTO> questionDtos = new TreeSet<>();
 	    for (AssessmentQuestion question : assessment.getQuestions()) {
@@ -274,9 +270,15 @@ public class MonitoringController {
 
     @RequestMapping(path = "/getCompletionChartsData", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId)
-	    throws JsonProcessingException, IOException {
-	return service.getCompletionChartsDataFlux(toolContentId);
+    public Flux<String> getCompletionChartsData(@RequestParam long toolContentId) {
+	return FluxRegistry.get(AssessmentConstants.COMPLETION_CHARTS_UPDATE_FLUX_NAME, toolContentId);
+    }
+
+    @RequestMapping(path = "/getTimeLimitPanelUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitPanelUpdateFlux(@RequestParam long toolContentId, HttpServletResponse response) {
+	response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+	return FluxRegistry.get(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
     }
 
     @RequestMapping("/userMasterDetail")
@@ -318,14 +320,14 @@ public class MonitoringController {
 	UserSummary userSummary = service.getUserSummary(contentId, userId, sessionId);
 	request.setAttribute(AssessmentConstants.ATTR_USER_SUMMARY, userSummary);
 
-	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService
-		.getFirstLearnerInteractions(contentId, userId.intValue());
+	Map<Long, LearnerInteractionEvent> learnerInteractions = learnerInteractionService.getFirstLearnerInteractions(
+		contentId, userId.intValue());
 	request.setAttribute("learnerInteractions", learnerInteractions);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
-	boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
-		&& assessment.isQuestionEtherpadEnabled()
-		&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	boolean questionEtherpadEnabled =
+		assessment.isUseSelectLeaderToolOuput() && assessment.isQuestionEtherpadEnabled()
+			&& StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	request.setAttribute(AssessmentConstants.ATTR_TOOL_SESSION_ID, sessionId);
 
@@ -347,8 +349,8 @@ public class MonitoringController {
     @ResponseBody
     public String saveUserGrade(HttpServletRequest request, HttpServletResponse response) {
 	String responseText = null;
-	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null)
-		&& !StringUtils.isEmpty(request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
+	if ((request.getParameter(AssessmentConstants.PARAM_NOT_A_NUMBER) == null) && !StringUtils.isEmpty(
+		request.getParameter(AssessmentConstants.PARAM_QUESTION_RESULT_UID))) {
 	    Long questionResultUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_RESULT_UID);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -445,35 +447,37 @@ public class MonitoringController {
 	if (sessionId == null) {
 	    userDtos = service.getPagedUsersByContentId(assessment.getContentId(), page - 1, rowLimit, sortBy,
 		    sortOrder, searchString);
-	    countSessionUsers = service.getCountUsersByContentId(assessment.getContentId(), searchString);
+	    countSessionUsers = service.getCountLearnersByContentId(assessment.getContentId(), searchString);
 	} else
-	//in case of UseSelectLeaderToolOuput - display only one user
-	if (assessment.isUseSelectLeaderToolOuput()) {
+	    //in case of UseSelectLeaderToolOuput - display only one user
+	    if (assessment.isUseSelectLeaderToolOuput()) {
 
-	    AssessmentSession session = service.getSessionBySessionId(sessionId);
-	    AssessmentUser groupLeader = session.getGroupLeader();
+		AssessmentSession session = service.getSessionBySessionId(sessionId);
+		AssessmentUser groupLeader = session.getGroupLeader();
 
-	    if (groupLeader != null) {
+		if (groupLeader != null) {
 
-		Float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(), groupLeader.getUserId());
-		String portraitId = service.getPortraitId(groupLeader.getUserId());
+		    Float assessmentResult = service.getLastTotalScoreByUser(assessment.getUid(),
+			    groupLeader.getUserId());
+		    String portraitId = service.getPortraitId(groupLeader.getUserId());
 
-		AssessmentUserDTO userDto = new AssessmentUserDTO();
-		userDto.setUserId(groupLeader.getUserId());
-		userDto.setSessionId(sessionId);
-		userDto.setFirstName(groupLeader.getFirstName());
-		userDto.setLastName(groupLeader.getLastName());
-		userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
-		userDto.setPortraitId(portraitId);
-		userDtos.add(userDto);
-		countSessionUsers = 1;
+		    AssessmentUserDTO userDto = new AssessmentUserDTO();
+		    userDto.setUserId(groupLeader.getUserId());
+		    userDto.setSessionId(sessionId);
+		    userDto.setFirstName(groupLeader.getFirstName());
+		    userDto.setLastName(groupLeader.getLastName());
+		    userDto.setGrade(assessmentResult == null ? 0 : assessmentResult);
+		    userDto.setPortraitId(portraitId);
+		    userDtos.add(userDto);
+		    countSessionUsers = 1;
+		}
+
+	    } else {
+		// Get the user list from the db
+		userDtos = service.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder,
+			searchString);
+		countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
 	    }
-
-	} else {
-	    // Get the user list from the db
-	    userDtos = service.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder, searchString);
-	    countSessionUsers = service.getCountUsersBySession(sessionId, searchString);
-	}
 
 	int totalPages = Double.valueOf(Math.ceil(Double.valueOf(countSessionUsers) / Double.valueOf(rowLimit)))
 		.intValue();
@@ -614,7 +618,8 @@ public class MonitoringController {
 
 		// show confidence levels if this feature is turned ON
 		if (assessment.isEnableConfidenceLevels()) {
-		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING) ? -1
+		    userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_MARK_HEDGING)
+			    ? -1
 			    : questionResult.getConfidenceLevel());
 		}
 
@@ -627,15 +632,17 @@ public class MonitoringController {
 			if (!ratings.isEmpty()) {
 			    int numberOfVotes = ratings.size();
 			    double ratingSum = ratings.stream().mapToDouble(Rating::getRating).sum();
-			    String averageRating = NumberUtil
-				    .formatLocalisedNumberForceDecimalPlaces(ratingSum / numberOfVotes, null, 2);
+			    String averageRating = NumberUtil.formatLocalisedNumberForceDecimalPlaces(
+				    ratingSum / numberOfVotes, null, 2);
 
 			    starString = "<div class='rating-stars-holder'>";
-			    starString += "<div class='rating-stars-disabled rating-stars-new' data-average='"
-				    + averageRating + "' data-id='" + ratingCriteriaId + "'>";
+			    starString +=
+				    "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+					    + "' data-id='" + ratingCriteriaId + "'>";
 			    starString += "</div>";
-			    starString += "<div class='rating-stars-caption' id='rating-stars-caption-"
-				    + ratingCriteriaId + "' >";
+			    starString +=
+				    "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId
+					    + "' >";
 			    String msg = service.getMessage("label.average.rating",
 				    new Object[] { averageRating, numberOfVotes });
 			    starString += msg;
@@ -648,12 +655,10 @@ public class MonitoringController {
 		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
 			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
-		userData.add(
-			questionResult.getMarkedBy() == null
-				? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
-					? service.getMessage("label.monitoring.user.summary.grade.required")
-					: "")
-				: questionResult.getMarkedBy().getFullName());
+		userData.add(questionResult.getMarkedBy() == null
+			? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY) ? service.getMessage(
+			"label.monitoring.user.summary.grade.required") : "")
+			: questionResult.getMarkedBy().getFullName());
 		userData.add(questionResult.getMarkerComment());
 	    } else {
 		userData.add("");
@@ -774,7 +779,8 @@ public class MonitoringController {
 		results = service.getMarksArrayForLeaders(contentId);
 	    } else {
 		Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID, true);
-		results = sessionId == null ? service.getMarksArrayByContentId(contentId)
+		results = sessionId == null
+			? service.getMarksArrayByContentId(contentId)
 			: service.getMarksArray(sessionId);
 	    }
 	}
@@ -930,25 +936,33 @@ public class MonitoringController {
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AssessmentConstants.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Assessment assessment = service.getAssessmentByContentId(toolContentId);
 	assessment.setRelativeTimeLimit(relativeTimeLimit);
+	assessment.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	assessment.setAbsoluteTimeLimit(absoluteTimeLimit == null ? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+	assessment.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
+		? null
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
 	service.saveOrUpdateAssessment(assessment);
 
 	// update monitoring UI where time limits are reflected on dashboard
 	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
     }
 
     @RequestMapping(path = "/getPossibleIndividualTimeLimits", method = RequestMethod.GET)
@@ -967,8 +981,8 @@ public class MonitoringController {
 	if (grouping != null) {
 	    Set<Group> groups = grouping.getGroups();
 	    for (Group group : groups) {
-		if (!group.getUsers().isEmpty()
-			&& group.getGroupName().toLowerCase().contains(searchString.toLowerCase())) {
+		if (!group.getUsers().isEmpty() && group.getGroupName().toLowerCase()
+			.contains(searchString.toLowerCase())) {
 		    ObjectNode groupJSON = JsonNodeFactory.instance.objectNode();
 		    groupJSON.put("label", groupLabel + group.getGroupName() + "\"");
 		    groupJSON.put("value", "group-" + group.getGroupId());
@@ -1080,6 +1094,9 @@ public class MonitoringController {
 	    }
 	}
 	service.saveOrUpdateAssessment(assessment);
+
+	FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
+
     }
 
     @RequestMapping(path = "/displayChangeLeaderForGroupDialogFromActivity")

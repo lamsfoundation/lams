@@ -196,8 +196,8 @@ public class AuthoringController {
 	    }
 	}
 
-	boolean isAssessmentAttempted = assessment.getUid() == null ? false
-		: service.isAssessmentAttempted(assessment.getUid());
+	boolean isAssessmentAttempted =
+		assessment.getUid() == null ? false : service.isAssessmentAttempted(assessment.getUid());
 	sessionMap.put(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED, isAssessmentAttempted && mode.isTeacher());
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_FORM, assessmentForm);
@@ -206,7 +206,7 @@ public class AuthoringController {
 	sessionMap.put(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 
 	boolean aiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
-	sessionMap.put(AssessmentConstants.ATTR_IS_AI_ENABLED, aiEnabled);
+	sessionMap.put(AttributeNames.ATTR_IS_AI_ENABLED, aiEnabled);
 
 	Hibernate.initialize(assessment.getSections());
 
@@ -247,7 +247,8 @@ public class AuthoringController {
 	Assessment assessmentPO = service.getAssessmentByContentId(assessmentForm.getAssessment().getContentId());
 
 	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getQuestions();
-	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<>()
+	Set<QuestionReference> oldReferences = (assessmentPO == null)
+		? new HashSet<>()
 		: assessmentPO.getQuestionReferences();
 	Set<AssessmentSection> oldSections = (assessmentPO == null) ? new HashSet<>() : assessmentPO.getSections();
 
@@ -552,8 +553,8 @@ public class AuthoringController {
 	} else {
 	    //replace QbQuestion with the new version of it
 	    for (QuestionReference reference : references) {
-		if (!reference.isRandomQuestion()
-			&& oldQbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
+		if (!reference.isRandomQuestion() && oldQbQuestionUid.equals(
+			reference.getQuestion().getQbQuestion().getUid())) {
 		    AssessmentQuestion assessmentQuestion = reference.getQuestion();
 		    assessmentQuestion.setQbQuestion(qbQuestion);
 		    break;
@@ -683,8 +684,8 @@ public class AuthoringController {
 
 	//check whether this question is a duplicate
 	for (QuestionReference reference : references) {
-	    if (!reference.isRandomQuestion()
-		    && qbQuestionUid.equals(reference.getQuestion().getQbQuestion().getUid())) {
+	    if (!reference.isRandomQuestion() && qbQuestionUid.equals(
+		    reference.getQuestion().getQbQuestion().getUid())) {
 		//let jsp know it's a duplicate
 		return "forward:/authoring/showDuplicateQuestionError.do";
 	    }
@@ -834,10 +835,12 @@ public class AuthoringController {
 	    ArrayNode questionData = JsonNodeFactory.instance.arrayNode();
 	    questionData.add(question.getUid());
 
-	    String title = question.getName() == null ? ""
+	    String title = question.getName() == null
+		    ? ""
 		    : question.getName().replaceAll("\\<.*?\\>", "").replaceAll("\\n", " ").trim();
 	    questionData.add(HtmlUtils.htmlEscape(title));
-	    String description = question.getDescription() == null ? ""
+	    String description = question.getDescription() == null
+		    ? ""
 		    : question.getDescription().replaceAll("\\<.*?\\>", "").trim();
 	    questionData.add(HtmlUtils.htmlEscape(description));
 
@@ -872,8 +875,8 @@ public class AuthoringController {
 		AssessmentConstants.ATTR_REFERENCES_SEQUENCE_IDS);
 	List<QuestionReference> updatedQuestionReferences = new LinkedList<>();
 	for (QuestionReference questionReference : questionReferences.toArray(new QuestionReference[0])) {
-	    String newSequenceId = sequenceIdsParamMap
-		    .get(AssessmentConstants.PARAM_SEQUENCE_ID + questionReference.getSequenceId());
+	    String newSequenceId = sequenceIdsParamMap.get(
+		    AssessmentConstants.PARAM_SEQUENCE_ID + questionReference.getSequenceId());
 
 	    questionReference.setSequenceId(Integer.valueOf(newSequenceId));
 	    updatedQuestionReferences.add(questionReference);
@@ -954,8 +957,8 @@ public class AuthoringController {
      */
     @SuppressWarnings("unchecked")
     private SortedSet<QuestionReference> getQuestionReferences(SessionMap<String, Object> sessionMap) {
-	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap
-		.get(AssessmentConstants.ATTR_QUESTION_REFERENCES);
+	SortedSet<QuestionReference> list = (SortedSet<QuestionReference>) sessionMap.get(
+		AssessmentConstants.ATTR_QUESTION_REFERENCES);
 	if (list == null) {
 	    list = new TreeSet<>(new SequencableComparator());
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_REFERENCES, list);
@@ -1012,8 +1015,8 @@ public class AuthoringController {
 	int count = NumberUtils.toInt(request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_COUNT));
 	TreeSet<AssessmentOverallFeedback> overallFeedbackList = new TreeSet<>(new SequencableComparator());
 	for (int i = 0; i < count; i++) {
-	    String gradeBoundaryStr = request
-		    .getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
+	    String gradeBoundaryStr = request.getParameter(
+		    AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i);
 	    String feedback = request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_FEEDBACK_PREFIX + i);
 	    String sequenceId = request.getParameter(AssessmentConstants.ATTR_OVERALL_FEEDBACK_SEQUENCE_ID_PREFIX + i);
 
@@ -1055,8 +1058,8 @@ public class AuthoringController {
 	    AssessmentOverallFeedback overallFeedback = new AssessmentOverallFeedback();
 	    overallFeedback.setSequenceId(NumberUtils.toInt(sequenceId));
 	    if (!StringUtils.isBlank(gradeBoundaryStr)) {
-		int gradeBoundary = NumberUtils
-			.toInt(paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
+		int gradeBoundary = NumberUtils.toInt(
+			paramMap.get(AssessmentConstants.ATTR_OVERALL_FEEDBACK_GRADE_BOUNDARY_PREFIX + i));
 		overallFeedback.setGradeBoundary(gradeBoundary);
 	    }
 	    overallFeedback.setFeedback(feedback);
@@ -1070,7 +1073,7 @@ public class AuthoringController {
      *
      * @param request
      * @param parameterName
-     *            parameterName
+     * 	parameterName
      */
     private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
 	String list = request.getParameter(parameterName);

@@ -111,11 +111,11 @@
 			if (isMinimunDropdownUsed) {
 				maxDropDown.selectedIndex = minDropDown.selectedIndex;
 				if ( max > 1) {
-					alert('<fmt:message key="js.error.validate.number"/>');
+					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.number"/></spring:escapeBody>');
 				}
 			} else {
 				minDropDown.selectedIndex = maxDropDown.selectedIndex;
-				alert('<fmt:message key="js.error.validate.number"/>');
+				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.number"/></spring:escapeBody>');
 			} 
 		}
 	}

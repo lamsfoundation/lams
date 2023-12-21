@@ -111,14 +111,18 @@
 	}
 	
 	function editRecord (sessionMapID, recordIndex){
-		var param = {"sessionMapID":sessionMapID,"recordIndex":recordIndex,"reqID":((new Date()).getTime())};
+		var param = {
+			"sessionMapID":sessionMapID,
+			"recordIndex":recordIndex,
+			"reqID":((new Date()).getTime())
+		};
 		$( "#addRecordDiv" ).load( 
 			editRecordUrl, 
 			param, 
 			function() {
 				readHiddenFormValues();
 				doSelectTab(1);
-			});
+		});
 	}
 	
 	function clearVisibleFormElements (formName,protectedFormElementNames){

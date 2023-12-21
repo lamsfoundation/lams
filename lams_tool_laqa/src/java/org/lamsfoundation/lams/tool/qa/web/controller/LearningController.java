@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,7 @@ import org.lamsfoundation.lams.tool.qa.util.LearningUtil;
 import org.lamsfoundation.lams.tool.qa.util.QaComparator;
 import org.lamsfoundation.lams.tool.qa.util.QaStringComparator;
 import org.lamsfoundation.lams.tool.qa.web.form.QaLearningForm;
+import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -126,8 +128,14 @@ public class LearningController implements QaAppConstants {
 
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
-
-		List<QaQueUsr> groupUsers = qaService.getUsersBySessionId(new Long(toolSessionID).longValue());
+		List<QaQueUsr> groupQaUsers = qaService.getUsersBySessionId(new Long(toolSessionID).longValue());
+		List<User> groupUsers = groupQaUsers.stream().map(qaUser -> {
+		    User userI = new User();
+		    userI.setUserId(qaUser.getQueUsrId().intValue());
+		    userI.setFirstName(qaUser.getFullname());
+	            return userI;
+	        }).collect(Collectors.toList());
+		
 		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, qaContent);
@@ -178,8 +186,10 @@ public class LearningController implements QaAppConstants {
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ATTR_CONTENT, qaContent);
 	sessionMap.put(AttributeNames.USER, user);
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
+	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 	generalLearnerFlowDTO.setSessionMapID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
@@ -243,8 +253,6 @@ public class LearningController implements QaAppConstants {
 
 	generalLearnerFlowDTO.setRemainingQuestionCount(generalLearnerFlowDTO.getTotalQuestionCount().toString());
 	generalLearnerFlowDTO.setInitialScreen(Boolean.TRUE.toString());
-
-	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	/*
 	 * check if the mode is teacher

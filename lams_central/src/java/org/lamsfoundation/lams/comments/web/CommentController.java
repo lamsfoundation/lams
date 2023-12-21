@@ -77,8 +77,8 @@ public class CommentController {
     private ISecurityService securityService;
 
     /**
-     * Display the comments for a given external id (usually tool session id). The session comments will be
-     * arranged by Tree structure and loaded thread by thread (with paging).
+     * Display the comments for a given external id (usually tool session id). The session comments will be arranged by
+     * Tree structure and loaded thread by thread (with paging).
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/init")
@@ -179,8 +179,8 @@ public class CommentController {
 
     private boolean monitorInToolSession(Long toolSessionId, User user, SessionMap<String, Object> sessionMap) {
 
-	if (ToolAccessMode.TEACHER
-		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)))) {
+	if (ToolAccessMode.TEACHER.equals(
+		WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)))) {
 	    GroupedToolSession toolSession = (GroupedToolSession) lamsCoreToolService.getToolSessionById(toolSessionId);
 	    return securityService.isLessonMonitor(toolSession.getLesson().getLessonId(), user.getUserId(),
 		    "Comment Monitoring Tasks");
@@ -190,9 +190,9 @@ public class CommentController {
     }
 
     /**
-     * Display the comments for a given external id (usually tool session id). The session comments will be
-     * arranged by Tree structure and loaded thread by thread (with paging). This may set a new value of sort by, so
-     * make sure the session is updated.
+     * Display the comments for a given external id (usually tool session id). The session comments will be arranged by
+     * Tree structure and loaded thread by thread (with paging). This may set a new value of sort by, so make sure the
+     * session is updated.
      */
     @RequestMapping("/viewTopic")
     @SuppressWarnings("unchecked")
@@ -209,7 +209,7 @@ public class CommentController {
 	}
 
 	prepareViewTopicData(request, sessionMap, pageSize, sortBy, sticky);
-	return (sticky ? "comments/allviewwrapper" : "comments/topicviewwrapper");
+	return "comments" + (sticky ? "/allviewwrapper" : "/topicviewwrapper");
     }
 
     private void prepareViewTopicData(HttpServletRequest request, SessionMap<String, Object> sessionMap,
@@ -292,7 +292,6 @@ public class CommentController {
 
 	// don't want to try to scroll as this is a single thread, completely displayed.
 	request.setAttribute(CommentConstants.ATTR_NO_MORE_PAGES, true);
-
 	return "comments/topicviewwrapper";
     }
 
@@ -344,8 +343,8 @@ public class CommentController {
 
 	    User user = getCurrentUser(request);
 	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
-	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode)
-		    && monitorInToolSession(externalId, user, sessionMap);
+	    boolean isMonitor =
+		    ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
 	    if (!isMonitor && !learnerInToolSession(externalId, user)) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
@@ -416,8 +415,8 @@ public class CommentController {
 
 	    User user = getCurrentUser(request);
 	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
-	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode)
-		    && monitorInToolSession(externalId, user, sessionMap);
+	    boolean isMonitor =
+		    ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
 	    if (!isMonitor && !learnerInToolSession(externalId, user)) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
@@ -497,9 +496,10 @@ public class CommentController {
 	}
 
 	// Don't update anonymous if it is monitoring
-	boolean isMonitoring = ToolAccessMode.TEACHER
-		.equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)));
-	Boolean commentAnonymous = isMonitoring ? null
+	boolean isMonitoring = ToolAccessMode.TEACHER.equals(
+		WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)));
+	Boolean commentAnonymous = isMonitoring
+		? null
 		: WebUtil.readBooleanParam(request, CommentConstants.ATTR_COMMENT_ANONYMOUS_EDIT, false);
 
 	ObjectNode ObjectNode;
@@ -512,8 +512,8 @@ public class CommentController {
 	    CommentDTO originalComment = commentService.getComment(commentId);
 
 	    User user = getCurrentUser(request);
-	    if (!originalComment.getComment().getCreatedBy().equals(user)
-		    && !monitorInToolSession(externalId, user, sessionMap)) {
+	    if (!originalComment.getComment().getCreatedBy().equals(user) && !monitorInToolSession(externalId, user,
+		    sessionMap)) {
 		throwException(
 			"Update comment: User does not have the rights to update the comment " + commentId + ". ",
 			user.getLogin(), externalId, externalType, externalSignature);
@@ -633,8 +633,7 @@ public class CommentController {
 	if (!monitorInToolSession(externalId, user, sessionMap)) {
 	    throwException(
 		    "Make comment sticky: User does not have the rights to make the comment stick to the top of the list "
-			    + commentId + ". ",
-		    user.getLogin());
+			    + commentId + ". ", user.getLogin());
 	}
 	if (originalComment.getComment().getCommentLevel() != 1) {
 	    throwException("Make comment sticky: Comment much be level 1 to stick to the top of the list " + commentId

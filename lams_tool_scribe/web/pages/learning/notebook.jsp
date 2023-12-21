@@ -17,7 +17,7 @@
 		</title>
 		<lams:css/>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+		<lams:JSImport src="includes/javascript/common.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
@@ -51,8 +51,8 @@
 				<form:textarea rows="5" id="focused" path="entryText"
 					cssClass="form-control"></form:textarea>
 		
-				
-					<a href="#nogo" class="btn btn-primary voffset10 pull-right na" id="finishButton">
+				<div class="activity-bottom-buttons">
+					<a href="#nogo" class="btn btn-primary na" id="finishButton">
 						<span class="nextActivity">
 							<c:choose>
 			 					<c:when test="${isLastActivity}">
@@ -64,6 +64,7 @@
 			 				</c:choose>
 			 			</span>
 					</a>
+				</div>
 		
 			</form:form>
 		</lams:Page>
@@ -76,5 +77,3 @@
 		</script>
 	</body>
 </lams:html>
-
-

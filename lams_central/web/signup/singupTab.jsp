@@ -99,35 +99,35 @@
 							},
 
 							// Specify the validation error messages
-							messages : {
-								password : {
-									required : "<fmt:message key='error.password.empty'/>",
-									minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-									maxlength : "<fmt:message key='label.password.max.length'/>",
-									charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
-									pwcheck : "<fmt:message key='label.password.restrictions'/>"
+							messages: {
+								password: {
+									required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.password.empty'/></spring:escapeBody>",
+									minlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message></spring:escapeBody>",
+									maxlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.max.length'/></spring:escapeBody>",
+									charactersAllowed: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.symbols.allowed'/></spring:escapeBody> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \\ | : ; \" ' < > , . ? /",
+									pwcheck: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.restrictions'/></spring:escapeBody>"
 								},
-								confirmPassword : {
-									equalTo : "<fmt:message key='error.passwords.unequal'/>"
+								confirmPassword: {
+									equalTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.passwords.unequal'/></spring:escapeBody>"
 								},
-								username : {
-									charactersNotAllowed : "<fmt:message key='error.username.invalid.characters'/>"
+								username: {
+									charactersNotAllowed: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.username.invalid.characters'/></spring:escapeBody>"
 								},
-								lastName : {
-									charactersNotAllowedName : "<fmt:message key='error.lastname.invalid.characters'/>"
+								lastName: {
+									charactersNotAllowedName: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.lastname.invalid.characters'/></spring:escapeBody>"
 								},
-								firstName : {
-									charactersNotAllowedName : "<fmt:message key='error.firstname.invalid.characters'/>"
+								firstName: {
+									charactersNotAllowedName: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.firstname.invalid.characters'/></spring:escapeBody>"
 								},
-								email : {
-									emailCheck : "<fmt:message key='error.email.invalid.format'/>"
+								email: {
+									emailCheck: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.email.invalid.format'/></spring:escapeBody>"
 								},
-								confirmEmail : {
-									equalTo : "<fmt:message key='error.emails.unequal'/>"
+								confirmEmail: {
+									equalTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.emails.unequal'/></spring:escapeBody>"
 								},
 								country: {
-									required: "<fmt:message key='error.country.required'/>",
-									notEqualTo: "<fmt:message key='error.country.required'/>"
+									required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.country.required'/></spring:escapeBody>",
+									notEqualTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.country.required'/></spring:escapeBody>"
 								}
 							},
 							submitHandler : function(form) {

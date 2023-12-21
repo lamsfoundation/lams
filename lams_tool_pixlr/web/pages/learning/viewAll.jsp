@@ -78,17 +78,17 @@
 				</c:choose>
 					
 				<%--Bottom buttons--------------------------------------------------%>
-				<button  class="btn btn-default btn-sm" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/viewAllImages.do';">
+				<button  class="btn btn-secondary btn-sm" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/viewAllImages.do';">
 					<fmt:message key="button.refresh" />
 				</button>
 					
 				<c:if test="${!pixlrDTO.lockOnFinish}">
-					<button  class="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning.do';">
+					<button  class="btn btn-secondary btn-sm ms-1" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning.do';">
 						<fmt:message key="button.redo" />
 					</button>
 				</c:if>
 									
-				<div class="voffset10 pull-right">
+				<div class="activity-bottom-buttons">
 					<c:choose>
 						<c:when test="${pixlrDTO.reflectOnActivity}">
 							<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/openNotebook.do';">

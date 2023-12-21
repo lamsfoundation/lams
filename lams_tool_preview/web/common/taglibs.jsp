@@ -6,4 +6,4 @@
 <%@ taglib uri="tags-xml" prefix="x" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>

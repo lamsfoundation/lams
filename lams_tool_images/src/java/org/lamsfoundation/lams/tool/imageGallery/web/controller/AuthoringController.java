@@ -352,8 +352,9 @@ public class AuthoringController {
 	request.setAttribute("saveUsingLearningAction", saveUsingLearningAction);
 
 	imageGalleryItemForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-
-	return "pages/authoring/parts/addimage";
+	
+	boolean bootstrap5 = WebUtil.readBooleanParam(request, "bootstrap5", false); 
+	return "pages/authoring/parts/addimage" + (bootstrap5 ? "5" : "");
     }
 
     /**

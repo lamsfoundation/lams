@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="isSticky" value="false"/> 
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <%-- Wraps up msgview.jsp for returning a single message - called when an edit is performed. It needs to do all the setup that topicview.jsp normally does. --%>
 
@@ -9,20 +11,13 @@
 	$(".comment").click(function (e) {
 		e.stopPropagation();
 	});
+
+    jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+    });
 </script>
 
-<c:set var="isSticky" value="false"/> 
-
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:forEach var="msgDto" items="${topicThread}">
-
 	<c:set var="msgLevel" value="${msgDto.level}" />
 	<%@ include file="msgview.jsp"%>
-
 </c:forEach>
-
-  <script type="text/javascript">
-    jQuery(document).ready(function() {
-      jQuery("time.timeago").timeago();
-    });
-  </script>

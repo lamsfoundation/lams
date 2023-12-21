@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
+		<lams:JSImport src="includes/javascript/portrait.js" />
 
 <script type="text/javascript">
 
@@ -53,7 +53,7 @@
             	resizable: true,
             	// include column filters 
                 filter_columnFilters: true, 
-                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
+                filter_placeholder: { search : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.search"/></spring:escapeBody>' }, 
                 filter_searchDelay: 700 
             }
 		});
@@ -82,7 +82,7 @@
 						    <c:forEach var="option" items="${question.options}">
 								rows += '<td align="center" width="30px">';
 								if ( $.inArray('${option.uid}',userData.choices) > -1 ) {
-									rows += '<i class="fa fa-check text-success" title="<fmt:message key="message.learner.choose.answer"/>">';
+									rows += '<i class="fa fa-check text-success" title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.learner.choose.answer"/></spring:escapeBody>">';
 								}
 								rows += '</td>';
 						    </c:forEach>

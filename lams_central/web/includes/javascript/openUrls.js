@@ -60,19 +60,8 @@ function openLearner( lessonId, url ) {
 		url = '/lams/home/learner.do?';
 	}
 	var learnerUrl = url + 'lessonID=' + lessonId;
-	
-	if (isMac) {
-		learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height 
-				   + ',resizable,scrollbars=yes,status=yes' + getCenterParams(learner_width, learner_height));
-	} else {
-		if (learnWin && !learnWin.closed ) {
-			learnWin.location = learnerUrl;		
-			learnWin.focus();
-		} else {
-			learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height 
-					   + ',resizable,scrollbars=yes,status=yes' + getCenterParams(learner_width, learner_height));
-		}
-	}
+
+	window.location.href = learnerUrl;
 }
 
 function openKumalive(orgID, role) {
@@ -204,4 +193,12 @@ function openCustom(url) {
 			customWin.focus();
 		}
 	}
+}
+
+function openTeamworkMonitorWindow (organisationId){
+	location.href = '/lams/teamwork/organisation.do?organisationId=' + organisationId;
+}
+
+function openTeamworkLearnerWindow (){
+	location.href = '/lams/teamwork/learner.do';
 }

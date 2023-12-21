@@ -44,18 +44,20 @@
 		
 				<form:textarea id="focused" rows="5" path="entryText" cssClass="form-control"/>
 		
-				<a href="#nogo" class="btn btn-primary voffset10 pull-right" id="finishButton" onclick="submitForm('finish')">
-					<span class="na">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="button.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="button.finish" />
-							</c:otherwise>
-						</c:choose>
-					</span>
-				</a>
+				<div class="activity-bottom-buttons">
+					<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finish')">
+						<span class="na">
+							<c:choose>
+								<c:when test="${isLastActivity}">
+									<fmt:message key="button.submit" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="button.finish" />
+								</c:otherwise>
+							</c:choose>
+						</span>
+					</a>
+				</div>
 			</form:form>
 		
 			<div class="footer"></div>

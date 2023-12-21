@@ -4,16 +4,16 @@
 <lams:html>
 <lams:head>
 	<lams:css/>
-	
-	<script type="text/javascript" src="${lams}includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/openUrls.js"></script>
+
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.all.my.lessons" />', '80%');
+			updateMyProfileDialogSettings('<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.all.my.lessons" /></spring:escapeBody>', '80%');
 		});
 	</script>
 </lams:head>
@@ -68,7 +68,7 @@
 					</div>
 					
 					<div align="center">
-						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+						<button type="button" class="btn btn-sm btn-primary offset5" onclick="history.go(-1);">
 							<fmt:message key="label.return.to.myprofile" />
 						</button>
 					</div>

@@ -150,13 +150,13 @@ public class GateController {
 	gateForm.setTotalLearners(gateDTO.getExpectedLearnerCount());
 	gateForm.setWaitingLearners(gateDTO.getWaitingLearnerCount());
 	gateForm.setPreviewLesson(lesson.isPreviewLesson());
-	gateForm.setMonitorCanOpenGate(true);
 	GateActivity gate = gateDTO.getGate();
 	gateForm.setActivityID(gate.getActivityId());
 	gateForm.setLessonID(lesson.getLessonId());
 	gateForm.setGate(gate);
 	if (gate.isSynchGate()) {
 	    return "gate/synchGateContent";
+	    
 	} else if (gate.isScheduleGate()) {
 	    ScheduleGateActivity scheduleGate = (ScheduleGateActivity) gate;
 	    if (Boolean.TRUE.equals(scheduleGate.getGateActivityCompletionBased())) {
@@ -189,17 +189,19 @@ public class GateController {
 		gateForm.setEndingTime(null);
 	    }
 	    return "gate/scheduleGateContent";
+	    
 	} else if (gate.isConditionGate()) {
-	    gateForm.setMonitorCanOpenGate(false);
 	    return "gate/conditionGateContent";
+	    
 	} else if (gate.isPermissionGate() || gate.isSystemGate()) {
 	    return "gate/permissionGateContent";
+	    
 	} else if (gate.isPasswordGate()) {
-	    gateForm.setMonitorCanOpenGate(false);
 	    if (StringUtils.isNotBlank(gateForm.getKey()) && !gateDTO.getAllowToPass()) {
 		gateForm.setIncorrectKey(true);
 	    }
 	    return "gate/passwordGateContent";
+	    
 	} else {
 	    throw new LearnerServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
 		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");

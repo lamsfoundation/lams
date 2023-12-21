@@ -20,86 +20,82 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="WebAppURL"><lams:WebAppURL/></c:set>
+<c:set var="formParameters" value="type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}"/>
 
-<lams:html>
+<lams:PageLearner title="${branchingForm.title}" toolSessionID="" lessonID="${lessonID}"
+		refresh="60;URL=${WebAppURL}/branching/performBranching.do?${formParameters}${(branchingForm.previewLesson == true) ? '&force=true' : ''}">
 
-	<lams:head>
-		<title><fmt:message key="label.branching.title"/></title>
-		<lams:css/>
-		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<c:set var="formAction">/branching/performBranching.do?type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}</c:set>
-		<c:if test="${branchingForm.previewLesson == true}">
-			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
-		</c:if>
-		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
-	  </lams:head>
-
-	<body class="stripes">
-		<script type="text/javascript">
-			function validate() {
-				var validated = false,
-					form = document.forms[0],
-					elements = form.elements;
-				for (var i = 0; i < elements.length; i++) {
-					if (elements[i].name == "branchID") {
-						if (elements[i].checked) {
-							validated = true;
-							break;
-						}
+	<script type="text/javascript">
+		function validate() {
+			var validated = false, form = document.forms[0], elements = form.elements;
+			for (var i = 0; i < elements.length; i++) {
+				if (elements[i].name == "branchID") {
+					if (elements[i].checked) {
+						validated = true;
+						break;
 					}
 				}
-				
-				if (validated) {
-					return true;
-				}
-			
-				alert("<fmt:message key="message.activity.options.noActivitySelected" />");
-				return false;
 			}
-		</script>
+
+			if (validated) {
+				return true;
+			}
+
+			alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.activity.options.noActivitySelected' /></spring:escapeBody>");
+			return false;
+		}
+	</script>
 		
-		<c:set var="title"><c:out value="${branchingForm.title}" /></c:set>
-		<lams:Page type="learner" title="${title}">
+	<div id="container-main">
+		<p>
+			<em><fmt:message key="label.branching.preview.message" /> </em>
+		</p>
 		
-			<p>
-				<em><fmt:message key="label.branching.preview.message" /> </em>
-			</p>
+		<form:form action="forceBranching.do?${formParameters}" modelAttribute="branchingForm" target="_self" onsubmit="return validate();">
+		<fieldset>
+			<legend class="visually-hidden">
+				<fmt:message key="message.activity.options.noActivitySelected" />
+			</legend>
 		
-			<div class="group-box">
-		
-				<form:form
-					action="forceBranching.do?type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}"
-					modelAttribute="branchingForm" target="_self" onsubmit="return validate();">
-		
-					<table class="table table-condensed table-striped">
-						<c:forEach items="${branchingForm.activityURLs}"
-							var="activityURL" varStatus="loop">
-							<tr>
-								<td width="2%">
-									<c:choose>
-										<c:when test="${activityURL.complete}">
-											<i class="fa fa-check"></i>
-										</c:when>
-										<c:when test="${activityURL.defaultURL}">
-											<input type="radio" name="branchID"
-												id="activityID-${activityURL.activityId}"
-												value="<c:out value="${activityURL.activityId}"/>"
-												checked="checked">
-										</c:when>
-										<c:otherwise>
-											<input type="radio" name="branchID"
-												id="activityID-${activityURL.activityId}"
-												value="<c:out value="${activityURL.activityId}"/>">
-										</c:otherwise>
-									</c:choose>
-								</td>
-								<td>
-									<c:choose>
-		
-										<c:when test="${activityURL.complete}">
-											<!-- No Label tags -->
+			<div class="ltable table-striped no-header">
+				<c:forEach items="${branchingForm.activityURLs}" var="activityURL" varStatus="loop">
+					<div class="row">
+						<div class="col">
+							<div class="form-check">
+								<c:choose>
+									<c:when test="${activityURL.complete}">
+										<i class="fa fa-check"></i>
+									</c:when>
+									<c:when test="${activityURL.defaultURL}">
+										<input type="radio" class="form-check-input" name="branchID"
+											id="activityID-${activityURL.activityId}"
+											value="<c:out value="${activityURL.activityId}"/>"
+											checked="checked">
+									</c:when>
+									<c:otherwise>
+										<input type="radio" class="form-check-input" name="branchID"
+											id="activityID-${activityURL.activityId}"
+											value="<c:out value="${activityURL.activityId}"/>">
+									</c:otherwise>
+								</c:choose>
+
+								<c:choose>
+									<c:when test="${activityURL.complete}">
+										<!-- No Label tags -->
+										<c:choose>
+											<c:when test="${activityURL.defaultURL}">
+												<strong><c:out value="${activityURL.title}" /> </strong>
+											</c:when>
+											<c:otherwise>
+												<c:out value="${activityURL.title}" />
+											</c:otherwise>
+										</c:choose>
+									</c:when>
+									<c:otherwise>
+										<!-- With Label tags -->
+										<label class="form-check-label" for="activityID-${activityURL.activityId}">
 											<c:choose>
 												<c:when test="${activityURL.defaultURL}">
 													<strong><c:out value="${activityURL.title}" /> </strong>
@@ -108,53 +104,33 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 													<c:out value="${activityURL.title}" />
 												</c:otherwise>
 											</c:choose>
-										</c:when>
-										<c:otherwise>
-											<!-- With Label tags -->
-											<label for="activityID-${activityURL.activityId}">
-												<c:choose>
-													<c:when test="${activityURL.defaultURL}">
-														<strong><c:out value="${activityURL.title}" /> </strong>
-													</c:when>
-													<c:otherwise>
-														<c:out value="${activityURL.title}" />
-													</c:otherwise>
-												</c:choose>
-											</label>
-										</c:otherwise>
+										</label>
+									</c:otherwise>
 		
-									</c:choose>
+								</c:choose>
 		
-								</td>
-							</tr>
-						</c:forEach>
-					</table>
-			
-					<button class="btn btn-primary pull-right">
-						<fmt:message key="label.activity.options.choose" />
-					</button>
-		
-				</form:form>
-				
-									
-				<form action="/lams/learning/CompleteActivity.do" method="post">
-					<input type="hidden" name="activityID" value="${branchingForm.activityID}">
-					<input type="hidden" name="progressID" value="${branchingForm.progressID}">
-			
-					<button class="btn btn-primary pull-left na" onclick="finishActivity()">
-						<fmt:message key="label.finish.button" />
-					</button>
-			
-				</form>
+							</div>
+						</div>
+					</div>
+				</c:forEach>
 			</div>
 			
+			<button type="submit" class="btn btn-secondary float-end mb-2">
+				<fmt:message key="label.activity.options.choose" />
+			</button>
+		</fieldset>
+		</form:form>
 
-		<!--closes content-->
+		<div class="activity-bottom-buttons">
+			<form action="/lams/learning/CompleteActivity.do" method="post">
+				<input type="hidden" name="activityID" value="${branchingForm.activityID}">
+				<input type="hidden" name="progressID" value="${branchingForm.progressID}">
+			
+				<button type="submit" class="btn btn-primary float-start na">
+					<fmt:message key="label.finish.button" />
+				</button>
+			</form>
+		</div>
 		
-		<div id="footer"></div>
-		
-		</lams:Page>
-
-	</body>
-
-</lams:html>
+	</div>
+</lams:PageLearner>

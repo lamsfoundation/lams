@@ -5,29 +5,28 @@
 <lams:head>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/outcome.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
+	<lams:JSImport src="includes/javascript/outcome.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.cookie.js"></script>
 	<lams:JSImport src="includes/javascript/dialog5.js" />
 	<script type="text/javascript">
 		var LAMS_URL = '<lams:LAMSURL/>',
 			
-			decoderDiv = $('<div />'),
 			LABELS = {
 				<fmt:message key="scale.manage.add" var="ADD_SCALE_TITLE_VAR"/>
-				ADD_SCALE_TITLE : '<c:out value="${ADD_SCALE_TITLE_VAR}" />',
+				ADD_SCALE_TITLE : '<spring:escapeBody javaScriptEscape="true">${ADD_SCALE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="outcome.manage.edit" var="EDIT_SCALE_TITLE_VAR"/>
-				EDIT_SCALE_TITLE : '<c:out value="${EDIT_SCALEE_TITLE_VAR}" />',
+				EDIT_SCALE_TITLE : '<spring:escapeBody javaScriptEscape="true">${EDIT_SCALE_TITLE_VAR}</spring:escapeBody>',
 				<fmt:message key="scale.manage.remove.confirm" var="REMOVE_SCALE_CONFIRM_LABEL_VAR"/>
-				REMOVE_SCALE_CONFIRM_LABEL : decoderDiv.html('<c:out value="${REMOVE_SCALE_CONFIRM_LABEL_VAR}" />').text()
+				REMOVE_SCALE_CONFIRM_LABEL : '<spring:escapeBody javaScriptEscape="true">${REMOVE_SCALE_CONFIRM_LABEL_VAR}</spring:escapeBody>'
+
 			};
 	</script>
 </lams:head>

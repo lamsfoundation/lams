@@ -91,7 +91,7 @@ final class ParallelLiftFuseable<I, O> extends ParallelFlux<O>
 
 			Objects.requireNonNull(converted, "Lifted subscriber MUST NOT be null");
 
-			if (actual instanceof Fuseable.QueueSubscription
+			if (actual instanceof QueueSubscription
 					&& !(converted instanceof QueueSubscription)) {
 				//user didn't produce a QueueSubscription, original was one
 				converted = new FluxHide.SuppressFuseableSubscriber<>(converted);

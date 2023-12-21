@@ -1,109 +1,92 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="tool"><lams:WebAppURL /></c:set>
 
-	<lams:html>
-		<c:set var="lams"><lams:LAMSURL /></c:set>
-		<c:set var="tool"><lams:WebAppURL /></c:set>
-	<lams:head>  
-		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-		<title>
-			<fmt:message key="activity.title" />
-		</title>
-		<lams:css/>
+<lams:PageLearner title="${mindmapDTO.title}" toolSessionID="${learningForm.toolSessionID}" >
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
+	<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
+	<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
 	
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<lams:JSImport src="includes/javascript/common.js" />
+	<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
+	<script src="${lams}includes/javascript/fullscreen.js"></script>
+	<script src="${tool}includes/javascript/jquery.timer.js"></script>
+	<script src="${tool}includes/javascript/mapjs/main.js"></script>
+	<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
 		
-		<link rel="stylesheet" type="text/css" href="${lams}css/jquery.minicolors.css"></link>
-		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mapjs.css"></link>
-		<link rel="stylesheet" type="text/css" href="${tool}includes/css/mindmap.css"></link>
-		
-		<script src="${lams}includes/javascript/jquery.minicolors.min.js"></script>
-		<script src="${lams}includes/javascript/fullscreen.js"></script>
-		<script src="${tool}includes/javascript/jquery.timer.js"></script>
-		<script src="${tool}includes/javascript/mapjs/main.js"></script>
-		<script src="${tool}includes/javascript/mapjs/underscore-min.js"></script>
-		
-		<lams:JSImport src="learning/includes/javascript/gate-check.js" />
-		<script type="text/javascript">
-			checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', submitForm);
-		
-			var mode = "${mode}";		// learner, teacher, ...
+		var mode = "${mode}";		// learner, teacher, ...
 			
-			function disableButtons() {
-				$("#finishButton, #continueButton").attr("disabled", true);
-				// show the waiting area during the upload
-				$("#spinnerArea_Busy").show();
-			}
+		function disableButtons() {
+			$("#finishButton, #continueButton").attr("disabled", true);
+			// show the waiting area during the upload
+			$("#spinnerArea_Busy").show();
+		}
 		
-			function enableButtons() {
-				$("#spinnerArea_Busy").hide();
-				$("#finishButton, #continueButton").removeAttr("disabled");
-			}
+		function enableButtons() {
+			$("#spinnerArea_Busy").hide();
+			$("#finishButton, #continueButton").removeAttr("disabled");
+		}
 		
-			function submitForm() {
-				var mindmapContent = document.getElementById("mindmapContent");
-				mindmapContent.value = JSON.stringify(contentAggregate);
-		 	 	var f = document.getElementById('learningForm');
-		 		f.submit();
-			}
+		function submitForm() {
+			var mindmapContent = document.getElementById("mindmapContent");
+			mindmapContent.value = JSON.stringify(contentAggregate);
+		 	var f = document.getElementById('learningForm');
+			f.submit();
+		}
 
-			$(document).ready(function(){
-				$('[data-toggle="tooltip"]').bootstrapTooltip();
+		$(document).ready(function() {
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
 			});
-		</script>
+		});
+	</script>	
+	<%@ include file="websocket.jsp"%>
 		
-		<%@ include file="websocket.jsp"%>		
-	</lams:head>
-
-	<body class="stripes">
-		
+	<div id="container-main">
 		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
 			<input type="hidden" name="userId" value="${userIdParam}" />
+			<input type="hidden" name="userUid" value="${userUid}" />
 			<input type="hidden" name="toolContentId" value="${toolContentID}" />
 			<form:hidden path="toolSessionID" />
 			<form:hidden path="mindmapContent" id="mindmapContent" />
-		
-			<lams:Page type="learner" title="${mindmapDTO.title}" hideProgressBar="${isMonitor}" formID="learningForm">
 			
-				<%--Advanced settings and notices-----------------------------------%>
-				
-				<div class="panel">
-					<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
-				</div>
+			<%--Advanced settings and notices-----------------------------------%>
 			
-				<c:if test="${mindmapDTO.lockOnFinish and  mode != 'teacher' }">
-					<lams:Alert type="danger" id="lock-on-finish" close="false">
-						<c:choose>
-							<c:when test="${finishedActivity}">
-								<fmt:message key="message.activityLocked" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="message.warnLockOnFinish" />
-							</c:otherwise>
-						</c:choose>
-					</lams:Alert>
-				</c:if>
+			<c:if test="${mindmapDTO.lockOnFinish and  mode != 'teacher' }">
+				<lams:Alert5 type="danger" id="lock-on-finish" close="false">
+					<c:choose>
+						<c:when test="${finishedActivity}">
+							<fmt:message key="message.activityLocked" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="message.warnLockOnFinish" />
+						</c:otherwise>
+					</c:choose>
+				</lams:Alert5>
+			</c:if>
 				
-				 <c:if test="${not empty submissionDeadline && (mode == 'author' || mode == 'learner')}">
-					 <lams:Alert id="submission-deadline" close="true" type="info">
-					  	<fmt:message key="authoring.info.teacher.set.restriction" >
-					  		<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
-					  	</fmt:message>
-					 </lams:Alert>
-				 </c:if>
-			
-				&nbsp;
+			 <c:if test="${not empty submissionDeadline && (mode == 'author' || mode == 'learner')}">
+				 <lams:Alert5 id="submission-deadline" close="true" type="info">
+				  	<fmt:message key="authoring.info.teacher.set.restriction" >
+				  		<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
+				  	</fmt:message>
+				 </lams:Alert5>
+			 </c:if>
 				
-				<%--MindMup -----------------------------------%>
-				<%@ include file="/common/mapjs.jsp"%>
-		 		<%-- End MindMup -----------------------------------%>
+			<div id="instructions" class="instructions">
+				<c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
+			</div>
+				
+			<%--MindMup -----------------------------------%>
+			<%@ include file="/common/mapjs.jsp"%>
 		 		
-				<div class="voffset10 pull-right">
+			<div class="activity-bottom-buttons">
 					<c:choose>
 						<c:when test="${isMonitor}">
-							<button class="btn btn-primary" name="backButton" onclick="history.go(-1)">
+							<button type="button" class="btn btn-primary" name="backButton" onclick="history.go(-1)">
 								<fmt:message key="button.back"/>
 							</button>
 						</c:when>
@@ -111,48 +94,43 @@
 						<c:otherwise>
 							<c:choose>
 								<c:when test="${mindmapDTO.galleryWalkEnabled}">
-									<button data-toggle="tooltip" 
-											class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
-											<c:choose>
-												<c:when test="${mode == 'author'}">
-													title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
-													onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
-												</c:when>
-												<c:otherwise>
-													title="<fmt:message key='label.gallery.walk.wait.start' />"
-												</c:otherwise>
-											</c:choose>
-										>
+									<button type="button" data-bs-toggle="tooltip" class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
+										<c:choose>
+											<c:when test="${mode == 'author'}">
+												title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
+												onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
+											</c:when>
+											<c:otherwise>
+												title="<fmt:message key='label.gallery.walk.wait.start' />"
+											</c:otherwise>
+										</c:choose>
+									>
 										<fmt:message key="button.continue" />
 									</button>
 								</c:when>
+								
 								<c:when test="${reflectOnActivity}">
-									<a href="javascript:submitForm();" class="btn btn-primary" id="continueButton">
-										   <span class="nextActivity"><fmt:message key="button.continue"/></span>
-									</a>
+									<button type="button" onclick="javascript:submitForm();" class="btn btn-primary na" id="continueButton">
+										   <fmt:message key="button.continue"/>
+									</button>
 								</c:when>
 				
 								<c:otherwise>
-									<button type="button" class="btn btn-primary" id="finishButton">
-										<span class="na">
-											<c:choose>
-							 					<c:when test="${isLastActivity}">
-							 						<fmt:message key="button.submit" />
-							 					</c:when>
-							 					<c:otherwise>
-							 		 				<fmt:message key="button.finish" />
-							 					</c:otherwise>
-							 				</c:choose>
-									 	</span>
+									<button type="button" class="btn btn-primary na" id="finishButton">
+										<c:choose>
+							 				<c:when test="${isLastActivity}">
+							 					<fmt:message key="button.submit" />
+							 				</c:when>
+							 				<c:otherwise>
+							 					<fmt:message key="button.finish" />
+							 				</c:otherwise>
+							 			</c:choose>
 									</button>
 								</c:otherwise>
 							</c:choose>
 						</c:otherwise>
 					</c:choose>
-				</div>
-		
-			</lams:Page>
-		</form:form>
-		<div class="footer"></div>					
-	</body>
-</lams:html>
+			</div>
+		</form:form>				
+	</div>
+</lams:PageLearner>

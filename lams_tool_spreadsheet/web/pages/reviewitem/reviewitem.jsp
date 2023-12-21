@@ -29,7 +29,7 @@
 						scrolling="no">
 					</iframe> 
 
-					<a href="javascript:window.close();" class="btn btn-default"><fmt:message key="button.close"/></a>
+					<a href="javascript:window.close();" class="btn btn-secondary"><fmt:message key="button.close"/></a>
 					
 				</c:otherwise>
 			</c:choose>	

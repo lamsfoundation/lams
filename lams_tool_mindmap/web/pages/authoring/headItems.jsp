@@ -6,4 +6,4 @@
 	<lams:WebAppURL />
 </c:set>
 
-<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
+<lams:JSImport src="includes/javascript/authoring.js" relative="true" />

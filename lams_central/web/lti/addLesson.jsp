@@ -28,9 +28,9 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/openUrls.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/addLesson.js"></script>	
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<lams:JSImport src="includes/javascript/openUrls.js" />
+	<lams:JSImport src="includes/javascript/addLesson.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
@@ -43,15 +43,14 @@
 		var tree;
 		var userId = '<lams:user property="userID"/>',
 			LAMS_URL = '<lams:LAMSURL/>',
-			decoderDiv = $('<div />'),
+
 			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
 			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />',
 			LABELS = {
-				<fmt:message key="authoring.fla.navigate.away.confirm" var="NAVIGATE_AWAY_CONFIRM_VAR"/>
-				NAVIGATE_AWAY_CONFIRM : decoderDiv.html('<c:out value="${NAVIGATE_AWAY_CONFIRM_VAR}" />').text(),
-				<fmt:message key="authoring.fla.page.title" var="AUTHORING_TITLE_VAR"/>
-				AUTHORING_TITLE : '<c:out value="${AUTHORING_TITLE_VAR}" />'
+				NAVIGATE_AWAY_CONFIRM : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='authoring.fla.navigate.away.confirm' /></spring:escapeBody>",
+				AUTHORING_TITLE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='authoring.fla.page.title' /></spring:escapeBody>"
 			};
+;
 	
 	$(document).ready(function (){
 		tree = $('#learningDesignTree');
@@ -248,4 +247,3 @@
 </body>
 	
 </lams:html>
- 

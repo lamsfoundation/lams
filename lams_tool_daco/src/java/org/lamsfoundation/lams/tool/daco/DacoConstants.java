@@ -160,8 +160,6 @@ public class DacoConstants {
 
     public static final String ATTR_DACO = "daco";
 
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-
     public static final String ATTR_USER_LIST = "userList";
 
     public static final String ATTR_FINISH_LOCK = "finishedLock";

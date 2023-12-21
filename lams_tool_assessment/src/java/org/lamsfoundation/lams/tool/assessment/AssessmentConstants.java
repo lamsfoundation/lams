@@ -127,8 +127,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_QUESTION_UID = "questionUid";
 
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
     public static final String ATTR_USER_SUMMARY = "userSummary";
@@ -219,15 +217,17 @@ public class AssessmentConstants {
     public static final String CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION = "autoexpandJustification";
 
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
-    
-    public static final String ATTR_IS_AI_ENABLED = "isAiEnabled";
-    
+
     public static final String ATTR_CODE_STYLES = "codeStyles";
 
     public static final String ATTR_ALL_GROUP_USERS = "allGroupUsers";
 
     //flux management
+    public static final String COMPLETION_CHARTS_UPDATE_SINK_NAME = "assessment completion chart updated";
     public static final String ANSWERS_UPDATED_SINK_NAME = "assessment learner answers updated";
-
+    public static final String LEARNER_TRAVERSED_SINK_NAME = "assessment learner traversed";
     public static final String COMPLETION_CHARTS_UPDATE_FLUX_NAME = "assessment completion chart updated";
+
+    public static final String TIME_LIMIT_PANEL_UPDATE_SINK_NAME = "assessment time limit panel updated";
+    public static final String TIME_LIMIT_PANEL_UPDATE_FLUX_NAME = "assessment time limit panel updated";
 }

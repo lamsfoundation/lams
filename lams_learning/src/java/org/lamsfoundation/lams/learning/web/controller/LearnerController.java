@@ -23,23 +23,9 @@
 
 package org.lamsfoundation.lams.learning.web.controller;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
@@ -75,6 +61,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,12 +73,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TimeZone;
 
 /**
  * <p>
@@ -148,21 +146,25 @@ public class LearnerController {
 
     public LearnerController() {
 	FluxRegistry.initFluxMap(LEARNER_TIMELINE_FLUX_NAME, CommonConstants.ACTIVITY_ENTERED_SINK_NAME,
-		(LearnerActivityCompleteFluxItem item,
-			LearnerActivityCompleteFluxItem key) -> item.getLessonId() == key.getLessonId()
-				&& item.getUserId() == key.getUserId(),
+		(LearnerActivityCompleteFluxItem item, LearnerActivityCompleteFluxItem key) ->
+			item.getLessonId() == key.getLessonId() && item.getUserId() == key.getUserId(),
 		(LearnerActivityCompleteFluxItem item) -> {
-		    ObjectNode responseJSON = null;
 		    try {
-			responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
-			if (responseJSON != null) {
-			    return UriUtils.encode(responseJSON.toString(), StandardCharsets.UTF_8.toString());
+			// without separate session the flux fetches cached data
+			HibernateSessionManager.openSession();
+			ObjectNode responseJSON = null;
+			try {
+			    responseJSON = getLearnerProgress(item.getLessonId(), item.getUserId(), true);
+			    if (responseJSON != null) {
+				return UriUtils.encode(responseJSON.toString(), StandardCharsets.UTF_8.toString());
+			    }
+			} catch (Exception e) {
+			    log.error("Error while getting learner timeline flux", e);
 			}
-		    } catch (Exception e) {
-			log.error("Error while getting learner timeline flux", e);
+			return "";
+		    } finally {
+			HibernateSessionManager.closeSession();
 		    }
-		    return "";
-
 		}, FluxMap.STANDARD_THROTTLE, FluxMap.STANDARD_TIMEOUT);
     }
 
@@ -184,18 +186,16 @@ public class LearnerController {
      * </p>
      *
      * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     *
+     * 	An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send the
+     * 	end-user.
      * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
+     * 	The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
-     *            A standard Servlet HttpServletRequest class.
+     * 	A standard Servlet HttpServletRequest class.
      * @param response
-     *            A standard Servlet HttpServletResponse class.
+     * 	A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     *
+     * 	next.
      * @throws IOException
      * @throws ServletException
      */
@@ -328,7 +328,9 @@ public class LearnerController {
 	    response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 	    return null;
 	}
-
+	Lesson lesson = lessonService.getLesson(lessonId);
+	responseJSON.put("lessonID", lessonId);
+	responseJSON.put("lessonName", lesson.getLessonName());
 	responseJSON.set("messages", getProgressBarMessages());
 
 	response.setContentType("application/json;charset=utf-8");
@@ -459,15 +461,15 @@ public class LearnerController {
 	String type = "a";
 	if (actType.contains("gate")) {
 	    type = "g";
+	    GateActivity activityObject = (GateActivity) learnerService.getActivity(activity.getActivityId());
+	    activityJSON.put("gateOpen", activityObject.getGateOpen());
+	} else if (actType.contains("grouping")) {
+	    activityJSON.put("isGrouping", true);
+	} else if (actType.contains("optionswithsequences") || actType.contains("branching")) {
+	    type = "b";
 	} else if (actType.contains("options") || actType.contains("ordered")) {
 	    type = "o";
-	} else if (actType.contains("branching")) {
-	    type = "b";
 	} else {
-	    if (activity.getIconURL() != null) {
-		activityJSON.put("iconURL", activity.getIconURL());
-	    }
-
 	    if (status == 1) {
 		GradebookUserActivity activityMark = gradebookService.getGradebookUserActivity(activity.getActivityId(),
 			learnerId);
@@ -490,8 +492,9 @@ public class LearnerController {
 
 	if (activity.getChildActivities() != null) {
 	    for (ActivityURL childActivity : activity.getChildActivities()) {
-		activityJSON.withArray("childActivities").add(
-			activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId, monitorMode));
+		activityJSON.withArray("childActivities")
+			.add(activityProgressToJSON(childActivity, currentActivityId, lessonId, learnerId,
+				monitorMode));
 	    }
 	}
 

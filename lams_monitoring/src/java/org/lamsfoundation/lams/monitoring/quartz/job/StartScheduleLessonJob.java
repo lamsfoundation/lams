@@ -24,13 +24,13 @@
 
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.monitoring.MonitoringConstants;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import java.util.Map;
 
 public class StartScheduleLessonJob extends MonitoringJob {
     //---------------------------------------------------------------------
@@ -51,7 +51,7 @@ public class StartScheduleLessonJob extends MonitoringJob {
 	    log.debug("Lesson [" + lessonId + "] is starting...");
 	}
 
-	monitoringService.startLesson(lessonId, userId);
+	monitoringService.startLesson(lessonId, userId, true);
 
 	if (log.isDebugEnabled()) {
 	    log.debug("Lesson [" + lessonId + "] started");

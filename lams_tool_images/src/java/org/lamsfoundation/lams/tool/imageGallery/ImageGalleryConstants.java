@@ -50,7 +50,6 @@ public interface ImageGalleryConstants {
     public static final String ATTR_DELETED_IMAGE_ATTACHMENT_LIST = "deletedItemAttachmmentList";;
     public static final String ATTR_IMAGE_GALLERY = "imageGallery";
     public static final String ATTR_IMAGE = "image";
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
     public static final String ATTR_SUMMARY_LIST = "summaryList";
     public static final String ATTR_IMAGE_SUMMARY = "imageSummary";
     public static final String ATTR_FINISH_LOCK = "finishedLock";

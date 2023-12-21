@@ -1,78 +1,122 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
+<lams:PageLearner title="${contentDTO.title}" toolSessionID="${learningForm.toolSessionID}">
+	<lams:JSImport src="includes/javascript/common.js" />
+	<lams:JSImport src="includes/javascript/getSysInfo.js" />
+	<script type="text/javascript">
+		checkNextGateActivity('finishButton', '${learningForm.toolSessionID}', '', function(){
+			$('#finishForm').submit();
+		});
+			
+		function disableFinishButton() {
+			var finishButton = document.getElementById("finishButton");
+			if (finishButton != null) {
+				finishButton.disabled = true;
+			}
+		}
+	
+		function continueReflect(){
+			location.href='<lams:WebAppURL />learning/openNotebook.do?toolSessionID=${learningForm.toolSessionID}';
+		}
+	</script>
 
-<lams:head>  
-	<title>
-		<fmt:message key="activity.title" />
-	</title>
+	<div id="container-main">
+		<lams:errors5/>
+		
+		<div id="instructions" class="instructions">
+			<c:out value="${contentDTO.instructions}" escapeXml="false" />
+		</div>
+		
+		<c:if test="${not skipContent}">
+			<c:choose>
+				<c:when test="${empty meetingURL}">
+					<script type="text/javascript">
+						// refresh in 20 seconds
+						window.setTimeout(function() {
+							window.location.reload();
+						}, 20*1000);
+					</script>
+					
+					<lams:Alert5 type="warning">
+						<fmt:message key="label.learning.conferenceNotAvailable" />
+					</lams:Alert5>
+				</c:when>
+				
+				<c:otherwise>
+					<div class="card lcard">
+						<div class="card-body">
+							<c:if test="${not empty meetingPassword}">
+								<div class="fs-4">
+									<fmt:message key="label.meeting.password" />&nbsp;<code>${meetingPassword}</code>
+								</div>
+							</c:if>
+							
+							<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
+							
+							<div class="clearfix">
+								<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-secondary float-end">
+									<i class="fa-solid fa-video me-1"></i>
+									<fmt:message key="button.enter" />
+								</a>
+							</div>
+							
+							<script type="text/javascript">
+								if (isMac) {
+									$('#zoomJoinButton').show();
+								} else {
+									$('#zoomJoinFrame').show();
+								}
+							</script>
+						</div>
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
+
+		<c:if test="${userDTO.finishedActivity and contentDTO.reflectOnActivity}">
+			<lams:NotebookReedit
+				reflectInstructions="${contentDTO.reflectInstructions}"
+				reflectEntry="${userDTO.notebookEntryDTO.entry}"
+				isEditButtonEnabled="true"
+				notebookHeaderLabelKey="label.notebookEntry"
+				editNotebookLabelKey="button.edit"/>
+		</c:if>
 	
-	<lams:css/>
-	
-	<%-- TODO is this the best place to import these scripts ?	--%>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-</lams:head>
-<body class="stripes">
-<lams:Page type="learner" title="${contentDTO.title}">
-	<div class="panel">
-		<c:out value="${contentDTO.instructions}" escapeXml="false" />
+		<c:if test="${mode == 'learner' || mode == 'author'}">
+			<form:form action="${!userDTO.finishedActivity and contentDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}"
+					   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="finishForm">
+				<form:hidden path="toolSessionID" />
+				<div class="activity-bottom-buttons">
+					<c:choose>
+						<c:when test="${!userDTO.finishedActivity and contentDTO.reflectOnActivity}">
+							<button type="submit" class="btn btn-primary na">
+								<fmt:message key="button.continue" />
+							</button>
+						</c:when>
+						
+						<c:otherwise>
+							<button type="button" class="btn btn-primary na" id="finishButton">
+								<c:choose>
+									<c:when test="${isLastActivity}">
+										<fmt:message key="button.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="button.finish" />
+									</c:otherwise>
+								</c:choose>
+							</button>
+						</c:otherwise>
+					</c:choose>
+
+					<c:if test="${empty meetingURL}">
+						<button type="button" onclick="window.location.reload()" class="btn btn-secondary btn-icon-refresh me-2">
+							<fmt:message key="label.refresh" />
+						</button>
+					</c:if>
+				</div>
+			</form:form>
+		</c:if>
+
 	</div>
-
-	<lams:errors/>
-	
-	<c:if test="${not skipContent}">
-		<c:choose>
-			<c:when test="${empty meetingURL}">
-				<script type="text/javascript">
-					// refresh in 20 seconds
-					window.setTimeout(function() {
-						window.location.reload();
-					}, 20*1000);
-				</script>
-				
-				<p>
-					<fmt:message key="label.learning.conferenceNotAvailable" />
-				</p>
-				<a href="#" onclick="window.location.reload()" class="btn btn-default"><fmt:message key="label.refresh" /></a>
-			</c:when>
-			<c:otherwise>
-				<c:if test="${not empty meetingPassword}">
-					<h4><fmt:message key="label.meeting.password" />&nbsp;<code>${meetingPassword}</code></h4>
-				</c:if>
-				
-				<iframe id="zoomJoinFrame" style="width: 100%; height: 680px; border: none; display: none" src="${meetingURL}"></iframe>
-				<a id="zoomJoinButton" href="${meetingURL}" target="_blank" style="display: none" class="btn btn-default">
-					<fmt:message key="button.enter" />
-				</a>
-				
-				<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/getSysInfo.js"></script>
-				<script type="text/javascript">
-					if (isMac) {
-						$('#zoomJoinButton').show();
-					} else {
-						$('#zoomJoinFrame').show();
-					}
-				</script>
-			</c:otherwise>
-		</c:choose>
-	</c:if>
-
-	<hr class="msg-hr">
-
-	<c:if test="${mode == 'learner' || mode == 'author'}">
-		<%@ include file="parts/finishButton.jsp"%>
-	</c:if>
-
-</lams:Page>
-</body>
-</lams:html>
+</lams:PageLearner>

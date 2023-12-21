@@ -94,8 +94,6 @@ public class PeerreviewConstants {
 
     public static final String ATTR_CRITERIAS = "criterias";
 
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
-
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
     public static final String ATTR_USER_LIST = "userList";
@@ -142,5 +140,5 @@ public class PeerreviewConstants {
 
     public static final String ATTR_USER_UID = "userUid";
 
-    public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.peerreview";
+    public static final String OUTPUT_NAME_LEARNER_RATING_AVERAGE = "learner.rating.average";
 }

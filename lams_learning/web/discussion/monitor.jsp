@@ -173,8 +173,8 @@
 												  ],
 								borderWidth : 0,
 							} ],
-							labels : [ '<fmt:message key="label.discussion.stay.header" />',
-									   '<fmt:message key="label.discussion.move.header" />']
+							labels : [ '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.discussion.stay.header" /></spring:escapeBody>',
+									   '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.discussion.move.header" /></spring:escapeBody>']
 						},
 						options : {
 							layout : {

@@ -45,7 +45,7 @@ final class MonoSubscribeOn<T> extends InternalMonoOperator<T, T> {
 
 	@Override
 	public CoreSubscriber<? super T> subscribeOrReturn(CoreSubscriber<? super T> actual) {
-		Scheduler.Worker worker = scheduler.createWorker();
+		Worker worker = scheduler.createWorker();
 
 		SubscribeOnSubscriber<T> parent = new SubscribeOnSubscriber<>(source,
 				actual, worker);
@@ -78,7 +78,7 @@ final class MonoSubscribeOn<T> extends InternalMonoOperator<T, T> {
 
 		final Publisher<? extends T> parent;
 
-		final Scheduler.Worker worker;
+		final Worker worker;
 
 		volatile Subscription s;
 		@SuppressWarnings("rawtypes")

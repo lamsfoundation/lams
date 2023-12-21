@@ -27,7 +27,7 @@
     			//check maximum number of options
     			var numberOfAnswers = $("textarea[name^=optionName]").length;
     			if (numberOfAnswers >= 10) {
-    				alert("<fmt:message key="label.authoring.maximum.answers.warning" />");
+    				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.maximum.answers.warning' /></spring:escapeBody>");
     				return;
     			}
     			
@@ -166,16 +166,16 @@
 	    			    }
 		    		},
 		    		messages: {
-		    			title: "<fmt:message key='label.authoring.title.required'/>",
-		    			hasAnswerFilled: "<fmt:message key='label.authoring.error.possible.answer'/>",
-		    			hasFilledCorrectAnswer: "<fmt:message key='label.authoring.error.correct.answer'/>"
+		    			title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.title.required'/></spring:escapeBody>",
+		    			hasAnswerFilled: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.error.possible.answer'/></spring:escapeBody>",
+		    			hasFilledCorrectAnswer: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.error.correct.answer'/></spring:escapeBody>"
 		    		},
 		    	    invalidHandler: function(form, validator) {
 		    		      var errors = validator.numberOfInvalids();
 		    		      if (errors) {
 		    		          var message = errors == 1
-		    		          	  ? "<fmt:message key='error.form.validation.error'/>"
-		    		          	  : "<fmt:message key='error.form.validation.errors'><fmt:param >" + errors + "</fmt:param></fmt:message>";
+		    		          	  ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.error'/></spring:escapeBody>"
+		    		          	  : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.form.validation.errors'><fmt:param >" + errors + "</fmt:param></fmt:message></spring:escapeBody>";
 	    		          	  
 		    		          $("div.error span").html(message);
 		    		          $("div.error").show();

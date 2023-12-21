@@ -20,7 +20,7 @@
 			  	  extensionIndex = name.lastIndexOf('.'),
 			  	  valid = extensionIndex < 0 || name.substring(extensionIndex).trim() == '.zip';
 			  if (!valid) {
-				  uppy.info('<fmt:message key="error.file.type.zip"/>', 'error', 10000);
+				  uppy.info('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.file.type.zip"/></spring:escapeBody>', 'error', 10000);
 			  }
 			  
 			  return valid;
@@ -29,7 +29,7 @@
 
 		  	$.validator.addMethod('requireFileCount', function (value, element, param) {
 				return $('#hasFile').val() === 'true' || uppy.getFiles().length >= +param
-			}, '<fmt:message key="error.resource.item.file.blank"/>');
+			}, '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>');
 
 						  
 	 		$( "#resourceItemForm" ).validate({
@@ -46,7 +46,7 @@
 	 			},
 				messages : {
 					title : {
-						required : '<fmt:message key="error.resource.item.title.blank"/> '
+						required : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.title.blank"/></spring:escapeBody> '
 					}
 				},
 				errorPlacement: function(error, element) {

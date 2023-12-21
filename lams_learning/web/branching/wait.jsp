@@ -20,40 +20,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="WebAppURL"><lams:WebAppURL/></c:set>
+<c:set var="formAction">performBranching.do?type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}</c:set>
 
-<lams:html>
+<lams:PageLearner title="${branchingForm.title}" toolSessionID="" lessonID="${lessonID}"
+		refresh="60;URL=${WebAppURL}/branching/${formAction}${(branchingForm.previewLesson == true) ? '&force=true' : ''}">
 
-	<lams:head>
-		<title><fmt:message key="label.branching.title"/></title>
-		<lams:css/>
-		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<c:set var="formAction">/branching/performBranching.do?type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}</c:set>
-		<c:if test="${branchingForm.previewLesson == true}">
-			<c:set var="formAction"><c:out value="${formAction}"/>&amp;force=true</c:set>
-		</c:if>
-		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>${formAction}">
-	  </lams:head>
-
-	<body class="stripes">
-	
-		<c:set var="formAction">performBranching.do?type=${branchingForm.type}&activityID=${branchingForm.activityID}&progressID=${branchingForm.progressID}</c:set>
-	
+	<div id="container-main">
 		<form:form action="${formAction}" modelAttribute="branchingForm" target="_self">
+			<lams:Alert5 type="info">
+				<fmt:message key="label.branching.wait.message"/>
+				<div class="mt-2"><fmt:message key="label.branching.refresh.message"/></div>
+			</lams:Alert5>
 	
-			<c:set var="title"><c:out value="${branchingForm.title}" /></c:set>
-			<lams:Page type="learner" title="${title}">
-	
-				<p><fmt:message key="label.branching.wait.message"/></p>
-				<p><fmt:message key="label.branching.refresh.message"/></p>
-	
-				<button class="btn btn-default pull-right"><fmt:message key="label.next.button"/></button>
-	
-				<div id="footer"></div>
-			</lams:Page>
-	
+			<div class="activity-bottom-buttons">
+				<button type="submit" class="btn btn-primary na">
+					<fmt:message key="label.next.button"/>
+				</button>
+			</div>
 		</form:form>
-	</body>
-
-</lams:html>
+	</div>
+</lams:PageLearner>

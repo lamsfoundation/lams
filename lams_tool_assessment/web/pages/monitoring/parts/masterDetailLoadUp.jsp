@@ -36,7 +36,7 @@
 	 	 	    marker : 
 		 	 	 <c:choose>
 	 	 	    	<c:when test="${requiresMarking}">
-		 	    		("<b><fmt:message key='label.monitoring.user.summary.grade.required' /></b>")
+		 	    		("<b><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody></b>")
 		 	    	</c:when>
 		 	    	<c:when test="${not empty questionResult.markedBy}">
 		 	  			"<c:out value='${questionResult.markedBy.fullName}' />"

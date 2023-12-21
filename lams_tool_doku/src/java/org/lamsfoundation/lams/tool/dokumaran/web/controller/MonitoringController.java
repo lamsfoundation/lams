@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Group;
@@ -55,7 +56,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -306,7 +309,16 @@ public class MonitoringController {
 
 	dokumaranService.startGalleryWalk(toolContentId);
 
-	updateTimeLimit(toolContentId, 0, null);
+	updateTimeLimit(toolContentId, 0, 0, null);
+    }
+
+    @RequestMapping("/skipGalleryWalk")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    private void skipGalleryWalk(HttpServletRequest request) throws IOException {
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+
+	dokumaranService.skipGalleryWalk(toolContentId);
     }
 
     @RequestMapping("/finishGalleryWalk")
@@ -327,6 +339,20 @@ public class MonitoringController {
 	dokumaranService.enableGalleryWalkLearnerEdit(toolContentId);
     }
 
+    @RequestMapping("/showGalleryWalkClusters")
+    private String showGalleryWalkClusters(
+	    @RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId, Model model) {
+	Map<String, Set<String>> groups = dokumaranService.getDokumaranSessionsByToolContentId(toolContentId).stream()
+		.collect(Collectors.toMap(DokumaranSession::getSessionName,
+			session -> session.getGalleryWalkCluster().stream().collect(
+				Collectors.mapping(DokumaranSession::getSessionName, Collectors.toCollection(
+					() -> new TreeSet<>(DokumaranSession.SESSION_NAME_COMPARATOR)))),
+			(session1Cluster, session2Cluster) -> session1Cluster,
+			() -> new TreeMap<>(DokumaranSession.SESSION_NAME_COMPARATOR)));
+	model.addAttribute("groups", groups);
+	return "pages/monitoring/viewGalleryWalkClusters";
+    }
+
     @RequestMapping("/ae")
     private String tblApplicationExcercise(HttpServletRequest request, HttpServletResponse response)
 	    throws EtherpadException {
@@ -335,25 +361,42 @@ public class MonitoringController {
 	return "pages/monitoring/summary5";
     }
 
+    @RequestMapping(path = "/getTimeLimitPanelUpdateFlux", method = RequestMethod.GET, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseBody
+    public Flux<String> getTimeLimitPanelUpdateFlux(@RequestParam long toolContentId, HttpServletResponse response) {
+	response.setContentType(MediaType.TEXT_EVENT_STREAM_VALUE);
+	return FluxRegistry.get(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_FLUX_NAME, toolContentId);
+    }
+
     @RequestMapping(path = "/updateTimeLimit", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void updateTimeLimit(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
-	    @RequestParam int relativeTimeLimit, @RequestParam(required = false) Long absoluteTimeLimit) {
+	    @RequestParam int relativeTimeLimit, @RequestParam int absoluteTimeLimit,
+	    @RequestParam(required = false) Long absoluteTimeLimitFinish) {
 	if (relativeTimeLimit < 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be negative and it is " + relativeTimeLimit);
 	}
-	if (absoluteTimeLimit != null && relativeTimeLimit != 0) {
+	if (absoluteTimeLimit < 0) {
+	    throw new InvalidParameterException(
+		    "Absolute time limit must not be negative and it is " + relativeTimeLimit);
+	}
+	if (absoluteTimeLimitFinish != null && relativeTimeLimit != 0) {
 	    throw new InvalidParameterException(
 		    "Relative time limit must not be provided when absolute time limit is set");
 	}
 
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
 	dokumaran.setRelativeTimeLimit(relativeTimeLimit);
+	dokumaran.setAbsoluteTimeLimit(absoluteTimeLimit);
 	// set time limit as seconds from start of epoch, using current server time zone
-	dokumaran.setAbsoluteTimeLimit(absoluteTimeLimit == null
+	dokumaran.setAbsoluteTimeLimitFinish(absoluteTimeLimitFinish == null
 		? null
-		: LocalDateTime.ofEpochSecond(absoluteTimeLimit, 0, OffsetDateTime.now().getOffset()));
+		: LocalDateTime.ofEpochSecond(absoluteTimeLimitFinish, 0, OffsetDateTime.now().getOffset()));
+
+	// update monitoring UI where time limits are reflected on dashboard
+	FluxRegistry.emit(CommonConstants.ACTIVITY_TIME_LIMIT_CHANGED_SINK_NAME, Set.of(toolContentId));
+	FluxRegistry.emit(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
 	dokumaranService.saveOrUpdate(dokumaran);
     }
 
@@ -485,6 +528,8 @@ public class MonitoringController {
 	    }
 	}
 	dokumaranService.saveOrUpdate(dokumaran);
+
+	FluxRegistry.emit(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, toolContentId);
     }
 
     /**

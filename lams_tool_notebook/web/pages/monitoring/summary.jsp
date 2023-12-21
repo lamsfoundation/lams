@@ -13,6 +13,19 @@
 	    -webkit-border-radius:0;
 	    -khtml-border-radius:0;
 	}
+
+	.jip-ok-button {
+		margin: 0.3rem
+	}
+
+	.ui-jqgrid td input,.ui-jqgrid td select,.ui-jqgrid td textarea {
+    	margin: 0.5rem
+	}	
+
+	.comment-area {
+		margin: 1.2rem
+	}
+
 </style>
 
 <script type="text/javascript">
@@ -23,9 +36,9 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 
 	$(document).ready(function(){
@@ -50,12 +63,12 @@
 				iconSet: 'fontAwesome',
 			   	colNames:['#',
 						'userUid',
- 						"<fmt:message key="label.user.name" />",
- 					    "<fmt:message key="label.lastModified" />",
-					    "<fmt:message key="label.lastModified" />",
-					    "<fmt:message key="label.lastModified" />",
+ 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.user.name' /></spring:escapeBody>",
+ 					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lastModified' /></spring:escapeBody>",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lastModified' /></spring:escapeBody>",
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.lastModified' /></spring:escapeBody>",
 	 				    'entry',
-					    "<fmt:message key="label.comment" />",  // comment summary for sorting
+					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.comment' /></spring:escapeBody>",  // comment summary for sorting
 					    'actualComment',
 	 					'userId',
 						'portraitId'
@@ -97,9 +110,9 @@
  	                $.each(rowIds, function (index, rowId) {
  	                	var comment = jQuery("#group${sessionId}").getCell(rowId, 'comment');
  	                	if ( comment && comment.length > 0 ){
-							jQuery("#group${sessionId}").setCell(rowId, 'commentsort','<fmt:message key="label.yes" />');
+							jQuery("#group${sessionId}").setCell(rowId, 'commentsort','<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.yes" /></spring:escapeBody>');
 						} else {
-							jQuery("#group${sessionId}").setCell(rowId, 'commentsort','<fmt:message key="label.no" />');
+							jQuery("#group${sessionId}").setCell(rowId, 'commentsort','<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no" /></spring:escapeBody>');
 						}
  	                	var lastEdited = jQuery("#group${sessionId}").getCell(rowId, 'lastEdited');
  	                	var lastEditedTimeagoFormat = jQuery("#group${sessionId}").getCell(rowId, 'lastEditedTimeago');
@@ -119,7 +132,7 @@
  					
  					//display "not available" sign if there is no entry
  					if (! (typeof(jQuery("#group${sessionId}").getCell) === "function")) {
- 						subgrid.append("<fmt:message key='label.notAvailable' />");
+ 						subgrid.append("<spring:escapeBody javaScriptEscape="true"><fmt:message key='label.notAvailable' /></spring:escapeBody>");
  					}
  					
  					var entry = jQuery("#group${sessionId}").getCell(rowId, 'entry');
@@ -133,21 +146,21 @@
  					}).appendTo(subgrid);
  					subgrid.append("<br>");
  					
- 					subgrid.append('<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all ui-state-default ui-th-column ui-th-ltr" style="text-align:left; margin-bottom: 4px;padding: 3px;"><fmt:message key="label.comment" /></div>');
+ 					subgrid.append('<div class="ui-jqgrid ui-widget ui-widget-content ui-corner-all ui-state-default ui-th-column ui-th-ltr" style="text-align:left; margin-bottom: 4px;padding: 3px;"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment" /></spring:escapeBody></div>');
  					//ui-widget-content
  					//display teacher's comment
  					$('<div/>', {
  						"class": "user-entry editable${sessionId}_" + rowId + "_t comment-area",
  						"data-type": "textarea",
- 						"data-checkbox-label": "<fmt:message key='label.notify.learner' />"
+ 						"data-checkbox-label": " <spring:escapeBody javaScriptEscape="true"><fmt:message key='label.notify.learner' /></spring:escapeBody> "
  					}).text(comment).appendTo(subgrid); 
   					
  					$(".editable${sessionId}_" + rowId + "_t").jinplace({
  					    url: "<c:url value='/monitoring/saveTeacherComment.do?userUid='/>" + userUid + "&<csrf:token/>",
  					    textOnly: true,
- 					    placeholder: '<fmt:message key="label.click.to.edit" />',
- 					    okButton: "<fmt:message key='button.ok' />",
- 					    cancelButton: "<fmt:message key='button.cancel' />"
+ 					    placeholder: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.click.to.edit" /></spring:escapeBody>',
+ 					    cancelButton: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.cancel' /></spring:escapeBody>",
+ 					    okButton: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.ok' /></spring:escapeBody>"
  					});
  				}
 			}).jqGrid('filterToolbar',{searchOnEnter: false});
@@ -184,7 +197,7 @@
 <div class="panel">
 	<button class="btn btn-default pull-right"
 			onClick="javascript:window.open('${tool}monitoring/showPrintDialog.do?toolContentID=${param.toolContentID}', 'PrintNotebook',width=800,height=600,scrollbars)">
-		<i class="fa fa-print"></i> <span class="hidden-xs"><fmt:message key="monitor.summary.print"/></span>
+		<i class="fa fa-print"></i> <span class="d-none d-sm-block"><fmt:message key="monitor.summary.print"/></span>
 	</button>
 	
 	<h4>

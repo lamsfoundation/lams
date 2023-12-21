@@ -172,6 +172,9 @@ public class LearningController {
 
 	String mode = request.getParameter(McAppConstants.MODE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, mcService.isLastActivity(new Long(toolSessionID)));
+	request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
+	request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -183,25 +186,6 @@ public class LearningController {
 	}
 	Long userID = user.getQueUsrId();
 	mcLearningForm.setUserID(userID);
-
-	/*
-	 * Is there a deadline set?
-	 */
-	Date submissionDeadline = mcContent.getSubmissionDeadline();
-	if (submissionDeadline != null) {
-
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
-	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-	    request.setAttribute("submissionDeadline", submissionDeadline);
-
-	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
-	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		return "learning/submissionDeadline";
-	    }
-	}
 
 	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
 
@@ -224,6 +208,25 @@ public class LearningController {
 	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
+
+	/*
+	 * Is there a deadline set?
+	 */
+	Date submissionDeadline = mcContent.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    request.setAttribute("submissionDeadline", submissionDeadline);
+
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return "learning/submissionDeadline";
+	    }
+	}
 
 	List<AnswerDTO> learnerAnswerDtos = mcService.getAnswersFromDatabase(mcContent, user);
 	request.setAttribute(McAppConstants.LEARNER_ANSWER_DTOS, learnerAnswerDtos);
@@ -248,8 +251,6 @@ public class LearningController {
 		Set<McQueUsr> groupUsers = mcSession.getMcQueUsers();// mcService.getUsersBySession(new
 								     // Long(toolSessionID).longValue());
 		request.setAttribute(McAppConstants.ATTR_GROUP_USERS, groupUsers);
-		request.setAttribute(McAppConstants.TOOL_SESSION_ID, toolSessionID);
-		request.setAttribute(McAppConstants.ATTR_CONTENT, mcContent);
 
 		return "learning/WaitForLeader";
 	    }

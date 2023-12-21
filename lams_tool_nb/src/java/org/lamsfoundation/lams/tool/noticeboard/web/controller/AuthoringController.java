@@ -84,6 +84,12 @@ public class AuthoringController {
     @RequestMapping("/authoring")
     public String unspecified(@ModelAttribute NbAuthoringForm nbAuthoringForm, HttpServletRequest request,
 	    HttpServletResponse response) {
+	/*
+	 * DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
+	 * the two tabs {Advanced, Instructions} are not visible.
+	 */
+	nbAuthoringForm.setDefineLater(request.getParameter(NoticeboardConstants.DEFINE_LATER));
+	
 	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	return readDatabaseData(nbAuthoringForm, request, mode);
     }
@@ -98,6 +104,7 @@ public class AuthoringController {
 	NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
 	nb.setDefineLater(true);
 	nbService.saveNoticeboard(nb);
+	nbAuthoringForm.setDefineLater("true");
 
 	// audit log the teacher has started editing activity in monitor
 	nbService.auditLogStartEditingActivityInMonitor(contentId);
@@ -113,12 +120,6 @@ public class AuthoringController {
 	String contentFolderId = WebUtil.readStrParam(request, NoticeboardConstants.CONTENT_FOLDER_ID);
 
 	nbAuthoringForm.setToolContentID(contentId.toString());
-
-	/*
-	 * DefineLater is used in the basic screen. If defineLater is set, then in the authoring page,
-	 * the two tabs {Advanced, Instructions} are not visible.
-	 */
-	nbAuthoringForm.setDefineLater(request.getParameter(NoticeboardConstants.DEFINE_LATER));
 
 	if (!contentExists(nbService, contentId)) {
 	    //	Pre-fill the form with the default content

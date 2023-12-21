@@ -84,7 +84,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 
 	String strGetUser = "from voteQueUsr in class VoteQueUsr where voteQueUsr.queUsrId=:queUsrId and voteQueUsr.voteSession.uid=:voteSessionId";
 	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(strGetUser)
-		.setParameter("queUsrId", queUsrId.longValue()).setParameter("voteSessionId", voteSessionId.longValue())
+		.setParameter("queUsrId", queUsrId).setParameter("voteSessionId", voteSessionId)
 		.list();
 
 	if (list != null && list.size() > 0) {

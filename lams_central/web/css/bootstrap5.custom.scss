@@ -1,14 +1,20 @@
 /* LAMS custom palette 
    https://coolors.co/f8f8f8-0175e2-f9f871-00914a-d73961
 */
-$blue: #0175E2; /* rgb(1, 117, 226) */
+$blue: #0570d5; /* rgb(5, 112, 213) */
 $yellow: #F9F871; /* rgb(249, 248, 113) */
-$green: #00914A; /* rgb(0, 145, 74) */
+$green: #018847; /* rgb(1, 136, 71) */
 $red: #D73961; /* rgb(215, 57, 97) */
 
+$enable-shadows:              true;
+$enable-negative-margins:     true;
 
 @import "bootstrap/bootstrap.scss";
 
 :root {
-	--lams-background-gray: #F8F8F8; /* rgb(248, 248, 248) */
+	--lams-background-gray: #e0e0e0; /* rgb(224, 224, 224) */
+}
+
+.offcanvas{
+	--bs-offcanvas-padding-x: 0.5rem;
 }

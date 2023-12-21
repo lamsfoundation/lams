@@ -35,32 +35,30 @@
 <%@ tag body-content="scriptless"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<%@ attribute name="defineLaterMessageKey" required="false"
-	rtexprvalue="true"%>
-<%@ attribute name="buttonTryAgainKey" required="false"
-	rtexprvalue="true"%>
-
-<%-- Default value for I18N keys --%>
-<c:if test="${empty defineLaterMessageKey}">
-	<c:set var="defineLaterMessageKey" value="define.later.message" />
+<%@ attribute name="toolSessionID" required="true" rtexprvalue="true"%>
+<%@ attribute name="refresh" required="false" rtexprvalue="true"%>
+<c:if test="${empty refresh}">
+	<c:set var="refresh" value="60" />
 </c:if>
-<c:if test="${empty buttonTryAgainKey}">
-	<c:set var="buttonTryAgainKey" value="button.try.again" />
+<%@ attribute name="defineLaterLabel" required="false" rtexprvalue="true"%>
+<c:if test="${empty defineLaterLabel}">
+	<c:set var="defineLaterLabel" value="define.later.message" />
 </c:if>
 
-<div class="row no-gutter">
-	<div
-		class="col-12 col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
-		<div class="alert alert-info">
-			<fmt:message key="${defineLaterMessageKey}" />
+<fmt:message var="title" key='activity.title'/>
+
+<lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" refresh="${refresh}">
+	<div id="container-main">
+		<lams:Alert5 type="info" id="define-later-info" close="false">
+			<fmt:message key="${defineLaterLabel}" />
+		</lams:Alert5>
+	
+		<div class="activity-bottom-buttons">
+			<button type="button" id="finishButton" onclick="javascript:location.reload(true);" class="btn btn-primary btn-icon-refresh mt-3"> 
+				<fmt:message key="button.try.again" />
+			</button>
 		</div>
 	</div>
-</div>
-<div class="row no-gutter">
-	<div class="col-12 col-xs-12">
-		<a href="javascript:location.reload(true);"
-			class="btn btn-primary pull-right voffset5"><fmt:message
-				key="${buttonTryAgainKey}" /></a>
-	</div>
-</div>
+</lams:PageLearner>

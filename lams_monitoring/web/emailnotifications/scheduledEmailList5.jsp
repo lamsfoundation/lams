@@ -8,7 +8,7 @@
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>	
 	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	
 	<c:choose>
@@ -25,8 +25,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript">
-	var deleteConfirmationMessage1 = '<fmt:message key="email.notification.delete.alert1"><fmt:param>%replace%</fmt:param></fmt:message>';
-	var deleteConfirmationMessage2 = '<fmt:message key="email.notification.delete.alert2"/>';
+	var deleteConfirmationMessage1 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notification.delete.alert1"><fmt:param>%replace%</fmt:param></fmt:message></spring:escapeBody>';
+	var deleteConfirmationMessage2 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notification.delete.alert2"/></spring:escapeBody>';
 	
 	function deleteNotification(triggerName, scheduledate, deleteUrlParams) {
 		var msg = deleteConfirmationMessage1;

@@ -1,8 +1,8 @@
 package org.lamsfoundation.lams.tool.sbmt.web.form;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.lamsfoundation.lams.tool.sbmt.model.SubmitFilesContent;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Dapeng.Ni
@@ -28,6 +28,8 @@ public class AuthoringForm {
     // file and display fields
 
     private boolean limitUpload;
+
+    private boolean minLimitUpload;
 
     private boolean useSelectLeaderToolOuput;
 
@@ -62,6 +64,7 @@ public class AuthoringForm {
 	limitUpload = content.isLimitUpload();
 	limitUploadNumber = content.getLimitUploadNumber();
 	minLimitUploadNumber = content.getMinLimitUploadNumber();
+	minLimitUpload = minLimitUploadNumber != null;
 
 	reflectOnActivity = content.isReflectOnActivity();
 	reflectInstructions = content.getReflectInstructions();
@@ -149,6 +152,14 @@ public class AuthoringForm {
 
     public void setLimitUpload(boolean limitUpload) {
 	this.limitUpload = limitUpload;
+    }
+
+    public boolean isMinLimitUpload() {
+	return minLimitUpload;
+    }
+
+    public void setMinLimitUpload(boolean minLimitUpload) {
+	this.minLimitUpload = minLimitUpload;
     }
 
     public int getLimitUploadNumber() {

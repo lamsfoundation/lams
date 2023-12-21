@@ -21,6 +21,10 @@
 		margin-top: 20px;
 		margin-bottom: 20px;
 	}
+
+	#gallery-walk-skip {
+		margin-top: 20px;
+	}
 	
 	#gallery-walk-rating-table th {
 		font-weight: bold;
@@ -52,17 +56,17 @@
 		submissionDateString: '${submissionDateString}',
 		setSubmissionDeadlineUrl: '<c:url value="setSubmissionDeadline.do"/>?<csrf:token/>',
 		toolContentID: '<c:out value="${param.toolContentID}" />',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+		messageNotification: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.notification" /></spring:escapeBody>',
+		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
+		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 
 
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/",
 		//vars for rating.js
-		AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-		YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+		AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+		YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 		MAX_RATES = 0,
 		MIN_RATES = 0,
 		LAMS_URL = '${lams}',
@@ -73,8 +77,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/portrait.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <script type="text/javascript">
@@ -98,7 +102,7 @@
 	}
 
 	function startGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.start.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.start.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 		
@@ -112,9 +116,25 @@
 			}
 		});
 	}
-	
+
+	function skipGalleryWalk(){
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
+			return;
+		}
+
+		$.ajax({
+			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'data': {
+				toolContentID : ${dto.toolContentId}
+			},
+			'success' : function(){
+				location.reload();
+			}
+		});
+	}
+
 	function finishGalleryWalk(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.finish.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 		
@@ -130,7 +150,7 @@
 	}
 
 	function enableGalleryWalkLearnerEdit(){
-		if (!confirm('<fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" />')) {
+		if (!confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 		
@@ -202,7 +222,14 @@
 			</button>
 			
 			<br>
-						
+
+			<button id="gallery-walk-skip" type="button"
+					  class="btn btn-danger
+							   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
+					  onClick="javascript:skipGalleryWalk()">
+				  <fmt:message key="monitoring.summary.gallery.walk.skip" />
+			</button>
+
 			<button id="gallery-walk-learner-edit" type="button"
 			        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
 			        onClick="javascript:enableGalleryWalkLearnerEdit()">
@@ -365,4 +392,3 @@
 <%@ include file="advanceOptions.jsp"%>
 
 <%@include file="dateRestriction.jsp"%>
-

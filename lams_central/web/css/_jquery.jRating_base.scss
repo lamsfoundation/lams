@@ -26,6 +26,9 @@
 	left:0;
 	z-index:3;
 }
+.rating-stars-disabled .jStar {
+	cursor: initial !important;
+}
 
 /** P containing the rate informations **/
 p.jRatingInfos {
@@ -56,18 +59,12 @@ p.jRatingInfos span.maxRate {
 .rating-stars-holder {text-align: center;}
 .rating-stars-caption {padding-top: 6px; font-size: 12px}
 .rating-stars, .rating-stars-disabled {margin: 0px auto; min-height: 20px;}
-.add-comment {
-	background-image: url('../images/tick.png');
-	width:16px !important;
-	height:16px;
-	cursor: pointer;
-	float: right !important;
-	margin-top: 20px;
-}
-.rating-comment{
+
+.rating-comment {
 	padding: 15px;
-	margin: 10px 0;
+	margin: 15px auto;
 }
+
 .rating-info{
 	margin-top: 0;
 	margin-bottom: 12px;

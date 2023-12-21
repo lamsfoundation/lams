@@ -52,6 +52,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
@@ -156,8 +157,9 @@ public class LearningController {
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page".
      */
     @RequestMapping("/start")
-    public String start(HttpServletRequest request) throws ServletException, IllegalAccessException,
-	    InstantiationException, InvocationTargetException, NoSuchMethodException {
+    public String start(HttpServletRequest request)
+	    throws ServletException, IllegalAccessException, InstantiationException, InvocationTargetException,
+	    NoSuchMethodException {
 
 	// initialize Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -203,8 +205,8 @@ public class LearningController {
 
 	    AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(),
 		    groupLeader.getUserId());
-	    boolean isLastAttemptFinishedByLeader = lastLeaderResult != null
-		    && lastLeaderResult.getFinishDate() != null;
+	    boolean isLastAttemptFinishedByLeader =
+		    lastLeaderResult != null && lastLeaderResult.getFinishDate() != null;
 
 	    // forwards to the waitForLeader pages
 	    if (assessment.getRelativeTimeLimit() != 0 && !isUserLeader && !isLastAttemptFinishedByLeader) {
@@ -260,7 +262,8 @@ public class LearningController {
 	}
 	//add random questions (actually replacing them with real ones)
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
-	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult == null ? null
+	Map<Long, AssessmentQuestionResult> questionToResultMap = lastResult == null
+		? null
 		: lastResult.getQuestionResults().stream()
 			.collect(Collectors.toMap(q -> q.getQbToolQuestion().getUid(), q -> q));
 	for (QuestionReference questionReference : questionReferences) {
@@ -271,13 +274,13 @@ public class LearningController {
 		if (lastResult == null) {
 		    //pick element randomly
 		    Random rand = new Random(System.currentTimeMillis());
-		    randomQuestion = (AssessmentQuestion) availableRandomQuestions.toArray()[rand
-			    .nextInt(availableRandomQuestions.size())];
+		    randomQuestion = (AssessmentQuestion) availableRandomQuestions.toArray()[rand.nextInt(
+			    availableRandomQuestions.size())];
 		    availableRandomQuestions.remove(randomQuestion);
 
 		} else {
 		    // pick element from the last result
-		    for (Iterator<AssessmentQuestion> iter = availableRandomQuestions.iterator(); iter.hasNext();) {
+		    for (Iterator<AssessmentQuestion> iter = availableRandomQuestions.iterator(); iter.hasNext(); ) {
 			AssessmentQuestion availableRandomQuestion = iter.next();
 			if (questionToResultMap.containsKey(availableRandomQuestion.getUid())) {
 			    randomQuestion = availableRandomQuestion;
@@ -295,8 +298,8 @@ public class LearningController {
 	}
 
 	//user is allowed to answer questions if assessment activity doesn't have leaders or he is the leader
-	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput()
-		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
+	boolean hasEditRight =
+		!assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader;
 
 	//showResults if user has finished the last result
 	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
@@ -458,9 +461,9 @@ public class LearningController {
 	    }
 
 	    // display Etherpads after each question
-	    boolean questionEtherpadEnabled = assessment.isUseSelectLeaderToolOuput()
-		    && assessment.isQuestionEtherpadEnabled()
-		    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
+	    boolean questionEtherpadEnabled =
+		    assessment.isUseSelectLeaderToolOuput() && assessment.isQuestionEtherpadEnabled()
+			    && StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	    request.setAttribute(AssessmentConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
 	    if (questionEtherpadEnabled) {
 		// get all users from the group, even if they did not reach the Scratchie yet
@@ -485,15 +488,15 @@ public class LearningController {
     }
 
     /**
-     * Auxiliary method to be called by nextPage(HttpServletRequest request,
-     * HttpServletResponse response) or submitAll.
+     * Auxiliary method to be called by nextPage(HttpServletRequest request, HttpServletResponse response) or
+     * submitAll.
      *
      * @param mapping
      * @param request
      * @param isAnswersValidationFailed
-     *            submitAll() method may set it as true in case some of the pages miss required answers
+     * 	submitAll() method may set it as true in case some of the pages miss required answers
      * @param pageNumberWithUnasweredQuestions
-     *            page number with questions required to be answered
+     * 	page number with questions required to be answered
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -514,8 +517,8 @@ public class LearningController {
 	}
 
 	int questionNumberingOffset = 0;
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	for (int i = 0; i < pageNumberToOpen - 1; i++) {
 	    Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(i);
 	    questionNumberingOffset += questionsForOnePage.size();
@@ -555,8 +558,8 @@ public class LearningController {
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
@@ -626,8 +629,8 @@ public class LearningController {
 	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
 	// using 2 browsers). Then show last stored results
 	if (!isResultsStored) {
-	    List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		    .get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	    List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		    AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	    Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	    Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	    service.loadupLastAttempt(assessmentUid, userId, pagedQuestionDtos);
@@ -653,8 +656,8 @@ public class LearningController {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 
 	Long userId = assessmentUser.getUserId();
 	service.unsetSessionFinished(toolSessionId, userId);
@@ -689,28 +692,19 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = user.getUserID().longValue();
-	    Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = user.getUserID().longValue();
+	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(AssessmentConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (AssessmentApplicationException e) {
-	    log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = service.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * auto saves responses
-     *
-     * @throws IOException
      */
     @RequestMapping("/autoSaveAnswers")
     @ResponseStatus(HttpStatus.OK)
@@ -796,8 +790,8 @@ public class LearningController {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
-	    HttpServletRequest request) {
+    public void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Integer userId = refForm.getUserID();
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -816,7 +810,7 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************
@@ -828,14 +822,14 @@ public class LearningController {
      *
      * @param request
      * @param pageNumber
-     *            number of the page to process
+     * 	number of the page to process
      */
     @SuppressWarnings("unchecked")
     private void storeUserAnswersIntoSessionMap(HttpServletRequest request, int pageNumber) {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
 
 	for (int i = 0; i < questionsForOnePage.size(); i++) {
@@ -859,12 +853,12 @@ public class LearningController {
 		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
 		    if (questionDto.isMultipleAnswersAllowed()) {
-			String answer = request
-				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
+			String answer = request.getParameter(
+				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getUid());
 			answerBoolean = StringUtils.isNotBlank(answer);
 		    } else {
-			String optionUidSelectedStr = request
-				.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
+			String optionUidSelectedStr = request.getParameter(
+				AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 			if (optionUidSelectedStr != null) {
 			    Long optionUidSelected = Long.parseLong(optionUidSelectedStr);
 			    answerBoolean = optionDto.getUid().equals(optionUidSelected);
@@ -964,8 +958,8 @@ public class LearningController {
      */
     @SuppressWarnings("unchecked")
     private int validateAnswers(SessionMap<String, Object> sessionMap) {
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 
 	//array of missing required questions
 	boolean isAllQuestionsAnswered = true;
@@ -995,10 +989,9 @@ public class LearningController {
 			    isAnswered |= optionDto.getAnswerInt() != 0;
 			}
 
-		    } else if ((questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
-			    || (questionType == QbQuestion.TYPE_NUMERICAL)
-			    || (questionType == QbQuestion.TYPE_TRUE_FALSE)
-			    || (questionType == QbQuestion.TYPE_ESSAY)) {
+		    } else if ((questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS) || (questionType
+			    == QbQuestion.TYPE_NUMERICAL) || (questionType == QbQuestion.TYPE_TRUE_FALSE) || (
+			    questionType == QbQuestion.TYPE_ESSAY)) {
 			isAnswered |= StringUtils.isNotBlank(questionDto.getAnswer());
 
 		    } else if (questionType == QbQuestion.TYPE_ORDERING) {
@@ -1055,8 +1048,8 @@ public class LearningController {
      */
     @SuppressWarnings("unchecked")
     private void showResults(HttpServletRequest request, SessionMap<String, Object> sessionMap) {
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	Long userId = user.getUserId();
@@ -1081,8 +1074,8 @@ public class LearningController {
 			//question feedback
 			questionDto.setQuestionFeedback(null);
 			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
-			    if (questionResult.getQbOption() != null
-				    && optionDto.getUid().equals(questionResult.getQbOption().getUid())) {
+			    if (questionResult.getQbOption() != null && optionDto.getUid()
+				    .equals(questionResult.getQbOption().getUid())) {
 				questionDto.setQuestionFeedback(optionDto.getFeedback());
 				break;
 			    }
@@ -1114,7 +1107,8 @@ public class LearningController {
 		}
 	    }
 
-	    Date timeTaken = result.getFinishDate() == null ? new Date(0)
+	    Date timeTaken = result.getFinishDate() == null
+		    ? new Date(0)
 		    : new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
 	    result.setTimeTaken(timeTaken);
 	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
@@ -1124,8 +1118,8 @@ public class LearningController {
 		int lastBorder = 0;
 		for (int i = overallFeedbacks.size() - 1; i >= 0; i--) {
 		    AssessmentOverallFeedback overallFeedback = overallFeedbacks.get(i);
-		    if ((percentageCorrectAnswers >= lastBorder)
-			    && (percentageCorrectAnswers <= overallFeedback.getGradeBoundary())) {
+		    if ((percentageCorrectAnswers >= lastBorder) && (percentageCorrectAnswers
+			    <= overallFeedback.getGradeBoundary())) {
 			result.setOverallFeedback(overallFeedback.getFeedback());
 			break;
 		    }
@@ -1200,8 +1194,8 @@ public class LearningController {
 	}
 	ToolActivityRatingCriteria criterion = null;
 	if (criteria.isEmpty()) {
-	    criterion = (ToolActivityRatingCriteria) RatingCriteria
-		    .getRatingCriteriaInstance(RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
+	    criterion = (ToolActivityRatingCriteria) RatingCriteria.getRatingCriteriaInstance(
+		    RatingCriteria.TOOL_ACTIVITY_CRITERIA_TYPE);
 	    criterion.setTitle(service.getMessage("label.answer.rating.title"));
 	    criterion.setOrderId(1);
 	    criterion.setCommentsEnabled(true);
@@ -1227,7 +1221,8 @@ public class LearningController {
 
 	Long ratingUserId = null;
 	if (user != null) {
-	    ratingUserId = user.getSession().getGroupLeader() == null ? user.getUserId()
+	    ratingUserId = user.getSession().getGroupLeader() == null
+		    ? user.getUserId()
 		    : user.getSession().getGroupLeader().getUserId();
 	}
 
@@ -1236,8 +1231,8 @@ public class LearningController {
 
 		List<List<AssessmentQuestionResult>> questionResultsPerSession = summary.getQuestionResultsPerSession();
 		if (questionResultsPerSession != null) {
-		    List<AssessmentQuestionResult> questionResults = questionResultsPerSession
-			    .remove((int) userSessionIndex);
+		    List<AssessmentQuestionResult> questionResults = questionResultsPerSession.remove(
+			    (int) userSessionIndex);
 
 		    Set<Long> questionItemIds = questionResultsPerSession.stream()
 			    .filter(l -> l != null && !l.isEmpty() && l.get(l.size() - 1).getUid() != null)
@@ -1340,9 +1335,10 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
-	boolean newUI = WebUtil.readBooleanParam(request, "newUI", false);
+	
+	boolean isBootstrap5 = WebUtil.readBooleanParam(request, "bootstrap5", false);
 
-	return "pages/learning/results" + (embedded ? "/allquestions" + (newUI ? "5" : "") : "");
+	return "pages/learning/" + (isBootstrap5 ? "results" : "resultsbootstrap3") + (embedded ? "/allquestions" : "");
     }
 
     @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)
@@ -1365,8 +1361,8 @@ public class LearningController {
     private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave)
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
-	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap.get(
+		AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -1393,6 +1389,8 @@ public class LearningController {
 	    AssessmentSession session = service.getSessionBySessionId(sessionId);
 	    assessmentUser = new AssessmentUser(user, session);
 	    service.createUser(assessmentUser);
+
+	    FluxRegistry.emit(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME, session.getAssessment().getContentId());
 	}
 	return assessmentUser;
     }

@@ -23,9 +23,11 @@
 
 package org.lamsfoundation.lams.tool.spreadsheet.web.controller;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -226,7 +228,7 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finishSession")
-    public String finishSession(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public void finishSession(HttpServletRequest request, HttpServletResponse response) throws IOException, SpreadsheetApplicationException {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
@@ -237,19 +239,12 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(userDTO.getUserID().longValue());
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = new Long(userDTO.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(SpreadsheetConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (SpreadsheetApplicationException e) {
-	    log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = service.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
@@ -284,7 +279,8 @@ public class LearningController {
      * Submit reflection form input database.
      */
     @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public void submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, SpreadsheetApplicationException {
 
 	Integer userId = reflectionForm.getUserID();
 
@@ -308,7 +304,7 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finishSession(reflectionForm, request);
+	finishSession(request, response);
     }
 
     //*************************************************************************************

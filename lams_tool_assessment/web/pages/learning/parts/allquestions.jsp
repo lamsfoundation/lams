@@ -3,52 +3,56 @@
 <c:if test="${isQuestionEtherpadEnabled and not empty allGroupUsers}">
 	<%-- Prepare same content for each question Etherpad. Each group participant's first and last name --%>
 	<c:set var="questionEtherpadContent">
-		<c:forEach items="${allGroupUsers}" var="user"><c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />:<br />
-	<br />
-	<br /></c:forEach>
+		<c:forEach items="${allGroupUsers}" var="user">
+			<c:out value="${user.firstName}" />&nbsp;<c:out
+				value="${user.lastName}" />:<br />
+			<br />
+			<br />
+		</c:forEach>
 	</c:set>
 </c:if>
 
 <form id="answers" name="answers" method="post" action="<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>">
 	<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
-						
-		<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
+		<c:set var="questionIndex" value="${status.index}"/>
+		<input type="hidden" name="questionUid${questionIndex}" id="questionUid${questionIndex}" value="${question.uid}" />						
 							
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title" style="margin-bottom: 10px;font-size: initial;">
-					<c:if test="${assessment.numbered}">
-							${status.index + sessionMap.questionNumberingOffset}.
-					</c:if>
-	  				
-	  				<c:if test="${not sessionMap.hideTitles}">
-						${question.title}
-					</c:if>
-				</h3>
+		<div class="card lcard">
+			<div class="card-header">
+				<div class="card-title">
+					<span id="question-title-${questionIndex}">
+						<c:if test="${assessment.numbered}">
+							${questionIndex + sessionMap.questionNumberingOffset}.
+						</c:if>
+		  				
+		  				<c:if test="${not sessionMap.hideTitles}">
+							${question.title}
+						</c:if>
+					</span>
 
-				<c:if test="${assessment.displayMaxMark}">
-					<span class="pull-right small loffset10" style="padding-top: 3px">
-						<fmt:message key="label.learning.max.mark">
-							<fmt:param value="${question.maxMark}" />
-						</fmt:message>
-					</span>
-				</c:if>
-									
-				<c:if test="${question.answerRequired}">
-					<span class="asterisk pull-right">
-						<i class="fa fa-xs fa-asterisk text-danger" title="<fmt:message key="label.answer.required"/>" 
-								alt="<fmt:message key="label.answer.required"/>"></i>
-					</span>
-				</c:if>
-							
-				<c:if test="${empty question.question}">
-					<!--  must have something here otherwise the question-numbers span does not float properly -->
-					&nbsp;
-				</c:if>
-				${question.question}
+					<c:if test="${assessment.displayMaxMark}">
+						<span class="float-end badge alert alert-info fw-normal m-1 p-1">
+							<fmt:message key="label.learning.max.mark">
+								<fmt:param value="${question.maxMark}" />
+							</fmt:message>
+						</span>
+					</c:if>
+										
+					<c:if test="${question.answerRequired}">
+						<span class="asterisk float-end badge alert alert-warning m-1 p-1"> 
+							<i class="fa fa-asterisk text-danger"
+							title="<fmt:message key="label.answer.required"/>"
+							alt="<fmt:message key="label.answer.required"/>"></i>
+						</span>
+					</c:if>
+				</div>
 			</div>
 					
-			<div class="panel-body question-area" id="question-area-${status.index}">
+			<div class="card-body question-area" id="question-area-${questionIndex}">
+				<div class="mb-4" id="question-description-${question.uid}">
+					${question.question}
+				</div>
+				
 				<c:choose>
 					<c:when test="${question.type == 1}">
 						<c:set var="justificationEligible" value="true" />
@@ -80,8 +84,6 @@
 					</c:when>
 					<c:when test="${question.type == 8}">
 						<c:set var="justificationEligible" value="true" />
-						<c:set var="questionIndex" value="${status.index}"/>
-						
 						<c:choose>
 							<c:when test="${question.responseSubmitted}">
 								<%@ include file="../results/markhedging.jsp"%>
@@ -102,35 +104,44 @@
 				<%--Display jsutification for each question --%>
 				<c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled)) 
 							&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
-					<div class="form-group answer-justification-container voffset20">
-						<a data-toggle="collapse" data-target="#answer-justification-${question.uid}" role="button" class="collapsed">
-							<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
-				 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+					<div class="answer-justification-container mt-4 mb-2">
+						<button type="button" data-bs-toggle="collapse"
+							data-bs-target="#answer-justification-${questionIndex}"
+							class="btn btn-light btn-sm collapsed card-subheader"
+							id="justification-button-${questionIndex}"
+						>
+							<span class="if-collapsed"> 
+								<i class="fa-regular fa-square-plus fa-xs me-2" aria-hidden="true"></i>
+							</span> 
+							<span class="if-not-collapsed"> 
+								<i class="fa-regular fa-square-minus fa-xs me-2" aria-hidden="true"></i>
+							</span>
 							<fmt:message key="label.answer.justification" />
-						</a>
-						
-						<div id="answer-justification-${question.uid}" class="collapse">
-							<textarea name="answerJustification${status.index}" class="form-control" rows="6" 
+						</button>
+
+						<div id="answer-justification-${questionIndex}" class="collapse">
+							<textarea name="answerJustification${questionIndex}" class="form-control mt-2" rows="6" 
 									  placeholder='<fmt:message key="label.answer.justification.prompt"/>'
+									  aria-labelledby="question-title-${questionIndex} justification-button-${questionIndex}"
 							>${question.justification}</textarea>
 						</div>
 					</div>
 				</c:if>
-				
-			</div>
-					
+			</div>		
 		</div>
-		
-
 		
 		<%--Display Etherpad for each question --%>
 		<c:if test="${isQuestionEtherpadEnabled}">
-			<div class="form-group question-etherpad-container">
-				<a data-toggle="collapse" data-target="#question-etherpad-${question.uid}" role="button" class="collapsed">
-					<span class="if-collapsed"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i></span>
-		 				<span class="if-not-collapsed"><i class="fa fa-xs fa-minus-square-o roffset5" aria-hidden="true"></i></span>
+			<div class="question-etherpad-container mb-3">
+				<button type="button" data-bs-toggle="collapse" data-bs-target="#question-etherpad-${question.uid}" class="btn btn-light btn-sm collapsed">
+					<span class="if-collapsed">
+						<i class="fa-regular fa-square-plus fa-xs me-2" aria-hidden="true"></i>
+					</span>
+		 			<span class="if-not-collapsed">
+		 				<i class="fa-regular fa-square-minus fa-xs me-2" aria-hidden="true"></i>
+		 			</span>
 					<fmt:message key="label.etherpad.discussion" />
-				</a>
+				</button>
 				
 				<div id="question-etherpad-${question.uid}" class="question-etherpad-collapse collapse">
 					<div class="panel panel-default question-etherpad">

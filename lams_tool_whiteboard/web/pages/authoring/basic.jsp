@@ -18,11 +18,11 @@
 <c:if test="${not empty whiteboardServerUrl}">
 	<div class="full-screen-content-div">
 		<div class="full-screen-flex-div">
-			<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
+			<a href="#" class="btn btn-default pull-right full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
 			   title="<fmt:message key='label.fullscreen.open' />">
 				<i class="fa fa-arrows-alt" aria-hidden="true"></i>
 			</a> 
-	       	<a href="#" class="btn btn-default fixed-button-width pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
+	       	<a href="#" class="btn btn-default pull-right full-screen-exit-button" onclick="javascript:exitFullscreen()"
 			   title="<fmt:message key='label.fullscreen.close' />">
 	       		<i class="fa fa-compress" aria-hidden="true"></i>
 	       	</a>

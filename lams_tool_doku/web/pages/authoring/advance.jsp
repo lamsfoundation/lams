@@ -16,6 +16,32 @@
 			}
 		}).change();
 		
+
+		// time limit various options functionality
+		$('input[name="timeLimit"]').change(function(){
+			let timeLimitTypeNone = $('#timeLimitNone'),
+					timeLimitTypeRelative = $('#timeLimitRelative'),
+					timeLimitTypeRelativeValue = $('#timeLimitRelativeValue'),
+					timeLimitTypeAbsolute = $('#timeLimitAbsolute'),
+					timeLimitTypeAbsoluteValue = $('#timeLimitAbsoluteValue');
+
+			if (timeLimitTypeNone.prop('checked')) {
+				timeLimitTypeRelativeValue.prop('disabled', true).val(0);
+				timeLimitTypeAbsoluteValue.prop('disabled', true).val(0);
+				return;
+			}
+			if (timeLimitTypeRelative.prop('checked')) {
+				timeLimitTypeRelativeValue.prop('disabled', false);
+				timeLimitTypeAbsoluteValue.prop('disabled', true).val(0);
+				return;
+			}
+			if (timeLimitTypeAbsolute.prop('checked')) {
+				timeLimitTypeRelativeValue.prop('disabled', true).val(0);
+				timeLimitTypeAbsoluteValue.prop('disabled', false);
+				return;
+			}
+		}).first().change();
+
 		$('[data-toggle="tooltip"]').bootstrapTooltip();
 	});
 </script>
@@ -44,15 +70,7 @@
 		</label>
         <form:input path="dokumaran.maxMark" type="number" min="1" max="100" size="2" id="maxMark" cssClass="form-control input-sm"/>        
     </div>
-    
-	<div class="form-inline voffset10">
-		<label for="relativeTimeLimit">
-			<fmt:message key="label.time.limit" />&nbsp;
-            <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="" data-original-title="<fmt:message key="label.time.limit.tooltip"/>"></i>
-		</label>
-        <form:input path="dokumaran.relativeTimeLimit" type="number" min="0" size="2" id="relativeTimeLimit" cssClass="form-control input-sm"/>        
-    </div>
-	
+
 	<div class="checkbox">
 		<label for="showChat">
 			<form:checkbox path="dokumaran.showChat" id="showChat"/>
@@ -82,6 +100,44 @@
 
 </lams:SimplePanel>
 
+<lams:SimplePanel titleKey="label.authoring.advance.time.limit">
+
+	<div class="loffset20">
+		<div class="radio form-inline">
+			<label for="timeLimitNone">
+				<input type="radio" name="timeLimit" value="none" id="timeLimitNone"
+					${authoringForm.dokumaran.relativeTimeLimit eq 0 and authoringForm.dokumaran.absoluteTimeLimit eq 0 ? 'checked' : ''}
+				/>
+				<fmt:message key="label.authoring.advance.time.limit.none" />
+			</label>
+		</div>
+
+		<div class="radio form-inline">
+			<label for="timeLimitRelative">
+				<input type="radio" id="timeLimitRelative" name="timeLimit" value="relative"
+					${authoringForm.dokumaran.relativeTimeLimit > 0 ? 'checked' : ''} />
+				<fmt:message key="label.authoring.advance.time.limit.relative" />&nbsp;
+			</label>
+			<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right"
+			   title='<fmt:message key="label.authoring.advance.time.limit.relative.tooltip" />'></i>&nbsp;
+			<form:input path="dokumaran.relativeTimeLimit" type="number" min="0" max="999" size="3"
+						id="timeLimitRelativeValue" cssClass="form-control input-sm"/>
+		</div>
+
+		<div class="radio form-inline">
+			<label for="timeLimitAbsolute">
+				<input type="radio" id="timeLimitAbsolute" name="timeLimit" value="absolute"
+					${authoringForm.dokumaran.absoluteTimeLimit > 0 ? 'checked' : ''} />
+				<fmt:message key="label.authoring.advance.time.limit.absolute" />&nbsp;
+			</label>
+			<i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right"
+			   title='<fmt:message key="label.authoring.advance.time.limit.absolute.tooltip" />'></i>&nbsp;
+			<form:input path="dokumaran.absoluteTimeLimit" type="number" min="0" max="999" size="3"
+						id="timeLimitAbsoluteValue" cssClass="form-control input-sm"/>
+		</div>
+	</div>
+</lams:SimplePanel>
+
 <lams:SimplePanel titleKey="label.gallery.walk">
 	<p>
 		<fmt:message key="label.authoring.advance.gallery.walk.info1" />
@@ -106,7 +162,18 @@
 			<i class="fa fa-question-circle" 
 			   data-toggle="tooltip" title="<fmt:message key='label.authoring.advance.gallery.walk.read.only.tooltip' />"></i>
 		</div>
-		
+
+		<div class="form-inline form-group">
+			<label for="galleryWalkClusterSize">
+				<fmt:message key="label.authoring.advance.gallery.walk.cluster" />&nbsp;
+				<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="top" title=""
+				   data-original-title="<fmt:message key="label.authoring.advance.gallery.walk.cluster.tooltip"/>"></i>
+			</label>
+			<form:input path="dokumaran.galleryWalkClusterSize" type="number" min="0" max="9" size="2" id="galleryWalkClusterSize"
+						cssClass="form-control input-sm"/>
+			<br><small class="text-muted"><fmt:message key="label.authoring.advance.gallery.walk.cluster.0" /></small>
+		</div>
+
 		<div class="form-group">
 			<fmt:message key='label.authoring.advance.gallery.walk.instructions' var="galleryWalkInstructions"/>
 			<form:textarea path="dokumaran.galleryWalkInstructions" cssClass="form-control" rows="3" 

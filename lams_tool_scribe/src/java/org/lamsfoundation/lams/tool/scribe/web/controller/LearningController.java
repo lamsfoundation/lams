@@ -81,7 +81,6 @@ public class LearningController {
 	// 'toolSessionID' and 'mode' paramters are expected to be present.
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE,
 		LearningController.MODE_OPTIONAL);
-
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	scribeService.createReportEntry(toolSessionID);
@@ -92,6 +91,9 @@ public class LearningController {
 	    throw new ScribeException("Cannot retrieve session with toolSessionID" + toolSessionID);
 	}
 	Scribe scribe = scribeSession.getScribe();
+	
+	learningform.setToolSessionID(scribeSession.getSessionId());
+	request.setAttribute("MODE", mode.toString());
 
 	// check defineLater
 	if (scribe.isDefineLater()) {
@@ -125,8 +127,6 @@ public class LearningController {
 	}
 
 	// setup dto's forms and attributes.
-	learningform.setToolSessionID(scribeSession.getSessionId());
-	request.setAttribute("MODE", mode.toString());
 	setupDTOs(request, scribeSession, scribeUser);
 
 	// check force complete

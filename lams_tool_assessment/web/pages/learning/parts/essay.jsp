@@ -1,23 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="isWordsLimitEnabled" value="${hasEditRight && (question.maxWordsLimit != 0 || question.minWordsLimit != 0)}"/>
 
-<c:if test="${isWordsLimitEnabled}">
 <script type="text/javascript">
-	
+<c:if test="${isWordsLimitEnabled}">
 	$(document).ready(function() {
 		var isCkeditor = ${question.allowRichEditor};
 			
 		if (isCkeditor) {
-			var ckeditor = CKEDITOR.instances['question${status.index}'];
+			var ckeditor = CKEDITOR.instances['question${questionIndex}'];
 			// each event needs to be specified separately
 			ckeditor.on('change', function(){
-				$('#word-count${status.index}').html(this.wordCount.wordCount);
+				$('#word-count${questionIndex}').html(this.wordCount.wordCount);
 			});
 			ckeditor.on('paste', function(){
-				$('#word-count${status.index}').html(this.wordCount.wordCount);
+				$('#word-count${questionIndex}').html(this.wordCount.wordCount);
 			});
 			ckeditor.on('blur', function(){
-				$('#word-count${status.index}').html(this.wordCount.wordCount);
+				$('#word-count${questionIndex}').html(this.wordCount.wordCount);
 			});
 			
 			// trigger count after load
@@ -25,7 +24,7 @@
 				ckeditor.fire('change');
 			});
 		} else {
-			$("#essay-question${status.index}").on('change keyup keydown paste', function(event){
+			$("#essay-question${questionIndex}").on('change keyup keydown paste', function(event){
 				var newText = '';
 				
 				// if it is a single key typed
@@ -43,7 +42,7 @@
 					newText = newText.getData('Text');
 				}
 				
-				var value = $("#essay-question${status.index}").val() + newText,
+				var value = $("#essay-question${questionIndex}").val() + newText,
 			    	wordCount = getNumberOfWords(value),
 			    	maxWordsLimit = ${question.maxWordsLimit};
 			    	
@@ -66,18 +65,16 @@
 						}
 				    }
 				
-				$('#word-count${status.index}').html(wordCount);
+				$('#word-count${questionIndex}').html(wordCount);
 			}).change();
 		}
 	});
-</script>
 </c:if>
 
-<c:if test="${not empty question.codeStyle}">
-	<script type="text/javascript">
+	<c:if test="${not empty question.codeStyle}">
 		// initialise syntax highlighter depending on programming language
 		$(document).ready(function() {
-			var codeArea = $('#essay-question${status.index}'),
+			var codeArea = $('#essay-question${questionIndex}'),
 				codeMirror = CodeMirror.fromTextArea(codeArea[0], {
 					'mode' : '${question.codeStyleMime}'
 				}),
@@ -85,77 +82,99 @@
 				content = codeMirror.getValue().replaceAll('<BR>', '\n');
 			codeMirror.setValue(content);
 		});
-	</script>
-</c:if>
+	</c:if>
+</script>
 
-<div class="question-type">
+<div class="card-subheader" id="instructions-${questionIndex}">
 	<fmt:message key="label.learning.short.answer.answer" />
 </div>
 
-<div class="table-responsive">
-	<table class="table table-condensed">
-		<c:if test="${isWordsLimitEnabled}">
-			<tr>
-				<td>
-					<c:choose>
-						<c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
-							<div class="reg-info">
-								<fmt:message key="label.info.max.and.min.number.words" >
-									<fmt:param>${question.minWordsLimit}</fmt:param>
-									<fmt:param>${question.maxWordsLimit}</fmt:param>
-								</fmt:message>
-							</div>
-							<div class="reg-info max-word-limit-exceeded text-danger">
-								<fmt:message key="warn.maximum.number.words" />
-							</div>
-						</c:when>
-						<c:when test="${question.maxWordsLimit != 0}">
-							<div class="reg-info">
-								<fmt:message key="label.info.maximum.number.words" >
-									<fmt:param>${question.maxWordsLimit}</fmt:param>
-								</fmt:message>
-							</div>
-							<div class="reg-info max-word-limit-exceeded text-danger">
-								<fmt:message key="warn.maximum.number.words" />
-							</div>
-						</c:when>
-						<c:when test="${question.minWordsLimit != 0}">
-							<div class="reg-info">
-								<fmt:message key="label.info.minimum.number.words" >
-									<fmt:param>${question.minWordsLimit}</fmt:param>
-								</fmt:message>
-							</div>
-						</c:when>
-					</c:choose>
-				</td>
-			</tr>
-		</c:if>
-	
-		<tr>
-			<td>
-				<c:choose>
-					<c:when test="${question.allowRichEditor && hasEditRight}">
-						<lams:CKEditor id="question${status.index}" value="${question.answer}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner" height="174px" maxWords="${question.maxWordsLimit}"></lams:CKEditor>
-					</c:when>
-					<c:when test="${not empty question.codeStyle}">
-						<textarea id="essay-question${status.index}" name="question${status.index}">${question.answer}</textarea>
-					</c:when>
-					<c:when test="${not hasEditRight}">
-						${question.answer}
-					</c:when>
-					<c:otherwise>
-						<lams:textarea id="essay-question${status.index}" name="question${status.index}" class="form-control" rows="8">${question.answer}</lams:textarea>
-					</c:otherwise>
-				</c:choose>
-			</td>
-		</tr>
-		
-		<c:if test="${isWordsLimitEnabled}">
-			<tr>
-				<td>
-					<fmt:message key="label.words" /> <span id="word-count${status.index}">0</span>
-				</td>
-			</tr>
-		</c:if>
-	</table>
+<div>
+	<c:if test="${isWordsLimitEnabled}">
+		<c:choose>
+			<c:when test="${question.maxWordsLimit != 0 && question.minWordsLimit != 0}">
+				<div class="alert" role="alert">
+					<span class="alert alert-info">
+						<fmt:message key="label.info.max.and.min.number.words">
+							<fmt:param>${question.minWordsLimit}</fmt:param>
+							<fmt:param>${question.maxWordsLimit}</fmt:param>
+						</fmt:message>
+					</span>
+				</div>
+				
+				<div class="alert max-word-limit-exceeded" role="alert">
+					<span class="alert alert-danger">
+						<fmt:message key="warn.maximum.number.words" />
+					</span>
+				</div>
+			</c:when>
+			
+			<c:when test="${question.maxWordsLimit != 0}">
+				<div class="alert" role="alert">
+					<span class="alert alert-info">
+						<fmt:message key="label.info.maximum.number.words">
+							<fmt:param>${question.maxWordsLimit}</fmt:param>
+						</fmt:message>
+					</span>
+				</div>
+				
+				<div class="alert max-word-limit-exceeded" role="alert">
+					<span class="alert alert-danger">
+						<fmt:message key="warn.maximum.number.words" />
+					</span>
+				</div>
+			</c:when>
+			
+			<c:when test="${question.minWordsLimit != 0}">
+				<div class="alert" role="alert">
+					<span class="alert alert-info">
+						<fmt:message key="label.info.minimum.number.words">
+							<fmt:param>${question.minWordsLimit}</fmt:param>
+						</fmt:message>
+					</span>
+				</div>
+			</c:when>
+		</c:choose>
+	</c:if>
+
+	<div>
+		<c:choose>
+			<c:when test="${question.allowRichEditor && hasEditRight}">
+				<lams:CKEditor id="question${questionIndex}"
+					value="${question.answer}"
+					contentFolderID="${sessionMap.learnerContentFolder}"
+					toolbarSet="DefaultLearner" height="174px"
+					maxWords="${question.maxWordsLimit}"
+					ariaLabelledby="question-title-${questionIndex} instructions-${questionIndex}"
+					isRequired="${question.answerRequired}"
+					></lams:CKEditor>
+			</c:when>
+			
+			<c:when test="${not empty question.codeStyle}">
+				<textarea id="essay-question${questionIndex}" name="question${questionIndex}"
+					aria-labelledby="question-title-${questionIndex} instructions-${questionIndex}"
+					${question.answerRequired? 'aria-required="true" required="true"' : ''}
+				>${question.answer}</textarea>
+			</c:when>
+			
+			<c:when test="${not hasEditRight}">
+				${question.answer}
+			</c:when>
+			
+			<c:otherwise>
+				<lams:textarea id="essay-question${questionIndex}"
+					name="question${questionIndex}" class="form-control" rows="8"
+					aria-labelledby="question-title-${questionIndex} instructions-${questionIndex}"
+					aria-describedby="question-description-${question.uid}"
+					aria-required="${question.answerRequired}"
+				>${question.answer}</lams:textarea>
+			</c:otherwise>
+		</c:choose>
+	</div>
+
+	<c:if test="${isWordsLimitEnabled}">
+		<div class="mt-1">
+			<fmt:message key="label.words" /> <span id="word-count${questionIndex}">0</span>
+		</div>
+	</c:if>
 </div>

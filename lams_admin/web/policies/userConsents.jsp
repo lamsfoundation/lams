@@ -3,12 +3,10 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css">
 	<style>
 		th, td {
 			text-align: center;

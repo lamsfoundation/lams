@@ -31,7 +31,7 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/webrtc-capturestill.js"></script>
@@ -48,14 +48,14 @@
 			//handler for upload-webcam button
 			$('#upload-webcam').click(function() {
 				$.blockUI({
-					message : '<h1><img src="images/loading.gif" style="padding-right:25px;"> <fmt:message key="label.portrait.please.wait" /> </h1>'
+					message : '<h1><img src="images/loading.gif" style="padding-right:25px;"> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.portrait.please.wait" /></spring:escapeBody> </h1>'
 				});
 				
 				uploadProtraitToServerSide(croppieWidget);
 			});
 
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.portrait.change.screen" />', '740');
+			updateMyProfileDialogSettings('<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.portrait.change.screen" /></spring:escapeBody>', '740');
 
 			//init croppie widget on Upload tab
 			var $uploadCroppie = $('#upload-croppie').croppie({
@@ -222,7 +222,7 @@
 
 		<c:if test="${!param.isReturnButtonHidden}">
 			<div align="right">
-				<button type="button" class="btn btn-sm btn-file btn-default offset5" id="portraitReturnButton" onclick="history.go(-1);">
+				<button type="button" class="btn btn-sm btn-file btn-primary offset5" id="portraitReturnButton" onclick="history.go(-1);">
 					<fmt:message key="label.return.to.myprofile" />
 				</button>
 			</div>

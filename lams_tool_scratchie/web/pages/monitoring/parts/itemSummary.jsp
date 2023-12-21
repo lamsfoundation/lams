@@ -48,9 +48,9 @@
 	  					guiStyle: "bootstrap",
 	  					iconSet: 'fontAwesome',
 	  				   	colNames:[
-		  				   	"<fmt:message key="label.monitoring.summary.answer" />"
+		  				   	"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.answer' /></spring:escapeBody>"
 		  			  	   	<c:forEach var="i" begin="0" end="${summary.numberColumns-1}">
-		  			  	   		,"<fmt:message key="label.monitoring.summary.choice" />&nbsp;${i+1}"
+		  			  	   		,"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.choice' /></spring:escapeBody>&nbsp;${i+1}"
 					  		</c:forEach>
 	  					],
 	  				   	colModel:[
@@ -64,7 +64,7 @@
 	  				
 	  	   	        <c:forEach var="optionDto" items="${summary.optionDtos}" varStatus="i">
 	  	   	     		jQuery("#session${summary.sessionId}").addRowData(${i.index + 1}, {
-	  	   	     			option:"<c:out value='${optionDto.answer}' escapeXml='${!optionDto.mcqType}' /><c:if test='${optionDto.correct}'> (<fmt:message key='label.monitoring.item.summary.correct' />)</c:if>"
+	  	   	     			option:"<c:out value='${optionDto.answer}' escapeXml='${!optionDto.mcqType}' /><c:if test='${optionDto.correct}'> (<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.item.summary.correct' /></spring:escapeBody>)</c:if>"
 	  	   	     			<c:forEach var="j" begin="0" end="${summary.numberColumns-1}">
 	  	   	     				,choice${j}:"${optionDto.attempts[j]}"
 	  	   	     			</c:forEach>

@@ -88,96 +88,65 @@ $(document).ready(function (){
 			// update presenceTabLabel
 			$("#presenceUserCount").html(labelUsers + " (" + users.length + ")");
 		}
-	},
-	
-	presenceWebsocketInitTime = Date.now(),
-	// init the connection with server using server URL but with different protocol
-	presenceWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId),
-	presenceWebsocketPingTimeout = null,
-	presenceWebsocketPingFunc = null;
-	
-	presenceWebsocket.onclose = function(e){
-		// react only on abnormal close
-		if (e.code === 1006 &&
-			Date.now() - presenceWebsocketInitTime > 1000) {
-			location.reload();
-		}
 	};
-	
-	presenceWebsocketPingFunc = function(skipPing){
-		if (presenceWebsocket.readyState == presenceWebsocket.CLOSING || presenceWebsocket.readyState == presenceWebsocket.CLOSED) {
-				return;
-		}
-		
-		// check and ping every 3 minutes
-		presenceWebsocketPingTimeout = setTimeout(presenceWebsocketPingFunc, 3*60*1000);
-		// initial set up does not send ping
-		if (!skipPing) {
-			presenceWebsocket.send("ping");
-		}
-	};
-	// set up timer for the first time
-	presenceWebsocketPingFunc(true);
-	
 
-	// when the server pushes new messages and roster to the learner's browser
-	presenceWebsocket.onmessage = function(e){
-	  // reset ping timer
-      clearTimeout(presenceWebsocketPingTimeout);
-      presenceWebsocketPingFunc(true);
-		
-	  // create JSON object
-	  var input = JSON.parse(e.data);
-	  if (input.roster) {
-		  roster.updateDisplay(input.roster);
-	  }
-	  
-	  if (input.messages) {
-		  var activeNick = getUserFromTabIndex(presenceChatTabs.tabs('option','active')),
-		  	  selectedTabTag = nickToTag(activeNick);
-		  
-		  jQuery.each(input.messages, function(){
-			  // which tab are we talking about?
-			  var from = this.to ? (this.from == nickname ? this.to : this.from) : groupChatInfo.nick,
-				  lastMessageUid = roster.lastMessageUids[from] || 0;
-			  
-			  // are the messages new?
-			  if (this.uid > lastMessageUid) {
-				  var tag = nickToTag(from);
-				  if (tag != selectedTabTag) {
-					var tab = $("#" + tagToTabLabel(tag));
-					if (tab.length == 0) {
-						// no tab opened yet, create it
-						tab = addTab(from, tag);
+	initWebsocket('presence' + lessonId,
+		APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId,
+		function (e) {
+			// create JSON object
+			var input = JSON.parse(e.data);
+			if (input.roster) {
+				roster.updateDisplay(input.roster);
+			}
+
+			if (input.messages) {
+				var activeNick = getUserFromTabIndex(presenceChatTabs.tabs('option','active')),
+					selectedTabTag = nickToTag(activeNick);
+
+				jQuery.each(input.messages, function(){
+					// which tab are we talking about?
+					var from = this.to ? (this.from == nickname ? this.to : this.from) : groupChatInfo.nick,
+						lastMessageUid = roster.lastMessageUids[from] || 0;
+
+					// are the messages new?
+					if (this.uid > lastMessageUid) {
+						var tag = nickToTag(from);
+						if (tag != selectedTabTag) {
+							var tab = $("#" + tagToTabLabel(tag));
+							if (tab.length == 0) {
+								// no tab opened yet, create it
+								tab = addTab(from, tag);
+							}
+
+							// notify of new message
+							tab.addClass('presenceTabNewMessage');
+							if (tag != groupChatInfo.tag) {
+								$("#" + tagToListing(tag)).addClass('presenceListingNewMessage');
+							}
+						}
+
+						roster.lastMessageUids[from] = this.uid;
+						var messageArea = $("#" + (nickToMessageArea(from)));
+						messageArea.append(generateMessageHTML(this.from, this.message, this.dateSent));
+						messageArea.scrollTop(messageArea.prop('scrollHeight'));
 					}
-					
-					// notify of new message
-					tab.addClass('presenceTabNewMessage');
-					if (tag != groupChatInfo.tag) {
-						$("#" + tagToListing(tag)).addClass('presenceListingNewMessage');
-					}
-				  }
-				  
-				  roster.lastMessageUids[from] = this.uid;
-				  var messageArea = $("#" + (nickToMessageArea(from)));
-				  messageArea.append(generateMessageHTML(this.from, this.message, this.dateSent));
-				  messageArea.scrollTop(messageArea.prop('scrollHeight'));
-			  }
-		  });  
-	  }
-	  
-		// remove conversation tabs with learners who are gone
-		$('li a', presenceChatTabs).each(function() {
-		  var nick = $(this).text();
-		  if (nick != groupChatInfo.nick && !roster.users[nick]) {
-			  var tag = $(this).attr('href');
-			  $(tag).remove();
-			  $(this).parent().remove();
-			  presenceChatTabs.tabs('refresh');
-		  }
+				});
+			}
+
+			// remove conversation tabs with learners who are gone
+			$('li a', presenceChatTabs).each(function() {
+				var nick = $(this).text();
+				if (nick != groupChatInfo.nick && !roster.users[nick]) {
+					var tag = $(this).attr('href');
+					$(tag).remove();
+					$(this).parent().remove();
+					presenceChatTabs.tabs('refresh');
+				}
+			});
+
+			// reset ping timer
+			websocketPing('presence' + lessonId, true);
 		});
-	};
-
 });
 
 
@@ -242,9 +211,8 @@ function addTab(nick, tag) {
 		 'type'     : 'fetchConversation',
 		 'to'       : nick
 		};
-	
-	presenceWebsocket.send(JSON.stringify(data));
-	
+	sendToWebsocket('presence' + lessonId, JSON.stringify(data));
+
 	return tab;
 }
 
@@ -303,12 +271,10 @@ function sendMessage(receiver) {
 		 'to'       : tag == groupChatInfo.tag ? '' : receiver,
 		 'message'  : message
 		};
-	
-	presenceWebsocket.send(JSON.stringify(data));
-	
+	sendToWebsocket('presence' + lessonId, JSON.stringify(data));
+
 	// reset ping timer
-    clearTimeout(presenceWebsocketPingTimeout);
-    presenceWebsocketPingFunc(true);
+	websocketPing('presence' + lessonId, true);
 }
 
 /* ******* Click handlers ******* */

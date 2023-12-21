@@ -1,0 +1,181 @@
+@import "free.ui.jqgrid.min.css";
+
+#gbox_grid {
+	width: 100% !important;
+	border: 0;
+}
+
+.ui-jqgrid-hdiv, .ui-jqgrid-bdivs, .ui-jqgrid-btable, .ui-jqgrid-hbox,
+	.ui-jqgrid-htable {
+	width: 100% !important;
+	font-size: 1rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap {
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);/*copied from .shadow class*/
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-caption {
+	background-color: var(--bs-gray-200);
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .btn:not(.disabled) {
+	opacity: 0.8;
+}
+
+.ui-jqgrid .ui-jqgrid-bdiv {
+	overflow: inherit;
+}
+
+.ui-jqgrid-htable th {
+	border: 3px !important;
+	padding: 0 !important;
+	font-family: mont-bold, sans-serif;
+	margin: 0;
+	width: 100%;
+	background-color: transparent !important;
+}
+
+.ui-jqgrid-labels th {
+	padding-bottom: .4rem !important;
+	background-color: #fff;
+}
+
+.ui-jqgrid .ui-jqgrid-btable .jqgrow>.ui-sgcollapsed {
+	background-color: transparent !important;
+	border: 0;
+	box-shadow: 0 0 0 !important;
+	padding-left: .5rem;
+	padding-right: .5rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap tr.jqgrow .sgbutton-div .sgbutton.btn {
+	box-shadow: 0 0 0 !important;
+}
+
+.ui-jqgrid-bdiv .table-bordered td, .ui-jqgrid-bdiv .table-bordered th {
+	border: 0 !important;
+}
+
+.ui-jqgrid-bdiv .ui-row-ltr.jqgrow td {
+	border-bottom: 2px solid var(--bs-gray-300) !important;
+	height: initial !important;
+}
+
+.ui-jqgrid .ui-row-ltr, .ui-jqgrid .ui-jqgrid-labels {
+	height: 3rem;
+}
+
+.ui-subgrid.ui-row-ltr td {
+	border-bottom: 1px solid #C3CEDC !important;
+}
+
+.ui-subgrid.ui-row-ltr th {
+	border-bottom: 2px solid #C3CEDC !important;
+}
+
+.ui-subgrid.ui-row-ltr td, .ui-jqgrid.ui-jqgrid-bootstrap {
+	border: 3px !important;
+}
+
+.ui-subgrid.ui-row-ltr .subgrid-cell, .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-bootstrap-corner-bottom	{
+	
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-pager {
+	background-color: #e5e5e5;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap>.ui-jqgrid-view {
+	border: none;
+}
+
+.table-hover tbody tr:hover {
+	background-color: var(--bs-gray-200);
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar {
+	color: #fff !important; /* copied from .text-bg-secondary */
+    background-color: RGBA(108, 117, 125, var(--bs-bg-opacity, 1)) !important; /* copied from .text-bg-secondary */
+    --bs-bg-opacity: 0.85;
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close {
+	right: .6rem;
+	top: 40%;
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close>span.fas {
+	font-size: 1.3rem;
+}
+
+.ui-jqgrid .ui-jqgrid-titlebar>.ui-jqgrid-titlebar-close>span.fas:before {
+	color: var(--bs-secondary);
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button {
+	color: var(--bs-white);
+	background-color: var(--bs-secondary);
+	border-color: var(--bs-secondary);
+	margin-right: .4rem;
+	margin-left: .4rem;
+	font-size: 14px;
+	border: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button.active,
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button:hover {
+	border: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-selbox {
+	border: 1px solid #c3cedc;
+	border-radius: 5px;
+	font-size: 1rem;
+	padding: 4px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .ui-pg-input {
+	border: 1px solid #c3cedc;
+	border-radius: 5px;
+	font-size: 1rem;
+	padding: 5px;
+	text-align: center;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable td > a {
+	text-decoration: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .sgbutton > .fa-solid {
+	font-weight: 1000;
+	color: #3C42E0;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-button span {
+	margin: 5px 7px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table td {
+	border-bottom: none;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-clear > a {
+	font-size: 30px;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-table .ui-search-input {
+	width: 90%;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap>.ui-jqgrid-pager {
+	font-size: 1rem;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-pg-table .btn.ui-pg-button[id^="refresh_"] {
+	padding: 0.9em 0 0.7em 0;
+}
+
+.ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable .table-success {
+	background-color: rgba(0, 145, 74, 0.1);
+}

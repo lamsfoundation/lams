@@ -23,21 +23,8 @@
 
 package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -62,8 +49,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Steve.Ni
@@ -79,7 +71,6 @@ public class LearningController {
     private static final String DEFINE_LATER_PATH = "/pages/learning/definelater";
     private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do";
     private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do";
-    private static final String FINISH_PATH = "/pages/learning/finish";
     private static final String SHOW_RESULTS_PAGE_PATH = "/pages/learning/results";
     private static final String NOTEBOOK_PATH = "/pages/learning/notebook";
 
@@ -95,7 +86,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     @RequestMapping("/start")
     public String start(HttpServletRequest request, HttpSession session) throws IOException, ServletException {
@@ -106,7 +96,6 @@ public class LearningController {
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -127,8 +116,8 @@ public class LearningController {
 	    user = service.getUserByIDAndSession(userId, sessionId);
 	    if (user == null) {
 		log.error(new StringBuilder(
-			"Unable to find specified user for peerreview activity. Screens are likely to fail. SessionId=")
-				.append(sessionId).append(" UserId=").append(userId).toString());
+			"Unable to find specified user for peerreview activity. Screens are likely to fail. SessionId=").append(
+			sessionId).append(" UserId=").append(userId).toString());
 	    }
 	} else {
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
@@ -165,7 +154,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     @RequestMapping("/refresh")
     @SuppressWarnings("unchecked")
@@ -222,7 +210,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     private String startRating(HttpServletRequest request, HttpSession session, SessionMap<String, Object> sessionMap,
 	    Long sessionId, PeerreviewUser user, ToolAccessMode mode, RatingCriteria currentCriteria, Boolean next)
@@ -376,12 +363,10 @@ public class LearningController {
 
 	// ratings left by and by the user
 	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(peerreview.getContentId());
-	List<StyledCriteriaRatingDTO> allUsersDtos = peerreview.isShowRatingsLeftByUser()
-		? new ArrayList<>(ratingCriterias.size())
-		: null;
-	List<StyledCriteriaRatingDTO> currentUserDtos = peerreview.isShowRatingsLeftForUser()
-		? new ArrayList<>(ratingCriterias.size())
-		: null;
+	List<StyledCriteriaRatingDTO> allUsersDtos = peerreview.isShowRatingsLeftByUser() ? new ArrayList<>(
+		ratingCriterias.size()) : null;
+	List<StyledCriteriaRatingDTO> currentUserDtos = peerreview.isShowRatingsLeftForUser() ? new ArrayList<>(
+		ratingCriterias.size()) : null;
 
 	Set<Integer> processedCriteriaGroups = new HashSet<>();
 	for (RatingCriteria criteria : ratingCriterias) {
@@ -392,34 +377,37 @@ public class LearningController {
 		processedCriteriaGroups.add(criteria.getRatingCriteriaGroupId());
 	    }
 
-	    boolean showAllUsers = peerreview.isSelfReview() || criteria.isRankingStyleRating()
-		    || criteria.isHedgeStyleRating() || (mode != null && mode.isTeacher());
+	    boolean showAllUsers =
+		    peerreview.isSelfReview() || criteria.isRankingStyleRating() || criteria.isHedgeStyleRating() || (
+			    mode != null && mode.isTeacher());
 
-	    int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating())
-		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC
-		    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    if (criteria.isStarStyleRating() || criteria.isHedgeStyleRating()) {
+		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
+	    } else if (criteria.isRubricsStyleRating()) {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	    }
+	    final int sortingFinal = sorting;
 
 	    if (allUsersDtos != null) {
-		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
-			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
-				user.getUserId(), false, sorting, null, showAllUsers, true);
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service.getUsersRatingsCommentsByCriteriaIdDTO(
+			peerreview.getContentId(), sessionId, c, user.getUserId(), false, sortingFinal, null,
+			showAllUsers, true);
 
 		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
-		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
-			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
-			: dtoBuilder.apply(criteria);
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating() ? PeerreviewServiceImpl.fillCriteriaGroup(
+			criteria, ratingCriterias, dtoBuilder) : dtoBuilder.apply(criteria);
 		allUsersDtos.add(dto);
 	    }
 
 	    if (currentUserDtos != null) {
-		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service
-			.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, c,
-				user.getUserId(), false, sorting, null, showAllUsers, false);
+		Function<RatingCriteria, StyledCriteriaRatingDTO> dtoBuilder = c -> service.getUsersRatingsCommentsByCriteriaIdDTO(
+			peerreview.getContentId(), sessionId, c, user.getUserId(), false, sortingFinal, null,
+			showAllUsers, false);
 
 		// for rubrics there is a single dto (first row) with list of all rows (including first) filled
-		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating()
-			? PeerreviewServiceImpl.fillCriteriaGroup(criteria, ratingCriterias, dtoBuilder)
-			: dtoBuilder.apply(criteria);
+		StyledCriteriaRatingDTO dto = criteria.isRubricsStyleRating() ? PeerreviewServiceImpl.fillCriteriaGroup(
+			criteria, ratingCriterias, dtoBuilder) : dtoBuilder.apply(criteria);
 		currentUserDtos.add(dto);
 	    }
 	}
@@ -498,7 +486,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     @RequestMapping("/edit")
     @SuppressWarnings("unchecked")
@@ -553,14 +540,13 @@ public class LearningController {
 	    // a Hibernate object and don't want to risk updating it in the db. Need to send a flag so why not make flag double as the
 	    // runtime min/max value while leaving min/max as the original criteria definition.
 	    int rateAllUsers = 0;
-	    if ((criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL)
-		    || (criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)
-		    || (criteria.isCommentRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)) {
+	    if ((criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL) || (
+		    criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL) || (
+		    criteria.isCommentRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL)) {
 		rateAllUsers = service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId);
-	    } else if ((criteria.isStarStyleRating() || criteria.isCommentRating())
-		    && (peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0)
-		    && (criteriaDto.getRatingCriteria().getMinimumRates() == 0
-			    && criteriaDto.getRatingCriteria().getMaximumRates() == 0)) {
+	    } else if ((criteria.isStarStyleRating() || criteria.isCommentRating()) && (peerreview.getMinimumRates() > 0
+		    || peerreview.getMaximumRates() > 0) && (criteriaDto.getRatingCriteria().getMinimumRates() == 0
+		    && criteriaDto.getRatingCriteria().getMaximumRates() == 0)) {
 		// override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
 		// does not matter if this change gets persisted to database.
 		criteria.setMinimumRates(peerreview.getMinimumRates());
@@ -582,7 +568,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     @RequestMapping("/nextPrev")
     @SuppressWarnings("unchecked")
@@ -619,7 +604,6 @@ public class LearningController {
      * @throws IOException
      * @throws ServletException
      * @throws JSONException
-     *
      */
     @RequestMapping("/submitComments")
     @SuppressWarnings("unchecked")
@@ -718,7 +702,6 @@ public class LearningController {
      *
      * @throws IOException
      * @throws ServletException
-     *
      */
     @RequestMapping("/submitRankingHedging")
     @SuppressWarnings("unchecked")
@@ -771,8 +754,8 @@ public class LearningController {
 			}
 		    }
 		}
-		valid = (ratings.size() == criteria.getMaxRating() || (ratings.size() >= service
-			.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : user.getUserId())));
+		valid = (ratings.size() == criteria.getMaxRating() || (ratings.size() >= service.getCountUsersBySession(
+			toolSessionId, peerreview.isSelfReview() ? -1 : user.getUserId())));
 	    }
 
 	    service.rateItems(criteria, toolSessionId, userId, ratings);
@@ -802,16 +785,9 @@ public class LearningController {
 
     /**
      * Finish learning session.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/finish")
-    @SuppressWarnings("unchecked")
-    public String finish(HttpServletRequest request, HttpSession session) {
+    public void finish(HttpServletRequest request, HttpSession session, HttpServletResponse response) throws PeerreviewApplicationException, IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
@@ -820,33 +796,16 @@ public class LearningController {
 	// get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 
-	return doFinish(request, sessionId, session);
-    }
-
-    private String doFinish(HttpServletRequest request, Long sessionId, HttpSession ss) {
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = new Long(user.getUserID().longValue());
+	UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
+	Long userID = new Long(user.getUserID().longValue());
 
-	    nextActivityUrl = service.finishToolSession(sessionId, userID);
-	    request.setAttribute(PeerreviewConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (PeerreviewApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return FINISH_PATH;
+	String nextActivityUrl = service.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/newReflection")
     @SuppressWarnings("unchecked")
@@ -876,17 +835,11 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/submitReflection")
     @SuppressWarnings("unchecked")
-    public String submitReflection(@ModelAttribute ReflectionForm form, HttpServletRequest request,
-	    HttpServletResponse response, HttpSession session) {
+    public void submitReflection(@ModelAttribute ReflectionForm form, HttpServletRequest request,
+	    HttpServletResponse response, HttpSession session) throws PeerreviewApplicationException, IOException {
 	ReflectionForm refForm = form;
 	Integer userId = refForm.getUserID();
 
@@ -909,6 +862,6 @@ public class LearningController {
 	    service.updateEntry(entry);
 	}
 
-	return finish(request, session);
+	finish(request, session, response);
     }
 }

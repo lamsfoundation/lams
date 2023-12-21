@@ -56,11 +56,7 @@ textarea {
 }
 
 .divrankx {
-    width: 300px;
-    height: 30px;
-    margin: 5px;
     padding: 5px;
-    border: $border-thin-default;
 }
 
 .divrankxlabel {
@@ -69,10 +65,19 @@ textarea {
     padding: 5px;
 }
 
-.draggable {
-	width: 290px;
-}
 .email-button {
 	margin: 2px;
 	font-size: $font-size-small !important; // force it to be small or the jqgrid setting will override
+}
+
+#no-users-info {
+	display: none;
+}
+
+.tablesorter {
+	margin-bottom: 0px;
+}
+
+#rubrics-user-cards button.btn, #rubrics-row-cards button.btn{
+	box-shadow: none !important;
 }

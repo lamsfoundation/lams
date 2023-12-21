@@ -1,27 +1,24 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="title"><fmt:message key="index.welcome" /></c:set>
 
-<lams:html>
-<lams:head>
-	<meta HTTP-EQUIV="Refresh" CONTENT="0.5;URL=index.do">
-	<title><fmt:message key="index.welcome" /></title>
-	<lams:css />
-</lams:head>
+<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true" refresh="0.5;URL=index.do">
 
-<body class="stripes">
 	<!-- Index page flag - do not remove, TestHarness looks for it -->
 
-	<lams:Page type="admin">
-
-		<div class="text-center" style="margin-top: 20px; margin-bottom: 20px;">
-			<i class="fa fa-2x fa-refresh fa-spin text-primary"></i>
-			<h4>
+	<div id="container-main">
+		<div class="text-center mt-4">
+			<button class="btn btn-outline-secondary btn-lg" type="button" disabled>
+				<span class="spinner-border me-2" role="status" aria-hidden="true" style="width: 1.35rem; height: 1.35rem;"></span>
 				<fmt:message key="msg.loading" />
-			</h4>
+			</button>
 		</div>
-
-		<div id="footer"></div>
-		<!--closes footer-->
-	</lams:Page>
-</body>
-</lams:html>
+			
+		<div class="text-center placeholder-glow">
+			<span class="placeholder col-12 col-md-10 placeholder-xs mt-5 mb-3"></span>
+		    <c:forEach var="i" begin="1" end="7">
+		    	<span class="placeholder col-12 col-md-10 placeholder-xs my-3"></span>
+		    </c:forEach>
+		</div>
+	</div>
+</lams:PageLearner>

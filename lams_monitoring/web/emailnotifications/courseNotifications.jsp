@@ -46,7 +46,7 @@
 				iconSet: 'fontAwesome',
 			   	url: "<c:url value='/emailNotifications/getUsers.do?'/>" + getSearchParams(),
 				datatype: "json",
-			   	colNames:['<fmt:message key="email.notifications.user.name"/>'],
+				colNames: ['<spring:escapeBody javaScriptEscape="true"><fmt:message key="email.notifications.user.name" /></spring:escapeBody>'],
 			   	colModel:[
 			   		{name:'name',index:'name', width:260, firstsortorder:'desc', sorttype: 'text'}
 			   	],
@@ -79,9 +79,9 @@
     			},
     			activate: function(event, ui) {
     				if ($('#accordion').accordion('option', 'active') == 0) {
-    					$("#emailButton").attr('value', '<fmt:message key="email.notifications.send"/>');
+    					$("#emailButton").attr('value', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="email.notifications.send"/></spring:escapeBody>');
     				} else {
-    					$("#emailButton").attr('value', '<fmt:message key="email.notifications.button.schedule"/>');
+    					$("#emailButton").attr('value', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="email.notifications.button.schedule"/></spring:escapeBody>');
     				}
     		    }
     		});
@@ -89,7 +89,7 @@
 			jQuery("#lessonsTable").jqGrid({
 				datatype: "local",
 				rowNum: 10000,
-			   	colNames:['Id', '<fmt:message key="email.notifications.lesson.name"/>'],
+			   	colNames:['Id', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="email.notifications.lesson.name"/></spring:escapeBody>'],
 			   	colModel:[
 					{name:'id2',index:'id2', width:35, sorttype:"int"},
 			   		{name:'name',index:'name', width:225, firstsortorder:'desc', sorttype: 'text'}
@@ -150,11 +150,11 @@
     	            type: 'post',
     	            success: function (json) {
     		            if (json.isSuccessfullySent) {
-    		            	alert("<fmt:message key="email.notifications.emails.successfully.sent" />");
+    		            	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.emails.successfully.sent" /></spring:escapeBody>");
     					} else if (json.isSuccessfullyScheduled) {
-    		            	alert("<fmt:message key="email.notifications.emails.successfully.scheduled" />");
+    		            	alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.emails.successfully.scheduled" /></spring:escapeBody>");
     					} else {
-    						alert("<fmt:message key="email.notifications.problems.sending.emails" />");
+    						alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key="email.notifications.problems.sending.emails" /></spring:escapeBody>");
     					}
     	            }
     	       	});

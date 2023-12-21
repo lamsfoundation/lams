@@ -72,15 +72,14 @@ public class LearningController {
 
 	Leaderselection content = session.getLeaderselection();
 	request.setAttribute(LeaderselectionConstants.ATTR_CONTENT, content);
+	// set mode, toolSessionID and LeaderselectionDTO
+	request.setAttribute("mode", mode.toString());
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// check defineLater
 	if (content.isDefineLater()) {
 	    return "pages/learning/defineLater";
 	}
-
-	// set mode, toolSessionID and LeaderselectionDTO
-	request.setAttribute("mode", mode.toString());
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// Set the content in use flag.
 	if (!content.isContentInUse()) {

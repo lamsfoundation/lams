@@ -1,41 +1,39 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="question-type">
+<div class="card-subheader" id="instructions-${questionIndex}">
 	<fmt:message key="label.assign.hedging.mark">
 		<fmt:param>${question.maxMark}</fmt:param>
 	</fmt:message>
 </div>
 
-<div class="table-responsive">
-	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.optionDtos}">
-			<tr>
-				<td>
-					<c:out value="${option.name}" escapeXml="false" />
-				</td>
+<div class="table table-sm div-hover px-3">
+	<c:forEach var="option" items="${question.optionDtos}">
+		<div class="row">
+			<div class="col" id="option-name-${option.uid}">
+				<c:out value="${option.name}" escapeXml="false" />
+			</div>
 				
-				<td style="width: 100px;">
-					<select name="question${questionIndex}_${option.uid}" class="mark-hedging-select" data-question-index="${questionIndex}"
-						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>				
-					>
-						
-						<c:forEach var="i" begin="0" end="${question.maxMark}">
-							<option
-								<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
-							>${i}</option>
-						</c:forEach>
-						
-					</select>
-				</td>				
-			</tr>
-		</c:forEach>
-	</table>
+			<div style="width: 70px;">
+				<select name="question${questionIndex}_${option.uid}" class="mark-hedging-select form-select" data-question-index="${questionIndex}"
+					<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
+					aria-labelledby="instructions-${questionIndex} option-name-${option.uid}"
+					${question.answerRequired? 'aria-required="true" required="true"' : ''}			
+				>
+					<c:forEach var="i" begin="0" end="${question.maxMark}">
+						<option
+							<c:if test="${option.answerInt == i}">selected="selected"</c:if>						
+						>${i}</option>
+					</c:forEach>
+				</select>
+			</div>				
+		</div>
+	</c:forEach>
 </div>
 
 <c:if test="${isLeadershipEnabled && isUserLeader}">
-	<div class="float-right">
-		<button type="button" name="submit-hedging-question${questionIndex}" onclick="return submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
-				class="btn pull-right">
+	<div>
+		<button type="button" name="submit-hedging-question${questionIndex}" onclick="submitSingleMarkHedgingQuestion(${question.uid}, ${questionIndex});" 
+				class="btn btn-sm btn-secondary float-end me-2">
 			<fmt:message key="label.learning.submit" />
 		</button>
 	</div>

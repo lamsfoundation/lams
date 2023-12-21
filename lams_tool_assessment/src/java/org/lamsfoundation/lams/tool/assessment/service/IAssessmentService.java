@@ -23,13 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentResultDTO;
@@ -50,7 +44,12 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 
-import reactor.core.publisher.Flux;
+import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface that defines the contract that all ShareAssessment service provider must follow.
@@ -115,13 +114,17 @@ public interface IAssessmentService extends ICommonToolService {
 
     int getCountUsersBySession(Long sessionId, String searchString);
 
-    int getCountUsersByContentId(Long contentId);
-    
-    int getCountUsersByContentId(Long contentId, String searchString);
+    int getCountLearnersByContentId(Long contentId);
+
+    int getCountLearnersByContentId(Long contentId, String searchString);
 
     int getCountLessonLearnersByContentId(long contentId);
 
-    int getCountLearnersWithFinishedCurrentAttempt(long contentId);
+    ArrayNode getLearnersByContentIdJson(Long contentId);
+
+    ArrayNode getLessonLearnersByContentIdJson(long contentId);
+
+    ArrayNode getLearnersWithFinishedCurrentAttemptJson(long contentId);
 
     List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page, int size,
 	    String sortBy, String sortOrder, String searchString);
@@ -145,6 +148,7 @@ public interface IAssessmentService extends ICommonToolService {
     Assessment getDefaultContent(Long contentId) throws AssessmentApplicationException;
 
     // ********** for user methods *************
+
     /**
      * Create a new user in database.
      */
@@ -241,14 +245,11 @@ public interface IAssessmentService extends ICommonToolService {
      * @param userId
      * @param pagedQuestions
      * @param isAutosave
-     *            indicates whether it's autosave request
-     *
+     * 	indicates whether it's autosave request
      * @return whether storing results is allowed, false otherwise
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
 	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
-
-    Flux<String> getCompletionChartsDataFlux(long toolContentId);
 
     void loadupLastAttempt(Long assessmentUid, Long userId, List<Set<QuestionDTO>> pagedQuestionDtos);
 
@@ -438,23 +439,21 @@ public interface IAssessmentService extends ICommonToolService {
     List<ExcelSheet> exportSummary(Assessment assessment, long toolContentId);
 
     /**
-     * Gets the basic statistics for the grades for the Leaders when an Assessment is done using
-     * Group Leaders. So the averages, etc are for the whole Assessment, not for a Group.
+     * Gets the basic statistics for the grades for the Leaders when an Assessment is done using Group Leaders. So the
+     * averages, etc are for the whole Assessment, not for a Group.
      */
     GradeStatsDTO getStatsDtoForLeaders(Long contentId);
 
     /**
      * Prepares data for the marks summary graph on the statistics page
-     *
      */
     List<Float> getMarksArray(Long sessionId);
 
     List<Float> getMarksArrayByContentId(Long toolContentId);
 
     /**
-     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders
-     * when an Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
-     *
+     * Prepares data for the marks summary graph on the statistics page, using the grades for the Leaders when an
+     * Assessment is done using Group Leaders. So the grades are for the whole Assessment, not for a Group.
      */
     List<Float> getMarksArrayForLeaders(Long contentId);
 
@@ -508,8 +507,8 @@ public interface IAssessmentService extends ICommonToolService {
     AssessmentQuestion getAssessmentQuestionByUid(Long questionUid);
 
     /**
-     * Sends a websocket command to learners who have assessment results open
-     * to refresh page because new data is available
+     * Sends a websocket command to learners who have assessment results open to refresh page because new data is
+     * available
      */
     void notifyLearnersOnAnswerDisclose(long toolContentId);
 
@@ -522,8 +521,6 @@ public interface IAssessmentService extends ICommonToolService {
     Grouping getGrouping(long toolContentId);
 
     List<User> getPossibleIndividualTimeLimitUsers(long toolContentId, String searchString);
-
-    Map<Integer, List<String[]>> getAnsweredQuestionsByUsers(long toolContentId);
 
     void changeLeaderForGroup(long toolSessionId, long leaderUserId);
 }

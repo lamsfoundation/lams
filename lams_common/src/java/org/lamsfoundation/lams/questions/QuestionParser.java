@@ -22,26 +22,6 @@
 
 package org.lamsfoundation.lams.questions;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -57,12 +37,30 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Extract questions and answers from various formats. They can be later used in question-based tools. Currently it
  * supports only IMS QTI but other methods can be added as needed.
  *
  * @author Marcin Cieslak
- *
  */
 public class QuestionParser {
     private static Logger log = Logger.getLogger(QuestionParser.class);
@@ -136,17 +134,17 @@ public class QuestionParser {
 
 	NodeList questionItems = doc.getElementsByTagName("item");
 	// yes, a label here for convenience
-	questionLoop: for (int questionItemIndex = 0; questionItemIndex < questionItems
-		.getLength(); questionItemIndex++) {
+	questionLoop:
+	for (int questionItemIndex = 0; questionItemIndex < questionItems.getLength(); questionItemIndex++) {
 	    Element questionItem = (Element) questionItems.item(questionItemIndex);
 	    NodeList questionItemTypes = questionItem.getElementsByTagName("qmd_itemtype");
-	    String questionItemType = questionItemTypes.getLength() > 0
-		    ? ((Text) questionItemTypes.item(0).getChildNodes().item(0)).getData()
-		    : null;
+	    String questionItemType =
+		    questionItemTypes.getLength() > 0 ? ((Text) questionItemTypes.item(0).getChildNodes()
+			    .item(0)).getData() : null;
 	    Question question = new Question();
 	    // check if it is "matching" question type
-	    if ("Matching".equalsIgnoreCase(questionItemType)
-		    && !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_MATCHING, limitType, question)) {
+	    if ("Matching".equalsIgnoreCase(questionItemType) && !QuestionParser.isQuestionTypeAcceptable(
+		    Question.QUESTION_TYPE_MATCHING, limitType, question)) {
 		continue;
 	    }
 	    String questionTitle = questionItem.getAttribute("title");
@@ -163,8 +161,8 @@ public class QuestionParser {
 	    Element presentation = (Element) questionItem.getElementsByTagName("presentation").item(0);
 	    NodeList presentationChildrenList = presentation.getChildNodes();
 	    // cumberstone parsing, but there is no other way using this API
-	    for (int presentationChildIndex = 0; presentationChildIndex < presentationChildrenList
-		    .getLength(); presentationChildIndex++) {
+	    for (int presentationChildIndex = 0;
+		    presentationChildIndex < presentationChildrenList.getLength(); presentationChildIndex++) {
 		Node presentationChild = presentationChildrenList.item(presentationChildIndex);
 		// here is where question data is stored
 		if ("material".equals(presentationChild.getNodeName())) {
@@ -177,8 +175,8 @@ public class QuestionParser {
 		    question.setText(questionText);
 		} else if ("response_lid".equals(presentationChild.getNodeName())) {
 		    if (question.getAnswers() == null) {
-			boolean multipleAnswersAllowed = "multiple"
-				.equalsIgnoreCase(((Element) presentationChild).getAttribute("rcardinality"));
+			boolean multipleAnswersAllowed = "multiple".equalsIgnoreCase(
+				((Element) presentationChild).getAttribute("rcardinality"));
 			NodeList answerList = ((Element) presentationChild).getElementsByTagName("response_label");
 			// parse answers
 			for (int answerIndex = 0; answerIndex < answerList.getLength(); answerIndex++) {
@@ -191,11 +189,9 @@ public class QuestionParser {
 			    // it is Multiple Choice or Multiple Answers
 			    if ((question.getType() == null) && !"true".equalsIgnoreCase(answerText)
 				    && !"false".equalsIgnoreCase(answerText)
-				    && !QuestionParser
-					    .isQuestionTypeAcceptable(
-						    multipleAnswersAllowed ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
-							    : Question.QUESTION_TYPE_MULTIPLE_CHOICE,
-						    limitType, question)) {
+				    && !QuestionParser.isQuestionTypeAcceptable(multipleAnswersAllowed
+				    ? Question.QUESTION_TYPE_MULTIPLE_RESPONSE
+				    : Question.QUESTION_TYPE_MULTIPLE_CHOICE, limitType, question)) {
 				continue questionLoop;
 			    }
 
@@ -212,10 +208,10 @@ public class QuestionParser {
 			}
 
 			// if there are only true/false answers, set the question type
-			if ((question.getType() == null) && (question.getAnswers() != null)
-				&& (question.getAnswers().size() == 2) && !multipleAnswersAllowed
+			if ((question.getType() == null) && (question.getAnswers() != null) && (
+				question.getAnswers().size() == 2) && !multipleAnswersAllowed
 				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_TRUE_FALSE,
-					limitType, question)) {
+				limitType, question)) {
 			    continue questionLoop;
 			}
 		    }
@@ -232,8 +228,8 @@ public class QuestionParser {
 			}
 
 			NodeList responseLidChildrenList = presentationChild.getChildNodes();
-			for (int responseLidChildIndex = 0; responseLidChildIndex < responseLidChildrenList
-				.getLength(); responseLidChildIndex++) {
+			for (int responseLidChildIndex = 0;
+				responseLidChildIndex < responseLidChildrenList.getLength(); responseLidChildIndex++) {
 			    // parse answers for first part of matching
 			    Node responseLidChild = responseLidChildrenList.item(responseLidChildIndex);
 			    if ("material".equals(responseLidChild.getNodeName())) {
@@ -262,26 +258,27 @@ public class QuestionParser {
 		// if no answers at all, it is Essay type
 		if ((answerMetadatas.getLength() == 0) && (question.getType() == null) && textBasedQuestion
 			&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType,
-				question)) {
+			question)) {
 		    continue questionLoop;
 		}
-		for (int answerMetadataIndex = 0; answerMetadataIndex < answerMetadatas
-			.getLength(); answerMetadataIndex++) {
+		for (int answerMetadataIndex = 0;
+			answerMetadataIndex < answerMetadatas.getLength(); answerMetadataIndex++) {
 		    Element answerMetadata = (Element) answerMetadatas.item(answerMetadataIndex);
 		    NodeList scoreReference = answerMetadata.getElementsByTagName("varequal");
 		    // find where given metadata part references to
-		    String answerId = scoreReference.getLength() > 0
-			    ? ((Text) scoreReference.item(0).getChildNodes().item(0)).getData()
-			    : null;
+		    String answerId = scoreReference.getLength() > 0 ? ((Text) scoreReference.item(0).getChildNodes()
+			    .item(0)).getData() : null;
 		    if (answerId == null) {
 			// no answers at all, so it is Essay type
-			if ((question.getType() == null) && textBasedQuestion && !QuestionParser
-				.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType, question)) {
+			if ((question.getType() == null) && textBasedQuestion
+				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_ESSAY, limitType,
+				question)) {
 			    continue questionLoop;
 			}
 		    } else {
-			if ((question.getType() == null) && textBasedQuestion && !QuestionParser
-				.isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK, limitType, question)) {
+			if ((question.getType() == null) && textBasedQuestion
+				&& !QuestionParser.isQuestionTypeAcceptable(Question.QUESTION_TYPE_FILL_IN_BLANK,
+				limitType, question)) {
 			    continue questionLoop;
 			}
 
@@ -405,8 +402,8 @@ public class QuestionParser {
 		    question.setFeedback(questionFeedback);
 		}
 
-		String questionResourcesFolderPath = request
-			.getParameter("question" + questionIndex + "resourcesFolder");
+		String questionResourcesFolderPath = request.getParameter(
+			"question" + questionIndex + "resourcesFolder");
 		if (!StringUtils.isBlank(questionResourcesFolderPath)) {
 		    question.setResourcesFolderPath(questionResourcesFolderPath);
 		}
@@ -438,8 +435,8 @@ public class QuestionParser {
 
 			    if (isMatching) {
 				// map indexes of answers
-				String matchAnswerIndex = request
-					.getParameter("question" + questionIndex + "match" + answerIndex);
+				String matchAnswerIndex = request.getParameter(
+					"question" + questionIndex + "match" + answerIndex);
 				if (!StringUtils.isBlank(matchAnswerIndex)) {
 				    if (question.getMatchMap() == null) {
 					question.setMatchMap(new TreeMap<Integer, Integer>());
@@ -473,13 +470,14 @@ public class QuestionParser {
 
 		// extract learning outcomes
 		String learningOutcomeCountParam = request.getParameter("learningOutcomeCount" + questionIndex);
-		int learningOutcomeCount = learningOutcomeCountParam == null ? 0
-			: Integer.parseInt(learningOutcomeCountParam);
+		int learningOutcomeCount =
+			learningOutcomeCountParam == null ? 0 : Integer.parseInt(learningOutcomeCountParam);
 		if (learningOutcomeCount > 0) {
 		    question.setLearningOutcomes(new ArrayList<String>());
-		    for (int learningOutcomeIndex = 0; learningOutcomeIndex < learningOutcomeCount; learningOutcomeIndex++) {
-			String learningOutcomeId = "question" + questionIndex + "learningOutcome"
-				+ learningOutcomeIndex;
+		    for (int learningOutcomeIndex = 0;
+			    learningOutcomeIndex < learningOutcomeCount; learningOutcomeIndex++) {
+			String learningOutcomeId =
+				"question" + questionIndex + "learningOutcome" + learningOutcomeIndex;
 			String learningOutcomeText = request.getParameter(learningOutcomeId);
 			question.getLearningOutcomes().add(learningOutcomeText);
 		    }
@@ -526,7 +524,7 @@ public class QuestionParser {
 			    String destinationFileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
 			    File destinationFile = new File(uploadDir, destinationFileName);
 			    String uploadWebPath = UploadFileUtil.getUploadWebPath(contentFolderID, "Image") + '/'
-				    + fileName;
+				    + destinationFileName;
 			    try {
 				FileUtils.copyFile(sourceFile, destinationFile);
 
@@ -540,8 +538,8 @@ public class QuestionParser {
 				    if (!attribute.toLowerCase().contains("img-responsive")) {
 					int endQuoationMarkIndex = attribute.lastIndexOf("\"");
 					if (endQuoationMarkIndex > 0) {
-					    attribute = attribute.substring(0, endQuoationMarkIndex)
-						    + " img-responsive\"";
+					    attribute =
+						    attribute.substring(0, endQuoationMarkIndex) + " img-responsive\"";
 					    imageAttributes.set(classAttributeIndex, attribute);
 					}
 				    }
@@ -630,15 +628,15 @@ public class QuestionParser {
 	StringBuilder result = new StringBuilder();
 
 	NodeList questionElements = materialElement.getChildNodes();
-	for (int questionElementIndex = 0; questionElementIndex < questionElements
-		.getLength(); questionElementIndex++) {
+	for (int questionElementIndex = 0;
+		questionElementIndex < questionElements.getLength(); questionElementIndex++) {
 	    Node questionElement = questionElements.item(questionElementIndex);
 	    String elementName = questionElement.getNodeName();
 	    if ("mattext".equalsIgnoreCase(elementName) && questionElement.getChildNodes().getLength() > 0) {
 		// it is a HTML part
 		NodeList questionTextChildrenList = questionElement.getChildNodes();
-		for (int questionTextIndex = 0; questionTextIndex < questionTextChildrenList
-			.getLength(); questionTextIndex++) {
+		for (int questionTextIndex = 0;
+			questionTextIndex < questionTextChildrenList.getLength(); questionTextIndex++) {
 		    Node questionTextChildNode = questionElement.getChildNodes().item(questionTextIndex);
 		    result.append(((Text) questionTextChildNode).getData());
 		}

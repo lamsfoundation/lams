@@ -1,20 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set scope="request" var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set scope="request" var="tool">
-	<lams:WebAppURL />
-</c:set>
-
-<lams:html>
-<lams:head>
-	<lams:css />
-	<title><fmt:message key="activity.title" /></title>
-
-	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-	<script language="JavaScript" type="text/JavaScript">
+<lams:PageLearner title="${voteGeneralLearnerFlowDTO.activityTitle}" toolSessionID="${voteLearningForm.toolSessionID}">
+	<script type="text/JavaScript">
 		var noSelected = 0;
 		var maxVotes = <c:out value="${voteLearningForm.maxNominationCount}"/>;
 		var minVotes = <c:out value="${voteLearningForm.minNominationCount}"/>;
@@ -36,7 +24,6 @@
 				noSelected--;
 				alertTooManyVotes(maxVotes);
 			}
-
 		}
 
 		function validate() {
@@ -53,12 +40,12 @@
 				alertTooManyVotes(maxVotes);
 				return false;
 			} else if (numberOfVotes < minVotes) {
-				var msg = "<fmt:message key="error.minNominationCount.not.reached"/> "
-						+ minVotes + " <fmt:message key="label.nominations"/>";
+				var msg = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.minNominationCount.not.reached'/></spring:escapeBody> "
+						+ minVotes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.nominations'/></spring:escapeBody>";
 				alert(msg);
 				return false;
 			} else if (numberOfVotes == 0) {
-				alert("<fmt:message key="error.empty.selection"/>");
+				alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.empty.selection'/></spring:escapeBody>");
 				return false;
 			} else {
 				$('.btn').prop('disabled', true);
@@ -67,13 +54,12 @@
 		}
 
 		function alertTooManyVotes(maxVotes) {
-			var msg = "<fmt:message key="error.maxNominationCount.reached"/> "
-					+ maxVotes + " <fmt:message key="label.nominations"/>";
+			var msg = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.maxNominationCount.reached'/></spring:escapeBody> "
+					+ maxVotes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.nominations'/></spring:escapeBody>";
 			alert(msg);
 		}
 
 		function checkLeaderProgress() {
-
 			$.ajax({
 				async : false,
 				url : '<c:url value="/learning/checkLeaderProgress.do"/>',
@@ -89,7 +75,6 @@
 		}
 
 		$(document).ready(function() {
-
 			var mode = "${voteGeneralLearnerFlowDTO.learningMode}";
 			var isUserLeader = ($('[name="userLeader"]').val() === "true");
 			var isLeadershipEnabled = ($(
@@ -108,7 +93,6 @@
 				$('[name="continueOptionsCombined"]').hide();
 			}
 
-
 			<%-- Connect to command websocket only if it is learner UI --%>
 			<c:if test="${voteLearningForm.useSelectLeaderToolOuput and voteGeneralLearnerFlowDTO.learningMode == 'learner'}">
 				// command websocket stuff for refreshing
@@ -121,29 +105,23 @@
 			</c:if>
 		});
 	</script>
-</lams:head>
 
-<body class="stripes">
-	<form:form modelAttribute="voteLearningForm" onsubmit="return validate();" action="continueOptionsCombined.do" method="POST">
-		<form:hidden path="toolSessionID" />
-		<form:hidden path="userID" />
-		<form:hidden path="revisitingUser" />
-		<form:hidden path="previewOnly" />
-		<form:hidden path="maxNominationCount" />
-		<form:hidden path="minNominationCount" />
-		<form:hidden path="allowTextEntry" />
-		<form:hidden path="lockOnFinish" />
-		<form:hidden path="reportViewOnly" />
-		<form:hidden path="showResults" />
-		<form:hidden path="userLeader" />
-		<form:hidden path="groupLeaderName" />
-		<form:hidden path="groupLeaderUserId" />
-		<form:hidden path="useSelectLeaderToolOuput" />
-
-
-		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
-
-
+	<div id="container-main">
+		<form:form modelAttribute="voteLearningForm" onsubmit="return validate();" action="continueOptionsCombined.do" method="POST">
+			<form:hidden path="toolSessionID" />
+			<form:hidden path="userID" />
+			<form:hidden path="revisitingUser" />
+			<form:hidden path="previewOnly" />
+			<form:hidden path="maxNominationCount" />
+			<form:hidden path="minNominationCount" />
+			<form:hidden path="allowTextEntry" />
+			<form:hidden path="lockOnFinish" />
+			<form:hidden path="reportViewOnly" />
+			<form:hidden path="showResults" />
+			<form:hidden path="userLeader" />
+			<form:hidden path="groupLeaderName" />
+			<form:hidden path="groupLeaderUserId" />
+			<form:hidden path="useSelectLeaderToolOuput" />
 
 			<!-- Announcements and advanced settings -->
 			<c:if test="${voteLearningForm.useSelectLeaderToolOuput}">
@@ -151,71 +129,88 @@
 			</c:if>
 
 			<c:if test="${not empty voteGeneralLearnerFlowDTO.submissionDeadline}">
-				<lams:Alert id="submissionDeadline" type="warning" close="false">
+				<lams:Alert5 id="submissionDeadline" type="warning">
 					<fmt:message key="authoring.info.teacher.set.restriction">
 						<fmt:param>
 							<lams:Date value="${voteGeneralLearnerFlowDTO.submissionDeadline}" />
 						</fmt:param>
 					</fmt:message>
-				</lams:Alert>
+				</lams:Alert5>
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCountReached == 'true'}">
-				<lams:Alert id="maxNominations" type="info" close="false">
+			<c:if test="${voteLearningForm.maxNominationCountReached == 'true'}">
+				<lams:Alert5 id="maxNominations" type="info">
 					<fmt:message key="error.maxNominationCount.reached" />
 					<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
 					<fmt:message key="label.nominations" />
-				</lams:Alert>
+				</lams:Alert5>
 			</c:if>
+
+			<c:if test="${voteLearningForm.maxNominationCount > 1}">
+				<lams:Alert5 id="maxNominations" type="info">
+					<fmt:message key="label.nominations.available">
+						<fmt:param>
+							<c:out value="${voteLearningForm.maxNominationCount}" />
+						</fmt:param>
+					</fmt:message>
+				</lams:Alert5>
+			</c:if>
+			
 			<!-- End announcements and advanced settings -->
-			<div class="panel">
+			<div id="instructions" class="instructions">
 				<c:out value="${voteGeneralLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 			</div>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.maxNominationCount > 1}">
-				<lams:Alert id="maxNominations" type="info" close="false">
-					<fmt:message key="label.nominations.available">
-						<fmt:param>
-							<c:out value="${voteGeneralLearnerFlowDTO.maxNominationCount}" />
-						</fmt:param>
-					</fmt:message>
-				</lams:Alert>
-			</c:if>
-
 			<!-- options  -->
-			<div class="table-responsive">
-				<table class="table table-hover table-condensed">
-					<tbody>
+				<div class="card lcard">
+					<div class="card-body">
+			<fieldset>
+				<legend class="visually-hidden">
+					<fmt:message key="label.vote.nominations" />
+				</legend>
+			
+					<div class="div-hover my-3">
 						<c:set var="count" value="0" scope="page" />
 						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
 							<c:set var="count" value="${count + 1}" scope="page" />
-
-							<tr>
-								<td width="20px"><input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}"
-									onClick="updateCount(this);"></td>
-								<td width="100%"><label for="vote${count}"><c:out value="${subEntry.value}" escapeXml="false" /></label></td>
-							</tr>
+	
+							<div class="row g-0">
+								<div class="col">
+									<div class="form-check">
+										<input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}" class="form-check-input"
+											onClick="updateCount(this);">
+		
+										<label for="vote${count}" class="form-check-label">
+											<c:out value="${subEntry.value}" escapeXml="false" />
+										</label>
+									</div>
+								</div>
+							</div>
 						</c:forEach>
-					</tbody>
-				</table>
-			</div>
+						
+						<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
+							<div class="row g-0">
+								<div class="col input-group">
+									<label for="userEntry" class="input-group-text">
+										<fmt:message key="label.other" />:
+									</label>
+									<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
+								</div>
+							</div>
+						</c:if>
+					</div>
+			</fieldset>
+					</div>
+				</div>
 			<!-- End options -->
 
-			<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
-				<fmt:message key="label.other" />:
-				<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
-			</c:if>
+			<div class="activity-bottom-buttons">
+				<form:hidden path="donePreview" />
+				<button type="submit" name="continueOptionsCombined" class="btn btn-primary na">
+					<fmt:message key="label.submit.vote" />
+				</button>
+			</div>
 
-			<form:hidden path="donePreview" />
-
-			<input type="submit" name="continueOptionsCombined" class="btn btn-primary pull-right voffset10"
-				   value='<fmt:message key="label.submit.vote" />' />
-
-			<div id="footer"></div>
-
-		</lams:Page>
-
-	</form:form>
-
-</body>
-</lams:html>
+		</form:form>
+	</div>
+</lams:PageLearner>

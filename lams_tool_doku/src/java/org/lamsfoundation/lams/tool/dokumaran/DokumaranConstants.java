@@ -32,13 +32,6 @@ public class DokumaranConstants {
 
     public static final int COMPLETED = 1;
 
-    // for action forward name
-    public static final String SUCCESS = "success";
-
-    public static final String ERROR = "error";
-
-    public static final String DEFINE_LATER = "definelater";
-
     // for parameters' name
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 
@@ -60,8 +53,6 @@ public class DokumaranConstants {
     public static final String ATTR_GROUP_USERS = "groupUsers";
 
     public static final String ATTR_IS_LEADER_RESPONSE_FINALIZED = "isLeaderResponseFinalized";
-
-    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
@@ -124,4 +115,8 @@ public class DokumaranConstants {
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 
     public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
+
+    public static final String TIME_LIMIT_PANEL_UPDATE_SINK_NAME = "dokumaran time limit panel updated";
+    public static final String TIME_LIMIT_PANEL_UPDATE_FLUX_NAME = "dokumaran time limit panel updated";
+
 }

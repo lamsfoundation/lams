@@ -13,11 +13,11 @@
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="label.policies.consents" />', '80%');
+			updateMyProfileDialogSettings('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.policies.consents" /></spring:escapeBody>', '80%');
 		});
 	</script>
 </lams:head>
@@ -84,7 +84,7 @@
 					</table>
 					
 					<div class="pull-right">
-						<button type="button" class="btn btn-sm btn-default offset5" onclick="history.go(-1);">
+						<button type="button" class="btn btn-sm btn-primary offset5" onclick="history.go(-1);">
 							<fmt:message key="label.return.to.myprofile" />
 						</button>
 					</div>

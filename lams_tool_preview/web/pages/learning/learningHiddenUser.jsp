@@ -1,57 +1,28 @@
 <!DOCTYPE html>
 <%@include file="/common/taglibs.jsp"%>
 
-<lams:html>
-<lams:head>
-	<%@ include file="/common/header.jsp"%>
-	<meta http-equiv="refresh" content="60">
-	
+<fmt:message var="title" key='activity.title'/>
+<lams:PageLearner title="${title}" toolSessionID="${toolSessionID}" refresh="60">
 	<script type="text/javascript">
-
  		function finishSession(){
  			document.getElementById("finishButton").disabled = true;
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-			return false;
 		}
- 		
      </script>
-</lams:head>
-
-<body class="stripes">
-
-	<c:set scope="request" var="title">
-		<fmt:message key="activity.title" />
-	</c:set>
-	<lams:Page type="learner" title="${title}">
 	
-		<div class="row no-gutter">
-			<div
-				class="col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
-				<div class="alert alert-info">
-					<fmt:message key="label.removed.user.warning" />
-				</div>
-			</div>
-		</div>
+	<div id="container-main">
+		<lams:Alert5 type="info" id="removed-user-info" close="false">
+			<fmt:message key="label.removed.user.warning" />
+		</lams:Alert5>
 		
-		<div class="row no-gutter">
-			<div class="col-xs-12">
-				
-			</div>
-		</div>
+		<div class="activity-bottom-buttons">
+			<button type="button" onclick="javascript:location.reload(true);" class="btn btn-secondary btn-icon-refresh">
+				<fmt:message key="button.try.again" />
+			</button>
 		
-		<div>
-		<a href="javascript:location.reload(true);"	class="btn btn-default voffset5">
-					<fmt:message key="button.try.again" />
-				</a>
-		
-			<a href="#nogo" path="FinishButton" id="finishButton" onclick="return finishSession()" class="btn btn-primary voffset5 pull-right na">
+			<button type="button" name="FinishButton" id="finishButton" onclick="finishSession()" class="btn btn-primary na">
 				<fmt:message key="label.finished" />
-			</a>
+			</button>
 		</div>
-		
-	</lams:Page>
-	
-	<div id="footer"></div>
-
-</body>
-</lams:html>
+	</div>
+</lams:PageLearner>

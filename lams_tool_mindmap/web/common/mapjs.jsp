@@ -8,9 +8,18 @@
 <%-- <script src="${tool}includes/javascript/mapjs/main.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/mapjs/underscore-min.js"></script> --%>
 <%-- <script src="${tool}includes/javascript/fullscreen.js"></script> --%>
+<style>
+	/* hack to display tooltip even when input is disabled */
+	#background-color[disabled] {
+	    pointer-events: auto !important;
+	}
+	.minicolors-swatch.minicolors-sprite.minicolors-input-swatch {
+		margin-left: 0.5rem;
+	}
+</style>
 
+<lams:JSImport src="includes/javascript/websocket.js" />
 <script type="text/javascript">
-
 	var initialActionId = null,  // multiuser request tracking
 		lastActionId = null, 	// multiuser request tracking
 		// Requests already processed:
@@ -59,7 +68,68 @@
 		        </c:if>
 		        contentAggregate = window.mapModel.getIdea();
 		        <c:if  test="${multiMode && contentEditable}">
-		        startWebsocket(initialActionId);
+
+				<%-- Websockets used to get the node updates from the server --%>
+				<%-- init the connection with server using server URL but with different protocol --%>
+				initWebsocket('mindmapNodes${sessionId}',
+						'<lams:WebAppURL />'.replace('http', 'ws')
+						+ 'learningWebsocket?toolSessionID=${sessionId}&lastActionId=' + initialActionId,
+						function (e) {
+							// create JSON object
+							var response = JSON.parse(e.data);
+
+							if ( ! response.actions ) {
+								return;
+							}
+
+							var valuesChanged = false;
+							for ( i=0; i<response.actions.length; i++ ) {
+								var action = response.actions[i];
+								requestId =  action.actionId;
+								if ( ! action.actionId ) {
+									abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
+									return;
+								}
+								// only process requests we have not done already otherwise we would redo any we trigger
+								if ( requestId > initialActionId && requestsProcessed.indexOf(requestId) == -1 ) {
+									if ( action.type == 0 ) {
+										customRemoveSubIdea(action.nodeId);
+									} else if ( action.type == 1 ) {
+										updateUnsavedNodeIds(action.childNodeId);
+										// add node response.nodeId, response.title, response.color
+										contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
+										var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
+										newChildNode.attr = {};
+										newChildNode.attr.contentLocked = true;
+										newChildNode.creator = action.creator;
+										if ( action.color ) {
+											newChildNode.attr.style = {};
+											newChildNode.attr.style.background = action.color;
+										}
+									} else if ( action.type == 2 ) {
+										// update colour - this call updates the node on screen but also triggers the change
+										// action which will call onIdeaChangedLAMS() - so the change to the other user's node
+										// will need to be ignored.
+										contentAggregate.mergeAttrProperty(action.nodeId, 'style', 'background', action.color);
+									} else if ( action.type == 3 ) {
+										// update title
+										var ideaToUpdate = contentAggregate.findSubIdeaById(action.nodeId);
+										ideaToUpdate.title = action.title;
+									} else {
+										abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
+									}
+									requestsProcessed.push( requestId );
+									updateLastActionId( requestId );
+									valuesChanged = true;
+								}
+							}
+							if ( valuesChanged ) {
+								window.mapModel.rebuildRequired();
+							}
+						// reset ping timer
+						websocketPing('mindmapNodes${sessionId}', true);
+					});
+
 			    </c:if>
 			},
 			error: function (response) {
@@ -244,114 +314,11 @@
 				return removedNodeIds[link.ideaIdFrom]  || removedNodeIds[link.ideaIdTo];
 			});
 		} 
-		
-		<%-- Websockets used to get the node updates from the server --%>
-		<%-- init the connection with server using server URL but with different protocol --%>
-		var mindmapWebsocketInitTime = null, 
-			mindmapWebsocket = null,
-			mindmapWebsocketPingTimeout = null,
-			mindmapWebsocketPingFunc = null;
 
 		function abortLoad(msg) {
 			alert(msg);
 			window.mapModel.setEditingEnabled(false);
 		}
-
-		mindmapWebsocketPingFunc = function(skipPing){
-			if (mindmapWebsocket.readyState == mindmapWebsocket.CLOSING 
-					|| mindmapWebsocket.readyState == mindmapWebsocket.CLOSED){
-				if (Date.now() - mindmapWebsocketInitTime < 1000) {
-					return;
-				}
-				abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-			}
-			// check and ping every 3 minutes
-			mindmapWebsocketPingTimeout = setTimeout(mindmapWebsocketPingFunc, 3*60*1000);
-			// initial set up does not send ping
-			if (!skipPing) {
-				mindmapWebsocket.send("ping");
-			}
-		};
-	
-		mindmapWebsocketProcessMessage = function(e) {
-			// create JSON object
-			var response = JSON.parse(e.data);
-			
-			// reset ping timer
-			clearTimeout(mindmapWebsocketPingTimeout);
-			mindmapWebsocketPingFunc(true);
-			
-        		if ( ! response.actions ) {
-        			return;
-        		}
-			        		
-        		var valuesChanged = false;
-        		for ( i=0; i<response.actions.length; i++ ) {
-        			var action = response.actions[i];
-       				requestId =  action.actionId;
-        			if ( ! action.actionId ) {
-        				abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-        				return;
-        			}
-        			// only process requests we have not done already otherwise we would redo any we trigger
-        			if ( requestId > initialActionId && requestsProcessed.indexOf(requestId) == -1 ) {
-		        		if ( action.type == 0 ) {
-		        			customRemoveSubIdea(action.nodeId);
-		        		} else if ( action.type == 1 ) {
-						updateUnsavedNodeIds(action.childNodeId);
-		        			// add node response.nodeId, response.title, response.color
-						contentAggregate.addSubIdea(action.nodeId, action.title, action.childNodeId);
-		        			var newChildNode = contentAggregate.findSubIdeaById(action.childNodeId);
-						newChildNode.attr = {};
-						newChildNode.attr.contentLocked = true;
-						newChildNode.creator = action.creator;
-		        			if ( action.color ) {
-							newChildNode.attr.style = {};
-			        			newChildNode.attr.style.background = action.color;
-		        			}
-		        		} else if ( action.type == 2 ) {
-		        			// update colour - this call updates the node on screen but also triggers the change
-		        			// action which will call onIdeaChangedLAMS() - so the change to the other user's node
-		        			// will need to be ignored.
-		        			contentAggregate.mergeAttrProperty(action.nodeId, 'style', 'background', action.color);
-		        		} else if ( action.type == 3 ) {
-		        			// update title
-		        			var ideaToUpdate = contentAggregate.findSubIdeaById(action.nodeId);
-		        			ideaToUpdate.title = action.title;    		
-		        		} else {
-						abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-		        		}
-		        		requestsProcessed.push( requestId );
-        				updateLastActionId( requestId );
-        				valuesChanged = true;
-	        		}
-        		}
-        		if ( valuesChanged ) {
-	        		window.mapModel.rebuildRequired();
-        		}
-		};
-	
-		// websocket communicaton should only be done once the diagram is fully loaded.
-		function startWebsocket(lastActionId) {
-			mindmapWebsocketInitTime = Date.now();
-			mindmapWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws')
-						+ 'learningWebsocket?toolSessionID=' + '${sessionId}' + '&lastActionId=' + lastActionId );
-
-			// run when the server pushes new reports and vote statistics
-			mindmapWebsocket.onmessage = mindmapWebsocketProcessMessage;
-
-			mindmapWebsocket.onclose = function(e){
-				if (e.code === 1006 &&
-					Date.now() - mindmapWebsocketInitTime > 1000) {
-					abortLoad('<fmt:message key="error.unable.to.load.mindmap"/>');
-				}
-			};
-			
-			// set up timer for the first time
-			mindmapWebsocketPingFunc(true);
-		}			
-
-		<%--  End Websockets --%>
 
     </c:when>
 	<c:otherwise>
@@ -425,61 +392,113 @@
 </c:if>
 </script>	
 
-	<div class="full-screen-content-div">
+<div class="full-screen-content-div">
 	<div class="full-screen-flex-div">
-	<div class="full-screen-main-div">
-	
-	<c:if test="${contentEditable and (mode == 'learner' || mode == 'author')}">
-		<div>
-		<c:if test="${not multiMode}">
-			<div class="hint"><fmt:message key="label.your.mindmap.saved.every.minute"/><lams:WaitingSpinner id="spinnerArea_Busy" showInline="true"/></div>
-		</c:if>
-		</div>
-	</c:if>	
+		<div class="full-screen-main-div">
 
-	<div id="mindmap-controls">
-	
-		<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
-		<div style="display:inline" role="group">
-        <a href="#" class="btn btn-default btn-sm full-screen-launch-button pull-right loffset5" id="expand" onclick="javascript:launchIntoFullscreen(this)"><i class="fa fa-arrows-alt" aria-hidden="true"></i></a> 
-        <a href="#" class="btn btn-default btn-sm full-screen-exit-button pull-right loffset5" id="shrink" onclick="javascript:exitFullscreen()" style="display: none;"><i class="fa fa-compress" aria-hidden="true"></i></a> 
-		
-		<c:if test="${param.allowPrinting}">
-			<a href="#" class="btn btn-default btn-sm pull-right loffset5" id="print" onclick="javascript:showPrintView()"
-			   title="<fmt:message key='button.print'/>"><i class="fa fa-print" aria-hidden="true"></i></a> 
-		</c:if>
-		
-		<input type="text" id="background-color" class='updateStyle form-control input-sm' data-mm-target-property='background' size="7" width="180px">
+			<c:if test="${contentEditable and (mode == 'learner' || mode == 'author') and not multiMode}">
+				<div class="alert alert-secondary" role="alert">
+					<fmt:message key="label.your.mindmap.saved.every.minute" />
+					<lams:WaitingSpinner id="spinnerArea_Busy" showInline="true" />
+				</div>
+			</c:if>
 
-		</div>
-		 
-		<div>
-			<div class="btn-group btn-group-sm" role="group">
-			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom'/>:</a>
-			<a href="#" class="resetView btn btn-default btn-sm"><fmt:message key='label.zoom.reset'/></a>
-			<a href="#" class="scaleUp btn btn-default btn-sm" title="<fmt:message key='label.zoom.increase'/>"><i class="fa fa-lg fa-search-plus"></i></a>
-			<a href="#" class="scaleDown btn btn-default btn-sm" title="<fmt:message key='label.zoom.decrease'/>"><i class="fa fa-lg fa-search-minus"></i></a>
+			<div id="mindmap-controls">
+
+				<!-- Color picker & expand buttons must be outside the next div or it can't float on top of the mindmap. The float is done in javascript. -->
+				<div style="display: inline" role="group">
+					<button type="button" class="btn btn-secondary btn-sm full-screen-launch-button float-end ms-1" id="expand"
+						onclick="javascript:launchIntoFullscreen(this)"
+						data-bs-toggle="tooltip" data-bs-original-title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.enter.full.screen' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.enter.full.screen' />"
+					>
+						<i class="fa-solid fa-maximize" aria-hidden="true"></i>
+					</button>
+
+					<button type="button" class="btn btn-secondary btn-sm full-screen-exit-button float-end ms-1" id="shrink"
+						onclick="javascript:exitFullscreen()" style="display: none;"
+						title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.exit.full.screen' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.exit.full.screen' />"
+					>
+						<i class="fa fa-compress" aria-hidden="true"></i>
+					</button>
+
+					<c:if test="${param.allowPrinting}">
+						<button type="button" class="btn btn-secondary btn-sm float-end ms-1" id="print" onclick="javascript:showPrintView()"
+							title="<fmt:message key='button.print'/>"
+						>
+							<i class="fa fa-print" aria-hidden="true"></i>
+						</button>
+					</c:if>
+
+					<input type="text" id="background-color" class='updateStyle btn btn-secondary btn-sm'
+						data-mm-target-property='background' size="7" width="180px"
+						data-bs-toggle="tooltip" data-bs-original-title="<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.background.color' /></spring:escapeBody>"
+						aria-label="<fmt:message key='label.background.color' />"
+					>
+				</div>
+
+				<div>
+					<div class="btn-group mt-1" role="group">
+						<button type="button" class="resetView btn btn-secondary btn-sm">
+							<fmt:message key='label.zoom' />:<fmt:message key='label.zoom.reset' />
+						</button>
+						<button type="button" class="scaleUp btn btn-secondary btn-sm"
+							title="<fmt:message key='label.zoom.increase'/>"
+						>
+							<i class="fa fa-lg fa-search-plus"></i>
+						</button>
+						<button type="button" class="scaleDown btn btn-secondary btn-sm"
+							title="<fmt:message key='label.zoom.decrease'/>"
+						>
+							<i class="fa fa-lg fa-search-minus"></i>
+						</button>
+					</div>
+
+					<div style="display: inline-block" role="group" class="btn-group mt-1">
+						<button type="button" class="toggleCollapse btn btn-secondary btn-sm"
+							title="<fmt:message key='label.expand.collapse.idea'/>"
+						>
+							<i class="fa fa-lg fa-navicon"></i>
+							<span class="d-none d-sm-inline">&nbsp;
+								<fmt:message key='label.expand.collapse.idea'/>
+							</span>
+						</button>
+						<c:if test="${contentEditable}">
+							<button type="button" class="addSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.add.idea'/>">
+								<i class="fa-regular fa-lg fa-square-plus"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.add.idea' />
+								</span>
+							</button>
+							<button type="button" class="editNode btn btn-secondary btn-sm" title="<fmt:message key='label.edit.idea.text'/>">
+								<i class="fa-regular fa-lg fa-pen-to-square"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.edit.idea.text' />
+								</span>
+							</button>
+							<button type="button" class="removeSubIdea btn btn-secondary btn-sm" title="<fmt:message key='label.delete.idea'/>">
+								<i class="fa-regular fa-lg fa-trash-can"></i>
+								<span class="d-none d-sm-inline">
+									&nbsp;
+									<fmt:message key='label.delete.idea' />
+								</span>
+							</button>
+							<%-- Not yet implemented in back end  --%>
+							<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%>
+							<%--  		<input type="button" class="insertRoot" value="add root node">  --%>
+							<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root">  --%>
+						</c:if>
+					</div>
+				</div>
 			</div>
-			
-			<div style="display:inline-block" role="group">
-		 	<a href="#" class="toggleCollapse btn btn-default btn-sm" title="<fmt:message key='label.expand.collapse.idea'/>"><i class="fa fa-lg fa-navicon"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.expand.collapse.idea'/></span></a>
-		<c:if test="${contentEditable}">
-			<a href="#" class="addSubIdea btn btn-default btn-sm" title="<fmt:message key='label.add.idea'/>"><i class="fa fa-lg fa-plus-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.add.idea'/></span></a>
-			<a href="#" class="editNode btn btn-default btn-sm" title="<fmt:message key='label.edit.idea.text'/>"><i class="fa fa-lg fa-pencil-square-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.edit.idea.text'/></span></a>		
-			<a href="#" class="removeSubIdea btn btn-default btn-sm" title="<fmt:message key='label.delete.idea'/>"><i class="fa fa-lg fa-trash-o"></i><span class="hidden-xs">&nbsp;<fmt:message key='label.delete.idea'/></span></a>
-	<%-- Not yet implemented in back end  --%> 
-	<%-- 		<input type="button" data-mm-action="export-image" value="Export To Image"/>  --%> 
-	<%--  		<input type="button" class="insertRoot" value="add root node">  --%> 
-	<%-- 		<input type="button" class="makeSelectedNodeRoot" value="make root">  --%> 
-	 	</c:if>
-	 		</div>
- 		</div>
-	</div>
 
- 	<div id="mindmap-container"></div>
- 	<style id="themecss">
-	</style>
-	
+			<div id="mindmap-container"></div>
+			<style id="themecss">
+			</style>
+
+		</div>
 	</div>
-	</div>
-	</div>
+</div>

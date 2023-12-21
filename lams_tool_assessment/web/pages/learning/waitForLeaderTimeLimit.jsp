@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
-
-	<lams:css />
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
 	<script type="text/javascript">
 		function refresh() {
 			location.reload();
 		}
-		
+
 		//refresh page every 30 sec
-		setTimeout("refresh();",30000);
-    </script>
-</lams:head>
-<body class="stripes">
+		setTimeout("refresh();", 30000);
+	</script>
 
-	<lams:Page type="learner" title="${content.title}">
-		
-		<h4>
+	<div id="container-main">
+		<lams:Alert5 id="waitingForLeader" type="info" close="false">
 			<fmt:message key="${waitingMessageKey}" />
-		</h4>
-		
-		<button type="button" name="refreshButton" onclick="refresh();" class="btn btn-sm btn-primary pull-right">
-			<fmt:message key="label.refresh" />
-		</button>
+		</lams:Alert5>
 
-	</lams:Page>
-
-</body>
-</lams:html>
+		<div class="activity-bottom-buttons">
+			<button type="button" id="refresh-button" name="refreshButton" onclick="refresh();" class="btn btn-primary btn-icon-refresh">
+				<fmt:message key="label.refresh" />
+			</button>
+		</div>
+	</div>
+</lams:PageLearner>

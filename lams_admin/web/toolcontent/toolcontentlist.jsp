@@ -3,54 +3,57 @@
 <%@ include file="/taglibs.jsp"%>
 
 <lams:html>
-<lams:head>
-	<c:set var="title"><fmt:message key="appadmin.tool.management"/></c:set>
-	<title>${title}</title>
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	<lams:head>
+		<c:set var="title"><fmt:message key="appadmin.tool.management"/></c:set>
+		<title>${title}</title>
+		<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap5.custom.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
-	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-</lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	
-	<%-- Build breadcrumb --%>
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
+		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" type="text/css" media="screen">
+		<style>
+			#tools-table tr > th:last-child {
+				min-width: 11rem;
+			}
+		</style>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	</lams:head>
+
+	<body class="component pb-4 pt-2 px-2 px-sm-4">
+
+		<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.tool.management" /></c:set>
 	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
-	
+
 	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<div class="card">
 			<div class="card-body">
-			<p class="card-text">
-				<fmt:message key="msg.edit.tool.content.1" />
-			</p>
-			<p class="card-text">
-				<fmt:message key="msg.edit.tool.content.2" />
-			</p>
-			<p class="card-text">
-				<fmt:message key="msg.edit.tool.content.3" />
-			</p>
-			<p class="card-text">${fn:length(toolLibrary)}&nbsp;<fmt:message key="appadmin.library.totals" /></p>
+				<p class="card-text">
+					<fmt:message key="msg.edit.tool.content.1" />
+				</p>
+				<p class="card-text">
+					<fmt:message key="msg.edit.tool.content.2" />
+				</p>
+				<p class="card-text">
+					<fmt:message key="msg.edit.tool.content.3" />
+				</p>
+				<p class="card-text">${fn:length(toolLibrary)}&nbsp;<fmt:message key="appadmin.library.totals" /></p>
 			</div>
-		</div>	
-				
+		</div>
+
 		<c:set var="displayToolManagement" value="false" />
 		<c:forEach var="dto" items="${toolLibrary}">
 			<c:if test="${dto.adminURL != null}">
 				<c:set var="displayToolManagement" value="true" />
 			</c:if>
 		</c:forEach>
-		
-		<table class="table table-striped table-bordered mt-3">
+
+		<table class="table table-striped table-bordered mt-3" id="tools-table">
 			<thead>
 			<tr>
 				<th><fmt:message key="label.tool" /></th>
@@ -65,7 +68,7 @@
 					<td <c:if test="${learningLibraryValidity[dto.learningLibraryID] == 'false'}">class="table-danger"</c:if> >
 						<strong><c:out value="${dto.activityTitle}" escapeXml="true"/></strong>
 						<c:if test="${learningLibraryValidity[dto.learningLibraryID] == 'false'}">
-							<span class="badge bg-warning text-black"><fmt:message key="sysadmin.disabled" /></span> 
+							<span class="badge bg-warning text-black"><fmt:message key="sysadmin.disabled" /></span>
 						</c:if>
 						<br/>
 						<c:out value="${dto.description}" escapeXml="true"/>
@@ -83,7 +86,7 @@
 									<input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/>
 									<input type="hidden" name="disable" value="false"/>
 									<button type="submit" class="btn btn-secondary" title="<fmt:message key="admin.disable" />"/>
-										<i class="fa fa-eye-slash"></i>
+									<i class="fa fa-eye-slash"></i>
 									</button>
 								</csrf:form>
 							</c:when>
@@ -92,10 +95,10 @@
 									<input type="hidden" name="libraryID" value="${dto.learningLibraryID}"/>
 									<input type="hidden" name="enable" value="false"/>
 									<button type="submit" class="btn btn-success" title="<fmt:message key="admin.enable" />"/>
-										<i class="fa fa-eye"></i>
+									<i class="fa fa-eye"></i>
 									</button>
 								</csrf:form>
-								
+
 							</c:otherwise>
 						</c:choose>
 						<c:if test="${not empty dto.toolContentID}">
@@ -120,5 +123,5 @@
 		</table>
 	</lams:Page5>
 
-</body>
+	</body>
 </lams:html>

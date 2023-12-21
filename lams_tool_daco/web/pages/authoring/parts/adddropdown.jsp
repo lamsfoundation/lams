@@ -10,8 +10,8 @@
 	<script type="text/javascript">
 	   var removeAnswerOptionUrl = "<c:url value='/authoring/removeAnswerOption.do'/>";
        var addAnswerOptionUrl = "<c:url value='/authoring/newAnswerOption.do'/>";
-	   var msgShowAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.show' />";
-       var msgHideAdditionalOptions = "<fmt:message key='label.authoring.basic.additionaloptions.hide' />";
+	   var msgShowAdditionalOptions = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.basic.additionaloptions.show' /></spring:escapeBody>";
+       var msgHideAdditionalOptions = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.basic.additionaloptions.hide' /></spring:escapeBody>";
 	   	//Initial behavior
 	   	$(document).ready(function() {
 	   		defaultShowAdditionaOptionsArea();

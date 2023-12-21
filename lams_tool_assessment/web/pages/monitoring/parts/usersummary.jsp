@@ -15,10 +15,6 @@
 		</c:if>
 	
 		<style>
-			.question-etherpad {
-				padding: 0;
-			}
-			
 			[data-toggle="collapse"].collapsed .if-not-collapsed, [data-toggle="collapse"]:not(.collapsed) .if-collapsed {
 	  			display: none;
 	  		}
@@ -37,12 +33,12 @@
 			// pass settings to jquery.jqGrid.confidence-level-formattter.js
 			var confidenceLevelsSettings = {
 				type: "${assessment.confidenceLevelsType}",
-				LABEL_NOT_CONFIDENT : '<fmt:message key="label.not.confident" />',
-				LABEL_CONFIDENT : '<fmt:message key="label.confident" />',
-				LABEL_VERY_CONFIDENT : '<fmt:message key="label.very.confident" />',
-				LABEL_NOT_SURE : '<fmt:message key="label.not.sure" />',
-				LABEL_SURE : '<fmt:message key="label.sure" />',
-				LABEL_VERY_SURE : '<fmt:message key="label.very.sure" />'
+				LABEL_NOT_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.confident" /></spring:escapeBody>',
+				LABEL_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confident" /></spring:escapeBody>',
+				LABEL_VERY_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.confident" /></spring:escapeBody>',
+				LABEL_NOT_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.sure" /></spring:escapeBody>',
+				LABEL_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.sure" /></spring:escapeBody>',
+				LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
 			};
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -84,16 +80,16 @@
 	  					guiStyle: "bootstrap",
 	  					iconSet: 'fontAwesome',
 	  				   	colNames:[
-		  				   	"<fmt:message key="label.monitoring.user.summary.attempt" />",
+		  				   	"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.attempt" /></spring:escapeBody>",
 	  						'questionResultUid',
-	  						"<fmt:message key="label.monitoring.user.summary.time" />",
-	  						"<fmt:message key="label.monitoring.user.summary.response" />",
+	  						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.time" /></spring:escapeBody>",
+	  						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.response" /></spring:escapeBody>",
 	  						<c:if test="${assessment.enableConfidenceLevels and question.type != 8}">
-	  							"<fmt:message key="label.confidence" />",
+	  							"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.confidence' /></spring:escapeBody>",
 	  						</c:if>
-	  						"<fmt:message key="label.monitoring.user.summary.grade" />",
-	  	  					"<fmt:message key="label.monitoring.user.summary.marker" />",
-	  	  					"<fmt:message key="label.monitoring.user.summary.marker.comment" />"
+	  						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.grade" /></spring:escapeBody>",
+	  	  					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.marker" /></spring:escapeBody>",
+	  	  					"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.marker.comment" /></spring:escapeBody>"
 	  					],  
 	  				   	colModel:[
 	  				   		{name:'id', index:'id', width:52, sorttype:"int"},

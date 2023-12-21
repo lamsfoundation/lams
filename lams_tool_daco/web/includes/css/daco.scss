@@ -48,37 +48,33 @@ div.bigNumber{
 }
 
 // cells must have the same height, otherwise they will be incorrectly aligned in horizontal record list
-table {
-  &#recordListTable td, &#horizontalListTable td {
+#recordListTable .col, #horizontalListTable .col {
     padding-left: 5px;
     vertical-align: middle;
     padding-right: 5px;
-  }
-  &#recordListTable td {
+}
+#recordListTable .col {
     background-color: $gray-lightest;
-    &.fixedCellHeight {
-      height: 150px;
-    }
   }
-  &#horizontalListTable td.fixedCellHeight {
+.fixedCellHeight {
     height: 150px;
   }
-  &#summaryTable table.alternative-color-inner-table {
-    // centers the table in the outer table column
-    margin: auto;
-  }
-  &#recordListTable {
+#recordListTable {
     border-right: none !important;
-    tr, td {
+    .row, .col {
       border-right: none !important;
     }
-  }
-  &#summaryTable {
-    td.singleSummaryCell, th.singleSummaryCell {
+}
+
+#summaryTable {
+    .singleSummaryCell {
       vertical-align: middle;
       text-align: center;
     }
-  }
+	.alternative-color-inner-table {
+	   	// centers the table in the outer table column
+	   	margin: auto;
+	}
 }
 
 border-thick { 

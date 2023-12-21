@@ -28,7 +28,7 @@
 			    <label for="file-title">
 			    	<fmt:message key="label.authoring.basic.resource.title.input"/>
 			    </label>
-			    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control input-sm" id="file-title" tabindex="1" maxlength="255"/>
+			    <input type="text" name="title" value="${imageGalleryItemForm.title}" class="form-control input-sm" id="file-title" maxlength="255"/>
 			</div>
 		
 			<div class="form-group">
@@ -38,7 +38,7 @@
 
 				<c:choose>
 					<c:when test="${saveUsingLearningAction}">
-						<lams:textarea rows="5" tabindex="2" class="text-area form-control" name="description"></lams:textarea>
+						<lams:textarea rows="5" class="text-area form-control" name="description"></lams:textarea>
 					</c:when>
 					<c:otherwise>
 						<lams:CKEditor id="description" value="${imageGalleryItemForm.description}" width="99%" 

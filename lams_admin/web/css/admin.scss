@@ -1,5 +1,9 @@
 @import "_lams_variables.scss";
 
+body.component {
+  background-color: #F8F8F8; /* rgb(248, 248, 248) */
+}
+
 .signupFieldDescription {
 	color: lighten($gray-base, 50%);
 }

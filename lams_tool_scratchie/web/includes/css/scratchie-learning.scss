@@ -1,40 +1,36 @@
 @import "_lams_variables.scss";
-	
-.scratches {
-	margin: 40px 0 15px;
-}
-
-.scratches tr td {
-	padding: 12px 15px;
-}
 
 .scratches a, .scratches a:hover {
 	border-bottom: none;
 }
 
-.scartchie-image {
-	border: 0;
+.scratches .scartchie-image-col {
+	width: 120px;
+	margin-left: -1rem;
 }
 
-
+/*----------countdown growl----------------*/
 .jGrowl {
   	font-size: 22px;
   	font-family: $font-family-base;
   	margin-left: 120px;
 }
 .jGrowl-notification {
-	opacity: .6;
+	opacity: .8;
 	border-radius: 10px;
-	width: 230px;
+	width: 400px;
 	margin: 10px 20px;
 	background: #eedc94 url(#{$url_css_directory}/check48.png) no-repeat 10px 10px;
+	padding-bottom: 20px;
 }
 .jGrowl-message {
 	padding-left: 60px;
 	padding-top: 5px;
+	color: black;
 }
 
-.burning-question-container, .question-etherpad-container {
+/*----------  ----------------*/
+.question-etherpad-container {
 	padding: 0 15px;
 }
 .answer-description {
@@ -59,14 +55,11 @@ hr.hr-confidence-level {
     margin-top: 10px;
     margin-bottom: 15px;
 }
-.lead {
-	margin-top: 30px;
+[data-bs-toggle="collapse"].collapsed .if-not-collapsed {
+	display: none;
 }
-[data-toggle="collapse"].collapsed .if-not-collapsed {
-  display: none;
-}
-[data-toggle="collapse"]:not(.collapsed) .if-collapsed {
-  display: none;
+[data-bs-toggle="collapse"]:not(.collapsed) .if-collapsed {
+	display: none;
 }
 	
 /* confidence levels tooltips */
@@ -76,18 +69,14 @@ hr.hr-confidence-level {
     border:  1px solid #ddd;
 }
 .tooltip.top .tooltip-arrow {
-      border-top-color:grey;
-      color:black;
+	border-top-color:grey;
+	color:black;
 }
 .tooltip {
-background-color: transparent;
-border: none;
-color:black;
-box-shadow:none;
-}
-		
-.item-score {
-	font-weight: bold;
+	background-color: transparent;
+	border: none;
+	color:black;
+	box-shadow:none;
 }
 
 .question-etherpad {
@@ -105,3 +94,65 @@ box-shadow:none;
 	color:#47bc23;
 	text-align: center;
 }
+
+.bq-title {
+	text-decoration: underline;
+	color: rgb(255, 255, 255)	
+}
+.bq-title:hover {
+	color: rgb(255, 255, 255);
+}
+
+	
+.fake-validation-input {
+	visibility: hidden;
+	height: 0px;	
+}
+
+/*----------Scratchie SVG----------------*/
+@keyframes reveal-tick {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+.icon-mask,
+.letter-mask {
+	stroke-dasharray: 12296;
+	stroke-dashoffset: 12296;
+}
+
+.scratched {
+	.icon-mask,
+	.letter-mask {
+		stroke-dashoffset: 0;
+	}
+}
+
+.show-tick .icon-mask,
+.show-tick .letter-mask,
+.show-cross .icon-mask,
+.show-cross .letter-mask {
+	animation: reveal-tick 2s ease-in-out both;
+}
+
+.show-tick .cross-icon {
+	opacity: 0;
+}
+
+.show-cross .tick-icon {
+	opacity: 0;
+}
+
+.scartchie-image-col {
+	text-align: right;
+	
+	a {
+		padding: 0;
+	}
+	svg {
+		margin: 0 -0.5rem 0 0.5rem;
+		padding: initial;
+	}
+}
+

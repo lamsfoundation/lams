@@ -3,6 +3,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!DOCTYPE html>
 <lams:html>
@@ -15,9 +16,10 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/portrait.js"></script>
+	<lams:JSImport src="includes/javascript/portrait.js" />
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/chart.js"></script>
+
 	<script type="text/javascript">
 		"use strict"
 		
@@ -28,30 +30,20 @@
 			LAMS_URL = '<lams:LAMSURL/>',
 			LEARNING_URL = LAMS_URL + 'learning/',
 			KUMALIVE_URL = LEARNING_URL + 'kumalive.jsp?organisationID='+ orgId,
-				
-			decoderDiv = $('<div />'),
 			LABELS = {
-				<fmt:message key="label.kumalive.title" var="KUMALIVE_TITLE_VAR"/>
-				KUMALIVE_TITLE : '<c:out value="${KUMALIVE_TITLE_VAR}" />',
-				<fmt:message key="message.kumalive.finish.kumalive" var="FINISH_KUMALIVE_MESSAGE_VAR"/>
-				FINISH_KUMALIVE_MESSAGE : decoderDiv.html('<c:out value="${FINISH_KUMALIVE_MESSAGE_VAR}" />').text(),
-				<fmt:message key="message.kumalive.finish.kumalive.confirm" var="FINISH_KUMALIVE_CONFIRM_VAR"/>
-				FINISH_KUMALIVE_CONFIRM : decoderDiv.html('<c:out value="${FINISH_KUMALIVE_CONFIRM_VAR}" />').text(),
-				<fmt:message key="message.kumalive.speak.not.raised.hand" var="SPEAK_CONFIRM_VAR"/>
-				SPEAK_CONFIRM : decoderDiv.html('<c:out value="${SPEAK_CONFIRM_VAR}" />').text(),
-				<fmt:message key="label.kumalive.finish.speak" var="SPEAK_FINISH_VAR"/>
-				SPEAK_FINISH : '<c:out value="${SPEAK_FINISH_VAR}" />',
-				<fmt:message key="message.kumalive.poll.finish.confirm" var="POLL_FINISH_CONFIRM_VAR"/>
-				POLL_FINISH_CONFIRM : decoderDiv.html('<c:out value="${POLL_FINISH_CONFIRM_VAR}" />').text(),
-				<fmt:message key="message.kumalive.poll.release.votes.confirm" var="POLL_RELEASE_VOTES_CONFIRM_VAR"/>
-				POLL_RELEASE_VOTES_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTES_CONFIRM_VAR}" />').text(),
-				<fmt:message key="message.kumalive.poll.release.voters.confirm" var="POLL_RELEASE_VOTERS_CONFIRM_VAR"/>
-				POLL_RELEASE_VOTERS_CONFIRM : decoderDiv.html('<c:out value="${POLL_RELEASE_VOTERS_CONFIRM_VAR}" />').text(),
-				<fmt:message key="label.kumalive.poll.missing.voters" var="MISSING_VOTERS_VAR"/>
-				MISSING_VOTERS : '<c:out value="${MISSING_VOTERS_VAR}" />'
+				KUMALIVE_TITLE: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.kumalive.title" /></spring:escapeBody>',
+				FINISH_KUMALIVE_MESSAGE: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.finish.kumalive" /></spring:escapeBody>',
+				FINISH_KUMALIVE_CONFIRM: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.finish.kumalive.confirm" /></spring:escapeBody>',
+				SPEAK_CONFIRM: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.speak.not.raised.hand" /></spring:escapeBody>',
+				SPEAK_FINISH: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.kumalive.finish.speak" /></spring:escapeBody>',
+				POLL_FINISH_CONFIRM: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.poll.finish.confirm" /></spring:escapeBody>',
+				POLL_RELEASE_VOTES_CONFIRM: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.poll.release.votes.confirm" /></spring:escapeBody>',
+				POLL_RELEASE_VOTERS_CONFIRM: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="message.kumalive.poll.release.voters.confirm" /></spring:escapeBody>',
+				MISSING_VOTERS: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.kumalive.poll.missing.voters" /></spring:escapeBody>'
 			};
 			
 	</script>
+	<lams:JSImport src="includes/javascript/websocket.js" />
 	<lams:JSImport src="includes/javascript/kumalive.js" relative="true" />
 </lams:head>
 <body>

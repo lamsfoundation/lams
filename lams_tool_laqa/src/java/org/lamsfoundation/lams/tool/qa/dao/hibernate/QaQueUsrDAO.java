@@ -56,8 +56,8 @@ public class QaQueUsrDAO extends LAMSBaseDAO implements IQaQueUsrDAO {
     public QaQueUsr getQaUserBySession(final Long queUsrId, final Long qaSessionId) {
 
 	String strGetUser = "from qaQueUsr in class QaQueUsr where qaQueUsr.queUsrId=:queUsrId and qaQueUsr.qaSession.qaSessionId=:qaSessionId";
-	List<?> list = getSession().createQuery(strGetUser).setParameter("queUsrId", queUsrId.longValue())
-		.setParameter("qaSessionId", qaSessionId.longValue()).list();
+	List<?> list = getSession().createQuery(strGetUser).setParameter("queUsrId", queUsrId)
+		.setParameter("qaSessionId", qaSessionId).list();
 
 	if (list != null && list.size() > 0) {
 	    QaQueUsr usr = (QaQueUsr) list.get(0);

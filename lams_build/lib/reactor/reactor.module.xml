@@ -24,7 +24,7 @@
 
 <module xmlns="urn:jboss:module:1.5" name="reactor">
   <resources>
-    <resource-root path="reactor-core-3.4.12.jar"/>
+    <resource-root path="reactor-core-3.5.11.jar"/>
   </resources>
   
   <dependencies>

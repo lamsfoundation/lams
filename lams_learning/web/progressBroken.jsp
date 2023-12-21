@@ -18,38 +18,23 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-<%@ taglib uri="tags-core" prefix="c" %>		
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
-<%@ taglib uri="tags-lams" prefix="lams" %>
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="error.title" />
-	</title>
+<c:set var="title"><fmt:message key="error.title" /></c:set>
+<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true">
 
-	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-</lams:head>
-
-<body class="stripes">
-	<lams:Page type="learner">
-	     <div class="voffset10">
-		    <p><fmt:message key="message.progress.broken"/></p>
-		    <p><fmt:message key="message.progress.broken.try.resume"/></p>
-		 <div class="voffset10 pull-right">
-		      <a href="#" class="btn btn-default" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button" /></a>
+	<div id="container-main">
+	     <lams:Alert5 type="danger">
+		    <fmt:message key="message.progress.broken"/>
+		    <br>
+		    <fmt:message key="message.progress.broken.try.resume"/>
+		 </lams:Alert5>
+		    
+		 <div class="activity-bottom-buttons">
+		 	<button type="button" class="btn btn-primary" id="addNewBtn" onClick="window.close();">
+		    	<fmt:message key="label.close.button" />
+		    </button>
 	     </div>
-	     <div id="footer"></div>
-	</lams:Page>
-</body>
-
-
-</lams:html>
+	</div>
+</lams:PageLearner>

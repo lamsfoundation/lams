@@ -1,14 +1,13 @@
+<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
+<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
+
+<!-- ********************  CSS ********************** -->
 	<lams:css suffix="jquery.jRating"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>/includes/css/learning.css'/>">
-	<style media="screen,projection" type="text/css">
-		#no-users-info {display: none;}
-	</style>
 
-	<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
-	<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
-
+<!-- ********************  javascript ********************** -->
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
@@ -18,11 +17,10 @@
 		MIN_RATES = 0, // only applies to stars
 		MAX_RATINGS_FOR_ITEM = 0, // only applies to stars
 		COUNT_RATED_ITEMS = 0, // only applies to stars
-		LAMS_URL = '${lams}',
 		COMMENTS_MIN_WORDS_LIMIT = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit},
-		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>",
+		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
+		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
 		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId}; 
 
@@ -31,16 +29,13 @@
 			commentsOnOtherPages = ${countRatedItems};
 			numCommentsOnPage = 0;
 	</script>
-	
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
-	<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
-	
+	<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 	<script type="text/javascript">
-
 	$(document).ready(function(){
 
 		$(".tablesorter").tablesorter({
@@ -103,9 +98,9 @@
 							
 							rows += '<tr>';
 
-							rows += '<td class="username" width="20%"><div class="pull-left roffset5">';
+							rows += '<td class="username" width="20%"><div class="float-start me-2">';
 							rows += definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' );
-							rows += '</div><span class="portrait-sm-lineheight">';
+							rows += '</div><span class="portrait-sm-lineheight" id="username-' + itemId + '">';
 							rows += userData["itemDescription"];
 							rows += '</span>'
 							rows += '</td>';
@@ -121,10 +116,10 @@
 										
 							} else {
 								rows += '<div id="add-comment-area-' + itemId + '">';	
-								rows += '<div class="no-gutter">';
+								rows += '<div class="g-0">';
 								rows += '';
-								rows += '<div class="col-xs-12 col-sm-11 ">';										
-								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control"';
+								rows += '<div class="col-12 col-sm-11 ">';										
+								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId + '" class="form-control" aria-labelledby="theader-comment username-' + itemId + '"';
 								<c:if test="${minRates ne 0 || maxRates ne 0}">
 									rows += ' onkeyup="return updatedComment(this);"';
 									if ( maxReached && commentPostedByUser == '' ) {
@@ -194,7 +189,7 @@
 	function updatedComment(comment) {		
 		// if the data has been saved to the database, don't clear it!
 		if ( comment.value == '' && comment.defaultValue != '' ) {
-			alert('<fmt:message key="error.edit.not.remove"/>');
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.edit.not.remove"/></spring:escapeBody>');
 			comment.value = comment.defaultValue;
 			return;
 		}
@@ -215,18 +210,16 @@
 				});
 			}
 		}
-		$('#countRatedItemsSpan').html('<fmt:message key="label.rate.limits.topic.reminder"/>'.replace('{0}', numCommentsOnPage + commentsOnOtherPages));
+		$('#countRatedItemsSpan').html('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rate.limits.topic.reminder"/></spring:escapeBody>'.replace('{0}', numCommentsOnPage + commentsOnOtherPages));
 		checkButtons();
 		return true;
 	}
 	</c:if>
 
-	
 	function submitEntry(next, skipNumberValidation){	
-
 		hideButtons();
 		if (!skipNumberValidation && (numCommentsOnPage + commentsOnOtherPages < ${minRates})) {
-			alert('<fmt:message key="label.rate.limits.reminder.min"/>'.replace('{0}',${minRates}) );
+			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.rate.limits.reminder.min"/></spring:escapeBody>'.replace('{0}',${minRates}) );
 			return false;
 		}
 			
@@ -264,7 +257,7 @@
 		        success: function (response) {
 	    			var countCommentsSaved = response.countCommentsSaved;
 					if ( ! ( countCommentsSaved > 0 ) ) {
-	       				alert('<fmt:message key="error.unable.save.comments"/>');
+	       				alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.unable.save.comments"/></spring:escapeBody>');
 	       				showButtons();
 	       				return false;
 					} else {
@@ -291,10 +284,9 @@
 	}
     </script>
 
-		<!-- Rating limits info -->
-		<c:if test="${minRates ne 0 || maxRates ne 0}">
-		
-			<lams:Alert type="info" id="rate-limits-reminder" close="false">
+	<!-- Rating limits info -->
+	<c:if test="${minRates ne 0 || maxRates ne 0}">	
+		<lams:Alert5 type="info" id="rate-limits-reminder" close="false">
 				<c:choose>
 					<c:when test="${rateAllUsers > 0}">
 						<fmt:message key="label.rate.all.users"></fmt:message>
@@ -327,27 +319,31 @@
 						<fmt:param value="<span id='count-rated-items'>${countRatedItems}</span>"/>
 					</fmt:message>
 				</span>
-			</lams:Alert>
-				
-		</c:if>
-		
+		</lams:Alert5>
+	</c:if>
+	
+<div class="card lcard">
+	<div class="card-header">
+		<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true" />
+	</div>
+
 	<form action="<c:url value="/learning/submitComments.do?"/>" method="get" id="editForm">
 		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 		<input type="hidden" name="toolContentId" value="${peerreview.contentId}"/>
 		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
 		<input type="hidden" name="next" id="next" value=""/>		
 
-		<lams:TSTable numColumns="2" test="1">
+		<lams:TSTable5 numColumns="2">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" style="width:25%" > 
 				<fmt:message key="label.user.name" />
 			</th>
-			<th class="comment"> 
+			<th class="comment" id="theader-comment"> 
 				<fmt:message key="label.comment" />
 			</th>
-		</lams:TSTable>
-
+		</lams:TSTable5>
 	</form>
 								
-	<div id="no-users-info">
+	<div id="no-users-info" class="alert alert-warning">
 		<fmt:message key="label.no.users" />
 	</div>
+</div>

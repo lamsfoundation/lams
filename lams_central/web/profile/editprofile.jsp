@@ -22,7 +22,7 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready( function() {
 			if ('${submitted}' == true && $('#error').length == 0) {
@@ -31,7 +31,7 @@
 			
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
-				'<fmt:message key="title.profile.edit.screen" />',
+				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.profile.edit.screen" /></spring:escapeBody>',
 				'100%'
 			);
 		});
@@ -178,10 +178,8 @@
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
 									<form:select path="timeZone" disabled="${!profileEditEnabled or editOnlyName}" cssClass="form-control">
-										<c:forEach items="${timezoneDtos}" var="timezoneDto">
-											<form:option value="${timezoneDto.timeZoneId}">
-												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-											</form:option>
+										<c:forEach items="${timezones}" var="timezone">
+											<form:option value="${timezone}"><c:out value="${timezone}" /></form:option>
 										</c:forEach>
 									</form:select>
 								</div>
@@ -321,10 +319,8 @@
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
 									<form:select path="timeZone" disabled="${!profileEditEnabled}" cssClass="form-control">
-										<c:forEach items="${timezoneDtos}" var="timezoneDto">
-											<form:option value="${timezoneDto.timeZoneId}">
-												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-											</form:option>
+										<c:forEach items="${timezones}" var="timezone">
+											<form:option value="${timezone}"><c:out value="${timezone}" /></form:option>
 										</c:forEach>
 									</form:select>
 								</div>
@@ -339,22 +335,24 @@
 
 						</div>
 					</div>
+
+					<div class="form-group" align="right">
+						<button type="button" class="btn btn-sm btn-default voffset5" id="cancelEditProfile" onclick="history.go(-1);">
+							<fmt:message key="button.cancel" />
+						</button>
+						&nbsp;&nbsp;
+						<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
+							<button type="submit" class="btn btn-sm btn-primary voffset5" 
+									name="submit"  id="saveEditProfile"> 
+								<fmt:message key="button.save" />
+							</button>
+						</c:if>
+					</div>
+
 				</div>
 			</div>
 		</div>
 			
-		<div class="form-group" align="right">
-			<button type="button" class="btn btn-sm btn-default voffset5" id="cancelEditProfile" onclick="history.go(-1);">
-				<fmt:message key="button.cancel" />
-			</button>
-			&nbsp;&nbsp;
-			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-				<button type="submit" class="btn btn-sm btn-primary voffset5" 
-						name="submit"  id="saveEditProfile"> 
-					<fmt:message key="button.save" />
-				</button>
-			</c:if>
-		</div>
 	</form:form>
 </body>
 </lams:html>

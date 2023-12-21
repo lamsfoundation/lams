@@ -2,6 +2,7 @@
 /build/
 /.sass-cache/
 /web/css/addLesson.css
+/web/css/components.css
 /web/css/defaultHTML*.css
 /web/css/jquery.jqGrid.confidence-level-formattter.css
 /web/css/purple*.css

@@ -23,19 +23,8 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -62,8 +51,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 @Controller
 @RequestMapping("/learning")
@@ -96,6 +94,7 @@ public class LearningController {
 	Whiteboard whiteboard = whiteboardService.getWhiteboardBySessionId(toolSessionId);
 	WhiteboardSession session = whiteboardService.getWhiteboardSessionBySessionId(toolSessionId);
 	sessionMap.put(WhiteboardConstants.ATTR_TOOL_CONTENT_ID, whiteboard.getContentId());
+	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 
 	// get back the whiteboard and item list and display them on page
 	WhiteboardUser user = null;
@@ -133,17 +132,17 @@ public class LearningController {
 	    }
 	    request.setAttribute(WhiteboardConstants.ATTR_GROUP_USERS, groupUserDtos);
 	    request.setAttribute(WhiteboardConstants.ATTR_WHITEBOARD, whiteboard);
+	    request.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    return "pages/learning/waitforleader";
 	}
 
 	boolean isUserLeader = user != null && leader != null && user.getUid().equals(leader.getUid());
 	boolean hasEditRight = !whiteboard.isUseSelectLeaderToolOuput() || isUserLeader;
 	sessionMap.put(WhiteboardConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(WhiteboardConstants.ATTR_REFLECTION_ON, whiteboard.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, whiteboardService.isLastActivity(toolSessionId));
 	sessionMap.put(WhiteboardConstants.ATTR_WHITEBOARD, whiteboard);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
 	// reflection information
 	String entryText = new String();
@@ -209,6 +208,7 @@ public class LearningController {
 
 	// add define later support
 	if (whiteboard.isDefineLater()) {
+	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    return "pages/learning/definelater";
 	}
 
@@ -273,7 +273,6 @@ public class LearningController {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	responseJSON.put(WhiteboardConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(responseJSON);
 	return responseJSON.toString();
     }
 
@@ -281,7 +280,8 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    private String finish(HttpServletRequest request) {
+    private void finish(HttpServletRequest request, HttpServletResponse response)
+	    throws WhiteboardApplicationException, IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(WhiteboardConstants.ATTR_SESSION_MAP_ID);
@@ -293,29 +293,16 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = user.getUserID().longValue();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = user.getUserID().longValue();
 
-	    nextActivityUrl = whiteboardService.finishToolSession(sessionId, userID);
-	    request.setAttribute(WhiteboardConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (WhiteboardApplicationException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = whiteboardService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
      * Display empty reflection form.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @SuppressWarnings("unchecked")
     @RequestMapping("/newReflection")
@@ -346,16 +333,11 @@ public class LearningController {
 
     /**
      * Submit reflection form input database.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) {
+    private void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws WhiteboardApplicationException, IOException {
 	Integer userId = reflectionForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, WhiteboardConstants.ATTR_SESSION_MAP_ID);
@@ -378,7 +360,7 @@ public class LearningController {
 	    whiteboardService.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************

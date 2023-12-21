@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.comments.CommentConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <script type="text/javascript">
 	// The treetable code uses the clicks to expand and collapse the replies but then 
@@ -34,7 +35,7 @@
 		
 		var theForm = $(editForm);			
 
-		if ( validateBodyText($('#editFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<fmt:message key="label.comment.body.validation" />") ) {
+		if ( validateBodyText($('#editFormBody').val(), <%=CommentConstants.MAX_BODY_LENGTH%>, "<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.body.validation" /></spring:escapeBody>") ) {
 	    	$.ajax({ // create an AJAX call...
 		        data: theForm.serialize(), 
 	    	    processData: false, // tell jQuery not to process the data
@@ -48,7 +49,12 @@
 					// make sure the old edit form is gone, so the user won't try to submit it again
 					$('#edit').remove();
 				}
-				reloadThread(response,'<lams:LAMSURL />','<fmt:message key="error.cannot.redisplay.please.refresh"/>','<fmt:message key="error.please.refresh"/>');
+				reloadThread(
+					response,
+					'<lams:LAMSURL />',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.cannot.redisplay.please.refresh"/></spring:escapeBody>',
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.please.refresh"/></spring:escapeBody>'
+				);
     		});
 		} // end validateBodyText
 		else {
@@ -60,44 +66,37 @@
 	function cancelEdit() {
 		$('#edit').remove();
 	}
-	
 </script>
 
-<div class="comment-entry form-group voffset5">
-<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
-	<textarea class="form-control"  id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH+2%>" name="body" class="comment">${comment.comment.body}</textarea>
-	<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}"/>
-	<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
-	
-	<div class="row voffset5">
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<div class="card lcard m-2">
+<div class="card-body">
+<div class="comment-entry form-group">
+	<form id="editForm" method="GET" action="<lams:LAMSURL />comments/updateTopicInline.do">
+		<textarea class="form-control" id="editFormBody" maxlength="<%=CommentConstants.MAX_BODY_LENGTH + 2%>" name="body"
+			class="comment"
+		>${comment.comment.body}</textarea>
+		<input type="hidden" id="sessionMapID" name="sessionMapID" value="${sessionMapID}" /> 
+		<input type="hidden" id="commentUid" name="commentUid" value="${commentUid}"/>
 
- 	<c:choose>
- 	<c:when test="${sessionMap.anonymous}">
- 	<%-- Post Anonymously? --%>
-	<div class="col-xs-12 col-sm-6">
-		<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
-		<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
-		<%@include file="anonymouscheckbox.jsp" %>
- 	</div>
-
-	<%-- Cancel / Edit Buttons --%>
-	<div class="col-xs-12 col-sm-6">
-	</c:when>
-	<c:otherwise>
-	<div class="col-xs-12">
-	</c:otherwise>
-	</c:choose>
-	<a href="#nogo" onclick="javascript:editCommentSubmit();" class="btn btn-xs btn-primary pull-right" id="editCommentSubmitButton">
-		<fmt:message key="label.post" />
-	</a>&nbsp;
-	<a href="#nogo" onclick="javascript:cancelEdit();" class="btn btn-xs btn-primary pull-right roffset5">
-		<fmt:message key="label.cancel" />
-	</a>
-	</div>
-
-</form>
+		<div class="mt-3">
+			<div class="clearfix">
+				<button type="button" onclick="javascript:editCommentSubmit();" class="btn btn-sm btn-secondary float-end btn-icon-comment" id="editCommentSubmitButton">
+					<fmt:message key="label.post" />
+				</button>
+				
+				<button type="button" onclick="javascript:cancelEdit();" class="btn btn-sm btn-secondary btn-icon-cancel float-end me-1">
+					<fmt:message key="label.cancel" />
+				</button>
+			</div>
+			
+			<%-- Post Anonymously? --%>
+			<c:if test="${sessionMap.anonymous}">
+				<c:set var="anonymousCheckboxChecked" value="${comment.comment.anonymous}"/>
+				<c:set var="anonymousCheckboxName" value="commentAnonymousEdit"/>
+				<%@include file="anonymouscheckbox.jsp"%>
+			</c:if>
+		</div>
+	</form>
 </div>
-
-
-
+</div>
+</div>

@@ -3,32 +3,13 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 	
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
+<lams:PageLearner title="${mindmapDTO.title}" toolSessionID="${toolSessionID}" >
 	
-	<lams:css/>
 	<lams:css suffix="jquery.jRating"/>
-	
 	<style>
 		#gallery-walk-rating-table {
 			width: 60%;
 			margin: 50px auto;
-			border-bottom: 1px solid #ddd;
-		}
-		
-		#gallery-walk-rating-table th {
-			font-weight: bold;
-			font-style: normal;
-			text-align: center;
-		}
-		
-		#gallery-walk-rating-table td {
-			text-align: center;
-		}
-		
-		#gallery-walk-rating-table th:first-child, #gallery-walk-rating-table td:first-child {
-			text-align: right;
 		}
 		
 		.gallery-walk-rating-comment-container {
@@ -51,30 +32,28 @@
 		}
 	</style>
 	
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<lams:JSImport src="learning/includes/javascript/gate-check.js" />
+	<lams:JSImport src="includes/javascript/common.js" />
 	<script type="text/javascript">
 			//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/",
 			//vars for rating.js
-			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
-			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
 			COMMENTS_MIN_WORDS_LIMIT = 0,
-			COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
-			WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
+			COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
+			WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
 			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 			
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
-			
-	    $(document).ready(function(){
-			$('[data-toggle="tooltip"]').bootstrapTooltip();
+
+		$(document).ready(function(){
+			$('[data-bs-toggle="tooltip"]').each((i, el) => {
+				new bootstrap.Tooltip($(el))
+			});
 			
 			// show mindmaps only on Group expand
 			$('.mindmap-collapse').on('show.bs.collapse', function(){
@@ -94,67 +73,66 @@
 			document.location.href='<c:url value="/learning/reflect.do?toolSessionID=${toolSessionID}&userUid=${userUid}"/>';
 		}
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-	
+	<lams:JSImport src="includes/javascript/rating.js" />
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>	
 	<%@ include file="websocket.jsp"%>	
-</lams:head>
-<body class="stripes">
 
-<lams:Page type="learner" title="${mindmapDTO.title}" style="">
-
-	<lams:errors/>
+<div id="container-main">
+	<lams:errors5/>
 	
-	<p><c:out value="${mindmapDTO.instructions}" escapeXml="false" /></p>
-	
-	<c:if test="${not empty mindmapDTO.galleryWalkInstructions}">
-		<hr>
-		<p><c:out value="${mindmapDTO.galleryWalkInstructions}" escapeXml="false" /></p>
-	</c:if>
+	<div id="instructions" class="instructions">
+		<c:out value="${mindmapDTO.instructions}" escapeXml="false" />
 		
+		<c:if test="${not empty mindmapDTO.galleryWalkInstructions}">
+			<div class="mt-3">
+				<c:out value="${mindmapDTO.galleryWalkInstructions}" escapeXml="false" />
+			</div>
+		</c:if>
+	</div>
+
 	<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
-		<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-		<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-		  <thead class="thead-light">
-		    <tr>
-		      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
-		      <th scope="col"><fmt:message key="label.rating" /></th>
-		    </tr>
-		  </thead>
-		  <tbody>
+		<div class="text-center card-subheader my-3">
+			<fmt:message key="label.gallery.walk.ratings.header" />
+		</div>
+		
+		<div id="gallery-walk-rating-table" class="ltable table-sm">
+			<div class="row">
+		    	<div class="col"><fmt:message key="monitoring.label.group" /></div>
+		    	<div class="col text-center"><fmt:message key="label.rating" /></div>
+			</div>
+		  
 			<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}">
-				<tr>
-					<td>${mindmapSession.sessionName}</td>
-					<td>
-						<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
+				<div class="row">
+					<div class="col">
+						${mindmapSession.sessionName}
+					</div>
+					<div class="col">
+						<lams:Rating5 itemRatingDto="${mindmapSession.itemRatingDto}" 
 									 isItemAuthoredByUser="true"
 									 hideCriteriaTitle="true" />
-					</td>
-				</tr>
-			</c:forEach>
-		  </tbody>
-		</table>
-	</c:if>
-	
-	<h4 class="voffset20" style="text-align: center"><fmt:message key="label.gallery.walk" /></h4>
-	
-	<c:if test="${mode == 'author'}">
-		<div class="row no-gutter" id="gallery-walk-preview-info">
-			<div class="col-xs-12 col-sm-offset-2 col-sm-8">
-				<div class="alert alert-info leader-display">
-					<fmt:message key="label.gallery.walk.preview" />
+					</div>
 				</div>
-			</div>
+			</c:forEach>
 		</div>
 	</c:if>
 	
+	<div class="text-center card-subheader my-3">
+		<fmt:message key="label.gallery.walk" />
+	</div>
+	
+	<c:if test="${mode == 'author'}">
+		<lams:Alert5 type="info" id="gallery-walk-preview-info" close="false">
+			<fmt:message key="label.gallery.walk.preview" />
+		</lams:Alert5>
+	</c:if>
 
 	<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}" varStatus="status">
-	    <div class="panel panel-default">
-	       <div class="panel-heading" role="tab" id="heading${mindmapSession.sessionID}">
-	       	<span class="panel-title collapsable-icon-left">
-	       		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${mindmapSession.sessionID}" 
-						aria-expanded="false" aria-controls="collapse${mindmapSession.sessionID}">
+	    <div class="card lcard">
+	       <div class="card-header">
+	       	<span class="card-title collapsable-icon-left">
+	       		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#collapse${mindmapSession.sessionID}" 
+						aria-expanded="false" aria-controls="collapse${mindmapSession.sessionID}"
+				>
 					<c:choose>
 						<c:when test="${toolSessionID == mindmapSession.sessionID}">
 							<b><c:out value="${mindmapSession.sessionName}" />&nbsp;<fmt:message key="label.gallery.walk.your.group" /></b>
@@ -163,15 +141,15 @@
 							<c:out value="${mindmapSession.sessionName}" />
 						</c:otherwise>
 					</c:choose>
-				</a>
+				</button>
 			</span>
 	       </div>
-	       <div id="collapse${mindmapSession.sessionID}" class="panel-collapse collapse mindmap-collapse" 
-	       	    role="tabpanel" aria-labelledby="heading${mindmapSession.sessionID}">
+	       
+	       <div id="collapse${mindmapSession.sessionID}" class="card-body collapse mindmap-collapse">
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not mindmapDTO.galleryWalkReadOnly and (mindmapDTO.galleryWalkFinished or mode == 'teacher' or toolSessionID != mindmapSession.sessionID)}">
 	       	    	<div class="gallery-walk-rating-comment-container">
-	       	    		<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}"
+	       	    		<lams:Rating5 itemRatingDto="${mindmapSession.itemRatingDto}"
 								     isItemAuthoredByUser="${mindmapDTO.galleryWalkFinished or mode == 'teacher'}" />
 					 </div>
 	       	    </c:if>
@@ -179,17 +157,16 @@
 				<iframe class="mindmap-frame"
 						data-src='<c:url value="/learning/getGalleryWalkMindmap.do?toolSessionID=${mindmapSession.sessionID}"/>'>
 				</iframe>
-
 			</div>
 		</div>
 	</c:forEach>
 	
 	<c:if test="${mode != 'teacher'}">
-		<div>
+		<div class="activity-bottom-buttons">
 			<c:choose>
 				<c:when test="${not mindmapDTO.galleryWalkFinished}">
-					<button data-toggle="tooltip" 
-							class="btn btn-default voffset5 pull-right ${mode == 'author' ? '' : 'disabled'}"
+					<button type="button" data-bs-toggle="tooltip" 
+							class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
 							<c:choose>
 								<c:when test="${mode == 'author'}">
 									title="<fmt:message key='label.gallery.walk.wait.finish.preview' />"
@@ -203,29 +180,28 @@
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
+				
 				<c:when test="${reflectOnActivity and not finishedActivity}">
-					<button name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-default voffset5 pull-right">
+					<button type="button" name="FinishButton" id="finish-button"
+							onclick="return continueReflect()" class="btn btn-primary na">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>
+				
 				<c:otherwise>
-					<a href="#nogo" name="FinishButton" id="finish-button" class="btn btn-primary voffset5 pull-right na">
-						<span class="nextActivity">
-							<c:choose>
-			 					<c:when test="${sessionMap.isLastActivity}">
-			 						<fmt:message key="button.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="button.finish" />
-			 					</c:otherwise>
-			 				</c:choose>
-						</span>
-					</a>
+					<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na">
+						<c:choose>
+			 				<c:when test="${sessionMap.isLastActivity}">
+			 					<fmt:message key="button.submit" />
+			 				</c:when>
+			 				<c:otherwise>
+			 		 			<fmt:message key="button.finish" />
+			 				</c:otherwise>
+			 			</c:choose>
+					</button>
 				</c:otherwise>
 			</c:choose>
 		</div>
 	</c:if>
-</lams:Page>
-</body>
-</lams:html>
+</div>
+</lams:PageLearner>

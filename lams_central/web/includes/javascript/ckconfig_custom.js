@@ -168,6 +168,18 @@ CKEDITOR.on('instanceReady', function(e){
 	}
 	e.editor._.editable.$.style.minHeight = height;
 	
+	//add ARIA attributes
+	if (e.editor.config.isRequired) {
+		e.editor._.editable.$.ariaRequired = true;	
+	}
+	if (e.editor.config.ariaLabel) {
+		e.editor._.editable.$.setAttribute('aria-label', e.editor.config.ariaLabel);
+		//e.editor._.editable.$.ariaLabel = ;	
+	} else if (e.editor.config.ariaLabelledby) {
+		e.editor._.editable.$.setAttribute('aria-labelledby', e.editor.config.ariaLabelledby);
+		//e.editor._.editable.$.ariaLabelledby = e.editor.config.ariaLabelledby;	
+	}
+	
 	// make all links open in new window
 	e.editor.on('getData', function(f){
 		// create a DOM element for easier manipulation

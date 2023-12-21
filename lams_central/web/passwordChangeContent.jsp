@@ -18,7 +18,7 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/profile.js"></script>
+	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		var mustHaveUppercase = ${mustHaveUppercase},
@@ -57,21 +57,21 @@
 		      },
 		      
 		      // Specify the validation error messages
-		      messages: {
-		          oldPassword: {
-		      		  required: "<fmt:message key='label.password.old.must.entered'/>" 
-		          },
-		          password: {
-		              required: "<fmt:message key='error.password.empty'/>",
-		              minlength: "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
-		              maxlength: "<fmt:message key='label.password.max.length'/>",
-		              charactersAllowed: "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
-		              pwcheck: "<fmt:message key='label.password.restrictions'/>"
-		          },
-		          passwordConfirm: {
-		        	  equalTo: "<fmt:message key='error.newpassword.mismatch'/>"
-		          },
-		      },
+			  messages: {
+				oldPassword: {
+					required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.old.must.entered'/></spring:escapeBody>"
+				},
+				password: {
+					required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.password.empty'/></spring:escapeBody>",
+					minlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message></spring:escapeBody>",
+					maxlength: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.max.length'/></spring:escapeBody>",
+					charactersAllowed: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.symbols.allowed'/></spring:escapeBody>",
+					pwcheck: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.restrictions'/></spring:escapeBody>"
+				},
+				passwordConfirm: {
+					equalTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.newpassword.mismatch'/></spring:escapeBody>"
+				}
+			},
 		      
 		      submitHandler: function(form) {
 		          form.submit();
@@ -81,7 +81,7 @@
 		
 		$(document).ready(function () {
 			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.password.change.screen" />', '430');
+			updateMyProfileDialogSettings('<fmt:message key="title.password.change.screen" />', '550');
 		});	
 	</script>
 </lams:head>
@@ -166,20 +166,19 @@
 							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="50"/>
 						</div>
-							
-						<div class="form-group" align="right">
-							<c:if test="${not passwordChangeActionForm.passwordExpired}">
-								<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
-									<fmt:message key="button.cancel"/>
-								</button>
-								&nbsp;&nbsp;
-							</c:if>
-							<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
-								<fmt:message key="button.save" />
-							</button>
-						</div>
 					</div>
 
+				</div>
+				<div class="form-group" align="right">
+					<c:if test="${not passwordChangeActionForm.passwordExpired}">
+						<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+							<fmt:message key="button.cancel"/>
+						</button>
+						&nbsp;&nbsp;
+					</c:if>
+					<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
+						<fmt:message key="button.save" />
+					</button>
 				</div>
 			</div>
 		</div>

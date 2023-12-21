@@ -70,7 +70,7 @@
 
     	//handler for "delete" buttons
     	$(document).on("click", '.delete-reference-link', function() {
-    		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
+    		var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.do.you.want.to.delete'/></spring:escapeBody>");
 
     		if (deletionConfirmed) {
     			var sequenceId = $('.reference-sequence-id', $(this).parents('tr')).val();
@@ -185,7 +185,7 @@
 	function reinitializePassingMarkSelect(isPageFresh){
 		var oldValue = (isPageFresh) ? "${assessmentForm.assessment.passingMark}" : $("#passingMark").val();
 		$('#passingMark').empty();
-		$('#passingMark').append( new Option("<fmt:message key='label.authoring.advance.passing.mark.none' />",0) );
+		$('#passingMark').append( new Option("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.authoring.advance.passing.mark.none' /></spring:escapeBody>",0) );
 		
 		var sumMaxMark = 0;
 		$("[name^=maxMark]").each(function() {

@@ -221,7 +221,7 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(HttpServletRequest request) {
+    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -232,19 +232,12 @@ public class LearningController {
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// get sessionId from HttpServletRequest
-	String nextActivityUrl = null;
-	try {
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    Long userID = userDTO.getUserID().longValue();
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	Long userID = userDTO.getUserID().longValue();
 
-	    nextActivityUrl = igService.finishToolSession(sessionId, userID);
-	    request.setAttribute(ImageGalleryConstants.ATTR_NEXT_ACTIVITY_URL, nextActivityUrl);
-	} catch (ImageGalleryException e) {
-	    LearningController.log.error("Failed get next activity url:" + e.getMessage());
-	}
-
-	return "pages/learning/finish";
+	String nextActivityUrl = igService.finishToolSession(sessionId, userID);
+	response.sendRedirect(nextActivityUrl);
     }
 
     /**
@@ -283,7 +276,7 @@ public class LearningController {
      * Save file or url imageGallery item into database.
      */
     @RequestMapping("/deleteImage")
-    public String deleteImage(HttpServletRequest request, HttpServletResponse response) {
+    public String deleteImage(HttpServletRequest request) {
 
 	Long imageUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
@@ -431,7 +424,8 @@ public class LearningController {
      * Submit reflection form input database.
      */
     @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public void submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
 
 	Integer userId = reflectionForm.getUserID();
 
@@ -455,7 +449,7 @@ public class LearningController {
 	    igService.updateEntry(entry);
 	}
 
-	return finish(request);
+	finish(request, response);
     }
 
     // *************************************************************************************
@@ -526,45 +520,43 @@ public class LearningController {
 	    }
 
 	    igService.uploadImageGalleryItemFile(image, files[0]);
-	} else {
-	    throw new ServletException("Can not access upload dir");
-	}
 
-	FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
+	    FileUtil.deleteTmpFileUploadDir(imageForm.getTmpFileUploadId());
 
-	String title = imageForm.getTitle();
-	if (StringUtils.isBlank(title)) {
-	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();
-	    imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
+	    String title = imageForm.getTitle();
+	    if (StringUtils.isBlank(title)) {
+		Long nextImageTitleNumber = imageGallery.getNextImageTitle();
+		imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
 
-	    title = igService.generateNextImageTitle(nextImageTitleNumber);
-	}
-	image.setTitle(title);
-
-	image.setCreateBy(user);
-	image.setDescription(imageForm.getDescription());
-	image.setCreateByAuthor(mode.isTeacher());
-	image.setHide(false);
-
-	// setting SequenceId
-	Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
-	int maxSeq = 0;
-	for (ImageGalleryItem dbImage : imageList) {
-	    if (dbImage.getSequenceId() > maxSeq) {
-		maxSeq = dbImage.getSequenceId();
+		title = igService.generateNextImageTitle(nextImageTitleNumber);
 	    }
-	}
-	maxSeq++;
-	image.setSequenceId(maxSeq);
+	    image.setTitle(title);
 
-	imageList.add(image);
-	igService.saveOrUpdateImageGallery(imageGallery);
+	    image.setCreateBy(user);
+	    image.setDescription(imageForm.getDescription());
+	    image.setCreateByAuthor(mode.isTeacher());
+	    image.setHide(false);
 
-	igService.saveOrUpdateImageGalleryItem(image);
+	    // setting SequenceId
+	    Set<ImageGalleryItem> imageList = imageGallery.getImageGalleryItems();
+	    int maxSeq = 0;
+	    for (ImageGalleryItem dbImage : imageList) {
+		if (dbImage.getSequenceId() > maxSeq) {
+		    maxSeq = dbImage.getSequenceId();
+		}
+	    }
+	    maxSeq++;
+	    image.setSequenceId(maxSeq);
 
-	// notify teachers
-	if (mode.isLearner() && imageGallery.isNotifyTeachersOnImageSumbit()) {
-	    igService.notifyTeachersOnImageSumbit(toolSessionId, user);
+	    imageList.add(image);
+	    igService.saveOrUpdateImageGallery(imageGallery);
+
+	    igService.saveOrUpdateImageGalleryItem(image);
+
+	    // notify teachers
+	    if (mode.isLearner() && imageGallery.isNotifyTeachersOnImageSumbit()) {
+		igService.notifyTeachersOnImageSumbit(toolSessionId, user);
+	    }
 	}
     }
 }

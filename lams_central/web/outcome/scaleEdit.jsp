@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/outcome.js"></script>
+	<lams:JSImport src="includes/javascript/outcome.js" />
 	<lams:JSImport src="includes/javascript/dialog.js" />
 	<script type="text/javascript">
 		<c:if test="${saved}">

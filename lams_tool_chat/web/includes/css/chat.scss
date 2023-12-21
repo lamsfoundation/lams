@@ -2,7 +2,6 @@
  
 /* ==================== COMMON ==================== */
 .message {
-	font-size: 12px;
 	padding-bottom: 4px;
 }
 
@@ -29,10 +28,10 @@
 
 @media (max-width: 767px) {
 	#messages {
-		height: 100px;
+		height: 200px;
 		resize: vertical;
 		overflow: auto;
-		border: $border-thin-default;
+		border: $border-thin-default-light;
 		padding: 2px;
 		padding-left:5px;
 	}
@@ -41,10 +40,10 @@
 
 @media (min-width: 768px) {
 	#messages {
-		height: 200px;
+		height: 330px;
 		resize: vertical;
 		overflow: auto;
-		border: $border-thin-default;
+		border: $border-thin-default-light;
 		padding: 2px;
 		padding-left:5px;
 	}
@@ -53,15 +52,15 @@
 }
 
 #roster {
-	height: 200px;
+	height: 400px;
 	resize: vertical;
 	overflow: auto;
-	border: $border-thin-default;
+	border: $border-thin-default-light;
 	padding: 2px;
 }
 
-#roster div {
-	margin-right: 5px; 
+.unselected div:first-child, .selected div:first-child {
+	margin-right: 10px; 
 }	
 
 #roster span {
@@ -72,7 +71,7 @@
 }
 	
 #sendMessageArea {
-	border: $border-thin-default;
+	border: $border-thin-default-light;
 	width: 100%;
 }
 
@@ -83,17 +82,18 @@
 #sendMessageButton {
 	width: 100%;
 }
-    
-.selected {
-	background-color: $gray-lightest;
-	padding: 2px;
+
+#roster>div {
+	line-height: 35px;
+}
+#roster.mode-teacher>div {
 	cursor: pointer;
 }
-
+.selected {
+	background-color: $gray-lightest;
+}
 .unselected {
 	background-color: white;
-	padding: 2px;
-	cursor: pointer;
 }
 
 /* ================== MONITORING ================== */
