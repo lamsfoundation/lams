@@ -23,13 +23,7 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -62,7 +56,12 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.JsonUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * An implementation of the NoticeboardService interface.
@@ -277,7 +276,7 @@ public class NoticeboardService
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -316,8 +315,9 @@ public class NoticeboardService
 		saveNoticeboard(newNbContent);
 	    }
 	} catch (RepositoryCheckedException e) {
-	    log.error("Unable to copy the tool content due to a content repository error. fromContentId "
-		    + fromContentId + " toContentId " + toContentId);
+	    log.error(
+		    "Unable to copy the tool content due to a content repository error. fromContentId " + fromContentId
+			    + " toContentId " + toContentId);
 	    throw new ToolException(e);
 	}
 
@@ -350,9 +350,15 @@ public class NoticeboardService
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Noticeboard user completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Noticeboard user for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	NoticeboardContent nbContent = nbContentDAO.findNbContentById(toolContentId);
@@ -364,13 +370,18 @@ public class NoticeboardService
 	for (NoticeboardSession session : nbContent.getNbSessions()) {
 	    NoticeboardUser user = nbUserDAO.getNbUser(userId.longValue(), session.getNbSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			NoticeboardConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    nbContentDAO.delete(entry);
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setUserStatus(NoticeboardUser.INCOMPLETE);
+		    nbUserDAO.updateNbUser(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    NoticeboardConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			nbContentDAO.delete(entry);
+		    }
 
-		nbUserDAO.delete(user);
+		    nbUserDAO.delete(user);
+		}
 	    }
 	}
     }
@@ -545,7 +556,7 @@ public class NoticeboardService
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -636,10 +647,9 @@ public class NoticeboardService
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(
-		NoticeboardUser.COMPLETED.equals(learner.getUserStatus()) ? ToolCompletionStatus.ACTIVITY_COMPLETED
-			: ToolCompletionStatus.ACTIVITY_ATTEMPTED,
-		null, null);
+	return new ToolCompletionStatus(NoticeboardUser.COMPLETED.equals(learner.getUserStatus())
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
+		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 
     // ****************** REST methods *************************

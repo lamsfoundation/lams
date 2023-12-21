@@ -23,22 +23,10 @@
 
 package org.lamsfoundation.lams.tool.chat.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
@@ -73,7 +61,17 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An implementation of the IChatService interface.
@@ -111,8 +109,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ChatService.logger.isDebugEnabled()) {
-	    ChatService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    ChatService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	ChatSession session = new ChatSession();
@@ -163,7 +162,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	// }
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }
-    
+
     @Override
     public String finishToolSession(Long userUid) {
 
@@ -221,7 +220,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -238,8 +237,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (ChatService.logger.isDebugEnabled()) {
-	    ChatService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    ChatService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -291,40 +291,47 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ChatService.logger.isDebugEnabled()) {
-	    ChatService.logger
-		    .debug("Removing Chat messages for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug("Resetting Chat completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		ChatService.logger.debug(
+			"Removing Chat messages for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
+
 	Chat chat = chatDAO.getByContentId(toolContentId);
 	if (chat == null) {
-	    ChatService.logger
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ChatService.logger.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
-	for (ChatSession session : (Set<ChatSession>) chat.getChatSessions()) {
+	for (ChatSession session : chat.getChatSessions()) {
 	    ChatUser user = chatUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		List<ChatMessage> messages = chatMessageDAO.getSentByUser(user.getUid());
-		if (!messages.isEmpty()) {
-		    for (ChatMessage message : messages) {
-			chatMessageDAO.delete(message);
-			session.getChatMessages().remove(message);
+		if (!resetActivityCompletionOnly) {
+		    List<ChatMessage> messages = chatMessageDAO.getSentByUser(user.getUid());
+		    if (!messages.isEmpty()) {
+			for (ChatMessage message : messages) {
+			    chatMessageDAO.delete(message);
+			    session.getChatMessages().remove(message);
+			}
 		    }
-		}
 
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ChatConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    chatDAO.delete(entry);
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    ChatConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			chatDAO.delete(entry);
+		    }
 		}
 
 		user.setFinishedActivity(false);
 		user.setLastPresence(null);
 		chatUserDAO.update(user);
 	    }
-
 	}
     }
 
@@ -332,9 +339,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
 
     @Override
@@ -362,7 +369,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
@@ -689,7 +696,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -868,9 +875,9 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
 	}
     }
-    // =========================================================================================
+// =========================================================================================
 
-    // ****************** REST methods *************************
+// ****************** REST methods *************************
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions Optional

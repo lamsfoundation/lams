@@ -23,30 +23,10 @@
 
 package org.lamsfoundation.lams.tool.scratchie.service;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -122,12 +102,31 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
+
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -2839,9 +2838,15 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug(
+			"Resetting Scratchie completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		log.debug("Removing Scratchie content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
@@ -2850,25 +2855,36 @@ public class ScratchieServiceImpl
 		    session.getSessionId());
 
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ScratchieConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    scratchieUserDao.saveObject(user);
+		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
+			session.setScratchingFinished(false);
+			session.setSessionEndDate(null);
+			scratchieSessionDao.update(session);
+		    }
+		} else {
+
+		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			    ScratchieConstants.TOOL_SIGNATURE, userId);
+		    if (entry != null) {
+			scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
+
+		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
+			session.setGroupLeader(null);
+			session.setScratchingFinished(false);
+			session.setSessionEndDate(null);
+			session.setTimeLimitLaunchedDate(null);
+			scratchieSessionDao.update(session);
+
+			scratchieAnswerVisitDao.deleteByProperty(ScratchieAnswerVisitLog.class, "sessionId",
+				session.getSessionId());
+		    }
+
+		    scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
+		    toolService.removeActivityMark(userId, session.getSessionId());
 		}
-
-		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
-		    session.setGroupLeader(null);
-		    session.setScratchingFinished(false);
-		    session.setSessionEndDate(null);
-		    session.setTimeLimitLaunchedDate(null);
-		    scratchieSessionDao.update(session);
-
-		    scratchieAnswerVisitDao.deleteByProperty(ScratchieAnswerVisitLog.class, "sessionId",
-			    session.getSessionId());
-		}
-
-		scratchieUserDao.removeObject(ScratchieUser.class, user.getUid());
-		toolService.removeActivityMark(userId, session.getSessionId());
 	    }
 	}
     }

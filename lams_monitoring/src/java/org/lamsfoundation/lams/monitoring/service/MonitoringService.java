@@ -1725,13 +1725,11 @@ public class MonitoringService implements IMonitoringFullService {
 	for (Activity activity : uncompleteActivities) {
 	    learnerProgress.getAttemptedActivities().remove(activity);
 	    learnerProgress.getCompletedActivities().remove(activity);
-	    if (removeLearnerContent) {
-		// the iteration goes from the end of the sequence to the beginning
-		// once an activity reports it will not reset its read-only flag, no other activities will reset it
-		// Also target activity does not have it reset
-		resetReadOnly = removeLearnerContent(activity, learner,
-			resetReadOnly && !activity.equals(targetActivity));
-	    }
+	    // the iteration goes from the end of the sequence to the beginning
+	    // once an activity reports it will not reset its read-only flag, no other activities will reset it
+	    // Also target activity does not have it reset
+	    resetReadOnly = removeLearnerContent(activity, learner, !removeLearnerContent,
+		    resetReadOnly && !activity.equals(targetActivity));
 	}
 
 	// set target activity as attempted
@@ -2723,7 +2721,7 @@ public class MonitoringService implements IMonitoringFullService {
 	activities.addAll(learnerProgress.getCompletedActivities().keySet());
 	boolean resetReadOnly = true;
 	for (Activity activity : activities) {
-	    resetReadOnly = removeLearnerContent(activity, learner, resetReadOnly);
+	    resetReadOnly = removeLearnerContent(activity, learner, false, resetReadOnly);
 	}
     }
 
@@ -2948,10 +2946,11 @@ public class MonitoringService implements IMonitoringFullService {
     /**
      * Removes learner content from ToolActivities and resets read-only flag, if possible.
      */
-    private boolean removeLearnerContent(Activity activity, User learner, boolean resetReadOnly) {
+    private boolean removeLearnerContent(Activity activity, User learner, boolean resetActivityCompletionOnly,
+	    boolean resetReadOnly) {
 	activity = getActivityById(activity.getActivityId());
 	// remove learner content from this activity
-	boolean update = lamsCoreToolService.removeLearnerContent(activity, learner);
+	boolean update = lamsCoreToolService.removeLearnerContent(activity, learner, resetActivityCompletionOnly);
 	if (update) {
 	    activityDAO.update(activity);
 	}

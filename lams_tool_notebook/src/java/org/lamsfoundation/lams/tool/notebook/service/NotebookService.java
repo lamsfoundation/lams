@@ -23,13 +23,7 @@
 
 package org.lamsfoundation.lams.tool.notebook.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.SortedMap;
-
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -68,7 +62,12 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.SortedMap;
 
 /**
  * An implementation of the INotebookService interface.
@@ -114,8 +113,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (NotebookService.logger.isDebugEnabled()) {
-	    NotebookService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    NotebookService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	NotebookSession session = new NotebookSession();
@@ -186,8 +186,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (NotebookService.logger.isDebugEnabled()) {
-	    NotebookService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    NotebookService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -238,28 +239,40 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (NotebookService.logger.isDebugEnabled()) {
-	    NotebookService.logger
-		    .debug("Removing Notebook entries for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug(
+			"Resetting Notebook completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Notebook entries for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Notebook notebook = notebookDAO.getByContentId(toolContentId);
-	if (notebook == null) {
-	    NotebookService.logger
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
-	    return;
+	if (!resetActivityCompletionOnly) {
+	    if (notebook == null) {
+		NotebookService.logger.warn(
+			"Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+		return;
+	    }
 	}
 
 	for (NotebookSession session : notebook.getNotebookSessions()) {
 	    NotebookUser user = notebookUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		if (user.getEntryUID() != null) {
-		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
-		    notebookDAO.delete(entry);
-		}
+		if (resetActivityCompletionOnly) {
+		    user.setFinishedActivity(false);
+		    saveOrUpdateNotebookUser(user);
+		} else {
+		    if (user.getEntryUID() != null) {
+			NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
+			notebookDAO.delete(entry);
+		    }
 
-		notebookUserDAO.delete(user);
+		    notebookUserDAO.delete(user);
+		}
 	    }
 	}
     }
@@ -268,9 +281,9 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
 
     @Override
@@ -298,7 +311,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
@@ -680,7 +693,8 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 

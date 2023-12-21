@@ -353,9 +353,7 @@ public class AssessmentServiceImpl
 
 			    }
 			}
-
 		    }
-
 		}
 	    }
 	}
@@ -3329,38 +3327,60 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+
 	if (log.isDebugEnabled()) {
-	    log.debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Assessment completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Assessment results for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	List<AssessmentSession> sessions = assessmentSessionDao.getByContentId(toolContentId);
 	for (AssessmentSession session : sessions) {
 	    List<AssessmentResult> results = assessmentResultDao.getAssessmentResultsBySession(session.getSessionId(),
 		    userId.longValue());
+
 	    for (AssessmentResult result : results) {
-		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class, questionResult.getUid());
+		if (resetActivityCompletionOnly) {
+		    if (result.isLatest() && result.getFinishDate() != null) {
+			result.setFinishDate(null);
+			assessmentResultDao.saveObject(result);
+		    }
+		} else {
+		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+			assessmentQuestionResultDao.removeObject(AssessmentQuestionResult.class,
+				questionResult.getUid());
+		    }
+		    assessmentResultDao.removeObject(AssessmentResult.class, result.getUid());
 		}
-		assessmentResultDao.removeObject(AssessmentResult.class, result.getUid());
 	    }
 
 	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), userId);
-		if (entry != null) {
-		    assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
+
+		if (resetActivityCompletionOnly) {
+		    user.setSessionFinished(false);
+		    assessmentUserDao.saveObject(user);
+		} else {
+		    NotebookEntry entry = getEntry(session.getSessionId(), userId);
+		    if (entry != null) {
+			assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
+		    }
+
+		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
+			session.setGroupLeader(null);
+		    }
+
+		    // propagade changes to Gradebook
+		    toolService.removeActivityMark(userId, session.getSessionId());
+
+		    assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 		}
-
-		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
-		    session.setGroupLeader(null);
-		}
-
-		// propagade changes to Gradebook
-		toolService.removeActivityMark(userId, session.getSessionId());
-
-		assessmentUserDao.removeObject(AssessmentUser.class, user.getUid());
 	    }
 	}
     }
@@ -3807,7 +3827,7 @@ public class AssessmentServiceImpl
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
 	}
     }
-    // ****************** REST methods *************************
+// ****************** REST methods *************************
 
     /**
      * Rest call to create a new Assessment content. Required fields in toolContentJSON: "title", "instructions",

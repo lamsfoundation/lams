@@ -23,20 +23,10 @@
 
 package org.lamsfoundation.lams.tool.qa.service;
 
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -89,10 +79,18 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * The POJO implementation of Qa service. All business logics of Qa tool are implemented in this class. It translate the
@@ -480,9 +478,14 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
 	if (logger.isDebugEnabled()) {
-	    logger.debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);
+	    if (resetActivityCompletionOnly) {
+		logger.debug("Resetting Q&A completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Q&A answers for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	QaContent content = qaDAO.getQaByContentId(toolContentId);
@@ -490,20 +493,27 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    for (QaSession session : content.getQaSessions()) {
 		QaQueUsr user = qaQueUsrDAO.getQaUserBySession(userId.longValue(), session.getQaSessionId());
 		if (user != null) {
-		    for (QaUsrResp response : user.getQaUsrResps()) {
-			qaUsrRespDAO.removeUserResponse(response);
-		    }
+		    if (resetActivityCompletionOnly) {
+			user.setResponseFinalized(false);
+			user.setLearnerFinished(false);
+			updateUser(user);
+		    } else {
+			for (QaUsrResp response : user.getQaUsrResps()) {
+			    qaUsrRespDAO.removeUserResponse(response);
+			}
 
-		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
-			session.setGroupLeader(null);
-		    }
+			if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid()
+				.equals(user.getUid())) {
+			    session.setGroupLeader(null);
+			}
 
-		    qaQueUsrDAO.deleteQaQueUsr(user);
+			qaQueUsrDAO.deleteQaQueUsr(user);
 
-		    NotebookEntry entry = getEntry(session.getQaSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    QaAppConstants.MY_SIGNATURE, userId);
-		    if (entry != null) {
-			qaDAO.delete(entry);
+			NotebookEntry entry = getEntry(session.getQaSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+				QaAppConstants.MY_SIGNATURE, userId);
+			if (entry != null) {
+			    qaDAO.delete(entry);
+			}
 		    }
 		}
 	    }
@@ -544,9 +554,9 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    attemptTime = response.getAttemptTime();
 	}
 
-	message = NEW_LINE_CHARACTER + NEW_LINE_CHARACTER
-		+ messageService.getMessage("label.user.has.answered.questions", new Object[] { fullName, attemptTime })
-		+ message + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
+	message =
+		NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + messageService.getMessage("label.user.has.answered.questions",
+			new Object[] { fullName, attemptTime }) + message + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER;
 
 	eventNotificationService.notifyLessonMonitors(sessionId, message, true);
     }
@@ -555,8 +565,9 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     public void changeLeaderForGroup(long toolSessionId, long leaderUserId) {
 	QaSession session = getSessionById(toolSessionId);
 	if (QaAppConstants.COMPLETED.equals(session.getSession_status())) {
-	    throw new InvalidParameterException("Attempting to assing a new leader with user ID " + leaderUserId
-		    + " to a finished session wtih ID " + toolSessionId);
+	    throw new InvalidParameterException(
+		    "Attempting to assing a new leader with user ID " + leaderUserId + " to a finished session wtih ID "
+			    + toolSessionId);
 	}
 
 	QaQueUsr existingLeader = session.getGroupLeader();
@@ -1038,7 +1049,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     /**
      * @param qaToolContentHandler
-     *            The qaToolContentHandler to set.
+     * 	The qaToolContentHandler to set.
      */
     public void setQaToolContentHandler(IToolContentHandler qaToolContentHandler) {
 	this.qaToolContentHandler = qaToolContentHandler;
@@ -1066,6 +1077,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     // =========================================================================================
+
     /**
      * @return Returns the coreNotebookService.
      */
@@ -1075,7 +1087,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     /**
      * @param coreNotebookService
-     *            The coreNotebookService to set.
+     * 	The coreNotebookService to set.
      */
     public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
 	this.coreNotebookService = coreNotebookService;
@@ -1203,7 +1215,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		});
 	    }
 	}
-	
+
 	//return nextActivityUrl
 	return leaveToolSession(toolSessionID, userID);
     }

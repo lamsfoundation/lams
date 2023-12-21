@@ -23,15 +23,9 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -67,9 +61,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * An implementation of the IScribeService interface.
@@ -106,8 +105,9 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (ScribeService.logger.isDebugEnabled()) {
-	    ScribeService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    ScribeService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	ScribeSession session = new ScribeSession();
@@ -163,7 +163,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -180,8 +180,9 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (ScribeService.logger.isDebugEnabled()) {
-	    ScribeService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    ScribeService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -233,26 +234,36 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
     @Override
     @SuppressWarnings("unchecked")
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (ScribeService.logger.isDebugEnabled()) {
-	    ScribeService.logger
-		    .debug("Removing Scribe contents for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug(
+			"Resetting Scribe completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Scribe content for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
 	}
 
 	Scribe scribe = scribeDAO.getByContentId(toolContentId);
 	if (scribe == null) {
-	    ScribeService.logger
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ScribeService.logger.warn(
+		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
-	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
-	    if ((session.getAppointedScribe() != null)
-		    && session.getAppointedScribe().getUserId().equals(userId.longValue())) {
+	for (ScribeSession session : scribe.getScribeSessions()) {
+	    if ((session.getAppointedScribe() != null) && session.getAppointedScribe().getUserId()
+		    .equals(userId.longValue())) {
 
-		for (ScribeUser user : (Set<ScribeUser>) session.getScribeUsers()) {
+		for (ScribeUser user : session.getScribeUsers()) {
 		    if (user.getUserId().equals(userId.longValue())) {
-			scribeUserDAO.delete(user);
+			if (resetActivityCompletionOnly) {
+			    user.setFinishedActivity(false);
+			    scribeUserDAO.saveOrUpdate(user);
+			} else {
+			    scribeUserDAO.delete(user);
+			}
 		    } else {
 			user.setReportApproved(false);
 			scribeUserDAO.saveOrUpdate(user);
@@ -267,14 +278,19 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    } else {
 		ScribeUser user = scribeUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 		if (user != null) {
-		    scribeUserDAO.delete(user);
+		    if (resetActivityCompletionOnly) {
+			user.setFinishedActivity(false);
+		    } else {
+			scribeUserDAO.delete(user);
+		    }
 		}
 	    }
-
-	    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScribeConstants.TOOL_SIGNATURE, userId);
-	    if (entry != null) {
-		scribeDAO.delete(entry);
+	    if (!resetActivityCompletionOnly) {
+		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
+			ScribeConstants.TOOL_SIGNATURE, userId);
+		if (entry != null) {
+		    scribeDAO.delete(entry);
+		}
 	    }
 	}
     }
@@ -379,7 +395,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    reports = new HashSet();
 	    session.setScribeReportEntries(reports);
 	}
-	for (Iterator iter = scribe.getScribeHeadings().iterator(); iter.hasNext();) {
+	for (Iterator iter = scribe.getScribeHeadings().iterator(); iter.hasNext(); ) {
 	    ScribeHeading heading = (ScribeHeading) iter.next();
 
 	    ScribeReportEntry report = new ScribeReportEntry();
@@ -502,7 +518,7 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
 	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -634,7 +650,8 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 

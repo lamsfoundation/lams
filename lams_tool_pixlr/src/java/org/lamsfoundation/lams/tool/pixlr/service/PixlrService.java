@@ -21,15 +21,7 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.pixlr.service;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -66,6 +58,13 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
 
 /**
  * An implementation of the IPixlrService interface.
@@ -108,8 +107,9 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
 	if (PixlrService.logger.isDebugEnabled()) {
-	    PixlrService.logger.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId
-		    + " toolSessionName = " + toolSessionName + " toolContentId = " + toolContentId);
+	    PixlrService.logger.debug(
+		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+			    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	PixlrSession session = new PixlrSession();
@@ -155,17 +155,17 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
     }
-    
+
     @Override
     public List<ConfidenceLevelDTO> getConfidenceLevels(Long toolSessionId) {
 	return null;
     }
-    
+
     @Override
     public boolean isUserGroupLeader(Long userId, Long toolSessionId) {
 	return false;
@@ -182,8 +182,9 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
 	if (PixlrService.logger.isDebugEnabled()) {
-	    PixlrService.logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId
-		    + " toContentId=" + toContentId);
+	    PixlrService.logger.debug(
+		    "entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+			    + toContentId);
 	}
 
 	if (toContentId == null) {
@@ -284,15 +285,25 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     @Override
-    public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (PixlrService.logger.isDebugEnabled()) {
-	    PixlrService.logger
-		    .debug("Removing Pixlr image for user ID " + userId + " and toolContentId " + toolContentId);
+    public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
+	    throws ToolException {
+	if (logger.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		logger.debug(
+			"Resetting Pixlr completion for user ID " + userId + " and toolContentId " + toolContentId);
+	    } else {
+		logger.debug("Removing Pixlr image for user ID " + userId + " and toolContentId " + toolContentId);
+	    }
+	}
 
-	    Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
-	    if (pixlr != null) {
-		for (PixlrSession session : pixlr.getPixlrSessions()) {
-		    PixlrUser user = pixlrUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+	Pixlr pixlr = pixlrDAO.getByContentId(toolContentId);
+	if (pixlr != null) {
+	    for (PixlrSession session : pixlr.getPixlrSessions()) {
+		PixlrUser user = pixlrUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
+		if (resetActivityCompletionOnly) {
+		    user.setFinishedActivity(false);
+		    pixlrUserDAO.saveOrUpdate(user);
+		} else {
 		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
 			    PixlrConstants.TOOL_SIGNATURE, userId);
 		    if (entry != null) {
@@ -309,9 +320,9 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
      * Export the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws DataMissingException
-     *             if no tool content matches the toolSessionId
+     * 	if no tool content matches the toolSessionId
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
 
     @Override
@@ -363,7 +374,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
      * Import the XML fragment for the tool's content, along with any files needed for the content.
      *
      * @throws ToolException
-     *             if any other error occurs
+     * 	if any other error occurs
      */
     @Override
     public void importToolContent(Long toolContentId, Integer newUserUid, String toolContentPath, String fromVersion,
@@ -389,8 +400,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
 	    if (imageFile.exists() && imageFile.canRead()) {
 
-		String newFileName = FileUtil.generateUniqueContentFolderID()
-			+ getFileExtension(pixlr.getImageFileName());
+		String newFileName =
+			FileUtil.generateUniqueContentFolderID() + getFileExtension(pixlr.getImageFileName());
 
 		String newFilePath = PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + newFileName;
 
@@ -591,12 +602,12 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public void auditLogStartEditingActivityInMonitor(long toolContentID) {
-    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
-    
+
     @Override
     public boolean isLastActivity(Long toolSessionId) {
 	return toolService.isLastActivity(toolSessionId);
@@ -691,7 +702,7 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getPixlrOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	// db doesn't have a start/finish date for learner, and session start/finish is null
@@ -700,7 +711,8 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
 	}
 
-	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+	return new ToolCompletionStatus(learner.isFinishedActivity()
+		? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 }
