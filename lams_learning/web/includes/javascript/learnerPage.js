@@ -49,30 +49,18 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
 
 				//current
                 if (activityData.status === 0) {
-                    activityItem.addClass('active');
-                    $(".col", activityItem).text(activityName);
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-unlock')
-                        			.attr('title', LABEL_CURRENT_GATE);
-                        
-                    } else {
-                        activityIcon.addClass('fa-regular fa-pen-to-square')
-                        			.attr('title', LABEL_CURRENT_ACTIVITY);
-                    }
+					activityItem.addClass('active');
+					$(".col", activityItem).text(activityName);
+					activityIcon.addClass('fa-regular fa-pen-to-square')
+						.attr('title', LABEL_CURRENT_ACTIVITY);
                 
                 //completed
                 } else if (activityData.status === 1) {
                     completedActivityCount++;
 
-                    activityItem.addClass('progress-bar-item-complete');
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-lock-open')
-                        			.attr('title', LABEL_COMPLETED_GATE);
-                        
-                    } else {
-                        activityIcon.addClass('fa-solid fa-square-check')
-                        			.attr('title', LABEL_COMPLETED_ACTIVITY);
-                    }
+					activityItem.addClass('progress-bar-item-complete');
+					activityIcon.addClass('fa-solid fa-square-check')
+						.attr('title', LABEL_COMPLETED_ACTIVITY);
                     if (activityData.url) {
                         let activityLink = $('<a>').text(activityName).attr({
                             'target': '_blank',
@@ -87,15 +75,9 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                 //not yet finished
                 } else {
                     activityItem.addClass('progress-bar-item-incomplete');
-                    $(".col", activityItem).text(activityName);
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-lock')
-                        			.attr('title', LABEL_NOT_STARTED_GATE);
-                        
-                    } else {
-                        activityIcon.addClass('fa-regular fa-square')
-                        			.attr('title', LABEL_NOT_STARTED_ACTIVITY);
-                    }
+					$(".col", activityItem).text(activityName);
+					activityIcon.addClass('fa-regular fa-square')
+						.attr('title', LABEL_NOT_STARTED_ACTIVITY);
                 }
             });
 
