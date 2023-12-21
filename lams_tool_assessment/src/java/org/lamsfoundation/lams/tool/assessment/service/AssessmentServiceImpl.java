@@ -312,7 +312,6 @@ public class AssessmentServiceImpl
 		    userOptionAnswers.add(userOptionAnswer);
 		}
 
-		userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 	    }
 	} else if (userResult.getFinishDate().equals(leaderResult.getFinishDate())) {
 	    // the latest result is already copied, so no need to copy it again
@@ -341,6 +340,7 @@ public class AssessmentServiceImpl
 		    userQuestionResult.setMaxMark(leaderQuestionResult.getMaxMark());
 		    userQuestionResult.setPenalty(leaderQuestionResult.getPenalty());
 		    userQuestionResult.setConfidenceLevel(leaderQuestionResult.getConfidenceLevel());
+		    userQuestionResult.setJustification(leaderQuestionResult.getJustification());
 
 		    Set<AssessmentOptionAnswer> leaderOptionAnswers = leaderQuestionResult.getOptionAnswers();
 		    Set<AssessmentOptionAnswer> userOptionAnswers = userQuestionResult.getOptionAnswers();

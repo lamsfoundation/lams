@@ -71,7 +71,7 @@ import java.util.SortedMap;
 public class LeaderselectionService
 	implements ToolSessionManager, ToolContentManager, ILeaderselectionService, ToolRestManager {
 
-    private static Logger logger = Logger.getLogger(LeaderselectionService.class.getName());
+    private static Logger log = Logger.getLogger(LeaderselectionService.class.getName());
 
     private ILeaderselectionDAO leaderselectionDAO = null;
 
@@ -92,10 +92,9 @@ public class LeaderselectionService
     /* ************ Methods from ToolSessionManager ************* */
     @Override
     public void createToolSession(Long toolSessionId, String toolSessionName, Long toolContentId) throws ToolException {
-	if (logger.isDebugEnabled()) {
-	    logger.debug(
-		    "entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
-			    + toolSessionName + " toolContentId = " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("entering method createToolSession:" + " toolSessionId = " + toolSessionId + " toolSessionName = "
+		    + toolSessionName + " toolContentId = " + toolContentId);
 	}
 
 	LeaderselectionSession session = new LeaderselectionSession();
@@ -164,8 +163,8 @@ public class LeaderselectionService
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
 
-	if (logger.isDebugEnabled()) {
-	    logger.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
+	if (log.isDebugEnabled()) {
+	    log.debug("entering method copyToolContent:" + " fromContentId=" + fromContentId + " toContentId="
 		    + toContentId);
 	}
 
@@ -201,7 +200,7 @@ public class LeaderselectionService
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Leaderselection content = leaderselectionDAO.getByContentId(toolContentId);
 	if (content == null) {
-	    logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 	for (LeaderselectionSession session : content.getLeaderselectionSessions()) {
@@ -219,11 +218,14 @@ public class LeaderselectionService
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId, boolean resetActivityCompletionOnly)
 	    throws ToolException {
-	// effect is the same whether resetActivityCompletionOnly is true or false
-
-	if (logger.isDebugEnabled()) {
-	    logger.debug(
-		    "Removing Leader Selection state for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    if (resetActivityCompletionOnly) {
+		log.debug("Resetting Leader Selection completion for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    } else {
+		log.debug("Removing Leader Selection content for user ID " + userId + " and toolContentId "
+			+ toolContentId);
+	    }
 	}
 
 	Leaderselection selection = leaderselectionDAO.getByContentId(toolContentId);
@@ -232,7 +234,8 @@ public class LeaderselectionService
 	}
 
 	for (LeaderselectionSession session : selection.getLeaderselectionSessions()) {
-	    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUserId().equals(userId.longValue())) {
+	    if (!resetActivityCompletionOnly && (session.getGroupLeader() != null) && session.getGroupLeader()
+		    .getUserId().equals(userId.longValue())) {
 		session.setGroupLeader(null);
 		leaderselectionSessionDAO.update(session);
 	    }
@@ -333,7 +336,7 @@ public class LeaderselectionService
 	LeaderselectionSession session = getSessionBySessionId(toolSessionId);
 	LeaderselectionUser newLeader = getUserByUID(userUid);
 	if ((session == null) || (newLeader == null)) {
-	    logger.error("Wrong parameters supplied. SessionId=" + toolSessionId + " UserId=" + userUid);
+	    log.error("Wrong parameters supplied. SessionId=" + toolSessionId + " UserId=" + userUid);
 	    return false;
 	}
 
@@ -386,7 +389,7 @@ public class LeaderselectionService
 	long toolContentId = toolService.getToolDefaultContentIdBySignature(toolSignature);
 	if (toolContentId == 0) {
 	    String error = "Could not retrieve default content id for this tool";
-	    logger.error(error);
+	    log.error(error);
 	    throw new LeaderselectionException(error);
 	}
 	return toolContentId;
@@ -398,7 +401,7 @@ public class LeaderselectionService
 	Leaderselection defaultContent = getContentByContentId(defaultContentID);
 	if (defaultContent == null) {
 	    String error = "Could not retrieve default content record for this tool";
-	    logger.error(error);
+	    log.error(error);
 	    throw new LeaderselectionException(error);
 	}
 	return defaultContent;
@@ -409,7 +412,7 @@ public class LeaderselectionService
 
 	if (newContentID == null) {
 	    String error = "Cannot copy the Leaderselection tools default content: + " + "newContentID is null";
-	    logger.error(error);
+	    log.error(error);
 	    throw new LeaderselectionException(error);
 	}
 
@@ -425,7 +428,7 @@ public class LeaderselectionService
     public Leaderselection getContentByContentId(Long toolContentID) {
 	Leaderselection leaderselection = leaderselectionDAO.getByContentId(toolContentID);
 	if (leaderselection == null) {
-	    logger.debug("Could not find the content with toolContentID:" + toolContentID);
+	    log.debug("Could not find the content with toolContentID:" + toolContentID);
 	}
 	return leaderselection;
     }
@@ -434,7 +437,7 @@ public class LeaderselectionService
     public LeaderselectionSession getSessionBySessionId(Long toolSessionId) {
 	LeaderselectionSession leaderselectionSession = leaderselectionSessionDAO.getBySessionId(toolSessionId);
 	if (leaderselectionSession == null) {
-	    logger.debug("Could not find the leaderselection session with toolSessionID:" + toolSessionId);
+	    log.debug("Could not find the leaderselection session with toolSessionID:" + toolSessionId);
 	}
 	return leaderselectionSession;
     }
