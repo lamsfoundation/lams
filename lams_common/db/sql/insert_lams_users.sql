@@ -125,4 +125,5 @@ INSERT INTO lams_user_organisation_role VALUES
 (71,27,5),
 (72,28,5),
 (73,29,5),
-(74,18,2);
+(74,18,2),
+(75,1,7);
