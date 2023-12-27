@@ -16,24 +16,24 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
             const ACTIVITY_ITEM_TEMPLATE = '<li><div class="row align-items-center"><div class="icon"></div><div class="col text-center"></div></div></li>';
             if (result.support) {
                 let supportBarItems = $('.component-page-wrapper .offcanvas #offcanvas-support-bar')
-                	.removeClass('d-none')
+                    .removeClass('d-none')
                     .find('#support-bar-items')
                     .empty();
                 $.each(result.support, function (activityIndex, activityData) {
                     let activityItem = $(ACTIVITY_ITEM_TEMPLATE)
-                        .addClass('list-group-item list-group-item-action progress-bar-item-openable').appendTo(supportBarItems),
+                            .addClass('list-group-item list-group-item-action progress-bar-item-openable').appendTo(supportBarItems),
                         activityIcon = $('<i>').attr({
-	                        'class': 'fa-solid fa-fw fa-lg fa-up-right-from-square progress-bar-icon',
-	                        'title': LABEL_SUPPORT_ACTIVITY
-						}),
-                    	activityLink = $('<a>').text(activityData.name).attr({
-	                        'target': '_blank',
-	                        'href': activityData.url,
-	                        'role': 'menuitem',
-	                        'title': LABEL_CLICK_TO_OPEN
-	                    });
-	                $(".icon", activityItem).prepend(activityIcon);
-	                $(".col", activityItem).append(activityLink);
+                            'class': 'fa-solid fa-fw fa-lg fa-up-right-from-square progress-bar-icon',
+                            'title': LABEL_SUPPORT_ACTIVITY
+                        }),
+                        activityLink = $('<a>').text(activityData.name).attr({
+                            'target': '_blank',
+                            'href': activityData.url,
+                            'role': 'menuitem',
+                            'title': LABEL_CLICK_TO_OPEN
+                        });
+                    $(".icon", activityItem).prepend(activityIcon);
+                    $(".col", activityItem).append(activityLink);
                 });
             }
 
@@ -41,60 +41,64 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                 completedActivityCount = 0;
             $.each(result.activities, function (activityIndex, activityData) {
                 let activityItem = $(ACTIVITY_ITEM_TEMPLATE)
-                		.addClass('list-group-item list-group-item-action')
-                		.appendTo(progressBarItems),
+                        .addClass('list-group-item list-group-item-action')
+                        .appendTo(progressBarItems),
                     activityName = !activityData.name && activityData.type === 'g' ? 'Gate' : activityData.name,
                     activityIcon = $('<i class="fa-fw fa-lg progress-bar-icon"></i>');
-                    $(".icon", activityItem).prepend(activityIcon);
+                $(".icon", activityItem).prepend(activityIcon);
 
-				//current
+                //current
                 if (activityData.status === 0) {
                     activityItem.addClass('active');
                     $(".col", activityItem).text(activityName);
                     if (activityData.type === 'g') {
                         activityIcon.addClass('fa-solid fa-unlock')
-                        			.attr('title', LABEL_CURRENT_GATE);
-                        
+                            .attr('title', LABEL_CURRENT_GATE);
+
                     } else {
                         activityIcon.addClass('fa-regular fa-pen-to-square')
-                        			.attr('title', LABEL_CURRENT_ACTIVITY);
+                            .attr('title', LABEL_CURRENT_ACTIVITY);
                     }
-                
-                //completed
-                } else if (activityData.status === 1) {
-                    completedActivityCount++;
+                } else {
+                    let target = '_blank';
 
-                    activityItem.addClass('progress-bar-item-complete');
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-lock-open')
-                        			.attr('title', LABEL_COMPLETED_GATE);
-                        
+                    //completed
+                    if (activityData.status === 1) {
+                        completedActivityCount++;
+
+                        activityItem.addClass('progress-bar-item-complete');
+                        if (activityData.type === 'g') {
+                            activityIcon.addClass('fa-solid fa-lock-open')
+                                .attr('title', LABEL_COMPLETED_GATE);
+
+                        } else {
+                            activityIcon.addClass('fa-solid fa-square-check')
+                                .attr('title', LABEL_COMPLETED_ACTIVITY);
+                        }
                     } else {
-                        activityIcon.addClass('fa-solid fa-square-check')
-                        			.attr('title', LABEL_COMPLETED_ACTIVITY);
+                        target = '_self';
+                        //not yet finished
+                        activityItem.addClass('progress-bar-item-incomplete');
+                        if (activityData.type === 'g') {
+                            activityIcon.addClass('fa-solid fa-lock')
+                                .attr('title', LABEL_NOT_STARTED_GATE);
+
+                        } else {
+                            activityIcon.addClass('fa-regular fa-square')
+                                .attr('title', LABEL_NOT_STARTED_ACTIVITY);
+                        }
                     }
                     if (activityData.url) {
                         let activityLink = $('<a>').text(activityName).attr({
-                            'target': '_blank',
+                            'target': target,
                             'href': activityData.url,
                             'role': 'menuitem',
                             'title': LABEL_CLICK_TO_OPEN
                         });
                         activityItem.addClass('progress-bar-item-openable');
                         $(".col", activityItem).append(activityLink);
-                    }
-                
-                //not yet finished
-                } else {
-                    activityItem.addClass('progress-bar-item-incomplete');
-                    $(".col", activityItem).text(activityName);
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-lock')
-                        			.attr('title', LABEL_NOT_STARTED_GATE);
-                        
                     } else {
-                        activityIcon.addClass('fa-regular fa-square')
-                        			.attr('title', LABEL_NOT_STARTED_ACTIVITY);
+                        $(".col", activityItem).text(activityName);
                     }
                 }
             });
@@ -170,7 +174,7 @@ function toggleProgressBar(forceClose) {
         progressBar = $('.component-page-wrapper .offcanvas'),
         topToggleButton = $('header #hamb', pageContent),
         isExpanded = forceClose || topToggleButton.attr('aria-expanded') == 'true';
-        
+
     topToggleButton.attr('aria-expanded', !isExpanded)
         .children('i').toggleClass(topToggleButton.data('closed-class')).toggleClass(topToggleButton.data('opened-class'));
     progressBar.toggleClass('active').attr('aria-expanded', !isExpanded);

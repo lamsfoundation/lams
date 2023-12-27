@@ -315,12 +315,7 @@ var MenuLib = {
 					cache : false,
 					dataType : 'text',
 					success : function() {
-						// open preview pop up window
-						var left = ((screen.width / 2) - (1280 / 2)),
-							// open the window a bit higher than center
-							top = ((screen.height / 2) - (720 / 2)) / 2;
-						window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID,'Preview',
-							'width=1280,height=720,resizable,scrollbars=yes,status=yes,top=' + top + ',left=' + left);
+						window.open(LAMS_URL + 'home/learner.do?mode=preview&lessonID='+lessonID, '_blank');
 						previewButton.button('reset');
 					}
 				});
@@ -512,7 +507,7 @@ var MenuLib = {
 					}
 				},
 				'close' : function(){
-					// stop checking in LD was 
+					// stop checking in LD was
 					clearInterval(loadCheckInterval);
 					$(this).remove();
 				},
