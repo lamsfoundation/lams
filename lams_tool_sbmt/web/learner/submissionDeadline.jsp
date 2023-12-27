@@ -6,9 +6,6 @@
 	toolSessionID="${sessionMap.toolSessionID}"
 	submissionDeadline="${sessionMap.submissionDeadline}"
 	finishSessionUrl="/learning/finish.do?sessionMapID=${sessionMapID}"
-	continueReflectUrl="/learning/newReflection.do?sessionMapID=${sessionMapID}"
-	isNotebookReeditEnabled="false"
-	isContinueReflectButtonEnabled="${sessionMap.reflectOn && (not sessionMap.userFinished)}"
 	isLastActivity="${isLastActivity}" />
 
 

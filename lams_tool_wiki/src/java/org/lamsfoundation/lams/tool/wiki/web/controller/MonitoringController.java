@@ -23,19 +23,15 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.controller;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
@@ -277,13 +273,7 @@ public class MonitoringController extends WikiPageController {
 	WikiSessionDTO sessionDTO = new WikiSessionDTO(wikiSession);
 	Long toolContentId = wikiSession.getWiki().getToolContentId();
 
-	// Add all the user notebook entries to the session dto
 	for (WikiUserDTO userDTO : sessionDTO.getUserDTOs()) {
-	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WikiConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-	    if (notebookEntry != null) {
-		userDTO.setNotebookEntry(notebookEntry.getEntry());
-	    }
 	    sessionDTO.getUserDTOs().add(userDTO);
 	}
 	request.setAttribute(WikiConstants.ATTR_SESSION_DTO, sessionDTO);

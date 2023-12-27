@@ -76,7 +76,6 @@ public class DokumaranForm {
 	    dokumaran.setDefineLater(false);
 	    dokumaran.setUseSelectLeaderToolOuput(false);
 	    dokumaran.setAllowMultipleLeaders(false);
-	    dokumaran.setReflectOnActivity(false);
 	}
     }
 

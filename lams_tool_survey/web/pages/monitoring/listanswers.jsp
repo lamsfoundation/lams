@@ -65,7 +65,8 @@
                 output: '{startRow} to {endRow} ({totalRows})',
                 cssPageDisplay: '.pagedisplay',
                 cssPageSize: '.pagesize',
-                cssDisabled: 'disabled',				ajaxUrl : "<c:url value='/monitoring/getAnswersJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${question.uid}&toolSessionID=" + $(this).attr('data-session-id'),
+                cssDisabled: 'disabled',				
+                ajaxUrl : "<c:url value='/monitoring/getAnswersJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${question.uid}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],

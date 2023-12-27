@@ -95,11 +95,6 @@
 			return false;
 		}
 
-		function continueReflect() {
-			disableButtons() ;
-			document.location.href = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-
 		function showMessage(url) {
 			var area = document.getElementById("reourceInputArea");
 			if (area != null) {
@@ -303,15 +298,6 @@
 			 - <fmt:message key="label.learning.required.tasks" />
 		</p>
 
-		<!--Reflection-->
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="${mode != 'teacher'}"
-				notebookHeaderLabelKey="label.monitoring.summary.title.reflection"/>
-		</c:if>
-
 		<!--Bottom buttons-->
 
 		<c:set var="isRequiredTasksCompleted" value="${true}" />
@@ -331,13 +317,6 @@
 				<c:if test="${isRequiredTasksCompleted}">
 					<c:choose>
 						<c:when test="${taskList.monitorVerificationRequired && !sessionMap.userVerifiedByMonitor && (mode != 'author')}">
-						</c:when>
-	
-						<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-							<button type="button" id="finishButton" onclick="return continueReflect()"
-								class="btn btn-primary btn-disable-on-submit na">
-								<fmt:message key="label.continue" />
-							</button>
 						</c:when>
 	
 						<c:otherwise>

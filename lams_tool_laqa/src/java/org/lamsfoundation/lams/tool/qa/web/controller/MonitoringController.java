@@ -282,52 +282,6 @@ public class MonitoringController implements QaAppConstants {
     }
 
     /**
-     * Get Paged Reflections
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping(path = "/getReflectionsJSON")
-    @ResponseBody
-    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException, ToolException {
-
-	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
-
-	// paging parameters of tablesorter
-	int size = WebUtil.readIntParam(request, "size");
-	int page = WebUtil.readIntParam(request, "page");
-	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]");
-
-	int sorting = QaAppConstants.SORT_BY_NO;
-	if (sortByName != null) {
-	    sorting = sortByName.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
-	}
-
-	//return user list according to the given sessionID
-	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting,
-		searchString);
-
-	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", qaService.getCountUsersBySessionWithSearch(toolSessionId, searchString));
-
-	for (Object[] userAndReflection : users) {
-	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
-	    responseRow.put("username", HtmlUtils.htmlEscape((String) userAndReflection[1]));
-	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[2]);
-		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
-	    }
-	    rows.add(responseRow);
-	}
-	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=UTF-8");
-	return responsedata.toString();
-    }
-
-    /**
      * Start to download the page that has an HTML version of the answers. Calls answersDownload
      * which forwards to the jsp to download the file.
      *

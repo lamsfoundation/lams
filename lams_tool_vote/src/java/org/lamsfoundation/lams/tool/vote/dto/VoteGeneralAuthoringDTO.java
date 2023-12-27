@@ -52,11 +52,6 @@ public class VoteGeneralAuthoringDTO implements Comparable<Object> {
     protected String contentFolderID;
     protected String editableQuestionText;
 
-    //  protected List attachmentList;
-    //  protected List deletedAttachmentList;
-    protected String reflect;
-    protected String reflectionSubject;
-
     protected String editableNominationText;
     protected String responseId;
     protected String currentUid;
@@ -334,66 +329,6 @@ public class VoteGeneralAuthoringDTO implements Comparable<Object> {
      */
     public void setEditableQuestionText(String editableQuestionText) {
 	this.editableQuestionText = editableQuestionText;
-    }
-
-//    /**
-//     * @return Returns the attachmentList.
-//     */
-//    public List getAttachmentList() {
-//	return attachmentList;
-//    }
-//
-//    /**
-//     * @param attachmentList
-//     *            The attachmentList to set.
-//     */
-//    public void setAttachmentList(List attachmentList) {
-//	this.attachmentList = attachmentList;
-//    }
-
-//    /**
-//     * @return Returns the deletedAttachmentList.
-//     */
-//    public List getDeletedAttachmentList() {
-//	return deletedAttachmentList;
-//    }
-//
-//    /**
-//     * @param deletedAttachmentList
-//     *            The deletedAttachmentList to set.
-//     */
-//    public void setDeletedAttachmentList(List deletedAttachmentList) {
-//	this.deletedAttachmentList = deletedAttachmentList;
-//    }
-
-    /**
-     * @return Returns the reflect.
-     */
-    public String getReflect() {
-	return reflect;
-    }
-
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     /**

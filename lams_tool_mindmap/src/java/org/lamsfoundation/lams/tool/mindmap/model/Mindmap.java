@@ -92,12 +92,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     @Column(name = "export_content")
     private String mindmapExportContent;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "gallery_walk_enabled")
     private boolean galleryWalkEnabled;
 
@@ -302,28 +296,6 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     public void setMindmapExportContent(String mindmapExportContent) {
 	this.mindmapExportContent = mindmapExportContent;
-    }
-
-    /**
-     *
-     */
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    /**
-     *
-     */
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isGalleryWalkEnabled() {

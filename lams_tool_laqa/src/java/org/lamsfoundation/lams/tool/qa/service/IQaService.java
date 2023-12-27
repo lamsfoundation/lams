@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -196,10 +195,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
 
     long getToolDefaultContentIdBySignature(String toolSignature);
 
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
     String finishToolSession(Long toolSessionID, Long userID);
 
     /**
@@ -207,8 +202,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      * must be made by the web layer.
      */
     ILogEventService getLogEventService();
-
-    void updateEntry(NotebookEntry notebookEntry);
 
     QaContent getQaContentBySessionId(Long sessionId);
 
@@ -237,22 +230,6 @@ public interface IQaService extends ToolRatingManager, ICommonToolService {
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
-
-    /**
-     *
-     * Takes the tool session id as the main input.
-     */
-
-    /**
-     * Return username and reflections for a sessions. Paged. Used for monitoring.
-     * Will return List<[username (String), fullname(String), String (notebook entry)]>
-     *
-     * @param content
-     * @param userID
-     * @return
-     */
-    List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting,
-	    String searchString);
 
     int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString);
 

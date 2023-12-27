@@ -38,9 +38,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -93,8 +90,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     private ILogEventService logEventService = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -225,14 +220,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    return;
 	}
 
-	for (NotebookSession session : notebook.getNotebookSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	notebookDAO.delete(notebook);
     }
 
@@ -254,11 +241,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	for (NotebookSession session : notebook.getNotebookSessions()) {
 	    NotebookUser user = notebookUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		if (user.getEntryUID() != null) {
-		    NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
-		    notebookDAO.delete(entry);
-		}
-
 		notebookUserDAO.delete(user);
 	    }
 	}
@@ -374,28 +356,14 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
 	// learningForm.getContentEditable() will be null if the deadline has passed
 	if (isContentEditable != null && isContentEditable) {
-	    // TODO fix idType to use real value not 999
-	    if (notebookUser.getEntryUID() == null) {
-		Long entryUID = coreNotebookService.createNotebookEntry(toolSessionId,
-			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
-			notebookUser.getUserId().intValue(), "", entryText);
-		notebookUser.setEntryUID(entryUID);
-
-	    } else {
-		// update existing entry.
-		coreNotebookService.updateEntry(notebookUser.getEntryUID(), "", entryText);
-	    }
-
+	    // save the entry
+	    notebookUser.setNotebookEntry(entryText);
+	    notebookUser.setNotebookEntryModifiedDate(new Date());
 	    notebookUser.setFinishedActivity(true);
 	    saveOrUpdateNotebookUser(notebookUser);
 	}
 
 	return leaveToolSession(toolSessionId, userId);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long uid) {
-	return coreNotebookService.getEntry(uid);
     }
 
     @Override
@@ -508,8 +476,7 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     @Override
     public List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
 	    String searchString) {
-	return notebookUserDAO.getUsersEntriesDates(sessionId, page, size, sorting, searchString, coreNotebookService,
-		userManagementService);
+	return notebookUserDAO.getUsersEntriesDates(sessionId, page, size, sorting, searchString, userManagementService);
     }
 
     @Override
@@ -587,14 +554,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {

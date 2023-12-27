@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.tool.notebook.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -71,8 +73,11 @@ public class NotebookUser implements java.io.Serializable {
     @Column
     private boolean finishedActivity;
 
-    @Column(name = "entry_uid")
-    private Long entryUID;
+    @Column(name = "notebook_entry")
+    private String notebookEntry;
+    
+    @Column(name = "notebook_entry_modified_date")
+    private Date notebookEntryModifiedDate;
 
     @Column(name = "teachers_comment")
     private String teachersComment;
@@ -152,13 +157,21 @@ public class NotebookUser implements java.io.Serializable {
 	this.notebookSession = notebookSession;
     }
 
-    public Long getEntryUID() {
-	return entryUID;
+    public String getNotebookEntry() {
+	return notebookEntry;
     }
 
-    public void setEntryUID(Long entryUID) {
-	this.entryUID = entryUID;
+    public void setNotebookEntry(String notebookEntry) {
+	this.notebookEntry = notebookEntry;
     }
+    
+    public Date getNotebookEntryModifiedDate() {
+   	return notebookEntryModifiedDate;
+       }
+
+       public void setNotebookEntryModifiedDate(Date notebookEntryModifiedDate) {
+   	this.notebookEntryModifiedDate = notebookEntryModifiedDate;
+       }
 
     public String getTeachersComment() {
 	return teachersComment;

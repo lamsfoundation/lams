@@ -39,8 +39,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -57,7 +55,6 @@ import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumException;
 import org.lamsfoundation.lams.tool.forum.util.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
-import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -203,26 +200,6 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_IS_MIN_RATINGS_COMPLETED, isMinRatingsCompleted);
 	sessionMap.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
 
-	// Should we show the reflection or not? We shouldn't show it when the screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
-	if (hideReflection) {
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_ON, false);
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION, "");
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, "");
-	} else {
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_ON, forum.isReflectOnActivity());
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_INSTRUCTION, forum.getReflectInstructions());
-
-	    NotebookEntry notebookEntry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ForumConstants.TOOL_SIGNATURE, forumUser.getUserId().intValue());
-	    sessionMap.put(ForumConstants.ATTR_REFLECTION_ENTRY, notebookEntry != null ? notebookEntry.getEntry() : "");
-	}
-
 	// add define later support
 	if (forum.isDefineLater()) {
 	    return "jsps/learning/definelater";
@@ -287,8 +264,7 @@ public class LearningController {
      * Learner click "finish" button in forum page, this method will turn on session status flag for this learner.
      */
     @RequestMapping("/finish")
-    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public String finish(HttpServletRequest request, HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -330,71 +306,6 @@ public class LearningController {
 	return "jsps/learning/viewforum";
     }
 
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Integer userId = reflectionForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = forumService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ForumConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    forumService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ForumConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    forumService.updateEntry(entry);
-	}
-
-	return finish(reflectionForm, request, response);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "jsps/learning/viewforum";
-	}
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = forumService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ForumConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "jsps/learning/notebook";
-    }
-
     // ==========================================================================================
     // Topic level methods
     // ==========================================================================================
@@ -434,14 +345,6 @@ public class LearningController {
 
 	setupViewTopicPagedDTOList(request, rootTopicId, sessionMapID, forumUser, forum, lastMsgSeqId, pageSize);
 
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
 	return "jsps/learning/viewtopic";
     }
 
@@ -475,14 +378,6 @@ public class LearningController {
 	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
 
 	setupViewTopicPagedDTOList(request, rootTopicId, sessionMapID, forumUser, forum, lastMsgSeqId, pageSize);
-
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
 	return "jsps/learning/message/topicviewwrapper";
     }
@@ -689,14 +584,6 @@ public class LearningController {
 	}
 
 	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 	return "jsps/learning/reply";
     }
 
@@ -795,14 +682,6 @@ public class LearningController {
 	sessionMap.put(ForumConstants.ATTR_TOPIC_ID, topicId);
 
 	messageForm.setTmpFileUploadId(FileUtil.generateTmpFileUploadId());
-
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 	return "jsps/learning/edit";
     }
 

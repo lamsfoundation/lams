@@ -38,8 +38,6 @@ public class McLearningForm {
     protected String redoQuestions;
     protected String viewAnswers;
     protected String learnerFinished;
-    protected String submitReflection;
-    protected String forwardtoReflection;
 
     protected String[] checkedCa;
     protected String[] sequentialCheckedCa;
@@ -381,36 +379,6 @@ public class McLearningForm {
      */
     public void setUserID(Long userID) {
 	this.userID = userID;
-    }
-
-    /**
-     * @return Returns the submitReflection.
-     */
-    public String getSubmitReflection() {
-	return submitReflection;
-    }
-
-    /**
-     * @param submitReflection
-     *            The submitReflection to set.
-     */
-    public void setSubmitReflection(String submitReflection) {
-	this.submitReflection = submitReflection;
-    }
-
-    /**
-     * @return Returns the forwardtoReflection.
-     */
-    public String getForwardtoReflection() {
-	return forwardtoReflection;
-    }
-
-    /**
-     * @param forwardtoReflection
-     *            The forwardtoReflection to set.
-     */
-    public void setForwardtoReflection(String forwardtoReflection) {
-	this.forwardtoReflection = forwardtoReflection;
     }
 
     /**

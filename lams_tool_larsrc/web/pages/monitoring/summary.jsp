@@ -296,9 +296,5 @@
 <c:if test="${sessionMap.isGroupedActivity}">
 </div> <!--  end accordianSessions --> 
 </c:if>
-	
-<c:if test="${sessionMap.resource.reflectOnActivity}">
-	<%@ include file="reflections.jsp"%>
-</c:if>
 
 <%@ include file="advanceoptions.jsp"%>

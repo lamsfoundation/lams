@@ -67,14 +67,8 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
     @Column(name = "allow_view_others_images")
     private boolean allowViewOthersImages;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
 
     @Column(name = "content_in_use")
     private boolean contentInUse;
@@ -154,14 +148,6 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isAllowViewOthersImages() {
@@ -290,11 +276,4 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	this.imageHeight = imageHeight;
     }
 
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
 }

@@ -5,9 +5,6 @@
 	toolSessionID="${voteLearningForm.toolSessionID}"
 	submissionDeadline="${submissionDeadline}"
 	finishSessionUrl="/learning/learnerFinished.do?toolSessionID=${voteLearningForm.toolSessionID}&userID=${voteLearningForm.userID}&userLeader=${voteLearningForm.userLeader}"
-	continueReflectUrl="/learning/forwardtoReflection.do?toolSessionID=${voteLearningForm.toolSessionID}&userID=${voteLearningForm.userID}&userLeader=${voteLearningForm.userLeader}"
-	isNotebookReeditEnabled="false"
-	isContinueReflectButtonEnabled="${voteGeneralLearnerFlowDTO.reflection == 'true'}"
 	isLastActivity="${isLastActivity}"
 	finishButtonLastActivityLabelKey="button.submitActivity"
 	finishButtonLabelKey="button.endLearning"/>

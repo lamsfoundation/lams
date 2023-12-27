@@ -9,14 +9,14 @@
 <c:set var="toolSessionId" value="${sessionMap.toolSessionId}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="userId" value="${sessionMap.user.userId }"/>
-<c:set var="displayFinalFinishButton" value="${not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity and stepNumber >= numCriteria}" />
+<c:set var="displayFinalFinishButton" value="${not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and stepNumber >= numCriteria}" />
 <c:set var="isComment" value="<%=RatingCriteria.RATING_STYLE_COMMENT%>"/>
 <c:set var="isStar" value="<%=RatingCriteria.RATING_STYLE_STAR%>"/>
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
 <c:set var="isHedging" value="<%=RatingCriteria.RATING_STYLE_HEDGING%>"/>
 <c:set var="isRubrics" value="<%=RatingCriteria.RATING_STYLE_RUBRICS%>"/>
 <c:choose>
-	<c:when test="${peerreview.showRatingsLeftForUser || peerreview.reflectOnActivity}">
+	<c:when test="${peerreview.showRatingsLeftForUser}">
 		<c:set var="finishButtonLabel"><fmt:message key="label.continue" /></c:set>
 	</c:when>	
 	<c:when test="${sessionMap.isLastActivity}">
@@ -49,11 +49,6 @@
 			hideButtons();
 			document.location.href ='<c:url value="/learning/showResults.do?sessionMapID=${sessionMapID}"/>';
 			return false;
-		}
-		
-		function continueReflect(){
-			hideButtons();
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		function refresh(page){

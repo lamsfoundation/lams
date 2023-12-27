@@ -15,11 +15,6 @@
 			document.location.href='<c:url value="/learning/showOtherUsersAnswers.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
-		function continueReflect(){
-			disableButtons();
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-		
 		function retakeSurvey(questionSeqId){
 			disableButtons();
 			//retake for all questions
@@ -146,26 +141,12 @@
 			</div>
 		</c:forEach>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.showOtherUsersAnswers}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="true"
-				notebookHeaderLabelKey="title.reflection"/>
-		</c:if>
-
 		<c:if test="${sessionMap.mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
 				<c:choose>
 					<c:when test="${sessionMap.showOtherUsersAnswers}">
 						<button type="button" name="otherUsersAnswersButton" onclick="showOtherUsersAnswers()" class="btn btn-primary na">
 							<fmt:message key="label.view.all.responses" />
-						</button>
-					</c:when>
-
-					<c:when test="${sessionMap.reflectOn}">
-						<button type="button" name="ContinueButton" onclick="continueReflect()" class="btn btn-primary na">
-							<fmt:message key="label.continue" />
 						</button>
 					</c:when>
 

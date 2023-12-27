@@ -38,7 +38,6 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
@@ -381,60 +380,6 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    /**
-     * Will return List<[login (String), fullname(String), String (notebook entry)]>
-     */
-    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionUid, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService,
-	    IUserManagementService userManagementService) {
-	String sortingOrder;
-	switch (sorting) {
-	    case VoteAppConstants.SORT_BY_NAME_ASC:
-		sortingOrder = "user.fullname ASC";
-		break;
-	    case VoteAppConstants.SORT_BY_NAME_DESC:
-		sortingOrder = "user.fullname DESC";
-		break;
-	    default:
-		sortingOrder = "user.uid";
-	}
-
-	// If the session uses notebook, then get the sql to join across to get the entries
-	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings("session.vote_session_id",
-		VoteAppConstants.MY_SIGNATURE, "user.user_id");
-
-	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
-
-	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.user_id user_id, user.username username, user.fullname fullname ");
-	queryText.append(notebookEntryStrings[0]);
-	queryText.append(portraitStrings[0]);
-	queryText.append(" FROM tl_lavote11_usr user ");
-	queryText.append(
-		" JOIN tl_lavote11_session session ON user.vote_session_id = :sessionUid AND user.vote_session_id = session.uid ");
-
-	// Add the notebook join
-	queryText.append(notebookEntryStrings[1]);
-	queryText.append(portraitStrings[1]);
-
-	// If filtering by name add a name based where clause
-	buildNameSearch(searchString, queryText, true);
-
-	// Now specify the sort based on the switch statement above.
-	queryText.append(" ORDER BY " + sortingOrder);
-
-	NativeQuery<Object[]> query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("user_id", IntegerType.INSTANCE).addScalar("username", StringType.INSTANCE)
-		.addScalar("fullname", StringType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionUid", sessionUid)
-		.setFirstResult(page * size).setMaxResults(size);
-
-	return query.list();
     }
 
     private static final String FIND_USER_OPEN_TEXT_SELECT = "SELECT user.uid userUid, user.username login, user.fullname fullName, "

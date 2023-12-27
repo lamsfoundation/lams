@@ -23,11 +23,21 @@
 
 package org.lamsfoundation.lams.tool.peerreview.web.controller;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -37,7 +47,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewApplicationException;
 import org.lamsfoundation.lams.tool.peerreview.service.PeerreviewServiceImpl;
-import org.lamsfoundation.lams.tool.peerreview.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -45,17 +54,11 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Steve.Ni
@@ -70,9 +73,7 @@ public class LearningController {
     private static final String HIDDEN_USER_PATH = "/pages/learning/learningHiddenUser";
     private static final String DEFINE_LATER_PATH = "/pages/learning/definelater";
     private static final String SHOW_RESULTS_REDIRECT = "redirect:/learning/showResults.do";
-    private static final String NEW_REFLECTION_REDIRECT = "redirect:/learning/newReflection.do";
     private static final String SHOW_RESULTS_PAGE_PATH = "/pages/learning/results";
-    private static final String NOTEBOOK_PATH = "/pages/learning/notebook";
 
     @Autowired
     @Qualifier("peerreviewService")
@@ -217,24 +218,11 @@ public class LearningController {
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(sessionId);
 
-	// get notebook entry
-	String entryText = new String();
-	NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PeerreviewConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-	if (notebookEntry != null) {
-	    entryText = notebookEntry.getEntry();
-	}
-
 	// basic information
 	sessionMap.put(PeerreviewConstants.ATTR_PEERREVIEW, peerreview);
 	sessionMap.put(PeerreviewConstants.ATTR_TITLE, peerreview.getTitle());
 	sessionMap.put(PeerreviewConstants.ATTR_RESOURCE_INSTRUCTION, peerreview.getInstructions());
 	sessionMap.put(PeerreviewConstants.ATTR_LOCK_ON_FINISH, peerreview.getLockWhenFinished());
-
-	// reflection information
-	sessionMap.put(PeerreviewConstants.ATTR_REFLECTION_ON, peerreview.isReflectOnActivity());
-	sessionMap.put(PeerreviewConstants.ATTR_REFLECTION_INSTRUCTION, peerreview.getReflectInstructions());
-	sessionMap.put(PeerreviewConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (peerreview.isDefineLater()) {
@@ -321,17 +309,10 @@ public class LearningController {
 
 	// finally, work out which page to go to!
 	if (user.isSessionFinished()) {
-	    if (peerreview.isReflectOnActivity()) {
-		String redirectURL = NEW_REFLECTION_REDIRECT;
-		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
-			sessionMap.getSessionID());
-		return redirectURL;
-	    } else {
-		String redirectURL = SHOW_RESULTS_REDIRECT;
-		redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID,
-			sessionMap.getSessionID());
-		return redirectURL;
-	    }
+	    String redirectURL = SHOW_RESULTS_REDIRECT;
+	    redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    return redirectURL;
+
 	} else {
 	    return doEdit(request, sessionMap, sessionId, peerreview, newCriteria);
 	}
@@ -802,66 +783,5 @@ public class LearningController {
 
 	String nextActivityUrl = service.finishToolSession(sessionId, userID);
 	response.sendRedirect(nextActivityUrl);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    @SuppressWarnings("unchecked")
-    public String newReflection(@ModelAttribute ReflectionForm refForm, HttpServletRequest request,
-	    HttpServletResponse response, HttpSession session) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, PeerreviewConstants.ATTR_SESSION_MAP_ID);
-
-	UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-	SessionMap<String, Object> map = (SessionMap<String, Object>) session.getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PeerreviewConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
-	}
-
-	return NOTEBOOK_PATH;
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    @SuppressWarnings("unchecked")
-    public void submitReflection(@ModelAttribute ReflectionForm form, HttpServletRequest request,
-	    HttpServletResponse response, HttpSession session) throws PeerreviewApplicationException, IOException {
-	ReflectionForm refForm = form;
-	Integer userId = refForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) session.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PeerreviewConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PeerreviewConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
-	}
-
-	finish(request, session, response);
     }
 }

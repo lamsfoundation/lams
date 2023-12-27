@@ -53,16 +53,6 @@
 			</div>
 		</c:when>
 	</c:choose>
-	
-	<c:if test="${content.reflect}"> 			
-		<div style="margin-bottom: 20px">
-			<c:set var="viewReflectionsURL"><lams:WebAppURL/>/monitoring/Reflections.jsp?toolSessionID=${groupDto.sessionId}</c:set>
-			<button name="viewAllMarks" onclick="javascript:launchPopup('${viewReflectionsURL}')"
-					class="btn btn-default loffset5 voffset10" >
-				<fmt:message key="label.notebook.entries" />
-			</button>
-		</div>
-	</c:if>
 				  	
 	<c:forEach var="questionDto" items="${questions}" varStatus="loop">
 		<div class="panel panel-default"">

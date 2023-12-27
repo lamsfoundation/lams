@@ -24,12 +24,8 @@
 package org.lamsfoundation.lams.tool.spreadsheet.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
@@ -165,8 +161,7 @@ public interface ISpreadsheetService extends ICommonToolService {
      *
      * @return
      */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
 
     /**
      * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports
@@ -183,42 +178,6 @@ public interface ISpreadsheetService extends ICommonToolService {
      * @return
      */
     List<StatisticDTO> getStatistics(Long contentId);
-
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    public void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list grouped by sessionID.
-     *
-     * @param contentId
-     * @return
-     */
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
     /**
      * Returns messageService

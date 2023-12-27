@@ -21,12 +21,9 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.notebook.dto;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
 
 public class NotebookUserDTO implements Comparable {
@@ -41,24 +38,9 @@ public class NotebookUserDTO implements Comparable {
 
     private boolean finishedActivity;
 
-    private NotebookEntryDTO entryDTO;
-
-    private Long entryUID;
+    private String notebookEntry;
 
     private String teachersComment;
-
-    public NotebookUserDTO(NotebookUser user, NotebookEntry entry) {
-	this.uid = user.getUid();
-	this.loginName = user.getLoginName();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
-	if (user.getTeachersComment() != null) {
-	    this.teachersComment = StringEscapeUtils.escapeJavaScript(user.getTeachersComment());
-	}
-	this.entryDTO = new NotebookEntryDTO(entry);
-    }
 
     public NotebookUserDTO(NotebookUser user) {
 	this.uid = user.getUid();
@@ -66,7 +48,7 @@ public class NotebookUserDTO implements Comparable {
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
+	this.notebookEntry = user.getNotebookEntry();
 	if (user.getTeachersComment() != null) {
 	    this.teachersComment = StringEscapeUtils.escapeJavaScript(user.getTeachersComment());
 	}
@@ -115,20 +97,12 @@ public class NotebookUserDTO implements Comparable {
 	this.uid = uid;
     }
 
-    public NotebookEntryDTO getEntryDTO() {
-	return entryDTO;
+    public String getNotebookEntry() {
+	return notebookEntry;
     }
 
-    public void setEntryDTO(NotebookEntryDTO entryDTO) {
-	this.entryDTO = entryDTO;
-    }
-
-    public Long getEntryUID() {
-	return entryUID;
-    }
-
-    public void setEntryUID(Long entryUID) {
-	this.entryUID = entryUID;
+    public void setNotebookEntry(String notebookEntry) {
+	this.notebookEntry = notebookEntry;
     }
 
     public String getTeachersComment() {

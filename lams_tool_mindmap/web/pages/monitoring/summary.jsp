@@ -306,7 +306,7 @@
 		</iframe>
 	</c:if>
 
-	<c:if test="${not dto.multiUserMode or dto.reflectOnActivity == true}">
+	<c:if test="${not dto.multiUserMode}">
 		<table class="table table-striped table-condensed voffset10">
 	
 			<tr>
@@ -317,11 +317,6 @@
 					<th width="40%">
 						<fmt:message key="heading.mindmapEntry" />
 					</th>
-				</c:if>
-				<c:if test="${dto.reflectOnActivity == true}">
-				<th>
-					<fmt:message key="label.notebookEntry" />
-				</th>
 				</c:if>
 			</tr>
 	
@@ -334,9 +329,7 @@
 							</td>
 					
 							<td width="30%">
-								<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}">
-									<fmt:message key="label.view" />
-								</a>
+								
 							</td>
 						</tr>
 					</c:forEach>
@@ -361,13 +354,6 @@
 									</c:otherwise>
 								</c:choose>
 							</td>
-							
-							<c:if test="${dto.reflectOnActivity}">
-							<td>
-								<a href="reflect.do?userUID=${user.uid}&toolContentID=${dto.toolContentId}"><fmt:message key="label.view" />	</a>
-							</td>
-							</c:if>
-							
 						</tr>
 					</c:forEach>
 				</c:otherwise>

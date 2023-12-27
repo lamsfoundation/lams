@@ -43,8 +43,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Daco
@@ -103,12 +101,6 @@ public class Daco implements Cloneable {
     @OrderBy("uid ASC")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<DacoQuestion> dacoQuestions = new LinkedHashSet<>();
-
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
 
     @Column(name = "learner_entry_notify")
     private boolean notifyTeachersOnLearnerEntry;
@@ -279,22 +271,6 @@ public class Daco implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public Short getMinRecords() {

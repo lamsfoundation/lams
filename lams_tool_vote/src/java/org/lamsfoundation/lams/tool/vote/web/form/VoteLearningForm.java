@@ -82,10 +82,6 @@ public class VoteLearningForm implements VoteAppConstants {
     protected String getNextQuestion;
     protected String getPreviousQuestion;
     protected String refreshVotes;
-    protected String submitReflection;
-    protected String forwardtoReflection;
-
-    protected String reflection;
 
     protected String nominationsSubmited;
     protected String revisitingUser;
@@ -237,8 +233,6 @@ public class VoteLearningForm implements VoteAppConstants {
 	this.setDonePreview(null);
 	this.setDoneLearnerProgress(null);
 	this.setRefreshVotes(null);
-	this.setSubmitReflection(null);
-	this.setForwardtoReflection(null);
     }
 
     public void resetParameters() {
@@ -870,36 +864,6 @@ public class VoteLearningForm implements VoteAppConstants {
 	this.previewOnly = previewOnly;
     }
 
-    /**
-     * @return Returns the forwardtoReflection.
-     */
-    public String getForwardtoReflection() {
-	return forwardtoReflection;
-    }
-
-    /**
-     * @param forwardtoReflection
-     *            The forwardtoReflection to set.
-     */
-    public void setForwardtoReflection(String forwardtoReflection) {
-	this.forwardtoReflection = forwardtoReflection;
-    }
-
-    /**
-     * @return Returns the submitReflection.
-     */
-    public String getSubmitReflection() {
-	return submitReflection;
-    }
-
-    /**
-     * @param submitReflection
-     *            The submitReflection to set.
-     */
-    public void setSubmitReflection(String submitReflection) {
-	this.submitReflection = submitReflection;
-    }
-
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityInstructions: ", activityInstructions)
@@ -926,21 +890,6 @@ public class VoteLearningForm implements VoteAppConstants {
      */
     public void setEntryText(String entryText) {
 	this.entryText = entryText;
-    }
-
-    /**
-     * @return Returns the reflection.
-     */
-    public String getReflection() {
-	return reflection;
-    }
-
-    /**
-     * @param reflection
-     *            The reflection to set.
-     */
-    public void setReflection(String reflection) {
-	this.reflection = reflection;
     }
 
     public String getShowResults() {

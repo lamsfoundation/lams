@@ -688,10 +688,6 @@
 	</div> <!--  end accordianSessions -->
 	</c:if>
 
-	<c:if test="${sessionMap.whiteboard.reflectOnActivity}">
-		<%@ include file="reflections.jsp"%>
-	</c:if>
-
 	<c:if test="${not isTbl}">
 		<%@ include file="advanceoptions.jsp"%>
 	</c:if>

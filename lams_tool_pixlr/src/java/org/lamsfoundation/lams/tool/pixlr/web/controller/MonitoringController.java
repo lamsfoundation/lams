@@ -26,10 +26,7 @@ package org.lamsfoundation.lams.tool.pixlr.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.pixlr.dto.PixlrDTO;
-import org.lamsfoundation.lams.tool.pixlr.dto.PixlrSessionDTO;
 import org.lamsfoundation.lams.tool.pixlr.dto.PixlrUserDTO;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrUser;
@@ -65,21 +62,6 @@ public class MonitoringController {
 
 	PixlrDTO pixlrDT0 = new PixlrDTO(pixlr);
 
-	for (PixlrSessionDTO sessionDTO : pixlrDT0.getSessionDTOs()) {
-	    Long toolSessionID = sessionDTO.getSessionID();
-
-	    for (PixlrUserDTO userDTO : sessionDTO.getUserDTOs()) {
-		// get the notebook entry.
-		NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			PixlrConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-		if (notebookEntry != null) {
-		    userDTO.notebookEntry = notebookEntry.getEntry();
-		    userDTO.setFinishedReflection(true);
-		}
-
-	    }
-	}
-
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	pixlrDT0.setCurrentTab(currentTab);
 
@@ -106,45 +88,6 @@ public class MonitoringController {
     }
 
     /**
-     * set up pixlrService
-     */
-
-    /**
-     * Opens a user's reflection
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    @RequestMapping("/openNotebook")
-    public String openNotebook(HttpServletRequest request) {
-
-	//MonitoringForm monitorForm = (MonitoringForm) form;
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionID", false);
-	Long userID = WebUtil.readLongParam(request, "userID", false);
-
-	PixlrUser pixlrUser = pixlrService.getUserByUserIdAndSessionId(userID, toolSessionId);
-
-	NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PixlrConstants.TOOL_SIGNATURE, userID.intValue());
-
-	PixlrUserDTO pixlrUserDTO = new PixlrUserDTO(pixlrUser);
-	pixlrUserDTO.setNotebookEntry(notebookEntry.getEntry());
-
-	request.setAttribute("pixlrUserDTO", pixlrUserDTO);
-
-	return "/pages/learning/notebook";
-    }
-
-    /**
-     * Opens a user's reflection
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
      * @return
      */
     @RequestMapping("/toggleHideImage")

@@ -104,13 +104,7 @@ public class CommonCartridge implements Cloneable {
     @JoinColumn(name = "commonCartridge_uid")
     @OrderBy("create_date DESC")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();;
-
-    @Column(name = "reflect_on_activity")
-    private Boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
+    private Set<CommonCartridgeItem> commonCartridgeItems = new HashSet<>();
 
     // *************** NON Persist Fields ********************
 
@@ -340,22 +334,5 @@ public class CommonCartridge implements Cloneable {
 
     public void setMiniViewNumberStr(String minViewNumber) {
 	miniViewNumberStr = minViewNumber;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    // LDEV-4744 The JSTL pages require this to be a primitive boolean
-    public Boolean getReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(Boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 }

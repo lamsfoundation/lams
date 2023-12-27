@@ -3,7 +3,6 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		
 		$("#showOtherAnswers").click(function() {
 			$("#show-other-answers-options").toggle('slow');
 			if ($(this).is(':checked')) {
@@ -14,19 +13,11 @@
 		 $('#allowRateAnswers').click(function() {
 		    	$("#criterias-holder").toggle("slow");
 		    });
-		
-		 $('#reflect').click(function() {
-		    	$("#reflectionInstructions").toggle("slow");
-		    });
 		 
 		//initial state
 		
 		if (${!authoringForm.qa.showOtherAnswers}) {
 			$("#show-other-answers-options").hide();
-		}
-		
-		if (${!authoringForm.qa.reflect}) {
-			$("#reflectionInstructions").hide();
 		}
 		
 	    $('#no-reedit-allowed').click(function() {
@@ -35,11 +26,6 @@
 	    	}
 	        $("#lockWhenFinished").prop("disabled", $(this).is(':checked'));
 	    });
-	    
-	    $('#reflectionSubject').keyup(function(){
-	    	$('#reflect').prop('checked', !isEmpty($(this).val()));
-	    });
-	    
 	});
 </script>
 
@@ -123,16 +109,5 @@
 			<form:checkbox path="qa.lockWhenFinished" id="lockWhenFinished" disabled="${authoringForm.qa.noReeditAllowed}"/>
 			<fmt:message key="label.lockWhenFinished" />
 		</label>
-	</div>
-
-	<div class="checkbox">
-		<label for="reflect">
-			<form:checkbox path="qa.reflect" id="reflect"/>
-			<fmt:message key="label.reflect" />
-		</label>
-	</div>
-	
-	<div id="reflectionInstructions" class="form-group">
-		<form:textarea path="qa.reflectionSubject" id="reflectionSubject" cssClass="form-control" cols="30" rows="3"	/>
 	</div>
 </lams:SimplePanel>

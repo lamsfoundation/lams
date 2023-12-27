@@ -20,48 +20,11 @@
 	    }
 	</script>
 
-  <c:if test="${userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-    <form:form action="openNotebook.do" method="get" id="learningForm" modelAttribute="learningForm">
-      <form:hidden path="mode" value="${mode}" />	
-      <form:hidden path="toolSessionID" id="toolSessionID"/>
-      <div class="panel panel-default mt-2">
-        <div class="panel-heading">
-          <h4 class="panel-title">
-            <lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true"/>
-          </h4>
-        </div>
-        <div class="panel-body">
-          <c:choose>
-            <c:when test="${not empty userDTO.notebookEntry}">
-              <lams:out escapeHtml="true" value="${userDTO.notebookEntry}" />
-            </c:when>
-
-            <c:otherwise>
-              <fmt:message key="message.no.reflection.available" />
-            </c:otherwise>
-          </c:choose>
-          <hr class="mgs-hr"/>
-          <input type="submit" class="btn btn-primary" value="<fmt:message key="button.edit" />"/>
-        </div>
-
-      </div>
-
-    </form:form>
-  </c:if>
-
-  <form:form action="openNotebook.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
+  <form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
     <form:hidden path="toolSessionID" id="toolSessionID"/>
     <form:hidden path="mode" value="${mode}" />	
     
     <div class="activity-bottom-buttons5" id="finishButtonDiv">
-      <c:choose>
-        <c:when test="${!userDTO.finishedActivity and wikiDTO.reflectOnActivity}">
-          <a href="javascript:continueOrFinish('openNotebook');" class="btn btn-primary">
-          	<fmt:message key="button.continue" />
-          </a>
-        </c:when>
-        
-        <c:otherwise>
             <a href="#nogo" class="btn btn-primary na" id="finishButton">
               <c:choose>
                 <c:when test="${isLastActivity}">
@@ -72,7 +35,5 @@
                 </c:otherwise>
               </c:choose>
             </a>
-        </c:otherwise>
-      </c:choose>
     </div>
   </form:form>

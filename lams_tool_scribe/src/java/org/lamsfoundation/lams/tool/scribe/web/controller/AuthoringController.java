@@ -340,8 +340,6 @@ public class AuthoringController {
     private void updateScribe(Scribe scribe, AuthoringForm authoringForm) {
 	scribe.setTitle(authoringForm.getTitle());
 	scribe.setInstructions(authoringForm.getInstructions());
-	scribe.setReflectOnActivity(authoringForm.isReflectOnActivity());
-	scribe.setReflectInstructions(authoringForm.getReflectInstructions());
 	scribe.setAutoSelectScribe(authoringForm.isAutoSelectScribe());
 	scribe.setShowAggregatedReports(authoringForm.isShowAggregatedReports());
     }
@@ -356,8 +354,6 @@ public class AuthoringController {
     private void updateAuthForm(AuthoringForm authoringForm, Scribe scribe) {
 	authoringForm.setTitle(scribe.getTitle());
 	authoringForm.setInstructions(scribe.getInstructions());
-	authoringForm.setReflectOnActivity(scribe.isReflectOnActivity());
-	authoringForm.setReflectInstructions(scribe.getReflectInstructions());
 	authoringForm.setAutoSelectScribe(scribe.isAutoSelectScribe());
 	authoringForm.setShowAggregatedReports(scribe.isShowAggregatedReports());
     }

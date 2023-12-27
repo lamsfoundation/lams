@@ -29,11 +29,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TimestampType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -290,65 +286,6 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
 	return (List<Object[]>) query.list();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    /**
-     * Will return List<[user.user_id, user.first_name, user.last_name, notebook entry, notebook date]>
-     */
-    public List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size,
-	    int sorting, String searchString, ICoreNotebookService coreNotebookService,
-	    IUserManagementService userManagementService) {
-
-	String sortingOrder;
-	switch (sorting) {
-	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = " ORDER BY user.first_name ASC";
-		break;
-	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = " ORDER BY user.first_name DESC";
-		break;
-	    case PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC:
-		sortingOrder = " ORDER BY notebookEntry ASC";
-		break;
-	    case PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_DESC:
-		sortingOrder = " ORDER BY notebookEntry DESC";
-		break;
-	    case PeerreviewConstants.SORT_BY_NO:
-	    default:
-		sortingOrder = " ORDER BY user.user_id";
-	}
-
-	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(toolSessionId.toString(),
-		PeerreviewConstants.TOOL_SIGNATURE, "user.user_id", true);
-
-	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
-
-	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder();
-
-	queryText.append("SELECT user.user_id, user.first_name, user.last_name ").append(portraitStrings[0])
-		.append(notebookEntryStrings[0]).append(" FROM tl_laprev11_user user ")
-		.append(" JOIN tl_laprev11_session session ON session.session_id = :toolSessionId AND user.session_uid = session.uid");
-
-	queryText.append(portraitStrings[1]);
-	queryText.append(notebookEntryStrings[1]);
-
-	buildNameSearch(searchString, queryText, false);
-
-	// Now specify the sort based on the switch statement above.
-	queryText.append(sortingOrder);
-
-	NativeQuery query = getSession().createNativeQuery(queryText.toString());
-	query.addScalar("user_id", LongType.INSTANCE).addScalar("first_name", StringType.INSTANCE)
-		.addScalar("last_name", StringType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("notebookModifiedDate", TimestampType.INSTANCE)
-		.setParameter("toolSessionId", toolSessionId.longValue()).setFirstResult(page * size)
-		.setMaxResults(size);
-	return query.list();
-
     }
 
     @SuppressWarnings("unchecked")

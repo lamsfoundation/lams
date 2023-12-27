@@ -128,12 +128,6 @@
 							}
 							rows += '</td>';
 							
-							if (${forum.reflectOnActivity}) {
-								rows += '<td>';
-								rows += 	(userData["notebookEntry"]) ? userData["notebookEntry"] : '-' ;
-								rows += '</td>';
-							}
-							
 							rows += '</tr>';
 						}
 			            
@@ -197,26 +191,12 @@
         
         <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
 	</c:if>
-	
-		<c:choose>
-		<c:when test="${forum.reflectOnActivity}">
-			<c:set var="numColumns">5</c:set>
-			<c:set var="postingWidth">15%</c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="numColumns">4</c:set>
-			<c:set var="postingWidth">25%</c:set>
-		</c:otherwise>
-		</c:choose>
 		
-		<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionDto.sessionID}'">
+		<lams:TSTable numColumns="4" dataId="data-session-id='${sessionDto.sessionID}'">
 				<th><fmt:message key="monitoring.user.fullname"/></th>
 				<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
-				<th width="${postingWidth}" align="center"><fmt:message key="label.latest.posting.date"/></th>
+				<th width="25%" align="center"><fmt:message key="label.latest.posting.date"/></th>
 				<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
-				<c:if test="${forum.reflectOnActivity}">
-					<th width="40%" align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
-				</c:if>
 		</lams:TSTable>
 
 		<P style="display: inline"> 
@@ -229,7 +209,7 @@
 			</div>
 					
 			<c:set var="viewforum">
-				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true
+				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher
 			</c:set>
 			<a href="javascript:launchPopup('${viewforum}');" class="btn btn-default loffset5 voffset10">
 				<fmt:message key="label.monitoring.summary.view.forum"/>

@@ -34,7 +34,6 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.notebook.dao.INotebookUserDAO;
 import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookUser;
@@ -102,8 +101,7 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
     /**
      * Will return List<[NotebookUser, String, Date]> where the String is the notebook entry and the modified date.
      */
-    public List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService,
+    public List<Object[]> getUsersEntriesDates(final Long sessionId, Integer page, Integer size, int sorting, String searchString,
 	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
@@ -114,10 +112,10 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 		sortingOrder = "user.last_name DESC, user.first_name DESC";
 		break;
 	    case NotebookConstants.SORT_BY_DATE_ASC:
-		sortingOrder = "notebookModifiedDate ASC";
+		sortingOrder = "user.notebook_entry_modified_date ASC";
 		break;
 	    case NotebookConstants.SORT_BY_DATE_DESC:
-		sortingOrder = "notebookModifiedDate DESC";
+		sortingOrder = "user.notebook_entry_modified_date DESC";
 		break;
 	    case NotebookConstants.SORT_BY_COMMENT_ASC:
 		sortingOrder = "user.teachers_comment ASC";
@@ -129,20 +127,15 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 		sortingOrder = "user.last_name, user.first_name";
 	}
 
-	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		NotebookConstants.TOOL_SIGNATURE, "user.user_id", true);
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ");
-	queryText.append(notebookEntryStrings[0]);
 	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lantbk11_user user ");
 	queryText.append(
 		" JOIN tl_lantbk11_session session ON user.notebook_session_uid = session.uid and session.session_id = :sessionId");
-	queryText.append(notebookEntryStrings[1]);
 	queryText.append(portraitStrings[1]);
 
 	// If filtering by name add a name based where clause
@@ -152,9 +145,7 @@ public class NotebookUserDAO extends LAMSBaseDAO implements INotebookUserDAO {
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", NotebookUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("notebookModifiedDate", TimestampType.INSTANCE).addScalar("portraitId", StringType.INSTANCE)
-		.setParameter("sessionId", sessionId.longValue());
+	query.addEntity("user", NotebookUser.class).addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue());
 
 	if (size != null) {
 	    query.setMaxResults(size);

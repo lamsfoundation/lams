@@ -32,11 +32,7 @@
 		
 		function finishSession() {
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-		}
-		
-		function continueReflect() {
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}     
+		}  
     </script>
 </lams:head>
 <body class="stripes">
@@ -89,45 +85,11 @@
 				</tbody>
 			</table>
 		</div>
-		<%--Reflection--------------------------------------------------%>
-
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="panel panel-default mt-2">
-				
-				<div class="panel-heading panel-title">
-					<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-				</div>
-
-				<div class="panel-body">
-					<c:choose>
-						<c:when test="${empty sessionMap.reflectEntry}">
-							<em> <fmt:message key="message.no.reflection.available" /></em>
-						</c:when>
-						<c:otherwise>
-							<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-						</c:otherwise>
-					</c:choose>
-	
-					<c:if test="${mode != 'teacher'}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-secondary ms-2">
-							<fmt:message key="label.edit" />
-						</button>
-					</c:if>
-				</div>
-			</div>
-		</c:if>
 		
 		<%--Finish buttons--------------------------------------------------%>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="mt-2 float-end">
-				<c:choose>
-					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-						<button name="FinishButton" onclick="return continueReflect()" class="btn btn-primary">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:when>
-					<c:otherwise>
 						<a href="#nogo" name="FinishButton" id="finishButton" class="btn btn-primary">
 							<span class="na">
 								<c:choose>
@@ -140,8 +102,6 @@
 				 				</c:choose>
 							</span>
 						</a>
-					</c:otherwise>
-				</c:choose>
 			</div>
 		</c:if>
 

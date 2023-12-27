@@ -110,10 +110,6 @@
             document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
         }
 
-        function continueReflect() {
-            document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-        }
-
         function deleteImage(imageUid) {
 			var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.do.you.want.to.delete'/></spring:escapeBody>");
 
@@ -203,43 +199,23 @@
             <div id="new-image-input-area" class="mt-4"></div>
         </c:if>
 
-        <%--Reflection--------------------------------------------------%>
-
-        <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-            <lams:NotebookReedit
-                    reflectInstructions="${sessionMap.reflectInstructions}"
-                    reflectEntry="${sessionMap.reflectEntry}"
-                    isEditButtonEnabled="${mode != 'teacher'}"
-                    notebookHeaderLabelKey="title.reflection"/>
-        </c:if>
-
         <%--Bottom buttons-------------------------------------------%>
 
         <c:if test="${mode != 'teacher'}">
             <div class="activity-bottom-buttons" id="learner-submit"
                  <c:if test="${imageGallery.minimumRates ne 0 && empty sessionMap.currentImage}">style="display:none;"</c:if>
             >
-                <c:choose>
-                    <c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-                        <button type="button" name="FinishButton" onclick="return continueReflect()" class="btn btn-primary na">
-                            <fmt:message key="label.continue" />
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button" name="FinishButton" id="finishButton" class="btn btn-primary na" >
-                            <c:choose>
-                                <c:when test="${sessionMap.isLastActivity}">
-                                    <fmt:message key="label.submit" />
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:message key="label.finished" />
-                                </c:otherwise>
-                            </c:choose>
-                        </button>
-                    </c:otherwise>
-                </c:choose>
+            	<button type="button" name="FinishButton" id="finishButton" class="btn btn-primary na" >
+                	<c:choose>
+                    	<c:when test="${sessionMap.isLastActivity}">
+                        	<fmt:message key="label.submit" />
+                        </c:when>
+                       <c:otherwise>
+                            <fmt:message key="label.finished" />
+                       </c:otherwise>
+                   </c:choose>
+               </button>
             </div>
         </c:if>
-
     </div>
 </lams:PageLearner>

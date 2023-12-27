@@ -65,42 +65,15 @@
 <lams:OutcomeAuthor toolContentId="${voteGeneralAuthoringDTO.toolContentID}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
-
 	<div class="checkbox">
 		<label for="lockOnFinish">
 			<form:checkbox path="lockOnFinish" id="lockOnFinish" value="1" />
 			<fmt:message key="label.vote.lockedOnFinish" />
 		</label>
 	</div>
-
-	<div class="checkbox">
-		<label for="reflect">
-			<form:checkbox path="reflect" id="reflect" value="1" />
-			<fmt:message key="label.reflect" />
-		</label>
-	</div>
-	<div class="form-group">
-		<form:textarea rows="3" path="reflectionSubject" cssClass="form-control"></form:textarea> 
-	</div>
-
 </lams:SimplePanel>
 
 <script type="text/javascript">
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectionSubject");
-	var rao = document.getElementById("reflect");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
-		//turn off	
-			rao.checked = false;
-		}else{
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-	
 	function validateNominationCount(isMinimunDropdownUsed) {
 		var minDropDown = document.getElementById("minNominationCount");
 		var min = parseInt(minNominationCount.options[minNominationCount.selectedIndex].value);

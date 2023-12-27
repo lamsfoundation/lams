@@ -37,7 +37,7 @@
 		}
 		
 		<c:set var="refresh">
-			<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}&reqUid=${reqIDVar.getTime()};
+			<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&pageLastId=0&size=${pageSize}&reqUid=${reqIDVar.getTime()};
 		</c:set>
 		function refreshTopic(){
 			var reqIDVar = new Date();
@@ -112,7 +112,7 @@
 		<c:set var="buttonPanel">
 			<div class="float-end">
 				<c:set var="backToForum">
-					<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
+					<lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&sessionMapID=${sessionMapID}&toolSessionID=${sessionMap.toolSessionID}
 				</c:set>
 				<button type="button" name="backToForum" onclick="javascript:location.href='${backToForum}';"
 						class="btn btn-sm btn-primary">

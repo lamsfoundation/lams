@@ -52,14 +52,13 @@ public class NotebookSessionDTO implements Comparable {
 	for (Iterator iterator = session.getNotebookUsers().iterator(); iterator.hasNext();) {
 	    NotebookUser user = (NotebookUser) iterator.next();
 	    NotebookUserDTO userDTO = new NotebookUserDTO(user);
-	    if (userDTO.getEntryUID() != null) {
+	    if (userDTO.getNotebookEntry() != null) {
 		numberOfFinishedLearners++;
 	    }
 	    userDTOs.add(userDTO);
 	}
 
 	numberOfLearners = userDTOs.size();
-
     }
 
     public NotebookSessionDTO() {

@@ -39,34 +39,4 @@
 
 <lams:OutcomeAuthor toolContentId="${authoringForm.commonCartridge.contentId}" />
 
-<lams:SimplePanel titleKey="label.activity.completion">
 
-<div class="checkbox">
-	<label for="reflect-on-activity">
-		<form:checkbox path="commonCartridge.reflectOnActivity" id="reflect-on-activity"/>
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-	</label>
-</div>
-
-<div class="form-group">
-	<form:textarea path="commonCartridge.reflectInstructions" rows="3" id="reflect-instructions" cssClass="form-control"/>
-</div>
-
-</lams:SimplePanel>
-
-<script type="text/javascript">
-	//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflect-instructions");
-	var rao = document.getElementById("reflect-on-activity");
-	function turnOnRefect() {
-		if (isEmpty(ra.value)) {
-		//turn off	
-			rao.checked = false;
-		} else {
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-</script>

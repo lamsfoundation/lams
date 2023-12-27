@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.forum.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.dao.IForumUserDAO;
 import org.lamsfoundation.lams.tool.forum.model.ForumUser;
@@ -87,13 +86,10 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     /**
-     * Will return List<[ForumUser, String], [ForumUser, String], ... , [ForumUser, String]>
-     * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
+     * Will return List<[ForumUser], [ForumUser], ... , [ForumUser]>
      */
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
 	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	boolean sortOnMessage;
@@ -136,20 +132,12 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 		sortOnMessage = false;
 	}
 
-	// If the session uses notebook, then get the SQL to join across to get the entries
-	String[] notebookEntryStrings = null;
-	if (getNotebookEntries) {
-	    notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		    ForumConstants.TOOL_SIGNATURE, "user.user_id");
-	}
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
 	queryText.append("SELECT user.* ");
-	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
 	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lafrum11_forum_user user ");
 	queryText.append(portraitStrings[1]);
@@ -166,11 +154,6 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	// If filtering by name add a name based where clause (LDEV-3779: must come before the Notebook JOIN statement)
 	buildNameSearch(queryText, searchString);
 
-	// If using notebook, add the notebook join
-	if (notebookEntryStrings != null) {
-	    queryText.append(notebookEntryStrings[1]);
-	}
-
 	if (sortOnMessage) {
 	    queryText.append(" GROUP BY user.user_id");
 	}
@@ -179,8 +162,7 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", ForumUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue())
+	query.addEntity("user", ForumUser.class).addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 

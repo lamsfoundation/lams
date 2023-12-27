@@ -188,45 +188,6 @@ $(document).ready(function(){
 		<tbody>
 	</table>
 	
-	<br>	
-
-	<%-- Reflection list  --%>
-	<c:if test="${sessionMap.imageGallery.reflectOnActivity && not (empty sessionId)}">	
-	
-		<h5>
-			<fmt:message key="label.monitoring.summary.title.reflection"/>
-		</h5>
-	
-		<table class="table table-condensed">			
-		
-			<tr>
-				<th>
-					<fmt:message key="monitoring.user.fullname"/>
-				</th>
-				<th>
-					<fmt:message key="monitoring.user.reflection"/>
-				</th>
-			</tr>		
-		
-			<c:set var="userList" value="${sessionMap.reflectList[sessionId]}"/>
-			<c:forEach var="user" items="${userList}" varStatus="refStatus">
-				<tr>
-					<td>
-						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.fullName}" escapeXml="true"/></lams:Portrait>
-					</td>
-					<td>
-						<c:set var="viewReflection">
-							<c:url value="/monitoring/viewReflection.do?toolSessionID=${sessionId}&userUid=${user.userUid}"/>
-						</c:set>
-						<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-xs loffset5">
-							<fmt:message key="label.view" />
-						</a>
-					</td>
-				</tr>
-			</c:forEach>
-		</table>
-	</c:if>
-	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->

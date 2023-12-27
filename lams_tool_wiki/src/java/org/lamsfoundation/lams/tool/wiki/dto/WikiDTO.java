@@ -58,10 +58,6 @@ public class WikiDTO {
 
     private boolean notifyUpdates;
 
-    private boolean reflectOnActivity;
-
-    private String reflectInstructions;
-
     private Integer minimumEdits;
 
     private Integer maximumEdits;
@@ -88,8 +84,6 @@ public class WikiDTO {
 	allowLearnerInsertLinks = wiki.isAllowLearnerInsertLinks();
 	allowLearnerAttachImages = wiki.isAllowLearnerAttachImages();
 	notifyUpdates = wiki.isNotifyUpdates();
-	reflectOnActivity = wiki.isReflectOnActivity();
-	reflectInstructions = wiki.getReflectInstructions();
     submissionDeadline = wiki.getSubmissionDeadline();
 	minimumEdits = wiki.getMinimumEdits();
 	maximumEdits = wiki.getMaximumEdits();
@@ -182,22 +176,6 @@ public class WikiDTO {
 
     public void setNotifyUpdates(boolean notifyUpdates) {
 	this.notifyUpdates = notifyUpdates;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public Integer getMinimumEdits() {

@@ -58,12 +58,6 @@ public class SubmitUserDTO implements Serializable {
     //submit file list
     private List filesUploaded;
 
-    //reflect option
-    private boolean hasRefection;
-    private String reflectInstrctions;
-    private boolean finishReflection;
-    private String reflect;
-
     public SubmitUserDTO() {
 
     }
@@ -180,38 +174,6 @@ public class SubmitUserDTO implements Serializable {
      */
     public void setFilesUploaded(List filesUploaded) {
 	this.filesUploaded = filesUploaded;
-    }
-
-    public boolean isFinishReflection() {
-	return finishReflection;
-    }
-
-    public void setFinishReflection(boolean finishReflection) {
-	this.finishReflection = finishReflection;
-    }
-
-    public boolean isHasRefection() {
-	return hasRefection;
-    }
-
-    public void setHasRefection(boolean hasRefection) {
-	this.hasRefection = hasRefection;
-    }
-
-    public String getReflect() {
-	return reflect;
-    }
-
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    public String getReflectInstrctions() {
-	return reflectInstrctions;
-    }
-
-    public void setReflectInstrctions(String reflectInstrctions) {
-	this.reflectInstrctions = reflectInstrctions;
     }
 
     public String getFirstName() {

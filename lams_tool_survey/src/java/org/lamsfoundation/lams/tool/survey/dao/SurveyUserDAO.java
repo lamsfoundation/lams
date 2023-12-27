@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.survey.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -45,7 +44,4 @@ public interface SurveyUserDAO extends DAO {
     int getCountUsersBySession(final Long sessionId, String searchString);
 
     List<Object[]> getStatisticsBySession(final Long contentId);
-
-    List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
 }

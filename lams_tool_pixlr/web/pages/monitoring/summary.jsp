@@ -68,11 +68,6 @@
 				<th>
 					<fmt:message key="monitoring.th.image" />
 				</th>
-				<c:if test="${pixlrDTO.reflectOnActivity}">
-					<th>
-						<fmt:message key="monitoring.th.reflection" />
-					</th>
-				</c:if>
 			</tr>
 			
 			<c:forEach var="user" items="${session.userDTOs}">
@@ -109,19 +104,6 @@
 							</c:otherwise>
 						</c:choose>
 					</td>
-					
-					<c:if test="${pixlrDTO.reflectOnActivity}">
-						<td>
-							<c:choose>
-								<c:when test="${user.finishedReflection}">
-									<lams:out escapeHtml="true" value="${user.notebookEntry}" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="label.notAvailable" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</c:if>
 				</tr>
 			</c:forEach>
 		</table>

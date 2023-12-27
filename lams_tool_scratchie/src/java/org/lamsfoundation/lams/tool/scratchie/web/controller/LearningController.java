@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -42,12 +41,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.qb.QbConstants;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -55,7 +51,6 @@ import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;
@@ -66,7 +61,6 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieApplicationException;
 import org.lamsfoundation.lams.tool.scratchie.service.ScratchieServiceImpl;
-import org.lamsfoundation.lams.tool.scratchie.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
@@ -79,7 +73,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -113,7 +106,6 @@ public class LearningController {
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionID);
 	// get back the scratchie and item list and display them on page
 	final Scratchie scratchie = scratchieService.getScratchieBySessionId(toolSessionID);
-	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
 
 	final ScratchieUser user;
 	if ((mode != null) && mode.isTeacher()) {
@@ -151,14 +143,6 @@ public class LearningController {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	// get notebook entry
-	NotebookEntry notebookEntry = null;
-	if (isReflectOnActivity && (groupLeader != null)) {
-	    notebookEntry = scratchieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
-	}
-	String entryText = (notebookEntry == null) ? null : notebookEntry.getEntry();
-
 	// basic information
 	sessionMap.put(ScratchieConstants.ATTR_TITLE, scratchie.getTitle());
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
@@ -174,10 +158,6 @@ public class LearningController {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED, scratchie.isBurningQuestionsEnabled());
-	// reflection information
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, isReflectOnActivity);
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_INSTRUCTION, scratchie.getReflectInstructions());
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
 	// add all option uids to one set
 	if (isUserLeader) {
 	    Set<Long> optionUids = new HashSet<>();
@@ -208,8 +188,7 @@ public class LearningController {
 	sessionMap.put(ScratchieConstants.ATTR_MAX_SCORE, maxScore);
 
 	boolean isScratchingFinished = toolSession.isScratchingFinished();
-	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook) && !mode.isTeacher();
+	boolean isShowResults = isScratchingFinished && !mode.isTeacher();
 
 	// check if there is submission deadline
 	Date submissionDeadline = scratchie.getSubmissionDeadline();
@@ -227,17 +206,6 @@ public class LearningController {
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
 		return "pages/learning/submissionDeadline";
 	    }
-	}
-
-	// show notebook page to the leader
-	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
-
-	    String redirectURL = "redirect:/learning/newReflection.do";
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,
-		    sessionMap.getSessionID());
-	    redirectURL = WebUtil.appendParameterToURL(redirectURL, AttributeNames.ATTR_MODE, mode.toString());
-	    return redirectURL;
-
 	}
 
 	// show results page
@@ -258,14 +226,6 @@ public class LearningController {
 	    if (!isUserLeader && toolSession.getTimeLimitLaunchedDate() == null) {
 		request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
 			"label.waiting.for.leader.launch.time.limit");
-		return "pages/learning/waitForLeaderTimeLimit";
-	    }
-
-	    // if the time limit is over and the leader hasn't submitted notebook or burning questions (thus
-	    // non-leaders should wait) - show waitForLeaderFinish page
-	    if (!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
-		request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
-			"label.waiting.for.leader.submit.notebook");
 		return "pages/learning/waitForLeaderTimeLimit";
 	    }
 
@@ -297,9 +257,6 @@ public class LearningController {
 	}
 
 	sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
-	// make non-leaders wait for notebook to be submitted, if required
-	sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
-		isWaitingForLeaderToSubmitNotebook);
 
 	boolean questionEtherpadEnabled = scratchie.isQuestionEtherpadEnabled() && StringUtils.isNotBlank(
 		Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
@@ -535,7 +492,6 @@ public class LearningController {
     @RequestMapping("/showResults")
     public String showResults(HttpServletRequest request) throws ScratchieApplicationException, IOException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
 	boolean isBurningQuestionsEnabled = (Boolean) sessionMap.get(
 		ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
 
@@ -577,30 +533,6 @@ public class LearningController {
 	    if (burningQuestionsAvailable) {
 		request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	    }
-	}
-
-	// display other groups' notebooks
-	if (isReflectOnActivity) {
-	    List<ReflectDTO> reflections = scratchieService.getReflectionList(
-		    toolSession.getScratchie().getContentId());
-
-	    // remove current session leader reflection
-	    Iterator<ReflectDTO> refIterator = reflections.iterator();
-	    while (refIterator.hasNext()) {
-		ReflectDTO reflection = refIterator.next();
-		if (toolSession.getSessionName().equals(reflection.getGroupName())) {
-
-		    // store for displaying purposes
-		    String reflectEntry = StringEscapeUtils.unescapeJavaScript(reflection.getReflection());
-		    sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, reflectEntry);
-
-		    // remove from list to display other groups' notebooks
-		    refIterator.remove();
-		    break;
-		}
-	    }
-
-	    request.setAttribute(ScratchieConstants.ATTR_REFLECTIONS, reflections);
 	}
 
 	if (scratchie.isShowScrachiesInResults()) {
@@ -745,88 +677,6 @@ public class LearningController {
 	}
 	// update general question in sessionMap
 	sessionMap.put(ScratchieConstants.ATTR_GENERAL_BURNING_QUESTION, generalQuestion);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) throws ScratchieApplicationException, IOException {
-	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-	NotebookEntry entry = scratchieService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ScratchieConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
-	Scratchie scratchie = toolSession.getScratchie();
-
-	//handle burning questions saving if needed
-	if (toolSession.isUserGroupLeader(userUid) && scratchie.isBurningQuestionsEnabled()
-		&& !toolSession.isScratchingFinished()) {
-	    saveBurningQuestions(request);
-	}
-
-	// in case of the leader we should let all other learners see Next Activity button
-	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
-	    scratchieService.setScratchingFinished(toolSessionId);
-	    // non-leaders need to go to results page
-	    LearningWebsocketServer.getInstance().sendPageRefreshRequest(scratchie.getContentId(), toolSessionId);
-	}
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database. Only leaders can submit reflections.
-     */
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) throws ScratchieApplicationException, IOException {
-	final Integer userId = reflectionForm.getUserID();
-	final String entryText = reflectionForm.getEntryText();
-
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	final Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	final NotebookEntry entry = scratchieService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ScratchieConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    scratchieService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, userId, entryText);
-	} else {
-	    // update existing entry
-	    entry.setEntry(entryText);
-	    entry.setLastModified(new Date());
-	    scratchieService.updateEntry(entry);
-	}
-	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
-
-	Scratchie scratchie = scratchieService.getScratchieBySessionId(sessionId);
-	// non-leaders need to go to results page
-	LearningWebsocketServer.getInstance().sendPageRefreshRequest(scratchie.getContentId(), sessionId);
-
-	String redirectURL = "redirect:showResults.do";
-	redirectURL = WebUtil.appendParameterToURL(redirectURL, ScratchieConstants.ATTR_SESSION_MAP_ID,
-		sessionMap.getSessionID());
-	return redirectURL;
     }
 
     // *************************************************************************************

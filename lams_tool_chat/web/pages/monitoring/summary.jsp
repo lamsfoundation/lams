@@ -108,48 +108,6 @@
 			</c:choose>
 		</div>
 		<!--  End of the Messages -->
-						
-		<hr/>
-		<!--  View the Reflections -->
-		<c:if test="${dto.reflectOnActivity}">
-			<table class="table table-condensed table-no-border">
-				<th>
-					<fmt:message>heading.learner</fmt:message>
-				</th>
-				<th class="text-center">
-					<fmt:message>heading.numPosts</fmt:message>
-				</th>
-	
-				<th class="text-center">
-					<fmt:message key="heading.reflection" />
-				</th>
-	
-				<c:forEach var="user" items="${session.userDTOs}">
-					<tr>
-						<td>
-							<lams:Portrait userId="${user.userID}" hover="true"><c:out value="${user.nickname}" escapeXml="true"/></lams:Portrait>
-						</td>
-						<td class="text-center">
-							${user.postCount}
-						</td>
-						<c:if test="${dto.reflectOnActivity}">
-							<td class="text-center">
-								<c:if test="${user.finishedReflection}">
-									<c:url value="openNotebook.do" var="openNotebook">
-										<c:param name="uid" value="${user.uid}" />
-									</c:url>
-	
-									<a href="javascript:launchPopup('${fn:escapeXml(openNotebook)}')">
-										<fmt:message key="link.view" />
-									</a>
-								</c:if>
-							</td>
-						</c:if>
-					</tr>
-				</c:forEach>
-	        </table>
-	</c:if>
-	<!--  End of the Reflections -->
 	
 	<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->

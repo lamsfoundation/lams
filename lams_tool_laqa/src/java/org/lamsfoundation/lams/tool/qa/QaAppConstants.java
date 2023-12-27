@@ -56,10 +56,6 @@ public interface QaAppConstants {
     public static final String IS_HIDE_ITEM = "isHideItem";
     public static final String MAP_SEQUENTIAL_ANSWERS_KEY = "mapSequentialAnswersKey";
     public static final String TOOL_SESSION_ID = "toolSessionID";
-    public static final String NOTEBOOK = "notebook";
-    public static final String ENTRY_TEXT = "entryText";
-    public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
-    public static final String LEARNER_NOTEBOOK = "learnerNotebook";
     public static final String QA_STATS_DTO = "qaStatsDTO";
     public static final String LIST_ALL_GROUPS_DTO = "listAllGroupsDTO";
     public static final String IS_TOOL_SESSION_AVAILABLE = "isToolSessionAvailable";

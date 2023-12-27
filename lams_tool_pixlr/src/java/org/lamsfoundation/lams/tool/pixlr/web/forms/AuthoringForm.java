@@ -46,11 +46,7 @@ public class AuthoringForm {
 
     boolean lockOnFinished;
 
-    boolean reflectOnActivity;
-
     boolean allowViewOthersImages;
-
-    String reflectInstructions;
 
     String onlineFile;
 
@@ -167,14 +163,6 @@ public class AuthoringForm {
 	this.deleteFileUuid = deleteFile;
     }
 
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
     public boolean isHasFile() {
 	return hasFile;
     }
@@ -245,14 +233,6 @@ public class AuthoringForm {
 
     public void setExistingImageFileName(String existingImageFileName) {
 	this.existingImageFileName = existingImageFileName;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isAllowViewOthersImages() {

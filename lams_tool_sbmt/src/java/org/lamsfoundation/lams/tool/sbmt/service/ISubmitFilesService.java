@@ -31,7 +31,6 @@ import java.util.SortedMap;
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
@@ -231,34 +230,6 @@ public interface ISubmitFilesService extends ICommonToolService {
      */
     public void saveOrUpdateContent(SubmitFilesContent persistContent);
 
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    public void updateEntry(NotebookEntry notebookEntry);
-
     public List<SubmitFilesSession> getSessionsByContentID(Long toolContentID);
 
     // *************************************************************
@@ -304,15 +275,13 @@ public interface ISubmitFilesService extends ICommonToolService {
 
     /**
      * Get a paged, optionally sorted and filtered, list of users.
-     * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... ,
-     * [SubmitUser, Integer1, Integer2, String]>
-     * where Integer1 is the number of files uploaded, Integer2 is the number of files marked
-     * and String is the notebook entry. No notebook entries needed? Will return null in their place.
+     * Will return List<[SubmitUser, Integer1, Integer2], [SubmitUser, Integer1, Integer2], ... ,
+     * [SubmitUser, Integer1, Integer2]>
+     * where Integer1 is the number of files uploaded, Integer2 is the number of files marked.
      *
      * @return
      */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
 
     /**
      * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports

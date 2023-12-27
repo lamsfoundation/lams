@@ -268,40 +268,20 @@
             </c:choose>
         </div>
 
-        <!-- notebook reedit -->
-        <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-            <lams:NotebookReedit
-                    reflectInstructions="${sessionMap.reflectInstructions}"
-                    reflectEntry="${learner.reflect}"
-                    isEditButtonEnabled="${sessionMap.mode != 'teacher'}"
-                    notebookHeaderLabelKey="title.reflection"/>
-        </c:if>
-
         <!-- submit buttons -->
         <div class="activity-bottom-buttons">
             <c:if test="${sessionMap.mode != 'teacher'}">
-                <c:choose>
-                    <c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-                        <button type="button" id="notebookButton" onclick="javascript:notebook();"
-                                class="btn btn-primary btn-disable-on-submit
-								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
-                            <fmt:message key="label.continue" />
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button" id="finishButton" class="btn btn-primary btn-disable-on-submit na
-								   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
-                            <c:choose>
-                                <c:when test="${isLastActivity}">
-                                    <fmt:message key="button.submit" />
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:message key="button.finish" />
-                                </c:otherwise>
-                            </c:choose>
-                        </button>
-                    </c:otherwise>
-                </c:choose>
+            	<button type="button" id="finishButton" class="btn btn-primary btn-disable-on-submit na
+					   ${sessionMap.mode eq 'author' or empty sessionMap.minLimitUploadNumber ? '' : 'btn-hide-on-min-not-met'}">
+                	<c:choose>
+                    	<c:when test="${isLastActivity}">
+                        	<fmt:message key="button.submit" />
+                        </c:when>
+                        <c:otherwise>
+	                        <fmt:message key="button.finish" />
+                        </c:otherwise>
+                    </c:choose>
+               </button>
             </c:if>
         </div>
     </div>
@@ -429,10 +409,6 @@
         function finish() {
             var finishUrl = "<lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}";
             return validateFinish(finishUrl);
-        }
-        function notebook() {
-            var continueUrl = "<lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}";
-            return validateFinish(continueUrl);
         }
         function validateFinish(tUrl) {
             var uploadedFilesNumber = +${learner.filesUploaded.size()};

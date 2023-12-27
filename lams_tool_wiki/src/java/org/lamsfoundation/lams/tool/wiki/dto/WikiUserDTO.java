@@ -41,8 +41,6 @@ public class WikiUserDTO implements Comparable {
 
     public boolean finishedActivity;
 
-    public String notebookEntry;
-
     public Long entryUID;
 
     public boolean notificationEnabled;
@@ -123,14 +121,6 @@ public class WikiUserDTO implements Comparable {
 
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
-    }
-
-    public String getNotebookEntry() {
-	return notebookEntry;
-    }
-
-    public void setNotebookEntry(String notebookEntry) {
-	this.notebookEntry = notebookEntry;
     }
 
     public boolean isNotificationEnabled() {

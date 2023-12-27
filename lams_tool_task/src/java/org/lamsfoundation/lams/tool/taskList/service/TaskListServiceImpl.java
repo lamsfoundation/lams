@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -47,9 +46,6 @@ import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedExce
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -65,7 +61,6 @@ import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListSessionDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -102,7 +97,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     private ILamsToolService toolService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
-    private ICoreNotebookService coreNotebookService;
 
     // *******************************************************************************
     // Methods implements ITaskListService.
@@ -351,44 +345,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     }
 
     @Override
-    public NotebookEntry getEntry(Long sessionId, Integer userId) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		TaskListConstants.TOOL_SIGNATURE, userId);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflectList = new LinkedList<>();
-
-	List<TaskListSession> sessionList = taskListSessionDao.getByContentId(contentId);
-	for (TaskListSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<TaskListUser> users = taskListUserDao.getBySessionID(sessionId);
-	    for (TaskListUser user : users) {
-
-		NotebookEntry entry = getEntry(sessionId, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflectList.add(ref);
-		}
-
-	    }
-	}
-
-	return reflectList;
-    }
-
-    @Override
     public int getNumTasksCompletedByUser(Long toolSessionId, Long userId) {
 	return getTaskListItemVisitDao().getCountCompletedTasksByUser(toolSessionId, userId);
     }
@@ -445,28 +401,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
     @Override
     public List<TaskListUser> getUserListBySessionId(Long sessionId) {
 	return taskListUserDao.getBySessionID(sessionId);
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -553,14 +487,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     @Override
@@ -724,14 +650,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	    return;
 	}
 
-	for (TaskListSession session : taskListSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, TaskListConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	taskListDao.delete(taskList);
     }
 
@@ -789,12 +707,6 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 	for (TaskListSession session : sessions) {
 	    TaskListUser user = taskListUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(user.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			TaskListConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    taskListDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
 		taskListUserDao.removeObject(TaskListUser.class, user.getUid());
 	    }
 	}

@@ -284,32 +284,6 @@
 		          </c:forEach>
 		        </div>                
 		        <!-- end wiki pages folders -->
-			
-			<!-- Reflections -->
-			<c:if test="${not empty sessionDTO.userDTOs && sessionDTO.reflectOnActivity}">
-		     	<div class="panel panel-default voffset10" id="add">
-		            <div class="panel-heading">
-		              <h4 class="panel-title">
-		                <fmt:message key="monitor.notebooks"></fmt:message>
-		              </h4>
-		            </div>
-		
-					<table class="table table-condensed table-striped">
-					<c:forEach var="user" items="${sessionDTO.userDTOs}">
-						<c:if test="${not empty user.notebookEntry}">
-							<tr>
-								<td>
-									<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
-								</td>
-								<td>
-									<lams:out escapeHtml="true" value="${user.notebookEntry}" />
-								</td>
-							</tr>
-						</c:if>
-					</c:forEach>
-					</table>
-				</div>
-			</c:if>
 		
 			<div id="finishButtonDiv"></div>
 		

@@ -33,7 +33,7 @@
 					<div class="row">
 						<div class="col-5 flex-fill">
 							<c:set var="viewtopic">
-								<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=0&size=${pageSize}
+								<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&topicID=${topic.message.uid}&create=${topic.message.created.time}&pageLastId=0&size=${pageSize}
 							</c:set> 
 							<a href="${viewtopic}" id="topicTitle">
 								<c:choose>

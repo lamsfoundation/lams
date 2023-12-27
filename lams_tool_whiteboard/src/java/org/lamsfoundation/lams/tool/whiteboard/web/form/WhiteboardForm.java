@@ -60,7 +60,6 @@ public class WhiteboardForm {
 	    whiteboard.setLockWhenFinished(false);
 	    whiteboard.setDefineLater(false);
 	    whiteboard.setUseSelectLeaderToolOuput(false);
-	    whiteboard.setReflectOnActivity(false);
 	}
     }
 

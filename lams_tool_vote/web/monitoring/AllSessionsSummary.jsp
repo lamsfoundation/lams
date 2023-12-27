@@ -7,12 +7,6 @@
 
 <c:forEach var="sessionDto" items="${sessionDTOs}" varStatus="status">
 	<c:set var="sessionUid" value="${sessionDto.sessionUid}"/>
-	
-	<c:if test="${reflect && sessionUid ne 0}">			
-		<c:set var="viewReflectionsURL">
-			<lams:WebAppURL/>/monitoring/ReflectionViewer.jsp?sessionUid=${sessionUid}
-		</c:set>
-	</c:if>
 
 	<c:set var="buttonbar">
 		<div class="pull-right">
@@ -21,12 +15,7 @@
 						onClick="javascript:showChangeLeaderModal(${sessionDto.toolSessionId})">
 					<fmt:message key='label.monitoring.change.leader'/>
 				</button>
-			</c:if>
-			<c:if test="${not empty viewReflectionsURL}">
-				<a href="javascript:launchPopup('${viewReflectionsURL}')" class="btn btn-default btn-sm">
-					<fmt:message key="label.notebook.entries" />
-				</a>
-			</c:if>			
+			</c:if>		
 			&nbsp;
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />
 			<a class="fa fa-pie-chart text-primary btn btn-xs btn-primary" 

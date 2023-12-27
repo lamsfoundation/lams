@@ -85,8 +85,6 @@ public class AuthoringUtil {
 	String displayAnswersFeedback = request.getParameter("displayAnswersFeedback");
 	String showMarks = request.getParameter("showMarks");
 	String retries = request.getParameter("retries");
-	String reflect = request.getParameter(McAppConstants.REFLECT);
-	String reflectionSubject = request.getParameter(McAppConstants.REFLECTION_SUBJECT);
 
 	boolean questionsSequencedBoolean = false;
 	boolean randomizeBoolean = false;
@@ -97,7 +95,6 @@ public class AuthoringUtil {
 	boolean useSelectLeaderToolOuputBoolean = false;
 	boolean prefixAnswersWithLettersBoolean = false;
 	boolean retriesBoolean = false;
-	boolean reflectBoolean = false;
 	boolean enableConfidenceLevels = WebUtil.readBooleanParam(request, "enableConfidenceLevels", false);
 
 	if ((questionsSequenced != null) && (questionsSequenced.equalsIgnoreCase("1"))) {
@@ -136,10 +133,6 @@ public class AuthoringUtil {
 
 	if ((retries != null) && (retries.equalsIgnoreCase("1"))) {
 	    retriesBoolean = true;
-	}
-
-	if ((reflect != null) && (reflect.equalsIgnoreCase("1"))) {
-	    reflectBoolean = true;
 	}
 
 	long userId = 0;
@@ -186,9 +179,6 @@ public class AuthoringUtil {
 	mcContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
 	mcContent.setPrefixAnswersWithLetters(prefixAnswersWithLettersBoolean);
 	mcContent.setEnableConfidenceLevels(enableConfidenceLevels);
-
-	mcContent.setReflect(reflectBoolean);
-	mcContent.setReflectionSubject(reflectionSubject);
 
 	//calculate total mark
 	int totalMark = 0;

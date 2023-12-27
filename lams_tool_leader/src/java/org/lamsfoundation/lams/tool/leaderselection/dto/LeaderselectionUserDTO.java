@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.dto;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 
 public class LeaderselectionUserDTO implements Comparable {
@@ -41,15 +40,6 @@ public class LeaderselectionUserDTO implements Comparable {
     private Long userId;
 
     private boolean finishedActivity;
-
-    public LeaderselectionUserDTO(LeaderselectionUser user, NotebookEntry entry) {
-	this.uid = user.getUid();
-	this.loginName = user.getLoginName();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.finishedActivity = user.isFinishedActivity();
-	this.userId = user.getUserId();
-    }
 
     public LeaderselectionUserDTO(LeaderselectionUser user) {
 	this.uid = user.getUid();

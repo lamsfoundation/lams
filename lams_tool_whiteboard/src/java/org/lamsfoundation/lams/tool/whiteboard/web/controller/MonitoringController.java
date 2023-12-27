@@ -23,9 +23,28 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
@@ -36,7 +55,6 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
-import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
@@ -66,26 +84,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -152,12 +153,6 @@ public class MonitoringController {
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
 	    request.setAttribute(WhiteboardConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-	}
-
-	// Create reflectList if reflection is enabled.
-	if (whiteboard.isReflectOnActivity()) {
-	    List<ReflectDTO> relectList = whiteboardService.getReflectList(contentId);
-	    sessionMap.put(WhiteboardConstants.ATTR_REFLECT_LIST, relectList);
 	}
 
 	// cache into sessionMap

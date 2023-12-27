@@ -77,7 +77,6 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="dokumaranMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		<property name="dokumaranOutputFactory"><ref bean="dokumaranOutputFactory"/></property>
     </bean>
 

@@ -119,8 +119,6 @@ public class DacoConstants {
 
     public static final String USER_FULL_NAME = "userFullName";
 
-    public static final String NOTEBOOK_ENTRY = "notebookEntry";
-
     public static final String RECORD_COUNT = "recordCount";
 
     public static final String PORTRAIT_ID = "portraitId";
@@ -171,8 +169,6 @@ public class DacoConstants {
     public static final String ATTR_USER_FINISHED = "userFinished";
 
     public static final String ATTR_ANSWER_OPTION_LIST = "answerOptionList";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 
     public static final String ATTR_RECORD_OPERATION_SUCCESS = "recordOperationSuccess";
 

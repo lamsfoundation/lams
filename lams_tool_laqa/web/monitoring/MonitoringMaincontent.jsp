@@ -23,9 +23,6 @@
 		.rating-stars-div {
 			padding-top: 12px;
 		}
-		#reflections {
-			padding: 70px 0 0px;
-		}
 		.dialog {
 			display: none;
 		}

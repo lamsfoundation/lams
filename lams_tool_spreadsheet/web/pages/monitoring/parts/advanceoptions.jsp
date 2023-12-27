@@ -53,34 +53,7 @@
 					</c:otherwise>
 				</c:choose>
 			</td>	
-		</tr>
-		
-		<tr>
-			<td>
-				<fmt:message key="label.monitoring.summary.notebook.reflection" />
-			</td>
-			
-			<td>
-				<c:choose>
-					<c:when test="${spreadsheet.reflectOnActivity}">
-						<fmt:message key="label.on" />
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.off" />
-					</c:otherwise>
-				</c:choose>	
-			</td>	
-		</tr>
-		<c:if test="${spreadsheet.reflectOnActivity}">
-		<tr>
-			<td>
-				<fmt:message key="label.monitoring.summary.notebook.reflection" />
-			</td>
-			<td>
-				<lams:out value="${spreadsheet.reflectInstructions}" escapeHtml="true"/>
-			</td>	
-		</tr>
-		</c:if>		
+		</tr>	
 	</table>
 
 </lams:AdvancedAccordian>

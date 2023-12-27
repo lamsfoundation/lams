@@ -35,8 +35,7 @@
 				<property name="leaderselectionDAO"><ref bean="leaderselectionDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
  				<property name="leaderselectionToolContentHandler"><ref bean="leaderselectionToolContentHandler"/></property>
-		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
-		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		   		<property name="leaderselectionOutputFactory"><ref bean="leaderselectionOutputFactory"/></property>
 			</bean>
 		</property>

@@ -98,12 +98,6 @@ public class Whiteboard implements Cloneable {
     @Column(name = "define_later")
     private boolean defineLater;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "gallery_walk_enabled")
     private boolean galleryWalkEnabled;
 
@@ -368,22 +362,6 @@ public class Whiteboard implements Cloneable {
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isGalleryWalkEnabled() {

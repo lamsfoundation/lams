@@ -87,12 +87,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     @Column(name = "min_limit_upload_number")
     private Integer minLimitUploadNumber;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column
     private Date created;
 
@@ -231,22 +225,6 @@ public class SubmitFilesContent implements Serializable, Cloneable {
      */
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isLimitUpload() {

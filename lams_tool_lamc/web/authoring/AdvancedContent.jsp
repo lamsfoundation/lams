@@ -93,32 +93,3 @@
 </lams:SimplePanel>
 
 <lams:OutcomeAuthor toolContentId="${sessionMap.toolContentID}" />
-
-<lams:SimplePanel titleKey="label.activity.completion">
-	<div class="checkbox">
-		<label for="reflect">
-			<form:checkbox path="reflect" value="1" cssClass="noBorder" id="reflect"/>
-			<fmt:message key="label.reflect" />
-		</label>
-	</div>
-	<div class="form-group">
-		<textarea name="reflectionSubject" id="reflectInstructions" class="form-control" rows="3">${mcAuthoringForm.reflectionSubject}</textarea>
-	</div>
-</lams:SimplePanel>
-
-<script type="text/javascript">
-	//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflect");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
-		//turn off	
-			rao.checked = false;
-		}else{
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-</script>

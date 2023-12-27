@@ -28,9 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -272,34 +270,6 @@ public interface ITaskListService extends ICommonToolService {
     String finishToolSession(Long toolSessionId, Long userId) throws TaskListException;
 
     /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
      * Returns paged users for jqGrid based on sessionId.
      *
      * @param sessionId
@@ -345,10 +315,6 @@ public interface ITaskListService extends ICommonToolService {
      * @return
      */
     List<SessionDTO> getSummary(Long contentId);
-
-    NotebookEntry getEntry(Long sessionId, Integer userId);
-
-    List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * Get localized message.

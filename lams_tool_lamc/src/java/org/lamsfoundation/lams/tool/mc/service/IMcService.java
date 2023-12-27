@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -38,7 +37,6 @@ import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
@@ -166,12 +164,6 @@ public interface IMcService extends ICommonToolService {
 
     long getToolDefaultContentIdBySignature(String toolSignature) throws McApplicationException;
 
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
-    void updateEntry(NotebookEntry notebookEntry);
-
     /**
      * Return the top, lowest and average mark for all learners for one particular tool session.
      *
@@ -224,17 +216,6 @@ public interface IMcService extends ICommonToolService {
     void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
 
     void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs);
-
-    /**
-     *
-     * returns reflection data for all sessions
-     *
-     * @param mcContent
-     * @param userID
-     * @param mcService
-     * @return
-     */
-    List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID);
 
     /**
      * Gets the basic statistics for the grades for the Leaders when an Assessment is done using

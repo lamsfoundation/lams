@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -43,8 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -140,15 +137,6 @@ public class LearningController {
 
 	// set up the user dto
 	PixlrUserDTO pixlrUserDTO = new PixlrUserDTO(pixlrUser);
-	if (pixlrUser.isFinishedActivity()) {
-	    // get the notebook entry.
-	    NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PixlrConstants.TOOL_SIGNATURE, pixlrUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		pixlrUserDTO.notebookEntry = notebookEntry.getEntry();
-		pixlrUserDTO.setFinishedReflection(true);
-	    }
-	}
 	request.setAttribute("pixlrUserDTO", pixlrUserDTO);
 
 	String returnURL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/lapixl10/learning/updatePixlrImage.do";
@@ -317,56 +305,6 @@ public class LearningController {
 	}
 
 	return is;
-    }
-
-    @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// set the finished flag
-	PixlrUser pixlrUser = this.getCurrentUser(learningForm.getToolSessionID());
-	PixlrDTO pixlrDTO = new PixlrDTO(pixlrUser.getPixlrSession().getPixlr());
-
-	request.setAttribute("pixlrDTO", pixlrDTO);
-
-	NotebookEntry notebookEntry = pixlrService.getEntry(pixlrUser.getPixlrSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE, pixlrUser.getUserId().intValue());
-
-	if (notebookEntry != null) {
-	    learningForm.setEntryText(notebookEntry.getEntry());
-	}
-
-	Long toolSessionID = pixlrUser.getPixlrSession().getSessionId();
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, pixlrService.isLastActivity(toolSessionID));
-	return "pages/learning/notebook";
-    }
-
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningForm,
-	    HttpServletRequest request, HttpServletResponse response) {
-
-	// save the reflection entry and call the notebook.
-
-	PixlrUser pixlrUser = this.getCurrentUser(learningForm.getToolSessionID());
-	Long toolSessionID = pixlrUser.getPixlrSession().getSessionId();
-	Integer userID = pixlrUser.getUserId().intValue();
-
-	// check for existing notebook entry
-	NotebookEntry entry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		PixlrConstants.TOOL_SIGNATURE, userID);
-
-	if (entry == null) {
-	    // create new entry
-	    pixlrService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PixlrConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(learningForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    pixlrService.updateEntry(entry);
-	}
-
-	return finishActivity(request, response);
     }
 
     @RequestMapping("/viewAllImages")

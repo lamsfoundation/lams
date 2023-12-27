@@ -230,11 +230,6 @@
             document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
         }
 
-        function continueReflect(){
-            $('.btn-disable-on-submit').prop('disabled', true);
-            document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-        }
-
         function hideItem(itemUid) {
             if(confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='${delConfirmMsgKey}'/></spring:escapeBody>")){
                 $.ajax({
@@ -330,38 +325,20 @@
             </div>
         </c:forEach>
 
-        <!-- Reflection -->
-        <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-            <lams:NotebookReedit
-                    reflectInstructions="${sessionMap.reflectInstructions}"
-                    reflectEntry="${sessionMap.reflectEntry}"
-                    isEditButtonEnabled="${mode != 'teacher'}"
-                    notebookHeaderLabelKey="title.reflection"/>
-        </c:if>
-
         <div class="activity-bottom-buttons mt-5">
 
             <!-- Finish buttons -->
             <c:if test="${mode != 'teacher' && sessionMap.hasCompletedMinNumber}">
-                <c:choose>
-                    <c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-                        <button type="button" name="FinishButton" onclick="return continueReflect()" class="btn btn-primary na btn-disable-on-submit">
-                            <fmt:message key="label.continue" />
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
-                            <c:choose>
-                                <c:when test="${sessionMap.isLastActivity}">
-                                    <fmt:message key="label.submit" />
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:message key="label.finished" />
-                                </c:otherwise>
-                            </c:choose>
-                        </button>
-                    </c:otherwise>
-                </c:choose>
+            	<button type="button" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
+    	            <c:choose>
+                    	<c:when test="${sessionMap.isLastActivity}">
+            	            <fmt:message key="label.submit" />
+                        </c:when>
+                        <c:otherwise>
+    	                    <fmt:message key="label.finished" />
+                        </c:otherwise>
+                    </c:choose>
+            	</button>
             </c:if>
 
             <!--  Card button bar controlling refresh and adding items -->

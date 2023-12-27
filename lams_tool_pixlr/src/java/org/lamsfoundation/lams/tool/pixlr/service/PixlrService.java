@@ -38,9 +38,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -92,8 +89,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     private ILogEventService logEventService = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private PixlrOutputFactory pixlrOutputFactory;
 
@@ -272,14 +267,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    return;
 	}
 
-	for (PixlrSession session : pixlr.getPixlrSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, PixlrConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	pixlrDAO.delete(pixlr);
     }
 
@@ -293,12 +280,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 	    if (pixlr != null) {
 		for (PixlrSession session : pixlr.getPixlrSessions()) {
 		    PixlrUser user = pixlrUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
-		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    PixlrConstants.TOOL_SIGNATURE, userId);
-		    if (entry != null) {
-			pixlrDAO.delete(entry);
-		    }
-
 		    pixlrUserDAO.delete(user);
 		}
 	    }
@@ -460,30 +441,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     }
 
     /* ********** IPixlrService Methods ********************************* */
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    /**
-     * @param notebookEntry
-     */
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
     @Override
     public Long getDefaultContentIdBySignature(String toolSignature) {
 	Long toolContentId = null;
@@ -661,14 +618,6 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     public PixlrOutputFactory getPixlrOutputFactory() {

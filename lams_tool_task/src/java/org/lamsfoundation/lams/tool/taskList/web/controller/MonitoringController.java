@@ -41,7 +41,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
-import org.lamsfoundation.lams.tool.taskList.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.taskList.dto.TaskListUserDTO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskList;
@@ -119,13 +118,6 @@ public class MonitoringController {
 	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-	}
-
-	// Create reflectList if reflection is enabled.
-	if (taskList.isReflectOnActivity()) {
-	    List<ReflectDTO> reflectList = taskListService.getReflectList(taskList.getContentId());
-	    // Add reflectList to sessionMap
-	    sessionMap.put(TaskListConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
 	return "pages/monitoring/monitoring";

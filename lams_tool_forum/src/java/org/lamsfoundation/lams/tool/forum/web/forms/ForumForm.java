@@ -85,7 +85,6 @@ public class ForumForm {
 	forum.setAllowNewTopic(false);
 	forum.setAllowUpload(false);
 	forum.setAllowRateMessages(false);
-	forum.setReflectOnActivity(false);
     }
 
     //-------------------------get/set methods----------------

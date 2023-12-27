@@ -166,12 +166,6 @@ public class Assessment implements Cloneable {
     @Column(name = "attempt_completion_notify")
     private boolean notifyTeachersOnAttemptCompletion;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "question_etherpad_enabled")
     private boolean questionEtherpadEnabled;
 
@@ -744,22 +738,6 @@ public class Assessment implements Cloneable {
 
     public void setNotifyTeachersOnAttemptCompletion(boolean notifyTeachersOnAttemptCompletion) {
 	this.notifyTeachersOnAttemptCompletion = notifyTeachersOnAttemptCompletion;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isQuestionEtherpadEnabled() {

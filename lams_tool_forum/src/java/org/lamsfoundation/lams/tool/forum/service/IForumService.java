@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
@@ -88,8 +87,7 @@ public interface IForumService extends ICommonToolService {
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
 
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
 
     int getCountUsersBySession(Long sessionId, String searchString);
 
@@ -374,33 +372,6 @@ public interface IForumService extends ICommonToolService {
      */
     void finishUserSession(ForumUser currentUser);
 
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
 
     IEventNotificationService getEventNotificationService();
 

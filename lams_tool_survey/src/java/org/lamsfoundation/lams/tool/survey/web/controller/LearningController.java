@@ -42,8 +42,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
@@ -57,7 +55,6 @@ import org.lamsfoundation.lams.tool.survey.service.SurveyApplicationException;
 import org.lamsfoundation.lams.tool.survey.util.IntegerComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.tool.survey.web.form.AnswerForm;
-import org.lamsfoundation.lams.tool.survey.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -133,15 +130,6 @@ public class LearningController {
 	List<AnswerDTO> answers = surveyService.getQuestionAnswers(sessionId, surveyUser.getUid());
 	Survey survey = surveyService.getSurveyBySessionId(sessionId);
 
-	// get notebook entry
-	String entryText = new String();
-	NotebookEntry notebookEntry = surveyService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SurveyConstants.TOOL_SIGNATURE, surveyUser.getUserId().intValue());
-
-	if (notebookEntry != null) {
-	    entryText = notebookEntry.getEntry();
-	}
-
 	// get session from shared session.
 	HttpSession ss = SessionManager.getSession();
 
@@ -159,10 +147,6 @@ public class LearningController {
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(SurveyConstants.ATTR_REFLECTION_ON, survey.isReflectOnActivity());
-	sessionMap.put(SurveyConstants.ATTR_REFLECTION_INSTRUCTION, survey.getReflectInstructions());
-	sessionMap.put(SurveyConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (survey.isDefineLater()) {
@@ -488,69 +472,6 @@ public class LearningController {
 
 	String nextActivityUrl = surveyService.finishToolSession(sessionId, userID);
 	response.sendRedirect(nextActivityUrl);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping(value = "/newReflection")
-    private String newReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	messageForm.setUserID(user.getUserID());
-	messageForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = surveyService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SurveyConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    messageForm.setEntryText(entry.getEntry());
-	}
-
-	request.setAttribute("messageForm", messageForm);
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping(value = "/submitReflection", method = RequestMethod.POST)
-    private void submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, SurveyApplicationException {
-	Integer userId = messageForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = surveyService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SurveyConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    surveyService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    SurveyConstants.TOOL_SIGNATURE, userId, messageForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(messageForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    surveyService.updateEntry(entry);
-	}
-	request.setAttribute("messageForm", messageForm);
-	
-	finish(request, response);
     }
 
     // *************************************************************************************

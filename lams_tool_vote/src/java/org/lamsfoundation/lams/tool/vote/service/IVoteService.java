@@ -32,7 +32,6 @@ import java.util.SortedSet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
@@ -40,7 +39,6 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
-import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
@@ -121,8 +119,6 @@ public interface IVoteService extends ICommonToolService {
     SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID);
 
     List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId);
-
-    List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
 
     VoteContent getVoteContent(Long toolContentID);
 
@@ -235,12 +231,6 @@ public interface IVoteService extends ICommonToolService {
 
     Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long voteSessionUid);
 
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
-    void updateEntry(NotebookEntry notebookEntry);
-
     void removeQuestionsFromCache(VoteContent voteContent);
 
     void removeVoteContentFromCache(VoteContent voteContent);
@@ -265,9 +255,6 @@ public interface IVoteService extends ICommonToolService {
 	    String searchString);
 
     int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
-
-    List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
-	    String searchString);
 
     List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
 

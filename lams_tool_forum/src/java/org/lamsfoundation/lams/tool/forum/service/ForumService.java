@@ -56,9 +56,6 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
@@ -146,8 +143,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private IExportToolContentService exportContentService;
 
     private IUserManagementService userManagementService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private ForumOutputFactory forumOutputFactory;
 
@@ -527,9 +522,8 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     @Override
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries) {
-	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
-		coreNotebookService, userManagementService);
+	    String searchString) {
+	return forumUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, userManagementService);
     }
 
     @Override
@@ -776,29 +770,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	return defaultForum;
-
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -894,13 +865,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	    return;
 	}
 
-	for (ForumToolSession session : (List<ForumToolSession>) forumToolSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ForumConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	forumDao.delete(forum);
     }
 
@@ -939,13 +903,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 			message.setHideFlag(true);
 			messageDao.update(message);
 		    }
-		}
-
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ForumConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    // hopefully it understands NotebookEntries
-		    activityDAO.delete(entry);
 		}
 
 		user.setSessionFinished(false);
@@ -1345,14 +1302,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	this.userManagementService = userManagementService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
@@ -1531,8 +1480,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 		JsonUtil.optBoolean(toolContentJSON, "notifyLearnersOnMarkRelease", Boolean.FALSE));
 	forum.setNotifyTeachersOnForumPosting(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnForumPosting", Boolean.FALSE));
-	forum.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	forum.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	// submissionDeadline is set in monitoring
 
 	// *******************************Handle user*******************

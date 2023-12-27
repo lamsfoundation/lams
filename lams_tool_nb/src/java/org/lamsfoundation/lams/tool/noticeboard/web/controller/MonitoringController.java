@@ -23,23 +23,17 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-import org.lamsfoundation.lams.tool.noticeboard.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
-import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
 import org.lamsfoundation.lams.tool.noticeboard.service.INoticeboardService;
 import org.lamsfoundation.lams.tool.noticeboard.service.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.web.form.MonitoringDTO;
@@ -47,7 +41,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -94,62 +87,24 @@ public class MonitoringController {
 	Iterator i = sessions.iterator();
 	Map numUsersMap = new HashMap();
 	Map sessionIdMap = new HashMap();
-	List<ReflectionDTO> reflections = new ArrayList<>();
+
 	while (i.hasNext()) {
 	    NoticeboardSession session = (NoticeboardSession) i.next();
 	    int numUsersInSession = nbService.getNumberOfUsersInSession(session);
 	    numUsersMap.put(session.getNbSessionName(), new Integer(numUsersInSession));
 	    sessionIdMap.put(session.getNbSessionName(), session.getNbSessionId());
-	    // Get list of users that have made a reflection entry
-	    if (content.getReflectOnActivity()) {
-		List sessionUsers = nbService.getUsersBySession(session.getNbSessionId());
-		for (int j = 0; j < sessionUsers.size(); j++) {
-		    NoticeboardUser nbUser = (NoticeboardUser) sessionUsers.get(j);
-		    NotebookEntry nbEntry = nbService.getEntry(session.getNbSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE,
-			    nbUser.getUserId().intValue());
-		    if (nbEntry != null) {
-			ReflectionDTO dto = new ReflectionDTO(nbEntry);
-			dto.setExternalId(session.getNbSessionId());
-			dto.setUserId(nbUser.getUserId());
-			dto.setUsername(nbUser.getUsername());
-			reflections.add(dto);
-		    }
-		}
-	    }
 	}
 	monitoringDTO.setGroupStatsMap(numUsersMap);
 	monitoringDTO.setSessionIdMap(sessionIdMap);
 
 	boolean isGroupedActivity = nbService.isGroupedActivity(toolContentId);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-
-	// Set reflection statistics, if reflection is set
-	request.setAttribute("reflectOnActivity", content.getReflectOnActivity());
-	request.setAttribute("reflectInstructions", content.getReflectInstructions());
-	request.setAttribute("reflections", reflections);
-
 	request.setAttribute("allowComments", content.isAllowComments());
 
 	String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	monitoringDTO.setCurrentTab(currentTab != null ? currentTab : "1");
 
 	return "/monitoring/monitoring";
-    }
-
-    @RequestMapping("/viewReflection")
-    public String viewReflection(HttpServletRequest request) {
-	Long userId = WebUtil.readLongParam(request, NoticeboardConstants.USER_ID);
-	Long toolSessionId = WebUtil.readLongParam(request, NoticeboardConstants.TOOL_SESSION_ID);
-	NoticeboardUser nbUser = nbService.retrieveNoticeboardUser(userId, toolSessionId);
-	NotebookEntry nbEntry = nbService.getEntry(nbUser.getNbSession().getNbSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE, userId.intValue());
-	if (nbEntry != null) {
-	    request.setAttribute("nbEntry", nbEntry.getEntry());
-	    request.setAttribute("name", nbUser.getFullname());
-	}
-
-	return "/monitoring/reflection";
     }
 
     @RequestMapping("/viewComments")

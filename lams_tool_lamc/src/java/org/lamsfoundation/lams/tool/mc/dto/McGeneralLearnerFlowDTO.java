@@ -65,14 +65,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected Integer topMark;
 
-    protected String reflection;
-
-    protected String reflectionSubject;
-
-    protected String notebookEntry;
-
-    protected String notebookEntriesVisible;
-
     protected Integer lowestMark;
 
     protected Integer averageMark;
@@ -358,8 +350,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 		.append("userOverPassMark: ", userOverPassMark).append("reportTitleLearner: ", reportTitleLearner)
 		.append("activityInstructions: ", activityInstructions).append("activityTitle: ", activityTitle)
 		.append("displayAnswers: ", displayAnswers).append("displayFeedbackOnly: ", displayFeedbackOnly)
-		.append("reflection: ", reflection).append("reflectionSubject: ", reflectionSubject)
-		.append("notebookEntry: ", notebookEntry).append("notebookEntriesVisible: ", notebookEntriesVisible)
 		.toString();
     }
 
@@ -436,66 +426,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      */
     public void setQuestions(List<McQueContent> questions) {
 	this.questions = questions;
-    }
-
-    /**
-     * @return Returns the reflection.
-     */
-    public String getReflection() {
-	return reflection;
-    }
-
-    /**
-     * @param reflection
-     *            The reflection to set.
-     */
-    public void setReflection(String reflection) {
-	this.reflection = reflection;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
-    }
-
-    /**
-     * @return Returns the notebookEntry.
-     */
-    public String getNotebookEntry() {
-	return notebookEntry;
-    }
-
-    /**
-     * @param notebookEntry
-     *            The notebookEntry to set.
-     */
-    public void setNotebookEntry(String notebookEntry) {
-	this.notebookEntry = notebookEntry;
-    }
-
-    /**
-     * @return Returns the notebookEntriesVisible.
-     */
-    public String getNotebookEntriesVisible() {
-	return notebookEntriesVisible;
-    }
-
-    /**
-     * @param notebookEntriesVisible
-     *            The notebookEntriesVisible to set.
-     */
-    public void setNotebookEntriesVisible(String notebookEntriesVisible) {
-	this.notebookEntriesVisible = notebookEntriesVisible;
     }
 
     /**

@@ -37,8 +37,7 @@
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="logEventService"><ref bean="logEventService"/></property>
  				<property name="chatToolContentHandler"><ref bean="chatToolContentHandler"/></property>
-		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
-		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
 		   		<property name="chatOutputFactory"><ref bean="chatOutputFactory"/></property>
 			</bean>
 		</property>

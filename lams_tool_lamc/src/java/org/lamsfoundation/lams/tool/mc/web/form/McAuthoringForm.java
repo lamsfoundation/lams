@@ -57,9 +57,6 @@ public class McAuthoringForm extends McLearningForm  {
 
     protected String questionsSequenced;
 
-    protected String reflect;
-    protected String reflectionSubject;
-
     protected String edit;
     private String feedback;
     private String candidateIndex;
@@ -235,36 +232,6 @@ public class McAuthoringForm extends McLearningForm  {
      */
     public void setSubmit(String submit) {
 	this.submit = submit;
-    }
-
-    /**
-     * @return Returns the reflect.
-     */
-    public String getReflect() {
-	return reflect;
-    }
-
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     /**

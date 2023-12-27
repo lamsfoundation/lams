@@ -23,8 +23,24 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -39,14 +55,16 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
-import org.lamsfoundation.lams.tool.*;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -55,7 +73,6 @@ import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardConfigItemDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardSessionDAO;
 import org.lamsfoundation.lams.tool.whiteboard.dao.WhiteboardUserDAO;
-import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
@@ -65,17 +82,14 @@ import org.lamsfoundation.lams.tool.whiteboard.web.controller.LearningWebsocketS
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.*;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
+import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.WebUtil;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class WhiteboardService implements IWhiteboardService, ToolContentManager, ToolSessionManager {
     private static Logger log = Logger.getLogger(WhiteboardService.class.getName());
@@ -103,8 +117,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
     private IRatingService ratingService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private WhiteboardOutputFactory whiteboardOutputFactory;
 
@@ -385,58 +397,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    throw new WhiteboardApplicationException(e);
 	}
 	return nextUrl;
-    }
-
-    @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflections = new LinkedList<>();
-
-	List<WhiteboardSession> sessionList = whiteboardSessionDao.getByContentId(contentId);
-	for (WhiteboardSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<WhiteboardUser> users = whiteboardUserDao.getBySessionID(sessionId);
-	    for (WhiteboardUser user : users) {
-
-		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			WhiteboardConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null)
-			    ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflections.add(ref);
-		}
-
-	    }
-
-	}
-
-	return reflections;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -977,13 +937,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    return;
 	}
 
-	for (WhiteboardSession session : whiteboardSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, WhiteboardConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	whiteboardDao.delete(whiteboard);
     }
 
@@ -1006,12 +959,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    WhiteboardUser user = whiteboardUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			WhiteboardConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    whiteboardDao.deleteById(NotebookEntry.class, entry.getUid());
-		}
-
 		whiteboardUserDao.deleteById(WhiteboardUser.class, user.getUid());
 	    }
 	}
@@ -1169,10 +1116,6 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     public WhiteboardOutputFactory getWhiteboardOutputFactory() {

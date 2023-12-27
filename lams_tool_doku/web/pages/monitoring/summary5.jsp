@@ -645,14 +645,6 @@
 		</div>
 	</div>
 
-	<div class="row mb-3">
-		<div class="col-10 offset-1">
-			<c:if test="${sessionMap.dokumaran.reflectOnActivity}">
-				<%@ include file="reflections.jsp"%>
-			</c:if>
-		</div>
-	</div>
-
 	<div class="row">
 		<div class="col-10 offset-1" id="time-limit-panel-placeholder">
 		</div>

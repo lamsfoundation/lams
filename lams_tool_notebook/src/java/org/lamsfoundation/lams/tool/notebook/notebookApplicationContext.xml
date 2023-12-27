@@ -35,8 +35,7 @@
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="logEventService"><ref bean="logEventService"/></property>
  				<property name="notebookToolContentHandler"><ref bean="notebookToolContentHandler"/></property>
-		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
-		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 
 		   		<property name="eventNotificationService"><ref bean="eventNotificationService" /></property>
 		   		<property name="messageService"><ref bean="notebookMessageService" /></property>
 		   		<property name="userManagementService"><ref bean="userManagementService" /></property>

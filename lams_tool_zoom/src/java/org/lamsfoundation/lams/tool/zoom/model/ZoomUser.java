@@ -64,9 +64,6 @@ public class ZoomUser implements java.io.Serializable {
     @Column
     private boolean finishedActivity;
 
-    @Column(name = "notebook_entry_uid")
-    private Long notebookEntryUID;
-
     @Column(name = "meeting_join_url")
     private String meetingJoinUrl;
 
@@ -136,14 +133,6 @@ public class ZoomUser implements java.io.Serializable {
 
     public void setZoomSession(ZoomSession zoomSession) {
 	this.zoomSession = zoomSession;
-    }
-
-    public Long getNotebookEntryUID() {
-	return notebookEntryUID;
-    }
-
-    public void setNotebookEntryUID(Long notebookEntryUID) {
-	this.notebookEntryUID = notebookEntryUID;
     }
 
     public String getMeetingJoinUrl() {

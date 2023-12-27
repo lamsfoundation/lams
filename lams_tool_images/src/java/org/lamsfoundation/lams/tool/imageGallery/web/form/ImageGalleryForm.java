@@ -76,7 +76,6 @@ public class ImageGalleryForm {
 	    imageGallery.setLockWhenFinished(false);
 	    imageGallery.setDefineLater(false);
 	    imageGallery.setAllowVote(false);
-	    imageGallery.setReflectOnActivity(false);
 	}
     }
 

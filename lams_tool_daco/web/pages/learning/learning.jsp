@@ -59,7 +59,6 @@
 	 	var currentTab = ${learningCurrentTab};
 	 	var changeViewUrl = "<c:url value='/learning/changeView.do' />";
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
-	 	var continueReflectUrl = '<c:url value="/learning/startReflection.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var refreshQuestionSummariesUrl = '<c:url value="/learning/refreshQuestionSummaries.do"/>';
 		var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
 	 	var EXE_STRING = '${EXE_STRING}';
@@ -104,28 +103,17 @@
 	
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
-				<c:choose>
-					<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-						<button type="button" name="FinishButton" onclick="javascript:continueReflect()" class="btn btn-primary btn-disable-on-submit na">
-							<fmt:message key="label.learning.continue" />
-						</button>
-					</c:when>
-					
-					<c:otherwise>
-						<button type="button" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
-							<c:choose>
-				 				<c:when test="${sessionMap.isLastActivity}">
-				 					<fmt:message key="label.learning.submit" />
-				 				</c:when>
-				 				<c:otherwise>
-				 		 			<fmt:message key="label.learning.finished" />
-				 				</c:otherwise>
-				 			</c:choose>
-						</button>
-					</c:otherwise>
-				</c:choose>
+				<button type="button" name="FinishButton" id="finishButton" class="btn btn-primary btn-disable-on-submit na">
+					<c:choose>
+						<c:when test="${sessionMap.isLastActivity}">
+							<fmt:message key="label.learning.submit" />
+						</c:when>
+						<c:otherwise>
+				 			<fmt:message key="label.learning.finished" />
+						</c:otherwise>
+					</c:choose>
+				</button>
 			</div>
 		</c:if>
-	
 	</div>
 </lams:PageLearner>

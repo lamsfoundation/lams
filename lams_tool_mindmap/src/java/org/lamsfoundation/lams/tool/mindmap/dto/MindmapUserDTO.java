@@ -25,7 +25,6 @@
 
 package org.lamsfoundation.lams.tool.mindmap.dto;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapUser;
 
 public class MindmapUserDTO implements Comparable {
@@ -35,19 +34,7 @@ public class MindmapUserDTO implements Comparable {
     public String firstName;
     public String lastName;
     public boolean finishedActivity;
-    public NotebookEntryDTO entryDTO;
     public Long entryUID;
-
-    public MindmapUserDTO(MindmapUser user, NotebookEntry entry) {
-	this.uid = user.getUid();
-	this.userId = user.getUserId();
-	this.loginName = user.getLoginName();
-	this.firstName = user.getFirstName();
-	this.lastName = user.getLastName();
-	this.finishedActivity = user.isFinishedActivity();
-	this.entryUID = user.getEntryUID();
-	this.entryDTO = new NotebookEntryDTO(entry);
-    }
 
     public MindmapUserDTO(MindmapUser user) {
 	this.uid = user.getUid();
@@ -107,14 +94,6 @@ public class MindmapUserDTO implements Comparable {
 
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
-    }
-
-    public void setEntryDTO(NotebookEntryDTO entryDTO) {
-	this.entryDTO = entryDTO;
-    }
-
-    public NotebookEntryDTO getEntryDTO() {
-	return entryDTO;
     }
 
     public Long getUserId() {

@@ -20,10 +20,6 @@
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
-		#reflections-div {
-			padding-bottom: 20px;
-		}
-	    
 	    /* when item is editable - show pencil icon on hover */
 	    .burning-question-text:hover +span+ i, /* when link is hovered select i */
 		.burning-question-text + span:hover+ i, /* when space after link is hovered select i */
@@ -257,35 +253,6 @@
 
 		        jQuery("#burningQuestions${scratchieItemUid}").jqGrid('sortGrid','groupName', false, 'asc');
 	        </c:forEach>
-			
-			<!-- Display reflection entries -->
-			jQuery("#reflections").jqGrid({
-				datatype: "local",
-				rowNum: 10000,
-				height: 'auto',
-				autowidth: true,
-				shrinkToFit: false,
-				guiStyle: "bootstrap4",
-				iconSet: 'fontAwesomeSolid',
-			   	colNames:[
-				   	'#',
-					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
-					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
-				],
-			   	colModel:[
-			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
-			   		{name:'groupName', index:'groupName', width:140},
-			   		{name:'feedback', index:'feedback', width:568}
-			   	],
-			   	caption: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.other.groups' /></spring:escapeBody>"
-			});
-		    <c:forEach var="reflectDTO" items="${reflections}" varStatus="i">
-		    		jQuery("#reflections").addRowData(${i.index + 1}, {
-		   			id:"${i.index + 1}",
-		   	     	groupName:"${reflectDTO.groupName}",
-			   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
-		   	   	});
-		    </c:forEach>
 		    
 			//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 			$(window).bind('resize', function() {
@@ -341,9 +308,6 @@
 	
 		function finishSession() {
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
-		}
-		function continueReflect() {
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		function refreshToBurningQuestions() {
@@ -409,15 +373,6 @@
 					</c:if>
 				</c:forEach>
 			</div>
-		</c:if>
-
-		<!-- Display reflections -->
-		<c:if test="${sessionMap.reflectOn}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="${(mode != 'teacher') && isUserLeader}"
-				isReflectionsJqGridEnabled="${fn:length(reflections) > 0}" />
 		</c:if>
 
 		<!-- Display finish buttons -->

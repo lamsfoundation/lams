@@ -121,12 +121,6 @@ public class TaskList implements Cloneable {
     @OrderBy("sequence_id ASC")
     private Set<TaskListItem> taskListItems = new HashSet<TaskListItem>();
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     //*************** NON Persist Fields ********************
     @Transient
     private String minimumNumberTasksErrorStr;
@@ -567,30 +561,6 @@ public class TaskList implements Cloneable {
      */
     public void setMinimumNumberTasks(int minimumNumberTasks) {
 	this.minimumNumberTasks = minimumNumberTasks;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     /**

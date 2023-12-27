@@ -74,7 +74,6 @@ public class SpreadsheetForm {
 	    spreadsheet.setDefineLater(false);
 	    spreadsheet.setLearnerAllowedToSave(true);
 	    spreadsheet.setMarkingEnabled(false);
-	    spreadsheet.setReflectOnActivity(false);
 	}
     }
 

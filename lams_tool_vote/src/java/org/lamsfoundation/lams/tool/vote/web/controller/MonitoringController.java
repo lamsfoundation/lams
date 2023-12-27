@@ -189,49 +189,6 @@ public class MonitoringController implements VoteAppConstants {
 	return responseJSON.toString();
     }
 
-    @RequestMapping(path = "/getReflectionsJSON")
-    @ResponseBody
-    public String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response) {
-
-	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
-
-	// paging parameters of tablesorter
-	int size = WebUtil.readIntParam(request, "size");
-	int page = WebUtil.readIntParam(request, "page");
-	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]");
-
-	int sorting = VoteAppConstants.SORT_BY_DEFAULT;
-	if (sortByName != null) {
-	    sorting = sortByName.equals(0) ? VoteAppConstants.SORT_BY_NAME_ASC : VoteAppConstants.SORT_BY_NAME_DESC;
-	}
-
-	//return user list according to the given sessionID
-	List<Object[]> users = voteService.getUserReflectionsForTablesorter(sessionUid, page, size, sorting,
-		searchString);
-
-	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	responseJSON.put("total_rows", voteService.getCountUsersBySession(sessionUid, null, searchString));
-
-	for (Object[] userAndReflection : users) {
-	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
-	    responseRow.put(VoteAppConstants.ATTR_USER_ID, (Integer) userAndReflection[0]);
-	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape((String) userAndReflection[2]));
-	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[3]);
-		responseRow.put(VoteAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
-	    }
-	    if (userAndReflection.length > 4) {
-		responseRow.put(VoteAppConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[4]);
-	    }
-	    rows.add(responseRow);
-	}
-	responseJSON.set("rows", rows);
-	response.setContentType("application/json;charset=UTF-8");
-	return responseJSON.toString();
-    }
-
     @RequestMapping("/statistics")
     public String statistics(HttpServletRequest request) {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -371,8 +328,6 @@ public class MonitoringController implements VoteAppConstants {
 	request.setAttribute("maxNominationCount", voteContent.getMaxNominationCount());
 	request.setAttribute("minNominationCount", voteContent.getMinNominationCount());
 	request.setAttribute("showResults", voteContent.isShowResults());
-	request.setAttribute("reflect", voteContent.isReflect());
-	request.setAttribute("reflectionSubject", voteContent.getReflectionSubject());
 	request.setAttribute("toolContentID", voteContent.getVoteContentId());
 
 	// setting up the SubmissionDeadline

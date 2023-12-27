@@ -11,14 +11,11 @@
 <c:set var="newtopic">
     <lams:WebAppURL />learning/newTopic.do?sessionMapID=${sessionMapID}
 </c:set>
-<c:set var="continue">
-    <lams:WebAppURL />learning/newReflection.do?sessionMapID=${sessionMapID}
-</c:set>
 <c:set var="finish">
     <lams:WebAppURL />learning/finish.do?sessionMapID=${sessionMapID}
 </c:set>
 <c:set var="refresh">
-    <lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}&hideReflection=${sessionMap.hideReflection}
+    <lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}
 </c:set>
 
 <lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
@@ -42,9 +39,6 @@
 
         function submitFinish() {
             location.href = '${finish}';
-        }
-        function continueReflect() {
-            location.href='${continue}';
         }
     </script>
     <script type="text/javascript" src="${tool}includes/javascript/learner.js"></script>
@@ -137,39 +131,19 @@
         <!-- main UI -->
         <%@ include file="/jsps/learning/message/topiclist.jsp"%>
 
-        <!-- Reflection -->
-        <c:if test="${sessionMap.userFinished and sessionMap.reflectOn and !sessionMap.hideReflection}">
-            <lams:NotebookReedit
-                    reflectInstructions="${sessionMap.reflectInstructions}"
-                    reflectEntry="${sessionMap.reflectEntry}"
-                    isEditButtonEnabled="${sessionMap.mode != 'teacher'}"
-                    notebookHeaderLabelKey="title.reflection"/>
-        </c:if>
-
         <c:if test='${sessionMap.mode != "teacher"}'>
             <div class="activity-bottom-buttons">
                 <c:if test="${sessionMap.isMinRatingsCompleted}">
-                    <c:choose>
-                        <c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-                            <button type="button" name="continue" class="btn btn-primary na"
-                                    onclick="javascript:location.href='${continue}';">
-                                <fmt:message key="label.continue" />
-                            </button>
-                        </c:when>
-
-                        <c:otherwise>
-                            <button type="button" name="finish" id="finishButton" class="btn btn-primary na">
-                                <c:choose>
-                                    <c:when test="${sessionMap.isLastActivity}">
-                                        <fmt:message key="label.submit" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <fmt:message key="label.finish" />
-                                    </c:otherwise>
-                                </c:choose>
-                            </button>
-                        </c:otherwise>
-                    </c:choose>
+                	<button type="button" name="finish" id="finishButton" class="btn btn-primary na">
+                    	<c:choose>
+                        	<c:when test="${sessionMap.isLastActivity}">
+                            	<fmt:message key="label.submit" />
+                            </c:when>
+                            <c:otherwise>
+                                <fmt:message key="label.finish" />
+                            </c:otherwise>
+                        </c:choose>
+                    </button>
                 </c:if>
 
                 <c:if test='${(not sessionMap.finishedLock) && (sessionMap.allowNewTopics)}'>

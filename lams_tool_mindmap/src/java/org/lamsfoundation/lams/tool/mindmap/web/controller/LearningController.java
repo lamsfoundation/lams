@@ -37,8 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -151,7 +149,6 @@ public class LearningController {
 
 	MindmapDTO mindmapDTO = new MindmapDTO(mindmap);
 	request.setAttribute("mindmapDTO", mindmapDTO);
-	request.setAttribute("reflectOnActivity", mindmap.isReflectOnActivity());
 
 	LearningController.storeMindmapCanvasParameters(mindmap, toolSessionID, mindmapUser, mode.toString(),
 		!(mode.equals(ToolAccessMode.TEACHER)
@@ -538,45 +535,6 @@ public class LearningController {
     }
 
     /**
-     * Saving Mindmap nodes and proceed to reflection.
-     */
-    @RequestMapping("/reflect")
-    public String reflect(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	Long userId = WebUtil.readLongParam(request, "userUid", false);
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId", false);
-
-	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
-	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentId);
-	MindmapSession mindmapSession = mindmapUser.getMindmapSession();
-
-	request.setAttribute("reflectTitle", mindmap.getTitle());
-	request.setAttribute("reflectInstructions", mindmap.getReflectInstructions());
-
-	if (mindmap.isLockOnFinished() && mindmapUser.isFinishedActivity()) {
-	    request.setAttribute("contentEditable", false);
-	} else {
-	    request.setAttribute("contentEditable", true);
-	}
-
-	// Saving Mindmap Nodes
-	if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
-	    saveMapJsJSON(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
-	}
-
-	// Reflection
-	NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
-	if (entry != null) {
-	    learningForm.setEntryText(entry.getEntry());
-	}
-
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY,
-		mindmapService.isLastActivity(mindmapSession.getSessionId()));
-	return "pages/learning/reflect";
-    }
-
-    /**
      * Finish Mindmap Activity and save reflection if appropriate.
      */
     @RequestMapping("/finishActivity")
@@ -598,31 +556,11 @@ public class LearningController {
 
 	if (mindmapUser != null) {
 	    if (!contentLocked) {
-
 		mindmapUser.setFinishedActivity(true);
 		mindmapService.saveOrUpdateMindmapUser(mindmapUser);
 
-		// save the reflection entry and call the notebook.
-		if (mindmap.isReflectOnActivity()) {
-		    // check for existing notebook entry
-		    NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
-		    if (entry == null) {
-			// create new entry
-			Long entryUID = mindmapService.createNotebookEntry(toolSessionID,
-				CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE,
-				mindmapUser.getUserId().intValue(), learningForm.getEntryText());
-			mindmapUser.setEntryUID(entryUID);
-			mindmapService.saveOrUpdateMindmapUser(mindmapUser);
-		    } else {
-			// update existing entry
-			entry.setEntry(learningForm.getEntryText());
-			entry.setLastModified(new Date());
-			mindmapService.updateEntry(entry);
-		    }
-		} else {
-		    if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
-			saveMapJsJSON(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
-		    }
+		if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
+		    saveMapJsJSON(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
 		}
 	    }
 

@@ -38,9 +38,6 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -94,8 +91,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     private IToolContentHandler scribeToolContentHandler = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     public ScribeService() {
 	super();
@@ -220,14 +215,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	    return;
 	}
 
-	for (ScribeSession session : (Set<ScribeSession>) scribe.getScribeSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	scribeDAO.delete(scribe);
     }
 
@@ -269,12 +256,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 		if (user != null) {
 		    scribeUserDAO.delete(user);
 		}
-	    }
-
-	    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScribeConstants.TOOL_SIGNATURE, userId);
-	    if (entry != null) {
-		scribeDAO.delete(entry);
 	    }
 	}
     }
@@ -587,30 +568,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 	this.exportContentService = exportContentService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
     // =========================================================================================
 
     public void setScribeHeadingDAO(IScribeHeadingDAO scribeHeadingDAO) {
@@ -664,8 +621,6 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
 
 	scribe.setAutoSelectScribe(JsonUtil.optBoolean(toolContentJSON, "autoSelectScribe", Boolean.FALSE));
 	scribe.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	scribe.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	scribe.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	scribe.setShowAggregatedReports(JsonUtil.optBoolean(toolContentJSON, "showAggregatedReports", Boolean.FALSE));
 
 	if (scribe.getScribeHeadings() == null) {

@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -114,12 +113,8 @@ public class LearningController {
 	}
 
 	// get any existing notebook entry
-	NotebookEntry nbEntry = null;
 	if (notebookUser != null) {
-	    nbEntry = notebookService.getEntry(notebookUser.getEntryUID());
-	}
-	if (nbEntry != null) {
-	    messageForm.setEntryText(nbEntry.getEntry());
+	    messageForm.setEntryText(notebookUser.getNotebookEntry());
 	}
 
 	// set readOnly flag.
@@ -158,25 +153,9 @@ public class LearningController {
 	return "pages/learning/notebook";
     }
 
-    private NotebookUser getCurrentUser(Long toolSessionId) {
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-
-	// attempt to retrieve user using userId and toolSessionId
-	NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
-		toolSessionId);
-
-	if (notebookUser == null) {
-	    NotebookSession notebookSession = notebookService.getSessionBySessionId(toolSessionId);
-	    notebookUser = notebookService.createNotebookUser(user, notebookSession);
-	}
-
-	return notebookUser;
-    }
-
     @RequestMapping(value = "/finishActivity")
     public String finishActivity(@ModelAttribute("messageForm") LearningForm messageForm, HttpServletRequest request,
 	    HttpServletResponse response) {
-
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
 
@@ -193,5 +172,20 @@ public class LearningController {
 	}
 
 	return null; // TODO need to return proper page.
+    }
+
+    private NotebookUser getCurrentUser(Long toolSessionId) {
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	// attempt to retrieve user using userId and toolSessionId
+	NotebookUser notebookUser = notebookService.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
+
+	if (notebookUser == null) {
+	    NotebookSession notebookSession = notebookService.getSessionBySessionId(toolSessionId);
+	    notebookUser = notebookService.createNotebookUser(user, notebookSession);
+	}
+
+	return notebookUser;
     }
 }

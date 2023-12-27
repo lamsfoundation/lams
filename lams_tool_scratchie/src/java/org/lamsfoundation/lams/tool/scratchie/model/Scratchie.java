@@ -131,12 +131,6 @@ public class Scratchie implements Cloneable {
     @Column(name = "preset_marks")
     private String presetMarks;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "show_scratchies_in_results")
     private boolean showScrachiesInResults;
 
@@ -323,22 +317,6 @@ public class Scratchie implements Cloneable {
 	for (ScratchieItem item : scratchieItems) {
 	    item.setToolContentId(contentId);
 	}
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isBurningQuestionsEnabled() {

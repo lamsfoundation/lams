@@ -68,9 +68,6 @@ public class VoteContent implements Serializable {
     private String title;
 
     @Column
-    private String reflectionSubject;
-
-    @Column
     private String instructions;
 
     @Column(name = "define_later")
@@ -87,9 +84,6 @@ public class VoteContent implements Serializable {
 
     @Column(name = "use_select_leader_tool_ouput")
     private boolean useSelectLeaderToolOuput;
-
-    @Column
-    private boolean reflect;
 
     @Column
     private boolean allowText;
@@ -130,11 +124,9 @@ public class VoteContent implements Serializable {
     @Column(name = "external_inputs_added")
     private Short externalInputsAdded;
 
-    public VoteContent(Long voteContentId, String title, String instructions, boolean defineLater, Date creationDate,
-	    Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
-	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
-	    boolean lockOnFinish, boolean showResults, Short maxExternalInputs, Short externalInputsAdded,
-	    Set<VoteQueContent> voteQueContents, Set<VoteSession> voteSessions) {
+    public VoteContent(Long voteContentId, String title, String instructions, boolean defineLater, Date creationDate, Date updateDate, boolean allowText,
+	    boolean useSelectLeaderToolOuput, String maxNominationCount, String minNominationCount, long createdBy, boolean lockOnFinish, boolean showResults,
+	    Short maxExternalInputs, Short externalInputsAdded, Set<VoteQueContent> voteQueContents, Set<VoteSession> voteSessions) {
 	this.voteContentId = voteContentId;
 	this.title = title;
 	this.instructions = instructions;
@@ -145,8 +137,6 @@ public class VoteContent implements Serializable {
 	this.minNominationCount = minNominationCount;
 	this.allowText = allowText;
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
-	this.reflect = reflect;
-	this.reflectionSubject = reflectionSubject;
 	this.createdBy = createdBy;
 	this.lockOnFinish = lockOnFinish;
 	this.showResults = showResults;
@@ -172,11 +162,9 @@ public class VoteContent implements Serializable {
      * @return the new mc content object.
      */
     public static VoteContent newInstance(VoteContent vote, Long newContentId) {
-	VoteContent newContent = new VoteContent(newContentId, vote.getTitle(), vote.getInstructions(),
-		vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(), vote.isAllowText(),
-		vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
-		vote.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
-		vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(),
+	VoteContent newContent = new VoteContent(newContentId, vote.getTitle(), vote.getInstructions(), vote.isDefineLater(), vote.getCreationDate(),
+		vote.getUpdateDate(), vote.isAllowText(), vote.isUseSelectLeaderToolOuput(), vote.getMaxNominationCount(), vote.getMinNominationCount(),
+		vote.getCreatedBy(), vote.isLockOnFinish(), vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(),
 		new TreeSet<VoteQueContent>(), new TreeSet<VoteSession>());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
@@ -325,28 +313,12 @@ public class VoteContent implements Serializable {
 	this.minNominationCount = minNominationCount;
     }
 
-    public boolean isReflect() {
-	return reflect;
-    }
-
-    public void setReflect(boolean reflect) {
-	this.reflect = reflect;
-    }
-
     public boolean isUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
-    }
-
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     public boolean isShowResults() {
