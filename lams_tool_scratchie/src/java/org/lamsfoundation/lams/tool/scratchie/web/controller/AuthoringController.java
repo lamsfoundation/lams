@@ -23,28 +23,8 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -86,8 +66,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -163,12 +161,12 @@ public class AuthoringController {
 	}
 
 	//prepare advanced option allowing to overwrite default preset marks
-	ScratchieConfigItem defaultPresetMarksConfigItem = scratchieService
-		.getConfigItem(ScratchieConfigItem.KEY_PRESET_MARKS);
-	String defaultPresetMarks = defaultPresetMarksConfigItem == null ? ""
-		: defaultPresetMarksConfigItem.getConfigValue();
-	boolean presetMarksOverwritten = scratchie.getPresetMarks() != null
-		&& !scratchie.getPresetMarks().equals(defaultPresetMarks);
+	ScratchieConfigItem defaultPresetMarksConfigItem = scratchieService.getConfigItem(
+		ScratchieConfigItem.KEY_PRESET_MARKS);
+	String defaultPresetMarks =
+		defaultPresetMarksConfigItem == null ? "" : defaultPresetMarksConfigItem.getConfigValue();
+	boolean presetMarksOverwritten =
+		scratchie.getPresetMarks() != null && !scratchie.getPresetMarks().equals(defaultPresetMarks);
 	sessionMap.put(ScratchieConstants.ATTR_IS_PRESET_MARKS_OVERWRITTEN, presetMarksOverwritten);
 	sessionMap.put(ScratchieConstants.ATTR_DEFAULT_PRESET_MARKS, defaultPresetMarks);
 
@@ -191,8 +189,8 @@ public class AuthoringController {
 	}
 
 	//display confidence providing activities
-	Set<ToolActivity> confidenceLevelsActivities = scratchieService
-		.getActivitiesProvidingConfidenceLevels(contentId);
+	Set<ToolActivity> confidenceLevelsActivities = scratchieService.getActivitiesProvidingConfidenceLevels(
+		contentId);
 	sessionMap.put(ScratchieConstants.ATTR_ACTIVITIES_PROVIDING_CONFIDENCE_LEVELS, confidenceLevelsActivities);
 
 	//display activities providing VSA answers
@@ -212,6 +210,9 @@ public class AuthoringController {
 
 	boolean questionEtherpadEnabled = StringUtils.isNotBlank(Configuration.get(ConfigurationKeys.ETHERPAD_API_KEY));
 	sessionMap.put(ScratchieConstants.ATTR_IS_QUESTION_ETHERPAD_ENABLED, questionEtherpadEnabled);
+
+	boolean hasMatchingRatActivity = lamsToolService.findMatchingRatActivity(contentId) != null;
+	sessionMap.put(ScratchieConstants.ATTR_HAS_MATCHING_RAT_ACTIVITY, hasMatchingRatActivity);
 
 	return "pages/authoring/start";
     }
@@ -239,7 +240,7 @@ public class AuthoringController {
      */
     @RequestMapping(path = "/update", method = RequestMethod.POST)
     private String updateContent(@ModelAttribute("authoringForm") ScratchieForm authoringForm,
-	    HttpServletRequest request) throws Exception {
+	    @RequestParam(required = false) boolean syncRatQuestions, HttpServletRequest request) throws Exception {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(authoringForm.getSessionMapID());
@@ -250,7 +251,8 @@ public class AuthoringController {
 	Scratchie scratchiePO = scratchieService.getScratchieByContentId(authoringForm.getScratchie().getContentId());
 
 	//allow using old and modified questions together
-	Set<ScratchieItem> oldItems = (scratchiePO == null) ? new HashSet<>()
+	Set<ScratchieItem> oldItems = (scratchiePO == null)
+		? new HashSet<>()
 		: new HashSet<>(scratchiePO.getScratchieItems());
 	String oldPresetMarks = null;
 
@@ -313,11 +315,11 @@ public class AuthoringController {
 		scratchieService.deleteScratchieItem(item.getUid());
 	    }
 	}
-
-	List<Long> newQuestionUids = scratchiePO.getScratchieItems().stream()
-		.collect(Collectors.mapping(q -> q.getQbQuestion().getUid(), Collectors.toList()));
-	lamsToolService.syncRatQuestions(scratchiePO.getContentId(), newQuestionUids);
-
+	if (syncRatQuestions) {
+	    List<Long> newQuestionUids = scratchiePO.getScratchieItems().stream()
+		    .collect(Collectors.mapping(q -> q.getQbQuestion().getUid(), Collectors.toList()));
+	    lamsToolService.syncRatQuestions(scratchiePO.getContentId(), newQuestionUids);
+	}
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
@@ -334,9 +336,8 @@ public class AuthoringController {
 	form.setSessionMapID(sessionMap.getSessionID());
 
 	List<QbOption> optionList = new ArrayList<>();
-	int initialOptionsNumber = questionType == QbQuestion.TYPE_MULTIPLE_CHOICE
-		? ScratchieConstants.INITIAL_MCQ_OPTIONS_NUMBER
-		: 2;
+	int initialOptionsNumber =
+		questionType == QbQuestion.TYPE_MULTIPLE_CHOICE ? ScratchieConstants.INITIAL_MCQ_OPTIONS_NUMBER : 2;
 	for (int i = 0; i < initialOptionsNumber; i++) {
 	    QbOption option = new QbOption();
 	    option.setDisplayOrder(i + 1);
@@ -351,7 +352,8 @@ public class AuthoringController {
 	form.setContentFolderID(contentFolderID);
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 
-	return questionType == QbQuestion.TYPE_MULTIPLE_CHOICE ? "pages/authoring/parts/addMcq"
+	return questionType == QbQuestion.TYPE_MULTIPLE_CHOICE
+		? "pages/authoring/parts/addMcq"
 		: "pages/authoring/parts/addVsa";
     }
 
@@ -513,7 +515,8 @@ public class AuthoringController {
 	    if (isDefaultQuestion) {
 		String questionContentFolderID = FileUtil.generateUniqueContentFolderID();
 		qbQuestion.setContentFolderId(questionContentFolderID);
-		qbQuestion.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
+		qbQuestion.setQuestionId(
+			qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 	    }
 	}
 
@@ -541,7 +544,8 @@ public class AuthoringController {
 	List<QbOption> options = new ArrayList<>(optionList);
 	qbQuestion.setQbOptions(options);
 
-	int isQbQuestionModified = isDefaultQuestion ? IQbService.QUESTION_MODIFIED_ID_BUMP
+	int isQbQuestionModified = isDefaultQuestion
+		? IQbService.QUESTION_MODIFIED_ID_BUMP
 		: qbQuestion.isQbQuestionModified(oldQbQuestion);
 	if (isQbQuestionModified < IQbService.QUESTION_MODIFIED_VERSION_BUMP && enforceNewVersion) {
 	    isQbQuestionModified = IQbService.QUESTION_MODIFIED_VERSION_BUMP;
@@ -556,7 +560,7 @@ public class AuthoringController {
 		updatedQuestion.setCreateDate(new Date());
 		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
-		break;
+	    break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
 		// new question gets created
 		updatedQuestion = qbQuestion.clone();
@@ -566,12 +570,12 @@ public class AuthoringController {
 		updatedQuestion.setCreateDate(new Date());
 		updatedQuestion.setUuid(UUID.randomUUID());
 	    }
-		break;
+	    break;
 	    case IQbService.QUESTION_MODIFIED_NONE: {
 		// save the old question anyway, as it may contain some minor changes (like title or description change)
 		updatedQuestion = qbQuestion;
 	    }
-		break;
+	    break;
 	}
 	userManagementService.save(updatedQuestion);
 	item.setQbQuestion(updatedQuestion);
@@ -585,8 +589,8 @@ public class AuthoringController {
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion || isDefaultQuestion
-		|| (newCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
+	if (isAddingQuestion || isDefaultQuestion || (newCollectionUid != null && !newCollectionUid.equals(
+		oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, updatedQuestion.getQuestionId(), false);
 	}
 	//remove from the old collection, if needed
@@ -648,8 +652,8 @@ public class AuthoringController {
 
 	Set<ScratchieItem> updatedItemList = new TreeSet<>(new ScratchieItemComparator());
 	for (ScratchieItem item : itemList) {
-	    String newSequenceId = sequenceIdsParamMap
-		    .get(ScratchieConstants.PARAM_SEQUENCE_ID + item.getDisplayOrder());
+	    String newSequenceId = sequenceIdsParamMap.get(
+		    ScratchieConstants.PARAM_SEQUENCE_ID + item.getDisplayOrder());
 	    item.setDisplayOrder(Integer.valueOf(newSequenceId));
 	    updatedItemList.add(item);
 	}
@@ -791,6 +795,7 @@ public class AuthoringController {
     // *************************************************************************************
     // Private method
     // *************************************************************************************
+
     /**
      * List save current scratchie items.
      *
@@ -828,13 +833,13 @@ public class AuthoringController {
      *
      * @param request
      * @param isForSaving
-     *            whether the blank options will be preserved or not
-     *
+     * 	whether the blank options will be preserved or not
      */
     private TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isMcqQuestion,
 	    boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, QbConstants.ATTR_OPTION_LIST);
-	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null) ? null
+	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null)
+		? null
 		: NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_CORRECT));
 
 	int count = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_COUNT));
@@ -882,7 +887,7 @@ public class AuthoringController {
      *
      * @param request
      * @param parameterName
-     *            parameterName
+     * 	parameterName
      */
     private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
 	String list = request.getParameter(parameterName);

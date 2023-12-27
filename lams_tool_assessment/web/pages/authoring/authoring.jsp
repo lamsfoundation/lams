@@ -12,7 +12,10 @@
 	 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
 	<script>
-        function init() {
+		const hasMatchingRatActivity = ${not empty sessionMap.hasMatchingRatActivity and sessionMap.hasMatchingRatActivity};
+		let questionsEdited = false;
+
+		function init() {
             var tag = document.getElementById("currentTab");
 		    if (tag.value != ""){
 		    	selectTab(tag.value);
@@ -48,6 +51,9 @@
 	        $("#display-summary").removeAttr("disabled", "disabled");
 	        $("#questionsPerPage").prop('disabled', false);
 
+			$('#syncRatQuestions').val(hasMatchingRatActivity && questionsEdited &&
+					confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.authoring.rat.questions.sync'/></spring:escapeBody>"));
+
         	return true;
         }
         
@@ -65,6 +71,7 @@
 		
 			<form:hidden path="assessment.contentId" />
 			<input type="hidden" name="mode" value="${mode}">
+			<input type="hidden" id="syncRatQuestions" name="syncRatQuestions" value="false">
 			<form:hidden path="sessionMapID" />
 			<form:hidden path="contentFolderID" />
 			<form:hidden path="currentTab" id="currentTab" />

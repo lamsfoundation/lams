@@ -37,6 +37,7 @@
 			break;
 	}
 	if (qbMessage) {
+		questionsEdited = true;
 		alert(qbMessage);
 	}
 	
@@ -50,6 +51,7 @@
 			    direction: 'vertical',
 				store: {
 					set: function (sortable) {
+						questionsEdited = true;
 						//update all sequenceIds
 						for (var i = 0; i < sortable.el.rows.length; i++) {
 						 	var tr = sortable.el.rows[i];
