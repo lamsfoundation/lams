@@ -328,14 +328,6 @@
    	<tag-file>
 	    <name>LeaderDisplay</name>
 		<path>/WEB-INF/tags/LeaderDisplay.tag</path>
-   	</tag-file>  
-   	<tag-file>
-	    <name>Notebook</name>
-		<path>/WEB-INF/tags/Notebook.tag</path>
-   	</tag-file>
-   	<tag-file>
-	    <name>NotebookReedit</name>
-		<path>/WEB-INF/tags/NotebookReedit.tag </path>
    	</tag-file>
    	<tag-file>
        <name>OutcomeAuthor</name>
