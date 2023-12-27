@@ -17,10 +17,10 @@
 		existingQbQuestionUids = '${existingQbQuestionUids}'.trim();
 		
 	switch (qbQuestionModified) {
-		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>: 
+		case <%= IQbService.QUESTION_MODIFIED_UPDATE %>:
 			qbMessage = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="message.qb.modified.update" /></spring:escapeBody>';
 			break;
-		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>: 
+		case <%= IQbService.QUESTION_MODIFIED_VERSION_BUMP %>:
 			let showMessage = true;
 		
 			// check if we are in main authoring environment
@@ -39,11 +39,12 @@
 				qbMessage = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="message.qb.modified.version" /></spring:escapeBody>';
 			}
 			break;
-		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>: 
+		case <%= IQbService.QUESTION_MODIFIED_ID_BUMP %>:
 			qbMessage = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="message.qb.modified.new" /></spring:escapeBody>';
 			break;
 	}
 	if (qbMessage) {
+		questionsEdited = true;
 		alert(qbMessage);
 	}
 
@@ -57,6 +58,7 @@
 		    direction: 'vertical',
 			store: {
 				set: function (sortable) {
+					questionsEdited = true;
 					//update all sequenceIds
 					for (var i = 0; i < sortable.el.rows.length; i++) {
 					 	var tr = sortable.el.rows[i];

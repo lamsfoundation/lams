@@ -251,5 +251,10 @@ public interface ILamsToolService {
      */
     boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids);
 
+    /**
+     * Delegates to ILearningDesignService#findMatchingRatActivity(long)
+     */
+    Long findMatchingRatActivity(long toolContentId);
+
     void assignGroupsForGalleryWalk(SortedMap<String, Set<String>> groups, int clusterSize);
 }

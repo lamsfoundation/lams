@@ -51,6 +51,9 @@
 	</style>
 	
 	<script>
+		const hasMatchingRatActivity = ${not empty sessionMap.hasMatchingRatActivity and sessionMap.hasMatchingRatActivity};
+		let questionsEdited = false;
+
         function init(){
             var tag = document.getElementById("currentTab");
 		    if (tag.value != "") {
@@ -77,6 +80,9 @@
 				$('#relativeTimeLimit').val(0);
 			}
 
+			$('#syncRatQuestions').val(hasMatchingRatActivity && questionsEdited &&
+					confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.authoring.rat.questions.sync'/></spring:escapeBody>"));
+
 			return true;
         }
     </script>
@@ -90,6 +96,7 @@
 		<form:hidden path="sessionMapID" />
 		<form:hidden path="contentFolderID" />
 		<input type="hidden" name="mode" value="${mode}"/>
+		<input type="hidden" id="syncRatQuestions" name="syncRatQuestions" value="false">
 		<form:hidden path="currentTab" id="currentTab" />
 		<input type="hidden" name="itemList" id="itemList" />
 
