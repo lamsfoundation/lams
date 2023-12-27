@@ -33,7 +33,6 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.sbmt.SbmtConstants;
 import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitUserDAO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
@@ -82,15 +81,12 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
     }
 
     /**
-     * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... ,
-     * [SubmitUser, Integer1, Integer2, String]>
+     * Will return List<[SubmitUser, Integer1, Integer2], [SubmitUser, Integer1, Integer2], ... ,
+     * [SubmitUser, Integer1, Integer2]>
      * where Integer1 is the number of files uploaded, Integer2 is the number of files marked
-     * and String is the notebook entry. No notebook entries needed? Will return null in their place.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
 	    IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
@@ -117,28 +113,15 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 		sortingOrder = "user.last_name, user.first_name";
 	}
 
-	// If the session uses notebook, then get the sql to join across to get the entries
-	String[] notebookEntryStrings = null;
-	if (getNotebookEntries) {
-	    notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		    SbmtConstants.TOOL_SIGNATURE, "user.user_id");
-	}
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ").append(portraitStrings[0]).append(
 		", COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ")
-		.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry")
 		.append(" FROM tl_lasbmt11_user user ").append(portraitStrings[1])
 		.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ")
 		.append(" LEFT JOIN tl_lasbmt11_report report ON details.submission_id = report.report_id ");
-
-	// If using notebook, add the notebook join
-	if (notebookEntryStrings != null) {
-	    queryText.append(notebookEntryStrings[1]);
-	}
 
 	queryText.append(" WHERE user.session_id = :sessionId");
 
@@ -152,9 +135,8 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", SubmitUser.class).addScalar("portraitId", StringType.INSTANCE)
-		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
-		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
+	query.addEntity("user", SubmitUser.class).addScalar("portraitId", StringType.INSTANCE).addScalar("numFiles", IntegerType.INSTANCE)
+		.addScalar("numFilesRemoved", IntegerType.INSTANCE).addScalar("numFilesMarked", IntegerType.INSTANCE)
 		.setParameter("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }

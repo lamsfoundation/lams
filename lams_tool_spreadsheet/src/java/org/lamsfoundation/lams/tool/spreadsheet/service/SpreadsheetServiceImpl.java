@@ -23,15 +23,18 @@
 
 package org.lamsfoundation.lams.tool.spreadsheet.service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -45,7 +48,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetSessionDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
-import org.lamsfoundation.lams.tool.spreadsheet.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.spreadsheet.dto.Summary;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
@@ -53,21 +55,10 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
-import org.lamsfoundation.lams.tool.spreadsheet.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * @author Andrey Balan
@@ -84,7 +75,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     private ILamsToolService toolService;
     private IUserManagementService userManagementService;
     private IExportToolContentService exportContentService;
-    private ICoreNotebookService coreNotebookService;
 
     // *******************************************************************************
     // Service method
@@ -200,10 +190,8 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     }
 
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries) {
-	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		getNotebookEntries, coreNotebookService, userManagementService);
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString) {
+	return spreadsheetUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, userManagementService);
     }
 
     @Override
@@ -236,59 +224,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	}
 
 	return statisticList;
-    }
-
-    @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<Long, Set<ReflectDTO>>();
-
-	List<SpreadsheetSession> sessionList = spreadsheetSessionDao.getByContentId(contentId);
-	for (SpreadsheetSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getSpreadsheet().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<ReflectDTO>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<SpreadsheetUser> users = spreadsheetUserDao.getBySessionID(sessionId);
-	    for (SpreadsheetUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    SpreadsheetConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -528,12 +463,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		    spreadsheetDao.removeObject(UserModifiedSpreadsheet.class, modified.getUid());
 		}
 	    }
-
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, SpreadsheetConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
 	}
 	spreadsheetDao.delete(spreadsheet);
     }
@@ -562,12 +491,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 		    if (user.getUserModifiedSpreadsheet() != null) {
 			spreadsheetDao.removeObject(UserModifiedSpreadsheet.class,
 				user.getUserModifiedSpreadsheet().getUid());
-		    }
-
-		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    SpreadsheetConstants.TOOL_SIGNATURE, userId);
-		    if (entry != null) {
-			spreadsheetDao.removeObject(NotebookEntry.class, entry.getUid());
 		    }
 
 		    spreadsheetUserDao.removeObject(SpreadsheetUser.class, user.getUid());
@@ -674,14 +597,6 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     @Override

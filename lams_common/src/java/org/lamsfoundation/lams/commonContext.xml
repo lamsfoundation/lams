@@ -312,43 +312,10 @@
 	<bean id="loadedMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource" scope="prototype">
 		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
-			
-	<!--  Core Notebook Service -->
-	<bean id="coreNotebookServiceTarget" class="org.lamsfoundation.lams.notebook.service.CoreNotebookService">
-		<property name="messageService"><ref bean="commonMessageService"/></property>
-		<property name="userManagementService"><ref bean="userManagementService"/></property>
-		<property name="notebookEntryDAO"><ref bean="notebookEntryDAO" /></property>
-		<property name="baseDAO"><ref bean="baseDAO" /></property>
-	</bean>
-	
-	<bean id="coreNotebookService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
-		<property name ="target"><ref bean="coreNotebookServiceTarget"/></property>
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<!-- TransactionProxyFactoryBean by default just proxies all interfaces implemented by the target object -->
-		<!-- AuthoringService is class so needs to be proxied via CGLIB -->
-		<!-- Specify "proxyTargetClass" = "true" to generate a CGLIB proxy-->
-		<property name="proxyTargetClass"><value>true</value></property>     
-		
-		<property name="transactionAttributes">
-			<props>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="delete*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
-	</bean>
 
 	<!--  Rating Service -->
 
 	<bean id="ratingService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-
 		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.rating.service.RatingService">
@@ -379,7 +346,6 @@
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
-
 	</bean>
 	
 	<!-- Event notification Service -->
@@ -722,12 +688,7 @@
 	<!-- Learner Interaction related beans -->
 	<bean id="learnerInteractionDAO" class="org.lamsfoundation.lams.logevent.dao.hibernate.LearnerInteractionDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>		
-		
-	<!-- Core Notebook related beans -->
-	<bean id="notebookEntryDAO" class="org.lamsfoundation.lams.notebook.dao.hibernate.NotebookEntryDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
+	</bean>
 
 	<!-- Rating related beans -->
 	<bean id="ratingDAO" class="org.lamsfoundation.lams.rating.dao.hibernate.RatingDAO">

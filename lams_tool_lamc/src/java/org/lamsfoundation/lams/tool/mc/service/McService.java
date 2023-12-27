@@ -43,9 +43,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbCollection;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
@@ -76,7 +73,6 @@ import org.lamsfoundation.lams.tool.mc.dto.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
@@ -148,7 +144,6 @@ public class McService
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
     private IExportToolContentService exportContentService;
-    private ICoreNotebookService coreNotebookService;
     private IQbService qbService;
 
     private MessageService messageService;
@@ -1346,14 +1341,6 @@ public class McService
 	    return;
 	}
 
-	for (McSession session : mcContent.getMcSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getMcSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	mcContentDAO.delete(mcContent);
     }
 
@@ -1392,12 +1379,6 @@ public class McService
 			mcUserDAO.saveMcUser(user);
 		    } else {
 			mcUsrAttemptDAO.removeAllUserAttempts(user.getUid());
-
-			NotebookEntry entry = getEntry(session.getMcSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-				McAppConstants.TOOL_SIGNATURE, userId);
-			if (entry != null) {
-			    mcContentDAO.delete(entry);
-			}
 
 			if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid()
 				.equals(user.getUid())) {
@@ -1854,64 +1835,6 @@ public class McService
 	this.mcOutputFactory = mcOutputFactory;
     }
 
-    @Override
-    public List<ReflectionDTO> getReflectionList(McContent mcContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
-	for (McSession mcSession : mcContent.getMcSessions()) {
-	    for (McQueUsr user : mcSession.getMcQueUsers()) {
-		// if all users mode or single user mode and found right user
-		if (userID == null || user.getQueUsrId().equals(userID)) {
-		    NotebookEntry notebookEntry = this.getEntry(mcSession.getMcSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, McAppConstants.TOOL_SIGNATURE,
-			    new Integer(user.getQueUsrId().toString()));
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO(user, mcSession.getMcSessionId().toString(),
-				notebookEntry);
-			reflectionsContainerDTO.add(reflectionDTO);
-		    }
-		}
-	    }
-	}
-	return reflectionsContainerDTO;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    /**
-     * @return Returns the coreNotebookService.
-     */
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    /**
-     * @param coreNotebookService
-     * 	The coreNotebookService to set.
-     */
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     /**
      * @return Returns the logEventService.
      */
@@ -2114,8 +2037,6 @@ public class McService
 	mcq.setRetries(JsonUtil.optBoolean(toolContentJSON, "allowRetries", Boolean.FALSE));
 	mcq.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));
-	mcq.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	mcq.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
 	mcq.setQuestionsSequenced(JsonUtil.optBoolean(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 	mcq.setRandomize(JsonUtil.optBoolean(toolContentJSON, "randomize", Boolean.FALSE));
 	mcq.setShowReport(JsonUtil.optBoolean(toolContentJSON, "showReport", Boolean.FALSE));

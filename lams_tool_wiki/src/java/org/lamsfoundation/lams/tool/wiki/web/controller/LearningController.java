@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -134,14 +132,6 @@ public class LearningController extends WikiPageController {
 
 	// Create the userDTO
 	WikiUserDTO wikiUserDTO = new WikiUserDTO(wikiUser);
-	if (wikiUser.isFinishedActivity()) {
-	    // get the notebook entry.
-	    NotebookEntry notebookEntry = wikiService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
-	    }
-	}
 
 	// Set whether the user has enabled notifications
 	if (wikiService.getEventNotificationService().eventExists(WikiConstants.TOOL_SIGNATURE,
@@ -362,63 +352,6 @@ public class LearningController extends WikiPageController {
 	}
 
 	return null; // TODO need to return proper page.
-    }
-
-    /**
-     * Opens the notebook page for reflections
-     */
-    @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// set the finished flag
-	WikiUser wikiUser = this.getCurrentUser(learningForm.getToolSessionID());
-	WikiDTO wikiDTO = new WikiDTO(wikiUser.getWikiSession().getWiki());
-
-	request.setAttribute("wikiDTO", wikiDTO);
-
-	NotebookEntry notebookEntry = wikiService.getEntry(wikiUser.getWikiSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUser.getUserId().intValue());
-
-	if (notebookEntry != null) {
-	    learningForm.setEntryText(notebookEntry.getEntry());
-	}
-
-	boolean isLastActivity = wikiService.isLastActivity(learningForm.getToolSessionID());
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflections
-     */
-    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// save the reflection entry and call the notebook.
-
-	WikiUser wikiUser = this.getCurrentUser(learningForm.getToolSessionID());
-	Long toolSessionID = wikiUser.getWikiSession().getSessionId();
-	Integer userID = wikiUser.getUserId().intValue();
-
-	// check for existing notebook entry
-	NotebookEntry entry = wikiService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		WikiConstants.TOOL_SIGNATURE, userID);
-
-	if (entry == null) {
-	    // create new entry
-	    wikiService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WikiConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(learningForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    wikiService.updateEntry(entry);
-	}
-
-	return finishActivity(learningForm, request, response);
     }
 
 }

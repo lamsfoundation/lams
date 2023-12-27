@@ -32,7 +32,7 @@
 </c:if>
 
 <c:set var="backToForum">
-	<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}
+	<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}
 </c:set>
 <button type="submit" class="btn btn-primary mt-2 ms-2 float-end" id="submitButton">
 	<i class="fa-solid fa-check me-1"></i>

@@ -54,11 +54,6 @@
 				$('#limitUploadNumber').val(0);
 			}
 		});
-
-		$('#reflectInstructions').keyup(function(){
-			var checked = $(this).val() != null && $(this).val().trim() != '';
-			$('#reflectOnActivity').prop('checked', checked)
-		});
 	});
 </script>
 
@@ -126,16 +121,5 @@
 			<form:checkbox path="lockOnFinished" id="lockOnFinished" />
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
-	</div>
-
-	<div class="checkbox">
-		<label for="reflectOnActivity">
-			<form:checkbox path="reflectOnActivity" id="reflectOnActivity" />
-			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-		</label>
-	</div>
-
-	<div class="form-group">
-		<form:textarea path="reflectInstructions" id="reflectInstructions" cssClass="form-control" cols="50" rows="4"></form:textarea>
 	</div>
 </lams:SimplePanel>

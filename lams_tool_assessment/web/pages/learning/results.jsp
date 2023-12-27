@@ -19,6 +19,11 @@
 <lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
 	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 	<lams:css suffix="jquery.jRating"/>
+	<style>
+		.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
+		    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
+		}
+	</style>
 	<c:if test="${not empty codeStyles}">
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
 		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror_simplescrollbars.css" />
@@ -26,10 +31,6 @@
 			pre {
 				background-color: initial;
 				border: none;
-			}
-			
-			.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
-			    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 
 			}
 		</style>
 		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
@@ -65,11 +66,6 @@
 		 
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
-		}
-		
-		function continueReflect(){
-			disableButtons();
-			document.location.href='<c:url value="/learning/newReflection.do"/>?sessionMapID=${sessionMapID}';
 		}
 		
 		function nextPage(pageNumber){
@@ -122,40 +118,20 @@
 				<%@ include file="parts/paging.jsp"%>
 			</div>
 		</c:if>
-		
-		<%-- Reflection entry --%>
-		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight)}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="${(mode != 'teacher') && isUserLeader}"
-				notebookHeaderLabelKey="label.export.reflection"/>
-		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
 				<c:if test="${!sessionMap.isUserFailed}">
-					<c:choose>
-						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
-							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-primary na">
-								<fmt:message key="label.continue" />
-							</button>
-						</c:when>
-						
-						<c:otherwise>
-							<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
-								<c:choose>
-									<c:when test="${sessionMap.isLastActivity}">
-										<fmt:message key="label.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="label.finished" />
-									</c:otherwise>
-								</c:choose>
-							</button>
-						</c:otherwise>
-					</c:choose>
+					<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
+						<c:choose>
+							<c:when test="${sessionMap.isLastActivity}">
+								<fmt:message key="label.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.finished" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 				</c:if>
 				
 				<c:if test="${isResubmitAllowed && hasEditRight}">

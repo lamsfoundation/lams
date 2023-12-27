@@ -41,13 +41,9 @@ public class PixlrUserDTO implements Comparable<Object> {
 
     public boolean finishedActivity;
 
-    public String notebookEntry;
-
     public Long entryUID;
 
     public String imageFileName;
-
-    public boolean finishedReflection;
 
     private Long imageHeight;
 
@@ -117,14 +113,6 @@ public class PixlrUserDTO implements Comparable<Object> {
 	this.uid = uid;
     }
 
-    public String getNotebookEntry() {
-	return notebookEntry;
-    }
-
-    public void setNotebookEntry(String notebookEntry) {
-	this.notebookEntry = notebookEntry;
-    }
-
     public Long getEntryUID() {
 	return entryUID;
     }
@@ -147,14 +135,6 @@ public class PixlrUserDTO implements Comparable<Object> {
 
     public void setImageFileName(String imageFileName) {
 	this.imageFileName = imageFileName;
-    }
-
-    public boolean isFinishedReflection() {
-	return finishedReflection;
-    }
-
-    public void setFinishedReflection(boolean finishedReflection) {
-	this.finishedReflection = finishedReflection;
     }
 
     public Long getUserId() {

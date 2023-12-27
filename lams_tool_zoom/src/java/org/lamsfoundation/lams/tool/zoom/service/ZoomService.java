@@ -35,9 +35,6 @@ import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -91,8 +88,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     private IToolContentHandler zoomToolContentHandler = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private static String TOKEN_CACHE = null;
     private static long TOKEN_CACHE_EXPIRE = 0;
@@ -210,14 +205,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	    return;
 	}
 
-	for (ZoomSession session : zoom.getZoomSessions()) {
-	    java.util.List<org.lamsfoundation.lams.notebook.model.NotebookEntry> entries = coreNotebookService.getEntry(
-		    session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, ZoomConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	zoomDAO.delete(zoom);
     }
 
@@ -242,11 +229,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	for (ZoomSession session : zoom.getZoomSessions()) {
 	    for (ZoomUser user : session.getZoomUsers()) {
 		if (user.getUserId().equals(userId)) {
-		    if (!resetActivityCompletionOnly && user.getNotebookEntryUID() != null) {
-			NotebookEntry entry = coreNotebookService.getEntry(user.getNotebookEntryUID());
-			zoomDAO.delete(entry);
-			user.setNotebookEntryUID(null);
-		    }
 		    user.setFinishedActivity(false);
 		    zoomDAO.update(user);
 		}
@@ -352,7 +334,7 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 	Zoom content = getZoomByContentId(toolContentId);
 	for (ZoomSession session : content.getZoomSessions()) {
 	    for (ZoomUser user : session.getZoomUsers()) {
-		if (user.getNotebookEntryUID() != null) {
+		if (user.isFinishedActivity()) {
 		    // we don't remove users in removeLearnerContent()
 		    // we just set their notebook entry to NULL
 		    return true;
@@ -366,38 +348,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
     @Override
     public String getContributionURL(Long toolContentId) {
 	return ZoomConstants.TOOL_CONTRIBUTE_URL + toolContentId;
-    }
-
-    /* IZoomService Methods */
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-	java.util.List<org.lamsfoundation.lams.notebook.model.NotebookEntry> list = coreNotebookService.getEntry(id,
-		idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public NotebookEntry getNotebookEntry(Long uid) {
-	return coreNotebookService.getEntry(uid);
-    }
-
-    @Override
-    public void updateNotebookEntry(Long uid, String entry) {
-	coreNotebookService.updateEntry(uid, "", entry);
-    }
-
-    @Override
-    public void updateNotebookEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -533,9 +483,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 		    "Unable to set reflective data titled " + title + " on activity toolContentId " + toolContentId
 			    + " as the tool content does not exist.");
 	}
-
-	zoom.setReflectOnActivity(Boolean.TRUE);
-	zoom.setReflectInstructions(description);
     }
 
     // =========================================================================================
@@ -579,14 +526,6 @@ public class ZoomService implements ToolSessionManager, ToolContentManager, IZoo
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     @Override

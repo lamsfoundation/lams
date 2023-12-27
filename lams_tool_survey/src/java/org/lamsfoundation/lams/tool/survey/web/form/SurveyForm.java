@@ -69,7 +69,6 @@ public class SurveyForm {
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
 	    survey.setLockWhenFinished(false);
 	    survey.setDefineLater(false);
-	    survey.setReflectOnActivity(false);
 	    survey.setShowOnePage(false);
 	    survey.setShowOtherUsersAnswers(false);
 	}

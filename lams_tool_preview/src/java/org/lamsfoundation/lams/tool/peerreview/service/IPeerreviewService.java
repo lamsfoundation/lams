@@ -23,8 +23,10 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
@@ -39,9 +41,7 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Interface that defines the contract that all Peerreview service provider must follow.
@@ -171,34 +171,6 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
     int getCountUsersBySession(Long toolSessionId);
 
     /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
      * Get user by UID
      *
      * @param uid
@@ -286,13 +258,6 @@ public interface IPeerreviewService extends ToolRatingManager, ICommonToolServic
 
     /** Get the monitoring statistics */
     List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
-
-    /**
-     * Get all the notebook entries for a session Will return List<[user.user_id, user.first_name, user.first_name +
-     * user.last_name, notebook entry, notebook date]>
-     */
-    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
-	    String searchString);
 
     /**
      * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.

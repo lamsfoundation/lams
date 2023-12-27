@@ -37,10 +37,6 @@ public class ContentDTO {
 
     String instructions;
 
-    boolean reflectOnActivity;
-
-    String reflectInstructions;
-
     boolean startInMonitor;
 
     Integer duration;
@@ -62,8 +58,6 @@ public class ContentDTO {
 	this.title = zoom.getTitle();
 	this.instructions = zoom.getInstructions();
 	this.contentInUse = zoom.isContentInUse();
-	this.reflectInstructions = zoom.getReflectInstructions();
-	this.reflectOnActivity = zoom.isReflectOnActivity();
 	this.startInMonitor = zoom.isStartInMonitor();
 	this.duration = zoom.getDuration();
 	for (ZoomSession session : zoom.getZoomSessions()) {
@@ -79,22 +73,6 @@ public class ContentDTO {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isStartInMonitor() {

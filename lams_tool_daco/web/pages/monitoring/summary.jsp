@@ -70,13 +70,6 @@
 								rows += '</a>';
 							} 
 							rows += '</td>';
-
-							
-							if (${daco.reflectOnActivity}) {
-								rows += '<td style="text-align: left">';
-								rows += (userData["notebookEntry"]) ? userData["notebookEntry"] : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.notebook.none" /></spring:escapeBody>' ;
-								rows += '</td>';
-							}
 							
 							rows += '</tr>';
 						}
@@ -146,18 +139,11 @@
 		</c:if>
 		
 					<!-- Details for the group / whole of class -->
-					<c:set var="numColumns" value="3"/>
-					<c:if test="${daco.reflectOnActivity}">
-						<c:set var="numColumns" value="4"/>
-					</c:if>
 				
-					<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionSummary.sessionId}'">
+					<lams:TSTable numColumns="3" dataId="data-session-id='${sessionSummary.sessionId}'">
 						<th><fmt:message key="label.monitoring.fullname" /></th>
 						<th align="center"  width="8%"><fmt:message key="label.monitoring.recordcount" /></th>
 						<th align="center"  width="25%"></th>
-						<c:if test="${daco.reflectOnActivity}">
-							<th align="center"  width="35%"><fmt:message key="label.monitoring.notebook" /></th>
-						</c:if>
 					</lams:TSTable>
 
 		<c:if test="${sessionMap.isGroupedActivity}">
@@ -254,30 +240,5 @@
 			</c:choose>	
 		</td>
 	</tr>
-	<tr>
-		<td>
-			<fmt:message key="label.monitoring.advancedsettings.addNotebook" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.reflectOnActivity}">
-					<fmt:message key="label.monitoring.advancedsettings.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.monitoring.advancedsettings.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<c:if test="${daco.reflectOnActivity}">
-		<tr>
-			<td>
-				<fmt:message key="label.monitoring.advancedsettings.notebookinstructions" />
-			</td>
-			<td>
-				<lams:out value="${daco.reflectInstructions}" escapeHtml="true"/>
-			</td>
-		</tr>
-	</c:if>
 </table>
 </lams:AdvancedAccordian>

@@ -165,10 +165,6 @@
 			</c:choose>
 
 			<div id="btns${groupSummary.sessionId}" class="mt-2">
-				<c:if test="${sessionMap.peerreview.reflectOnActivity}">
-					<c:set var='url'><c:url value="/monitoring/reflections.do"/>?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
-					<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-secondary btn-disable-on-submit"><fmt:message key="title.reflection"/></button>
-				</c:if>
 				<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-secondary btn-disable-on-submit"><fmt:message key="label.notify.user.of.results"/></button>
 
 				<c:if test="${fn:length(criterias) > 1}">

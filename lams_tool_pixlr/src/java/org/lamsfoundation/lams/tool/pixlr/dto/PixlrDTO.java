@@ -45,9 +45,7 @@ public class PixlrDTO {
 
     public boolean defineLater;
 
-    public boolean contentInUse;
-
-    public boolean reflectOnActivity;
+    public boolean contentInUse;;
 
     public boolean lockOnFinish;
 
@@ -56,8 +54,6 @@ public class PixlrDTO {
     public Long currentTab;
 
     private String imageFileName;
-
-    private String reflectInstructions;
 
     boolean allowViewOthersImages;
 
@@ -74,10 +70,8 @@ public class PixlrDTO {
 	this.title = pixlr.getTitle();
 	this.instructions = pixlr.getInstructions();
 	this.contentInUse = pixlr.isContentInUse();
-	this.reflectOnActivity = pixlr.isReflectOnActivity();
 	this.lockOnFinish = pixlr.isLockOnFinished();
 	this.imageFileName = pixlr.getImageFileName();
-	this.reflectInstructions = pixlr.getReflectInstructions();
 	this.allowViewOthersImages = pixlr.isAllowViewOthersImages();
 
 	for (Iterator<PixlrSession> iter = pixlr.getPixlrSessions().iterator(); iter.hasNext();) {
@@ -129,14 +123,6 @@ public class PixlrDTO {
 	this.contentInUse = contentInUse;
     }
 
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
     public boolean isLockOnFinish() {
 	return lockOnFinish;
     }
@@ -163,14 +149,6 @@ public class PixlrDTO {
 
     public void setImageFileName(String imageFileName) {
 	this.imageFileName = imageFileName;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isAllowViewOthersImages() {

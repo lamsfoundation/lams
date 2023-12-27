@@ -92,7 +92,7 @@
 						</button>
 					</c:when>
 	
-					<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
+					<c:when test="${!hasEditRight}">
 						<button type="button" name="learnerFinished" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${isLastActivity}">
@@ -104,12 +104,6 @@
 							</c:choose>
 						</button>
 					</c:when>
-	
-					<c:otherwise>
-						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:otherwise>
 				</c:choose>
 			</div>
 

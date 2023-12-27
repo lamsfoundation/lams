@@ -51,7 +51,6 @@
 		<property name="sbmtToolContentHandler"><ref bean="sbmtToolContentHandler"/></property>
 		<property name="toolService"><ref bean="lamsToolService"/></property>
 		<property name="exportContentService"><ref bean="exportToolContentService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>		
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="learnerService"><ref bean="learnerService"/></property>
 		<property name="messageService"><ref bean="sbmtMessageService"/></property>

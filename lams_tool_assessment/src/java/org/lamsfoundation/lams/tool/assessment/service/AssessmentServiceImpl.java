@@ -23,10 +23,33 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -50,9 +73,6 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
 import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
@@ -85,7 +105,6 @@ import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
@@ -123,32 +142,10 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.springframework.web.util.UriUtils;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidParameterException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -192,8 +189,6 @@ public class AssessmentServiceImpl
     private ILessonService lessonService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -1290,56 +1285,6 @@ public class AssessmentServiceImpl
     @Override
     public Float getQuestionResultMark(Long assessmentUid, Long userId, int questionDisplayOrder) {
 	return assessmentQuestionResultDao.getQuestionResultMark(assessmentUid, userId, questionDisplayOrder);
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer userId, String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		AssessmentConstants.TOOL_SIGNATURE, userId, "", entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer userId) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		AssessmentConstants.TOOL_SIGNATURE, userId);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflectList = new LinkedList<>();
-
-	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
-	for (AssessmentSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<AssessmentUser> users = assessmentUserDao.getBySessionID(sessionId);
-	    for (AssessmentUser user : users) {
-
-		NotebookEntry entry = getEntry(sessionId, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null)
-			    ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflectList.add(ref);
-		}
-
-	    }
-	}
-
-	return reflectList;
     }
 
     @Override
@@ -3315,14 +3260,6 @@ public class AssessmentServiceImpl
 	    return;
 	}
 
-	for (AssessmentSession session : assessmentSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, AssessmentConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	assessmentDao.delete(assessment);
     }
 
@@ -3362,16 +3299,10 @@ public class AssessmentServiceImpl
 	    AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-
 		if (resetActivityCompletionOnly) {
 		    user.setSessionFinished(false);
 		    assessmentUserDao.saveObject(user);
 		} else {
-		    NotebookEntry entry = getEntry(session.getSessionId(), userId);
-		    if (entry != null) {
-			assessmentDao.removeObject(NotebookEntry.class, entry.getUid());
-		    }
-
 		    if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 			session.setGroupLeader(null);
 		    }
@@ -3746,14 +3677,6 @@ public class AssessmentServiceImpl
 	this.userManagementService = userManagementService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public void setLearnerService(ILearnerService learnerService) {
 	this.learnerService = learnerService;
     }
@@ -3857,9 +3780,6 @@ public class AssessmentServiceImpl
 	assessment.setInstructions(toolContentJSON.get(RestTags.INSTRUCTIONS).asText());
 	assessment.setCreated(new Date());
 
-	assessment.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	assessment.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	assessment.setAllowGradesAfterAttempt(
 		JsonUtil.optBoolean(toolContentJSON, "allowGradesAfterAttempt", Boolean.FALSE));
 	assessment.setAllowHistoryResponses(
@@ -3886,9 +3806,6 @@ public class AssessmentServiceImpl
 	assessment.setNumbered(JsonUtil.optBoolean(toolContentJSON, "numbered", Boolean.TRUE));
 	assessment.setPassingMark(JsonUtil.optInt(toolContentJSON, "passingMark", 0));
 	assessment.setQuestionsPerPage(JsonUtil.optInt(toolContentJSON, "questionsPerPage", 0));
-	assessment.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, ""));
-	assessment.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setShuffled(JsonUtil.optBoolean(toolContentJSON, "shuffled", Boolean.FALSE));
 	assessment.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
 	assessment.setUseSelectLeaderToolOuput(

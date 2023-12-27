@@ -259,9 +259,6 @@ public class AuthoringController {
 	mindmap.setGalleryWalkEnabled(authoringForm.isGalleryWalkEnabled());
 	mindmap.setGalleryWalkReadOnly(authoringForm.isGalleryWalkReadOnly());
 	mindmap.setGalleryWalkInstructions(authoringForm.getGalleryWalkInstructions());
-	// reflection
-	mindmap.setReflectOnActivity(authoringForm.isReflectOnActivity());
-	mindmap.setReflectInstructions(authoringForm.getReflectInstructions());
     }
 
     /**
@@ -275,9 +272,6 @@ public class AuthoringController {
 	authoringForm.setGalleryWalkEnabled(mindmap.isGalleryWalkEnabled());
 	authoringForm.setGalleryWalkReadOnly(mindmap.isGalleryWalkReadOnly());
 	authoringForm.setGalleryWalkInstructions(mindmap.getGalleryWalkInstructions());
-	// reflection
-	authoringForm.setReflectOnActivity(mindmap.isReflectOnActivity());
-	authoringForm.setReflectInstructions(mindmap.getReflectInstructions());
     }
 
     /**

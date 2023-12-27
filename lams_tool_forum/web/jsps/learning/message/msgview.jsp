@@ -156,7 +156,7 @@
 			<!--  Hide/Unhide Buttons -->
 			<c:if test='${sessionMap.mode == "teacher"}'>
 				<c:set var="updateMark">
-					<lams:WebAppURL />monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum&hideReflection=${sessionMap.hideReflection}
+					<lams:WebAppURL />monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum
 				</c:set>
 				<a href="${updateMark}" class="comment">
 					<fmt:message key="lable.topic.title.mark" />
@@ -190,7 +190,7 @@
 			<!--  Edit Button -->
 			<c:if test="${not hidden && ((sessionMap.mode == 'teacher') || (msgDto.isAuthor && not sessionMap.finishedLock && sessionMap.allowEdit && (empty msgDto.mark)))}">
 				<c:set var="edittopic">
-					<lams:WebAppURL />learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}&hideReflection=${sessionMap.hideReflection}
+					<lams:WebAppURL />learning/editTopic.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&rootUid=${sessinoMap.rootUid}&create=${msgDto.message.created.time}
 				</c:set>
 				<button type="button" onClick="javascript:createEdit(${msgDto.message.uid},'${edittopic}',${msgLevel})" class="btn btn-light comment align-top ms-2">
 					<i class="fa-regular fa-pen-to-square me-1"></i>
@@ -201,7 +201,7 @@
 			<%--  Reply Button. Must have class replybutton so that the button is hidden when the user reaches the maximum number of posts. See $('#messageForm').submit() --%>
 			<c:if test="${(not sessionMap.finishedLock) && (not noMorePosts)}">
 				<c:set var="replytopic">
-					<lams:WebAppURL />learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
+					<lams:WebAppURL />learning/newReplyTopic.do?sessionMapID=${sessionMapID}&parentID=${msgDto.message.uid}&rootUid=${sessionMap.rootUid}
 				</c:set>
 				<button type="button" onClick="javascript:createReply(${msgDto.message.uid},'${replytopic}',${msgLevel})" class="btn btn-light comment replybutton align-top ms-2">
 					<i class="fa-solid fa-reply me-1"></i>

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.peerreview.dao;
 import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
@@ -72,10 +71,6 @@ public interface PeerreviewUserDAO extends IBaseDAO {
     int getCountUsersBySession(Long toolSessionId);
 
     int createUsersForSession(PeerreviewSession session);
-
-    List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService,
-	    IUserManagementService userManagementService);
 
     /**
      * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.

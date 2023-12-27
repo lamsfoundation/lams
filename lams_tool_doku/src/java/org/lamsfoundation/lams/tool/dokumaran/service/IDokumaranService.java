@@ -23,10 +23,14 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.lamsfoundation.lams.etherpad.EtherpadException;
 import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
@@ -34,11 +38,6 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author Dapeng.Ni
@@ -188,42 +187,6 @@ public interface IDokumaranService extends ICommonToolService {
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
      */
     List<SessionDTO> getSummary(Long contentId, Long ratingUserUid);
-
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list.
-     *
-     * @param contentId
-     * @return
-     */
-    List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * Get user by UID

@@ -109,12 +109,6 @@ public class Dokumaran implements Cloneable {
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "gallery_walk_enabled")
     private boolean galleryWalkEnabled;
 
@@ -452,22 +446,6 @@ public class Dokumaran implements Cloneable {
 
     public void setAllowMultipleLeaders(boolean allowMultipleLeaders) {
 	this.allowMultipleLeaders = allowMultipleLeaders;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public int getMaxMark() {

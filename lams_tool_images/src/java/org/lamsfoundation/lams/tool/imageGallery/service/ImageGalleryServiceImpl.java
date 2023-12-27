@@ -23,6 +23,29 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+<<<<<<< HEAD
+=======
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+
+>>>>>>> LDEV-5397
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -35,9 +58,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -59,7 +79,6 @@ import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGallerySessionDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageGalleryUserDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dao.ImageVoteDAO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.ImageGalleryAttachment;
-import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
@@ -70,7 +89,6 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
-import org.lamsfoundation.lams.tool.imageGallery.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -140,8 +158,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IRatingService ratingService;
 
@@ -322,28 +338,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    @Override
     public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long toolSessionId, Long imageUid, Long userId) {
 
 	LinkedList<Long> itemIds = new LinkedList<>();
@@ -512,37 +506,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
 	return imageSummary;
 
-    }
-
-    @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<>();
-
-	List<ImageGallerySession> sessionList = imageGallerySessionDao.getByContentId(contentId);
-	for (ImageGallerySession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getImageGallery().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<ImageGalleryUser> users = imageGalleryUserDao.getBySessionID(sessionId);
-	    for (ImageGalleryUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    ImageGalleryConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
     }
 
     @Override
@@ -938,14 +901,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    return;
 	}
 
-	for (ImageGallerySession session : imageGallerySessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ImageGalleryConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	imageGalleryDao.delete(imageGallery);
     }
 
@@ -1007,12 +962,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		    user.setSessionFinished(false);
 		    imageGalleryUserDao.saveObject(user);
 		} else {
-		    NotebookEntry entry = getEntry(user.getSession().getSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, ImageGalleryConstants.TOOL_SIGNATURE, userId);
-		    if (entry != null) {
-			imageGalleryDao.removeObject(NotebookEntry.class, entry.getUid());
-		    }
-
 		    imageGalleryUserDao.removeObject(ImageGalleryUser.class, user.getUid());
 		}
 	    }
@@ -1150,14 +1099,6 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     public void setRatingService(IRatingService ratingService) {

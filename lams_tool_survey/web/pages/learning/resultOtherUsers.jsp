@@ -82,11 +82,6 @@
 			return false;
 		}
 
-		function continueReflect() {
-			disableButtons();
-			document.location.href = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-
 		function retakeSurvey() {
 			disableButtons();
 			document.location.href = '<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}"/>';
@@ -240,37 +235,19 @@
 			</c:forEach>
 		</c:if>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="true"
-				notebookHeaderLabelKey="title.reflection"/>
-		</c:if>
-
 		<c:if test="${sessionMap.mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
-				<c:choose>
-					<c:when test="${sessionMap.reflectOn}">
-						<button type="button" onclick="return continueReflect()" class="btn btn-primary na">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:when>
+				<button type="button" id="finishButton" onclick="return finishSession()" class="btn btn-primary na">
+					<c:choose>
+						<c:when test="${sessionMap.isLastActivity}">
+							<fmt:message key="label.submit" />
+						</c:when>
 
-					<c:otherwise>
-						<button type="button" id="finishButton" onclick="return finishSession()" class="btn btn-primary na">
-							<c:choose>
-								<c:when test="${sessionMap.isLastActivity}">
-									<fmt:message key="label.submit" />
-								</c:when>
-
-								<c:otherwise>
-									<fmt:message key="label.finished" />
-								</c:otherwise>
-							</c:choose>
-						</button>
-					</c:otherwise>
-				</c:choose>
+						<c:otherwise>
+							<fmt:message key="label.finished" />
+						</c:otherwise>
+					</c:choose>
+				</button>
 
 				<c:if test="${not sessionMap.lockOnFinish}">
 					<button type="button" onclick="return retakeSurvey()" class="btn btn-secondary btn-icon-return me-2">

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.zoom.service;
 import java.io.IOException;
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomApi;
@@ -109,14 +108,6 @@ public interface IZoomService extends ICommonToolService {
      * @return
      */
     public ZoomUser createZoomUser(UserDTO user, ZoomSession zoomSession);
-
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getNotebookEntry(Long uid);
-
-    void updateNotebookEntry(NotebookEntry notebookEntry);
-
-    void updateNotebookEntry(Long uid, String entry);
 
     /**
      * Choose API keys for a new meeting.

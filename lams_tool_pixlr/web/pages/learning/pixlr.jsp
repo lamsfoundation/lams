@@ -91,38 +91,6 @@
 			</div>
 			
 			<c:if test="${mode == 'learner' || mode == 'author'}">
-				<%--Reflection--------------------------------------------------%>
-		
-				<c:if test="${pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity and pixlrUserDTO.finishedReflection}">
-					<form:form action="openNotebook.do" method="post" id="learningForm" modelAttribute="learningForm">
-						<form:hidden path="mode" value="${mode}" />	
-						<form:hidden path="toolSessionID" id="toolSessionID"/>
-						
-						<div class="panel panel-default mt-2">
-							<div class="panel-heading panel-title">
-								${pixlrDTO.reflectInstructions}
-							</div>
-					
-							<div class="panel-body">
-								<c:choose>
-									<c:when test="${not empty pixlrUserDTO.notebookEntry}">
-										<lams:out escapeHtml="true" value="${pixlrUserDTO.notebookEntry}" />
-									</c:when>
-					
-									<c:otherwise>
-										<em><fmt:message key="message.no.reflection.available" /> </em>
-									</c:otherwise>
-								</c:choose>
-											
-								<button	type="button" class="btn btn-secondary float-start" >
-									<fmt:message key="button.edit" />
-								</button>
-							</div>
-					
-						</div>
-							
-					</form:form>
-				</c:if>
 				
 				<%--Finish buttons--------------------------------------------------%>
 				
@@ -139,14 +107,6 @@
 							</c:when>
 							
 							<c:otherwise>
-								<c:choose>
-									<c:when test="${!pixlrUserDTO.finishedActivity and pixlrDTO.reflectOnActivity}">
-										<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/openNotebook.do';">
-											<fmt:message key="button.continue" />
-										</button>
-									</c:when>
-									
-									<c:otherwise>!!
 										<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finished');">
 											<span class="na">
 												<c:choose>
@@ -159,8 +119,6 @@
 												</c:choose>
 											</span>
 										</a>
-									</c:otherwise>
-								</c:choose>
 							</c:otherwise>
 						</c:choose>
 					</div>

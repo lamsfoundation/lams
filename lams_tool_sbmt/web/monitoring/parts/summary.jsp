@@ -77,16 +77,6 @@
 							}
 							rows += ' [<a href=\"javascript:viewMark('+userId+','+$(table).attr("data-session-id")+');\"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.view.files" /></spring:escapeBody></a>]';
 							rows += '</td>';
-
-							<c:if test="${reflectOn}">
-							rows += '<td>';
-							if ( userData["reflection"] ) {
-								rows += userData["reflection"];
-							} else {
-								rows += '-';
-							}
-							rows += '</td>';
-							</c:if>
 							
 							rows += '</tr>';
 						}
@@ -239,13 +229,10 @@
 		</c:when>
 	</c:choose>
 	
-	<lams:TSTable numColumns="${reflectOn ? 4 : 3}" dataId="data-session-id='${sessionDto.sessionID}'">
+	<lams:TSTable numColumns="3" dataId="data-session-id='${sessionDto.sessionID}'">
 			<th><fmt:message key="monitoring.user.fullname"/></th>
 			<th width="15%" align="center"><fmt:message key="monitoring.user.submittedFiles"/></th>
 			<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
-			<c:if test="${reflectOn}">
-				<th align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
-			</c:if>
 	</lams:TSTable>
 	
 	<P style="display: inline"> 

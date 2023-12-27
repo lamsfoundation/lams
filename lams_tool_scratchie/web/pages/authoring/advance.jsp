@@ -285,34 +285,7 @@
 
 <lams:OutcomeAuthor toolContentId="${authoringForm.scratchie.contentId}" />
 
-<lams:SimplePanel titleKey="label.activity.completion">
-    <div class="checkbox">
-        <label for="reflect-on">
-            <form:checkbox path="scratchie.reflectOnActivity" id="reflect-on"/>
-            <fmt:message key="label.authoring.advanced.reflectOnActivity" />
-        </label>
-    </div>
-
-    <div class="form-group">
-        <form:textarea path="scratchie.reflectInstructions"  cssClass="form-control" id="reflectInstructions" rows="3" />
-    </div>
-</lams:SimplePanel>
-
 <script type="text/javascript">
-    //automatically turn on refect option if there are text input in refect instruction area
-    var ra = document.getElementById("reflectInstructions");
-    var rao = document.getElementById("reflect-on");
-    function turnOnRefect(){
-        if(isEmpty(ra.value)){
-            //turn off
-            rao.checked = false;
-        }else{
-            //turn on
-            rao.checked = true;
-        }
-    }
-    ra.onkeyup=turnOnRefect;
-
     //disable #shuffle-items when burning questions option is ON
     $("#burning-questions-enabled").click(function() {
         var isBurningQuestionsOn = $("#burning-questions-enabled").is(":checked");
@@ -324,5 +297,4 @@
     });
 
     <c:if test="${authoringForm.scratchie.burningQuestionsEnabled}">$("#shuffle-items").prop("disabled", true);</c:if>
-
 </script>

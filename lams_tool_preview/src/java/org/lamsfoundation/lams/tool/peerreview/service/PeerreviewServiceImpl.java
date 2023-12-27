@@ -23,8 +23,29 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -33,9 +54,6 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
@@ -46,7 +64,12 @@ import org.lamsfoundation.lams.rating.model.RatingRubricsColumn;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
-import org.lamsfoundation.lams.tool.*;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
+import org.lamsfoundation.lams.tool.ToolContentManager;
+import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
+import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -71,11 +94,8 @@ import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.util.HtmlUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import java.text.NumberFormat;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Andrey Balan
@@ -104,8 +124,6 @@ public class PeerreviewServiceImpl
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IRatingService ratingService;
 
@@ -249,28 +267,6 @@ public class PeerreviewServiceImpl
     @Override
     public int getCountUsersBySession(final Long toolSessionId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId);
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -451,20 +447,6 @@ public class PeerreviewServiceImpl
     @Override
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
 	return peerreviewDao.getStatistics(toolContentId);
-    }
-
-    @Override
-    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
-	    String searchString) {
-	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, page, size,
-		sorting, searchString, coreNotebookService, userManagementService);
-
-	for (Object[] raw : rawData) {
-	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
-	    raw[2] = HtmlUtils.htmlEscape(description.toString());
-	}
-
-	return rawData;
     }
 
     @Override
@@ -891,14 +873,6 @@ public class PeerreviewServiceImpl
 	    return;
 	}
 
-	for (PeerreviewSession session : peerreviewSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, PeerreviewConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	peerreviewDao.delete(peerreview);
     }
 
@@ -933,12 +907,6 @@ public class PeerreviewServiceImpl
 		    user.setSessionFinished(false);
 		    peerreviewUserDao.update(user);
 		} else {
-		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    PeerreviewConstants.TOOL_SIGNATURE, userId);
-		    if (entry != null) {
-			peerreviewDao.deleteById(NotebookEntry.class, entry.getUid());
-		    }
-
 		    peerreviewUserDao.delete(user);
 		}
 	    }
@@ -1157,10 +1125,6 @@ public class PeerreviewServiceImpl
 	this.userManagementService = userManagementService;
     }
 
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
     }
@@ -1203,9 +1167,6 @@ public class PeerreviewServiceImpl
 
 	peerreview.setLockWhenFinished(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	peerreview.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	peerreview.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	peerreview.setContentInUse(false);
 	peerreview.setDefineLater(false);

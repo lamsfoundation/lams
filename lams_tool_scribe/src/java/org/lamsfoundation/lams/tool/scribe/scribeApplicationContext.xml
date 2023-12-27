@@ -33,8 +33,7 @@
 				<property name="scribeDAO"><ref bean="lascrbScribeDAO"/></property>
 				<property name="toolService"><ref bean="lamsToolService"/></property>
 				<property name="scribeToolContentHandler"><ref bean="lascrbScribeToolContentHandler"/></property>
-		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
-		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
+		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 	
 			</bean>
 		</property>
 		<property name="transactionAttributes">

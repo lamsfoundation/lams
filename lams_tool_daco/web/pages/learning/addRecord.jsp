@@ -344,16 +344,6 @@
 		</div>
 	<!--  end record panel -->
 	</c:if>
-	
-	<!-- Reflection -->
-	<c:if test="${sessionMap.userFinished and daco.reflectOnActivity}">
-		<lams:NotebookReedit
-			reflectInstructions="${daco.reflectInstructions}"
-			reflectEntry="${sessionMap.reflectEntry}"
-			isEditButtonEnabled="${mode != 'teacher'}"
-			notebookHeaderLabelKey="label.export.reflection.heading"
-			editNotebookLabelKey="label.common.edit"/>
-	</c:if>
 
 </div> <!-- End addRecordDiv -->
 <script type="text/javascript">

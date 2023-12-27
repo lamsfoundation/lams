@@ -24,26 +24,19 @@
 package org.lamsfoundation.lams.tool.imageGallery.web.controller;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
-import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.util.MessageService;
@@ -86,8 +79,6 @@ public class MonitoringController {
 	List<List<Summary>> groupList = igService.getSummary(contentId);
 
 	ImageGallery imageGallery = igService.getImageGalleryByContentId(contentId);
-
-	Map<Long, Set<ReflectDTO>> reflectList = igService.getReflectList(contentId, false);
 	boolean isGroupedActivity = igService.isGroupedActivity(contentId);
 
 	// cache into sessionMap
@@ -96,7 +87,6 @@ public class MonitoringController {
 	sessionMap.put(ImageGalleryConstants.PAGE_EDITABLE, imageGallery.isContentInUse());
 	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, imageGallery);
 	sessionMap.put(ImageGalleryConstants.ATTR_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECT_LIST, reflectList);
 	sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
 	//rating stuff
 	boolean isCommentsEnabled = igService.isCommentsEnabled(contentId);
@@ -194,32 +184,6 @@ public class MonitoringController {
 	igService.toggleImageVisibility(itemUid, contentId);
 
 	return null;
-    }
-
-    @RequestMapping("/viewReflection")
-    public String viewReflection(HttpServletRequest request) {
-
-	Long uid = WebUtil.readLongParam(request, ImageGalleryConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ImageGalleryUser user = igService.getUser(uid);
-	NotebookEntry notebookEntry = igService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ImageGalleryConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	ImageGallerySession session = igService.getImageGallerySessionBySessionId(sessionID);
-
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getImageGallery().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return "pages/monitoring/notebook";
     }
 
 }

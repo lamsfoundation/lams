@@ -21,7 +21,6 @@ public class MonitoringSummaryUserDTO {
     private String loginName;
     private List<List<DacoAnswer>> records;
     private Integer recordCount;
-    private String reflectionEntry;
 
     public MonitoringSummaryUserDTO() {
 
@@ -75,14 +74,6 @@ public class MonitoringSummaryUserDTO {
 
     public void setRecordCount(Integer recordCount) {
 	this.recordCount = recordCount;
-    }
-
-    public String getReflectionEntry() {
-	return reflectionEntry;
-    }
-
-    public void setReflectionEntry(String reflectionEntry) {
-	this.reflectionEntry = reflectionEntry;
     }
 
     public Integer getUserId() {

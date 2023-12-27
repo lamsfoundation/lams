@@ -41,10 +41,6 @@ public class ChatUserDTO implements Comparable {
 
     public Long userID;
 
-    public String notebookEntry;
-
-    public boolean finishedReflection;
-
     public int postCount;
 
     public boolean finishedActivity;
@@ -133,22 +129,6 @@ public class ChatUserDTO implements Comparable {
 
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
-    }
-
-    public String getNotebookEntry() {
-	return notebookEntry;
-    }
-
-    public void setNotebookEntry(String notebookEntry) {
-	this.notebookEntry = notebookEntry;
-    }
-
-    public boolean isFinishedReflection() {
-	return finishedReflection;
-    }
-
-    public void setFinishedReflection(boolean finishedReflection) {
-	this.finishedReflection = finishedReflection;
     }
 
 }

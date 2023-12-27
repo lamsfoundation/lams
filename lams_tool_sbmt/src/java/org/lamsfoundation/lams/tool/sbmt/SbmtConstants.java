@@ -45,8 +45,6 @@ public interface SbmtConstants {
 
     public static final String ATTR_USER_FULLNAME = "fullName";
 
-    public static final String ATTR_USER_REFLECTION = "reflection";
-
     public static final String ATTR_USER_NUM_FILE = "numFiles";
 
     public static final String ATTR_USER_FILE_MARKED = "marked";
@@ -56,10 +54,6 @@ public interface SbmtConstants {
     public static final String SUCCESS = "success";
 
     public static final String ATTR_FINISH_LOCK = "finishLock";
-
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
 
     public static final String ATTR_TITLE = "title";
 

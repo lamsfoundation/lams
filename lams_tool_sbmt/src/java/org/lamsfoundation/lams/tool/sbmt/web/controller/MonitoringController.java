@@ -148,7 +148,6 @@ public class MonitoringController {
 	request.setAttribute(SbmtConstants.ATTR_CONTENT, content);
 	request.setAttribute(SbmtConstants.CONTENT_IN_USE, content.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
-	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
 
 	// set SubmissionDeadline, if any
 	if (content.getSubmissionDeadline() != null) {
@@ -195,8 +194,7 @@ public class MonitoringController {
 
 	// return user list according to the given sessionID
 	SubmitFilesContent spreadsheet = submitFilesService.getSubmitFilesContent(contentId);
-	List<Object[]> users = submitFilesService.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
-		spreadsheet.isReflectOnActivity());
+	List<Object[]> users = submitFilesService.getUsersForTablesorter(sessionID, page, size, sorting, searchString);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
@@ -206,31 +204,27 @@ public class MonitoringController {
 	    SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
 	    groupLeader = session.getGroupLeader();
 	}
-	for (Object[] userAndReflection : users) {
-
+	for (Object[] userData : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-	    SubmitUser user = (SubmitUser) userAndReflection[0];
+	    SubmitUser user = (SubmitUser) userData[0];
 	    responseRow.put(SbmtConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, HtmlUtils.htmlEscape(user.getFullName()));
 
-	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[1]);
+	    if (userData.length > 2) {
+		responseRow.put(SbmtConstants.ATTR_PORTRAIT_ID, (String) userData[1]);
 	    }
 
-	    if (userAndReflection.length > 3) {
+	    if (userData.length > 3) {
 		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE,
-			(Integer) userAndReflection[2] - (Integer) userAndReflection[3]);
+			(Integer) userData[2] - (Integer) userData[3]);
 	    }
 
-	    if (userAndReflection.length > 4) {
-		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[4] > 0);
+	    if (userData.length > 4) {
+		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userData[4] > 0);
 	    }
 
-	    if (userAndReflection.length > 5) {
-		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, (String) userAndReflection[5]);
-	    }
 	    if (!spreadsheet.isUseSelectLeaderToolOuput()
 		    || (spreadsheet.isUseSelectLeaderToolOuput() && groupLeader == user)) {
 		rows.add(responseRow);

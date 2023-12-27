@@ -72,14 +72,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable<Object> {
 
     protected String lockOnFinish;
 
-    protected String notebookEntriesVisible;
-
-    protected String reflection;
-
-    protected String reflectionSubject;
-
-    protected String notebookEntry;
-
     protected String previewOnly;
 
     protected String reportViewOnly;
@@ -610,66 +602,6 @@ public class VoteGeneralLearnerFlowDTO implements Comparable<Object> {
      */
     public void setMapStandardToolSessionUid(Map<Long, Long> mapStandardToolSessionUid) {
 	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
-    }
-
-    /**
-     * @return Returns the notebookEntriesVisible.
-     */
-    public String getNotebookEntriesVisible() {
-	return notebookEntriesVisible;
-    }
-
-    /**
-     * @param notebookEntriesVisible
-     *            The notebookEntriesVisible to set.
-     */
-    public void setNotebookEntriesVisible(String notebookEntriesVisible) {
-	this.notebookEntriesVisible = notebookEntriesVisible;
-    }
-
-    /**
-     * @return Returns the notebookEntry.
-     */
-    public String getNotebookEntry() {
-	return notebookEntry;
-    }
-
-    /**
-     * @param notebookEntry
-     *            The notebookEntry to set.
-     */
-    public void setNotebookEntry(String notebookEntry) {
-	this.notebookEntry = notebookEntry;
-    }
-
-    /**
-     * @return Returns the reflection.
-     */
-    public String getReflection() {
-	return reflection;
-    }
-
-    /**
-     * @param reflection
-     *            The reflection to set.
-     */
-    public void setReflection(String reflection) {
-	this.reflection = reflection;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     /**

@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.dao.SpreadsheetUserDAO;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
@@ -73,12 +72,10 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
     @Override
     /**
-     * Will return List<[SpreadsheetUser, String], [SpreadsheetUser, String], ... , [SpreadsheetUser, String]>
-     * where the String is the notebook entry. No notebook entries needed? Will return in their place.
+     * Will return List<[SpreadsheetUser], [SpreadsheetUser], ... , [SpreadsheetUser]>
      */
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
-	    IUserManagementService userManagementService) {
+	    String searchString, IUserManagementService userManagementService) {
 	String sortingOrder;
 	switch (sorting) {
 	    case SpreadsheetConstants.SORT_BY_USERNAME_ASC:
@@ -99,17 +96,9 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 
-	// If the session uses notebook, then get the sql to join across to get the entries
-	String[] notebookEntryStrings = null;
-	if (getNotebookEntries) {
-	    notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		    SpreadsheetConstants.TOOL_SIGNATURE, "user.user_id");
-	}
-
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 	queryText.append("SELECT user.* ");
-	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
 	queryText.append(portraitStrings[0]);
 	queryText.append(" FROM tl_lasprd10_user user ");
 	queryText.append(
@@ -123,11 +112,6 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 	    queryText.append(" LEFT JOIN tl_lasprd10_spreadsheet_mark mark on ms.mark_id = mark.uid ");
 	}
 
-	// If using notebook, add the notebook join
-	if (notebookEntryStrings != null) {
-	    queryText.append(notebookEntryStrings[1]);
-	}
-
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
 
@@ -136,8 +120,7 @@ public class SpreadsheetUserDAOHibernate extends LAMSBaseDAO implements Spreadsh
 
 	@SuppressWarnings("unchecked")
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", SpreadsheetUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId)
+	query.addEntity("user", SpreadsheetUser.class).addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId)
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }

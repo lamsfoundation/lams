@@ -39,9 +39,6 @@ public interface McAppConstants {
     public static final String MC_GENERAL_MONITORING_DTO = "mcGeneralMonitoringDTO";
     public static final String QUESTION_DTO = "questionDto";
 
-    public static final String REFLECTION_SUBJECT = "reflectionSubject";
-    public static final String REFLECTIONS_CONTAINER_DTO = "reflectionsContainerDTO";
-    public static final String LEARNER_NOTEBOOK = "learnerNotebook";
     public static final String USER_MASTER_DETAIL = "userMasterDetail";
     public static final String STATISTICS = "statistic";
 
@@ -86,8 +83,6 @@ public interface McAppConstants {
     /* learner mode contants */
     public static final String LEARNER_ANSWER_DTOS = "learnerAnswerDtos";
     public static final String MC_GENERAL_LEARNER_FLOW_DTO = "mcGeneralLearnerFlowDTO";
-    public static final String NOTEBOOK = "notebook";
-    public static final String ENTRY_TEXT = "entryText";
 
     /*
      * Monitoring Mode constants
@@ -101,7 +96,6 @@ public interface McAppConstants {
     public static final String SESSION_DTOS = "sessionDtos";
 
     public static final String MODE = "mode";
-    public static final String REFLECT = "reflect";
     
   //output definitions
     public static final String ATTR_ACTIVITY_EVALUATION = "activityEvaluation";

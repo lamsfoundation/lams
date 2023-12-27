@@ -23,9 +23,21 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.gjerull.etherpad.client.EPLiteClient;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -43,9 +55,6 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
@@ -63,7 +72,6 @@ import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranSessionDAO;
 import org.lamsfoundation.lams.tool.dokumaran.dao.DokumaranUserDAO;
-import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
@@ -80,20 +88,10 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
-import javax.servlet.http.HttpServletResponse;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.gjerull.etherpad.client.EPLiteClient;
 
 /**
  * @author Dapeng.Ni
@@ -125,8 +123,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private IRatingService ratingService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEtherpadService etherpadService;
 
@@ -561,58 +557,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflections = new LinkedList<>();
-
-	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
-	for (DokumaranSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<DokumaranUser> users = dokumaranUserDao.getBySessionID(sessionId);
-	    for (DokumaranUser user : users) {
-
-		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			DokumaranConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null)
-			    ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflections.add(ref);
-		}
-
-	    }
-
-	}
-
-	return reflections;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
-    @Override
     public DokumaranUser getUser(Long uid) {
 	return (DokumaranUser) dokumaranUserDao.getObject(DokumaranUser.class, uid);
     }
@@ -972,13 +916,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    return;
 	}
 
-	for (DokumaranSession session : dokumaranSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, DokumaranConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	dokumaranDao.delete(dokumaran);
     }
 
@@ -1011,12 +948,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    user.setSessionFinished(false);
 		    dokumaranUserDao.saveObject(user);
 		} else {
-		    NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    DokumaranConstants.TOOL_SIGNATURE, userId);
-		    if (entry != null) {
-			dokumaranDao.removeObject(NotebookEntry.class, entry.getUid());
-		    }
-
 		    dokumaranUserDao.removeObject(DokumaranUser.class, user.getUid());
 		}
 	    }
@@ -1304,10 +1235,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	this.ratingService = ratingService;
     }
 
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public void setEtherpadService(IEtherpadService etherpadService) {
 	this.etherpadService = etherpadService;
     }
@@ -1345,9 +1272,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setShowLineNumbers(JsonUtil.optBoolean(toolContentJSON, "showLineNumbers", Boolean.FALSE));
 	dokumaran.setSharedPadId(JsonUtil.optString(toolContentJSON, "sharedPadId"));
 	dokumaran.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
-	dokumaran.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	dokumaran.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	dokumaran.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
 	dokumaran.setAllowMultipleLeaders(JsonUtil.optBoolean(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));

@@ -85,16 +85,6 @@
 							rows += '</td>';
 							</c:if>
 							
-							<c:if test="${spreadsheet.reflectOnActivity}">
-							rows += '<td>';
-							if ( userData["reflection"] ) {
-								rows += userData["reflection"];
-							} else {
-								rows += '-';
-							}
-							rows += '</td>';
-							</c:if>
-							
 							rows += '</tr>';
 						}
 			            
@@ -142,7 +132,6 @@
 		
 			<c:set var="numColumns" value="1"/>
 			<c:if test="${spreadsheet.markingEnabled}"><c:set var="numColumns" value="${numColumns+1}"/></c:if>
-			<c:if test="${spreadsheet.reflectOnActivity}"><c:set var="numColumns" value="${numColumns+1}"/></c:if>
 			<lams:TSTable numColumns="${numColumns}" dataId='data-session-id="${summary.sessionId}"' test="fred"> 
 				<th align="left">
 					<fmt:message key="label.monitoring.summary.learner" />
@@ -150,11 +139,6 @@
 				<c:if test="${spreadsheet.markingEnabled}">			
 					<th width="20%" align="center">
 						<fmt:message key="label.monitoring.summary.marked" />
-					</th>
-				</c:if>
-				<c:if test="${spreadsheet.reflectOnActivity}">			
-					<th width="50%" align="center">
-						<fmt:message key="label.monitoring.summary.reflection" />
 					</th>
 				</c:if>
 			</lams:TSTable>

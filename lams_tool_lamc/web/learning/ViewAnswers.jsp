@@ -225,14 +225,6 @@
 			</div>
 		</c:if>
 
-		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
-			<lams:NotebookReedit
-				reflectInstructions="${mcGeneralLearnerFlowDTO.reflectionSubject}"
-				reflectEntry="${mcGeneralLearnerFlowDTO.notebookEntry}"
-				isEditButtonEnabled="false"
-				notebookHeaderLabelKey="label.reflection"/>				
-		</c:if>
-
 		<!--  now really start the form -->
 		<div class="activity-bottom-buttons">
 			<form:hidden path="toolContentID" />
@@ -244,7 +236,7 @@
 				
 			<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
 					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
-				<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
+				<c:if test="${!hasEditRight}">
 					<form:hidden path="learnerFinished" value="Finished" />
 
 					<button type="button" class="btn btn-primary na" id="finishButton">
@@ -256,12 +248,6 @@
 								<fmt:message key="label.finished" />
 							</c:otherwise>
 						</c:choose>
-					</button>
-				</c:if>
-
-				<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-					<button type="submit" name="forwardtoReflection" class="btn btn-primary na">
-						<fmt:message key="label.continue" />
 					</button>
 				</c:if>
 			</c:if>

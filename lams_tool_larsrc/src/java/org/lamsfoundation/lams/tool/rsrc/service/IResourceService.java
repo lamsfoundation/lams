@@ -30,11 +30,9 @@ import java.util.SortedSet;
 
 import org.lamsfoundation.lams.contentrepository.exception.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
-import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
@@ -208,42 +206,6 @@ public interface IResourceService extends ICommonToolService {
      *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, Long sessionId, Long contentId, boolean visible);
-
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list.
-     *
-     * @param contentId
-     * @return
-     */
-    List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * Get user by UID

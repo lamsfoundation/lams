@@ -39,7 +39,6 @@ public class QaLearningForm implements QaAppConstants {
     protected String toolSessionID;
     protected String questionIndex;
     protected String userID;
-    protected String entryText;
     protected String responseId;
 
     /**
@@ -192,21 +191,6 @@ public class QaLearningForm implements QaAppConstants {
      */
     public void setRefreshAnswers(String refreshAnswers) {
 	this.refreshAnswers = refreshAnswers;
-    }
-
-    /**
-     * @return Returns the entryText.
-     */
-    public String getEntryText() {
-	return entryText;
-    }
-
-    /**
-     * @param entryText
-     *            The entryText to set.
-     */
-    public void setEntryText(String entryText) {
-	this.entryText = entryText;
     }
 
 }

@@ -42,34 +42,9 @@
 			<fmt:message key="advanced.duration" />
 		</label>
 	</div>
-
-	<div class="checkbox voffset10">
-		<label for="reflectOnActivity"> <form:checkbox path="reflectOnActivity" cssClass="noBorder"	id="reflectOnActivity"/>
-			<fmt:message key="advanced.reflectOnActivity" />
-		</label>
-	</div>
-	
-	<div class="form-group">
-		<form:textarea path="reflectInstructions" id="reflectInstructions" cssClass="form-control" rows="3"/>
-	</div>
-
 </lams:SimplePanel>
 
 <script type="text/javascript">
-	//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions"),
-		rao = document.getElementById("reflectOnActivity");
-	function turnOnReflect() {
-		if (isEmpty(ra.value)) {
-			//turn off	
-			rao.checked = false;
-		} else {
-			//turn on
-			rao.checked = true;
-		}
-	}
-	ra.onkeyup = turnOnReflect;
-
 	$('#durationSwitch').change(function(){
 		var duration = $('#duration');
 		if ($(this).prop('checked')) {

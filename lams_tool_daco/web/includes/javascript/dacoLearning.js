@@ -13,11 +13,6 @@
 		document.location.href = finishUrl;
 		return false;
 	}
-		
-	function continueReflect(){
-		$('.btn-disable-on-submit').prop('disabled', true);
-		document.location.href=continueReflectUrl;
-	}
 
 	function getFile(errorId) {
 		var arr = errorId.split('-');

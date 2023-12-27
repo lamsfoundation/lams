@@ -46,15 +46,11 @@ public class ChatDTO {
 
     public boolean contentInUse;
 
-    public boolean reflectOnActivity;
-
     public boolean lockOnFinish;
 
     public boolean filteringEnabled;
 
     public String filteredKeyWords;
-
-    public String reflectInstructions;
 
     public Date submissionDeadline;
 
@@ -67,8 +63,6 @@ public class ChatDTO {
 	title = chat.getTitle();
 	instructions = chat.getInstructions();
 	contentInUse = chat.isContentInUse();
-	reflectInstructions = chat.getReflectInstructions();
-	reflectOnActivity = chat.isReflectOnActivity();
 	lockOnFinish = chat.isLockOnFinished();
 	filteringEnabled = chat.isFilteringEnabled();
 	filteredKeyWords = chat.getFilterKeywords();
@@ -107,14 +101,6 @@ public class ChatDTO {
 	this.toolContentId = toolContentID;
     }
 
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -129,14 +115,6 @@ public class ChatDTO {
 
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isLockOnFinish() {

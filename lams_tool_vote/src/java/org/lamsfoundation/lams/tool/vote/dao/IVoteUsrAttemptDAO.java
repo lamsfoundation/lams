@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.vote.dao;
 import java.util.List;
 import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteStatsDTO;
 import org.lamsfoundation.lams.tool.vote.model.VoteUsrAttempt;
@@ -91,9 +90,6 @@ public interface IVoteUsrAttemptDAO {
      * be null but not both.
      */
     int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
-
-    List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
 
     List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
 

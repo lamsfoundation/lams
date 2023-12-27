@@ -169,13 +169,7 @@ public interface ForumConstants {
 
     public static final String ATTR_TOPIC_ID = "topicID";
 
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
     public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
 
     public static final String ATTR_MINIMUM_REPLY = "minimumReply";
 
@@ -184,8 +178,6 @@ public interface ForumConstants {
     public static final String MARK_UPDATE_FROM_USER = "listMarks";
 
     public static final String MARK_UPDATE_FROM_FORUM = "viewForum";
-
-    public static final String ATTR_HIDE_REFLECTION = "hideReflection";
 
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 

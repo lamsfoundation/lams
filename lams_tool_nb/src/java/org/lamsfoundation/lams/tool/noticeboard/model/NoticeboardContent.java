@@ -73,12 +73,6 @@ public class NoticeboardContent implements Serializable {
     @Column(name = "define_later")
     private boolean defineLater;
 
-    @Column(name = "reflect_on_activity")
-    private Boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
@@ -110,16 +104,12 @@ public class NoticeboardContent implements Serializable {
     }
 
     /** full constructor */
-    public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
-	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId,
-	    Date dateCreated, Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike,
-	    boolean allowAnonymous) {
+    public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater, boolean contentInUse, Long creatorUserId, Date dateCreated,
+	    Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike, boolean allowAnonymous) {
 	this.nbContentId = nbContentId;
 	this.title = title;
 	this.content = content;
 	this.defineLater = defineLater;
-	this.reflectOnActivity = reflectOnActivity;
-	this.reflectInstructions = reflectInstructions;
 	this.contentInUse = contentInUse;
 	this.creatorUserId = creatorUserId;
 	this.dateCreated = dateCreated;
@@ -141,7 +131,6 @@ public class NoticeboardContent implements Serializable {
 	this.title = title;
 	this.content = content;
 	this.defineLater = false;
-	this.reflectOnActivity = false;
 	this.contentInUse = false;
 	this.creatorUserId = null;
 	this.dateCreated = dateCreated;
@@ -189,22 +178,6 @@ public class NoticeboardContent implements Serializable {
 
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
-    }
-
-    public boolean getReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isContentInUse() {
@@ -284,10 +257,8 @@ public class NoticeboardContent implements Serializable {
      */
     public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId)
 	    throws ItemNotFoundException, RepositoryCheckedException {
-	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
-		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
-		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(),
-		nb.isCommentsLikeAndDislike(), nb.isAllowAnonymous());
+	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(), nb.isDefineLater(), nb.isContentInUse(),
+		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(), nb.isCommentsLikeAndDislike(), nb.isAllowAnonymous());
 
 	return newContent;
     }

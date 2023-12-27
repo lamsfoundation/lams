@@ -66,7 +66,6 @@ public interface VoteAppConstants {
     public static final String ACTIVITY_TITLE_KEY = "activityTitleKey";
     public static final String ACTIVITY_INSTRUCTIONS_KEY = "activityInstructionsKey";
     public static final String VOTE_GENERAL_MONITORING_DTO = "voteGeneralMonitoringDTO";
-    public static final String LEARNER_NOTEBOOK = "learnerNotebook";
 
     public static final String VOTE_GENERAL_AUTHORING_DTO = "voteGeneralAuthoringDTO";
     public static final String HTTP_SESSION_ID = "httpSessionID";
@@ -74,9 +73,6 @@ public interface VoteAppConstants {
     public static final String LIST_DELETED_QUESTION_DTOS = "deletedQuestionDTOs";
 
     public static final String MAX_INPUTS = "maxInputs";
-
-    public static final String NOTEBOOK = "notebook";
-    public static final String ENTRY_TEXT = "entryText";
 
     /*
      * authoring mode controllers
@@ -113,8 +109,6 @@ public interface VoteAppConstants {
     public static final String INSTRUCTIONS = "instructions";
     public static final String VIEW_ANSWERS = "viewAnswers";
     public static final String WAIT_FOR_LEADER = "waitForLeader";
-
-    public static final String REFLECT = "reflect";
 
     /*
      * the learner or monitoring environment provides toolSessionId

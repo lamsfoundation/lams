@@ -62,10 +62,7 @@
 	                LABEL_SUPPORT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.support.activity' /></spring:escapeBody>",
 	                LABEL_COMPLETED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.completed.activity' /></spring:escapeBody>",
 	                LABEL_CURRENT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.current.activity' /></spring:escapeBody>",
-	                LABEL_NOT_STARTED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.not.started.activity' /></spring:escapeBody>",
-	                LABEL_COMPLETED_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.completed.gate' /></spring:escapeBody>",
-	                LABEL_CURRENT_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.current.gate' /></spring:escapeBody>",
-	                LABEL_NOT_STARTED_GATE = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.not.started.gate' /></spring:escapeBody>";
+	                LABEL_NOT_STARTED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.not.started.activity' /></spring:escapeBody>";
 	            var commandWebsocketHookTrigger = null,
 	                commandWebsocketHook = null;
 	

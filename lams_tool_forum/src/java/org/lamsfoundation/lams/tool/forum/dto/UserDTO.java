@@ -8,10 +8,6 @@ public class UserDTO {
     private String fullName;
     private String loginName;
     private int noOfPosts;
-    private boolean hasRefection;
-    private String reflectInstrctions;
-    private boolean finishReflection;
-    private String reflect;
     private boolean anyPostsMarked;
 
     public UserDTO() {
@@ -30,14 +26,6 @@ public class UserDTO {
 
     public void setFullName(String fullName) {
 	this.fullName = fullName;
-    }
-
-    public boolean isHasRefection() {
-	return hasRefection;
-    }
-
-    public void setHasRefection(boolean hasRefection) {
-	this.hasRefection = hasRefection;
     }
 
     public String getLoginName() {
@@ -62,30 +50,6 @@ public class UserDTO {
 
     public void setUserUid(Long userUid) {
 	this.userUid = userUid;
-    }
-
-    public String getReflect() {
-	return reflect;
-    }
-
-    public void setReflect(String reflection) {
-	this.reflect = reflection;
-    }
-
-    public String getReflectInstrctions() {
-	return reflectInstrctions;
-    }
-
-    public void setReflectInstrctions(String reflectInstrctions) {
-	this.reflectInstrctions = reflectInstrctions;
-    }
-
-    public boolean isFinishReflection() {
-	return finishReflection;
-    }
-
-    public void setFinishReflection(boolean finishReflection) {
-	this.finishReflection = finishReflection;
     }
 
     public boolean isAnyPostsMarked() {

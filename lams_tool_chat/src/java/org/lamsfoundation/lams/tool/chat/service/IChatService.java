@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
@@ -177,12 +176,6 @@ public interface IChatService extends ICommonToolService {
     Map<Long, Integer> getMessageCountBySession(Long chatUID);
 
     Map<Long, Integer> getMessageCountByFromUser(Long sessionUID);
-
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
-    void updateEntry(NotebookEntry notebookEntry);
 
     String createConditionName(Collection<ChatCondition> existingConditions);
 

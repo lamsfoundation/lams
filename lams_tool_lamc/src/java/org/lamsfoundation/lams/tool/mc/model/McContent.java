@@ -38,8 +38,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 
@@ -72,9 +70,6 @@ public class McContent implements Serializable {
 
     @Column(name = "define_later")
     private boolean defineLater;
-
-    @Column
-    private boolean reflect;
 
     @Column(name = "creation_date")
     private Date creationDate;
@@ -121,9 +116,6 @@ public class McContent implements Serializable {
     @Column(name = "enable_confidence_levels")
     private boolean enableConfidenceLevels;
 
-    @Column
-    private String reflectionSubject;
-
     @OneToMany(mappedBy = "mcContent", cascade = CascadeType.ALL)
     @SortComparator(QbToolQuestion.QbToolQuestionComparator.class)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -134,11 +126,9 @@ public class McContent implements Serializable {
     private Set<McSession> mcSessions;
 
     /** full constructor */
-    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate,
-	    Date updateDate, boolean questionsSequenced, long createdBy, Integer passMark,
-	    boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
-	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput,
-	    boolean prefixAnswersWithLetters, boolean retries, boolean reflect, String reflectionSubject,
+    public McContent(Long mcContentId, String title, String instructions, boolean defineLater, Date creationDate, Date updateDate, boolean questionsSequenced,
+	    long createdBy, Integer passMark, boolean enableConfidenceLevels, boolean showReport, boolean randomize, boolean displayAnswers,
+	    boolean displayFeedbackOnly, boolean showMarks, boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries,
 	    Set<McQueContent> mcQueContents, Set<McSession> mcSessions) {
 
 	this.mcContentId = mcContentId;
@@ -150,8 +140,6 @@ public class McContent implements Serializable {
 	this.questionsSequenced = questionsSequenced;
 	this.createdBy = createdBy;
 	this.retries = retries;
-	this.reflectionSubject = reflectionSubject;
-	this.reflect = reflect;
 	this.passMark = passMark;
 	this.enableConfidenceLevels = enableConfidenceLevels;
 	this.showReport = showReport;
@@ -191,12 +179,10 @@ public class McContent implements Serializable {
      * @return the new mc content object.
      */
     public static McContent newInstance(McContent mc, Long newContentId) {
-	McContent newContent = new McContent(newContentId, mc.getTitle(), mc.getInstructions(), mc.isDefineLater(),
-		mc.getCreationDate(), mc.getUpdateDate(), mc.isQuestionsSequenced(), mc.getCreatedBy(),
-		mc.getPassMark(), mc.isEnableConfidenceLevels(), mc.isShowReport(), mc.isRandomize(),
-		mc.isDisplayAnswers(), mc.displayFeedbackOnly, mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(),
-		mc.isPrefixAnswersWithLetters(), mc.isRetries(), mc.isReflect(), mc.getReflectionSubject(),
-		new TreeSet<McQueContent>(), new TreeSet<McSession>());
+	McContent newContent = new McContent(newContentId, mc.getTitle(), mc.getInstructions(), mc.isDefineLater(), mc.getCreationDate(), mc.getUpdateDate(),
+		mc.isQuestionsSequenced(), mc.getCreatedBy(), mc.getPassMark(), mc.isEnableConfidenceLevels(), mc.isShowReport(), mc.isRandomize(),
+		mc.isDisplayAnswers(), mc.displayFeedbackOnly, mc.isShowMarks(), mc.isUseSelectLeaderToolOuput(), mc.isPrefixAnswersWithLetters(),
+		mc.isRetries(), new TreeSet<McQueContent>(), new TreeSet<McSession>());
 	newContent.setMcQueContents(mc.deepCopyMcQueContent(newContent));
 
 	return newContent;
@@ -371,33 +357,6 @@ public class McContent implements Serializable {
      */
     public void setCreationDate(Date creationDate) {
 	this.creationDate = creationDate;
-    }
-
-    /**
-     * @return Returns the reflect.
-     */
-    public boolean isReflect() {
-	return reflect;
-    }
-
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
-    public void setReflect(boolean reflect) {
-	this.reflect = reflect;
-    }
-
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     /**

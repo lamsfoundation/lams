@@ -23,11 +23,18 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -36,9 +43,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
@@ -79,17 +83,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * An implementation of the IMindmapService interface. As a requirement, all LAMS tool's service bean must implement
@@ -111,7 +109,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     private IToolContentHandler mindmapToolContentHandler = null;
     private ILogEventService logEventService = null;
     private IExportToolContentService exportContentService;
-    private ICoreNotebookService coreNotebookService;
     private ILearnerService learnerService;
     private IRatingService ratingService;
     private MindmapOutputFactory mindmapOutputFactory;
@@ -425,14 +422,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    return;
 	}
 
-	for (MindmapSession session : mindmap.getMindmapSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, MindmapConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	mindmapDAO.delete(mindmap);
     }
 
@@ -482,11 +471,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	    MindmapUser user = mindmapUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
 		if (!resetActivityCompletionOnly) {
-		    if (user.getEntryUID() != null) {
-			NotebookEntry entry = coreNotebookService.getEntry(user.getEntryUID());
-			mindmapDAO.delete(entry);
-		    }
-
 		    user.setEntryUID(null);
 		}
 		user.setFinishedActivity(false);
@@ -651,28 +635,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 
 	}
 	return false;
-    }
-
-    /* IMindmapService Methods */
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long uid) {
-	return coreNotebookService.getEntry(uid);
-    }
-
-    @Override
-    public void updateEntry(Long uid, String entry) {
-	coreNotebookService.updateEntry(uid, "", entry);
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -861,14 +823,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	this.exportContentService = exportContentService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public MindmapOutputFactory getMindmapOutputFactory() {
 	return mindmapOutputFactory;
     }
@@ -1051,8 +1005,6 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	content.setInstructions(JsonUtil.optString(toolContentJSON, RestTags.INSTRUCTIONS));
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	content.setMultiUserMode(JsonUtil.optBoolean(toolContentJSON, "multiUserMode", Boolean.FALSE));
 

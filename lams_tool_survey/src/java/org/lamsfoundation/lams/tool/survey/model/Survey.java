@@ -84,12 +84,6 @@ public class Survey implements Cloneable {
     @Column(name = "lock_on_finished")
     private boolean lockWhenFinished;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "define_later")
     private boolean defineLater;
 
@@ -321,22 +315,6 @@ public class Survey implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isShowOnePage() {

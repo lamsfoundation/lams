@@ -31,8 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
@@ -40,7 +38,6 @@ import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 import org.lamsfoundation.lams.tool.chat.service.IChatService;
-import org.lamsfoundation.lams.tool.chat.util.ChatConstants;
 import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -98,14 +95,6 @@ public class LearningController {
 	request.setAttribute("chatDTO", chatDTO);
 
 	ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
-	if (chatUser.isFinishedActivity()) {
-	    // get the notebook entry.
-	    NotebookEntry notebookEntry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		chatUserDTO.notebookEntry = notebookEntry.getEntry();
-	    }
-	}
 	request.setAttribute("chatUserDTO", chatUserDTO);
 
 	// Ensure that the content is use flag is set
@@ -151,56 +140,6 @@ public class LearningController {
 	} catch (IOException e) {
 	    throw new ChatException(e);
 	}
-    }
-
-    @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// set the finished flag
-	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
-	ChatDTO chatDTO = new ChatDTO(chatUser.getChatSession().getChat());
-
-	request.setAttribute("chatDTO", chatDTO);
-
-	NotebookEntry notebookEntry = chatService.getEntry(chatUser.getChatSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
-
-	if (notebookEntry != null) {
-	    learningForm.setEntryText(notebookEntry.getEntry());
-	}
-
-	Long toolSessionId = chatUser.getChatSession().getSessionId();
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, chatService.isLastActivity(toolSessionId));
-
-	return "pages/learning/notebook";
-    }
-
-    @RequestMapping("/submitReflection")
-    public void submitReflection(@ModelAttribute LearningForm learningForm, HttpServletResponse response) {
-
-	// save the reflection entry and call the notebook.
-	ChatUser chatUser = chatService.getUserByUID(learningForm.getChatUserUID());
-	Long toolSessionID = chatUser.getChatSession().getSessionId();
-	Integer userID = chatUser.getUserId().intValue();
-
-	// check for existing notebook entry
-	NotebookEntry entry = chatService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ChatConstants.TOOL_SIGNATURE, userID);
-
-	if (entry == null) {
-	    // create new entry
-	    chatService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ChatConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(learningForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    chatService.updateEntry(entry);
-	}
-
-	finishActivity(learningForm, response);
     }
 
     private ChatUser getCurrentUser(Long toolSessionId) {

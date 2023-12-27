@@ -23,16 +23,18 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.SortedMap;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -56,11 +58,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.JsonUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedMap;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * An implementation of the ILeaderselectionService interface.
@@ -84,8 +82,6 @@ public class LeaderselectionService
     private IToolContentHandler leaderselectionToolContentHandler = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private LeaderselectionOutputFactory leaderselectionOutputFactory;
 
@@ -203,13 +199,6 @@ public class LeaderselectionService
 	if (content == null) {
 	    logger.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
-	}
-	for (LeaderselectionSession session : content.getLeaderselectionSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, LeaderselectionConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
 	}
 
 	leaderselectionDAO.delete(content);
@@ -364,21 +353,6 @@ public class LeaderselectionService
     @Override
     public Collection<User> getAllGroupUsers(Long toolSessionId) {
 	return toolService.getToolSession(toolSessionId).getLearners();
-    }
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long uid) {
-	return coreNotebookService.getEntry(uid);
-    }
-
-    @Override
-    public void updateEntry(Long uid, String entry) {
-	coreNotebookService.updateEntry(uid, "", entry);
     }
 
     @Override
@@ -551,14 +525,6 @@ public class LeaderselectionService
 
     public void setExportContentService(IExportToolContentService exportContentService) {
 	this.exportContentService = exportContentService;
-    }
-
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     public LeaderselectionOutputFactory getLeaderselectionOutputFactory() {

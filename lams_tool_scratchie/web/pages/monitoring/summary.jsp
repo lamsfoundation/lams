@@ -188,32 +188,6 @@
 	     	jQuery("#burningQuestions${scratchieItem.uid}").jqGrid('sortGrid','groupName', false, 'asc');
         </c:forEach>
 		
-		<!-- Display reflection entries -->
-		jQuery("#reflections").jqGrid({
-			datatype: "local",
-			rowNum: 10000,
-			height: 'auto',
-			autowidth: true,
-			shrinkToFit: false,
-		   	colNames:['#',
-					"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.summary.user.name' /></spring:escapeBody>",
-				    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
-			],
-		   	colModel:[
-		   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
-		   		{name:'groupName', index:'groupName', width:200},
-		   		{name:'feedback', index:'feedback', width:570}
-		   	],
-		   	//caption: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learners.feedback' /></spring:escapeBody>"
-		});
-	    <c:forEach var="reflectDTO" items="${sessionMap.reflections}" varStatus="i">
-	    	jQuery("#reflections").addRowData(${i.index + 1}, {
-	   			id:"${i.index + 1}",
-	   	     	groupName:"${reflectDTO.groupName}",
-		   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
-	   	   	});
-        </c:forEach>
-		
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)
         $(window).bind('resize', function() {
             resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
@@ -283,22 +257,6 @@
 	
 				launchPopup(userSummaryUrl, "MonitoringReview");
 			}
-	    });
-		
-		//filter reflections by group name
-		$("#reflection-group-selector").change(function() {
-            var grid = $("#reflections");
-            var searchFiler = $(this).val();
-
-            if (searchFiler.length === 0) {
-                grid[0].p.search = false;
-                $.extend(grid[0].p.postData,{filters:""});
-            }
-            var f = {groupOp:"OR",rules:[]};
-            f.rules.push({field:"groupName",op:"cn",data:searchFiler});
-            grid[0].p.search = true;
-            $.extend(grid[0].p.postData,{filters:JSON.stringify(f)});
-            grid.trigger("reloadGrid",[{page:1,current:true}]);
 	    });
 	});
 	
@@ -453,32 +411,6 @@
 		
 		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning" style="padding: 10px;">
 					<%@ include file="parts/burningQuestions.jsp"%>
-				</div>
-			</div>
-		</div>
-	</c:if>
-	
-	<!-- Display reflection entries -->
-	<c:if test="${sessionMap.reflectOn}">
-
-		<div class="panel-group" id="accordionReflections" role="tablist" aria-multiselectable="true"> 
-		    <div class="panel panel-default" >
-		        <div class="panel-heading collapsable-icon-left" id="headingReflections">
-		        	<span class="panel-title">
-			    	<a role="button" data-toggle="collapse" href="#collapseReflections" aria-expanded="false" aria-controls="collapseReflections" >
-		          	<fmt:message key="label.learners.feedback" />
-		        	</a>
-		        	<select id="reflection-group-selector" class="input-sm pull-right">
-						<option selected="selected" value=""><fmt:message key="label.all" /></option>
-		    			<c:forEach var="reflectDTO" items="${sessionMap.reflections}">
-							<option value="${reflectDTO.groupName}">${reflectDTO.groupName}</option>
-					   	</c:forEach>
-					</select>
-		      		</span>
-		        </div>
-		
-		        <div id="collapseReflections" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingReflections">
-					<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
 				</div>
 			</div>
 		</div>

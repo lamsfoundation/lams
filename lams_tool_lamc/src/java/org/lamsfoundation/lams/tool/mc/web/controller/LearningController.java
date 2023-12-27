@@ -38,8 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -117,10 +115,6 @@ public class LearningController {
 	    return redoQuestions(mcLearningForm, request, response);
 	} else if (mcLearningForm.getViewAnswers() != null) {
 	    return viewAnswers(mcLearningForm, request, response);
-	} else if (mcLearningForm.getSubmitReflection() != null) {
-	    return submitReflection(mcLearningForm, request, response);
-	} else if (mcLearningForm.getForwardtoReflection() != null) {
-	    return forwardtoReflection(mcLearningForm, request, response);
 	} else if (mcLearningForm.getLearnerFinished() != null) {
 	    return endLearning(mcLearningForm, request, response);
 	}
@@ -196,17 +190,6 @@ public class LearningController {
 	Boolean displayAnswers = mcContent.isDisplayAnswers();
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(displayAnswers.toString());
 	mcGeneralLearnerFlowDTO.setDisplayFeedbackOnly(((Boolean) mcContent.isDisplayFeedbackOnly()).toString());
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.TOOL_SIGNATURE, userID.intValue());
-
-	if (notebookEntry != null) {
-	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	}
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
 	/*
@@ -502,8 +485,6 @@ public class LearningController {
 	    mcGeneralLearnerFlowDTO.setTotalCountReached(new Boolean(true).toString());
 	}
 
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 	mcGeneralLearnerFlowDTO.setQuestionIndex(questionIndex);
@@ -595,15 +576,6 @@ public class LearningController {
 	    }
 	}
 	mcGeneralLearnerFlowDTO.setAttemptMap(attemptMap);
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.TOOL_SIGNATURE, new Integer(user.getQueUsrId().intValue()));
-	request.setAttribute("notebookEntry", notebookEntry);
-	if (notebookEntry != null) {
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	}
 
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.isPassMarkApplicable()).toString());
@@ -660,8 +632,6 @@ public class LearningController {
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 
 	String passMarkApplicable = new Boolean(mcContent.isPassMarkApplicable()).toString();
@@ -703,62 +673,6 @@ public class LearningController {
 	ObjectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=UTF-8");
 	return ObjectNode.toString();
-    }
-
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	mcLearningForm.setToolSessionID(toolSessionID);
-
-	Long userID = mcLearningForm.getUserID();
-
-	String reflectionEntry = request.getParameter(McAppConstants.ENTRY_TEXT);
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.TOOL_SIGNATURE, userID.intValue());
-
-	if (notebookEntry != null) {
-	    notebookEntry.setEntry(reflectionEntry);
-	    notebookEntry.setLastModified(new Date());
-	    mcService.updateEntry(notebookEntry);
-	} else {
-	    mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    McAppConstants.TOOL_SIGNATURE, userID.intValue(), reflectionEntry);
-	}
-
-	return endLearning(mcLearningForm, request, response);
-    }
-
-    @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(@ModelAttribute McLearningForm mcLearningForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-
-	McContent mcContent = mcSession.getMcContent();
-
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
-	mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
-	Long userID = mcLearningForm.getUserID();
-
-	// attempt getting notebookEntry
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.TOOL_SIGNATURE, userID.intValue());
-
-	if (notebookEntry != null) {
-	    String notebookEntryPresentable = notebookEntry.getEntry();
-	    mcLearningForm.setEntryText(notebookEntryPresentable);
-
-	}
-
-	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	return "learning/Notebook";
     }
 
     /**

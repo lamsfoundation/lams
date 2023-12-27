@@ -117,7 +117,7 @@
 <c:if test='${maxThreadUid > 0 && ! noMorePages}'>
     <div class="text-center">
         <c:set var="more">
-            <lams:WebAppURL />learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}&pageLastId=${maxThreadUid}&size=${pageSize}
+            <lams:WebAppURL />learning/viewTopicNext.do?sessionMapID=${sessionMapID}&topicID=${sessionMap.rootUid}&create=${topic.message.created.time}&pageLastId=${maxThreadUid}&size=${pageSize}
         </c:set>
         <a href="<c:out value="${more}"/>" class="btn btn-sm btn-secondary">
             <fmt:message key="label.show.more.messages" />

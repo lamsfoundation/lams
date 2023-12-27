@@ -81,7 +81,6 @@ public class MonitoringController {
 
     @RequestMapping(value = "")
     public String unspecified(HttpServletRequest request) {
-
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	request.setAttribute("contentFolderID", contentFolderID);
@@ -116,7 +115,6 @@ public class MonitoringController {
 
     @RequestMapping(value = "/getUsers")
     public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	Long toolSessionId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 
 	boolean hasSearch = WebUtil.readBooleanParam(request, "_search", false);
@@ -153,24 +151,23 @@ public class MonitoringController {
 	String noEntry = getNoEntryText();
 
 	int id = 1;
-	for (Object[] userAndReflection : users) {
-
+	for (Object[] userData : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-	    NotebookUser user = (NotebookUser) userAndReflection[0];
+	    NotebookUser user = (NotebookUser) userData[0];
 	    responseRow.put("id", id++);
 	    responseRow.put(NotebookConstants.PARAM_USER_UID, user.getUid());
 	    responseRow.put(NotebookConstants.PARAM_NAME,
 		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
-	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape((String) userAndReflection[1]));
+	    if (user.getNotebookEntry() != null) {
+		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape(user.getNotebookEntry()));
 	    }
 	    if (user.getTeachersComment() != null && user.getTeachersComment().length() > 0) {
 		responseRow.put(NotebookConstants.PARAM_COMMENT, HtmlUtils.htmlEscape(user.getTeachersComment()));
 	    }
 
-	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		Date modifiedDate = (Date) userAndReflection[2];
+	    if (user.getNotebookEntryModifiedDate() != null) {
+		Date modifiedDate = user.getNotebookEntryModifiedDate();
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE,
 			DateUtil.convertToStringForJSON(modifiedDate, request.getLocale()));
 		responseRow.put(NotebookConstants.PARAM_MODIFIED_DATE_TIMEAGO,
@@ -180,8 +177,8 @@ public class MonitoringController {
 	    }
 
 	    responseRow.put(NotebookConstants.ATTR_USER_ID, user.getUserId());
-	    if (userAndReflection.length > 3 && userAndReflection[3] != null) {
-		responseRow.put(NotebookConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[3]);
+	    if (userData.length > 1 && userData[1] != null) {
+		responseRow.put(NotebookConstants.ATTR_PORTRAIT_ID, (String) userData[1]);
 	    }
 	    rows.add(responseRow);
 	}
@@ -189,30 +186,20 @@ public class MonitoringController {
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(responsedata.toString());
 	return null;
-
     }
 
     /**
      * Updates a user's mark or feedback for an entire lesson
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
-
     @RequestMapping(value = "/saveTeacherComment", method = RequestMethod.POST)
     public String saveTeacherComment(HttpServletRequest request) throws Exception {
-
 	String teachersComment = WebUtil.readStrParam(request, "value", true);
 	Long userUid = WebUtil.readLongParam(request, NotebookConstants.PARAM_USER_UID);
 	boolean isNotifyLearner = WebUtil.readBooleanParam(request, "isNotifyLearner");
 	NotebookUser user = notebookService.getUserByUID(userUid);
 
 	//check user had available notebook entry and teachersComment is not blank
-	if ((user.getEntryUID() == null) && StringUtils.isNotBlank(teachersComment)) {
+	if ((user.getNotebookEntry() == null) && StringUtils.isNotBlank(teachersComment)) {
 	    return null;
 	}
 
@@ -254,10 +241,8 @@ public class MonitoringController {
     }
 
     /** Get the statistics for monitoring */
-
     @RequestMapping(value = "/getStatistics")
     public String getStatistics(HttpServletRequest request) {
-
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	boolean isGroupedActivity = notebookService.isGroupedActivity(contentID);
@@ -289,8 +274,8 @@ public class MonitoringController {
 		printUserDTO.setFirstName(user.getFirstName());
 		printUserDTO.setLastName(user.getLastName());
 		printUserDTO.setEmail(userManagementService.getUserById(user.getUserId().intValue()).getEmail());
-		printUserDTO.setEntry((String) userData[1]);
-		printUserDTO.setEntryModifiedDate((Date) userData[2]);
+		printUserDTO.setEntry(user.getNotebookEntry());
+		printUserDTO.setEntryModifiedDate(user.getNotebookEntryModifiedDate());
 		printUserDTO.setTeacherComment(user.getTeachersComment());
 		printUserDTOs.add(printUserDTO);
 	    }
@@ -305,7 +290,6 @@ public class MonitoringController {
     /**
      * set up notebookService
      */
-
     private String getNoEntryText() {
 	if (noEntryText == null) {
 	    noEntryText = messageService.getMessage("label.no.entry");

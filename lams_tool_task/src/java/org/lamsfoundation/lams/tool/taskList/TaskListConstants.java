@@ -87,9 +87,5 @@ public interface TaskListConstants {
     public static final String ERROR_MSG_UPLOAD_FAILED = "error.upload.failed";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-    public static final String ATTR_REFLECT_LIST = "reflectList";
 
 }

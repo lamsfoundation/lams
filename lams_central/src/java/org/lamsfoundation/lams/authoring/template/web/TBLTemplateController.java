@@ -123,7 +123,7 @@ public class TBLTemplateController extends LdTemplateController {
 	if (data.useIntroduction) {
 	    activityTitle = data.getText("boilerplate.introduction.title");
 	    Long welcomeToolContentId = createNoticeboardToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.introduction.instructions"), null);
+		    data.getText("boilerplate.introduction.instructions"));
 	    activities.add(createNoticeboardActivity(maxUIID, order++, firstActivityInRowPosition, welcomeToolContentId,
 		    data.contentFolderID, null, null, null, activityTitle));
 	    currentActivityPosition = calcPositionNextRight(firstActivityInRowPosition);
@@ -161,7 +161,7 @@ public class TBLTemplateController extends LdTemplateController {
 	    ArrayNode testQuestionsArray = JsonUtil.readArray(data.testQuestions.values());
 
 	    Long iRAToolContentId = authoringService.createTblAssessmentToolContent(userDTO, activityTitle,
-		    data.getText("boilerplate.ira.instructions"), null, false, true, data.shuffleIRAT,
+		    data.getText("boilerplate.ira.instructions"), false, true, data.shuffleIRAT,
 		    data.confidenceLevelEnable, false, false, false, qbCollectionUid, testQuestionsArray);
 	    ObjectNode iraActivityJSON = createAssessmentActivity(maxUIID, order++, currentActivityPosition,
 		    iRAToolContentId, data.contentFolderID, groupingUIID, null, null, activityTitle);
@@ -235,7 +235,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    Long aetoolContentId = createDokumaranToolContent(userDTO, applicationExerciseTitle,
 			    applicationExercise.description, applicationExercise.dokuInstructions, false,
 			    applicationExercise.dokuGalleryWalkEnabled, applicationExercise.dokuGalleryWalkReadOnly,
-			    applicationExercise.dokuGalleryWalkInstructions, null);
+			    applicationExercise.dokuGalleryWalkInstructions);
 		    activities.add(createDokumaranActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
 		} else {
@@ -249,7 +249,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    Long aetoolContentId = authoringService.createTblAssessmentToolContent(userDTO,
 			    applicationExerciseTitle,
 			    StringUtils.isBlank(applicationExercise.description) ? data.getText(
-				    "boilerplate.ae.instructions") : applicationExercise.description, null, true, true,
+				    "boilerplate.ae.instructions") : applicationExercise.description, true, true,
 			    false, false, true, true, true, qbCollectionUid, questionsJSONArray);
 		    activities.add(createAssessmentActivity(maxUIID, order++, currentActivityPosition, aetoolContentId,
 			    data.contentFolderID, groupingUIID, null, null, applicationExerciseTitle));
@@ -272,7 +272,7 @@ public class TBLTemplateController extends LdTemplateController {
 		    String notebookTitle = data.getText("boilerplate.grouped.ae.noticeboard.num",
 			    new String[] { noticeboardCountAsString });
 		    Long aeNoticeboardContentId = createNoticeboardToolContent(userDTO, notebookTitle,
-			    applicationExercise.noticeboardInstructions, null);
+			    applicationExercise.noticeboardInstructions);
 		    activities.add(
 			    createNoticeboardActivity(maxUIID, order++, currentActivityPosition, aeNoticeboardContentId,
 				    data.contentFolderID, groupingUIID, null, null, notebookTitle));
@@ -302,7 +302,7 @@ public class TBLTemplateController extends LdTemplateController {
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);
 		String peerReviewTitle = data.getText("boilerplate.peerreview");
 		Long prtoolContentId = createPeerReviewToolContent(userDTO, peerReviewTitle,
-			data.getText("boilerplate.peerreview.instructions"), null, criterias);
+			data.getText("boilerplate.peerreview.instructions"), criterias);
 		activities.add(createPeerReviewActivity(maxUIID, order++, currentActivityPosition, prtoolContentId,
 			data.contentFolderID, groupingUIID, null, null, peerReviewTitle));
 		currentActivityPosition = calcPositionNextRight(currentActivityPosition);

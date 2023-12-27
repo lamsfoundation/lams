@@ -12,8 +12,7 @@
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
-<c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
-<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || isWaitingForLeaderToSubmitNotebook)}" />
+<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished)}" />
 
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
     <!-- ********************  CSS ********************** -->
@@ -480,8 +479,6 @@
         </c:if>
 
         function finish(isTimelimitExpired) {
-            var method = $("#method").val();
-
             var proceed = true;
             // ask for leave confirmation only if time limit is not expired
             if (!isTimelimitExpired) {
@@ -494,7 +491,7 @@
                 document.getElementById("finishButton").disabled = true;
 
                 var myForm = $('#burning-questions');
-                myForm.attr("action", '<lams:WebAppURL />learning/' + method + '.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
+                myForm.attr("action", '<lams:WebAppURL />learning/showResults.do?sessionMapID=${sessionMapID}&date=' + new Date().getTime());
                 myForm.submit();
             }
 
@@ -517,8 +514,8 @@
         </c:if>
 
         <c:if test="${isUserLeader and scratchie.revealOnDoubleClick}">
-            <lams:Alert5 type="warning" id="reveal-double-click-warning" close="false">
-                <i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> <fmt:message key="label.learning.reveal.double.click" />
+            <lams:Alert5 type="info" id="reveal-double-click-warning" close="false">
+                <fmt:message key="label.learning.reveal.double.click" />
             </lams:Alert5>
         </c:if>
 

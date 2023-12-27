@@ -26,13 +26,10 @@ package org.lamsfoundation.lams.tool.imageGallery.service;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
-import org.lamsfoundation.lams.tool.imageGallery.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.imageGallery.dto.Summary;
 import org.lamsfoundation.lams.tool.imageGallery.dto.UserImageContributionDTO;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
@@ -238,42 +235,6 @@ public interface IImageGalleryService extends ToolRatingManager, ICommonToolServ
      * @param itemUid
      */
     void toggleImageVisibility(Long itemUid, Long toolContentId);
-
-    /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list grouped by sessionID.
-     *
-     * @param contentId
-     * @return
-     */
-    Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry);
 
     /**
      * Get user by UID

@@ -64,7 +64,6 @@ public class AssessmentForm {
 	assessment.setShuffledAnswers(false);
 	assessment.setNumbered(false);
 	assessment.setDisplaySummary(false);
-	assessment.setReflectOnActivity(false);
     }
 
     public int getCurrentTab() {

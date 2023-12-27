@@ -24,18 +24,13 @@
 package org.lamsfoundation.lams.tool.zoom.web.controller;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;
 import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
 import org.lamsfoundation.lams.tool.zoom.model.ZoomSession;
@@ -72,21 +67,10 @@ public class LearningController {
     @RequestMapping("finishActivity")
     public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request)
 	    throws IOException {
-
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
 	ZoomUser user = getCurrentUser(toolSessionID);
 
 	if (user != null) {
-	    if (user.getNotebookEntryUID() == null) {
-		user.setNotebookEntryUID(zoomService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, ZoomConstants.TOOL_SIGNATURE, user.getUserId().intValue(),
-			learningForm.getEntryText()));
-	    } else {
-		// update existing entry.
-		zoomService.updateNotebookEntry(user.getNotebookEntryUID(), learningForm.getEntryText());
-	    }
-
 	    user.setFinishedActivity(true);
 	    zoomService.saveOrUpdateZoomUser(user);
 	} else {
@@ -114,53 +98,6 @@ public class LearningController {
 	return user;
     }
 
-    @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute LearningForm learningForm, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
-
-	// set the finished flag
-	ZoomUser user = getCurrentUser(learningForm.getToolSessionID());
-	ContentDTO contentDTO = new ContentDTO(user.getZoomSession().getZoom());
-	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
-
-	NotebookEntry notebookEntry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
-	if (notebookEntry != null) {
-	    learningForm.setEntryText(notebookEntry.getEntry());
-	}
-
-	boolean isLastActivity = zoomService.isLastActivity(learningForm.getToolSessionID());
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-	return "pages/learning/notebook";
-    }
-
-    @RequestMapping("submitReflection")
-    public String submitReflection(@ModelAttribute LearningForm learningForm, HttpServletRequest request)
-	    throws IOException {
-
-	// save the reflection entry and call the notebook.
-	ZoomUser user = getCurrentUser(learningForm.getToolSessionID());
-	Long toolSessionID = user.getZoomSession().getSessionId();
-	Integer userID = user.getUserId().intValue();
-
-	// check for existing notebook entry
-	NotebookEntry entry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
-
-	if (entry == null) {
-	    // create new entry
-	    Long entryUID = zoomService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ZoomConstants.TOOL_SIGNATURE, userID, learningForm.getEntryText());
-	    user.setNotebookEntryUID(entryUID);
-	    zoomService.saveOrUpdateZoomUser(user);
-	} else {
-	    // update existing entry
-	    entry.setEntry(learningForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    zoomService.updateNotebookEntry(entry);
-	}
-
-	return finishActivity(learningForm, request);
-    }
-
     @RequestMapping("/start")
     public String start(@ModelAttribute LearningForm learningForm, HttpServletRequest request) throws Exception {
 	// 'toolSessionID' and 'mode' parameters are expected to be present.
@@ -182,8 +119,6 @@ public class LearningController {
 	ContentDTO contentDTO = new ContentDTO();
 	contentDTO.setTitle(zoom.getTitle());
 	contentDTO.setInstructions(zoom.getInstructions());
-	contentDTO.setReflectOnActivity(zoom.isReflectOnActivity());
-	contentDTO.setReflectInstructions(zoom.getReflectInstructions());
 
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_DTO, contentDTO);
 
@@ -204,12 +139,7 @@ public class LearningController {
 	    user = getCurrentUser(toolSessionID);
 	}
 
-	// get any existing notebook entries and create userDTO
-	NotebookEntry entry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
 	ZoomUserDTO userDTO = new ZoomUserDTO(user);
-	if (entry != null) {
-	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
-	}
 	request.setAttribute(ZoomConstants.ATTR_USER_DTO, userDTO);
 	// set toolSessionID in request
 	request.setAttribute(ZoomConstants.ATTR_TOOL_SESSION_ID, session.getSessionId());

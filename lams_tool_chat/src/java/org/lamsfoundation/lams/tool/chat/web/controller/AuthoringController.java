@@ -190,8 +190,6 @@ public class AuthoringController {
 	chat.setTitle(authoringForm.getTitle());
 	chat.setInstructions(authoringForm.getInstructions());
 	chat.setLockOnFinished(authoringForm.isLockOnFinished());
-	chat.setReflectOnActivity(authoringForm.isReflectOnActivity());
-	chat.setReflectInstructions(authoringForm.getReflectInstructions());
 	chat.setFilteringEnabled(authoringForm.isFilteringEnabled());
 	chat.setFilterKeywords(authoringForm.getFilterKeywords());
     }
@@ -203,8 +201,6 @@ public class AuthoringController {
 	authoringForm.setTitle(chat.getTitle());
 	authoringForm.setInstructions(chat.getInstructions());
 	authoringForm.setLockOnFinished(chat.isLockOnFinished());
-	authoringForm.setReflectOnActivity(chat.isReflectOnActivity());
-	authoringForm.setReflectInstructions(chat.getReflectInstructions());
 	authoringForm.setFilteringEnabled(chat.isFilteringEnabled());
 	authoringForm.setFilterKeywords(chat.getFilterKeywords());
     }

@@ -140,14 +140,6 @@ public class ResourceConstants {
 
     public static final String MODE_AUTHOR_SESSION = "author_session";
 
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
-    public static final String ATTR_REFLECT_LIST = "reflectList";
-
     public static final String ATTR_USER_UID = "userUid";
 
     public static final String SHARED_ITEMS_DEFINITION_NAME = "shared.items.output.definition.rsrc";

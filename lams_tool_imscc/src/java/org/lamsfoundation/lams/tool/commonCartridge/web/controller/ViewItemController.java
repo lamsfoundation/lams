@@ -191,7 +191,6 @@ public class ViewItemController {
     // Private method
     // *************************************************************************************
     /**
-     * Submit reflection form input database.
      *
      * @param mapping
      * @param form

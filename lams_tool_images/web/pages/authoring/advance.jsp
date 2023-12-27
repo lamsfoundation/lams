@@ -98,42 +98,11 @@ $(document).ready(function() {
 <lams:OutcomeAuthor toolContentId="${imageGalleryForm.imageGallery.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
-
 <div class="checkbox">
 	<label for="lock-when-finished">
 		<form:checkbox path="imageGallery.lockWhenFinished" id="lock-when-finished"/>
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
 </div>
-
-<div class="checkbox">
-	<label for="reflect-on">
-		<form:checkbox path="imageGallery.reflectOnActivity" id="reflect-on"/>
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-	</label>
-</div>
-
-<div class="form-group">
-	<textarea name="imageGallery.reflectInstructions" cols="60" rows="3" id="reflect-instructions" class="form-control">${imageGalleryForm.imageGallery.reflectInstructions}</textarea>
-</div>
-
 </lams:SimplePanel>
 
-<script type="text/javascript">
-<!--
-	//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflect-instructions");
-	var rao = document.getElementById("reflect-on");
-	function turnOnRefect(){
-		if (isEmpty(ra.value)) {
-		//turn off	
-			rao.checked = false;
-		} else {
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-//-->
-</script>

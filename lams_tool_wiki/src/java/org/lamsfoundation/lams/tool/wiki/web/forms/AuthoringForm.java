@@ -60,10 +60,6 @@ public class AuthoringForm extends WikiPageForm {
 
     boolean notifyUpdates;
 
-    boolean reflectOnActivity;
-
-    String reflectInstructions;
-
     Integer minimumEdits;
 
     Integer maximumEdits;
@@ -188,22 +184,6 @@ public class AuthoringForm extends WikiPageForm {
 
     public void setNotifyUpdates(boolean notifyUpdates) {
 	this.notifyUpdates = notifyUpdates;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public Integer getMinimumEdits() {

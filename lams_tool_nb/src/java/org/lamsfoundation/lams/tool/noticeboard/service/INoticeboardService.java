@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.noticeboard.service;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardContent;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardSession;
 import org.lamsfoundation.lams.tool.noticeboard.model.NoticeboardUser;
@@ -297,12 +296,6 @@ public interface INoticeboardService extends ICommonToolService {
      * @return the default content id
      */
     public Long getToolDefaultContentIdBySignature(String toolSignature);
-
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
-
-    public void updateEntry(NotebookEntry notebookEntry);
 
     public List<NoticeboardUser> getUsersBySession(Long sessionId);
 }

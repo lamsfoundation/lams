@@ -90,25 +90,16 @@
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
-					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
-						<button type="button" id="finishButton" class="btn btn-primary na">
-							<c:choose>
-								<c:when test="${sessionMap.isLastActivity}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.endLearning" />
-								</c:otherwise>
-							</c:choose>
-						</button>
-					</c:if>
-
-					<c:if test="${generalLearnerFlowDTO.reflection == 'true'}">
-						<button name="forwardtoReflection" type="button" onclick="javascript:submitMethod('storeAllResults');"
-								class="btn btn-primary na">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:if>
+					<button type="button" id="finishButton" class="btn btn-primary na">
+						<c:choose>
+							<c:when test="${sessionMap.isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 				</c:if>
 
 				<c:if test="${!generalLearnerFlowDTO.noReeditAllowed}">

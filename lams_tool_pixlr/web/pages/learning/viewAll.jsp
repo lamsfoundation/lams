@@ -89,14 +89,6 @@
 				</c:if>
 									
 				<div class="activity-bottom-buttons">
-					<c:choose>
-						<c:when test="${pixlrDTO.reflectOnActivity}">
-							<button class="btn btn-primary" onclick="javascript:document.getElementById('learningForm').action = '<lams:WebAppURL />learning/openNotebook.do';">
-								<fmt:message key="button.continue" />
-							</button>
-						</c:when>
-						
-						<c:otherwise>
 							<a href="#nogo" class="btn btn-primary" id="finishButton" onclick="submitForm('finished');return false">
 								<span class="na">
 									<c:choose>
@@ -110,8 +102,6 @@
 									</c:choose>
 								</span>
 							</a>
-						</c:otherwise>
-					</c:choose>
 				</div>
 				
 			</form:form>

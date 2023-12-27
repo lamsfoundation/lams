@@ -194,17 +194,9 @@
 				</div>
 			</div>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.notebookEntry != null && voteGeneralLearnerFlowDTO.notebookEntry != ''}">			
-				<lams:NotebookReedit
-					reflectInstructions="${voteGeneralLearnerFlowDTO.reflectionSubject}"
-					reflectEntry="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					isEditButtonEnabled="false"
-					notebookHeaderLabelKey="label.notebook.entries"/>
-			</c:if>
-
 			<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
 				<div class="activity-bottom-buttons">
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
+					<c:if test="${!hasEditRight}">
 						<button type="button" class="btn btn-primary na" id="finishButton">
 							<c:choose>
 								<c:when test="${isLastActivity}">
@@ -214,12 +206,6 @@
 									<fmt:message key="button.endLearning" />
 								</c:otherwise>
 							</c:choose>
-						</button>
-					</c:if>
-	
-					<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
-						<button type="button" onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary na">
-							<fmt:message key="label.continue" />
 						</button>
 					</c:if>
 	

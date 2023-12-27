@@ -6,9 +6,6 @@
 	toolSessionID="${qaLearningForm.toolSessionID}"
 	submissionDeadline="${sessionMap.submissionDeadline}"
 	finishSessionUrl="/learning/endLearning.do?toolSessionID=${qaLearningForm.toolSessionID}&userID=${qaLearningForm.userID}&sessionMapID=${qaLearningForm.sessionMapID}&totalQuestionCount=${qaLearningForm.totalQuestionCount}"
-	continueReflectUrl="/learning/forwardtoReflection.do?toolSessionID=${qaLearningForm.toolSessionID}&userID=${qaLearningForm.userID}&sessionMapID=${qaLearningForm.sessionMapID}&totalQuestionCount=${qaLearningForm.totalQuestionCount}"
-	isNotebookReeditEnabled="false"
-	isContinueReflectButtonEnabled="${generalLearnerFlowDTO.reflection == 'true'}"
 	isLastActivity="${sessionMap.isLastActivity}" 
 	finishButtonLastActivityLabelKey="button.submit"
 	finishButtonLabelKey="button.endLearning"/>

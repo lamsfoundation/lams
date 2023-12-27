@@ -40,8 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
@@ -194,19 +192,8 @@ public class LearningController implements QaAppConstants {
 	generalLearnerFlowDTO.setSessionMapID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);
 	generalLearnerFlowDTO.setToolContentID(qaContent.getQaContentId().toString());
-
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
-	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-	generalLearnerFlowDTO.setReflectionSubject(qaContent.getReflectionSubject());
-
-	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, userId.intValue());
-	if (notebookEntry != null) {
-	    //String notebookEntryPresentable = QaUtils.replaceNewLines(notebookEntry.getEntry());
-	    qaLearningForm.setEntryText(notebookEntry.getEntry());
-	    generalLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	}
 
 	/*
 	 * Is the tool activity been checked as Define Later in the property inspector?
@@ -462,7 +449,6 @@ public class LearningController implements QaAppConstants {
 	boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
-	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
 
 	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -576,7 +562,7 @@ public class LearningController implements QaAppConstants {
 
     /**
      * Stores all results and moves onto the next step. If view other users answers = true, then goes to the view all
-     * answers screen, otherwise goes straight to the reflection screen (if any).
+     * answers screen.
      *
      * @return Learner Report for a session
      */
@@ -602,8 +588,6 @@ public class LearningController implements QaAppConstants {
 	    LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		    generalLearnerFlowDTO);
 
-	    generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-
 	    boolean lockWhenFinished = qaContent.isLockWhenFinished();
 	    generalLearnerFlowDTO.setLockWhenFinished(new Boolean(lockWhenFinished).toString());
 	    generalLearnerFlowDTO.setNoReeditAllowed(qaContent.isNoReeditAllowed());
@@ -618,20 +602,8 @@ public class LearningController implements QaAppConstants {
 	    boolean usernameVisible = qaContent.isUsernameVisible();
 	    generalLearnerFlowDTO.setUserNameVisible(usernameVisible);
 
-	    NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE, new Integer(userID));
-
-	    if (notebookEntry != null) {
-		// String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
-		String notebookEntryPresentable = notebookEntry.getEntry();
-		qaLearningForm.setEntryText(notebookEntryPresentable);
-	    }
-
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 	    return "learning/LearnerRep";
-
-	} else if (qaContent.isReflect()) {
-	    return forwardtoReflection(request, qaContent, toolSessionID, userID, qaLearningForm);
 
 	} else {
 	    return endLearning(qaLearningForm, request, response);
@@ -673,9 +645,6 @@ public class LearningController implements QaAppConstants {
 
 	LearningController.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapID, user,
 		generalLearnerFlowDTO);
-
-	generalLearnerFlowDTO.setReflection(new Boolean(qaContent.isReflect()).toString());
-	// generalLearnerFlowDTO.setNotebookEntriesVisible(Boolean.FALSE.toString());
 
 	boolean lockWhenFinished;
 	boolean noReeditAllowed;
@@ -933,90 +902,6 @@ public class LearningController implements QaAppConstants {
 	response.sendRedirect(nextActivityUrl);
 
 	return null;
-    }
-
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
-	    HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException, ToolException {
-
-	LearningUtil.saveFormRequestData(request, qaLearningForm);
-
-	String sessionMapID = qaLearningForm.getSessionMapID();
-
-	qaLearningForm.setSessionMapID(sessionMapID);
-
-	String toolSessionIDString = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	qaLearningForm.setToolSessionID(toolSessionIDString);
-	Long toolSessionID = new Long(toolSessionIDString);
-
-	String userIDString = request.getParameter("userID");
-	qaLearningForm.setUserID(userIDString);
-	Integer userID = new Integer(userIDString);
-
-	String reflectionEntry = request.getParameter(QaAppConstants.ENTRY_TEXT);
-
-	// check for existing notebook entry
-	NotebookEntry entry = qaService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
-		userID);
-
-	if (entry == null) {
-	    // create new entry
-	    qaService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    QaAppConstants.MY_SIGNATURE, userID, reflectionEntry);
-
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionEntry);
-	    entry.setLastModified(new Date());
-	    qaService.updateEntry(entry);
-	}
-
-	return endLearning(qaLearningForm, request, response);
-    }
-
-    @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(@ModelAttribute("qaLearningForm") QaLearningForm qaLearningForm,
-	    HttpServletRequest request) throws IOException, ServletException, ToolException {
-
-	String sessionMapID = qaLearningForm.getSessionMapID();
-
-	qaLearningForm.setSessionMapID(sessionMapID);
-
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	QaSession qaSession = qaService.getSessionById(new Long(toolSessionID).longValue());
-
-	QaContent qaContent = qaSession.getQaContent();
-
-	String userID = request.getParameter("userID");
-	qaLearningForm.setUserID(userID);
-
-	return forwardtoReflection(request, qaContent, toolSessionID, userID, qaLearningForm);
-    }
-
-    private String forwardtoReflection(HttpServletRequest request, QaContent qaContent, String toolSessionID,
-	    String userID, QaLearningForm reflectionForm) {
-
-	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
-	generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
-	String reflectionSubject = qaContent.getReflectionSubject();
-	// reflectionSubject = QaUtils.replaceNewLines(reflectionSubject);
-	generalLearnerFlowDTO.setReflectionSubject(reflectionSubject);
-
-	// attempt getting notebookEntry
-	NotebookEntry notebookEntry = qaService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		QaAppConstants.MY_SIGNATURE, new Integer(userID));
-
-	if (notebookEntry != null) {
-	    // String notebookEntryPresentable=QaUtils.replaceNewLines(notebookEntry.getEntry());
-	    String notebookEntryPresentable = notebookEntry.getEntry();
-	    generalLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-	    reflectionForm.setEntryText(notebookEntryPresentable);
-	}
-
-	request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	return "learning/Notebook";
     }
 
     /**

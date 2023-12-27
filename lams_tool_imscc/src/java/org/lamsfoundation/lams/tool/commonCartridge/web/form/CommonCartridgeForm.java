@@ -70,7 +70,6 @@ public class CommonCartridgeForm {
 	if (!StringUtils.equals(param, "start") && !StringUtils.equals(param, "initPage")) {
 	    commonCartridge.setDefineLater(false);
 	    commonCartridge.setRunAuto(false);
-	    commonCartridge.setReflectOnActivity(false);
 	}
     }
 

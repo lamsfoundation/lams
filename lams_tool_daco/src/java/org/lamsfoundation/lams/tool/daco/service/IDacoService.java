@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.daco.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.daco.dao.DacoAnswerDAO;
 import org.lamsfoundation.lams.tool.daco.dto.MonitoringSummarySessionDTO;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
@@ -159,34 +158,6 @@ public interface IDacoService extends ICommonToolService {
     DacoQuestion getDacoQuestionByUid(Long questionUid);
 
     /**
-     * Create refection entry into notebook tool.
-     *
-     * @param sessionId
-     * @param notebook_tool
-     * @param tool_signature
-     * @param userId
-     * @param entryText
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     *
-     * @param sessionId
-     * @param idType
-     * @param signature
-     * @param userID
-     * @return
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * @param notebookEntry
-     */
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
      * Get user by UID
      *
      * @param uid
@@ -289,8 +260,7 @@ public interface IDacoService extends ICommonToolService {
     List<MonitoringSummarySessionDTO> getSummaryForExport(Long contentId, Long userUid);
 
     /** Get a paged user list for monitoring */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 

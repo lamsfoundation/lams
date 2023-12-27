@@ -23,11 +23,20 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.web.controller;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants;
 import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
@@ -37,7 +46,6 @@ import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.tool.whiteboard.service.IWhiteboardService;
 import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardApplicationException;
 import org.lamsfoundation.lams.tool.whiteboard.service.WhiteboardService;
-import org.lamsfoundation.lams.tool.whiteboard.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -48,20 +56,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Controller
 @RequestMapping("/learning")
@@ -139,22 +137,9 @@ public class LearningController {
 	boolean isUserLeader = user != null && leader != null && user.getUid().equals(leader.getUid());
 	boolean hasEditRight = !whiteboard.isUseSelectLeaderToolOuput() || isUserLeader;
 	sessionMap.put(WhiteboardConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(WhiteboardConstants.ATTR_REFLECTION_ON, whiteboard.isReflectOnActivity());
 	sessionMap.put(AttributeNames.ATTR_IS_LAST_ACTIVITY, whiteboardService.isLastActivity(toolSessionId));
 	sessionMap.put(WhiteboardConstants.ATTR_WHITEBOARD, whiteboard);
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
-
-	// reflection information
-	String entryText = new String();
-	if (user != null) {
-	    NotebookEntry notebookEntry = whiteboardService.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WhiteboardConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-	sessionMap.put(WhiteboardConstants.ATTR_REFLECTION_INSTRUCTION, whiteboard.getReflectInstructions());
-	sessionMap.put(WhiteboardConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	if (whiteboard.isGalleryWalkEnabled() && mode != null && mode.isAuthor()) {
 	    String[] galleryWalkParameterValuesArray = request.getParameterValues("galleryWalk");
@@ -299,68 +284,6 @@ public class LearningController {
 
 	String nextActivityUrl = whiteboardService.finishToolSession(sessionId, userID);
 	response.sendRedirect(nextActivityUrl);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @SuppressWarnings("unchecked")
-    @RequestMapping("/newReflection")
-    private String newReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, WhiteboardConstants.ATTR_SESSION_MAP_ID);
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = whiteboardService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		WhiteboardConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    private void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm reflectionForm,
-	    HttpServletRequest request, HttpServletResponse response)
-	    throws WhiteboardApplicationException, IOException {
-	Integer userId = reflectionForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, WhiteboardConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = whiteboardService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		WhiteboardConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    whiteboardService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    WhiteboardConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    whiteboardService.updateEntry(entry);
-	}
-
-	finish(request, response);
     }
 
     // *************************************************************************************

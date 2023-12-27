@@ -51,14 +51,9 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                 if (activityData.status === 0) {
                     activityItem.addClass('active');
                     $(".col", activityItem).text(activityName);
-                    if (activityData.type === 'g') {
-                        activityIcon.addClass('fa-solid fa-unlock')
-                            .attr('title', LABEL_CURRENT_GATE);
+                    activityIcon.addClass('fa-regular fa-pen-to-square')
+	                    .attr('title', LABEL_CURRENT_ACTIVITY);
 
-                    } else {
-                        activityIcon.addClass('fa-regular fa-pen-to-square')
-                            .attr('title', LABEL_CURRENT_ACTIVITY);
-                    }
                 } else {
                     let target = '_blank';
 
@@ -67,27 +62,16 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                         completedActivityCount++;
 
                         activityItem.addClass('progress-bar-item-complete');
-                        if (activityData.type === 'g') {
-                            activityIcon.addClass('fa-solid fa-lock-open')
-                                .attr('title', LABEL_COMPLETED_GATE);
-
-                        } else {
-                            activityIcon.addClass('fa-solid fa-square-check')
-                                .attr('title', LABEL_COMPLETED_ACTIVITY);
-                        }
+                        activityIcon.addClass('fa-solid fa-square-check')
+                            .attr('title', LABEL_COMPLETED_ACTIVITY);
                     } else {
                         target = '_self';
                         //not yet finished
                         activityItem.addClass('progress-bar-item-incomplete');
-                        if (activityData.type === 'g') {
-                            activityIcon.addClass('fa-solid fa-lock')
-                                .attr('title', LABEL_NOT_STARTED_GATE);
-
-                        } else {
-                            activityIcon.addClass('fa-regular fa-square')
-                                .attr('title', LABEL_NOT_STARTED_ACTIVITY);
-                        }
+                        activityIcon.addClass('fa-regular fa-square')
+                        	.attr('title', LABEL_NOT_STARTED_ACTIVITY);
                     }
+
                     if (activityData.url) {
                         let activityLink = $('<a>').text(activityName).attr({
                             'target': target,
@@ -109,7 +93,6 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                 .css('width', progressBarWidgetValue + '%')
                 .attr('aria-valuenow', progressBarWidgetValue);
             $('#progress-bar-widget-value').text(progressBarWidgetValue + '%');
-
 
             initCommandWebsocket(result.lessonID);
         }

@@ -72,7 +72,6 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="peerreviewMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		<property name="ratingService"><ref bean="ratingService"/></property> 
  		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
      </bean>

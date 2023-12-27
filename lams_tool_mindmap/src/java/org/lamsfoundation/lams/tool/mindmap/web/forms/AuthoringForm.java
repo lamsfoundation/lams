@@ -40,10 +40,6 @@ public class AuthoringForm {
     private SessionMap sessionMap;
     private String mindmapContent;
 
-    // reflection
-    private boolean reflectOnActivity;
-    private String reflectInstructions;
-
     public String getSessionMapID() {
 	return sessionMapID;
     }
@@ -138,21 +134,5 @@ public class AuthoringForm {
 
     public void setMindmapContent(String mindmapContent) {
 	this.mindmapContent = mindmapContent;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
     }
 }
