@@ -132,51 +132,6 @@
 		</div>
 	</c:if>
 
-	<c:if test="${dto.reflectOnActivity}">
-		<div class="panel panel-default voffset10" style="margin-bottom:5px" >
-        <div class="panel-heading  ${subpanelHeadingClass}"><span class="panel-title"><fmt:message key="heading.reflections" /></span></div>
-		<table class="table table-condensed table-striped">
-			<tr>
-				<th>
-					<fmt:message>heading.learner</fmt:message>
-				</th>
-
-				<th style="text-align: right">
-					<c:choose>
-						<c:when test="${dto.reflectOnActivity}">
-							<fmt:message key="heading.reflection" />
-						</c:when>
-						<c:otherwise>
-							&nbsp;
-						</c:otherwise>
-					</c:choose>
-				</th>
-			</tr>
-
-			<c:forEach var="user" items="${session.userDTOs}">
-				<tr>
-					<td>
-						<lams:Portrait userId="${user.userID}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
-					</td>
-					<c:if test="${dto.reflectOnActivity}">
-						<td style="text-align: right">
-							<c:if test="${user.finishedReflection}">
-								<c:url value="monitoring/openNotebook.do" var="openNotebook">
-									<c:param name="uid" value="${user.uid}" />
-								</c:url>
-								<a href="javascript:launchPopup('${openNotebook}','<fmt:message key="heading.reflection" />');" class="btn btn-default btn-sm" >
-									<fmt:message key="link.view" />
-								</a>
-							</c:if>
-						</td>
-					</c:if>
-				</tr>
-			</c:forEach>
-		</table>
-		</div>
-	</c:if>
-
-
 	<c:if test="${isGroupedActivity}">
 		</div>
 		</div> <!-- end collapse area  -->
@@ -227,35 +182,5 @@
 			</c:choose>	
 		</td>
 	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.reflectOnActivity}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${dto.reflectOnActivity}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					<lams:out value="${dto.reflectInstructions}" escapeHtml="true" />	
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
 </table>
 </lams:AdvancedAccordian>

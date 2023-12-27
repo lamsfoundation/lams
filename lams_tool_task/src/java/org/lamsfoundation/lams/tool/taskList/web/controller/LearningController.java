@@ -40,8 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.taskList.TaskListConstants;
 import org.lamsfoundation.lams.tool.taskList.dto.TasListItemDTO;
@@ -52,12 +50,10 @@ import org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListSession;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListUser;
 import org.lamsfoundation.lams.tool.taskList.service.ITaskListService;
-import org.lamsfoundation.lams.tool.taskList.service.TaskListException;
 import org.lamsfoundation.lams.tool.taskList.service.UploadTaskListFileException;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemAttachmentComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemCommentComparator;
 import org.lamsfoundation.lams.tool.taskList.util.TaskListItemComparator;
-import org.lamsfoundation.lams.tool.taskList.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.taskList.web.form.TaskListItemForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
@@ -146,16 +142,6 @@ public class LearningController implements TaskListConstants {
 
 	// check whehter finish lock is on/off
 	boolean lock = taskList.getLockWhenFinished() && taskListUser != null && taskListUser.isSessionFinished();
-
-	// get notebook entry
-	String entryText = new String();
-	if (taskListUser != null) {
-	    NotebookEntry notebookEntry = taskListService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    TaskListConstants.TOOL_SIGNATURE, taskListUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
 
 	// set complete flag for display purpose
 	if (taskListUser != null) {
@@ -279,10 +265,6 @@ public class LearningController implements TaskListConstants {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	sessionMap.put(TaskListConstants.ATTR_TASK_LIST_ITEM_DTOS, itemDTOs);
-	// reflection information
-	sessionMap.put(TaskListConstants.ATTR_REFLECTION_ON, taskList.isReflectOnActivity());
-	sessionMap.put(TaskListConstants.ATTR_REFLECTION_INSTRUCTION, taskList.getReflectInstructions());
-	sessionMap.put(TaskListConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (taskList.isDefineLater()) {
@@ -340,8 +322,7 @@ public class LearningController implements TaskListConstants {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public String finish(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+    public String finish(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	// auto run mode, when use finish the only one taskList item, mark it as complete then finish this activity as well
 	String taskListItemUid = request.getParameter(TaskListConstants.PARAM_ITEM_UID);
 	if (taskListItemUid != null) {
@@ -516,68 +497,6 @@ public class LearningController implements TaskListConstants {
 		sessionId.toString());
 
 	return redirectURL;
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "pages/learning/learning";
-	}
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	;
-	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = taskListService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		TaskListConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "pages/learning/parts/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-	Integer userId = reflectionForm.getUserID();
-
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = taskListService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		TaskListConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    taskListService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    TaskListConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    taskListService.updateEntry(entry);
-	}
-
-	return finish(reflectionForm, request, response);
     }
 
     // *************************************************************************************

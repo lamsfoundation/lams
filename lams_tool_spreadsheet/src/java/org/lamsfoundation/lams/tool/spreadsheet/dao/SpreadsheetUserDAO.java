@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.tool.spreadsheet.dao;
 
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -38,7 +37,7 @@ public interface SpreadsheetUserDAO extends DAO {
     List<SpreadsheetUser> getBySessionID(Long sessionId);
 
     List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
-	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService, IUserManagementService userManagementService);
+	    IUserManagementService userManagementService);
 
     int getCountUsersBySession(final Long sessionId, String searchString);
 }

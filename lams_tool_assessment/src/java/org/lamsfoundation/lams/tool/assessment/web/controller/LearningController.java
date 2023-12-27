@@ -57,7 +57,6 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LearnerInteractionEvent;
 import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -80,11 +79,9 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentSection;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.tool.assessment.service.AssessmentApplicationException;
 import org.lamsfoundation.lams.tool.assessment.service.IAssessmentService;
 import org.lamsfoundation.lams.tool.assessment.util.AssessmentSessionComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
-import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -101,7 +98,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -304,14 +300,6 @@ public class LearningController {
 	//showResults if user has finished the last result
 	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
 
-	// get notebook entry
-	String entryText = new String();
-	AssessmentUser notebookCreator = (groupLeader == null) ? user : groupLeader;
-	NotebookEntry notebookEntry = service.getEntry(toolSessionId, notebookCreator.getUserId().intValue());
-	if (notebookEntry != null) {
-	    entryText = notebookEntry.getEntry();
-	}
-
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
@@ -323,10 +311,6 @@ public class LearningController {
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AssessmentConstants.ATTR_USER, user);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	Boolean isLastActivity = (Boolean) sessionMap.get(AttributeNames.ATTR_IS_LAST_ACTIVITY);
 	if (isLastActivity == null) {
@@ -758,59 +742,6 @@ public class LearningController {
 	}
 	response.setContentType("application/json;charset=utf-8");
 	return responseJSON.toString();
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = service.getEntry(toolSessionID, user.getUserID());
-
-	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
-	}
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    public void submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	Integer userId = refForm.getUserID();
-
-	SessionMap<String, Object> sessionMap = getSessionMap(request);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    service.createNotebookEntry(sessionId, userId, refForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
-	}
-
-	finish(request, response);
     }
 
     // *************************************************************************************

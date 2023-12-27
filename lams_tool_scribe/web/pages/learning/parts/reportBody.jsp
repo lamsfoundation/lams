@@ -32,27 +32,6 @@
 	</div>
 </c:forEach>
 
-<c:if test="${scribeUserDTO.finishedActivity and scribeDTO.reflectOnActivity}">
-	<div class="row">
-		<div class="col-12">
-			<div class="panel panel-default">
-				<div class="panel-heading panel-title">
-					<fmt:message key="heading.reflection" />
-				</div>
-				<div class="panel-body">
-					<div class="panel">
-						<lams:out value="${scribeDTO.reflectInstructions}" escapeHtml="true" />
-					</div>
-
-					<div class="panel-body bg-warning mt-2">
-						<lams:out value="${scribeUserDTO.notebookEntry}" escapeHtml="true" />
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</c:if>
-
 
 <c:if test="${not empty otherScribeSessions}">
 	<h4>

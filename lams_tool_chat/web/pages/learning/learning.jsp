@@ -101,51 +101,21 @@
 		</c:if>
 		
 		<c:if test="${MODE == 'learner' || MODE == 'author'}">
-			<form action="openNotebook.do" method="post">
-				<input type="hidden" name="chatUserUID" value="${chatUserDTO.uid}" />
-			
-				<c:if test="${chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
-					<br class="mt-5">
-					<lams:NotebookReedit
-						reflectInstructions="${chatDTO.reflectInstructions}"
-						reflectEntry="${chatUserDTO.notebookEntry}"
-						isEditButtonEnabled="true"
-						notebookHeaderLabelKey="button.reflect"
-						editNotebookLabelKey="button.edit"/>
-				</c:if>
-			</form>
-
 			<div class="activity-bottom-buttons" id="learner-submit">
-				<c:choose>
-					<c:when test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
-						<form:form action="openNotebook.do" method="post"
-								onsubmit="disableFinishButton();" modelAttribute="learningForm" id="learningForm">
-							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-							<button type="submit" class="btn btn-primary na mt-2">
-								<fmt:message key="button.continue" />
-							</button>
-						</form:form>
-					</c:when>
-
-					<c:otherwise>
-						<form:form action="finishActivity.do" method="post"
-								onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
-							<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
-							<button type="button" class="btn btn-primary mt-2 na" id="finishButton">
-								 <c:choose>
-								 	<c:when test="${isLastActivity}">
-								 		 <fmt:message key="button.submit" />
-								 	</c:when>
-								 	<c:otherwise>
-								 		 <fmt:message key="button.finish" />
-								 	</c:otherwise>
-								 </c:choose>
-							</button>
-						</form:form>
-					</c:otherwise>
-				</c:choose>
+				<form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();"  modelAttribute="learningForm" id="learningForm">
+					<form:hidden path="chatUserUID" value="${chatUserDTO.uid}" />
+					<button type="button" class="btn btn-primary mt-2 na" id="finishButton">
+						 <c:choose>
+						 	<c:when test="${isLastActivity}">
+						 		 <fmt:message key="button.submit" />
+						 	</c:when>
+						 	<c:otherwise>
+						 		 <fmt:message key="button.finish" />
+						 	</c:otherwise>
+						 </c:choose>
+					</button>
+				</form:form>
 			</div>
-
 		</c:if>
 	</div>
 </lams:PageLearner>

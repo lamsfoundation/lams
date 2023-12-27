@@ -16,10 +16,6 @@
         	saveUserSpreadsheet("finishSession");
 		}
 		
-		function continueReflect(){
-			saveUserSpreadsheet("continueReflect");
-		}
-		
 		//save changes made in spreadsheet
 		function saveUserSpreadsheet(typeOfAction){
 			var code = window.frames["externalSpreadsheet"].cellsToJS();
@@ -113,37 +109,19 @@
 			</div>
 		</div>
 
-		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="${hasEditRight}"
-				notebookHeaderLabelKey="title.reflection"/>
-		</c:if>
-
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
-				<c:choose>
-					<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">				
-						<button type="button" name="FinishButton" onclick="return continueReflect()" class="btn btn-primary na">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:when>
-					<c:otherwise>
-						<button type="button" class="btn btn-primary na" id="finishButton">
-							<c:choose>
-			 					<c:when test="${sessionMap.isLastActivity}">
-			 						<fmt:message key="label.submit" />
-			 					</c:when>
-			 					<c:otherwise>
-			 		 				<fmt:message key="label.finished" />
-			 					</c:otherwise>
-			 				</c:choose>
-						</button>
-					</c:otherwise>
-				</c:choose>
+				<button type="button" class="btn btn-primary na" id="finishButton">
+					<c:choose>
+			 			<c:when test="${sessionMap.isLastActivity}">
+			 				<fmt:message key="label.submit" />
+			 			</c:when>
+			 			<c:otherwise>
+			 				<fmt:message key="label.finished" />
+			 			</c:otherwise>
+			 		</c:choose>
+				</button>
 			</div>
 		</c:if>
-
 	</div>
 </lams:PageLearner>

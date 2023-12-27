@@ -91,14 +91,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
     @Column(name = "notify_updates")
     private boolean notifyUpdates;
 
-    // Add notebook at the end of activity
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    // instructions for notebook
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     // Minimum number of edits a learner must do before finishing activity
     @Column(name = "minimum_edits")
     private Integer minimumEdits;
@@ -218,22 +210,6 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     public void setNotifyUpdates(boolean notifyUpdates) {
 	this.notifyUpdates = notifyUpdates;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public Integer getMinimumEdits() {

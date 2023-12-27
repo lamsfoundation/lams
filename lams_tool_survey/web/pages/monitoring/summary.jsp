@@ -45,12 +45,6 @@
 		<c:set var="questions"  value="${group.value}"/>
 		
 		<c:set var="sessionButtons">
-			<c:if test="${sessionMap.survey.reflectOnActivity}">
-				<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
-				<button onclick="launchPopup('${listReflections}');return false;" class="btn btn-default btn-disable-on-submit ${sessionButtonSize}">
-					<fmt:message key="page.title.monitoring.view.reflection" />
-				</button>
-			</c:if>	
 			<button onclick="return exportSurvey(${surveySession.sessionId});" property="exportExcel" class="btn btn-default btn-disable-on-submit ${sessionButtonSize} loffset5">
 				<i class="fa fa-download" aria-hidden="true"></i>
 				<fmt:message key="label.monitoring.button.export.excel" />

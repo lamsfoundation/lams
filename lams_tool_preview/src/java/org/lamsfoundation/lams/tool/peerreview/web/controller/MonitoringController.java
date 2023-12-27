@@ -73,7 +73,6 @@ public class MonitoringController {
     private static final String MONITORING_PATH = "/pages/monitoring/monitoring";
     private static final String CRITERIA_PATH = "/pages/monitoring/criteria";
     private static final String STATISTICS_PATH = "/pages/monitoring/statisticpart";
-    private static final String REFLECTIONS_PATH = "/pages/monitoring/reflections";
     private static final String EMAIL_PREVIEW_PATH = "pages/monitoring/emailpreview";
     private static final String MANAGE_USERS_PATH = "/pages/monitoring/manageUsers";
 
@@ -381,109 +380,6 @@ public class MonitoringController {
 	request.setAttribute("summaryList", service.getStatistics(toolContentId));
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return STATISTICS_PATH;
-    }
-
-    @RequestMapping("/reflections")
-    @SuppressWarnings("unchecked")
-    public String reflections(HttpServletRequest request, HttpServletResponse response) {
-
-	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
-
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-	request.setAttribute("toolSessionId", toolSessionId);
-
-	return REFLECTIONS_PATH;
-    }
-
-    @RequestMapping("/getReflections")
-    @ResponseBody
-    @SuppressWarnings("unchecked")
-    public String getReflections(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	sessionMap.remove("emailPreviewDTO"); // clear any old cached emails
-
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-
-	// Getting the params passed in from the jqGrid
-	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
-	int size = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_ROWS);
-	String sortOrder = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SORD);
-	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
-
-	int sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-
-	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NAME)) {
-	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
-		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
-	    } else {
-		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-	    }
-	} else if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NOTEBOOK)) {
-	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
-		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_DESC;
-	    } else {
-		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC;
-	    }
-	}
-
-	String searchString = WebUtil.readStrParam(request, "itemDescription", true);
-
-	// setting date format to ISO8601 for jquery.timeago
-	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
-	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-	int sessionUserCount = service.getCountUsersBySession(toolSessionId, -1L);
-
-	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
-	responcedata.put("page", page + 1);
-	responcedata.put("total", Math.ceil((float) sessionUserCount / size));
-	responcedata.put("records", sessionUserCount);
-
-	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, page, size, sorting,
-		searchString);
-
-	// processed data from db is user.user_id, user.first_name, escaped( first_name + last_name), notebook entry, notebook date
-	// if no rating or comment, then the entries will be null and not an empty string
-	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	int i = 0;
-
-	for (Object[] nbEntry : nbEntryList) {
-	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
-	    userData.add(asLong(nbEntry[0])); // user id
-	    userData.add((String) nbEntry[2]); // user name
-
-	    Date entryTime = (Date) nbEntry[5]; // when....
-	    if (entryTime == null) {
-		userData.add("");
-	    } else {
-		StringBuilder nameField = new StringBuilder("<time class=\"timeago\" title=\"").append(
-				DateUtil.convertToStringForJSON(entryTime, request.getLocale())).append("\" datetime=\"")
-			.append(dateFormatterTimeAgo.format(entryTime)).append("\"></time>");
-		userData.add(nameField.toString());
-	    }
-
-	    userData.add((String) nbEntry[3]);
-	    userData.add(HtmlUtils.htmlEscape((String) nbEntry[4]));
-
-	    ObjectNode userRow = JsonNodeFactory.instance.objectNode();
-	    userRow.put("id", i++);
-	    userRow.set("cell", userData);
-
-	    rows.add(userRow);
-	}
-
-	responcedata.set("rows", rows);
-
-	response.setContentType("application/json;charset=utf-8");
-	return responcedata.toString();
     }
 
     @RequestMapping("/previewResultsToUser")

@@ -27,7 +27,6 @@ package org.lamsfoundation.lams.tool.wiki.service;
 import java.util.List;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
@@ -229,30 +228,6 @@ public interface IWikiService extends ICommonToolService {
      * @return
      */
     public WikiUser createWikiUser(UserDTO user, WikiSession wikiSession);
-
-    /**
-     * Creates a core notebook entry
-     *
-     * @param id
-     * @param idType
-     * @param signature
-     * @param userID
-     * @param entry
-     * @return
-     */
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    /**
-     * Gets the entry from the database
-     *
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    /**
-     * Updates an existing notebook entry
-     *
-     */
-    void updateEntry(NotebookEntry notebookEntry);
 
     /**
      * This method compares two strings and returns a java html diff of the two

@@ -128,42 +128,6 @@ $(document).ready(function(){
 					</td>
 				</tr>
 			</c:if>
-			
-				<%-- Reflection list  --%>
-				<c:if test="${sessionMap.commonCartridge.reflectOnActivity && status.last}">
-					<c:set var="userList" value="${sessionMap.reflectList[item.sessionId]}"/>
-					<c:forEach var="user" items="${userList}" varStatus="refStatus">
-						<c:if test="${refStatus.first}">
-							<tr>
-								<td colspan="4">
-									<b><fmt:message key="title.reflection"/>	</b>
-								</td>
-							</tr>
-							<tr>
-								<th colspan="2">
-									<fmt:message key="monitoring.user.fullname"/>
-								</th>
-								<th colspan="2">
-									<fmt:message key="monitoring.user.reflection"/>
-								</th>
-							</tr>
-						</c:if>
-						<tr>
-							<td colspan="2">
-								<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.fullName}" escapeXml="true"/></lams:Portrait>
-							</td>
-							<td colspan="2" class="align-right">
-								<c:set var="viewReflection">
-									<c:url value="/monitoring/viewReflection.do?toolSessionID=${item.sessionId}&userUid=${user.userUid}"/>
-								</c:set>
-								<a href="javascript:launchPopup('${viewReflection}')" class="btn btn-default btn-xs loffset5">
-									<fmt:message key="label.view" />
-								</a>
-							</td>
-						</tr>
-					</c:forEach>
-				</c:if>
-			
 		</c:forEach>	
 	</table>
 	

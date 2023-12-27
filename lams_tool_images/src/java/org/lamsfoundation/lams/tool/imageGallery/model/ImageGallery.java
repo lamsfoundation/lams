@@ -106,12 +106,6 @@ public class ImageGallery implements Serializable, Cloneable {
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     private Set<LearnerItemRatingCriteria> ratingCriterias = new HashSet<>();
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "image_submit_notify")
     private boolean notifyTeachersOnImageSumbit;
 
@@ -407,22 +401,6 @@ public class ImageGallery implements Serializable, Cloneable {
 
     public void setAllowVote(boolean allowVote) {
 	this.allowVote = allowVote;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isAllowRank() {

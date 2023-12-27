@@ -99,14 +99,6 @@ public class SurveyConstants {
 
     public static final String MSG_BARCHART_VALUE_AXIS_LABEL = "barchart.value.axis.label";
 
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECT_LIST = "reflectList";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
 
     public static final String PAGE_EDITABLE = "isPageEditable";
@@ -168,8 +160,6 @@ public class SurveyConstants {
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
     public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
-
-    public static final String ATTR_REFLECTION = "notebookEntry";
 
     public static final String ATTR_PORTRAIT_ID = "portraitId";
 

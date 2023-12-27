@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,9 +54,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
@@ -80,7 +76,6 @@ import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceSessionDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceUserDAO;
-import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
@@ -135,8 +130,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -438,35 +431,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     }
 
     @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
-	List<ReflectDTO> reflections = new LinkedList<>();
-
-	List<ResourceSession> sessionList = resourceSessionDao.getByContentId(contentId);
-	for (ResourceSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<ResourceUser> users = resourceUserDao.getBySessionID(sessionId);
-	    for (ResourceUser user : users) {
-
-		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflections.add(ref);
-		}
-
-	    }
-
-	}
-
-	return reflections;
-    }
-
-    @Override
     public List<ResourceUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
 	List<ResourceItemVisitLog> logList = resourceItemVisitDao.getResourceItemLogBySession(sessionId, itemUid);
 	List<ResourceUser> userList = new ArrayList(logList.size());
@@ -524,28 +488,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    item.setHide(!visible);
 	    resourceItemDao.saveObject(item);
 	}
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -918,13 +860,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    return;
 	}
 
-	for (ResourceSession session : resourceSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ResourceConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	resourceDao.delete(resource);
     }
 
@@ -966,12 +901,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	for (ResourceSession session : sessions) {
 	    ResourceUser user = resourceUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ResourceConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    resourceDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
 		resourceUserDao.removeObject(ResourceUser.class, user.getUid());
 	    }
 	}
@@ -1144,14 +1073,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	this.userManagementService = userManagementService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
     }
@@ -1219,9 +1140,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	resource.setMiniViewResourceNumber(JsonUtil.optInt(toolContentJSON, "minViewResourceNumber", 0));
 	resource.setNotifyTeachersOnAssigmentSumbit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAssigmentSubmit", Boolean.FALSE));
-	resource.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	resource.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	resource.setContentInUse(false);
 	resource.setDefineLater(false);

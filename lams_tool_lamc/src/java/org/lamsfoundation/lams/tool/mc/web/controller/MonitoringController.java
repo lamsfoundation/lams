@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -41,16 +40,12 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.dto.LeaderResultsDTO;
-import org.lamsfoundation.lams.tool.mc.dto.McGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McGeneralMonitoringDTO;
 import org.lamsfoundation.lams.tool.mc.dto.McUserMarkDTO;
-import org.lamsfoundation.lams.tool.mc.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.model.McContent;
 import org.lamsfoundation.lams.tool.mc.model.McOptsContent;
@@ -143,8 +138,6 @@ public class MonitoringController {
 	request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
 	request.setAttribute("displayFeedbackOnly", mcContent.isDisplayFeedbackOnly());
 	request.setAttribute("retries", mcContent.isRetries());
-	request.setAttribute("reflect", mcContent.isReflect());
-	request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
 	request.setAttribute("passMark", mcContent.getPassMark());
 	request.setAttribute("toolContentID", mcContent.getMcContentId());
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
@@ -170,9 +163,6 @@ public class MonitoringController {
 
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 	mcGeneralMonitoringDTO.setDisplayFeedbackOnly(new Boolean(mcContent.isDisplayFeedbackOnly()).toString());
-
-	List<ReflectionDTO> reflectionsContainerDTO = mcService.getReflectionList(mcContent, null);
-	request.setAttribute(McAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
 	request.setAttribute(McAppConstants.MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
 
@@ -236,30 +226,6 @@ public class MonitoringController {
 	redirect = WebUtil.appendParameterToURL(redirect, McAppConstants.TOOL_CONTENT_ID, strToolContentID);
 	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	return redirect;
-    }
-
-    /**
-     * allows viewing users reflection data
-     */
-    @RequestMapping("/openNotebook")
-    public String openNotebook(HttpServletRequest request) {
-
-	String userId = request.getParameter("userId");
-	String userName = request.getParameter("userName");
-	String sessionId = request.getParameter("sessionId");
-	NotebookEntry notebookEntry = mcService.getEntry(new Long(sessionId), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.TOOL_SIGNATURE, new Integer(userId));
-
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = new McGeneralLearnerFlowDTO();
-	if (notebookEntry != null) {
-	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	    mcGeneralLearnerFlowDTO.setUserName(userName);
-	}
-
-	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	return "monitoring/LearnerNotebook";
     }
 
     /**

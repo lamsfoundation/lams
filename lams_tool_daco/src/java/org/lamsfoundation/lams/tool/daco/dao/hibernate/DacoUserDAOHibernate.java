@@ -31,7 +31,6 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.dao.DacoUserDAO;
 import org.lamsfoundation.lams.tool.daco.model.DacoUser;
@@ -94,12 +93,10 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
     @Override
     @SuppressWarnings("unchecked")
     /**
-     * Will return List<[DacoUser, Integer (record count), String (notebook entry)], [DacoUser, Integer, String], ... ,
-     * [DacoUser, Integer, String]>
-     * where the String is the notebook entry. No notebook entries needed? Will return "null" in their place.
+     * Will return List<[DacoUser, Integer (record count)], [DacoUser, Integer], ... ,
+     * [DacoUser, Integer]>
      */
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries, ICoreNotebookService coreNotebookService,
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
 	    IUserManagementService userManagementService) {
 
 	String sortingOrder;
@@ -121,20 +118,12 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 		sortingOrder = "user.uid";
 	}
 
-	// If the session uses notebook, then get the SQL to join across to get the entries
-	String[] notebookEntryStrings = null;
-	if (getNotebookEntries) {
-	    notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		    DacoConstants.TOOL_SIGNATURE, "user.user_id");
-	}
-
 	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
 	
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
 
 	queryText.append("SELECT user.* ")
-		.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry")
 		.append(", COUNT(DISTINCT(record_id)) record_count ")
 		.append(portraitStrings[0])
 		.append(" FROM tl_ladaco10_users user ")
@@ -146,11 +135,6 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 
 	queryText.append(" LEFT JOIN tl_ladaco10_answers ans ON ans.user_uid = user.uid");
 
-	// If using notebook, add the notebook join
-	if (notebookEntryStrings != null) {
-	    queryText.append(notebookEntryStrings[1]);
-	}
-
 	queryText.append(" GROUP BY user.uid");
 
 	// Now specify the sort based on the switch statement above.
@@ -158,12 +142,10 @@ public class DacoUserDAOHibernate extends LAMSBaseDAO implements DacoUserDAO {
 
 	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
 	query.addEntity("user", DacoUser.class).addScalar("record_count", IntegerType.INSTANCE)
-		.addScalar("notebookEntry", StringType.INSTANCE)
 		.addScalar("portraitId", StringType.INSTANCE)
 		.setParameter("sessionId", sessionId.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
-
     }
 
     private void buildNameSearch(StringBuilder queryText, String searchString) {

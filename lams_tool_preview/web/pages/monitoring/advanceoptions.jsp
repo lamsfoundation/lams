@@ -54,36 +54,6 @@
 			</c:choose>	
 		</td>
 	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.peerreview.reflectOnActivity}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${sessionMap.peerreview.reflectOnActivity}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					<lams:out escapeHtml="true" value="${sessionMap.peerreview.reflectInstructions}"/>	
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
 </table>
 
 </lams:AdvancedAccordian>

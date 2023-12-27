@@ -56,14 +56,6 @@
 				<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 			</c:if>
 
-			<c:if test="${voteGeneralLearnerFlowDTO.reflection}">
-				<lams:NotebookReedit
-					reflectInstructions="${voteGeneralLearnerFlowDTO.reflectionSubject}"
-					reflectEntry="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					isEditButtonEnabled="${voteGeneralLearnerFlowDTO.lockOnFinish == 'false' && hasEditRight && voteGeneralLearnerFlowDTO.learningMode != 'teacher'}"
-					notebookHeaderLabelKey="label.reflection"/>
-			</c:if>
-
 			<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
 				<div class="activity-bottom-buttons">
 					<button type="submit" class="btn btn-primary na" id="finishButton" onclick="submitMethod('learnerFinished')">

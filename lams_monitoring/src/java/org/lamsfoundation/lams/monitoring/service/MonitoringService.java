@@ -23,8 +23,28 @@
 
 package org.lamsfoundation.lams.monitoring.service;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeSet;
+import java.util.Vector;
+
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -73,8 +93,6 @@ import org.lamsfoundation.lams.monitoring.quartz.job.CloseScheduleGateJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.FinishScheduleLessonJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.OpenScheduleGateJob;
 import org.lamsfoundation.lams.monitoring.quartz.job.StartScheduleLessonJob;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolContent;
@@ -107,27 +125,8 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * <p>
@@ -1168,10 +1167,6 @@ public class MonitoringService implements IMonitoringFullService {
 	// remove lesson resources
 	lessonDAO.deleteByProperty(LogEvent.class, "lessonId", lessonId);
 	lessonDAO.deleteByProperty(ToolSession.class, "lesson.lessonId", lessonId);
-	Map<String, Object> notebookProperties = new TreeMap<>();
-	notebookProperties.put("externalID", lessonId);
-	notebookProperties.put("externalIDType", CoreNotebookConstants.SCRATCH_PAD);
-	lessonDAO.deleteByProperties(NotebookEntry.class, notebookProperties);
 	lessonDAO.deleteLesson(lesson);
 
 	// remove each Tool activity content

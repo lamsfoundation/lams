@@ -94,7 +94,6 @@ public class MonitoringController {
 	// sessionMap.put(ScratchieConstants.ATTR_TOOL_CONTENT_ID, toolContentID);
 	// sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 	// WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
-	// sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
 
 	LeaderselectionDTO leaderselectionDT0 = new LeaderselectionDTO(content);
 	sessionMap.put("leaderselectionDT0", leaderselectionDT0);

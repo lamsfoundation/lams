@@ -21,7 +21,6 @@
 		    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 			<form:hidden path="sessionMapID"/>
 			<form:hidden path="topicID"/>
-			<input type="hidden" name="hideReflection" value="${sessionMap.hideReflection}"/>
 		
 			<p>
 				<fmt:message key="message.assign.mark" />&nbsp;
@@ -32,7 +31,7 @@
 			
 			<p>
 				<c:set var="viewtopic">
-				    <lams:WebAppURL />learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${markForm.sessionMapID}&hideReflection=${sessionMap.hideReflection}
+				    <lams:WebAppURL />learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${markForm.sessionMapID}
 				</c:set>
 				<a href="javascript:launchPopup('${viewtopic}','viewtopic')">
 					<c:out value="${topic.message.subject}" />
@@ -65,7 +64,7 @@
 							
 				<c:if test="${sessionMap.updateMode == 'viewForum'}">
 					<c:set var="cancelUrl">
-							<c:url value="/learning/viewTopic.do"/>?sessionMapID=${markForm.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
+							<c:url value="/learning/viewTopic.do"/>?sessionMapID=${markForm.sessionMapID}&topicID=${sessionMap.rootUid}
 					</c:set>
 				</c:if>
 			

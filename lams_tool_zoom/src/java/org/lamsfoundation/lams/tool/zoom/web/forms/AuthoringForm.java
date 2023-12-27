@@ -35,10 +35,6 @@ public class AuthoringForm {
 
     private String instructions;
 
-    private boolean reflectOnActivity;
-
-    private String reflectInstructions;
-
     private boolean startInMonitor;
 
     private Integer duration;
@@ -81,22 +77,6 @@ public class AuthoringForm {
 
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isStartInMonitor() {

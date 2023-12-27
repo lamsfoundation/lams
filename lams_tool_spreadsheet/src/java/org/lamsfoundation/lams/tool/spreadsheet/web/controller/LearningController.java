@@ -24,15 +24,12 @@
 package org.lamsfoundation.lams.tool.spreadsheet.web.controller;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
@@ -41,7 +38,6 @@ import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
 import org.lamsfoundation.lams.tool.spreadsheet.service.SpreadsheetApplicationException;
-import org.lamsfoundation.lams.tool.spreadsheet.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -50,9 +46,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.HtmlUtils;
 
 /**
@@ -76,7 +70,7 @@ public class LearningController {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      */
     @RequestMapping("/start")
-    public String start(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public String start(HttpServletRequest request) {
 
 	//initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
@@ -109,16 +103,6 @@ public class LearningController {
 	boolean lock = spreadsheet.getLockWhenFinished() && spreadsheetUser != null
 		&& spreadsheetUser.isSessionFinished();
 
-	// get notebook entry
-	String entryText = new String();
-	if (spreadsheetUser != null) {
-	    NotebookEntry notebookEntry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    SpreadsheetConstants.TOOL_SIGNATURE, spreadsheetUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-
 	//basic information
 	sessionMap.put(SpreadsheetConstants.ATTR_TITLE, spreadsheet.getTitle());
 	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE_INSTRUCTION, spreadsheet.getInstructions());
@@ -129,10 +113,6 @@ public class LearningController {
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	//reflection information
-	sessionMap.put(SpreadsheetConstants.ATTR_REFLECTION_ON, spreadsheet.isReflectOnActivity());
-	sessionMap.put(SpreadsheetConstants.ATTR_REFLECTION_INSTRUCTION, spreadsheet.getReflectInstructions());
-	sessionMap.put(SpreadsheetConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	//add define later support
 	if (spreadsheet.isDefineLater()) {
@@ -174,7 +154,7 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/saveUserSpreadsheet")
-    public String saveUserSpreadsheet(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
+    public String saveUserSpreadsheet(HttpServletRequest request) {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
@@ -211,8 +191,6 @@ public class LearningController {
 	String conf;
 	if ("finishSession".equals(typeOfAction)) {
 	    conf = "finishSession.do";
-	} else if ("continueReflect".equals(typeOfAction)) {
-	    conf = "newReflection.do";
 	} else {
 	    conf = "start.do";
 	}
@@ -245,66 +223,6 @@ public class LearningController {
 
 	String nextActivityUrl = service.finishToolSession(sessionId, userID);
 	response.sendRedirect(nextActivityUrl);
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
-
-	//get session value
-	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = service.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SpreadsheetConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public void submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, SpreadsheetApplicationException {
-
-	Integer userId = reflectionForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = service.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SpreadsheetConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    SpreadsheetConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    service.updateEntry(entry);
-	}
-
-	finishSession(request, response);
     }
 
     //*************************************************************************************

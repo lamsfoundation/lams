@@ -112,14 +112,6 @@ public class AuthoringController implements VoteAppConstants {
 	voteAuthoringForm.setMinNominationCount(minNominationCount);
 	voteGeneralAuthoringDTO.setMinNominationCount(minNominationCount);
 
-	String reflect = request.getParameter("reflect");
-	voteAuthoringForm.setReflect(reflect);
-	voteGeneralAuthoringDTO.setReflect(reflect);
-
-	String reflectionSubject = request.getParameter("reflectionSubject");
-	voteAuthoringForm.setReflectionSubject(reflectionSubject);
-	voteGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
-
 	String maxInputs = request.getParameter(VoteAppConstants.MAX_INPUTS);
 	if (maxInputs == null) {
 	    logger.info("Since minNomcount is equal to null hence setting it to '0'");
@@ -865,9 +857,6 @@ public class AuthoringController implements VoteAppConstants {
 	sessionMap.put(VoteAppConstants.ACTIVITY_TITLE_KEY, voteGeneralAuthoringDTO.getActivityTitle());
 	sessionMap.put(VoteAppConstants.ACTIVITY_INSTRUCTIONS_KEY, voteGeneralAuthoringDTO.getActivityInstructions());
 
-	voteAuthoringForm.setReflectionSubject(voteContent.getReflectionSubject());
-	voteGeneralAuthoringDTO.setReflectionSubject(voteContent.getReflectionSubject());
-
 	List<DataFlowObject> dataFlowObjects = voteService.getDataFlowObjects(new Long(strToolContentId));
 	if (dataFlowObjects != null) {
 	    List<String> dataFlowObjectNames = new ArrayList<>(dataFlowObjects.size());
@@ -972,12 +961,10 @@ public class AuthoringController implements VoteAppConstants {
 	voteAuthoringForm.setShowResults(voteContent.isShowResults() ? "1" : "0");
 
 	voteAuthoringForm.setLockOnFinish(voteContent.isLockOnFinish() ? "1" : "0");
-	voteAuthoringForm.setReflect(voteContent.isReflect() ? "1" : "0");
 
 	voteGeneralAuthoringDTO.setUseSelectLeaderToolOuput(voteContent.isUseSelectLeaderToolOuput() ? "1" : "0");
 	voteGeneralAuthoringDTO.setAllowText(voteContent.isAllowText() ? "1" : "0");
 	voteGeneralAuthoringDTO.setLockOnFinish(voteContent.isLockOnFinish() ? "1" : "0");
-	voteAuthoringForm.setReflect(voteContent.isReflect() ? "1" : "0");
 
 	String maxNomcount = voteContent.getMaxNominationCount();
 	if (maxNomcount.equals("")) {
@@ -1168,10 +1155,6 @@ public class AuthoringController implements VoteAppConstants {
 
 	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
 
-	String reflect = request.getParameter(VoteAppConstants.REFLECT);
-
-	String reflectionSubject = voteAuthoringForm.getReflectionSubject();
-
 	String maxNomcount = voteAuthoringForm.getMaxNominationCount();
 
 	String minNomcount = voteAuthoringForm.getMinNominationCount();
@@ -1179,7 +1162,6 @@ public class AuthoringController implements VoteAppConstants {
 	boolean lockOnFinishBoolean = false;
 	boolean allowTextEntryBoolean = false;
 	boolean useSelectLeaderToolOuputBoolean = false;
-	boolean reflectBoolean = false;
 	boolean showResultsBoolean = false;
 	short maxInputsShort = 0;
 
@@ -1193,10 +1175,6 @@ public class AuthoringController implements VoteAppConstants {
 
 	if (useSelectLeaderToolOuput != null && useSelectLeaderToolOuput.equalsIgnoreCase("1")) {
 	    useSelectLeaderToolOuputBoolean = true;
-	}
-
-	if (reflect != null && reflect.equalsIgnoreCase("1")) {
-	    reflectBoolean = true;
 	}
 
 	if (showResults != null && showResults.equalsIgnoreCase("1")) {
@@ -1238,12 +1216,8 @@ public class AuthoringController implements VoteAppConstants {
 	voteContent.setAllowText(allowTextEntryBoolean);
 	voteContent.setShowResults(showResultsBoolean);
 	voteContent.setUseSelectLeaderToolOuput(useSelectLeaderToolOuputBoolean);
-	voteContent.setReflect(reflectBoolean);
 	voteContent.setMaxNominationCount(maxNomcount);
 	voteContent.setMinNominationCount(minNomcount);
-
-	voteContent.setReflectionSubject(reflectionSubject);
-
 	voteContent.setMaxExternalInputs(maxInputsShort);
 
 	if (newContent) {

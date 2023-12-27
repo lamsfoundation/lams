@@ -26,12 +26,8 @@ package org.lamsfoundation.lams.tool.zoom.web.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.zoom.dto.ContentDTO;
-import org.lamsfoundation.lams.tool.zoom.dto.NotebookEntryDTO;
-import org.lamsfoundation.lams.tool.zoom.dto.ZoomUserDTO;
 import org.lamsfoundation.lams.tool.zoom.model.Zoom;
-import org.lamsfoundation.lams.tool.zoom.model.ZoomUser;
 import org.lamsfoundation.lams.tool.zoom.service.IZoomService;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomConstants;
 import org.lamsfoundation.lams.tool.zoom.util.ZoomUtil;
@@ -80,21 +76,6 @@ public class MonitoringController {
 	request.setAttribute(ZoomConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 
 	return "pages/monitoring/monitoring";
-    }
-
-    @RequestMapping("/openNotebook")
-    public String openNotebook(HttpServletRequest request) {
-	Long uid = new Long(WebUtil.readLongParam(request, ZoomConstants.PARAM_USER_UID));
-
-	ZoomUser user = zoomService.getUserByUID(uid);
-	NotebookEntry entry = zoomService.getNotebookEntry(user.getNotebookEntryUID());
-
-	ZoomUserDTO userDTO = new ZoomUserDTO(user);
-	userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
-
-	request.setAttribute(ZoomConstants.ATTR_USER_DTO, userDTO);
-
-	return "pages/monitoring/notebook";
     }
 
     @RequestMapping("/startMeeting")

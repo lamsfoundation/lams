@@ -81,21 +81,5 @@
 			</c:choose>	
 		</td>
 	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.monitoring.summary.notebook.reflection" ><fmt:param> </fmt:param></fmt:message>
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${taskList.reflectOnActivity}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
 </table>
 </lams:AdvancedAccordian>

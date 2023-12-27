@@ -23,9 +23,33 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxRegistry;
@@ -47,7 +71,6 @@ import org.lamsfoundation.lams.tool.assessment.dto.GradeStatsDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
-import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.TblAssessmentQuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
@@ -87,33 +110,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
-import reactor.core.publisher.Flux;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -163,13 +165,6 @@ public class MonitoringController {
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
 	    request.setAttribute(AssessmentConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
 		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
-	}
-
-	// Create reflectList if reflection is enabled.
-	if (assessment.isReflectOnActivity()) {
-	    List<ReflectDTO> reflectList = service.getReflectList(assessment.getContentId());
-	    // Add reflectList to sessionMap
-	    sessionMap.put(AssessmentConstants.ATTR_REFLECT_LIST, reflectList);
 	}
 
 	//prepare list of the questions to display in question drop down menu, filtering out questions that aren't supposed to be answered

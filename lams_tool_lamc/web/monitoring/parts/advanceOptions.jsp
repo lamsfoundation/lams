@@ -143,33 +143,6 @@
 	</tr>
 
 	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${reflect}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:if test="${reflect}">
-		<tr>
-			<td>
-				<fmt:message key="monitor.summary.td.notebookInstructions" />
-			</td>
-			<td>	
-				<lams:out value="${reflectionSubject}" escapeHtml="true"/>
-			</td>
-		</tr>
-	</c:if>
-
-	<tr>
 		<td colspan="2">
 		<c:choose>
 			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">

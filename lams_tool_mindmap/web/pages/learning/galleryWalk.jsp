@@ -68,10 +68,6 @@
 		function finishSession(){
 			document.location.href ='<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
 		}
-		
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/reflect.do?toolSessionID=${toolSessionID}&userUid=${userUid}"/>';
-		}
 	</script>
 	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>	
@@ -177,13 +173,6 @@
 								</c:otherwise>
 							</c:choose>
 					>
-						<fmt:message key="button.continue" />
-					</button>
-				</c:when>
-				
-				<c:when test="${reflectOnActivity and not finishedActivity}">
-					<button type="button" name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-primary na">
 						<fmt:message key="button.continue" />
 					</button>
 				</c:when>

@@ -23,8 +23,15 @@
 
 package org.lamsfoundation.lams.tool.mindmap.web.controller;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.TimeZone;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.mindmap.MindmapConstants;
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
@@ -43,13 +50,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * @author Ruslan Kazakov
@@ -129,30 +129,6 @@ public class MonitoringController {
 	}
 
 	return "pages/monitoring/mindmapDisplay";
-    }
-
-    /**
-     * Shows Notebook reflection that Learner has done.
-     */
-    @RequestMapping("/reflect")
-    public String reflect(HttpServletRequest request, HttpServletResponse response) {
-
-	Long userId = WebUtil.readLongParam(request, "userUID", false);
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentID", false);
-	MindmapUser mindmapUser = mindmapService.getUserByUID(userId);
-	Mindmap mindmap = mindmapService.getMindmapByContentId(toolContentId);
-
-	request.setAttribute("reflectTitle", mindmap.getTitle());
-	request.setAttribute("mindmapUser", mindmapUser.getFirstName() + " " + mindmapUser.getLastName());
-	request.setAttribute("mode", ToolAccessMode.TEACHER);
-
-	// Reflection
-	NotebookEntry entry = mindmapService.getEntry(mindmapUser.getEntryUID());
-	if (entry != null) {
-	    request.setAttribute("reflectEntry", entry.getEntry());
-	}
-
-	return "pages/monitoring/reflect";
     }
 
     /**

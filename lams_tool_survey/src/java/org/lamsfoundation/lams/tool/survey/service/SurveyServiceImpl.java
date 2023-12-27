@@ -35,7 +35,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -44,9 +43,6 @@ import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -65,7 +61,6 @@ import org.lamsfoundation.lams.tool.survey.dao.SurveyQuestionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveySessionDAO;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
-import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyAnswer;
 import org.lamsfoundation.lams.tool.survey.model.SurveyCondition;
@@ -74,7 +69,6 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
 import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
-import org.lamsfoundation.lams.tool.survey.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveySessionComparator;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -115,8 +109,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -219,66 +211,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	SurveyUser user = (SurveyUser) surveyUserDao.getObject(SurveyUser.class, userUid);
 	user.setResponseFinalized(true);
 	surveyUserDao.saveObject(user);
-    }
-
-    @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<>();
-
-	List<SurveySession> sessionList = surveySessionDao.getByContentId(contentId);
-	for (SurveySession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getSurvey().isReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<SurveyUser> users = surveyUserDao.getBySessionID(sessionId);
-	    for (SurveyUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    SurveyConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
-    }
-
-    @Override
-    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString) {
-	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString,
-		coreNotebookService, userManagementService);
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -768,13 +700,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    return;
 	}
 
-	for (SurveySession session : surveySessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, SurveyConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	surveyDao.delete(survey);
     }
 
@@ -794,12 +719,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	for (SurveySession session : sessions) {
 	    SurveyUser user = surveyUserDao.getUserByUserIDAndSessionID(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SurveyConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    surveyDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
 		surveyUserDao.removeObject(SurveyUser.class, user.getUid());
 	    }
 	}
@@ -923,14 +842,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	this.userManagementService = userManagementService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public void setSurveyAnswerDao(SurveyAnswerDAO surveyAnswerDao) {
 	this.surveyAnswerDao = surveyAnswerDao;
     }
@@ -997,8 +908,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	survey.setContentInUse(false);
 	survey.setDefineLater(false);
 	survey.setLockWhenFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.TRUE));
-	survey.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	survey.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	survey.setNotifyTeachersOnAnswerSumbit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnAnswerSumbit", Boolean.FALSE));
 	survey.setShowOnePage(JsonUtil.optBoolean(toolContentJSON, "showOnePage", Boolean.TRUE));

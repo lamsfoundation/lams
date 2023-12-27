@@ -232,8 +232,6 @@ public class AuthoringController {
 	pixlr.setTitle(authoringForm.getTitle());
 	pixlr.setInstructions(authoringForm.getInstructions());
 	pixlr.setLockOnFinished(authoringForm.isLockOnFinished());
-	pixlr.setReflectOnActivity(authoringForm.isReflectOnActivity());
-	pixlr.setReflectInstructions(authoringForm.getReflectInstructions());
 	pixlr.setAllowViewOthersImages(authoringForm.isAllowViewOthersImages());
     }
 
@@ -248,9 +246,7 @@ public class AuthoringController {
 	authoringForm.setTitle(pixlr.getTitle());
 	authoringForm.setInstructions(pixlr.getInstructions());
 	authoringForm.setLockOnFinished(pixlr.isLockOnFinished());
-	authoringForm.setReflectOnActivity(pixlr.isReflectOnActivity());
 	authoringForm.setExistingImageFileName(pixlr.getImageFileName());
-	authoringForm.setReflectInstructions(pixlr.getReflectInstructions());
 	authoringForm.setAllowViewOthersImages(pixlr.isAllowViewOthersImages());
 
 	if (pixlr.getImageFileName() == null || pixlr.getImageFileName().trim().equals("")) {

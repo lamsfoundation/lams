@@ -65,7 +65,6 @@
    			<ref bean="exportToolContentService"/>
    		</property>
    		<property name="messageService"><ref bean="spreadsheetMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
     </bean>
 
     <bean id="spreadsheetService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -63,9 +63,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.outcome.Outcome;
 import org.lamsfoundation.lams.outcome.OutcomeMapping;
 import org.lamsfoundation.lams.outcome.service.IOutcomeService;
@@ -99,7 +96,6 @@ import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.LeaderResultsDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.OptionDTO;
-import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.ScratchieItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswerVisitLog;
@@ -122,12 +118,12 @@ import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 /**
  * @author Andrey Balan
@@ -167,8 +163,6 @@ public class ScratchieServiceImpl
     private IExportToolContentService exportContentService;
 
     private ILogEventService logEventService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -1421,59 +1415,6 @@ public class ScratchieServiceImpl
     @Override
     public void removeLike(Long burningQuestionUid, Long sessionId) {
 	burningQuestionLikeDao.removeLike(burningQuestionUid, sessionId);
-    }
-
-    @Override
-    public List<ReflectDTO> getReflectionList(Long contentId) {
-	ArrayList<ReflectDTO> reflections = new ArrayList<>();
-
-	// get all available leaders associated with this content as only leaders have reflections
-	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(contentId);
-	for (ScratchieSession session : sessionList) {
-
-	    ScratchieUser leader = session.getGroupLeader();
-	    if (leader != null) {
-		NotebookEntry notebookEntry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ScratchieConstants.TOOL_SIGNATURE, leader.getUserId().intValue());
-		if ((notebookEntry != null) && StringUtils.isNotBlank(notebookEntry.getEntry())) {
-		    User user = new User();
-		    user.setLastName(leader.getLastName());
-		    user.setFirstName(leader.getFirstName());
-		    ReflectDTO reflectDTO = new ReflectDTO(user);
-		    reflectDTO.setGroupName(session.getSessionName());
-		    String reflection = notebookEntry.getEntry();
-		    reflection = StringEscapeUtils.escapeJavaScript(reflection);
-		    reflectDTO.setReflection(reflection);
-		    reflectDTO.setIsGroupLeader(session.isUserGroupLeader(leader.getUid()));
-
-		    reflections.add(reflectDTO);
-		}
-	    }
-	}
-
-	return reflections;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -2827,14 +2768,6 @@ public class ScratchieServiceImpl
 	    return;
 	}
 
-	for (ScratchieSession session : scratchieSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ScratchieConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	scratchieDao.delete(scratchie);
     }
 
@@ -2850,12 +2783,6 @@ public class ScratchieServiceImpl
 		    session.getSessionId());
 
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ScratchieConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    scratchieDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
 		if ((session.getGroupLeader() != null) && session.getGroupLeader().getUid().equals(user.getUid())) {
 		    session.setGroupLeader(null);
 		    session.setScratchingFinished(false);
@@ -2994,10 +2921,6 @@ public class ScratchieServiceImpl
 	this.userManagementService = userManagementService;
     }
 
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     @Override
     public IEventNotificationService getEventNotificationService() {
 	return eventNotificationService;
@@ -3079,9 +3002,6 @@ public class ScratchieServiceImpl
 	scratchie.setDiscussionSentimentEnabled(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.ENABLE_DISCUSSION_SENTIMENT, false));
 	scratchie.setRelativeTimeLimit(JsonUtil.optInt(toolContentJSON, "timeLimit", 0));
-	scratchie.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	scratchie.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	scratchie.setShowScrachiesInResults(JsonUtil.optBoolean(toolContentJSON, "showScrachiesInResults", true));
 	scratchie.setConfidenceLevelsActivityUiid(
 		JsonUtil.optInt(toolContentJSON, RestTags.CONFIDENCE_LEVELS_ACTIVITY_UIID));

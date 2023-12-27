@@ -84,12 +84,6 @@ public class Spreadsheet implements Cloneable {
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     // general infomation
 
     @Column(name = "create_date")
@@ -340,22 +334,6 @@ public class Spreadsheet implements Cloneable {
 
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     private static String javaScriptEscape(String input) {

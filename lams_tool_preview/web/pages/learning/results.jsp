@@ -11,7 +11,7 @@
 <c:set var="peerreview" value="${sessionMap.peerreview}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
-<c:set var="finishImmediately" value="${peerreview.lockWhenFinished and not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser and not peerreview.reflectOnActivity}" />
+<c:set var="finishImmediately" value="${peerreview.lockWhenFinished and not peerreview.showRatingsLeftByUser and not peerreview.showRatingsLeftForUser}" />
 
 <lams:PageLearner title="${peerreview.title}" toolSessionID="${toolSessionId}">
 	<!-- ********************  CSS ********************** -->
@@ -73,10 +73,6 @@
 	
 		function finishSession(){
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionId=${toolSessionId}"/>';
-		}
-		
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		function redoRatings(){
@@ -142,24 +138,10 @@
 			</div>
 		</div>
 	</c:if>
-				
-	<!-- Reflection -->
-	<c:if test="${sessionMap.reflectOn and not empty sessionMap.reflectEntry}">
-		<lams:NotebookReedit
-			reflectInstructions="${sessionMap.reflectInstructions}"
-			reflectEntry="${sessionMap.reflectEntry}"
-			isEditButtonEnabled="${mode != 'teacher'}"
-			notebookHeaderLabelKey="title.reflection"/>
-	</c:if>
 
 	<c:if test="${mode != 'teacher'}">
 		<div class="activity-bottom-buttons">
-			<c:choose>			
-				<c:when test="${sessionMap.reflectOn and empty sessionMap.reflectEntry}">
-					<button type="button" id="continueButton" onclick="continueReflect()" class="btn btn-primary na">
-						<fmt:message key="label.continue" />
-					</button>
-				</c:when>
+			<c:choose>
 				<c:when test="${sessionMap.isLastActivity}">
 					<button type="button" id="finishButton" class="btn btn-primary na">
 						<fmt:message key="label.finish" />

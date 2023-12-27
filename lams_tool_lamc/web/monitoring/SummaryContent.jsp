@@ -257,10 +257,6 @@
 	<%@ include file="masterDetailLoadUp.jsp"%>
 </div>
 
-<c:if test="${not empty reflectionsContainerDTO}"> 							
-	<jsp:include page="/monitoring/Reflections.jsp" />
-</c:if>
-
 <%@ include file="parts/advanceQuestions.jsp"%>
 <%@ include file="parts/advanceOptions.jsp"%>
 <%@ include file="parts/dateRestriction.jsp"%>

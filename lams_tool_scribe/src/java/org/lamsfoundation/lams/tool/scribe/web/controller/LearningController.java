@@ -31,8 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -43,7 +41,6 @@ import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeException;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.LearningForm;
@@ -57,7 +54,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/learning")
@@ -231,35 +227,6 @@ public class LearningController {
 	return null; // TODO need to return proper page.
     }
 
-    @RequestMapping("/openNotebook")
-    public String openNotebook(@ModelAttribute("learningForm") LearningForm learningform, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	// set the finished flag
-	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
-	ScribeDTO scribeDTO = new ScribeDTO(scribeUser.getScribeSession().getScribe());
-	request.setAttribute("scribeDTO", scribeDTO);
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, scribeUser.getScribeSession().getSessionId());
-
-	boolean isLastActivity = scribeService.isLastActivity(scribeUser.getScribeSession().getSessionId());
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-	return "pages/learning/notebook";
-    }
-
-    @RequestMapping(value = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(@ModelAttribute("learningForm") LearningForm learningform,
-	    HttpServletRequest request, HttpServletResponse response) {
-
-	// save the reflection entry and call the notebook.
-	ScribeUser scribeUser = scribeService.getUserByUID(learningform.getScribeUserUID());
-
-	scribeService.createNotebookEntry(scribeUser.getScribeSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue(),
-		learningform.getEntryText());
-
-	return finishActivity(learningform, request, response);
-    }
-
     @RequestMapping("/forceCompleteActivity")
     public String forceCompleteActivity(@ModelAttribute("learningForm") LearningForm learningform,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -301,15 +268,6 @@ public class LearningController {
 	request.setAttribute("scribeSessionDTO", sessionDTO);
 
 	ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-	if (scribeUser.isFinishedActivity()) {
-	    // get the notebook entry.
-	    NotebookEntry notebookEntry = scribeService.getEntry(scribeSession.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE,
-		    scribeUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		scribeUserDTO.notebookEntry = notebookEntry.getEntry();
-	    }
-	}
 	request.setAttribute("scribeUserDTO", scribeUserDTO);
     }
 

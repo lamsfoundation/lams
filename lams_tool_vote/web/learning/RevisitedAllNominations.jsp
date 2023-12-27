@@ -22,10 +22,6 @@
 			document.forms.voteLearningForm.action = actionMethod + '.do';
 			document.forms.voteLearningForm.submit();
 		}
-
-		function continueReflect(){
-			submitMethod('forwardtoReflection');
-		}
 	</script>
 
 	<div id="container-main">
@@ -59,14 +55,6 @@
 					<jsp:include page="/learning/RevisitedNoDisplay.jsp" />
 				</c:if>
 			</div>
-
-			<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true'}">
-				<lams:NotebookReedit
-					reflectInstructions="${voteGeneralLearnerFlowDTO.reflectionSubject}"
-					reflectEntry="${voteGeneralLearnerFlowDTO.notebookEntry}"
-					isEditButtonEnabled="${voteGeneralLearnerFlowDTO.lockOnFinish == 'false' && hasEditRight}"
-					notebookHeaderLabelKey="label.reflection"/>
-			</c:if>
 
 			<div class="activity-bottom-buttons">
 				<button type="button" id="finishButton" class="btn btn-primary na">

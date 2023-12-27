@@ -42,8 +42,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
@@ -55,7 +53,6 @@ import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceApplicationException;
 import org.lamsfoundation.lams.tool.rsrc.service.UploadResourceFileException;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
-import org.lamsfoundation.lams.tool.rsrc.web.form.ReflectionForm;
 import org.lamsfoundation.lams.tool.rsrc.web.form.ResourceItemForm;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -70,7 +67,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -176,16 +172,6 @@ public class LearningController {
 	// check whether finish lock is on/off
 	boolean lock = resource.getLockWhenFinished() && (resourceUser != null) && resourceUser.isSessionFinished();
 
-	// get notebook entry
-	String entryText = new String();
-	if (resourceUser != null) {
-	    NotebookEntry notebookEntry = resourceService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-
 	// basic information
 	sessionMap.put(ResourceConstants.ATTR_TITLE, resource.getTitle());
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE_INSTRUCTION, resource.getInstructions());
@@ -196,10 +182,6 @@ public class LearningController {
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, resource.isReflectOnActivity());
-	sessionMap.put(ResourceConstants.ATTR_REFLECTION_INSTRUCTION, resource.getReflectInstructions());
-	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	// add define later support
 	if (resource.isDefineLater()) {
@@ -389,70 +371,6 @@ public class LearningController {
 	}
 
 	return "pages/learning/success";
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    private String newReflection(ReflectionForm reflectionForm, HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	if (!validateBeforeFinish(request, sessionMapID)) {
-	    return "pages/learning/learning";
-	}
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = resourceService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ResourceConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "/pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database
-     */
-    @RequestMapping("/submitReflection")
-    private String submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ResourceApplicationException {
-	Integer userId = reflectionForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = resourceService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ResourceConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    resourceService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ResourceConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    resourceService.updateEntry(entry);
-	}
-	request.setAttribute("reflectionForm", reflectionForm);
-
-	return finish(request, response);
     }
 
     // *************************************************************************************

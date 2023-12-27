@@ -241,19 +241,18 @@ public class MonitoringController {
 	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
 	Forum forum = (Forum) sessionMap.get("forum");
-	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		forum.isReflectOnActivity());
+	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 
 	ObjectNode responcedata = JsonNodeFactory.instance.objectNode();
 	responcedata.put("total_rows", forumService.getCountUsersBySession(sessionId, searchString));
 
-	for (Object[] userAndReflection : users) {
+	for (Object[] userData : users) {
 
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-	    ForumUser user = (ForumUser) userAndReflection[0];
+	    ForumUser user = (ForumUser) userData[0];
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(ForumConstants.ATTR_USER_ID, user.getUserId());
@@ -285,12 +284,8 @@ public class MonitoringController {
 	    responseRow.put("anyPostsMarked", isAnyPostsMarked);
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
-	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("notebookEntry", HtmlUtils.htmlEscape((String) userAndReflection[1]));
-	    }
-
-	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[2]);
+	    if (userData.length > 1 && userData[1] != null) {
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userData[2]);
 	    }
 
 	    rows.add(responseRow);
@@ -617,14 +612,6 @@ public class MonitoringController {
 	// each back to web page
 	request.setAttribute(ForumConstants.ATTR_TOPIC, MessageDTO.getMessageDTO(msg));
 	request.setAttribute(ForumConstants.ATTR_USER, user);
-
-	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
-	// from the Monitoring Summary screen, but we should when accessed from the Learner Progress screen.
-	// Need to constantly past this value on, rather than hiding just the once, as the View Forum
-	// screen has a refresh button. Need to pass it through the view topic screen and dependent screens
-	// as it has a link from the view topic screen back to View Forum screen.
-	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
-	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
 
 	return "jsps/monitoring/updatemarks";
     }

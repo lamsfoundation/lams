@@ -39,8 +39,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
@@ -74,12 +72,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
-
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
 
     @Column(name = "filtering_enabled")
     private boolean filteringEnabled;
@@ -182,22 +174,6 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isContentInUse() {

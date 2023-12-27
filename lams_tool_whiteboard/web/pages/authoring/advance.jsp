@@ -133,30 +133,10 @@
 <lams:OutcomeAuthor toolContentId="${authoringForm.whiteboard.contentId}" />
 
 <lams:SimplePanel titleKey="label.activity.completion">
-
 	<div class="checkbox">
 		<label for="lockWhenFinished">
 			<form:checkbox path="whiteboard.lockWhenFinished" id="lockWhenFinished" />
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
 		</label>
 	</div>
-
-	<div class="checkbox">
-		<label for="reflect-on">
-			<form:checkbox path="whiteboard.reflectOnActivity" id="reflect-on"/>
-			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-		</label>
-	</div>
-
-	<div class="form-group">
-		<form:textarea path="whiteboard.reflectInstructions" cssClass="form-control" id="reflect-instructions" rows="3" />
-	</div>
-
 </lams:SimplePanel>
-
-<script type="text/javascript">
-	//automatically turn on refect option if there are text input in refect instruction area
-	$('#reflect-instructions').keyup(function(){
-		$('#reflect-on').prop('checked', !isEmpty($(this).val()));
-	});
-</script>

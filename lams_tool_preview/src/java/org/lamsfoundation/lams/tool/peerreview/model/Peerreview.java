@@ -119,12 +119,6 @@ public class Peerreview implements Serializable, Cloneable {
     @Column(name = "show_ratings_left_by_user")
     private boolean showRatingsLeftByUser;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "self_review")
     private boolean selfReview;
 
@@ -419,28 +413,6 @@ public class Peerreview implements Serializable, Cloneable {
 
     public void setShowRatingsLeftForUser(boolean showRatingsLeftForUser) {
 	this.showRatingsLeftForUser = showRatingsLeftForUser;
-    }
-
-    /**
-     * @return
-     */
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     * @return
-     */
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isSelfReview() {

@@ -77,10 +77,6 @@
 		function finishSession(){
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 		}
-		
-		function continueReflect(){
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
 	</script>
 	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
@@ -190,13 +186,6 @@
 								</c:otherwise>
 							</c:choose>
 					>
-						<fmt:message key="label.continue" />
-					</button>
-				</c:when>
-				
-				<c:when test="${sessionMap.reflectOn and not sessionMap.userFinished}">
-					<button type="button" name="FinishButton" id="finish-button"
-							onclick="return continueReflect()" class="btn btn-primary na">
 						<fmt:message key="label.continue" />
 					</button>
 				</c:when>

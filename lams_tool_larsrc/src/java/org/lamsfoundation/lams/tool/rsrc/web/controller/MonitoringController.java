@@ -34,15 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
-import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.ResourceItemDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceSession;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -81,12 +77,6 @@ public class MonitoringController {
 	List<SessionDTO> groupList = resourceService.getSummary(contentId);
 
 	Resource resource = resourceService.getResourceByContentId(contentId);
-
-	// Create reflectList if reflection is enabled.
-	if (resource.isReflectOnActivity()) {
-	    List<ReflectDTO> relectList = resourceService.getReflectList(contentId);
-	    sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, relectList);
-	}
 
 	// cache into sessionMap
 	sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
@@ -186,32 +176,6 @@ public class MonitoringController {
 	resourceService.setItemVisible(itemUid, sessionId, contentId, !isHideItem);
 
 	return null;
-    }
-
-    @RequestMapping("/viewReflection")
-    public String viewReflection(HttpServletRequest request) {
-
-	Long uid = WebUtil.readLongParam(request, ResourceConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ResourceUser user = resourceService.getUser(uid);
-	NotebookEntry notebookEntry = resourceService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ResourceConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	ResourceSession session = resourceService.getResourceSessionBySessionId(sessionID);
-
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getResource().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return "pages/monitoring/reflections";
     }
 
     @SuppressWarnings("unchecked")

@@ -1,11 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript">
-	function turnOnReflect(){
-			document.getElementById("reflectOn").checked = !isEmpty(document.getElementById("reflectInstructions").value);
-	}
-</script>
-
 <!-- Advance Tab Content -->
 
 <lams:SimplePanel titleKey="label.authoring.advanced.record">
@@ -52,14 +46,6 @@
 <div class="checkbox">
 <label for="lockOnFinished"><form:checkbox path="daco.lockOnFinished" id="lockOnFinished" />
 <fmt:message key="label.authoring.advanced.lock.on.finished" /></label>
-</div>
-
-<div class="checkbox">
-<label for="reflectOn"><form:checkbox path="daco.reflectOnActivity" id="reflectOn"/>
-<fmt:message key="label.authoring.advanced.reflectOnActivity" /> </label>
-<div class="form-group">
-<form:textarea path="daco.reflectInstructions" id="reflectInstructions"  cssClass="form-control" cols="50" rows="3"
-	onkeyup="javascript:turnOnReflect()"/>
 </div>
 </lams:SimplePanel>
 

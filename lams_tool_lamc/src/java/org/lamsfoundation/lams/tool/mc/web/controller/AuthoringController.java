@@ -155,8 +155,6 @@ public class AuthoringController {
 	mcAuthoringForm.setPrefixAnswersWithLetters(mcContent.isPrefixAnswersWithLetters() ? "1" : "0");
 	mcAuthoringForm.setRetries(mcContent.isRetries() ? "1" : "0");
 	mcAuthoringForm.setPassmark("" + mcContent.getPassMark());
-	mcAuthoringForm.setReflect(mcContent.isReflect() ? "1" : "0");
-	mcAuthoringForm.setReflectionSubject(mcContent.getReflectionSubject());
 	mcAuthoringForm.setTitle(mcContent.getTitle());
 	mcAuthoringForm.setInstructions(mcContent.getInstructions());
 	mcAuthoringForm.setEnableConfidenceLevels(mcContent.isEnableConfidenceLevels());

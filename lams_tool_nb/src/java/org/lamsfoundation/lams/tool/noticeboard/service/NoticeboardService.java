@@ -38,9 +38,6 @@ import org.lamsfoundation.lams.contentrepository.exception.RepositoryCheckedExce
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -78,8 +75,6 @@ public class NoticeboardService
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
     private IToolContentHandler nbToolContentHandler;
-    private ICoreNotebookService coreNotebookService;
-
     private INoticeboardContentDAO nbContentDAO;
     private INoticeboardSessionDAO nbSessionDAO;
     private INoticeboardUserDAO nbUserDAO;
@@ -338,14 +333,6 @@ public class NoticeboardService
 	    return;
 	}
 
-	for (NoticeboardSession session : nbContent.getNbSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getNbSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, NoticeboardConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	removeNoticeboard(toolContentId);
     }
 
@@ -364,12 +351,6 @@ public class NoticeboardService
 	for (NoticeboardSession session : nbContent.getNbSessions()) {
 	    NoticeboardUser user = nbUserDAO.getNbUser(userId.longValue(), session.getNbSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getNbSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			NoticeboardConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    nbContentDAO.delete(entry);
-		}
-
 		nbUserDAO.delete(user);
 	    }
 	}
@@ -593,36 +574,6 @@ public class NoticeboardService
 	this.exportContentService = exportContentService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
-    /* =============== Wrappers Methods for Notebook Service (Reflective Option) =============== */
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
@@ -652,9 +603,6 @@ public class NoticeboardService
 	noticeboard.setNbContentId(toolContentID);
 	noticeboard.setTitle(JsonUtil.optString(toolContentJSON, RestTags.TITLE));
 	noticeboard.setContent(JsonUtil.optString(toolContentJSON, "content"));
-	noticeboard.setReflectOnActivity(
-		JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	noticeboard.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 
 	noticeboard.setCreatorUserId(userID.longValue());
 	noticeboard.setDateCreated(updateDate);

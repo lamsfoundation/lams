@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -68,7 +66,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -130,10 +127,6 @@ public class LearningController implements VoteAppConstants {
 	request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
 	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
-
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	voteLearningForm.resetCommands();
 
@@ -240,10 +233,6 @@ public class LearningController implements VoteAppConstants {
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
-
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
@@ -289,10 +278,6 @@ public class LearningController implements VoteAppConstants {
 
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
-
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
@@ -438,9 +423,6 @@ public class LearningController implements VoteAppConstants {
 
 	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
 
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
-
 	voteLearningForm.resetCommands();
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
@@ -484,8 +466,6 @@ public class LearningController implements VoteAppConstants {
 
 	voteLearningForm.setUserEntry("");
 
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 	voteLearningForm.resetCommands();
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
@@ -508,74 +488,6 @@ public class LearningController implements VoteAppConstants {
 	objectNode.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/json;charset=UTF-8");
 	return objectNode.toString();
-    }
-
-    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    public String submitReflection(VoteLearningForm voteLearningForm, HttpServletRequest request) {
-
-	LearningController.repopulateRequestParameters(request, voteLearningForm);
-
-	String toolSessionIDString = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	voteLearningForm.setToolSessionID(toolSessionIDString);
-	Long toolSessionID = new Long(toolSessionIDString);
-
-	String userIDString = request.getParameter("userID");
-	voteLearningForm.setUserID(userIDString);
-	Integer userID = new Integer(userIDString);
-
-	String reflectionEntry = request.getParameter(ENTRY_TEXT);
-
-	// check for existing notebook entry
-	NotebookEntry entry = voteService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
-		userID);
-
-	if (entry == null) {
-	    // create new entry
-	    voteService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, userID,
-		    reflectionEntry);
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionEntry);
-	    entry.setLastModified(new Date());
-	    voteService.updateEntry(entry);
-	}
-
-	voteLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
-	return learnerFinished(voteLearningForm, request);
-    }
-
-    @RequestMapping("/forwardtoReflection")
-    public String forwardtoReflection(VoteLearningForm voteLearningForm, HttpServletRequest request) {
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	logger.info("toolSessionID:" + toolSessionID);
-	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
-
-	VoteContent voteContent = voteSession.getVoteContent();
-	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = new VoteGeneralLearnerFlowDTO();
-	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
-
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
-
-	String userID = request.getParameter("userID");
-	logger.info("User Id :" + userID);
-	voteLearningForm.setUserID(userID);
-
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		MY_SIGNATURE, new Integer(userID));
-
-	if (notebookEntry != null) {
-	    String notebookEntryPresentable = notebookEntry.getEntry();
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntryPresentable);
-	    voteLearningForm.setEntryText(notebookEntryPresentable);
-	}
-
-	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-
-	voteLearningForm.resetCommands();
-
-	boolean isLastActivity = voteService.isLastActivity(new Long(toolSessionID));
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, isLastActivity);
-	return "/learning/Notebook";
     }
 
     private static void repopulateRequestParameters(HttpServletRequest request, VoteLearningForm voteLearningForm) {
@@ -693,20 +605,10 @@ public class LearningController implements VoteAppConstants {
 	voteLearningForm.setToolContentUID(voteContent.getUid().toString());
 	voteGeneralLearnerFlowDTO.setToolContentUID(voteContent.getUid().toString());
 
-	voteGeneralLearnerFlowDTO.setReflection(new Boolean(voteContent.isReflect()).toString());
-	//String reflectionSubject = VoteUtils.replaceNewLines(voteContent.getReflectionSubject());
-	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
-
 	String mode = voteLearningForm.getLearningMode();
 	voteGeneralLearnerFlowDTO.setLearningMode(mode);
 
 	String userId = voteLearningForm.getUserID();
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		VoteAppConstants.MY_SIGNATURE, new Integer(userId));
-	if (notebookEntry != null) {
-	    //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
-	}
 
 	Map<String, String> mapQuestions = voteService.buildQuestionMap(voteContent, null);
 	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);

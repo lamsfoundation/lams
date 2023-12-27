@@ -65,9 +65,6 @@ public class NbAuthoringForm {
     private boolean commentsLikeAndDislike;
     private boolean allowAnonymous;
 
-    private boolean reflectOnActivity;
-    private String reflectInstructions;
-
     private String currentTab;
 
     /**
@@ -107,22 +104,6 @@ public class NbAuthoringForm {
 
     public void setAllowAnonymous(boolean allowAnonymous) {
 	this.allowAnonymous = allowAnonymous;
-    }
-
-    public boolean getReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     /**
@@ -221,8 +202,6 @@ public class NbAuthoringForm {
 	setAllowComments(nbContent.isAllowComments());
 	setCommentsLikeAndDislike(nbContent.isCommentsLikeAndDislike());
 	setAllowAnonymous(nbContent.isAllowAnonymous());
-	setReflectOnActivity(nbContent.getReflectOnActivity());
-	setReflectInstructions(nbContent.getReflectInstructions());
     }
 
     public void copyValuesIntoNbContent(NoticeboardContent nbContent) {
@@ -231,8 +210,6 @@ public class NbAuthoringForm {
 	nbContent.setAllowComments(isAllowComments());
 	nbContent.setCommentsLikeAndDislike(isCommentsLikeAndDislike());
 	nbContent.setAllowAnonymous(isAllowAnonymous());
-	nbContent.setReflectOnActivity(getReflectOnActivity());
-	nbContent.setReflectInstructions(getReflectInstructions());
 	nbContent.setDateUpdated(new Date(System.currentTimeMillis()));
     }
 

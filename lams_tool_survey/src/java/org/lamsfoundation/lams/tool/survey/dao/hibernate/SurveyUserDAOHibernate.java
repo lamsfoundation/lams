@@ -31,7 +31,6 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dao.SurveyUserDAO;
 import org.lamsfoundation.lams.tool.survey.model.SurveySession;
@@ -158,59 +157,6 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    /**
-     * Will return List<[SurveyUser, String (notebook entry)], [SurveyUser, String (notebook entry)], ... , [SurveyUser,
-     * String (notebook entry)]>
-     */
-    public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, ICoreNotebookService coreNotebookService,
-	    IUserManagementService userManagementService) {
-	String sortingOrder;
-	switch (sorting) {
-	    case SurveyConstants.SORT_BY_NAME_ASC:
-		sortingOrder = "user.last_name ASC, user.first_name ASC";
-		break;
-	    case SurveyConstants.SORT_BY_NAME_DESC:
-		sortingOrder = "user.last_name DESC, user.first_name DESC";
-		break;
-	    default:
-		sortingOrder = "user.uid";
-	}
-
-	// If the session uses notebook, then get the sql to join across to get the entries
-	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(sessionId.toString(),
-		SurveyConstants.TOOL_SIGNATURE, "user.user_id");
-
-	String[] portraitStrings = userManagementService.getPortraitSQL("user.user_id");
-
-	// Basic select for the user records
-	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.* ");
-	queryText.append(notebookEntryStrings[0]);
-	queryText.append(portraitStrings[0]);
-	queryText.append(" FROM tl_lasurv11_user user ");
-	queryText.append(
-		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId ");
-
-	// Add the notebook & portrait join
-	queryText.append(notebookEntryStrings[1]);
-	queryText.append(portraitStrings[1]);
-
-	// If filtering by name add a name based where clause
-	buildNameSearch(searchString, queryText);
-
-	// Now specify the sort based on the switch statement above.
-	queryText.append(" ORDER BY " + sortingOrder);
-
-	NativeQuery<Object[]> query = getSession().createNativeQuery(queryText.toString());
-	query.addEntity("user", SurveyUser.class).addScalar("notebookEntry", StringType.INSTANCE)
-		.addScalar("portraitId", StringType.INSTANCE).setParameter("sessionId", sessionId.longValue())
-		.setFirstResult(page * size).setMaxResults(size);
-	return query.list();
     }
 
     private static final String GET_STATISTICS = "SELECT session.*, COUNT(*) numUsers "

@@ -234,7 +234,7 @@ public class LearningWebsocketServer extends AbstractTimeLimitWebsocketServer {
     }
 
     /**
-     * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
+     * The time limit is expired but leader hasn't submitted required burning questions yet. Non-leaders
      * will need to refresh the page in order to stop showing them questions page.
      */
     public void sendPageRefreshRequest(Long toolContentId, long toolSessionId) throws IOException {

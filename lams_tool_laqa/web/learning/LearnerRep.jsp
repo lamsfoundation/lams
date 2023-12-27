@@ -217,28 +217,11 @@
 		</c:forEach>
 		<!-- End questions and answers -->
 
-		<!-- reflections -->
-		<c:if test="${generalLearnerFlowDTO.reflection == 'true' && generalLearnerFlowDTO.isLearnerFinished}">
-			<lams:NotebookReedit
-				reflectInstructions="${generalLearnerFlowDTO.reflectionSubject}"
-				reflectEntry="${qaLearningForm.entryText}"
-				isEditButtonEnabled="${hasEditRight && mode != 'teacher'}"
-				notebookHeaderLabelKey="label.reflection"/>
-		</c:if>
-
 		<!-- buttons -->
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
 				<span id="learner-submit">
-				<c:choose>
-					<c:when test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight && !generalLearnerFlowDTO.isLearnerFinished}">
-						<button type="button" name="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-								class="btn btn-primary na">
-							<fmt:message key="label.continue" />
-						</button>
-					</c:when>
-
-					<c:when test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
+					<c:if test="${!hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
 						<button type="button" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${sessionMap.isLastActivity}">
@@ -249,8 +232,7 @@
 								</c:otherwise>
 							</c:choose>
 						</button>
-					</c:when>
-				</c:choose>
+					</c:if>
 				</span>
 
 				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
@@ -502,10 +484,6 @@
 			} else {
 				submitMethod('refreshAllResults');
 			}
-		}
-		
-		function continueReflect() {
-			submitMethod('forwardtoReflection');
 		}
 		
 		function submitMethod(actionMethod) {

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
@@ -140,31 +139,4 @@ public interface ILeaderselectionService extends ICommonToolService {
     LeaderselectionUser createLeaderselectionUser(UserDTO user, LeaderselectionSession leaderselectionSession);
 
     String finishToolSession(Long toolSessionId, Long userId);
-
-    /**
-     *
-     * @param id
-     * @param idType
-     * @param signature
-     * @param userID
-     * @param title
-     * @param entry
-     * @return
-     */
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    /**
-     *
-     * @param uid
-     * @return
-     */
-    NotebookEntry getEntry(Long uid);
-
-    /**
-     *
-     * @param uid
-     * @param title
-     * @param entry
-     */
-    void updateEntry(Long uid, String entry);
 }

@@ -43,8 +43,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 import org.lamsfoundation.lams.tool.daco.dto.QuestionSummaryDTO;
@@ -58,7 +56,6 @@ import org.lamsfoundation.lams.tool.daco.service.IDacoService;
 import org.lamsfoundation.lams.tool.daco.service.UploadDacoFileException;
 import org.lamsfoundation.lams.tool.daco.util.DacoQuestionComparator;
 import org.lamsfoundation.lams.tool.daco.web.form.RecordForm;
-import org.lamsfoundation.lams.tool.daco.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -147,21 +144,10 @@ public class LearningController {
 	// check whehter finish lock is on/off
 	boolean lock = daco.getLockOnFinished() && dacoUser != null && dacoUser.isSessionFinished();
 
-	// get notebook entry
-	String entryText = null;
-	if (dacoUser != null) {
-	    NotebookEntry notebookEntry = dacoService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    DacoConstants.TOOL_SIGNATURE, dacoUser.getUserId().intValue());
-	    if (notebookEntry != null) {
-		entryText = notebookEntry.getEntry();
-	    }
-	}
-
 	sessionMap.put(DacoConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(DacoConstants.ATTR_USER_FINISHED, dacoUser != null && dacoUser.isSessionFinished());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	sessionMap.put(DacoConstants.ATTR_REFLECTION_ENTRY, entryText);
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
 	String currentView = request.getParameter(DacoConstants.ATTR_LEARNING_VIEW);
 	sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW,
@@ -453,73 +439,6 @@ public class LearningController {
 	refreshQuestionSummaries(request);
 
 	return "pages/learning/learning";
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/startReflection")
-    protected String startReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    @ModelAttribute("recordForm") RecordForm recordForm, HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-
-	MultiValueMap<String, String> errorMap = validateBeforeFinish(request, sessionMapID);
-	if (!errorMap.isEmpty()) {
-	    request.setAttribute("errorMap", errorMap);
-	    refreshQuestionSummaries(request);
-	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
-		    request.getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
-	    return "pages/learning/learning";
-	}
-	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-
-	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	HttpSession httpSession = SessionManager.getSession();
-	UserDTO userDTO = (UserDTO) httpSession.getAttribute(AttributeNames.USER);
-	DacoUser user = dacoService.getUserByUserIdAndSessionId(userDTO.getUserID().longValue(), toolSessionID);
-
-	messageForm.setUserId(userDTO.getUserID());
-	messageForm.setSessionId(toolSessionID);
-
-	// get the existing reflection entry
-
-	NotebookEntry entry = dacoService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		DacoConstants.TOOL_SIGNATURE, userDTO.getUserID());
-
-	if (entry != null) {
-	    messageForm.setEntryText(entry.getEntry());
-	}
-	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	messageForm.setSessionMapID(sessionMapID);
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping(path = "/submitReflection", method = RequestMethod.POST)
-    protected String submitReflection(@ModelAttribute("messageForm") ReflectionForm messageForm,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, DacoApplicationException {
-	Integer userId = messageForm.getUserId();
-	Long sessionId = messageForm.getSessionId();
-	// check for existing notebook entry
-	NotebookEntry entry = dacoService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		DacoConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    dacoService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    DacoConstants.TOOL_SIGNATURE, userId, messageForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(messageForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    dacoService.updateEntry(entry);
-	}
-
-	return finish(request, response);
     }
 
     // *************************************************************************************

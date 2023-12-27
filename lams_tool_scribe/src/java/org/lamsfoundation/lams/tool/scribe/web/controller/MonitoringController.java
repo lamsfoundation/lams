@@ -29,8 +29,6 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeSessionDTO;
 import org.lamsfoundation.lams.tool.scribe.dto.ScribeUserDTO;
@@ -38,7 +36,6 @@ import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 import org.lamsfoundation.lams.tool.scribe.service.IScribeService;
-import org.lamsfoundation.lams.tool.scribe.util.ScribeConstants;
 import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
 import org.lamsfoundation.lams.tool.scribe.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -83,23 +80,6 @@ public class MonitoringController {
 	request.setAttribute("contentFolderID", contentFolderID);
 
 	return "pages/monitoring/monitoring";
-    }
-
-    @RequestMapping("/openNotebook")
-    public String openNotebook(HttpServletRequest request) {
-
-	Long uid = WebUtil.readLongParam(request, "uid", false);
-
-	ScribeUser scribeUser = scribeService.getUserByUID(uid);
-	NotebookEntry notebookEntry = scribeService.getEntry(scribeUser.getScribeSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, scribeUser.getUserId().intValue());
-
-	ScribeUserDTO scribeUserDTO = new ScribeUserDTO(scribeUser);
-	scribeUserDTO.setNotebookEntry(notebookEntry.getEntry());
-
-	request.setAttribute("scribeUserDTO", scribeUserDTO);
-
-	return "pages/monitoring/notebook";
     }
 
     @RequestMapping(path = "/appointScribe", method = RequestMethod.POST)
@@ -153,16 +133,6 @@ public class MonitoringController {
 		ScribeUser user = (ScribeUser) userIter.next();
 		ScribeUserDTO userDTO = new ScribeUserDTO(user);
 
-		// get the notebook entry.
-		NotebookEntry notebookEntry = scribeService.getEntry(session.getSessionId(),
-			CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE,
-			user.getUserId().intValue());
-		if (notebookEntry != null) {
-		    userDTO.finishedReflection = true;
-		} else {
-		    userDTO.finishedReflection = false;
-		}
-
 		if (user.isReportApproved()) {
 		    numberOfVotes++;
 		}
@@ -178,7 +148,6 @@ public class MonitoringController {
 	}
 
 	return scribeDTO;
-
     }
 
     private ScribeUser getCurrentUser(Long toolSessionID) {

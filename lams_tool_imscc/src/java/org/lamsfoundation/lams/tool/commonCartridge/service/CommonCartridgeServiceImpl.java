@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -50,9 +48,6 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -66,7 +61,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeItemVisitDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeSessionDAO;
 import org.lamsfoundation.lams.tool.commonCartridge.dao.CommonCartridgeUserDAO;
-import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
 import org.lamsfoundation.lams.tool.commonCartridge.ims.SimpleCommonCartridgeConverter;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
@@ -75,7 +69,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemVisitLog;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
-import org.lamsfoundation.lams.tool.commonCartridge.util.ReflectDTOComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -121,8 +114,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     private IUserManagementService userManagementService;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
 
@@ -344,37 +335,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public Map<Long, Set<ReflectDTO>> getReflectList(Long contentId, boolean setEntry) {
-	Map<Long, Set<ReflectDTO>> map = new HashMap<>();
-
-	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
-	for (CommonCartridgeSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    boolean hasRefection = session.getCommonCartridge().getReflectOnActivity();
-	    Set<ReflectDTO> list = new TreeSet<>(new ReflectDTOComparator());
-	    // get all users in this session
-	    List<CommonCartridgeUser> users = commonCartridgeUserDao.getBySessionID(sessionId);
-	    for (CommonCartridgeUser user : users) {
-		ReflectDTO ref = new ReflectDTO(user);
-
-		if (setEntry) {
-		    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		    if (entry != null) {
-			ref.setReflect(entry.getEntry());
-		    }
-		}
-
-		ref.setHasRefection(hasRefection);
-		list.add(ref);
-	    }
-	    map.put(sessionId, list);
-	}
-
-	return map;
-    }
-
-    @Override
     public List<CommonCartridgeUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
 	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao
 		.getCommonCartridgeItemLogBySession(sessionId, itemUid);
@@ -406,31 +366,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    item.setHide(!visible);
 	    commonCartridgeItemDao.saveObject(item);
 	}
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    /**
-     * @param notebookEntry
-     */
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -729,13 +664,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    return;
 	}
 
-	for (CommonCartridgeSession session : commonCartridgeSessionDao.getByContentId(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, CommonCartridgeConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
 	commonCartridgeDao.delete(commonCartridge);
     }
 
@@ -781,12 +709,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndSessionID(userId.longValue(),
 		    session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			CommonCartridgeConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    commonCartridgeDao.removeObject(NotebookEntry.class, entry.getUid());
-		}
-
 		commonCartridgeUserDao.removeObject(CommonCartridgeUser.class, user.getUid());
 	    }
 	}
@@ -921,10 +843,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
     }
 
     @Override

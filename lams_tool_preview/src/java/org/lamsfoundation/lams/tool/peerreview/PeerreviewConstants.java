@@ -35,8 +35,6 @@ public class PeerreviewConstants {
     public static final int SORT_BY_USERNAME_DESC = 2;
     public static final int SORT_BY_AVERAGE_RESULT_ASC = 3;
     public static final int SORT_BY_AVERAGE_RESULT_DESC = 4;
-    public static final int SORT_BY_NOTEBOOK_ENTRY_ASC = 5;
-    public static final int SORT_BY_NOTEBOOK_ENTRY_DESC = 6;
     
     public static final int GET_RESULTS_FOR_ALL_USERS_BY_THIS_USER = 0; // used for the edit screens
     public static final int GET_RESULTS_FOR_ALL_USERS_BY_ALL_USERS = 1; // used for "everyone's results" on the results screen
@@ -67,7 +65,6 @@ public class PeerreviewConstants {
     public static final String PARAM_SORT_USER_NAME = "userName";
     public static final String PARAM_SORT_NAME = "itemDescription";
     public static final String PARAM_SORT_RATING = "rating";
-    public static final String PARAM_SORT_NOTEBOOK = "notebook";
     public static final String PARAM_TIME_TAKEN = "timeTaken";
     public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";
     public static final String PARAM_AVG_MARK = "avgMark";
@@ -129,14 +126,6 @@ public class PeerreviewConstants {
     public static final String PAGE_EDITABLE = "isPageEditable";
 
     public static final String MODE_AUTHOR_SESSION = "author_session";
-
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
-    public static final String ATTR_REFLECT_LIST = "reflectList";
 
     public static final String ATTR_USER_UID = "userUid";
 

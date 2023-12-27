@@ -155,35 +155,6 @@
 				path="forum.lockWhenFinished" id="lockWhenFinished" /> <fmt:message
 				key="label.authoring.advance.lock.on.finished" /></label>
 	</div>
-
-	<div class="checkbox">
-		<label for="reflectOn"><form:checkbox
-				path="forum.reflectOnActivity" id="reflectOn" /> <fmt:message
-				key="advanced.reflectOnActivity" /></label>
-	</div>
-	<div class="form-group">
-		<textarea name="forum.reflectInstructions"
-			id="reflectInstructions" class="form-control" rows="3"
-			onkeyup="javascript:turnOnReflect()" >${forumForm.forum.reflectInstructions}</textarea>
-	</div>
-
-	<script type="text/javascript">
-		//automatically turn on refect option if there are text input in refect instruction area
-		var ra = document.getElementById("reflectInstructions");
-		var rao = document.getElementById("reflectOn");
-		function turnOnRefect() {
-			if (isEmpty(ra.value)) {
-				//turn off	
-				rao.checked = false;
-			} else {
-				//turn on
-				rao.checked = true;
-			}
-		}
-
-		ra.onkeyup = turnOnRefect;
-	</script>
-
 </lams:SimplePanel>
 
 <script type="text/javascript">
@@ -308,16 +279,6 @@
 			}
 
 			alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="js.error.validate.number"/></spring:escapeBody>');
-		}
-	}
-
-	function checkReflection() {
-		var ropt = document.getElementById("reflectOn");
-		var rins = document.getElementById("reflectInstructions");
-		if (ropt.checked) {
-			rins.disabled = false;
-		} else {
-			rins.disabled = true;
 		}
 	}
 </script>

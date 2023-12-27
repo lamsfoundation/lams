@@ -30,14 +30,6 @@
         <form:hidden path="mode" />
         <form:hidden path="toolSessionID" />
 
-        <c:if test="${userFinished and reflectOnActivity}">
-			<lams:NotebookReedit
-				reflectInstructions="${reflectInstructions}"
-				reflectEntry="${reflectEntry}"
-				isEditButtonEnabled="false"
-				notebookHeaderLabelKey="titleHeading.reflection"/>
-        </c:if>
-
         <c:if test="${allowComments}">
             <lams:Comments toolSessionId="${nbLearnerForm.toolSessionID}"
                            toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}"
@@ -46,28 +38,17 @@
 
         <c:if test="${not nbLearnerForm.readOnly}">
             <div class="activity-bottom-buttons">
-                <c:choose>
-                    <c:when test="${reflectOnActivity}">
-                        <button type="button" class="btn btn-primary na" onclick="submitForm('reflect')">
-                            <fmt:message key="button.continue" />
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button" id="finishButton" class="btn btn-primary na">
-                            <c:choose>
-                                <c:when test="${isLastActivity}">
-                                    <fmt:message key="button.submit" />
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:message key="button.finish" />
-                                </c:otherwise>
-                            </c:choose>
-                        </button>
-                    </c:otherwise>
-                </c:choose>
+            	<button type="button" id="finishButton" class="btn btn-primary na">
+                	<c:choose>
+                    	<c:when test="${isLastActivity}">
+                        	<fmt:message key="button.submit" />
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:message key="button.finish" />
+                        </c:otherwise>
+                   </c:choose>
+                </button>
             </div>
-
         </c:if>
-
     </form:form>
 </lams:PageLearner>

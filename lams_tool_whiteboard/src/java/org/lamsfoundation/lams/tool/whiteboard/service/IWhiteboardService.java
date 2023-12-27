@@ -23,20 +23,18 @@
 
 package org.lamsfoundation.lams.tool.whiteboard.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.lamsfoundation.lams.learningdesign.Grouping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
-import org.lamsfoundation.lams.tool.whiteboard.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.whiteboard.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.whiteboard.model.Whiteboard;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardConfigItem;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardSession;
 import org.lamsfoundation.lams.tool.whiteboard.model.WhiteboardUser;
 import org.lamsfoundation.lams.usermanagement.User;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public interface IWhiteboardService extends ICommonToolService {
 
@@ -101,24 +99,6 @@ public interface IWhiteboardService extends ICommonToolService {
      * If success return next activity's url, otherwise return null.
      */
     String finishToolSession(Long toolSessionId, Long userId) throws WhiteboardApplicationException;
-
-    /**
-     * Create refection entry into notebook tool.
-     */
-    Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText);
-
-    /**
-     * Get reflection entry from notebook tool.
-     */
-    NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
-
-    void updateEntry(NotebookEntry notebookEntry);
-
-    /**
-     * Get Reflect DTO list.
-     */
-    List<ReflectDTO> getReflectList(Long contentId);
 
     List<SessionDTO> getSummary(Long contentId, Long ratingUserId) throws WhiteboardApplicationException;
 

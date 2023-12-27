@@ -37,8 +37,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -52,7 +50,6 @@ import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.sbmt.web.form.LearnerForm;
-import org.lamsfoundation.lams.tool.sbmt.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -186,8 +183,6 @@ public class LearningController implements SbmtConstants {
 	sessionMap.put(SbmtConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(SbmtConstants.ATTR_LOCK_ON_FINISH, content.isLockOnFinished());
 	sessionMap.put(SbmtConstants.ATTR_USE_SEL_LEADER, content.isUseSelectLeaderToolOuput());
-	sessionMap.put(SbmtConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-	sessionMap.put(SbmtConstants.ATTR_REFLECTION_INSTRUCTION, content.getReflectInstructions());
 	sessionMap.put(SbmtConstants.ATTR_IS_MAX_LIMIT_UPLOAD_ENABLED, content.isLimitUpload());
 	sessionMap.put(SbmtConstants.ATTR_MAX_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_MIN_LIMIT_UPLOAD_NUMBER, content.getMinLimitUploadNumber());
@@ -484,15 +479,6 @@ public class LearningController implements SbmtConstants {
 	    }
 	}
 
-	// retrieve notebook reflection entry.
-	NotebookEntry notebookEntry = submitFilesService.getEntry(
-		(Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		SbmtConstants.TOOL_SIGNATURE, currUser.getUserID());
-
-	if (notebookEntry != null) {
-	    dto.setReflect(notebookEntry.getEntry());
-	}
-
 	request.setAttribute("learner", dto);
     }
 
@@ -527,77 +513,6 @@ public class LearningController implements SbmtConstants {
 	} else {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You are not allowed to delete this item");
 	}
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-//		ISubmitFilesService submitFilesService = getService();
-//		ActionErrors errors = validateBeforeFinish(request,submitFilesService);
-//		if(!errors.isEmpty()){
-//			this.addErrors(request,errors);
-//			return mapping.getInputForward();
-//		}
-
-	//get session value
-	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	refForm.setUserID(user.getUserID());
-	refForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SbmtConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    refForm.setEntryText(entry.getEntry());
-	}
-
-	return "learner/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    public String submitReflection(@ModelAttribute("reflectionForm") ReflectionForm refForm, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Integer userId = refForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, SbmtConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(SbmtConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = submitFilesService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SbmtConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    submitFilesService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    SbmtConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(refForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    submitFilesService.updateEntry(entry);
-	}
-
-	return finish(request, response);
     }
 
     public void validateBeforeFinish(HttpServletRequest request, ISubmitFilesService submitFilesService) {

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.scribe.service;
 
 
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.scribe.model.Scribe;
@@ -120,10 +119,6 @@ public interface IScribeService extends ICommonToolService {
      * @return
      */
     public ScribeUser createScribeUser(UserDTO user, ScribeSession scribeSession);
-
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     /**
      * Delete heading's report by given heading UID.

@@ -56,9 +56,6 @@ import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -121,8 +118,6 @@ public class SubmitFilesService
 
     private IExportToolContentService exportContentService;
 
-    private ICoreNotebookService coreNotebookService;
-
     private IUserManagementService userManagementService;
 
     private ILearnerService learnerService;
@@ -151,28 +146,6 @@ public class SubmitFilesService
 	    }
 	}
 
-    }
-
-    @Override
-    public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
-	    String entryText) {
-	return coreNotebookService.createNotebookEntry(sessionId, notebookToolType, toolSignature, userId, "",
-		entryText);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -211,14 +184,6 @@ public class SubmitFilesService
 	    return;
 	}
 
-	for (SubmitFilesSession session : submitFilesSessionDAO.getSubmitFilesSessionByContentID(toolContentId)) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionID(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, SbmtConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	submitFilesContentDAO.delete(submitFilesContent);
     }
 
@@ -236,12 +201,6 @@ public class SubmitFilesService
 
 	    SubmitUser user = submitUserDAO.getLearner(session.getSessionID(), userId);
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionID(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			SbmtConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    submitFilesContentDAO.delete(entry);
-		}
-
 		toolService.removeActivityMark(user.getUserID(), session.getSessionID());
 
 		if (session.getGroupLeader() != null && session.getGroupLeader().getUid() == user.getUid()) {
@@ -1125,9 +1084,8 @@ public class SubmitFilesService
 
     @Override
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
-	    String searchString, boolean getNotebookEntries) {
-	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
-		coreNotebookService, userManagementService);
+	    String searchString) {
+	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, userManagementService);
     }
 
     @Override
@@ -1252,10 +1210,6 @@ public class SubmitFilesService
 	this.exportContentService = exportContentService;
     }
 
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
@@ -1350,8 +1304,6 @@ public class SubmitFilesService
 	content.setDefineLater(false);
 	content.setNotifyTeachersOnFileSubmit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnFileSubmit", Boolean.FALSE));
-	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	content.setLimitUpload(JsonUtil.optBoolean(toolContentJSON, "limitUpload", Boolean.FALSE));
 	content.setUseSelectLeaderToolOuput(

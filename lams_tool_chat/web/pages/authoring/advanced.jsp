@@ -22,35 +22,5 @@
 	<fmt:message key="advanced.lockOnFinished" />
 	</label>
 </div>
-
-<div class="checkbox">
-	<label for="reflectOnActivity">
-	<form:checkbox path="reflectOnActivity" value="1" id="reflectOnActivity"/>
-	<fmt:message key="advanced.reflectOnActivity" />
-	</label>
-</div>
-
-<div class="form-group">
-	<textarea name="reflectInstructions" rows="3" id="reflectInstructions" class="form-control">${authoringForm.reflectInstructions}</textarea>
-</div>
 </lams:SimplePanel>
-
-<script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOnActivity");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
-		//turn off	
-			rao.checked = false;
-		}else{
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-//-->
-</script>
 

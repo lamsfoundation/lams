@@ -54,9 +54,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.SimpleURL;
@@ -77,7 +74,6 @@ import org.lamsfoundation.lams.tool.vote.dao.IVoteSessionDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUserDAO;
 import org.lamsfoundation.lams.tool.vote.dao.IVoteUsrAttemptDAO;
 import org.lamsfoundation.lams.tool.vote.dto.OpenTextAnswerDTO;
-import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SessionNominationDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
@@ -128,7 +124,6 @@ public class VoteService
     private ILogEventService logEventService;
     private ILamsToolService toolService;
     private IExportToolContentService exportContentService;
-    private ICoreNotebookService coreNotebookService;
     private IToolContentHandler voteToolContentHandler = null;
     private VoteOutputFactory voteOutputFactory;
     private IDataFlowDAO dataFlowDAO;
@@ -708,61 +703,6 @@ public class VoteService
 	}
 
 	return monitoredAnswersDTOs;
-    }
-
-    @Override
-    public List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID) {
-	List<ReflectionDTO> reflectionsContainerDTO = new LinkedList<>();
-
-	if (userID == null) {
-	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
-		VoteSession voteSession = sessionIter.next();
-
-		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
-		    VoteQueUsr user = userIter.next();
-
-		    NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE,
-			    new Integer(user.getQueUsrId().toString()));
-
-		    if (notebookEntry != null) {
-			ReflectionDTO reflectionDTO = new ReflectionDTO();
-			reflectionDTO.setUserId(user.getQueUsrId().toString());
-			reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
-			reflectionDTO.setUserName(user.getFullname());
-			reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			// String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-			reflectionDTO.setEntry(notebookEntry.getEntry());
-			reflectionsContainerDTO.add(reflectionDTO);
-		    }
-		}
-	    }
-	} else {
-	    for (Iterator<VoteSession> sessionIter = voteContent.getVoteSessions().iterator(); sessionIter.hasNext();) {
-		VoteSession voteSession = sessionIter.next();
-		for (Iterator<VoteQueUsr> userIter = voteSession.getVoteQueUsers().iterator(); userIter.hasNext();) {
-		    VoteQueUsr user = userIter.next();
-		    if (user.getQueUsrId().equals(userID)) {
-			NotebookEntry notebookEntry = this.getEntry(voteSession.getVoteSessionId(),
-				CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE,
-				new Integer(user.getQueUsrId().toString()));
-
-			if (notebookEntry != null) {
-			    ReflectionDTO reflectionDTO = new ReflectionDTO();
-			    reflectionDTO.setUserId(user.getQueUsrId().toString());
-			    reflectionDTO.setSessionId(voteSession.getVoteSessionId().toString());
-			    reflectionDTO.setUserName(user.getFullname());
-			    reflectionDTO.setReflectionUid(notebookEntry.getUid().toString());
-			    // String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
-			    reflectionDTO.setEntry(notebookEntry.getEntry());
-			    reflectionsContainerDTO.add(reflectionDTO);
-			}
-		    }
-		}
-	    }
-	}
-
-	return reflectionsContainerDTO;
     }
 
     @Override
@@ -1370,14 +1310,6 @@ public class VoteService
 	    return;
 	}
 
-	for (VoteSession session : voteContent.getVoteSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getVoteSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	voteContentDAO.delete(voteContent);
     }
 
@@ -1398,13 +1330,6 @@ public class VoteService
 	    VoteQueUsr user = voteUserDAO.getVoteUserBySession(userId.longValue(), session.getUid());
 	    if (user != null) {
 		voteUsrAttemptDAO.removeAttemptsForUserandSession(user.getUid(), session.getUid());
-
-		NotebookEntry entry = getEntry(session.getVoteSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			VoteAppConstants.MY_SIGNATURE, userId);
-		if (entry != null) {
-		    voteContentDAO.delete(entry);
-		}
-
 		voteUserDAO.removeVoteUser(user);
 	    }
 	}
@@ -1701,30 +1626,7 @@ public class VoteService
 		// we need to make sure specified user has the same scratches as a leader
 		copyAnswersFromLeader(voteUser, groupLeader);
 	    }
-
 	}
-
-    }
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     @Override
@@ -1751,13 +1653,6 @@ public class VoteService
     @Override
     public int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString) {
 	return voteUsrAttemptDAO.getCountUsersBySession(sessionUid, questionUid, searchString);
-    }
-
-    @Override
-    public List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
-	    String searchString) {
-	return voteUsrAttemptDAO.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString,
-		getCoreNotebookService(), userManagementService);
     }
 
     @Override
@@ -1924,21 +1819,6 @@ public class VoteService
 	this.exportContentService = exportContentService;
     }
 
-    /**
-     * @return Returns the coreNotebookService.
-     */
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    /**
-     * @param coreNotebookService
-     *            The coreNotebookService to set.
-     */
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public VoteOutputFactory getVoteOutputFactory() {
 	return voteOutputFactory;
     }
@@ -2066,8 +1946,6 @@ public class VoteService
 	vote.setLockOnFinish(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	vote.setMaxNominationCount(JsonUtil.optString(toolContentJSON, "maxNominations", "1"));
 	vote.setMinNominationCount(JsonUtil.optString(toolContentJSON, "minNominations", "1"));
-	vote.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	vote.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	vote.setShowResults(JsonUtil.optBoolean(toolContentJSON, "showResults", Boolean.TRUE));
 	vote.setUseSelectLeaderToolOuput(
 		JsonUtil.optBoolean(toolContentJSON, RestTags.USE_SELECT_LEADER_TOOL_OUTPUT, Boolean.FALSE));

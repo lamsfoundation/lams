@@ -45,10 +45,6 @@ public class ScribeDTO {
 
     public boolean contentInUse;
 
-    public boolean reflectOnActivity;
-
-    public String reflectInstructions;
-
     public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();
 
     public Set<ScribeHeadingDTO> headingDTOs = new TreeSet<ScribeHeadingDTO>();
@@ -62,8 +58,6 @@ public class ScribeDTO {
 	title = scribe.getTitle();
 	instructions = scribe.getInstructions();
 	contentInUse = scribe.isContentInUse();
-	reflectInstructions = scribe.getReflectInstructions();
-	reflectOnActivity = scribe.isReflectOnActivity();
 	autoSelectScribe = scribe.isAutoSelectScribe();
 	showAggregatedReports = scribe.isShowAggregatedReports();
 
@@ -101,14 +95,6 @@ public class ScribeDTO {
 	this.toolContentID = toolContentID;
     }
 
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
     public boolean isContentInUse() {
 	return contentInUse;
     }
@@ -123,14 +109,6 @@ public class ScribeDTO {
 
     public void setDefineLater(boolean defineLater) {
 	this.defineLater = defineLater;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isAutoSelectScribe() {

@@ -15,10 +15,6 @@
 				finishButton.disabled = true;
 			}
 		}
-	
-		function continueReflect(){
-			location.href='<lams:WebAppURL />learning/openNotebook.do?toolSessionID=${learningForm.toolSessionID}';
-		}
 	</script>
 
 	<div id="container-main">
@@ -73,41 +69,21 @@
 				</c:otherwise>
 			</c:choose>
 		</c:if>
-
-		<c:if test="${userDTO.finishedActivity and contentDTO.reflectOnActivity}">
-			<lams:NotebookReedit
-				reflectInstructions="${contentDTO.reflectInstructions}"
-				reflectEntry="${userDTO.notebookEntryDTO.entry}"
-				isEditButtonEnabled="true"
-				notebookHeaderLabelKey="label.notebookEntry"
-				editNotebookLabelKey="button.edit"/>
-		</c:if>
 	
 		<c:if test="${mode == 'learner' || mode == 'author'}">
-			<form:form action="${!userDTO.finishedActivity and contentDTO.reflectOnActivity ? 'openNotebook.do' : 'finishActivity.do'}"
-					   method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="finishForm">
+			<form:form action="finishActivity.do" method="post" onsubmit="disableFinishButton();" modelAttribute="learningForm" id="finishForm">
 				<form:hidden path="toolSessionID" />
 				<div class="activity-bottom-buttons">
-					<c:choose>
-						<c:when test="${!userDTO.finishedActivity and contentDTO.reflectOnActivity}">
-							<button type="submit" class="btn btn-primary na">
-								<fmt:message key="button.continue" />
-							</button>
-						</c:when>
-						
-						<c:otherwise>
-							<button type="button" class="btn btn-primary na" id="finishButton">
-								<c:choose>
-									<c:when test="${isLastActivity}">
-										<fmt:message key="button.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="button.finish" />
-									</c:otherwise>
-								</c:choose>
-							</button>
-						</c:otherwise>
-					</c:choose>
+					<button type="button" class="btn btn-primary na" id="finishButton">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.finish" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 
 					<c:if test="${empty meetingURL}">
 						<button type="button" onclick="window.location.reload()" class="btn btn-secondary btn-icon-refresh me-2">
@@ -117,6 +93,5 @@
 				</div>
 			</form:form>
 		</c:if>
-
 	</div>
 </lams:PageLearner>

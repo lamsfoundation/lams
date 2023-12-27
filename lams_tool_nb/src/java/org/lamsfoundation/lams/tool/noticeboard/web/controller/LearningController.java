@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.noticeboard.web.controller;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,8 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
@@ -57,7 +54,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Creation Date: 27-06-05
@@ -171,13 +167,6 @@ public class LearningController {
 
 	nbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
 
-	NotebookEntry notebookEntry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
-	if (notebookEntry != null) {
-	    request.setAttribute("reflectEntry", notebookEntry.getEntry());
-	}
-	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
-	request.setAttribute("reflectOnActivity", nbContent.getReflectOnActivity());
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
@@ -251,25 +240,6 @@ public class LearningController {
 	    nbService.updateNoticeboardSession(nbSession);
 	    nbService.updateNoticeboardUser(nbUser);
 
-	    // Create the notebook entry if reflection is set.
-	    NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
-	    if (nbContent.getReflectOnActivity()) {
-		// check for existing notebook entry
-		NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			NoticeboardConstants.TOOL_SIGNATURE, userID.intValue());
-
-		if (entry == null) {
-		    // create new entry
-		    nbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-			    NoticeboardConstants.TOOL_SIGNATURE, userID.intValue(), nbLearnerForm.getEntryText());
-		} else {
-		    // update existing entry
-		    entry.setEntry(nbLearnerForm.getEntryText());
-		    entry.setLastModified(new Date());
-		    nbService.updateEntry(entry);
-		}
-	    }
-
 	    String nextActivityUrl;
 	    try {
 		nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, getUserID(request));
@@ -282,40 +252,11 @@ public class LearningController {
 	    }
 
 	    response.sendRedirect(nextActivityUrl);
-
 	    return null;
-
 	}
 	request.setAttribute(NoticeboardConstants.READ_ONLY_MODE, "true");
 
 	return "learnerContent";
-
-    }
-
-    /**
-     * Indicates that the user has finished viewing the noticeboard, and will be passed onto the Notebook reflection
-     * screen.
-     */
-    @RequestMapping(path = "/reflect", method = RequestMethod.POST)
-    public String reflect(@ModelAttribute NbLearnerForm nbLearnerForm, HttpServletRequest request) {
-
-	Long toolSessionID = Long.valueOf(nbLearnerForm.getToolSessionID());
-	NoticeboardContent nbContent = nbService.retrieveNoticeboardBySessionID(toolSessionID);
-	request.setAttribute("reflectInstructions", nbContent.getReflectInstructions());
-	request.setAttribute("title", nbContent.getTitle());
-	request.setAttribute("allowComments", nbContent.isAllowComments());
-	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
-	request.setAttribute("anonymous", nbContent.isAllowAnonymous());
-	request.setAttribute("toolSessionID", toolSessionID);
-	// get the existing reflection entry
-	NotebookEntry entry = nbService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		NoticeboardConstants.TOOL_SIGNATURE, getUserID(request).intValue());
-	if (entry != null) {
-	    request.setAttribute("reflectEntry", entry.getEntry());
-	}
-
-	request.setAttribute(AttributeNames.ATTR_IS_LAST_ACTIVITY, nbService.isLastActivity(toolSessionID));
-	return "reflect";
     }
 
 }

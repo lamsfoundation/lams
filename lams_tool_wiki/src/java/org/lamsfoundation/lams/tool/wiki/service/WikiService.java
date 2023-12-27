@@ -40,9 +40,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -102,8 +99,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     private IToolContentHandler wikiToolContentHandler = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private WikiOutputFactory wikiOutputFactory;
 
@@ -316,14 +311,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    return;
 	}
 
-	for (WikiSession session : wiki.getWikiSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	wikiDAO.delete(wiki);
     }
 
@@ -353,11 +340,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	    WikiUser user = wikiUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			WikiConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    wikiDAO.delete(entry);
-		}
 		user.setFinishedActivity(false);
 		// user.setWikiEdits(0);
 		wikiUserDAO.update(user);
@@ -439,42 +421,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     /* ********** IWikiService Methods ********************************* */
-
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#createNotebookEntry(java.lang.Long,
-     *      java.lang.Integer, java.lang.String, java.lang.Integer, java.lang.String)
-     */
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
-     */
-    @Override
-    public NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID) {
-	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    /**
-     * (non-Javadoc)
-     *
-     * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
-     */
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
 
     /**
      * (non-Javadoc)
@@ -967,14 +913,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	this.exportContentService = exportContentService;
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
     public WikiOutputFactory getWikiOutputFactory() {
 	return wikiOutputFactory;
     }
@@ -1044,8 +982,8 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     /**
      * Used by the Rest calls to create content.
      *
-     * Mandatory fields in toolContentJSON: title, instructions, pages. Optional fields reflectInstructions,
-     * reflectOnActivity, lockWhenFinished (default False), allowLearnerAttachImages (default True),
+     * Mandatory fields in toolContentJSON: title, instructions, pages. Optional fields lockWhenFinished (default
+     * False), allowLearnerAttachImages (default True),
      * allowLearnerCreatePages (default True), allowLearnerInsertLinks (default True) notifyUpdates (default False),
      * minimumEdits and maximumEdits (default 0, no min/max)
      *
@@ -1068,8 +1006,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 
 	content.setAllowLearnerAttachImages(

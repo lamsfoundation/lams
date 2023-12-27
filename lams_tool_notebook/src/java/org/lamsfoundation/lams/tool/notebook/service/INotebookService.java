@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.notebook.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.notebook.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;
 import org.lamsfoundation.lams.tool.notebook.model.NotebookCondition;
@@ -114,13 +113,6 @@ public interface INotebookService extends ICommonToolService {
     boolean notifyUser(Integer userId, String comment);
 
     String finishToolSession(NotebookUser notebookUser, Boolean isContentEditable, String entryText);
-
-    /**
-     *
-     * @param uid
-     * @return
-     */
-    NotebookEntry getEntry(Long uid);
 
     /**
      * Creates an unique name for a ChatCondition. It consists of the tool output definition name and a unique positive

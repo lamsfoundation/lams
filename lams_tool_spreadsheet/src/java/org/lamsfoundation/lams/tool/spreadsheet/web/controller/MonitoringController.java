@@ -111,9 +111,7 @@ public class MonitoringController {
     @RequestMapping("/getUsers")
     @ResponseBody
     public String getUsers(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
-	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
@@ -132,19 +130,16 @@ public class MonitoringController {
 	}
 
 	//return user list according to the given sessionID
-	Spreadsheet spreadsheet = service.getSpreadsheetByContentId(contentId);
-	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
-		spreadsheet.isReflectOnActivity());
+	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString);
 
 	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionID, searchString));
 
-	for (Object[] userAndReflection : users) {
-
+	for (Object[] userData : users) {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
-	    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
+	    SpreadsheetUser user = (SpreadsheetUser) userData[0];
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_ID, user.getUserId());
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape(user.getFullUsername()));
@@ -155,10 +150,6 @@ public class MonitoringController {
 			    NumberUtil.formatLocalisedNumber(user.getUserModifiedSpreadsheet().getMark().getMarks(),
 				    request.getLocale(), SpreadsheetConstants.MARK_NUM_DEC_PLACES));
 		}
-	    }
-
-	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("reflection", HtmlUtils.htmlEscape((String) userAndReflection[1]));
 	    }
 
 	    rows.add(responseRow);

@@ -74,8 +74,7 @@
 					<property name="toolService"><ref bean="lamsToolService"/></property>	
 					<property name="logEventService"><ref bean="logEventService"/></property>
 					<property name="voteToolContentHandler"><ref bean="voteToolContentHandler"/></property>		
-			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>						
-			   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>								   		
+			   		<property name="exportContentService"><ref bean="exportToolContentService"/></property>								   		
 			   		<property name="voteOutputFactory"><ref bean="voteOutputFactory"/></property>
 			   		<property name="messageService"><ref bean="lavoteMessageService"/></property>
 			   		<property name="userManagementService"><ref bean="userManagementService"/></property>

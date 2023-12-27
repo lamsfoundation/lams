@@ -35,8 +35,6 @@ public class ScratchieConstants {
     // for action forward name
     public static final String SUCCESS = "success";
 
-    public static final String NOTEBOOK = "notebook";
-
     public static final String ERROR = "error";
 
     public static final String DEFINE_LATER = "definelater";
@@ -99,8 +97,6 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
 
-    public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
-
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
 
     public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
@@ -137,19 +133,11 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
     public static final String ATTR_IS_BURNING_QUESTIONS_ENABLED = "isBurningQuestionsEnabled";
 
     public static final String ATTR_IS_PRESET_MARKS_OVERWRITTEN = "isPresetMarksOverwritten";
 
     public static final String ATTR_DEFAULT_PRESET_MARKS = "defaultPresetMarks";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
-    public static final String ATTR_REFLECTIONS = "reflections";
 
     public static final String ATTR_BURNING_QUESTION_ITEM_DTOS = "burningQuestionItemDtos";
 

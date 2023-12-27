@@ -140,10 +140,6 @@
             document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
         }
 
-        function continueReflect(){
-            document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-        }
-
         // time limit feature
         function displayCountdown(secondsLeft){
             var countdown = '<div id="countdown" role="timer"></div>' +
@@ -272,15 +268,6 @@
             </div>
         </div>
 
-        <!-- Reflection -->
-        <c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-            <lams:NotebookReedit
-                    reflectInstructions="${sessionMap.reflectInstructions}"
-                    reflectEntry="${sessionMap.reflectEntry}"
-                    isEditButtonEnabled="${mode != 'teacher'}"
-                    notebookHeaderLabelKey="title.reflection"/>
-        </c:if>
-
         <c:if test="${mode != 'teacher'}">
             <div class="activity-bottom-buttons">
                 <c:choose>
@@ -296,12 +283,6 @@
                                     </c:otherwise>
                                 </c:choose>
                         >
-                            <fmt:message key="label.continue" />
-                        </button>
-                    </c:when>
-
-                    <c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
-                        <button type="button" name="FinishButton" id="continue-button" onclick="return continueReflect()" class="btn btn-primary na">
                             <fmt:message key="label.continue" />
                         </button>
                     </c:when>

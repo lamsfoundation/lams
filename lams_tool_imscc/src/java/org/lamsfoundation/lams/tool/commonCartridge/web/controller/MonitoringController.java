@@ -24,20 +24,13 @@
 package org.lamsfoundation.lams.tool.commonCartridge.web.controller;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
-import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -127,14 +120,11 @@ public class MonitoringController {
 
 	CommonCartridge commonCartridge = commonCartridgeService.getCommonCartridgeByContentId(contentId);
 
-	Map<Long, Set<ReflectDTO>> relectList = commonCartridgeService.getReflectList(contentId, false);
-
 	// cache into sessionMap
 	sessionMap.put(CommonCartridgeConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(CommonCartridgeConstants.PAGE_EDITABLE, commonCartridge.isContentInUse());
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE, commonCartridge);
 	sessionMap.put(CommonCartridgeConstants.ATTR_TOOL_CONTENT_ID, contentId);
-	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECT_LIST, relectList);
 	return "pages/monitoring/monitoring";
     }
 
@@ -149,31 +139,5 @@ public class MonitoringController {
 	// set to request
 	request.setAttribute(CommonCartridgeConstants.ATTR_USER_LIST, list);
 	return "pages/monitoring/userlist";
-    }
-
-    @RequestMapping("/viewReflection")
-    private String viewReflection(HttpServletRequest request) {
-
-	Long uid = WebUtil.readLongParam(request, CommonCartridgeConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	CommonCartridgeUser user = commonCartridgeService.getUser(uid);
-	NotebookEntry notebookEntry = commonCartridgeService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	CommonCartridgeSession session = commonCartridgeService.getCommonCartridgeSessionBySessionId(sessionID);
-
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
-	}
-	refDTO.setReflectInstrctions(session.getCommonCartridge().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return "pages/monitoring/notebook";
     }
 }

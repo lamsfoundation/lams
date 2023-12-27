@@ -97,12 +97,6 @@ public class Resource implements Cloneable, Serializable {
     @Column(name = "assigment_submit_notify")
     private boolean notifyTeachersOnAssigmentSumbit;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     // general infomation
 
     @Column(name = "create_date")
@@ -394,22 +388,6 @@ public class Resource implements Cloneable, Serializable {
 
     public void setMiniViewNumberStr(String minViewNumber) {
 	miniViewNumberStr = minViewNumber;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isNotifyTeachersOnAssigmentSumbit() {

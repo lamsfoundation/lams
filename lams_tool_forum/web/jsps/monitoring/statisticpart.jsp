@@ -74,7 +74,7 @@
 			<tr>
 				<td valign="MIDDLE" width="48%">
 					<c:set var="viewtopic">
-						<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true&pageLastId=0
+						<lams:WebAppURL />learning/viewTopic.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&pageLastId=0
 					</c:set>
 					<a href="javascript:launchPopup('${viewtopic}');">
 						<c:out value="${topic.message.subject}" />

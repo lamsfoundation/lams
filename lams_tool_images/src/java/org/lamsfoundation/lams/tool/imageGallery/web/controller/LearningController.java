@@ -40,8 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;
@@ -52,11 +50,9 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallerySession;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
-import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageRatingForm;
-import org.lamsfoundation.lams.tool.imageGallery.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -132,14 +128,6 @@ public class LearningController {
 	// check whehter finish lock is on/off
 	boolean lock = imageGallery.getLockWhenFinished() && imageGalleryUser.isSessionFinished();
 
-	// get notebook entry
-	String entryText = new String();
-	NotebookEntry notebookEntry = igService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ImageGalleryConstants.TOOL_SIGNATURE, userId);
-	if (notebookEntry != null) {
-	    entryText = notebookEntry.getEntry();
-	}
-
 	// basic information
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, imageGallery.getTitle());
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, imageGallery.getInstructions());
@@ -150,10 +138,6 @@ public class LearningController {
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
-	// reflection information
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ON, imageGallery.isReflectOnActivity());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_INSTRUCTION, imageGallery.getReflectInstructions());
-	sessionMap.put(ImageGalleryConstants.ATTR_REFLECTION_ENTRY, entryText);
 
 	ImageGalleryConfigItem mediumImageDimensionsKey = igService
 		.getConfigItem(ImageGalleryConfigItem.KEY_MEDIUM_IMAGE_DIMENSIONS);
@@ -389,67 +373,6 @@ public class LearningController {
 
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return "pages/learning/parts/commentsarea";
-    }
-
-    /**
-     * Display empty reflection form.
-     */
-    @RequestMapping("/newReflection")
-    public String newReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request) {
-
-	// get session value
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	reflectionForm.setUserID(user.getUserID());
-	reflectionForm.setSessionMapID(sessionMapID);
-
-	// get the existing reflection entry
-
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	NotebookEntry entry = igService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ImageGalleryConstants.TOOL_SIGNATURE, user.getUserID());
-
-	if (entry != null) {
-	    reflectionForm.setEntryText(entry.getEntry());
-	}
-
-	return "pages/learning/notebook";
-    }
-
-    /**
-     * Submit reflection form input database.
-     */
-    @RequestMapping("/submitReflection")
-    public void submitReflection(@ModelAttribute ReflectionForm reflectionForm, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
-
-	Integer userId = reflectionForm.getUserID();
-
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// check for existing notebook entry
-	NotebookEntry entry = igService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		ImageGalleryConstants.TOOL_SIGNATURE, userId);
-
-	if (entry == null) {
-	    // create new entry
-	    igService.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ImageGalleryConstants.TOOL_SIGNATURE, userId, reflectionForm.getEntryText());
-	} else {
-	    // update existing entry
-	    entry.setEntry(reflectionForm.getEntryText());
-	    entry.setLastModified(new Date());
-	    igService.updateEntry(entry);
-	}
-
-	finish(request, response);
     }
 
     // *************************************************************************************

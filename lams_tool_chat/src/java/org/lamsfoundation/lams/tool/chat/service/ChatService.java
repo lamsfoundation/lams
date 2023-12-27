@@ -38,14 +38,10 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.learningdesign.dto.ActivityPositionDTO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -100,8 +96,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     private ILogEventService logEventService = null;
 
     private IExportToolContentService exportContentService;
-
-    private ICoreNotebookService coreNotebookService;
 
     private ChatOutputFactory chatOutputFactory;
 
@@ -278,14 +272,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	    return;
 	}
 
-	for (ChatSession session : (Set<ChatSession>) chat.getChatSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	chatDAO.delete(chat);
     }
 
@@ -314,17 +300,10 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 		    }
 		}
 
-		NotebookEntry entry = getEntry(session.getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			ChatConstants.TOOL_SIGNATURE, userId);
-		if (entry != null) {
-		    chatDAO.delete(entry);
-		}
-
 		user.setFinishedActivity(false);
 		user.setLastPresence(null);
 		chatUserDAO.update(user);
 	    }
-
 	}
     }
 
@@ -764,44 +743,12 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	return chatMessageDAO.getCountByFromUser(sessionUID);
     }
 
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
-
-    @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    /**
-     * @param notebookEntry
-     */
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
-    }
-
     public ChatOutputFactory getChatOutputFactory() {
 	return chatOutputFactory;
     }
 
-    public void setChatOutputFactory(ChatOutputFactory notebookOutputFactory) {
-	chatOutputFactory = notebookOutputFactory;
+    public void setChatOutputFactory(ChatOutputFactory chatOutputFactory) {
+	this.chatOutputFactory = chatOutputFactory;
     }
 
     @Override
@@ -890,8 +837,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 
 	content.setContentInUse(false);
 	content.setDefineLater(false);
-	content.setReflectInstructions(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
-	content.setReflectOnActivity(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	content.setLockOnFinished(JsonUtil.optBoolean(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 
 	String filterKeywords = JsonUtil.optString(toolContentJSON, "filterKeywords");

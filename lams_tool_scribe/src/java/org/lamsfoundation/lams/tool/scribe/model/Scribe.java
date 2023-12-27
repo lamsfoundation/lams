@@ -74,12 +74,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
     @Column(name = "lock_on_finished")
     private boolean lockOnFinished;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "content_in_use")
     private boolean contentInUse;
 
@@ -165,22 +159,6 @@ public class Scribe implements java.io.Serializable, Cloneable {
 
     public void setAutoSelectScribe(boolean autoSelectScribe) {
 	this.autoSelectScribe = autoSelectScribe;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isContentInUse() {

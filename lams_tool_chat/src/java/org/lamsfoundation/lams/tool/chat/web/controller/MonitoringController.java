@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.chat.dto.ChatDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatSessionDTO;
 import org.lamsfoundation.lams.tool.chat.dto.ChatUserDTO;
@@ -135,15 +133,6 @@ public class MonitoringController {
 		}
 		userDTO.setPostCount(count);
 
-		// get the notebook entry.
-		NotebookEntry notebookEntry = chatService.getEntry(session.getSessionId(),
-			CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (notebookEntry != null) {
-		    userDTO.finishedReflection = true;
-		} else {
-		    userDTO.finishedReflection = false;
-		}
-
 		sessionDTO.getUserDTOs().add(userDTO);
 	    }
 
@@ -167,23 +156,6 @@ public class MonitoringController {
 	ChatSessionDTO sessionDTO = new ChatSessionDTO(chatSession);
 	request.setAttribute("sessionDTO", sessionDTO);
 	return "pages/monitoring/chatHistory";
-    }
-
-    @RequestMapping("/openNotebook")
-    public String openNotebook(HttpServletRequest request) {
-
-	Long uid = WebUtil.readLongParam(request, "uid", false);
-
-	ChatUser chatUser = chatService.getUserByUID(uid);
-	NotebookEntry notebookEntry = chatService.getEntry(chatUser.getChatSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ChatConstants.TOOL_SIGNATURE, chatUser.getUserId().intValue());
-
-	ChatUserDTO chatUserDTO = new ChatUserDTO(chatUser);
-	chatUserDTO.setNotebookEntry(notebookEntry.getEntry());
-
-	request.setAttribute("chatUserDTO", chatUserDTO);
-
-	return "pages/monitoring/notebook";
     }
 
     @RequestMapping("/editMessage")

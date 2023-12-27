@@ -323,8 +323,6 @@ public class AuthoringController extends WikiPageController {
 	wiki.setAllowLearnerAttachImages(authForm.isAllowLearnerAttachImages());
 	wiki.setAllowLearnerCreatePages(authForm.isAllowLearnerCreatePages());
 	wiki.setAllowLearnerInsertLinks(authForm.isAllowLearnerInsertLinks());
-	wiki.setReflectOnActivity(authForm.isReflectOnActivity());
-	wiki.setReflectInstructions(authForm.getReflectInstructions());
 	wiki.setNotifyUpdates(authForm.isNotifyUpdates());
 	wiki.setMaximumEdits(authForm.getMaximumEdits());
 	wiki.setMinimumEdits(authForm.getMinimumEdits());
@@ -338,8 +336,6 @@ public class AuthoringController extends WikiPageController {
 	authForm.setAllowLearnerAttachImages(wiki.isAllowLearnerAttachImages());
 	authForm.setAllowLearnerCreatePages(wiki.isAllowLearnerCreatePages());
 	authForm.setAllowLearnerInsertLinks(wiki.isAllowLearnerInsertLinks());
-	authForm.setReflectOnActivity(wiki.isReflectOnActivity());
-	authForm.setReflectInstructions(wiki.getReflectInstructions());
 	authForm.setMaximumEdits(wiki.getMaximumEdits());
 	authForm.setMinimumEdits(wiki.getMinimumEdits());
 	authForm.setNewPageIsEditable(true);

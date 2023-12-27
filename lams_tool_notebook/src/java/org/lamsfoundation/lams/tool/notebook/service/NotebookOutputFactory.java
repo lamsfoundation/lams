@@ -30,7 +30,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -132,9 +131,7 @@ public class NotebookOutputFactory extends OutputFactory {
 	    NotebookUser user = notebookService.getUserByUserIdAndSessionId(learnerId, toolSessionId);
 
 	    if (user != null) {
-		NotebookEntry entry = notebookService.getEntry(user.getEntryUID());
-
-		String value = entry == null ? null : entry.getEntry();
+		String value = user.getNotebookEntry();	
 
 		return new ToolOutput(name, getI18NText(NotebookConstants.USER_ENTRY_DEFINITION_NAME, true), value);
 	    }
@@ -143,11 +140,7 @@ public class NotebookOutputFactory extends OutputFactory {
 	    String[] usersEntries = new String[users.size()];
 	    int userIndex = 0;
 	    for (NotebookUser user : users) {
-		Long entryUid = user.getEntryUID();
-		if (entryUid != null) {
-		    NotebookEntry entry = notebookService.getEntry(entryUid);
-		    usersEntries[userIndex] = entry.getEntry();
-		}
+		usersEntries[userIndex] = user.getNotebookEntry();
 		userIndex++;
 	    }
 	    return new ToolOutput(name, getI18NText(NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, true),

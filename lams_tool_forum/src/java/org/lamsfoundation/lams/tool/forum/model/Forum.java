@@ -150,12 +150,6 @@ public class Forum implements Cloneable {
     @Column(name = "limited_min_characters")
     private boolean limitedMaxCharacters;
 
-    @Column(name = "reflect_on_activity")
-    private boolean reflectOnActivity;
-
-    @Column(name = "reflect_instructions")
-    private String reflectInstructions;
-
     @Column(name = "mark_release_notify")
     private boolean notifyLearnersOnMarkRelease;
 
@@ -590,30 +584,6 @@ public class Forum implements Cloneable {
 
     public void setMinimumReply(int minimumReply) {
 	this.minimumReply = minimumReply;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     /**

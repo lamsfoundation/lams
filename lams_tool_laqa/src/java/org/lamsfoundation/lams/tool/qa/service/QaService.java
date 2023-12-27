@@ -46,9 +46,6 @@ import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
@@ -116,7 +113,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     private ILogEventService logEventService;
     private IExportToolContentService exportContentService;
     private QaOutputFactory qaOutputFactory;
-    private ICoreNotebookService coreNotebookService;
     private IRatingService ratingService;
     private IEventNotificationService eventNotificationService;
     private IQbService qbService;
@@ -466,14 +462,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	    return;
 	}
 
-	for (QaSession session : qaContent.getQaSessions()) {
-	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getQaSessionId(),
-		    CoreNotebookConstants.NOTEBOOK_TOOL, QaAppConstants.MY_SIGNATURE);
-	    for (NotebookEntry entry : entries) {
-		coreNotebookService.deleteEntry(entry);
-	    }
-	}
-
 	qbService.removeAnswersByToolContentId(toolContentId);
 
 	qaDAO.removeQa(toolContentId);
@@ -499,22 +487,9 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 		    }
 
 		    qaQueUsrDAO.deleteQaQueUsr(user);
-
-		    NotebookEntry entry = getEntry(session.getQaSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL,
-			    QaAppConstants.MY_SIGNATURE, userId);
-		    if (entry != null) {
-			qaDAO.delete(entry);
-		    }
 		}
 	    }
 	}
-    }
-
-    @Override
-    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting,
-	    String searchString) {
-	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString,
-		getCoreNotebookService());
     }
 
     @Override
@@ -955,22 +930,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     @Override
-    public Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry) {
-	return coreNotebookService.createNotebookEntry(id, idType, signature, userID, "", entry);
-    }
-
-    @Override
-    public NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID) {
-
-	List<NotebookEntry> list = coreNotebookService.getEntry(id, idType, signature, userID);
-	if ((list == null) || list.isEmpty()) {
-	    return null;
-	} else {
-	    return list.get(0);
-	}
-    }
-
-    @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
@@ -1066,20 +1025,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     }
 
     // =========================================================================================
-    /**
-     * @return Returns the coreNotebookService.
-     */
-    public ICoreNotebookService getCoreNotebookService() {
-	return coreNotebookService;
-    }
-
-    /**
-     * @param coreNotebookService
-     *            The coreNotebookService to set.
-     */
-    public void setCoreNotebookService(ICoreNotebookService coreNotebookService) {
-	this.coreNotebookService = coreNotebookService;
-    }
 
     public void setRatingService(IRatingService ratingService) {
 	this.ratingService = ratingService;
@@ -1091,11 +1036,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    @Override
-    public void updateEntry(NotebookEntry notebookEntry) {
-	coreNotebookService.updateEntry(notebookEntry);
     }
 
     public QaOutputFactory getQaOutputFactory() {
@@ -1243,8 +1183,6 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	qa.setAllowRateAnswers(JsonUtil.optBoolean(toolContentJSON, "allowRateAnswers", Boolean.FALSE));
 	qa.setNotifyTeachersOnResponseSubmit(
 		JsonUtil.optBoolean(toolContentJSON, "notifyTeachersOnResponseSubmit", Boolean.FALSE));
-	qa.setReflect(JsonUtil.optBoolean(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
-	qa.setReflectionSubject(JsonUtil.optString(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS));
 	qa.setQuestionsSequenced(JsonUtil.optBoolean(toolContentJSON, "questionsSequenced", Boolean.FALSE));
 
 	// submissionDeadline is set in monitoring

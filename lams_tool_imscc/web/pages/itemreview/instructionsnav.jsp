@@ -6,21 +6,13 @@
 <c:if test="${not empty param.mode}">
 	<c:set var="mode" value="${param.mode}" />
 </c:if>
-<%-- runAuto and reflectOn does not set when  authoring preview mode then set false as default value --%>
+<%-- runAuto does not set when  authoring preview mode then set false as default value --%>
 <c:choose>
 	<c:when test="${empty sessionMap.runAuto}">
 		<c:set var="runAuto" value="false" />
 	</c:when>
 	<c:otherwise>
 		<c:set var="runAuto" value="${sessionMap.runAuto}" />
-	</c:otherwise>
-</c:choose>
-<c:choose>
-	<c:when test="${empty sessionMap.reflectOn}">
-		<c:set var="reflectOn" value="false" />
-	</c:when>
-	<c:otherwise>
-		<c:set var="reflectOn" value="${sessionMap.reflectOn}" />
 	</c:otherwise>
 </c:choose>
 
@@ -84,10 +76,6 @@
 						window.parent.close();
 					}
 			}
-				
-			function continueReflect(){
-				 window.parent.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-			}
 		</script>
 	</lams:head>
 	<body>
@@ -95,15 +83,7 @@
 		<div class="container-fluid" id="instructions">
 		  <div class="row">
 			<div class="col-12 ">
-				<c:choose>
-					<c:when test="${reflectOn && runAuto}">
-						<input type="button" id="FinishInstruction" name="FinishInstruction"
-							onClick="javascript:continueReflect()" class="btn btn-primary float-end me-2" value="<fmt:message key='label.continue' />" />
-					</c:when>
-					<c:otherwise>
 						<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary float-end me-2" value="<fmt:message key='label.finish' />" />
-					</c:otherwise>
-				</c:choose>
 			</div>
 		  </div>
 		</div>

@@ -55,9 +55,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     protected String showResults;
     protected String useSelectLeaderToolOuput;
 
-    protected String reflect;
-    protected String reflectionSubject;
-
     protected String maxNominationCount;
     protected String minNominationCount;
 
@@ -154,7 +151,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	toolContentID = null;
 
 	useSelectLeaderToolOuput = null;
-	reflect = null;
 	lockOnFinish = null;
 	allowText = null;
 	showResults = null;
@@ -175,7 +171,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	lockOnFinish = "0";
 	allowText = "0";
 	showResults = "0";
-	reflect = "0";
 	useSelectLeaderToolOuput = "0";
     }
 
@@ -716,36 +711,6 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
     @Override
     public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
-    }
-
-    /**
-     * @return Returns the reflect.
-     */
-    public String getReflect() {
-	return reflect;
-    }
-
-    /**
-     * @param reflect
-     *            The reflect to set.
-     */
-    public void setReflect(String reflect) {
-	this.reflect = reflect;
-    }
-
-    /**
-     * @return Returns the reflectionSubject.
-     */
-    public String getReflectionSubject() {
-	return reflectionSubject;
-    }
-
-    /**
-     * @param reflectionSubject
-     *            The reflectionSubject to set.
-     */
-    public void setReflectionSubject(String reflectionSubject) {
-	this.reflectionSubject = reflectionSubject;
     }
 
     /**

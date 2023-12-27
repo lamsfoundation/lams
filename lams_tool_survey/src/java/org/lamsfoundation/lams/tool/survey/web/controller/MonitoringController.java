@@ -234,66 +234,6 @@ public class MonitoringController {
 	return null;
     }
 
-    @RequestMapping(value = "/listReflections")
-    private String listReflections(HttpServletRequest request) {
-	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	Survey survey = surveyService.getSurveyBySessionId(sessionId);
-
-	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
-	return "pages/monitoring/listreflections";
-    }
-
-    @RequestMapping(value = "/getReflectionsJSON")
-    private String getReflectionsJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	// paging parameters of tablesorter
-	int size = WebUtil.readIntParam(request, "size");
-	int page = WebUtil.readIntParam(request, "page");
-	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]");
-
-	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
-	if (sortByName != null) {
-	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC;
-	}
-
-	// return user list according to the given sessionID
-	List<Object[]> users = surveyService.getUserReflectionsForTablesorter(sessionId, page, size, sorting,
-		searchString);
-
-	ArrayNode rows = JsonNodeFactory.instance.arrayNode();
-	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
-	responsedata.put("total_rows", surveyService.getCountUsersBySession(sessionId, searchString));
-
-	for (Object[] userAndReflection : users) {
-
-	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
-
-	    SurveyUser user = (SurveyUser) userAndReflection[0];
-	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
-	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
-
-	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
-		String reflection = HtmlUtils.htmlEscape((String) userAndReflection[1]);
-		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
-	    }
-
-	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(SurveyConstants.ATTR_PORTRAIT_ID, (String) userAndReflection[2]);
-	    }
-
-	    rows.add(responseRow);
-	}
-	responsedata.set("rows", rows);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
-    }
-
     /**
      * Export Excel format survey data.
      */

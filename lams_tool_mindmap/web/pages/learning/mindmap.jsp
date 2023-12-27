@@ -46,7 +46,7 @@
 	<%@ include file="websocket.jsp"%>
 		
 	<div id="container-main">
-		<form:form action="${reflectOnActivity ? 'reflect.do' : 'finishActivity.do'}" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
+		<form:form action="finishActivity.do" method="post" onsubmit="return false;" modelAttribute="learningForm" id="learningForm">
 			<input type="hidden" name="userId" value="${userIdParam}" />
 			<input type="hidden" name="userUid" value="${userUid}" />
 			<input type="hidden" name="toolContentId" value="${toolContentID}" />
@@ -106,12 +106,6 @@
 										</c:choose>
 									>
 										<fmt:message key="button.continue" />
-									</button>
-								</c:when>
-								
-								<c:when test="${reflectOnActivity}">
-									<button type="button" onclick="javascript:submitForm();" class="btn btn-primary na" id="continueButton">
-										   <fmt:message key="button.continue"/>
 									</button>
 								</c:when>
 				

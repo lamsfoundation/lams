@@ -192,8 +192,6 @@ public class AuthoringController {
 	content.setInstruction(authoringForm.getInstructions());
 	content.setTitle(authoringForm.getTitle());
 	content.setLockOnFinished(authoringForm.isLockOnFinished());
-	content.setReflectInstructions(authoringForm.getReflectInstructions());
-	content.setReflectOnActivity(authoringForm.isReflectOnActivity());
 	content.setLimitUpload(authoringForm.isLimitUpload());
 	content.setLimitUploadNumber(authoringForm.getLimitUploadNumber());
 	content.setMinLimitUploadNumber(

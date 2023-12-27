@@ -53,7 +53,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * <code>AuthoringAction</code> action.
  *
  * @author Marcin Cieslak
- * @see org.lamsfoundation.lams.tool.notebook.web.action.AuthoringAction
+ * @see org.lamsfoundation.lams.tool.chat.web.action.AuthoringAction
  *
  */
 @Controller

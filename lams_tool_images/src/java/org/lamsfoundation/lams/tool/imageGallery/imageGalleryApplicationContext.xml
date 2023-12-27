@@ -107,7 +107,6 @@
 			<ref bean="eventNotificationService"/>
 		</property>
    		<property name="messageService"><ref bean="laimagMessageService"/></property>
-		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
 		<property name="ratingService"><ref bean="ratingService"/></property>
 		<property name="imageGalleryOutputFactory"><ref bean="imageGalleryOutputFactory"/></property> 
     </bean>

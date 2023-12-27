@@ -23,8 +23,9 @@
 
 package org.lamsfoundation.lams.tool.mindmap.service;
 
-import com.thoughtworks.xstream.XStream;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import java.io.IOException;
+import java.util.List;
+
 import org.lamsfoundation.lams.tool.mindmap.dto.MindmapDTO;
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;
 import org.lamsfoundation.lams.tool.mindmap.model.MindmapNode;
@@ -36,8 +37,7 @@ import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 
-import java.io.IOException;
-import java.util.List;
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Defines the services available to the web layer from the Mindmap Service
@@ -69,14 +69,6 @@ public interface IMindmapService extends ICommonToolService {
     void saveOrUpdateMindmapUser(MindmapUser mindmapUser);
 
     MindmapUser createMindmapUser(UserDTO user, MindmapSession mindmapSession);
-
-    Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
-
-    NotebookEntry getEntry(Long uid);
-
-    void updateEntry(Long uid, String entry);
-
-    void updateEntry(NotebookEntry notebookEntry);
 
     void setMindmapMessageService(MessageService mindmapMessageService);
 

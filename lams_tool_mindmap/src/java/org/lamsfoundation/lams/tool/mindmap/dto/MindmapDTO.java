@@ -47,10 +47,7 @@ public class MindmapDTO {
     public boolean galleryWalkEditEnabled;
     public String galleryWalkInstructions;
     public Set<MindmapSessionDTO> sessionDTOs = new TreeSet<>();
-    public Long currentTab;
-    // reflection
-    public boolean reflectOnActivity;
-    public String reflectInstructions;
+    public Long currentTab;;
 
     /* Constructors */
     public MindmapDTO() {
@@ -69,8 +66,6 @@ public class MindmapDTO {
 	galleryWalkFinished = mindmap.isGalleryWalkFinished();
 	galleryWalkEditEnabled = mindmap.isGalleryWalkEditEnabled();
 	galleryWalkInstructions = mindmap.getGalleryWalkInstructions();
-	reflectOnActivity = mindmap.isReflectOnActivity();
-	reflectInstructions = mindmap.getReflectInstructions();
 
 	for (Iterator iter = mindmap.getMindmapSessions().iterator(); iter.hasNext();) {
 	    MindmapSession session = (MindmapSession) iter.next();
@@ -191,21 +186,5 @@ public class MindmapDTO {
 
     public void setCurrentTab(Long currentTab) {
 	this.currentTab = currentTab;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
     }
 }

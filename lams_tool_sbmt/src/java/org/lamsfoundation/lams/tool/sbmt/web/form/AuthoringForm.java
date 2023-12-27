@@ -37,17 +37,12 @@ public class AuthoringForm {
 
     private Integer minLimitUploadNumber;
 
-    private boolean reflectOnActivity;
-
-    private String reflectInstructions;
-
     private boolean notifyTeachersOnFileSubmit;
 
     public void reset(HttpServletRequest request) {
 	lockOnFinished = false;
 	useSelectLeaderToolOuput = false;
 	limitUpload = false;
-	reflectOnActivity = false;
     }
 
     public void initContentValue(SubmitFilesContent content) {
@@ -66,8 +61,6 @@ public class AuthoringForm {
 	minLimitUploadNumber = content.getMinLimitUploadNumber();
 	minLimitUpload = minLimitUploadNumber != null;
 
-	reflectOnActivity = content.isReflectOnActivity();
-	reflectInstructions = content.getReflectInstructions();
 	setNotifyTeachersOnFileSubmit(content.isNotifyTeachersOnFileSubmit());
     }
 
@@ -120,22 +113,6 @@ public class AuthoringForm {
 
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    public String getReflectInstructions() {
-	return reflectInstructions;
-    }
-
-    public void setReflectInstructions(String reflectInstructions) {
-	this.reflectInstructions = reflectInstructions;
-    }
-
-    public boolean isReflectOnActivity() {
-	return reflectOnActivity;
-    }
-
-    public void setReflectOnActivity(boolean reflectOnActivity) {
-	this.reflectOnActivity = reflectOnActivity;
     }
 
     public String getContentFolderID() {

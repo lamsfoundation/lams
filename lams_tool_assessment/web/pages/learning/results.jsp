@@ -68,11 +68,6 @@
 			$('.btn').prop('disabled',true);
 		}
 		
-		function continueReflect(){
-			disableButtons();
-			document.location.href='<c:url value="/learning/newReflection.do"/>?sessionMapID=${sessionMapID}';
-		}
-		
 		function nextPage(pageNumber){
 			disableButtons();
         	document.location.href="<c:url value='/learning/nextPage.do'/>?sessionMapID=${sessionMapID}&pageNumber=" + pageNumber;
@@ -123,40 +118,20 @@
 				<%@ include file="parts/paging.jsp"%>
 			</div>
 		</c:if>
-		
-		<%-- Reflection entry --%>
-		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight)}">
-			<lams:NotebookReedit
-				reflectInstructions="${sessionMap.reflectInstructions}"
-				reflectEntry="${sessionMap.reflectEntry}"
-				isEditButtonEnabled="${(mode != 'teacher') && isUserLeader}"
-				notebookHeaderLabelKey="label.export.reflection"/>
-		</c:if>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
 				<c:if test="${!sessionMap.isUserFailed}">
-					<c:choose>
-						<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
-							<button type="button" name="FinishButton" onclick="return continueReflect()" 
-									class="btn btn-primary na">
-								<fmt:message key="label.continue" />
-							</button>
-						</c:when>
-						
-						<c:otherwise>
-							<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
-								<c:choose>
-									<c:when test="${sessionMap.isLastActivity}">
-										<fmt:message key="label.submit" />
-									</c:when>
-									<c:otherwise>
-										<fmt:message key="label.finished" />
-									</c:otherwise>
-								</c:choose>
-							</button>
-						</c:otherwise>
-					</c:choose>
+					<button type="button" id="finishButton" name="FinishButton" class="btn btn-primary na">
+						<c:choose>
+							<c:when test="${sessionMap.isLastActivity}">
+								<fmt:message key="label.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.finished" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 				</c:if>
 				
 				<c:if test="${isResubmitAllowed && hasEditRight}">

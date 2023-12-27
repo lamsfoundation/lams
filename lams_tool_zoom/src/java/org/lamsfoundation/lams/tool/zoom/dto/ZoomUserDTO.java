@@ -38,17 +38,12 @@ public class ZoomUserDTO implements Comparable<ZoomUserDTO> {
 
     private boolean finishedActivity;
 
-    private NotebookEntryDTO notebookEntryDTO;
-
-    private Long notebookEntryUID;
-
     public ZoomUserDTO(ZoomUser zoomUser) {
 	this.uid = zoomUser.getUid();
 	this.firstName = zoomUser.getFirstName();
 	this.lastName = zoomUser.getLastName();
 	this.email = zoomUser.getEmail();
 	this.finishedActivity = zoomUser.isFinishedActivity();
-	this.notebookEntryUID = zoomUser.getNotebookEntryUID();
     }
 
     @Override
@@ -98,22 +93,6 @@ public class ZoomUserDTO implements Comparable<ZoomUserDTO> {
 
     public void setUid(Long uid) {
 	this.uid = uid;
-    }
-
-    public NotebookEntryDTO getNotebookEntryDTO() {
-	return notebookEntryDTO;
-    }
-
-    public void setNotebookEntryDTO(NotebookEntryDTO notebookEntryDTO) {
-	this.notebookEntryDTO = notebookEntryDTO;
-    }
-
-    public Long getNotebookEntryUID() {
-	return notebookEntryUID;
-    }
-
-    public void setNotebookEntryUID(Long notebookEntryUID) {
-	this.notebookEntryUID = notebookEntryUID;
     }
 
     public boolean isFinishedActivity() {

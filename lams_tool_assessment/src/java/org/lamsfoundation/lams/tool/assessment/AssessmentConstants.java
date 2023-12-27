@@ -177,14 +177,6 @@ public class AssessmentConstants {
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
-    public static final String ATTR_REFLECTION_ON = "reflectOn";
-
-    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-
-    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
-
-    public static final String ATTR_REFLECT_LIST = "reflectList";
-
     public static final String ATTR_ACTIVITY_EVALUATION = "activityEvaluation";
 
     public static final String ATTR_TOOL_OUTPUT_DEFINITIONS = "toolOutputDefinitions";
