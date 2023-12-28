@@ -102,12 +102,10 @@ CREATE TABLE tl_larsrc11_user (
 
 INSERT INTO tl_larsrc11_resource (uid, title, lock_on_finished,
  instructions, content_in_use, define_later, content_id, allow_add_files, 
- allow_add_urls, mini_view_resource_number, allow_auto_run,reflect_on_activity) VALUES
-  (1,'Resources','0','Instructions ',0,0,${default_content_id},0,0,0,0,0);
+ allow_add_urls, mini_view_resource_number, reflect_on_activity) VALUES
+  (1,'Resources','0','Instructions ',0,0,${default_content_id},0,0,0,0);
   
-INSERT INTO tl_larsrc11_resource_item (uid, title, url,create_date, create_by_author, is_hide, item_type, open_url_new_window, resource_uid,order_id) VALUES 
-  (1,'Web Search','http://www.google.com ',NOW(),1,0,1,1,1,1);
-INSERT INTO tl_larsrc11_item_instruction (uid, description, sequence_id, item_uid) VALUES 
-  (1,'Use Google to search the web',0,1);
+INSERT INTO tl_larsrc11_resource_item (uid, title, url,create_date, create_by_author, is_hide, item_type,  resource_uid,order_id) VALUES
+  (1,'Web Search','http://www.google.com ',NOW(),1,0,1,1,1);
     
 SET FOREIGN_KEY_CHECKS=1;
