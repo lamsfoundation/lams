@@ -196,18 +196,16 @@
 
 			<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
 				<div class="activity-bottom-buttons">
-					<c:if test="${!hasEditRight}">
-						<button type="button" class="btn btn-primary na" id="finishButton">
-							<c:choose>
-								<c:when test="${isLastActivity}">
-									<fmt:message key="button.submitActivity" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.endLearning" />
-								</c:otherwise>
-							</c:choose>
-						</button>
-					</c:if>
+					<button type="button" class="btn btn-primary na" id="finishButton">
+						<c:choose>
+							<c:when test="${isLastActivity}">
+								<fmt:message key="button.submitActivity" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 	
 					<c:if test="${voteLearningForm.lockOnFinish != 'true' && hasEditRight}">
 						<button type="button" class="btn btn-secondary btn-icon-return me-2" onclick="submitMethod('redoQuestionsOk');">

@@ -92,7 +92,7 @@
 						</button>
 					</c:when>
 	
-					<c:when test="${!hasEditRight}">
+					<c:otherwise>
 						<button type="button" name="learnerFinished" id="finishButton" class="btn btn-primary na">
 							<c:choose>
 								<c:when test="${isLastActivity}">
@@ -103,7 +103,7 @@
 								</c:otherwise>
 							</c:choose>
 						</button>
-					</c:when>
+					</c:otherwise>
 				</c:choose>
 			</div>
 

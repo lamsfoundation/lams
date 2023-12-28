@@ -162,46 +162,46 @@
 			</div>
 
 			<!-- options  -->
-				<div class="card lcard">
-					<div class="card-body">
-			<fieldset>
-				<legend class="visually-hidden">
-					<fmt:message key="label.vote.nominations" />
-				</legend>
+			<div class="card lcard">
+				<div class="card-body">
+					<fieldset>
+						<legend class="visually-hidden">
+							<fmt:message key="label.vote.nominations" />
+						</legend>
 			
-					<div class="div-hover my-3">
-						<c:set var="count" value="0" scope="page" />
-						<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
-							<c:set var="count" value="${count + 1}" scope="page" />
-	
-							<div class="row g-0">
-								<div class="col">
-									<div class="form-check">
-										<input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}" class="form-check-input"
-											onClick="updateCount(this);">
+						<div class="div-hover my-3">
+							<c:set var="count" value="0" scope="page" />
+							<c:forEach var="subEntry" varStatus="status" items="${requestScope.mapQuestionContentLearner}">
+								<c:set var="count" value="${count + 1}" scope="page" />
 		
-										<label for="vote${count}" class="form-check-label">
-											<c:out value="${subEntry.value}" escapeXml="false" />
-										</label>
+								<div class="row g-0">
+									<div class="col">
+										<div class="form-check">
+											<input type="checkbox" id="vote${count}" name="checkedVotes" value="${subEntry.key}" class="form-check-input"
+												onClick="updateCount(this);">
+			
+											<label for="vote${count}" class="form-check-label">
+												<c:out value="${subEntry.value}" escapeXml="false" />
+											</label>
+										</div>
 									</div>
 								</div>
-							</div>
-						</c:forEach>
-						
-						<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
-							<div class="row g-0">
-								<div class="col input-group">
-									<label for="userEntry" class="input-group-text">
-										<fmt:message key="label.other" />:
-									</label>
-									<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
+							</c:forEach>
+							
+							<c:if test="${voteLearningForm.allowTextEntry == 'true'}">
+								<div class="row g-0">
+									<div class="col input-group">
+										<label for="userEntry" class="input-group-text">
+											<fmt:message key="label.other" />:
+										</label>
+										<form:input cssClass="form-control" path="userEntry" size="30" maxlength="100" />
+									</div>
 								</div>
-							</div>
-						</c:if>
-					</div>
-			</fieldset>
-					</div>
+							</c:if>
+						</div>
+					</fieldset>
 				</div>
+			</div>
 			<!-- End options -->
 
 			<div class="activity-bottom-buttons">
