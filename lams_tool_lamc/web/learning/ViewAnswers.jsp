@@ -236,20 +236,18 @@
 				
 			<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
 					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
-				<c:if test="${!hasEditRight}">
-					<form:hidden path="learnerFinished" value="Finished" />
+				<form:hidden path="learnerFinished" value="Finished" />
 
-					<button type="button" class="btn btn-primary na" id="finishButton">
-						<c:choose>
-							<c:when test="${isLastActivity}">
-								<fmt:message key="label.submit" />
-							</c:when>
-							<c:otherwise>
-								<fmt:message key="label.finished" />
-							</c:otherwise>
-						</c:choose>
-					</button>
-				</c:if>
+				<button type="button" class="btn btn-primary na" id="finishButton">
+					<c:choose>
+						<c:when test="${isLastActivity}">
+							<fmt:message key="label.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="label.finished" />
+						</c:otherwise>
+					</c:choose>
+				</button>
 			</c:if>
 
 			<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">

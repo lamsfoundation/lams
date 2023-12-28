@@ -221,18 +221,16 @@
 		<c:if test="${mode != 'teacher'}">
 			<div class="activity-bottom-buttons">
 				<span id="learner-submit">
-					<c:if test="${!hasEditRight || generalLearnerFlowDTO.isLearnerFinished}">
-						<button type="button" id="finishButton" class="btn btn-primary na">
-							<c:choose>
-								<c:when test="${sessionMap.isLastActivity}">
-									<fmt:message key="button.submit" />
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="button.endLearning" />
-								</c:otherwise>
-							</c:choose>
-						</button>
-					</c:if>
+					<button type="button" id="finishButton" class="btn btn-primary na">
+						<c:choose>
+							<c:when test="${sessionMap.isLastActivity}">
+								<fmt:message key="button.submit" />
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="button.endLearning" />
+							</c:otherwise>
+						</c:choose>
+					</button>
 				</span>
 
 				<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight && !generalLearnerFlowDTO.noReeditAllowed}">
