@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%-- TYPE parameter can have one of the following values: correct, incorrect, letter, full.--%>
 
-<svg id="svg-${param.svgId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2718.1306 1812.087"
+<svg id="svg-${param.svgId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2718.1306 1812.087" style="border-radius: 0.3rem" 
 		${param.type == 'correct' || param.type == 'incorrect' ? ' class="scratched"' : ''}
 		${param.type == 'full' && param.isHidden ? ' style="visibility: hidden;"' : ''}>
 	<title>
