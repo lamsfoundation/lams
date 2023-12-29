@@ -43,9 +43,6 @@
 				}
 			}
 
-			$(document).ready(function() {
-				$('#verificationCode').focus();
-			});
 		</script>
 	</lams:head>
 	<body>

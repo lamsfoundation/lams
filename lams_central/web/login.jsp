@@ -56,7 +56,6 @@
 					if (!isBrowserCompatible()) {
 						$('#browserNotCompatible').show();
 					}
-					$('#j_username').focus();
 					$('#news').load('/lams/www/news.html');
 
 					//make a POST call to ForgotPasswordRequest

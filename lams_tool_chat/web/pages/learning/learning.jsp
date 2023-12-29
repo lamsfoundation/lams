@@ -73,7 +73,7 @@
 							<label for="sendMessageArea" class="visually-hidden">
 								<fmt:message key="button.send"/>
 							</label>
-							<textarea id="sendMessageArea" rows="2" class="form-control shadow rounded" autofocus></textarea>
+							<textarea id="sendMessageArea" rows="2" class="form-control shadow rounded"></textarea>
 						</div>
 						<div id="sendMessageButtonCell" class="ms-2">
 							<button id="sendMessageButton" class="btn btn-secondary btn-icon-comment" type="button" onclick="javascript:sendChatToolMessage()">

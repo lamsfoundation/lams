@@ -16,16 +16,6 @@
 			}
 
 			function textAreaReady() {
-				<c:if test="${contentEditable}">
-					<c:choose>
-					<c:when test="${notebookDTO.allowRichEditor}">
-						CKEDITOR.instances["entryText"].focus();
-					</c:when>		
-					<c:otherwise>
-						document.forms.messageForm.entryText.focus();
-					</c:otherwise>
-					</c:choose>
-				</c:if>
 				document.getElementById("finishButton").style.visibility = 'visible';
 			}
 			
