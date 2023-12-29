@@ -97,6 +97,8 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
 
+    public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
+    
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
 
     public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
@@ -106,6 +108,8 @@ public class ScratchieConstants {
     public static final String ATTR_VISIT_LOGS = "visitLogs";
 
     public static final String ATTR_ITEM_UID = "itemUid";
+
+    public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
     public static final String ATTR_SUMMARY_LIST = "summaryList";
 
@@ -133,11 +137,19 @@ public class ScratchieConstants {
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
+    public static final String ATTR_REFLECTION_ON = "reflectOn";
+
     public static final String ATTR_IS_BURNING_QUESTIONS_ENABLED = "isBurningQuestionsEnabled";
 
     public static final String ATTR_IS_PRESET_MARKS_OVERWRITTEN = "isPresetMarksOverwritten";
 
     public static final String ATTR_DEFAULT_PRESET_MARKS = "defaultPresetMarks";
+
+    public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
+
+    public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
+
+    public static final String ATTR_REFLECTIONS = "reflections";
 
     public static final String ATTR_BURNING_QUESTION_ITEM_DTOS = "burningQuestionItemDtos";
 
@@ -178,10 +190,12 @@ public class ScratchieConstants {
 
     public static final String ATTR_REFERENCES_SEQUENCE_IDS = "sequenceIds";
 
+    public static final String ATTR_HAS_MATCHING_RAT_ACTIVITY = "hasMatchingRatActivity";
+
     //flux management
     public static final String ANSWERS_UPDATED_SINK_NAME = "scratchie learner answers updated";
     public static final String STUDENT_CHOICES_UPDATE_FLUX_NAME = "scratchie student choices updated";
-
+    
     public static final String BURNING_QUESTIONS_UPDATED_SINK_NAME = "scratchie burning questions updated";
     public static final String BURNING_QUESTIONS_UPDATED_FLUX_NAME = "scratchie burning questions updated";
 

@@ -209,6 +209,7 @@ public class AssessmentConstants {
     public static final String CONFIG_KEY_AUTO_EXPAND_JUSTIFICATION = "autoexpandJustification";
 
     public static final String ATTR_IS_QUESTION_ETHERPAD_ENABLED = "isQuestionEtherpadEnabled";
+    public static final String ATTR_HAS_MATCHING_RAT_ACTIVITY = "hasMatchingRatActivity";
 
     public static final String ATTR_CODE_STYLES = "codeStyles";
 

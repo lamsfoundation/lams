@@ -566,12 +566,16 @@ public class LamsToolService implements ILamsToolService {
 	return session.getLearners().size();
     }
 
+    public Long findMatchingRatActivity(long toolContentId) {
+	return learningDesignService.findMatchingRatActivity(toolContentId);
+    }
+
     /**
      * Updates TBL iRAT/tRAT activity with questions from matching tRAT/iRAT activity
      */
     @Override
     public boolean syncRatQuestions(long toolContentId, List<Long> newQuestionUids) {
-	Long matchingRATActivityId = learningDesignService.findMatchingRatActivity(toolContentId);
+	Long matchingRATActivityId = findMatchingRatActivity(toolContentId);
 	if (matchingRATActivityId == null) {
 	    return false;
 	}

@@ -1744,28 +1744,31 @@ public class MonitoringService implements IMonitoringFullService {
 
 	learnerProgressDAO.updateLearnerProgress(learnerProgress);
 
-	// do ungrouping and unbranching
-	for (Activity activity : groupings) {
-	    if (activity.isGroupingActivity()) {
-		// fetch real object, otherwise there is a cast error
-		GroupingActivity groupingActivity = (GroupingActivity) getActivityById(activity.getActivityId());
-		Grouping grouping = groupingActivity.getCreateGrouping();
-		if (grouping.doesLearnerExist(learner)) {
-		    // cancel existing grouping, so the learner has a chance to be grouped again
-		    Group group = grouping.getGroupBy(learner);
-		    group.getUsers().remove(learner);
-		    groupDAO.saveGroup(group);
+	if (removeLearnerContent) {
+	    // do ungrouping and unbranching
+	    for (Activity activity : groupings) {
+		if (activity.isGroupingActivity()) {
+		    // fetch real object, otherwise there is a cast error
+		    GroupingActivity groupingActivity = (GroupingActivity) getActivityById(activity.getActivityId());
+		    Grouping grouping = groupingActivity.getCreateGrouping();
+		    if (grouping.doesLearnerExist(learner)) {
+			// cancel existing grouping, so the learner has a chance to be grouped again
+			Group group = grouping.getGroupBy(learner);
+			group.getUsers().remove(learner);
+			groupDAO.saveGroup(group);
+		    }
+		} else if (activity.isSequenceActivity()) {
+		    SequenceActivity sequenceActivity = (SequenceActivity) getActivityById(activity.getActivityId());
+		    Group group = sequenceActivity.getSoleGroupForBranch();
+		    if ((group != null) && group.hasLearner(learner)) {
+			// remove learner from the branch
+			removeUsersFromBranch(sequenceActivity.getActivityId(),
+				new String[] { learner.getUserId().toString() });
+		    }
+		} else {
+		    MonitoringService.log.warn(
+			    "Unknow activity type marked for ungrouping: " + activity.getActivityId());
 		}
-	    } else if (activity.isSequenceActivity()) {
-		SequenceActivity sequenceActivity = (SequenceActivity) getActivityById(activity.getActivityId());
-		Group group = sequenceActivity.getSoleGroupForBranch();
-		if ((group != null) && group.hasLearner(learner)) {
-		    // remove learner from the branch
-		    removeUsersFromBranch(sequenceActivity.getActivityId(),
-			    new String[] { learner.getUserId().toString() });
-		}
-	    } else {
-		MonitoringService.log.warn("Unknow activity type marked for ungrouping: " + activity.getActivityId());
 	    }
 	}
 

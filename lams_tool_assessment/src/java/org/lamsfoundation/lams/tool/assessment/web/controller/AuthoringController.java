@@ -23,31 +23,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URLDecoder;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -90,9 +68,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.HtmlUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.URLDecoder;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * @author Andrey Balan
@@ -208,6 +206,9 @@ public class AuthoringController {
 	boolean aiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
 	sessionMap.put(AttributeNames.ATTR_IS_AI_ENABLED, aiEnabled);
 
+	boolean hasMatchingRatActivity = lamsToolService.findMatchingRatActivity(contentId) != null;
+	sessionMap.put(AssessmentConstants.ATTR_HAS_MATCHING_RAT_ACTIVITY, hasMatchingRatActivity);
+
 	Hibernate.initialize(assessment.getSections());
 
 	return "pages/authoring/start";
@@ -238,7 +239,7 @@ public class AuthoringController {
     @SuppressWarnings("unchecked")
     @RequestMapping(path = "/updateContent", method = RequestMethod.POST)
     public String updateContent(@ModelAttribute("assessmentForm") AssessmentForm assessmentForm,
-	    HttpServletRequest request) throws Exception {
+	    @RequestParam(required = false) boolean syncRatQuestions, HttpServletRequest request) throws Exception {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(assessmentForm.getSessionMapID());
@@ -427,9 +428,11 @@ public class AuthoringController {
 	    }
 	}
 
-	List<Long> newQuestionUids = assessmentPO.getQuestionReferences().stream()
-		.collect(Collectors.mapping(q -> q.getQuestion().getQbQuestion().getUid(), Collectors.toList()));
-	lamsToolService.syncRatQuestions(assessmentPO.getContentId(), newQuestionUids);
+	if (syncRatQuestions) {
+	    List<Long> newQuestionUids = assessmentPO.getQuestionReferences().stream()
+		    .collect(Collectors.mapping(q -> q.getQuestion().getQbQuestion().getUid(), Collectors.toList()));
+	    lamsToolService.syncRatQuestions(assessmentPO.getContentId(), newQuestionUids);
+	}
 
 	request.setAttribute(CommonConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());

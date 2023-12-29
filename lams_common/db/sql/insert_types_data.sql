@@ -16,8 +16,8 @@ INSERT INTO lams_ext_server_type VALUES
 (1,'INTEGRATED SERVER'),
 (2,'LTI TOOL CONSUMER');
 
-INSERT INTO lams_ext_server_org_map VALUES
-(1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%','',NULL,0x01,80,0,NULL,1,NULL,0,0,1,1,0,0,1,NULL,NULL);
+INSERT INTO lams_ext_server_org_map (sid, serverid, serverkey, servername, serverdesc, prefix, userinfo_url, disabled) VALUES
+(1,'moodle','moodle','moodle','moodle','mdl','http://localhost/moodle/mod/lamstwo/userinfo.php?ts=%timestamp%&un=%username%&hs=%hash%',1);
 
 INSERT INTO lams_gate_activity_level VALUES
 (1,'LEARNER'),
@@ -130,9 +130,9 @@ INSERT INTO lams_policy_type VALUES
 (4,'TYPE_OTHER');
 
 INSERT INTO lams_qb_question VALUES
-(1,0x71B92B1038C811ED8F4600D8618629BB,1,1,1,'2022-09-20 11:39:19','93b97f99-a9ad-471b-a71a-5cc58ab2196e','A Sample question?','A Sample question?',1,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,NULL,0,0),
-(2,0x71EFEAD338C811ED8F4600D8618629BB,1,2,1,'2022-09-20 11:40:08','93b97f99-a9ad-471b-a71a-5cc58ab2196e','Question Title','Question Description',NULL,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,NULL,0,0),
-(3,0x72E874A938C811ED8F4600D8618629BB,6,3,1,'2022-09-20 11:39:26','93b97f99-a9ad-471b-a71a-5cc58ab2196e','Sample Question 1?','Sample Question 1?',1,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,NULL,0,0);
+(1,0xC3A4FAD2A0C611EE8D61B025AA5E5BB6,1,1,1,'2022-09-20 11:39:19','93b97f99-a9ad-471b-a71a-5cc58ab2196e','A Sample question?','A Sample question?',1,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,0,NULL,0,0),
+(2,0xC3A4FE96A0C611EE8D61B025AA5E5BB6,1,2,1,'2022-09-20 11:40:08','93b97f99-a9ad-471b-a71a-5cc58ab2196e','Question Title','Question Description',NULL,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,0,NULL,0,0),
+(3,0xC3A4FFEDA0C611EE8D61B025AA5E5BB6,6,3,1,'2022-09-20 11:39:26','93b97f99-a9ad-471b-a71a-5cc58ab2196e','Sample Question 1?','Sample Question 1?',1,NULL,0,0,0,NULL,NULL,NULL,0,0,0,0,0,0,0,0,NULL,0,0);
 
 INSERT INTO lams_qb_option VALUES
 (1,1,1,'Answer 1',NULL,0,0,0,NULL),
@@ -157,11 +157,12 @@ INSERT INTO lams_rating_criteria_type VALUES
 (4,'LESSON');
 
 INSERT INTO lams_role VALUES
-(1,'SYSADMIN','LAMS System Adminstrator','2022-09-20 11:38:25'),
-(2,'GROUP MANAGER','Group Manager','2022-09-20 11:38:25'),
-(3,'AUTHOR','Authors Learning Designs','2022-09-20 11:38:25'),
-(4,'MONITOR','Member of Staff','2022-09-20 11:38:25'),
-(5,'LEARNER','Student','2022-09-20 11:38:25');
+(1,'APPADMIN','LAMS System Administrator', NOW()),
+(2,'GROUP MANAGER','Group Manager', NOW()),
+(3,'AUTHOR','Authors Learning Designs', NOW()),
+(4,'MONITOR','Member of Staff', NOW()),
+(5,'LEARNER','Student', NOW()),
+(7,'SYSADMIN', 'LAMS System Administrator', NOW());
 
 INSERT INTO lams_sequence_generator VALUES (3);
 
@@ -256,4 +257,4 @@ INSERT INTO lams_workspace_folder_type VALUES
 (3,'PUBLIC SEQUENCES');
 
 INSERT INTO patches VALUES
-('lams', 20211025, NOW(), 'F');
+('lams', 20230325, NOW(), 'F');

@@ -351,14 +351,14 @@ public class LearningController {
 	}
 
 	// shuffling
-	if (assessment.isShuffled()) {
+	if (!showResults && assessment.isShuffled()) {
 	    ArrayList<QuestionDTO> shuffledList = new ArrayList<>(questionDtos);
 	    Collections.shuffle(shuffledList);
 	    questionDtos = new LinkedList<>(shuffledList);
 	}
 	for (QuestionDTO questionDto : questionDtos) {
-	    if (assessment.isShuffledAnswers() || questionDto.isShuffle() || (questionDto.getType()
-		    == QbQuestion.TYPE_ORDERING)) {
+	    if (!showResults && (assessment.isShuffledAnswers() || questionDto.isShuffle() || (questionDto.getType()
+		    == QbQuestion.TYPE_ORDERING))) {
 		ArrayList<OptionDTO> shuffledList = new ArrayList<>(questionDto.getOptionDtos());
 		Collections.shuffle(shuffledList);
 		questionDto.setOptionDtos(new LinkedHashSet<>(shuffledList));
