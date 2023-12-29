@@ -22,10 +22,11 @@
         }
     </script>
 
-    <p role="region">
-        <c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
-    </p>
+    <div id="container-main" role="region">
 
+        <c:out value="${nbLearnerForm.basicContent}" escapeXml="false" />
+
+        <hr>
     <form:form modelAttribute="nbLearnerForm" target="_self" onsubmit="disableFinishButton();" id="nbLearnerForm">
         <form:hidden path="mode" />
         <form:hidden path="toolSessionID" />
@@ -51,4 +52,5 @@
             </div>
         </c:if>
     </form:form>
+    </div>
 </lams:PageLearner>
