@@ -89,13 +89,14 @@ $offcanvas_logo: "/lams/images/svg/lams_logo_white.svg";
 $offcanvas_height: 31px;
 
 // generic portrait colors
-$portrait-color-0:#001f3f;
-$portrait-color-1:#FF851B;
-$portrait-color-2:#85144b;
-$portrait-color-3:#111111;
-$portrait-color-4:#3D9970;
-$portrait-color-5:#0074D9;
-$portrait-color-6:#FF4136;
+// Increase colour contrast
+$portrait-color-0:#0D3D56;
+$portrait-color-1:#0E708B;
+$portrait-color-2:#9A2617;
+$portrait-color-3:#137124;
+$portrait-color-4:#9E3D93;
+$portrait-color-5:#086cb8;
+$portrait-color-6:#560079;
 
 // Canvas background svg:
 // <svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'>
