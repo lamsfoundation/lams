@@ -16,6 +16,7 @@ CREATE TABLE tl_lawhiteboard11_whiteboard (
    use_select_leader_tool_ouput tinyint,
    reflect_instructions MEDIUMTEXT, 
    reflect_on_activity smallint,
+   submission_deadline DATETIME,
    relative_time_limit smallint unsigned NOT NULL DEFAULT '0',
    absolute_time_limit datetime DEFAULT NULL,
    gallery_walk_enabled TINYINT NOT NULL DEFAULT 0,

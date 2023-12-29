@@ -26,6 +26,7 @@ CREATE TABLE tl_laasse10_assessment (
   allow_answer_justification tinyint DEFAULT '0',
   allow_discussion_sentiment tinyint DEFAULT '0',
   display_summary tinyint(1) DEFAULT NULL,
+  display_max_mark TINYINT NOT NULL DEFAULT 0,
   questions_per_page int DEFAULT '0',
   shuffled tinyint(1) DEFAULT NULL,
   attempt_completion_notify tinyint(1) DEFAULT '0',
@@ -137,20 +138,24 @@ CREATE TABLE tl_laasse10_question_reference (
 DROP TABLE IF EXISTS tl_laasse10_question_result;
 
 CREATE TABLE tl_laasse10_question_result (
-  uid bigint NOT NULL AUTO_INCREMENT,
-  result_uid bigint DEFAULT NULL,
-  answer_float float DEFAULT NULL,
-  answer_boolean tinyint(1) DEFAULT NULL,
-  mark float DEFAULT NULL,
-  penalty float DEFAULT NULL,
-  finish_date datetime DEFAULT NULL,
-  max_mark float DEFAULT NULL,
-  confidence_level int NOT NULL DEFAULT '0',
-  justification varchar(10000) DEFAULT NULL,
-  PRIMARY KEY (uid),
-  KEY FK_tl_laasse10_question_result_1 (result_uid),
-  CONSTRAINT FK_tl_laasse10_question_result_1 FOREIGN KEY (result_uid) REFERENCES tl_laasse10_assessment_result (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT FK_tl_laasse10_question_result_2 FOREIGN KEY (uid) REFERENCES lams_qb_tool_answer (answer_uid) ON DELETE CASCADE ON UPDATE CASCADE
+                                             uid bigint NOT NULL AUTO_INCREMENT,
+                                             result_uid bigint DEFAULT NULL,
+                                             answer_float float DEFAULT NULL,
+                                             answer_boolean tinyint(1) DEFAULT NULL,
+                                             mark float DEFAULT NULL,
+                                             penalty float DEFAULT NULL,
+                                             finish_date datetime DEFAULT NULL,
+                                             max_mark float DEFAULT NULL,
+                                             confidence_level int NOT NULL DEFAULT '0',
+                                             justification varchar(10000) DEFAULT NULL,
+                                             marked_by bigint DEFAULT NULL,
+                                             marker_comment varchar(100) DEFAULT NULL,
+                                             PRIMARY KEY (uid),
+                                             KEY FK_tl_laasse10_question_result_1 (result_uid),
+                                             KEY FK_tl_laasse10_question_result_3 (marked_by),
+                                             CONSTRAINT FK_tl_laasse10_question_result_1 FOREIGN KEY (result_uid) REFERENCES tl_laasse10_assessment_result (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+                                             CONSTRAINT FK_tl_laasse10_question_result_2 FOREIGN KEY (uid) REFERENCES lams_qb_tool_answer (answer_uid) ON DELETE CASCADE ON UPDATE CASCADE,
+                                             CONSTRAINT FK_tl_laasse10_question_result_3 FOREIGN KEY (marked_by) REFERENCES lams_user (user_id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS tl_laasse10_session;
@@ -203,7 +208,20 @@ CREATE TABLE tl_laasse10_user (
   CONSTRAINT FK_NEW_1720029621_30113BFCEC0D3147 FOREIGN KEY (session_uid) REFERENCES tl_laasse10_session (uid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO tl_laasse10_configuration VALUES ('hideTitles','false');
+DROP TABLE IF EXISTS tl_laasse10_section;
+
+CREATE TABLE tl_laasse10_section (
+                                     uid mediumint unsigned NOT NULL AUTO_INCREMENT,
+                                     assessment_uid bigint DEFAULT NULL,
+                                     display_order tinyint unsigned NOT NULL DEFAULT '1',
+                                     `name` varchar(100) DEFAULT NULL,
+                                     question_count tinyint unsigned NOT NULL,
+                                     PRIMARY KEY (uid),
+                                     KEY FK_tl_laasse10_section_1 (assessment_uid),
+                                     CONSTRAINT FK_tl_laasse10_section_1 FOREIGN KEY (assessment_uid) REFERENCES tl_laasse10_assessment (uid) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO tl_laasse10_configuration VALUES ('hideTitles','false'),  ('autoexpandJustification', 'false');
 
 INSERT INTO tl_laasse10_assessment (uid, title, instructions, define_later, content_id, allow_question_feedback,
 								    allow_overall_feedback, allow_right_answers, allow_wrong_answers,

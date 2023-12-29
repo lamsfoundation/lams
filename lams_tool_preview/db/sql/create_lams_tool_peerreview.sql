@@ -20,6 +20,9 @@ create table tl_laprev11_peerreview (
    self_review tinyint(1) DEFAULT 0,
    show_ratings_left_by_user tinyint(1) DEFAULT 0,
    tolerance TINYINT UNSIGNED NOT NULL DEFAULT 0,
+   rubrics_view TINYINT UNSIGNED NOT NULL DEFAULT 1,
+   rubrics_in_between_columns TINYINT UNSIGNED NOT NULL DEFAULT 0,
+   rubrics_require_ratings TINYINT UNSIGNED NOT NULL DEFAULT 0,
    PRIMARY KEY (uid),
    UNIQUE KEY content_id (content_id)
 );
@@ -32,6 +35,7 @@ create table tl_laprev11_session (
    peerreview_uid bigint,
    session_id bigint,
    session_name varchar(250),
+   emails_sent TINYINT UNSIGNED NOT NULL DEFAULT 0,
    primary key (uid),
    UNIQUE KEY session_id (session_id),
    CONSTRAINT FK_NEW_1661738138_24AA78C530E79035 FOREIGN KEY (peerreview_uid)

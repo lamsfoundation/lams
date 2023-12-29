@@ -21266,6 +21266,7 @@ $.fn.domMapWidget = function (activityLog, mapModel, touchEnabled, imageInsertCo
 			}
 
 		});
+
 		$(document).on('keydown', function (e) {
 			const functions = {
 				'U+003D': 'scaleUp',
@@ -21287,15 +21288,20 @@ $.fn.domMapWidget = function (activityLog, mapModel, touchEnabled, imageInsertCo
 					}
 				}
 			}
-		}).on('wheel mousewheel', function (e) {
-			const scroll = e.originalEvent.deltaX || (-1 * e.originalEvent.wheelDeltaX);
-			if (scroll < 0 && element.scrollLeft() === 0) {
-				e.preventDefault();
-			}
-			if (scroll > 0 && (element[0].scrollWidth - element.width() - element.scrollLeft() === 0)) {
-				e.preventDefault();
-			}
 		});
+
+        document.addEventListener('wheel mousewheel', function (e) {
+                const scroll = e.originalEvent.deltaX || (-1 * e.originalEvent.wheelDeltaX);
+                if (scroll < 0 && element.scrollLeft() === 0) {
+                  e.preventDefault();
+                }
+                if (scroll > 0 && (element[0].scrollWidth - element.width() - element.scrollLeft() === 0)) {
+                  e.preventDefault();
+                }
+              },
+            // LAMS fix for scrolling on Chrome
+            { passive: false });
+
 
 		element.on('keypress', function (evt) {
 			if (!actOnKeys) {

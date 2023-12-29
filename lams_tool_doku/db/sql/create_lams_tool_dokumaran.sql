@@ -21,6 +21,8 @@ CREATE TABLE tl_ladoku11_dokumaran (
   allow_multiple_leaders tinyint DEFAULT NULL,
   reflect_instructions mediumtext,
   reflect_on_activity smallint DEFAULT NULL,
+  max_mark TINYINT UNSIGNED NOT NULL DEFAULT '100',
+  submission_deadline DATETIME,
   relative_time_limit smallint unsigned NOT NULL DEFAULT '0',
   absolute_time_limit datetime DEFAULT NULL,
   gallery_walk_enabled tinyint NOT NULL DEFAULT '0',

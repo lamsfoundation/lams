@@ -63,6 +63,7 @@
 					toolContentId: ${sessionMap.toolContentID}
 				},
 				function() {
+					questionsEdited = true;
 					$(this).removeClass("contains-nothing");
 				}
 			);
@@ -73,6 +74,8 @@
     		var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.do.you.want.to.delete'/></spring:escapeBody>");
 
     		if (deletionConfirmed) {
+				questionsEdited = true;
+
     			var sequenceId = $('.reference-sequence-id', $(this).parents('tr')).val();
 
     			$(questionListTargetDiv).load(
@@ -108,6 +111,7 @@
 	//The panel of assessment list panel
 	var questionListTargetDiv = "#itemArea";
 	function initNewReferenceHref() {
+		questionsEdited = true;
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.value;
 		
@@ -152,6 +156,7 @@
 		if (oldQbQuestionUid == newQbQuestionUid) {
 			return;
 		}
+		questionsEdited = true;
 		
 		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
 		$(questionListTargetDiv).load(
@@ -213,6 +218,7 @@
 	
  	// this method is called by QTI questionChoice.jsp 
     function saveQTI(formHTML, formName) {
+		questionsEdited = true;
     	var form = $($.parseHTML(formHTML));
     	// first, save questions in the QB
 		$.ajax({

@@ -18,6 +18,7 @@
 					toolContentId: ${sessionMap.toolContentID}
 				},
 				function() {
+					questionsEdited = true;
 					$(this).removeClass("contains-nothing");
 				}
 			);
@@ -29,6 +30,7 @@
 		var	deletionConfirmed = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.msg.authoring.do.you.want.to.delete'/></spring:escapeBody>");
 		
 		if (deletionConfirmed) {
+			questionsEdited = true;
 			var url = "<c:url value="/authoring/removeItem.do"/>?<csrf:token/>";
 			$(itemTargetDiv).load(
 				url,
@@ -48,6 +50,7 @@
 		if (oldQbQuestionUid == newQbQuestionUid) {
 			return;
 		}
+		questionsEdited = true;
 		
 		var url = "<c:url value="/authoring/changeItemQuestionVersion.do"/>";
 		$(itemTargetDiv).load(
@@ -75,6 +78,7 @@
 	}
 	
 	function initNewItemHref() {
+		questionsEdited = true;
 		var itemTypeDropdown = document.getElementById("item-type");
 		var itemType = itemTypeDropdown.value;
 		
@@ -95,6 +99,7 @@
   	
   	// this method is called by QTI questionChoice.jsp 
     function saveQTI(formHTML, formName) {
+		questionsEdited = true;
     	var form = $($.parseHTML(formHTML));
     	// first, save questions in the QB
 		$.ajax({
