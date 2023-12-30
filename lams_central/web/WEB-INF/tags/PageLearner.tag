@@ -121,7 +121,7 @@
 			</c:if>
 	
 			<div class="component-page-content">
-	            <a href="#component-main-content" class="visually-hidden-focusable p-2">
+	            <a href="#component-main-content" class="visually-hidden-focusable btn btn-sm btn-light p-2">
 	            	<fmt:message key='label.skip.to.main.content'/>
 	            </a>
 	
