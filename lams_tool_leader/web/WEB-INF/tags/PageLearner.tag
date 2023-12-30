@@ -126,9 +126,9 @@
 	            </a>
 	
 				<c:if test="${showHeader}">
-		            <header id="header" class="d-flex justify-content-between" role="banner">
-		                <div class="d-flex">
-							<button class="no-decoration" id="hamb" type="button" accesskey="p" 
+		            <header id="header" class="d-flex justify-content-between align-items-center" role="banner">
+		                <div class="d-flex align-items-center">
+							<button class="btn btn-light no-decoration" id="hamb" type="button" accesskey="p" 
 									data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 									aria-controls="component-offcanvas"
 									aria-labelledby="offcanvas-progress-bar-title"
@@ -140,12 +140,12 @@
 		                </div>
 		                
 		                <div class="top-menu">
-		                    <button id="profile-picture" class="no-decoration px-3" type="button"
+		                    <button id="profile-picture" class="btn btn-light no-decoration px-3" type="button"
 		                            onclick="javascript:showMyPortraitDialog()" title="<fmt:message key='label.your.portrait'/>" >
 		                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="<fmt:message key='label.your.portrait'/>">
 		                    </button>
 		                    
-		                    <button type="button" id="progress-bar-widget" class="no-decoration d-none d-sm-none d-md-block"
+		                    <button type="button" id="progress-bar-widget" class="btn btn-light no-decoration d-none d-sm-none d-md-block"
 		                    		data-bs-toggle="offcanvas" 
 		                    		data-bs-target="#component-offcanvas"
 									aria-controls="component-offcanvas"
@@ -165,7 +165,7 @@
 		                    </button>
 		                    
 		                    <c:if test="${not isIntegrationLogin}">
-		                    	<a href="/" id="return-to-index" class="btn-close btn-sm float-end ms-3" 
+		                    	<a href="/" id="return-to-index" class="btn btn-light btn-close btn-sm" 
 		                    			title="<fmt:message key='label.close.and.return'/>"></a>
 		                    </c:if>
 		                </div>
