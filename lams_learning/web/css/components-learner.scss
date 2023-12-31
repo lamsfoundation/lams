@@ -45,15 +45,15 @@
 	}
 	
 	.btn {
-		background-color: var(--bs-gray-100);
+		background-color: var(--bs-gray-200);
 		border-radius: 1.25rem;
-		box-shadow: 0px 3px 6px var(--bs-gray-200);
+		box-shadow: 0px 3px 6px var(--bs-gray-100);
 	}
 	.btn:hover {
 		background-color: var(--bs-gray-200) !important;
 	}
 	.btn:focus {
-		box-shadow: var(--bs-btn-focus-box-shadow);
+		box-shadow: 0 0 0 0.20rem rgba(99,99,99,.5);
 		/*border: var(--bs-btn-border-width) solid var(--bs-btn-hover-border-color);*/
 	}
 	
