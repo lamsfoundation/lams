@@ -3,38 +3,38 @@ INSERT INTO lams_theme VALUES
 (2,'purple','Purple Theme','css');
 
 INSERT INTO lams_workspace_folder VALUES
-(1,NULL,'ROOT',1,1,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(2,1,'Developers Playpen',1,2,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(3,1,'MATH111',1,4,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(4,NULL,'Mary Morgan',4,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(5,NULL,'One Test',5,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(6,NULL,'Two Test',6,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(7,NULL,'Three Test',7,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(8,NULL,'Four Test',8,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(22,2,'Lesson Sequence Folder',1,2,'2022-09-20 11:38:25','2022-09-20 11:38:25',2),
-(23,3,'Lesson Sequence Folder',1,4,'2022-09-20 11:38:25','2022-09-20 11:38:25',2),
-(40,1,'Moodle Test',1,7,'2022-09-20 11:38:25','2022-09-20 11:38:25',2),
-(41,40,'Lesson Sequence Folder',1,7,'2022-09-20 11:38:25','2022-09-20 11:38:25',2),
-(45,NULL,'System Administrator',1,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',1),
-(46,1,'Public Folder',1,NULL,'2022-09-20 11:38:25','2022-09-20 11:38:25',3);
+(1,NULL,'ROOT',1,1,NOW(),NOW(),1),
+(2,1,'Developers Playpen',1,2,NOW(),NOW(),1),
+(3,1,'MATH111',1,4,NOW(),NOW(),1),
+(4,NULL,'Mary Morgan',4,NULL,NOW(),NOW(),1),
+(5,NULL,'One Test',5,NULL,NOW(),NOW(),1),
+(6,NULL,'Two Test',6,NULL,NOW(),NOW(),1),
+(7,NULL,'Three Test',7,NULL,NOW(),NOW(),1),
+(8,NULL,'Four Test',8,NULL,NOW(),NOW(),1),
+(22,2,'Lesson Sequence Folder',1,2,NOW(),NOW(),2),
+(23,3,'Lesson Sequence Folder',1,4,NOW(),NOW(),2),
+(40,1,'Moodle Test',1,7,NOW(),NOW(),2),
+(41,40,'Lesson Sequence Folder',1,7,NOW(),NOW(),2),
+(45,NULL,'System Administrator',1,NULL,NOW(),NOW(),1),
+(46,1,'Public Folder',1,NULL,NOW(),NOW(),3);
 
 INSERT INTO lams_organisation VALUES
-(1,'Root',NULL,'Root Organisation',NULL,1,'2022-09-20 11:38:25',1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
-(2,'Playpen','PP101','Developers Playpen',1,2,'2022-09-20 11:38:25',1,1,0,0,0,0,1,1,1,1,0,NULL,NULL),
-(3,'Everybody',NULL,'All People In Course',2,3,'2022-09-20 11:38:25',1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
-(4,'Mathematics 1','MATH111','Mathematics 1',1,2,'2022-09-20 11:38:25',1,1,0,0,0,0,1,1,1,1,0,NULL,NULL),
-(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,'2022-09-20 11:38:25',1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
-(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,'2022-09-20 11:38:25',1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
-(7,'Moodle','Moodle','Moodle Test',1,2,'2022-09-20 11:38:25',1,2,0,0,0,0,0,0,1,1,0,NULL,NULL);
+(1,'Root',NULL,'Root Organisation',NULL,1,NOW(),1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
+(2,'Playpen','PP101','Developers Playpen',1,2,NOW(),1,1,0,0,0,0,1,1,1,1,0,NULL,NULL),
+(3,'Everybody',NULL,'All People In Course',2,3,NOW(),1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
+(4,'Mathematics 1','MATH111','Mathematics 1',1,2,NOW(),1,1,0,0,0,0,1,1,1,1,0,NULL,NULL),
+(5,'Tutorial Group A','TUTA','Tutorial Group A',4,3,NOW(),1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
+(6,'Tutorial Group B','TUTB','Tutorial Group B',4,3,NOW(),1,1,0,0,0,0,0,0,1,1,0,NULL,NULL),
+(7,'Moodle','Moodle','Moodle Test',1,2,NOW(),1,2,0,0,0,0,0,0,1,1,0,NULL,NULL);
 
-INSERT INTO lams_user VALUES
-(1,'sysadmin','a159b7ae81ba3552af61e9731b20870515944538',NULL,0,NULL,'The','System','Administrator',NULL,NULL,NULL,'Sydney','NSW',NULL,NULL,NULL,NULL,NULL,NULL,'sysadmin@x.x',1,0,'2022-09-20 11:38:25',1,45,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(2,'test','a94a8fe5ccb19ba61c4c0873d391e987982fbbd3',NULL,0,NULL,'Dr','Testing','LDAP',NULL,NULL,NULL,'Sydney','NSW',NULL,NULL,NULL,NULL,NULL,NULL,'test@xx.xx.xx',1,0,'2022-09-20 11:38:25',3,NULL,1,3,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(4,'mmm','91223fd10ce86fc852b449583aa2196c304bf6e0',NULL,0,NULL,'Ms','Mary','Morgan','99','First Ave',NULL,'Parramatta','NSW',NULL,NULL,'0295099999','0298939999','0499999999','0299999999','mmmmmmm@xx.os',1,0,'2022-09-20 11:38:25',1,4,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(5,'test1','b444ac06613fc8d63795be9ad0beaf55011936ac',NULL,0,NULL,'Dr','One','Test','1','Test Ave',NULL,'Nowhere','NSW',NULL,NULL,'0211111111','0211111112','0411111111','0211111113','test1@xx.os',1,0,'2022-09-20 11:38:25',1,5,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(6,'test2','109f4b3c50d7b0df729d299bc6f8e9ef9066971f',NULL,0,NULL,'Dr','Two','Test','2','Test Ave',NULL,'Nowhere','NSW',NULL,NULL,'0211111111','0211111112','0411111111','0211111113','test2@xx.os',1,0,'2022-09-20 11:38:25',1,6,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(7,'test3','3ebfa301dc59196f18593c45e519287a23297589',NULL,0,NULL,'Dr','Three','Test','3','Test Ave',NULL,'Nowhere','NSW',NULL,NULL,'0211111111','0211111112','0411111111','0211111113','test3@xx.os',1,0,'2022-09-20 11:38:25',1,7,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL),
-(8,'test4','1ff2b3704aede04eecb51e50ca698efd50a1379b',NULL,0,NULL,'Dr','Four','Test','4','Test Ave',NULL,'Nowhere','NSW',NULL,NULL,'0211111111','0211111112','0411111111','0211111113','test4@xx.os',1,0,'2022-09-20 11:38:25',1,8,1,1,NULL,NULL,0,'Etc/GMT',1,NULL,NULL,NULL,NULL);
+INSERT INTO lams_user VALUES 
+(1,'sysadmin','a159b7ae81ba3552af61e9731b20870515944538',NULL,0,NULL,NULL,'System','Administrator','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'sysadmin@lams.sg',1,0,NOW(),1,45,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(2,'test','a94a8fe5ccb19ba61c4c0873d391e987982fbbd3',NULL,0,NULL,NULL,'Testing','LDAP','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'test@lams.sg',1,0,NOW(),3,NULL,1,3,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(4,'mmm','91223fd10ce86fc852b449583aa2196c304bf6e0',NULL,0,NULL,NULL,'Mary','Morgan','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'mmmmmmm@lams.sg',1,0,NOW(),1,4,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(5,'test1','b444ac06613fc8d63795be9ad0beaf55011936ac',NULL,0,NULL,NULL,'One','Test','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'test1@lams.sg',1,0,NOW(),1,5,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(6,'test2','109f4b3c50d7b0df729d299bc6f8e9ef9066971f',NULL,0,NULL,NULL,'Two','Test','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'test2@lams.sg',1,0,NOW(),1,6,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(7,'test3','3ebfa301dc59196f18593c45e519287a23297589',NULL,0,NULL,NULL,'Three','Test','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'test3@lams.sg',1,0,NOW(),1,7,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL), 
+(8,'test4','1ff2b3704aede04eecb51e50ca698efd50a1379b',NULL,0,NULL,NULL,'Four','Test','42 Wallaby Way',NULL,NULL,'Sydney','NSW',NULL,'AU',NULL,NULL,NULL,NULL,'test4@lams.sg',1,0,NOW(),1,8,1,1,NULL,NULL,0,'Australia/Sydney',1,NULL,NULL,NULL,NULL);
 
 INSERT INTO lams_user_organisation VALUES
 (1,1,1),
