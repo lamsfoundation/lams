@@ -110,7 +110,7 @@
 			    $('#timezoneWarning').html( '<BR/><fmt:message key="label.timezone.warning"/>');
 				<c:if test="${showTimezoneWarningPopup}"> 
 	 			    $.blockUI({ 
-			            message: '<div class="growlUI"><h2><fmt:message key="label.timezone.warning"/></h2></div>', 
+			            message: '<div style="padding: 1rem" class="growlUI lead"><fmt:message key="label.timezone.warning"/></div>', 
 	 		            fadeIn: 700, 
 			            fadeOut: 700, 
 			            width: 500,
