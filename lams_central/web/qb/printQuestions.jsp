@@ -14,6 +14,7 @@
 			body {
 				text-align: center;
 				overflow: visible;
+				padding-left: 1rem;
 			}
 
 			#question-list {
@@ -51,6 +52,7 @@
 
 				body {
 					text-align: left;
+					padding-left: 0;
 				}
 
 				.question-item, img {

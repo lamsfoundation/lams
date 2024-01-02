@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.qb.model.QbOption;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.model.QbQuestionUnit;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -84,8 +85,10 @@ public class QbService implements IQbService {
 
     private ILamsToolService toolService;
 
-    public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = Comparator
-	    .comparing(QbCollection::getName);
+    private ISecurityService securityService;
+
+    public static final Comparator<QbCollection> COLLECTION_NAME_COMPARATOR = Comparator.comparing(
+	    QbCollection::getName);
 
     @Override
     public QbQuestion getQuestionByUid(Long qbQuestionUid) {
@@ -268,8 +271,9 @@ public class QbService implements IQbService {
 	QbStatsActivityDTO activityDTO = new QbStatsActivityDTO();
 	activityDTO.setActivity(activity);
 
-	String monitorUrl = "/lams/" + lamsCoreToolService.getToolMonitoringURL(lessonId, activity)
-		+ "&contentFolderID=" + learningDesign.getContentFolderID();
+	String monitorUrl =
+		"/lams/" + lamsCoreToolService.getToolMonitoringURL(lessonId, activity) + "&contentFolderID="
+			+ learningDesign.getContentFolderID();
 	activityDTO.setMonitorURL(monitorUrl);
 
 	// if there is only 1 participant, there is no point in calculating question indexes
@@ -304,8 +308,8 @@ public class QbService implements IQbService {
 	    // sort grades by highest mark
 	    Collections.sort(userLessonGrades, Comparator.comparing(GradebookUserLesson::getMark).reversed());
 	    // see how many learners should be in top/bottom 27% of the group
-	    int groupCount = (int) Math
-		    .ceil(Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
+	    int groupCount = (int) Math.ceil(
+		    Configuration.getAsInt(ConfigurationKeys.QB_STATS_GROUP_SIZE) / 100.0 * participantCount);
 
 	    // go through each grade and gather data for indexes
 	    for (int userIndex = 0; userIndex < participantCount; userIndex++) {
@@ -634,12 +638,12 @@ public class QbService implements IQbService {
     @Override
     public List<QbCollection> getUserCollections(int userId) {
 	Set<QbCollection> collections = new LinkedHashSet<>();
-	
+
 	// even though it is covered by #getUserOwnCollections(),
 	// it creates user private collection when necessary
 	QbCollection privateCollection = getUserPrivateCollection(userId);
 	collections.add(privateCollection);
-	
+
 	collections.addAll(getUserOwnCollections(userId));
 
 	QbCollection publicCollection = getPublicCollection();
@@ -689,8 +693,8 @@ public class QbService implements IQbService {
     }
 
     /**
-     * Is the question in a learning design which is in user's private folder, public folder
-     * or a course folder where user is a monitor.
+     * Is the question in a learning design which is in user's private folder, public folder or a course folder where
+     * user is a monitor.
      */
     @Override
     public boolean isQuestionInUserMonitoredOrganisationFolder(int qbQuestionId, int userId) {
@@ -698,8 +702,8 @@ public class QbService implements IQbService {
     }
 
     /**
-     * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert.
-     * New QbQuestions need to be saved step by step.
+     * Cascades in QbToolQuestion, QbQuestion and QbOptions do not seem to work on insert. New QbQuestions need to be
+     * saved step by step.
      */
     @Override
     public void insertQuestion(QbQuestion qbQuestion) {
@@ -712,14 +716,14 @@ public class QbService implements IQbService {
 	    qbQuestion.setContentFolderId(FileUtil.generateUniqueContentFolderID());
 	}
 
-	Collection<QbOption> qbOptions = qbQuestion.getQbOptions() == null ? null
-		: new ArrayList<>(qbQuestion.getQbOptions());
+	Collection<QbOption> qbOptions =
+		qbQuestion.getQbOptions() == null ? null : new ArrayList<>(qbQuestion.getQbOptions());
 	if (qbOptions != null) {
 	    qbQuestion.getQbOptions().clear();
 	}
 
-	Collection<QbQuestionUnit> units = qbQuestion.getUnits() == null ? null
-		: new ArrayList<>(qbQuestion.getUnits());
+	Collection<QbQuestionUnit> units =
+		qbQuestion.getUnits() == null ? null : new ArrayList<>(qbQuestion.getUnits());
 	if (units != null) {
 	    qbQuestion.getUnits().clear();
 	}
@@ -833,7 +837,7 @@ public class QbService implements IQbService {
      * Allocate learner's answer into one of the available answer groups.
      *
      * @return if present, it contains optionUid of the option group containing duplicate (added there presumably by
-     *         another teacher working in parallel)
+     * 	another teacher working in parallel)
      */
     @Override
     public Long allocateVSAnswerToOption(Long toolQuestionUid, Long targetOptionUid, Long previousOptionUid,
@@ -874,8 +878,9 @@ public class QbService implements IQbService {
 
 	if (!targetOptionUid.equals(-1L) && targetOption == null) {
 	    // front end provided incorrect target option UID
-	    log.error("Target option with UID " + targetOptionUid + " was not found in question with UID "
-		    + qbQuestionUid + " to allocate answer " + answer);
+	    log.error(
+		    "Target option with UID " + targetOptionUid + " was not found in question with UID " + qbQuestionUid
+			    + " to allocate answer " + answer);
 	    return null;
 	}
 
@@ -886,7 +891,8 @@ public class QbService implements IQbService {
 
 	    Set<String> nameWithoutUserAnswer = new LinkedHashSet<>(List.of(alternatives));
 	    nameWithoutUserAnswer.remove(answer);
-	    name = nameWithoutUserAnswer.isEmpty() ? ""
+	    name = nameWithoutUserAnswer.isEmpty()
+		    ? ""
 		    : nameWithoutUserAnswer.stream().filter(a -> QbUtils.normaliseVSAnswer(a, isExactMatch) != null)
 			    .collect(Collectors.joining(QbUtils.VSA_ANSWER_DELIMITER));
 	    previousOption.setName(name);
@@ -931,9 +937,9 @@ public class QbService implements IQbService {
     /**
      * Extract web form content to QB question.
      *
-     * BE CAREFUL: This method will copy necessary info from request form to an old or new AssessmentQuestion
-     * instance. It gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
-     * persisting this assessment Question.
+     * BE CAREFUL: This method will copy necessary info from request form to an old or new AssessmentQuestion instance.
+     * It gets all info EXCEPT AssessmentQuestion.createDate, which need be set when persisting this assessment
+     * Question.
      *
      * @return qbQuestionModified
      */
@@ -1008,9 +1014,9 @@ public class QbService implements IQbService {
 	}
 
 	// set options
-	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE) || (type == QbQuestion.TYPE_ORDERING)
-		|| (type == QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
-		|| (type == QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
+	if ((type == QbQuestion.TYPE_MULTIPLE_CHOICE) || (type == QbQuestion.TYPE_ORDERING) || (type
+		== QbQuestion.TYPE_MATCHING_PAIRS) || (type == QbQuestion.TYPE_VERY_SHORT_ANSWERS) || (type
+		== QbQuestion.TYPE_NUMERICAL) || (type == QbQuestion.TYPE_MARK_HEDGING)) {
 	    Set<QbOption> optionList = getOptionsFromRequest(request, true);
 	    List<QbOption> options = new ArrayList<>();
 	    int displayOrder = 0;
@@ -1055,7 +1061,7 @@ public class QbService implements IQbService {
      *
      * @param request
      * @param isForSaving
-     *            whether the blank options will be preserved or not
+     * 	whether the blank options will be preserved or not
      */
     @Override
     public TreeSet<QbOption> getOptionsFromRequest(HttpServletRequest request, boolean isForSaving) {
@@ -1063,7 +1069,8 @@ public class QbService implements IQbService {
 
 	int count = NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_COUNT));
 	int questionType = WebUtil.readIntParam(request, QbConstants.ATTR_QUESTION_TYPE);
-	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null) ? null
+	Integer correctOptionIndex = (paramMap.get(QbConstants.ATTR_OPTION_CORRECT) == null)
+		? null
 		: NumberUtils.toInt(paramMap.get(QbConstants.ATTR_OPTION_CORRECT));
 
 	TreeSet<QbOption> optionList = new TreeSet<>();
@@ -1086,8 +1093,8 @@ public class QbService implements IQbService {
 	    }
 	    option.setDisplayOrder(NumberUtils.toInt(displayOrder));
 
-	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE)
-		    || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
+	    if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType
+		    == QbQuestion.TYPE_VERY_SHORT_ANSWERS)) {
 		String name = paramMap.get(QbConstants.ATTR_OPTION_NAME_PREFIX + i);
 		if (name == null && isForSaving && !(questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS && i < 2)) {
 		    continue;
@@ -1204,6 +1211,19 @@ public class QbService implements IQbService {
 	return unitList;
     }
 
+    @Override
+    public boolean hasUserAccessToCollection(long collectionUid) {
+	Integer userId = getUserId();
+	if (userId == null) {
+	    return false;
+	}
+	if (securityService.isAppadmin(userId, "access QB collection", true)) {
+	    return true;
+	}
+	Collection<QbCollection> collections = getUserCollections(userId);
+	return collections.stream().map(QbCollection::getUid).anyMatch(uid -> uid.equals(collectionUid));
+    }
+
     private Map<String, String> splitRequestParameter(HttpServletRequest request, String parameterName) {
 	String list = request.getParameter(parameterName);
 	if (list == null) {
@@ -1255,5 +1275,9 @@ public class QbService implements IQbService {
 
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
+    }
+
+    public void setSecurityService(ISecurityService securityService) {
+	this.securityService = securityService;
     }
 }
