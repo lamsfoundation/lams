@@ -41,6 +41,9 @@ $border-thin-primary: thin solid $brand-primary;
 $border-thin-danger: thin solid $brand-danger;
 $border-medium-danger: 3px solid $brand-danger;
 
+// border for learner .instruction and .activity-bottom-buttons {
+$border-thin-grey: 0.1rem solid #f2f2f2;	
+
 // learner page box shadow
 $panel-box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 
