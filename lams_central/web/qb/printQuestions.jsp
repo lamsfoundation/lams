@@ -26,6 +26,10 @@
 				color: var(--bs-success);
 			}
 
+			.reveal-answers {
+				display: none;
+			}
+
 			.hide-answers .option-feedback,
 			.hide-answers .option-correct-label {
 				display: none;
@@ -34,6 +38,10 @@
 			.hide-answers .option-correct-name {
 				font-weight: initial;
 				color: initial;
+			}
+
+			.hide-answers .reveal-answers {
+				display: block;
 			}
 
 			@media print {
@@ -84,26 +92,108 @@
 			<li class="mb-4 question-item">
 				<p class="fw-bold"><c:out value="${question.name}" /></p>
 				<c:out value="${question.description}" escapeXml="false" />
-				<ol type="a">
-					<c:forEach var="option" items="${question.qbOptions}">
-						<li>
-							<div class="option-name ${option.maxMark > 0 ? "option-correct-name" : ""}">
-								<c:out value="${option.name}" escapeXml="false" />
-								<c:if test="${option.maxMark > 0}">
-									<span class="option-correct-label">
-										(<fmt:message key="label.correct" />)
+				<c:choose>
+					<c:when test="${question.type eq 1 or question.type eq 3 or question.type eq 8}">
+						<!-- Multiple choice and Short Answers and Mark Hedging -->
+						<ol type="a">
+							<c:forEach var="option" items="${question.qbOptions}">
+								<li>
+									<div class="${option.maxMark > 0 ? "option-correct-name" : ""}">
+										<c:out value="${option.name}" escapeXml="false" />
+										<c:if test="${option.maxMark > 0}">
+											<span class="option-correct-label">
+												(<fmt:message key="label.correct" />)
+											</span>
+										</c:if>
+									</div>
+									<c:if test="${not empty option.feedback}">
+										<span class="text-muted option-feedback"
+											  title="<fmt:message key="label.authoring.basic.option.feedback" />">
+											<c:out value="${option.feedback}" escapeXml="false" />
+										</span>
+									</c:if>
+								</li>
+							</c:forEach>
+						</ol>
+					</c:when>
+					<c:when test="${question.type eq 2}">
+						<!-- Matching pairs -->
+						<ol type="a">
+							<c:forEach var="option" items="${question.qbOptions}">
+								<li>
+									<c:out value="${option.matchingPair}" escapeXml="false" />
+									<span class="option-correct-name option-correct-label">
+										(<c:out value="${option.name}" escapeXml="false" />)
 									</span>
-								</c:if>
-							</div>
-							<c:if test="${not empty option.feedback}">
-								<span class="text-muted option-feedback"
-									  title="<fmt:message key="label.authoring.basic.option.feedback" />">
-									<c:out value="${option.feedback}" escapeXml="false" />
-								</span>
-							</c:if>
-						</li>
-					</c:forEach>
-				</ol>
+								</li>
+							</c:forEach>
+						</ol>
+						<ol type="A" class="reveal-answers mt-4">
+							<c:forEach var="matchingAnswer" items="${printRandomisedOptions[question.uid]}">
+								<li>
+									<c:out value="${matchingAnswer}" escapeXml="false" />
+								</li>
+							</c:forEach>
+						</ol>
+					</c:when>
+					<c:when test="${question.type eq 4}">
+						<!-- Numerical -->
+						<ol type="a">
+							<c:forEach var="option" items="${question.qbOptions}">
+								<li>
+									<div class="${option.maxMark > 0 ? "option-correct-name" : ""}">
+										<c:out value="${option.numericalOption}" escapeXml="false" />
+										<c:if test="${option.maxMark > 0}">
+											<span class="option-correct-label">
+												(<fmt:message key="label.correct" />)
+											</span>
+										</c:if>
+									</div>
+									<p>
+										<fmt:message key="label.authoring.basic.option.accepted.error" />:
+										<c:out value="${option.acceptedError}" escapeXml="false" />
+									</p>
+									<c:if test="${not empty option.feedback}">
+										<span class="text-muted option-feedback"
+											  title="<fmt:message key="label.authoring.basic.option.feedback" />">
+											<c:out value="${option.feedback}" escapeXml="false" />
+										</span>
+									</c:if>
+								</li>
+							</c:forEach>
+						</ol>
+					</c:when>
+					<c:when test="${question.type eq 5}">
+						<!-- True/False -->
+						<p class="option-correct-name option-correct-label">
+							<c:choose>
+								<c:when test="${question.correctAnswer}">
+									(<fmt:message key="label.authoring.true.false.true" />)
+								</c:when>
+								<c:otherwise>
+									(<fmt:message key="label.authoring.true.false.false" />)
+								</c:otherwise>
+							</c:choose>
+						</p>
+					</c:when>
+					<c:when test="${question.type eq 7}">
+						<!-- Ordering -->
+						<ol type="a" class="option-correct-label">
+							<c:forEach var="option" items="${question.qbOptions}">
+								<li>
+									<c:out value="${option.name}" escapeXml="false" />
+								</li>
+							</c:forEach>
+						</ol>
+						<ol type="a" class="reveal-answers">
+							<c:forEach var="randomisedOption" items="${printRandomisedOptions[question.uid]}">
+								<li>
+									<c:out value="${randomisedOption}" escapeXml="false" />
+								</li>
+							</c:forEach>
+						</ol>
+					</c:when>
+				</c:choose>
 			</li>
 		</c:forEach>
 	</ol>
