@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[param.sessionMapID]}" />
 
 <lams:html>
 	<lams:head>
-		<title><fmt:message key="label.authoring.basic.question.list.title" /></title>
+		<title>
+			<fmt:message key="label.qb.print.title">
+				<fmt:param value="${printTitleSuffix}" />
+			</fmt:message>
+		</title>
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 		<style>
@@ -66,15 +69,14 @@
 			<input class="form-check-input" type="checkbox" id="hide-answers-checkbox"
 				   onchange="javascript:hideAnswers(this)">
 			<label class="form-check-label" for="hide-answers-checkbox">
-				<fmt:message key="label.print.hide.answers" />
+				<fmt:message key="label.qb.print.hide.answers" />
 			</label>
 		</div>
 
 	</div>
 
 	<ol id="question-list" class="mt-4">
-		<c:forEach var="reference" items="${sessionMap.questionReferences}">
-			<c:set var="question" value="${reference.question.qbQuestion}" />
+		<c:forEach var="question" items="${printQuestions}">
 			<li class="mb-2">
 				<span class="fw-bold"><c:out value="${question.name}" /></span>
 				<ol type="a">

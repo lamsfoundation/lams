@@ -244,7 +244,7 @@
 	}
 
 	function showQuestionsPrintPage() {
-		let url = '<c:url value="/pages/authoring/printQuestions.jsp?sessionMapID=${assessmentForm.sessionMapID}"/>';
+		let url = '<c:url value="/authoring/printQuestions.do?sessionMapID=${assessmentForm.sessionMapID}"/>';
 		window.open(url, "_blank");
 	}
 </script>
@@ -287,7 +287,7 @@
 <button onclick="javascript:showQuestionsPrintPage()" type="button" style="margin-left: 1em;"
 		class="btn btn-default btn-sm pull-right" id="print-questions-button">
 	<i class="fa fa-lg fa-print" aria-hidden="true"></i>
-	<fmt:message key="label.authoring.basic.question.list.print" />
+	<fmt:message key="label.print" />
 </button>
 
 <c:if test="${!isAuthoringRestricted}">
