@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.policy.details" /></title>
 	<link rel="icon" href="/lams/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="/lams/favicon.ico" type="image/x-icon" />
-	<lams:css/>
-	<lams:css suffix="main"/>
+	<link rel="stylesheet" href="${lams}css/components.css">
+    <link rel="stylesheet" href="${lams}includes/font-awesome6/css/all.css">
+    
+    <script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
 
 <body>
 <div style="clear: both;"></div>
 <div class="container">
-<div class="row vertical-center-row">
 <div>
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -65,12 +67,13 @@
 		</tr>
 	</table>
 					
-	<div class="pull-right">
-		<input class="btn btn-default" type="button" value="<fmt:message key="label.authoring.close" />"
-				onclick="javascript:window.close();" />
+	<div class="float-end">
+		<button class="btn btn-light mt-2" type="button" onclick="javascript:window.close();">
+			<i class="fa-solid fa-rotate-left me-1"></i>
+			<fmt:message key="label.authoring.close" />
+		</button>
 	</div>
 
-</div>
 </div>
 </div>
 </div>

@@ -8,11 +8,12 @@
 
 <lams:html>
 <lams:head>
-	<lams:css/>
-	
+	<link rel="stylesheet" href="${lams}css/components.css">
+    <link rel="stylesheet" href="${lams}includes/font-awesome6/css/all.css">
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready(function () {
@@ -22,12 +23,8 @@
 	</script>
 </lams:head>
 <body>
-
-<div class="container">
-	<div class="row vertical-center-row">
-		<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-6 col-md-offset-3">
-			<div class="panel voffset20">
-				<div class="panel-body">
+	<div class="container">
+		<div class="col-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 mx-auto">
 					<div class="text-center">
 						<c:choose>
 							<c:when test="${empty portraitUuid}">
@@ -52,12 +49,13 @@
 						</p>
 					</div>
 					<hr>
+					
 					<!-- Split button -->
-					<div class="col-xs-12 text-center">
-						<a class="btn btn-sm btn-default offset5"
+					<div class="col-12 text-center">
+						<a class="btn btn-sm btn-light m-1"
 								href="<lams:LAMSURL/>index.do?redirect=editprofile" id="editProfileButton" role="button">
 							<i class="fa fa-fw fa-pencil"></i> 
-							<span class="hidden-xs">
+							<span class="float-end d-none d-sm-block ms-1">
 								<fmt:message key="title.profile.edit.screen" />
 							</span>
 						</a>&nbsp;&nbsp;
@@ -67,46 +65,39 @@
 						</c:set>
 						<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 						<c:if test="${authenticationMethodId eq dbId}">
-							<a class="btn btn-sm btn-default offset5"
+							<a class="btn btn-sm btn-light m-1"
 									href="<lams:LAMSURL/>index.do?redirect=password&redirectURL=index.do%3Fstate%3Dactive%26redirect%3Dprofile"  id="changePasswordButton" role="button">
 								<i class="fa fa-fw fa-lock"></i>
-								<span class="hidden-xs">
+								<span class="float-end d-none d-sm-block ms-1">
 									<fmt:message key="title.password.change.screen" />
 								</span>
 							</a>
 						</c:if>
 
-						<a class="btn btn-sm btn-default offset5"
-								href="<lams:LAMSURL/>index.do?redirect=portrait"  id="editPortraitButton" role="button">
+						<a class="btn btn-sm btn-light m-1" href="<lams:LAMSURL/>index.do?redirect=portrait"  id="editPortraitButton" role="button">
 							<i class="fa fa-fw fa-camera"></i> 
-							<span class="hidden-xs">
+							<span class="float-end d-none d-sm-block ms-1">
 								<fmt:message key="title.portrait.change.screen" />
 							</span>
 						</a>&nbsp;&nbsp;
 
-						<a class="btn btn-sm btn-default offset5" href="profile/policyConsents.do"  id="viewPolicies" role="button">
-							<i class="fa fa-fw fa-calendar-check-o"></i> 
-							<span class="hidden-xs">
+						<a class="btn btn-sm btn-light m-1" href="profile/policyConsents.do"  id="viewPolicies" role="button">
+							<i class="fa-regular fa-calendar-check"></i>
+							<span class="float-end d-none d-sm-block ms-1">
 								<fmt:message key="label.policies.consents" />
 							</span>
 						</a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
-							<a class="btn btn-sm btn-default offset5"
-									href="<lams:LAMSURL/>index.do?redirect=lessons" id="viewAllLessons"  role="button">
+							<a class="btn btn-sm btn-light m-1" href="<lams:LAMSURL/>index.do?redirect=lessons" id="viewAllLessons"  role="button">
 								<i class="fa fa-fw fa-book"></i> 
-								<span class="hidden-xs">
+								<span class="float-end d-none d-sm-block ms-1">
 									<fmt:message key="title.all.my.lessons" />
 								</span>
 							</a>
 						</c:if>
 					</div>
-				</div>
-			</div>
 		</div>
 	</div>
-
-</div>
-
 </body>
 </lams:html>

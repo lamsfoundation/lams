@@ -7,7 +7,8 @@
 
 <lams:html>
 <lams:head>
-	<lams:css/>
+	<link rel="stylesheet" href="${lams}css/components.css">
+    <link rel="stylesheet" href="${lams}includes/font-awesome6/css/all.css">
 	<link rel="stylesheet" href="css/croppie.css" />
 	<style type="text/css">
 		#accordion h3 a {
@@ -32,7 +33,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<lams:JSImport src="includes/javascript/profile.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/webrtc-capturestill.js"></script>
 	<script type="text/javascript">
@@ -74,9 +75,9 @@
 		            
 		            reader.onload = function (e) {
 						$('#save-upload-button, #upload-croppie').show();
-		            		$uploadCroppie.croppie('bind', {
-		            			url: e.target.result
-		            		});
+		            	$uploadCroppie.croppie('bind', {
+		            		url: e.target.result
+		            	});
 		            }
 		            
 		            reader.readAsDataURL(this.files[0]);
@@ -127,16 +128,16 @@
 	<form:hidden path="portraitUuid" />
 	<div style="clear: both"></div>
 	
-	<div class="container">
-	<div class="row vertical-center-row">
-	<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
-
+	<div class="d-flex justify-content-center align-items-center text-center">
+	<div class="col-12 col-sm-10 col-sm-offset-1">
 		<div class="currentPortrait text-center" style="margin:10px">
-			<fmt:message key="label.portrait.current" />:<br/>
+			<fmt:message key="label.portrait.current" /><br/>
 	
 			<c:choose>
 				<c:when test="${PortraitActionForm.portraitUuid == 0}">
-					<em><fmt:message key="msg.portrait.none" /></em>
+					<div class="text-bg-light badge">
+						<fmt:message key="msg.portrait.none" />
+					</div>
 				</c:when>
 				<c:otherwise>
 				<img class="img-thumbnail" src="/lams/download?uuid=${PortraitActionForm.portraitUuid}&version=2&preferDownload=false" />
@@ -145,91 +146,84 @@
 		</div>
 
 		<c:if test="${ENABLE_PORTRAIT_EDITING}">
-			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			<div class="accordion" id="accordion">
 			
 				<!-- Webcamera -->
-				<div class="panel panel-default">
-				    <div class="panel-heading" role="tab" id="headingOne">
-				    	<div class="panel-title">
-				        	<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" 
-				        			aria-expanded="true" aria-controls="collapseOne">
-				          	<i class="fa fa-fw fa-camera text-primary"></i> 
+				<div class="accordion-item">
+				    <h2 class="accordion-header" id="headingOne">
+				    	<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"> 
 				          	<fmt:message key="label.portrait.take.snapshot.from.webcamera" />
-				        	</a>
-				    	</div>
-				    </div>
+				        </button>
+				    </h2>
 				    
-				    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-				    	<div class="panel-body">
-				      			
+					<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
+      					<div class="accordion-body">
 							<div>
 							    <video id="video">
-							    		<fmt:message key="label.video.stream.not.available" />
+							    	<fmt:message key="label.video.stream.not.available" />
 							    </video>
 							</div>
 							    
-							<a id="startbutton" class="btn btn-sm btn-file btn-default voffset5" role="button" href="#nogo">
+							<button type="button" id="startbutton" class="btn btn-sm btn-primary mt-2">
+								<i class="fa fa-fw fa-camera"></i>
 								<fmt:message key='label.portrait.take.snapshot' />
-							</a>
+							</button>
 							
 							<canvas id="canvas"></canvas>
+							
 							<div id="still-portrait">
-								<div class="output voffset10">
+								<div class="output mt-3">
 									<div id="photo" ></div> 
 								</div>
 								
-								<a class="btn btn-sm btn-default voffset10" id="upload-webcam">
+								<button type="button" class="btn btn-sm btn-primary" id="upload-webcam">
+									<i class="fa-regular fa-check-circle me-1"></i> 
 									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
-								</a>
+								</button>
 							</div>
 				    	</div>
 				    </div>
 				</div>
 				
 				<!-- Upload -->
-				<div class="panel panel-default">
-					<div class="panel-heading" role="tab" id="headingTwo">
-						<div class="panel-title">
-				        		<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" 
-				        				aria-expanded="false" aria-controls="collapseTwo">
-				        			<i class="fa fa-fw fa-upload text-primary"></i> 
-				        			<fmt:message key="label.portrait.upload" />
-				        		</a>
-						</div>
+				<div class="accordion-item">
+					<div class="accordion-header" id="headingTwo">
+						<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="#collapseTwo">
+				        	<fmt:message key="label.portrait.upload" />
+						</button>
 					</div>
 				    
-				    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-				    		<div class="panel-body">
-							<div class="form-group">
-								<label class="btn btn-default">
-									<input type="file" name="file" value="" id="upload-input" accept="image/*">
-								</label>
+				    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="collapseTwo" data-bs-parent="#accordion">
+				    	<div class="accordion-body">	
+							<input type="file" name="file" value="" id="upload-input" accept="image/*" class="form-control my-2" >
 								
-								<p class="help-block">
-									<fmt:message key="msg.portrait.resized" />
-								</p>	
-								<div id="upload-croppie"></div>
-								
-								<a class="btn btn-sm btn-default offset5" id="save-upload-button" role="button">
-									<fmt:message key='label.portrait.yes.set.it.as.portrait' />
-								</a>
+							<div class="alert alert-warning mt-3">
+								<fmt:message key="msg.portrait.resized" />
 							</div>
-				    		</div>
+								
+							<div id="upload-croppie"></div>
+								
+							<button type="button" class="btn btn-sm btn-primary m-2" id="save-upload-button">
+								<i class="fa-regular fa-check-circle me-1"></i> 
+								<fmt:message key='label.portrait.yes.set.it.as.portrait' />
+							</button>
+				    	</div>
 				    </div>
 				</div>
 			</div>
 		</c:if>
-
+		
 		<c:if test="${!param.isReturnButtonHidden}">
-			<div align="right">
-				<button type="button" class="btn btn-sm btn-file btn-primary offset5" id="portraitReturnButton" onclick="history.go(-1);">
+			<div class="float-end">
+				<button type="button" class="btn btn-sm btn-file btn-light my-4" id="portraitReturnButton" onclick="history.go(-1);">
+					<i class="fa-solid fa-rotate-left me-1"></i>
 					<fmt:message key="label.return.to.myprofile" />
 				</button>
 			</div>
 		</c:if>
 	</div>
-	</div>
 	</div>	
+
 </form:form>
 </body>
 </lams:html>

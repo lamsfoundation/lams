@@ -4,7 +4,8 @@
 
 <lams:html>
 <lams:head>
-	<lams:css/>
+	<link rel="stylesheet" href="${lams}css/components.css">
+    <link rel="stylesheet" href="${lams}includes/font-awesome6/css/all.css">
 	<style>
 		th, td {
 			text-align: center;
@@ -13,6 +14,7 @@
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript">
 		$(document).ready(function () {
@@ -23,14 +25,10 @@
 </lams:head>
 
 <body>
-<div style="clear: both;"></div>
-<div class="container">
-	<div class="row vertical-center-row">
-		<div>
-			<div class="panel">
-				<div class="panel-body">
-
-					<table class="table table-condensed table-striped" >
+	<div style="clear: both;"></div>
+	
+	<div class="container">
+					<table class="table table-condensed table-striped mt-3" >
 						<tr>
 							<th><fmt:message key="label.policy.name" /></th>
 							<th><fmt:message key="label.policy.type" /></th>
@@ -83,16 +81,12 @@
 						</c:forEach>
 					</table>
 					
-					<div class="pull-right">
-						<button type="button" class="btn btn-sm btn-primary offset5" onclick="history.go(-1);">
+					<div class="float-end">
+						<button type="button" class="btn btn-sm btn-light mt-2" onclick="history.go(-1);">
+							<i class="fa-solid fa-rotate-left me-1"></i>
 							<fmt:message key="label.return.to.myprofile" />
 						</button>
 					</div>
-
-				</div>
-			</div>
-		</div>
 	</div>
-</div>
 </body>
 </lams:html>
