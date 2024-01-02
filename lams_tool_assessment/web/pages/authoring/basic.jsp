@@ -285,7 +285,7 @@
 </div>
 
 <button onclick="javascript:showQuestionsPrintPage()" type="button" style="margin-left: 1em;"
-		class="btn btn-default btn-sm pull-right" id="print-questions-button">
+		class="btn btn-default btn-sm pull-right">
 	<i class="fa fa-lg fa-print" aria-hidden="true"></i>
 	<fmt:message key="label.print" />
 </button>

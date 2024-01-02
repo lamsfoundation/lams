@@ -59,12 +59,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -75,6 +77,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -790,6 +793,24 @@ public class AuthoringController {
 
 	request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	return "pages/authoring/parts/optionlist";
+    }
+
+    @GetMapping("/printQuestions")
+    public String printQuestions(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	// need to set up FlashAttributes so they are read in Central after redirect
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Collection<ScratchieItem> scratchieItems = getItemList(sessionMap);
+
+	List<QbQuestion> questions = new ArrayList<>();
+	for (ScratchieItem scratchieItem : scratchieItems) {
+	    questions.add(scratchieItem.getQbQuestion());
+	}
+	if (!questions.isEmpty()) {
+	    redirectAttributes.addFlashAttribute("printQuestions", questions);
+	}
+	ScratchieForm scratchieForm = (ScratchieForm) sessionMap.get(ScratchieConstants.ATTR_RESOURCE_FORM);
+	redirectAttributes.addFlashAttribute("printTitleSuffix", scratchieForm.getScratchie().getTitle());
+	return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "qb/printQuestions.do";
     }
 
     // *************************************************************************************
