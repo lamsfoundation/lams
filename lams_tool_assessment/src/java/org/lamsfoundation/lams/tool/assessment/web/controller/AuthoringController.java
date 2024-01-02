@@ -969,9 +969,8 @@ public class AuthoringController {
 	if (!questions.isEmpty()) {
 	    redirectAttributes.addFlashAttribute("printQuestions", questions);
 	}
-	Long toolContentId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_CONTENT_ID);
-	Assessment assessment = service.getAssessmentByContentId(toolContentId);
-	redirectAttributes.addFlashAttribute("printTitleSuffix", assessment.getTitle());
+	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
+	redirectAttributes.addFlashAttribute("printTitleSuffix", assessmentForm.getAssessment().getTitle());
 	return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "qb/printQuestions.do";
     }
 
