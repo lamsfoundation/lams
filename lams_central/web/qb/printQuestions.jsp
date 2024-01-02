@@ -44,6 +44,10 @@
 				body {
 					text-align: left;
 				}
+
+				.question-item, img {
+					break-inside: avoid;
+				}
 			}
 		</style>
 
@@ -77,8 +81,9 @@
 
 	<ol id="question-list" class="mt-4">
 		<c:forEach var="question" items="${printQuestions}">
-			<li class="mb-2">
-				<span class="fw-bold"><c:out value="${question.name}" /></span>
+			<li class="mb-4 question-item">
+				<p class="fw-bold"><c:out value="${question.name}" /></p>
+				<c:out value="${question.description}" escapeXml="false" />
 				<ol type="a">
 					<c:forEach var="option" items="${question.qbOptions}">
 						<li>
