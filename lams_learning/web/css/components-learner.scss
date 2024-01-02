@@ -169,6 +169,8 @@
 
 .component-page-wrapper .activity-bottom-buttons {
     margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: .1rem solid rgb(220 220 220);	
     display: flex;
     flex-direction: row-reverse;
 	clear: both;
