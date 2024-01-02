@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/qb")
-public class PrintQuestionsController {
+public class PrintQbQuestionController {
 
     @GetMapping("/printQuestions.do")
     public String printQuestions(HttpServletRequest request, Model model) {
