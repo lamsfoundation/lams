@@ -199,16 +199,9 @@
 								 cssClass="form-control input-sm loffset10">
 						<form:option value="-1" cssClass="hidden">-</form:option>
 						<form:option value="0">-</form:option>
-						<form:option value="1">1</form:option>
-						<form:option value="2">2</form:option>
-						<form:option value="3">3</form:option>
-						<form:option value="4">4</form:option>
-						<form:option value="5">5</form:option>
-						<form:option value="6">6</form:option>
-						<form:option value="7">7</form:option>
-						<form:option value="8">8</form:option>
-						<form:option value="9">9</form:option>
-						<form:option value="10">10</form:option>
+						<c:forEach var="pageQuestionCountOption" begin="1" end="50">
+							<form:option value="${pageQuestionCountOption}">${pageQuestionCountOption}</form:option>
+						</c:forEach>
 					</form:select>
 				</label>
 			</div>
@@ -235,7 +228,7 @@
 							<option value="0" ${section.questionCount eq 0 ? 'selected' : ''}>
 								<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
 							</option>
-							<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
+							<c:forEach var="sectionQuestionCountOption" begin="1" end="50">
 								<option value="${sectionQuestionCountOption}"
 									${sectionQuestionCountOption eq section.questionCount ? 'selected' : ''}>
 										${sectionQuestionCountOption}
@@ -258,7 +251,7 @@
 					<option value="0" selected>
 						<fmt:message key="label.authoring.advance.section.all.remaining.questions" />
 					</option>
-					<c:forEach var="sectionQuestionCountOption" begin="1" end="15">
+					<c:forEach var="sectionQuestionCountOption" begin="1" end="50">
 						<option value="${sectionQuestionCountOption}">
 								${sectionQuestionCountOption}
 						</option>
