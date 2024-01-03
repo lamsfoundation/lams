@@ -1,5 +1,5 @@
 var dialogTemplate = $('<div class="modal fade dialogContainer " tabindex="-1" role="dialog">' +
-	'<div class="modal-dialog" role="document">' +
+	'<div class="modal-dialog modal-lg" role="document">' +
 	'<div class="modal-content">' +
 	'<div class="modal-header">' +
 	'<h5 class="modal-title"></h5>' +

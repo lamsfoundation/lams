@@ -55,13 +55,17 @@ function openMonitorLesson( lessonID, url ) {
 	window.location.href = url;
 }
 
-function openLearner( lessonId, url ) {
+function openLearner( lessonId, url, isNewTab ) {
 	if (!url) {
-		url = '/lams/home/learner.do?';
+		url = (isNewTab ? LAMS_URL : '/lams') + '/home/learner.do?';
 	}
 	var learnerUrl = url + 'lessonID=' + lessonId;
 
-	window.location.href = learnerUrl;
+	if (isNewTab) {
+		window.open(learnerUrl, '_blank');
+	} else {
+		window.location.href = learnerUrl;
+	}
 }
 
 function openKumalive(orgID, role) {

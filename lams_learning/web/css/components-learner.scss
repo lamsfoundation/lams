@@ -50,7 +50,7 @@
 		box-shadow: 0px 3px 6px var(--bs-gray-100);
 	}
 	.btn:hover {
-		background-color: var(--bs-gray-200) !important;
+		background-color: var(--bs-gray-300) !important;
 	}
 	.btn:focus {
 		box-shadow: 0 0 0 0.20rem rgba(99,99,99,.5);
@@ -170,7 +170,7 @@
 .component-page-wrapper .activity-bottom-buttons {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: .1rem solid rgb(220 220 220);	
+    border-top: $border-thin-grey;	
     display: flex;
     flex-direction: row-reverse;
 	clear: both;

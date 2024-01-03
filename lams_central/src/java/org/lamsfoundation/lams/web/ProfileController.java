@@ -113,7 +113,7 @@ public class ProfileController {
 	    Organisation org = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    Integer orgTypeId = org.getOrganisationType().getOrganisationTypeId();
 	    IndexLessonBean lessonBean = new IndexLessonBean(lesson.getLessonName(),
-		    "javascript:openLearner(" + lesson.getLessonID() + ")");
+		    "javascript:openLearner(" + lesson.getLessonID() + ", null, true)");
 	    lessonBean.setId(lesson.getLessonID());
 	    log.debug("Lesson: " + lesson.getLessonName());
 
