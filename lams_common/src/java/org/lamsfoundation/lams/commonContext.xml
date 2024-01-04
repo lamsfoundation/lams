@@ -551,6 +551,7 @@
 		<property name="userManagementService"><ref bean="userManagementService"/></property>
 		<property name="logEventService"><ref bean="logEventService"/></property>
         <property name="toolService"><ref bean="lamsToolService"/></property>
+        <property name="securityService"><ref bean="securityService"/></property>
 	</bean>
 	
 	<bean id="qbService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

@@ -183,4 +183,6 @@ public interface IQbService {
     TreeSet<QbQuestionUnit> getUnitsFromRequest(HttpServletRequest request, boolean isForSaving);
 
     Long allocateVSAnswerToOption(Long qbQuestionUid, Long targetOptionUid, Long previousOptionUid, String answer);
+
+    boolean hasUserAccessToCollection(long collectionUid);
 }

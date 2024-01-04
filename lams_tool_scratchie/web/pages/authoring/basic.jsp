@@ -127,6 +127,11 @@
 			}
 		});
     }
+
+	function showQuestionsPrintPage() {
+		let url = '<c:url value="/authoring/printQuestions.do?sessionMapID=${sessionMapID}"/>';
+		window.open(url, "_blank");
+	}
 </script>
 
 <!-- Basic Tab Content -->
@@ -143,6 +148,12 @@
 <div id="itemArea">
 	<%@ include file="parts/itemlist.jsp"%>
 </div>
+
+<button onclick="javascript:showQuestionsPrintPage()" type="button" style="margin-left: 1em;"
+		class="btn btn-default btn-sm pull-right">
+	<i class="fa fa-lg fa-print" aria-hidden="true"></i>
+	<fmt:message key="label.print" />
+</button>
 
 <c:if test="${!isAuthoringRestricted}">
 	<!-- Dropdown menu for choosing a question type -->

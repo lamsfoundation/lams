@@ -93,7 +93,7 @@ public class QbCollectionController {
     @RequestMapping("/showOne")
     public String showOneCollection(@RequestParam long collectionUid, Model model, HttpServletResponse response)
 	    throws Exception {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
@@ -112,7 +112,7 @@ public class QbCollectionController {
     @ResponseBody
     public String getCollectionGridData(@RequestParam long collectionUid, @RequestParam String view,
 	    HttpServletRequest request, HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
@@ -148,7 +148,7 @@ public class QbCollectionController {
     @ResponseBody
     public void removeCollectionQuestion(@RequestParam long collectionUid, @RequestParam int qbQuestionId,
 	    HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return;
 	}
@@ -159,10 +159,13 @@ public class QbCollectionController {
     @ResponseBody
     public String removeCollectionQuestions(@RequestParam long collectionUid,
 	    @RequestParam("qbQuestionIds[]") int[] qbQuestionIds, HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	QbCollection collection = qbService.getCollection(collectionUid);
+	if (!qbService.hasUserAccessToCollection(collectionUid) || (collection.getUserId() == null
+		&& !securityService.isAppadmin(getUserId(), "remove questions from QB collection", true))) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
+
 	boolean allQuestionsRemoved = true;
 	for (int qbQuestionId : qbQuestionIds) {
 	    allQuestionsRemoved &= qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId,
@@ -179,7 +182,7 @@ public class QbCollectionController {
 	if (!Configuration.getAsBoolean(ConfigurationKeys.QB_COLLECTIONS_TRANSFER_ALLOW)) {
 	    throw new SecurityException("Transfering questions between collections is disabled");
 	}
-	if (!hasUserAccessToCollection(targetCollectionUid)) {
+	if (!qbService.hasUserAccessToCollection(targetCollectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return;
 	}
@@ -212,7 +215,7 @@ public class QbCollectionController {
     @ResponseBody
     public String changeCollectionName(@RequestParam(name = "pk") long collectionUid,
 	    @RequestParam(name = "value") String name, HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
@@ -236,7 +239,7 @@ public class QbCollectionController {
     @RequestMapping(path = "/removeCollection", method = RequestMethod.POST)
     @ResponseBody
     public void removeCollection(@RequestParam long collectionUid, HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return;
 	}
@@ -247,7 +250,7 @@ public class QbCollectionController {
     @ResponseBody
     public void shareCollection(@RequestParam long collectionUid, @RequestParam int organisationId,
 	    HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return;
 	}
@@ -258,7 +261,7 @@ public class QbCollectionController {
     @ResponseBody
     public void unshareCollection(@RequestParam long collectionUid, @RequestParam int organisationId,
 	    HttpServletResponse response) throws IOException {
-	if (!hasUserAccessToCollection(collectionUid)) {
+	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return;
 	}
@@ -329,17 +332,5 @@ public class QbCollectionController {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	return user != null ? user.getUserID() : null;
-    }
-
-    private boolean hasUserAccessToCollection(long collectionUid) {
-	Integer userId = getUserId();
-	if (userId == null) {
-	    return false;
-	}
-	if (securityService.isAppadmin(userId, "access QB collection", true)) {
-	    return true;
-	}
-	Collection<QbCollection> collections = qbService.getUserCollections(userId);
-	return collections.stream().map(QbCollection::getUid).anyMatch(uid -> uid.equals(collectionUid));
     }
 }

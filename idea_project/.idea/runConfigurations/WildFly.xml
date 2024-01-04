@@ -1,6 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="WildFly" type="JBossConfiguration" factoryName="Local" APPLICATION_SERVER_NAME="WildFly 4.8 server" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="11">
     <option name="OPEN_IN_BROWSER" value="false" />
+    <option name="COMMON_VM_ARGUMENTS" value="-Djdk.tls.client.protocols=&quot;TLSv1,TLSv1.1,TLSv1.2&quot;" />
     <option name="UPDATING_POLICY" value="restart-server" />
     <deployment />
     <server-settings>
