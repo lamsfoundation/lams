@@ -14,10 +14,12 @@
 	
 <lams:html>
 <lams:head>
-	<lams:css/>
+	<link rel="stylesheet" href="${lams}css/components.css">
+    <link rel="stylesheet" href="${lams}includes/font-awesome6/css/all.css">
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 	<lams:JSImport src="includes/javascript/profile.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
@@ -37,13 +39,14 @@
 			return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/.test(value)
 		});
 	
-		$(function() {
+		$(document).ready(function () {
 		  // Setup form validation 
 		  $("#change-password").validate({
-		  		errorClass: 'help-block',
+			  validClass: "is-valid",
+		  	  errorClass: 'is-invalid',
 		      //  validation rules
 		      rules: {
-		          	oldPassword: "required",
+		          oldPassword: "required",
 		          password: {
 		              required: true,
 		              minlength: <c:out value="${minNumChars}"/>,
@@ -52,6 +55,7 @@
 		              pwcheck: true              
 		          },
 		          passwordConfirm: {
+		        	  required: true,
 		        	  equalTo: "#password"
 		          }
 		      },
@@ -69,17 +73,17 @@
 					pwcheck: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.password.restrictions'/></spring:escapeBody>"
 				},
 				passwordConfirm: {
+					required: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.password.empty'/></spring:escapeBody>",
 					equalTo: "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.newpassword.mismatch'/></spring:escapeBody>"
 				}
 			},
 		      
-		      submitHandler: function(form) {
-		          form.submit();
-		      }
-		  });
+		    submitHandler: function(form) {
+		    	form.submit();
+		    }
 		});
 		
-		$(document).ready(function () {
+		
 			//update dialog's height and title
 			updateMyProfileDialogSettings('<fmt:message key="title.password.change.screen" />', '550');
 		});	
@@ -87,102 +91,94 @@
 </lams:head>
 
 <body>
-<form:form modelAttribute="passwordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
-	<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" />' />
-	<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-
-	<div style="clear: both"></div>
-	<div class="container">
-		<c:if test="${passwordChangeActionForm.passwordExpired}">
-			<div class="row voffset20">
-				<div class="col-xs-4 col-xs-offset-4 alert alert-warning" role="alert">
-				  	<fmt:message key="label.password.expired" />
+	<form:form modelAttribute="passwordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
+		<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" />' />
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+		<form:hidden path="passwordExpired" />
+		<form:hidden path="login" />
+	
+		<div class="container">
+			<c:if test="${passwordChangeActionForm.passwordExpired}">
+				<lams:Alert5 type="warning" id="error-messages">
+					<fmt:message key="label.password.expired" />
+				</lams:Alert5>
+			</c:if>
+			
+			<div class="col-12 col-sm-8 col-sm-offset-2 mt-3 mx-auto">
+				<lams:errors5/>
+				<div class="mb-3">
+					<!--<label for="oldPassword" class="form-label">
+						<fmt:message key="label.password.old.password" />
+					</label>-->
+	 				<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword" autocomplete="current-password"/>
+	 				<lams:errors5 path="oldPassword"/>				
 				</div>
-			</div>
-		</c:if>
-		
-		<div class="row vertical-center-row">
-			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-				<div class="panel voffset20">
-					<lams:errors/>
-					<div class="panel-body">
-						<form:hidden path="passwordExpired" />
-						<form:hidden path="login" />
-						
-						<div class="form-group">
-							<label for="oldPassword"><fmt:message key="label.password.old.password" />:</label>
- 							<lams:errors path="oldPassword"/>	
- 							<input class="form-control" type="password" maxlength="50" placeholder="<fmt:message key="label.password.old.password" />" name="oldPassword" id="oldPassword" autocomplete="current-password"/>			
-						</div>
 							
-						<div class="col-xs-12">
-							<lams:Alert type="info"  id="passwordConditions" close="false">
-								<strong><fmt:message key='label.password.must.contain'/>:</strong> 
+				<lams:Alert5 type="info"  id="passwordConditions">
+					<strong><fmt:message key='label.password.must.contain'/>:</strong> 
 								 
-								<ul class="list-unstyled" style="line-height: 1.2">
-									<li>
-										<span class="fa fa-check"></span> 
-										<fmt:message key='label.password.min.length'>
-											<fmt:param value='${minNumChars}'/>
-										</fmt:message>
-									</li>
-									<c:if test="${mustHaveUppercase}">
-										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.ucase'/></li>
-									</c:if>
-									<c:if test="${mustHaveLowercase}">
-								              <li><span class="fa fa-check"></span> <fmt:message key='label.password.must.lcase' /></li>
-							        </c:if>
-									<c:if test="${mustHaveNumerics}">
-										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.number'/></li>
-									</c:if>	
-									<c:if test="${mustHaveSymbols}">
-										<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
-									</c:if>
-									<li><span class="fa fa-check"></span>
-										<fmt:message key='label.password.user.details' />
-									</li>
-									<li><span class="fa fa-check"></span>
-										<fmt:message key='label.password.common' />
-									</li>
-									<c:if test="${passwordHistoryLimit > 0}">
-										<li><span class="fa fa-check"></span>
-											<fmt:message key='label.password.history'>
-												<fmt:param value="${passwordHistoryLimit}" />
-											</fmt:message>
-										</li>
-									</c:if>
-								</ul>
-							</lams:Alert> 
-						</div>
+					<ul class="list-unstyled mb-0" style="line-height: 1.2">
+						<li>
+							<span class="fa fa-check"></span> 
+							<fmt:message key='label.password.min.length'>
+								<fmt:param value='${minNumChars}'/>
+							</fmt:message>
+						</li>
+						<c:if test="${mustHaveUppercase}">
+							<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.ucase'/></li>
+						</c:if>
+						<c:if test="${mustHaveLowercase}">
+						    <li><span class="fa fa-check"></span> <fmt:message key='label.password.must.lcase' /></li>
+						</c:if>
+						<c:if test="${mustHaveNumerics}">
+							<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.number'/></li>
+						</c:if>	
+						<c:if test="${mustHaveSymbols}">
+							<li><span class="fa fa-check"></span> <fmt:message key='label.password.must.symbol'/></li>
+						</c:if>
+						<li><span class="fa fa-check"></span>
+							<fmt:message key='label.password.user.details' />
+						</li>
+						<li><span class="fa fa-check"></span>
+							<fmt:message key='label.password.common' />
+						</li>
+						<c:if test="${passwordHistoryLimit > 0}">
+							<li><span class="fa fa-check"></span>
+								<fmt:message key='label.password.history'>
+									<fmt:param value="${passwordHistoryLimit}" />
+								</fmt:message>
+							</li>
+						</c:if>
+					</ul>
+				</lams:Alert5> 
 							
-						<lams:errors path="password"/>	
- 						<div class="input-group voffset5">
-							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password"  autocomplete="new-password" 
-									placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="50"/> 			
-						</div>
-						<div class="input-group voffset5">
-							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
-							<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
-									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="50"/>
-						</div>
-					</div>
-
+ 				<div class="input-group mb-3">
+					<span class="input-group-text"><i class="fa fa-lock"></i></span>
+					<input class="form-control" type="password"  autocomplete="new-password" 
+							placeholder="<fmt:message key='label.password.new.password' />" id="password" name="password" maxlength="50"/>
+					<lams:errors5 path="password"/>	 			
 				</div>
-				<div class="form-group" align="right">
+				<div class="input-group mb-3">
+					<span class="input-group-text"><i class="fa fa-lock"></i></span>
+					<input class="form-control" type="password" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" 
+							placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="50"/>
+				</div>
+				
+				<div class="float-end mb-4 mt-3">
 					<c:if test="${not passwordChangeActionForm.passwordExpired}">
-						<button type="button" id="cancelButton" class="btn btn-sm btn-default voffset5" onclick="history.go(-1);">
+						<button type="button" id="cancelButton" class="btn btn-sm btn-secondary me-2" onclick="history.go(-1);">
+							<i class="fa-solid fa-ban me-1"></i>
 							<fmt:message key="button.cancel"/>
 						</button>
-						&nbsp;&nbsp;
 					</c:if>
-					<button id="saveButton" type="submit" class="btn btn-sm btn-primary voffset5">
+					
+					<button id="saveButton" type="submit" class="btn btn-sm btn-primary">
+						<i class="fa-regular fa-floppy-disk me-1"></i> 
 						<fmt:message key="button.save" />
 					</button>
 				</div>
 			</div>
 		</div>
-	</div>
-</form:form>
+	</form:form>
 </body>
 </lams:html>

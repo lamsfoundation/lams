@@ -633,6 +633,11 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
   pointer-events: auto !important;
 }
 
+/*----------Hack for jquery.validate.js----------------*/
+label.is-invalid {
+	@extend .invalid-feedback;
+}
+
 /*----------Ratings----------------*/
 .rating-comment{
   background-image: none;
