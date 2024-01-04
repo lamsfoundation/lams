@@ -4,17 +4,17 @@
 
 <!-- Index page flag - do not remove, TestHarness looks for it -->
 
-<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true" refresh="0.5;URL=index.do">
+<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true" refresh="1;URL=index.do">
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/lottie/lottie-player.js"></script>
 
 	<div id="container-main">
-		<div class="text-center mx-auto">
+		<div class="text-center mx-auto" aria-live="assertive">
 			<lottie-player
 			  autoplay
 			  loop
 			  mode="normal"
-			  src="<lams:LAMSURL/>includes/javascript/lottie/loading_sphere.json"
-			  style="width: 320px; height: 200px; margin-top: 5rem;"
+			  src="<lams:LAMSURL/>includes/javascript/lottie/circles.json"
+			  style="width: 320px; height: 200px; margin-top: 10rem;"
 			  class="mx-auto"
 			>
 			</lottie-player>
