@@ -112,7 +112,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</header>
 			
 		<div id="container-main">	
-			<div class="text-center mx-auto">
+			<div class="text-center mx-auto" aria-live="assertive">
 				<lottie-player
 				  autoplay
 				  loop
