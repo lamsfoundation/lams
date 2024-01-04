@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,15 +41,28 @@ public class PrintQbQuestionController {
     }
 
     @GetMapping("/printQbCollectionQuestions")
-    public String printQbCollectionQuestions(@RequestParam Long collectionUid, Model model,
+    public String printQbCollectionQuestions(@RequestParam Long collectionUid,
+	    @RequestParam(name = "qbQuestionUids", required = false) long[] qbQuestionUids, Model model,
 	    HttpServletResponse response) throws IOException {
 	if (!qbService.hasUserAccessToCollection(collectionUid)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
 
+
+	Collection<QbQuestion> questions = null;
+	if (qbQuestionUids == null || qbQuestionUids.length == 0) {
+	    questions = qbService.getCollectionQuestions(collectionUid);
+	} else {
+	    questions = new LinkedHashSet<>();
+	    for (long qbQuestionUid : qbQuestionUids) {
+		QbQuestion question = qbService.getQuestionByUid(qbQuestionUid);
+		if (question != null) {
+		    questions.add(question);
+		}
+	    }
+	}
 	Map<String, Object> input = new HashMap<>();
-	Collection<QbQuestion> questions = qbService.getCollectionQuestions(collectionUid);
 	input.put("printQuestions", questions);
 	QbCollection collection = qbService.getCollectionByUid(collectionUid);
 	input.put("printTitleSuffix", collection.getName());

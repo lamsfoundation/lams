@@ -100,9 +100,8 @@
 					height: "100%",
 					autowidth:true,
 					shrinkToFit: true,
-					<%-- Do not allow batch removing questions from the public collection --%>
-					multiselect: !isPublicCollection,
-					multiPageSelection: !isPublicCollection,
+					multiselect: true,
+					multiPageSelection: true,
 					viewrecords: true,
 					cellEdit: false,
 					cmTemplate: { title: false, search: false },
@@ -135,10 +134,6 @@
 						{name:'actions', index:'actions', classes: "stats-cell", sortable:false, width: 13, align: "center", formatter: actionsFormatter},
 						{name:'hasVersions', index:'hasVersions', width:0, hidden: true}
 					],
-					beforeSelectRow: function(rowid, e) {
-						// do not select rows at all
-						return !isPublicCollection;
-					},
 					loadComplete: function(data) {
 						//init thickbox
 						tb_init('a.thickbox');
@@ -470,8 +465,10 @@
 			};
 
 			function showQuestionsPrintPage() {
-				let url = '<c:url value="/qb/printQbCollectionQuestions.do?collectionUid=${collection.uid}"/>';
-				window.open(url, "_blank");
+				let questionsToPrint = $('#collection-grid').jqGrid('getGridParam','selarrrow'),
+						form = $('#print-questions-form');
+				$('input[name="qbQuestionUids"]', form).val(questionsToPrint);
+				form.submit();
 			}
 		</script>
 	</lams:head>
@@ -511,11 +508,13 @@
 					<fmt:message key="label.print" />
 				</button>
 
-				<a class="btn btn-default btn-xs loffset10 pull-right"
-				   onClick="javascript:removeQuestions()"
-				   title="<fmt:message key="label.qb.collection.remove.questions.tooltip" />">
-					<fmt:message key="label.qb.collection.remove.questions" />&nbsp;<i class="fa fa-trash"></i>
-				</a>
+				<c:if test="${isAppadmin or not empty collection.userId}">
+					<a class="btn btn-default btn-xs loffset10 pull-right"
+					   onClick="javascript:removeQuestions()"
+					   title="<fmt:message key="label.qb.collection.remove.questions.tooltip" />">
+						<fmt:message key="label.qb.collection.remove.questions" />&nbsp;<i class="fa fa-trash"></i>
+					</a>
+				</c:if>
 
 					<%-- Do not display button for public and private collections --%>
 				<c:if test="${not empty collection.userId and not collection.personal}">
@@ -664,5 +663,12 @@
 		<!-- Dummy div for question save to work properly -->
 		<div id="itemArea" class="hidden"></div>
 	</lams:Page>
+
+	<form id="print-questions-form" class="hidden" type="post" target="_blank"
+		  action="<c:url value="/qb/printQbCollectionQuestions.do"/>">
+		<input type="hidden" name="collectionUid" value="${collection.uid}"/>
+		<input type="hidden" name="qbQuestionUids" />
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>" />
+	</form>
 	</body>
 </lams:html>

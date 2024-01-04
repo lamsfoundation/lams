@@ -159,10 +159,13 @@ public class QbCollectionController {
     @ResponseBody
     public String removeCollectionQuestions(@RequestParam long collectionUid,
 	    @RequestParam("qbQuestionIds[]") int[] qbQuestionIds, HttpServletResponse response) throws IOException {
-	if (!qbService.hasUserAccessToCollection(collectionUid)) {
+	QbCollection collection = qbService.getCollection(collectionUid);
+	if (!qbService.hasUserAccessToCollection(collectionUid) || (collection.getUserId() == null
+		&& !securityService.isAppadmin(getUserId(), "remove questions from QB collection", true))) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user does not have access to given collection");
 	    return null;
 	}
+
 	boolean allQuestionsRemoved = true;
 	for (int qbQuestionId : qbQuestionIds) {
 	    allQuestionsRemoved &= qbService.removeQuestionFromCollectionByQuestionId(collectionUid, qbQuestionId,
