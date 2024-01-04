@@ -60,12 +60,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.ServletException;
@@ -949,6 +953,25 @@ public class AuthoringController {
 
 	request.setAttribute(AssessmentConstants.ATTR_OVERALL_FEEDBACK_LIST, overallFeedbackList);
 	return "pages/authoring/parts/overallfeedbacklist";
+    }
+
+    @GetMapping("/printQuestions")
+    public String printQuestions(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	// need to set up FlashAttributes so they are read in Central after redirect
+	SessionMap<String, Object> sessionMap = getSessionMap(request);
+	Collection<QuestionReference> questionReferences = getQuestionReferences(sessionMap);
+	List<QbQuestion> questions = new ArrayList<>();
+	for (QuestionReference questionReference : questionReferences) {
+	    if (!questionReference.isRandomQuestion()) {
+		questions.add(questionReference.getQuestion().getQbQuestion());
+	    }
+	}
+	if (!questions.isEmpty()) {
+	    redirectAttributes.addFlashAttribute("printQuestions", questions);
+	}
+	AssessmentForm assessmentForm = (AssessmentForm) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT_FORM);
+	redirectAttributes.addFlashAttribute("printTitleSuffix", assessmentForm.getAssessment().getTitle());
+	return "redirect:" + Configuration.get(ConfigurationKeys.SERVER_URL) + "qb/printQuestions.do";
     }
 
     // *************************************************************************************
