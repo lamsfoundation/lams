@@ -113,6 +113,13 @@
 	.doku-monitoring-summary .marks-container .marks-header {
 		line-height: 1.7;
 	}
+
+	.doku-monitoring-summary .ai-review-content {
+		padding: 1rem;
+		margin: 1rem;
+		border: 1px #EEEEEE solid;
+		border-radius: 5px;
+	}
 </style>
 
 <script>
@@ -472,31 +479,73 @@
 					'<csrf:tokenname/>': '<csrf:tokenvalue/>'
 				},
 				success: function () {
-					alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>');
 				},
 				error: function () {
-					alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>');
 				}
 			});
 
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>');
 		}
 	}
 
 	<c:if test="${isAiEnabled}">
 	function aiReview(toolSessionId) {
 		let container = $('#ai-review-container-' + toolSessionId),
+				button = 	container.children('button').prop('disabled', true),
 				header = $('.ai-review-header', container)
 						.removeClass('hidden')
-						.append('<i class="fa fa-circle-o-notch fa-spin loffset10"></i>'),
-				content = $('.ai-review-content', container).removeClass('hidden').empty();
-		container.children('button').prop('disabled', true);
-		container.children('.clearfix').remove();
+						.append('<i class="ai-review-loading-icon fa fa-circle-o-notch fa-spin loffset10"></i>'),
+				content = $('.ai-review-content', container).addClass('hidden').empty();
+		container.children('.ai-review-button-clearfix').remove();
 
-		<%--.load(<c:url value="/monitoring/aiReview.do" />, {--%>
-		<%--	toolSessionId: toolSessionId--%>
-		<%--});--%>
+		$.ajax({
+			'url': '<c:url value="/monitoring/aiReview.do"/>',
+			'type': 'get',
+			'dataType': 'json',
+			'cache': 'false',
+			'data': {
+				'toolSessionId': toolSessionId
+			},
+			success: function (response) {
+				let task = "";
+				if (response.instructions) {
+					task += response.instructions;
+				}
+				if (response.description) {
+					task += response.description;
+				}
+				$.ajax({
+					'url': LAMS_URL + 'ai/general/custom.do',
+					'type': 'post',
+					'dataType': 'text',
+					'cache': 'false',
+					'data': {
+						'promptKey' : 'essay.review.prompt.main',
+						'promptParameters' : [task,  response.content]
+					},
+					success: function (response) {
+						content.text(response);
+					},
+					error: function () {
+						content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
+					},
+					complete: function (){
+						content.removeClass('hidden');
+						button.prop('disabled', false);
+						header.children('.ai-review-loading-icon').remove();
+					}
+				});
+			},
+			error: function () {
+				content.removeClass('hidden')
+						.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
+				button.prop('disabled', false);
+				header.children('.ai-review-loading-icon').remove();
+			}
+		});
 	}
 
 	function aiReviewAll() {
@@ -731,10 +780,11 @@
 							title='<fmt:message key="label.monitoring.ai.review.tooltip" />'>
 						<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review"/>
 					</button>
-					<div class="clearfix"></div>
+					<div class="ai-review-button-clearfix clearfix"></div>
 					<h4 class="ai-review-header hidden">
 						<fmt:message key="label.monitoring.ai.review"/>
 					</h4>
+					<div class="clearfix"></div>
 					<div class="ai-review-content hidden"></div>
 				</div>
 			</c:if>

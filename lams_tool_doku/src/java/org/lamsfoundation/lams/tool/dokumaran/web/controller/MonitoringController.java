@@ -103,6 +103,9 @@ public class MonitoringController {
     public static final int LEARNER_MARKS_SORTING_LAST_NAME_ASC = 2;
     public static final int LEARNER_MARKS_SORTING_LAST_NAME_DESC = 3;
 
+    private static final String AI_REVIEW_TEMPLATE_INSTRUCTIONS = "The instructions are:";
+    private static final String AI_REVIEW_TEMPLATE_DESCRIPTION = "The essay they are writing should address the following:";
+
     private static final Comparator<User> USER_NAME_COMPARATOR = Comparator.comparing(User::getFirstName)
 	    .thenComparing(User::getLastName).thenComparing(User::getLogin);
 
@@ -574,6 +577,38 @@ public class MonitoringController {
 	dokumaranService.saveOrUpdate(dokumaran);
 
 	return formattedDate;
+    }
+
+    @RequestMapping(path = "/aiReview", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String aiReview(@RequestParam Long toolSessionId) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
+	Dokumaran dokumaran = session.getDokumaran();
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (StringUtils.isNotBlank(dokumaran.getInstructions())) {
+	    responseJSON.put("instructions",
+		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_INSTRUCTIONS).append("\n")
+			    .append(dokumaran.getInstructions()).append("\n\n").toString());
+	}
+	if (StringUtils.isNotBlank(dokumaran.getDescription())) {
+	    responseJSON.put("description",
+		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n").append(dokumaran.getDescription())
+			    .append("\n\n").toString());
+	}
+	try {
+	    String padContent = dokumaranService.getPadText(toolSessionId);
+	    if (StringUtils.isNotBlank(padContent)) {
+		responseJSON.put("content", "\n" + padContent);
+	    }
+	} catch (EtherpadException e) {
+	    log.error("Failed to get pad content for session " + toolSessionId, e);
+	    return null;
+	}
+	return responseJSON.toString();
     }
 
     private Integer getUserId() {

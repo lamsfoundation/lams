@@ -1098,6 +1098,16 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	etherpadService.createCookie(etherpadSessionIds, response);
     }
 
+    @Override
+    public String getPadText(long toolSessionId) throws EtherpadException {
+	DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
+	if (session == null) {
+	    return null;
+	}
+	String padId = EtherpadUtil.getPadId(session.getEtherpadGroupId());
+	return etherpadService.getPadText(padId);
+    }
+
     private ObjectNode getTimeLimitSettingsJson(long toolContentId) {
 	ObjectNode timeLimitSettings = JsonNodeFactory.instance.objectNode();
 	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);

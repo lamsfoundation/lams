@@ -18,7 +18,7 @@ public interface IEtherpadService {
      * Creates EPLiteClient that will make calls to Etherpad server
      *
      * @throws EtherpadException
-     *             if the Etherpad is not configured appropriately (either server URL or API key).
+     * 	if the Etherpad is not configured appropriately (either server URL or API key).
      */
     EPLiteClient getClient() throws EtherpadException;
 
@@ -26,12 +26,16 @@ public interface IEtherpadService {
      * Using API client creates/fetches Etherpad Pad.
      *
      * @param groupIdentifier
-     *            LAMS-specific group ID (just any identifier); do not confuse with Etherpad groupId, readOnlyId or
-     *            padId
+     * 	LAMS-specific group ID (just any identifier); do not confuse with Etherpad groupId, readOnlyId or padId
      * @param content
-     *            initial content of Etherpad; ignored if null or Etherpad already exists
+     * 	initial content of Etherpad; ignored if null or Etherpad already exists
      */
     Map<String, Object> createPad(String groupIdentifier, String content) throws EtherpadException;
+
+    /**
+     * Using API client fetches Pad text
+     */
+    String getPadText(String padId) throws EtherpadException;
 
     /**
      * Constructs cookie to be stored at a client side browser.
