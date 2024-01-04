@@ -152,9 +152,9 @@
 			COUNT_RATED_ITEMS = true,
 			ALLOW_RERATE = false;
 
-	$(document).ready(function(){
+	$(document).ready(function () {
 		// show etherpads only on Group expand
-		$('#doku-monitoring-summary-${sessionMap.toolContentID} .etherpad-collapse').on('show.bs.collapse', function(){
+		$('#doku-monitoring-summary-${sessionMap.toolContentID} .etherpad-collapse').on('show.bs.collapse', function () {
 			var etherpad = $('.etherpad-container', this);
 			if (!etherpad.hasClass('initialised')) {
 				var id = etherpad.attr('id'),
@@ -163,7 +163,7 @@
 			}
 		});
 
-		$("#doku-monitoring-summary-${sessionMap.toolContentID} .fix-faulty-pad").click(function() {
+		$("#doku-monitoring-summary-${sessionMap.toolContentID} .fix-faulty-pad").click(function () {
 			var toolSessionId = $(this).data("session-id");
 			var button = $(this);
 
@@ -178,7 +178,7 @@
 					backgroundColor: '#000',
 					'-webkit-border-radius': '10px',
 					'-moz-border-radius': '10px',
-					opacity: .98 ,
+					opacity: .98,
 					left: "0px",
 					width: "360px"
 				},
@@ -190,7 +190,7 @@
 			$.ajax({
 				async: true,
 				url: '<c:url value="/monitoring/fixFaultySession.do"/>',
-				data : 'toolSessionID=' + toolSessionId,
+				data: 'toolSessionID=' + toolSessionId,
 				type: 'post',
 				success: function (response) {
 					button.parent().html('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.pad.fixed" /></spring:escapeBody>');
@@ -209,42 +209,42 @@
 		// intialise tablesorter tables
 		tablesorters.tablesorter({
 			theme: 'bootstrap',
-			headerTemplate : '{content} {icon}',
+			headerTemplate: '{content} {icon}',
 			sortInitialOrder: 'asc',
 			sortList: [[0]],
-			widgets: [ "uitheme", "resizable", "editable" ],
-			headers: { 0: { sorter: true}, 1: { sorter: true}  },
-			sortList : [[0,1]],
+			widgets: ["uitheme", "resizable", "editable"],
+			headers: {0: {sorter: true}, 1: {sorter: true}},
+			sortList: [[0, 1]],
 			showProcessing: false,
 			widgetOptions: {
 				resizable: true,
 
 				// only marks is editable
-				editable_columns       : [1],
-				editable_enterToAccept : true,          // press enter to accept content, or click outside if false
-				editable_autoAccept    : false,          // accepts any changes made to the table cell automatically
-				editable_autoResort    : false,         // auto resort after the content has changed.
-				editable_validate      : function (text, original, columnIndex) {
+				editable_columns: [1],
+				editable_enterToAccept: true,          // press enter to accept content, or click outside if false
+				editable_autoAccept: false,          // accepts any changes made to the table cell automatically
+				editable_autoResort: false,         // auto resort after the content has changed.
+				editable_validate: function (text, original, columnIndex) {
 					// removing all text produces "&nbsp;", so get rid of it
 					text = text ? text.replace(/&nbsp;/g, '').trim() : null;
 					// acceptable values are empty text or a number
 					return !text || !isNaN(text) ? text : original;
 				},
-				editable_selectAll     : function(txt, columnIndex, $element) {
+				editable_selectAll: function (txt, columnIndex, $element) {
 					// note $element is the div inside of the table cell, so use $element.closest('td') to get the cell
 					// only select everthing within the element when the content starts with the letter "B"
 					return true;
 				},
-				editable_wrapContent   : '<div>',       // wrap all editable cell content... makes this widget work in IE, and with autocomplete
-				editable_trimContent   : true,          // trim content ( removes outer tabs & carriage returns )
-				editable_editComplete  : 'editComplete' // event fired after the table content has been edited
+				editable_wrapContent: '<div>',       // wrap all editable cell content... makes this widget work in IE, and with autocomplete
+				editable_trimContent: true,          // trim content ( removes outer tabs & carriage returns )
+				editable_editComplete: 'editComplete' // event fired after the table content has been edited
 			}
 		});
 
 		// update mark on edit
-		tablesorters.each(function(){
+		tablesorters.each(function () {
 			// config event variable new in v2.17.6
-			$(this).children('tbody').on('editComplete', 'td', function(event, config) {
+			$(this).children('tbody').on('editComplete', 'td', function (event, config) {
 				var $this = $(this),
 						mark = $this.text() ? +$this.text() : null,
 						toolSessionId = +$this.closest('.tablesorter').attr('toolSessionId'),
@@ -258,14 +258,14 @@
 				$.ajax({
 					async: true,
 					url: '<c:url value="/monitoring/updateLearnerMark.do"/>',
-					data : {
-						'toolSessionId' : toolSessionId,
-						'userId'		: userId,
-						'mark'			: mark,
-						'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+					data: {
+						'toolSessionId': toolSessionId,
+						'userId': userId,
+						'mark': mark,
+						'<csrf:tokenname/>': '<csrf:tokenvalue/>'
 					},
 					type: 'post',
-					success : function (){
+					success: function () {
 						$this.closest('.marks-container').find('.copy-mark-button')
 								.data('mark', mark).show()
 								.find('.copy-mark-value').text(mark);
@@ -279,7 +279,7 @@
 		});
 
 		// pager processing
-		tablesorters.each(function() {
+		tablesorters.each(function () {
 			var toolSessionId = $(this).attr('toolSessionId');
 
 			$(this).tablesorterPager({
@@ -293,28 +293,28 @@
 				cssPageDisplay: '.pagedisplay',
 				cssPageSize: '.pagesize',
 				cssDisabled: 'disabled',
-				ajaxUrl : "<c:url value='/monitoring/getLearnerMarks.do?{sortList:column}&page={page}&size={size}&toolSessionId='/>" + toolSessionId,
+				ajaxUrl: "<c:url value='/monitoring/getLearnerMarks.do?{sortList:column}&page={page}&size={size}&toolSessionId='/>" + toolSessionId,
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 						var rows = [],
 								json = {};
 
 
-						for (i = 0; i < data.rows.length; i++){
+						for (i = 0; i < data.rows.length; i++) {
 							var userData = data.rows[i],
 									isLeader = userData['isLeader'];
 
 							rows += '<tr userId="' + userData['userId'] + '" ' + (isLeader ? 'class="info"' : '') + '>';
 
 							rows += '<td style="width: 80%">';
-							rows += 	userData['firstName'] + ' ' +userData['lastName'];
+							rows += userData['firstName'] + ' ' + userData['lastName'];
 							if (isLeader) {
 								rows += '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
 							}
 							rows += '</td>';
 
 							rows += '<td>';
-							rows += 	(userData['mark'] == '' ? '0.0' : userData['mark']);
+							rows += (userData['mark'] == '' ? '0.0' : userData['mark']);
 							rows += '</td>';
 
 							rows += '</tr>';
@@ -326,8 +326,8 @@
 					}
 				}
 			})
-					.bind('pagerInitialized pagerComplete', function(event, options){
-						if ( options.totalRows == 0 ) {
+					.bind('pagerInitialized pagerComplete', function (event, options) {
+						if (options.totalRows == 0) {
 							$.tablesorter.showError($(this), '<fmt:message key="messsage.monitoring.learner.marks.no.data"/>');
 						}
 					});
@@ -347,22 +347,22 @@
 				button = table.closest('.marks-container').find('.copy-mark-button'),
 				mark = button.data('mark');
 
-		$('tbody > tr[userid] > td:nth-child(2) > div[contenteditable]', table).each(function(){
+		$('tbody > tr[userid] > td:nth-child(2) > div[contenteditable]', table).each(function () {
 			$(this).text(mark).trigger('editComplete');
 		});
 	}
 
-	function startGalleryWalk(){
+	function startGalleryWalk() {
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.start.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
 		$.ajax({
-			'url' : '<c:url value="/monitoring/startGalleryWalk.do"/>',
+			'url': '<c:url value="/monitoring/startGalleryWalk.do"/>',
 			'data': {
-				toolContentID : ${dokumaran.contentId}
+				toolContentID: ${dokumaran.contentId}
 			},
-			'success' : function(){
+			'success': function () {
 				<c:choose>
 				<c:when test="${isTbl}">
 				// reload current tab with Doku summary
@@ -376,17 +376,17 @@
 		});
 	}
 
-	function skipGalleryWalk(){
+	function skipGalleryWalk() {
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.skip.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
 		$.ajax({
-			'url' : '<c:url value="/monitoring/skipGalleryWalk.do"/>',
+			'url': '<c:url value="/monitoring/skipGalleryWalk.do"/>',
 			'data': {
-				toolContentID : ${dokumaran.contentId}
+				toolContentID: ${dokumaran.contentId}
 			},
-			'success' : function(){
+			'success': function () {
 				<c:choose>
 				<c:when test="${isTbl}">
 				// reload current tab with Doku summary
@@ -400,17 +400,17 @@
 		});
 	}
 
-	function finishGalleryWalk(){
+	function finishGalleryWalk() {
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.finish.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
 		$.ajax({
-			'url' : '<c:url value="/monitoring/finishGalleryWalk.do"/>',
+			'url': '<c:url value="/monitoring/finishGalleryWalk.do"/>',
 			'data': {
-				toolContentID : ${dokumaran.contentId}
+				toolContentID: ${dokumaran.contentId}
 			},
-			'success' : function(){
+			'success': function () {
 				<c:choose>
 				<c:when test="${isTbl}">
 				// reload current tab with Doku summary
@@ -424,21 +424,21 @@
 		});
 	}
 
-	function openGalleryWalkClusters(){
+	function openGalleryWalkClusters() {
 		window.open('<lams:WebAppURL/>monitoring/showGalleryWalkClusters.do?toolContentID=${dokumaran.contentId}', '_blank');
 	}
 
-	function enableGalleryWalkLearnerEdit(){
+	function enableGalleryWalkLearnerEdit() {
 		if (!confirm('<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.summary.gallery.walk.learner.edit.confirm" /></spring:escapeBody>')) {
 			return;
 		}
 
 		$.ajax({
-			'url' : '<c:url value="/monitoring/enableGalleryWalkLearnerEdit.do"/>',
+			'url': '<c:url value="/monitoring/enableGalleryWalkLearnerEdit.do"/>',
 			'data': {
-				toolContentID : ${dokumaran.contentId}
+				toolContentID: ${dokumaran.contentId}
 			},
-			'success' : function(){
+			'success': function () {
 				<c:choose>
 				<c:when test="${isTbl}">
 				// reload current tab with Doku summary
@@ -455,26 +455,26 @@
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#doku-monitoring-summary-${sessionMap.toolContentID} #change-leader-modals').empty()
-				.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
-					toolSessionID : toolSessionId
+				.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />', {
+					toolSessionID: toolSessionId
 				});
 	}
 
-	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
+	function onChangeLeaderCallback(response, leaderUserId, toolSessionId) {
 		if (response.isSuccessful) {
 			$.ajax({
-				'url' : '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
+				'url': '<c:url value="/monitoring/changeLeaderForGroup.do"/>',
 				'type': 'post',
-				'cache' : 'false',
+				'cache': 'false',
 				'data': {
-					'toolSessionID' : toolSessionId,
-					'leaderUserId' : leaderUserId,
-					'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
+					'toolSessionID': toolSessionId,
+					'leaderUserId': leaderUserId,
+					'<csrf:tokenname/>': '<csrf:tokenvalue/>'
 				},
-				success : function(){
+				success: function () {
 					alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
 				},
-				error : function(){
+				error: function () {
 					alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
 				}
 			});
@@ -484,8 +484,35 @@
 		}
 	}
 
+	<c:if test="${isAiEnabled}">
+	function aiReview(toolSessionId) {
+		let container = $('#ai-review-container-' + toolSessionId),
+				header = $('.ai-review-header', container)
+						.removeClass('hidden')
+						.append('<i class="fa fa-circle-o-notch fa-spin loffset10"></i>'),
+				content = $('.ai-review-content', container).removeClass('hidden').empty();
+		container.children('button').prop('disabled', true);
+		container.children('.clearfix').remove();
+
+		<%--.load(<c:url value="/monitoring/aiReview.do" />, {--%>
+		<%--	toolSessionId: toolSessionId--%>
+		<%--});--%>
+	}
+
+	function aiReviewAll() {
+		let button = $('#ai-review-all-button').prop('disabled', true);
+		// re-enable review all button after 10 seconds
+		setTimeout(function () {
+			button.prop('disabled', false);
+		}, 10000);
+
+		$('.ai-review-container').each(function () {
+			aiReview($(this).data('session-id'));
+		});
+	}
+	</c:if>
 </script>
-<lams:JSImport src="includes/javascript/rating.js" />
+<lams:JSImport src="includes/javascript/rating.js"/>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
@@ -617,6 +644,14 @@
 		</div>
 	</c:if>
 
+	<c:if test="${isAiEnabled}">
+		<button id="ai-review-all-button" class="btn btn-primary pull-right roffset10" style="margin-bottom: 1rem"
+				onClick="javascript:aiReviewAll()">
+			<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
+		</button>
+		<div class="clearfix"></div>
+	</c:if>
+
 	<c:if test="${sessionMap.isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true">
 		</c:if>
@@ -687,6 +722,22 @@
 				</c:otherwise>
 			</c:choose>
 
+			<c:if test="${isAiEnabled}">
+				<!-- AI review section -->
+				<div id="ai-review-container-${groupSummary.sessionId}" data-session-id="${groupSummary.sessionId}"
+					 class="ai-review-container voffset10">
+					<button type="button" class="btn btn-primary pull-right roffset10"
+							onClick="javascript:aiReview(${groupSummary.sessionId})"
+							title='<fmt:message key="label.monitoring.ai.review.tooltip" />'>
+						<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review"/>
+					</button>
+					<div class="clearfix"></div>
+					<h4 class="ai-review-header hidden">
+						<fmt:message key="label.monitoring.ai.review"/>
+					</h4>
+					<div class="ai-review-content hidden"></div>
+				</div>
+			</c:if>
 
 			<!-- Editable marks section -->
 			<div class="marks-container voffset10">

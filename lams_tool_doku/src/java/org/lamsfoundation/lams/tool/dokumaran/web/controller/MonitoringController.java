@@ -187,6 +187,9 @@ public class MonitoringController {
 	    dokumaranService.createEtherpadCookieForMonitor(user, contentId, response);
 	}
 
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	request.setAttribute("isAiEnabled", isAiEnabled);
+
 	return "pages/monitoring/monitoring";
     }
 
