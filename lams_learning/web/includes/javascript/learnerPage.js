@@ -61,7 +61,7 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
                     if (activityData.status === 1) {
                         completedActivityCount++;
 
-                        activityItem.addClass('progress-bar-item-complete');
+                        activityItem.addClass('list-group-item-success');
                         activityIcon.addClass('fa-solid fa-square-check')
                             .attr('title', LABEL_COMPLETED_ACTIVITY);
                     } else {

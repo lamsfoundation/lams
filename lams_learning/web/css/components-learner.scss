@@ -139,8 +139,8 @@
 	    color: var(--bs-gray-700);
 	}
 	
-	.progress-bar-items > li.progress-bar-item-complete,
-	.progress-bar-items > li.progress-bar-item-complete > .progress-bar-icon {
+	.progress-bar-items > li.list-group-item-success,
+	.progress-bar-items > li.list-group-item-success > .progress-bar-icon {
 	    color: var(--bs-green);
 	}
 	
