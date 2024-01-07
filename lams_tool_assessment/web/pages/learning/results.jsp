@@ -108,9 +108,11 @@
 		</c:if>
 		
 		<c:if test="${assessment.displaySummary}">
-			<div id="instructions" class="instructions">
-				<c:out value="${assessment.instructions}" escapeXml="false"/>
-			</div>
+			<c:if test="${not empty assessment.instructions}">
+				<div id="instructions" class="instructions">
+					<c:out value="${assessment.instructions}" escapeXml="false"/>
+				</div>
+			</c:if>
 
 			<div id="all-questions">
 				<%@ include file="results/allquestions.jsp"%>

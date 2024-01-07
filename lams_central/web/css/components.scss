@@ -5,6 +5,15 @@
     @extend .container-lg;
 }
 
+@media (width <= 768px) {
+	#container-main {
+		--bs-gutter-x: 0.1rem;
+		--bs-gutter-y: 0.1rem;
+		padding-right: calc(var(--bs-gutter-x) * -5.5);
+		padding-left: calc(var(--bs-gutter-x) * 0.5);
+	}
+}
+
 .btn-secondary-darker {
 	@extend .btn-secondary;
 	background-color: shade-color($secondary, 20%);
@@ -82,6 +91,14 @@
 body.component {
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
   background-color: var(--lams-background-gray);
+}
+
+@media (width <= 768px) {
+    body.component {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-size: 12px;
+      background-color: unset;
+    }
 }
 
 body.component .btn-success,

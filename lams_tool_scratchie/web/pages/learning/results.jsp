@@ -37,6 +37,16 @@
 			.ui-jqgrid-title {
 				font-size: 1.2rem !important;
 			}
+
+			@media (width <= 758px) {
+				.ui-jqgrid-title {
+					font-size: 14px !important;
+				}
+				.ui-jqgrid-hdiv, .ui-jqgrid-htable, .ui-jqgrid-btable {
+					font-size: 12px !important;
+				}
+			}
+
 			.ui-jqgrid .ui-jqgrid-labels th.ui-th-column, .ui-jqgrid .ui-jqgrid-legacy-subgrid .ui-th-subgrid, .ui-jqgrid-labels .ui-th-column-header {
 				text-align: left;
 			}

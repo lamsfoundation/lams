@@ -13,7 +13,7 @@
 </c:if>
 
 <c:forEach var="item" items="${sessionMap.itemList}" varStatus="questionNumber">
-	<div class="card lcard mt-4" id="question${questionNumber.count}">
+	<div class="card lcard mt-md-4" id="question${questionNumber.count}">
 		<div class="card-header" id="questionTitle${questionNumber.count}">
 	        ${questionNumber.count})&nbsp;
 	        <c:if test="${not sessionMap.hideTitles}">
@@ -35,7 +35,7 @@
 			<c:choose>
 			<%-- 1:TYPE_MULTIPLE_CHOICE, 8:TYPE_MARK_HEDGING --%>
 			<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
-				<div class="table div-hover scratches mt-4">
+				<div class="table div-hover scratches mt-md-4">
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="status">
 						<c:set var="svgId" value="${item.uid}-${optionDto.qbOptionUid}"/>
 						
@@ -228,7 +228,7 @@
 			
 			<%-- show burning questions --%>
 			<c:if test="${!showResults && scratchie.burningQuestionsEnabled && (isUserLeader || (mode == 'teacher'))}">
-				<div class="burning-question-container mb-2 mt-4">
+				<div class="burning-question-container mb-2 mt-md-4">
 					<button type="button" id="bq${item.uid}" data-bs-toggle="collapse" data-bs-target="#burning-question-item${item.uid}"
 							class="btn btn-light card-subheader <c:if test="${empty item.burningQuestion}">collapsed</c:if>">
 						<span class="if-collapsed"><i class="fa fa-xs fa-regular fa-square-plus" aria-hidden="true"></i></span>

@@ -1,6 +1,22 @@
 @import "../../../lams_central/web/css/components.scss";
 @import "_lams_variables.scss"; 
 
+
+@media (width <= 768px) {
+    .p-3 {
+        padding: 0rem !important;
+    }
+	.mb-3 {
+		margin-bottom: 0.3rem !important;
+	}
+}
+
+@media (width <= 768px) {
+  .component-page-wrapper .component-page-content {
+     padding: 0.5rem 1rem 1rem 1rem;
+  }
+}
+
 .component-page-wrapper h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
     color: var(--bs-gray-dark);
 }
@@ -178,19 +194,27 @@
     box-shadow: 0px 3px 6px var(--bs-gray-400);
 }
 
+@media (width <= 768px) {
+	.component-page-wrapper .btn {
+		font-size: 12px;
+	}
+}
+
 .component-page-wrapper .btn:focus {
     box-shadow: var(--bs-btn-focus-box-shadow);
 }
 
 .wave-orange {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGwtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI2Q1NmExMSIgd2lkdGg9IjEyNDAiIGhlaWdodD0iMzA0IiAgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBvcGFjaXR5PSIuMTUiIGQ9Ik0wIDBoMTIzOC4wOTV2Mjk2LjQ3N2MtMzQzLjQ0OCAyNi4xNjEtMzA1LjgxNi0yNC44NjEtNjE5LjA0OC0xNy45MDdTMjkxLjk5IDMxNS43ODggMCAyNzguNTdWMHoiLz48cGF0aCBkPSJNMTI0MCAwSC45NTN2MjY0LjgwNGM3Ni41NjYtNy4zNjUgMTQ2Ljg0NC0xOC4xMiAzMjcuMzUxLTcuMzY1czI0NC4yNDUgNTMuNzcxIDUwNi42MjggMTIuOTkxYzE3NC45MjItMjcuMTg3IDMwOS45NDUtMjUuMTg2IDQwNS4wNjggNi4wMDF6IiBmaWxsPSIjZjkzIi8+PC9zdmc+");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' fill='%23d56a11' width='1240' height='200'><path opacity='.15' d='M0 0h1238.095l.752 190.678c-343.448 18.646-306.568-19.271-619.8-14.315S291.99 213.078 0 186.551z'/><path d='M1240 0H.953v177.116c54.117-3.757 103.637-16.013 192.612-15.869 36.91.06 80.359 1.001 133.284 3.277 180.507 7.762 245.7 38.085 508.083 8.653 64.239-7.206 123.098-11.571 176.575-13.095 42.717-1.217 82-.622 117.85 1.787 41.477 2.786 78.358 15.999 110.643 23.639z' fill='%23f93'/></svg>");
     text-align: center;
     color: white;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .wave-blue {
@@ -201,7 +225,9 @@
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .wave-purple {
@@ -212,7 +238,9 @@
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .wave-green {
@@ -223,7 +251,9 @@
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .wave-pink {
@@ -234,7 +264,9 @@
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .wave-red {
@@ -245,7 +277,9 @@
     background-repeat: no-repeat;
     background-position: top;
     padding: 5% 0 12% 0;
-    margin: -16px
+    margin: -16px;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
 }
 
 .lcard {
@@ -263,6 +297,14 @@
     font-size: 1.3rem;
     padding: 1rem;
     @extend .text-bg-secondary;
+}
+
+@media (width <= 768px) {
+
+    .lcard > .card-header {
+        font-size: 14px;
+    }
+
 }
 
 .font-size-init {
@@ -327,6 +369,14 @@ div.growlUI h1,div.growlUI h2 {
 	border-top: 1px solid #ddd;
 	padding: 12px;
 }
+
+@media (width <= 768px) {
+	.div-hover>div {
+		padding: 3px;
+	}
+
+}
+
 .div-hover>div:hover{
 	background-color: var(--bs-gray-200);
 }
