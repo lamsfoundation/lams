@@ -586,22 +586,23 @@ public class UserManagementService implements IUserManagementService, Initializi
     @Override
     @SuppressWarnings("unchecked")
     public List<UserManageBean> getUserManageBeans(Integer orgId) {
-	String query = "select u.userId,u.login,u.title,u.firstName,u.lastName, r "
+	String query = "select u.userId,u.login,u.email,u.title,u.firstName,u.lastName, r "
 		+ "from User u left join u.userOrganisations as uo left join uo.userOrganisationRoles as uor left join uor.role as r where uo.organisation.organisationId=?";
 	List list = baseDAO.find(query, orgId);
 	Map<Integer, UserManageBean> beansMap = new HashMap<>();
 	for (int i = 0; i < list.size(); i++) {
 	    Object[] data = (Object[]) list.get(i);
 	    if (beansMap.containsKey(data[0])) {
-		beansMap.get(data[0]).getRoles().add((Role) data[5]);
+		beansMap.get(data[0]).getRoles().add((Role) data[6]);
 	    } else {
 		UserManageBean bean = new UserManageBean();
 		bean.setUserId((Integer) data[0]);
 		bean.setLogin((String) data[1]);
-		bean.setTitle((String) data[2]);
-		bean.setFirstName((String) data[3]);
-		bean.setLastName((String) data[4]);
-		bean.getRoles().add((Role) data[5]);
+		bean.setEmail((String) data[2]);
+		bean.setTitle((String) data[3]);
+		bean.setFirstName((String) data[4]);
+		bean.setLastName((String) data[5]);
+		bean.getRoles().add((Role) data[6]);
 		beansMap.put((Integer) data[0], bean);
 	    }
 	}
