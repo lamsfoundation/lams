@@ -27,8 +27,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="title"><fmt:message key="learner.title" /></c:set>
 
 <lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true">
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/lottie/lottie-player.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/nprogress.js"></script>		
+	<script type="text/javascript" src="${lams}includes/javascript/lottie/lottie-player.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/nprogress.js"></script>		
 	<c:if test="${!empty activityForm.activityURLs}">
 		<script type="text/javascript">
 			function redirectPage() {
@@ -90,7 +90,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div class="top-menu">
 				<button id="profile-picture" class="btn btn-light no-decoration px-3 disabled" type="button" disabled>
-					<img class="portrait-sm portrait-round" src="http://localhost:8080/lams/images/css/john-doe-portrait.jpg" alt="Your profile portrait">
+					<img class="portrait-sm portrait-round" src="${lams}images/css/john-doe-portrait.jpg" alt="Your profile portrait">
 				</button>
 		                    
 				<button type="button" id="progress-bar-widget" class="btn btn-light no-decoration d-none d-sm-none d-md-block disabled" disabled>
@@ -117,7 +117,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				  autoplay
 				  loop
 				  mode="normal"
-				  src="<lams:LAMSURL/>includes/javascript/lottie/loading_sphere.json"
+				  src="${lams}includes/javascript/lottie/loading_sphere.json"
 				  style="width: 320px; height: 200px; margin-top: 5rem;"
 				  class="mx-auto"
 				>

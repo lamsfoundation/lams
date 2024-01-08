@@ -2,6 +2,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <%-- param has higher level for request attribute --%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
@@ -16,9 +17,9 @@
 </c:set>
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
 	
-	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>css/circle.css" />
+	<link rel="stylesheet" type="text/css" href="${lams}css/circle.css" />
 	<link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie-learning.css" />
-	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<style type="text/css">
 	    /* when item is editable - show pencil icon on hover */
 	    .burning-question-text:hover +span+ i, /* when link is hovered select i */
@@ -72,7 +73,7 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', finishSession);
 		
