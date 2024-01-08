@@ -17,6 +17,13 @@
 	clear: both;
 	padding-top: 20px;
 }
+
+@media (width <= 768px) {
+	body.component .btn-sm {
+		font-size: 12px;
+	}
+}
+
 [id^=comments-area] {
 	clear: both;
 	padding-top: 10px;
