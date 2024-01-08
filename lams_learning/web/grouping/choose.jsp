@@ -26,7 +26,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		.user-container {
 			padding: 2px;
 		}
-		.modal-dialog {
+		#confirmationModal .modal-dialog {
 			--bs-modal-width: 400px;
 		}
 	</style>
