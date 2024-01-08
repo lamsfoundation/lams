@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -137,10 +136,8 @@ public class GroupingController {
 	SortedSet<Group> groups = new TreeSet<>();
 	groups.addAll(grouping.getGroups());
 
-	// sort users with first, then last name, then login
-	Comparator<User> userComparator = new FirstNameAlphabeticComparator();
 	for (Group group : groups) {
-	    Set<User> sortedUsers = new TreeSet<>(userComparator);
+	    Set<User> sortedUsers = new TreeSet<>();
 	    sortedUsers.addAll(group.getUsers());
 	    group.setUsers(sortedUsers);
 	}
@@ -174,10 +171,8 @@ public class GroupingController {
 	if (orgGrouping != null) {
 	    groups.addAll(orgGrouping.getGroups());
 
-	    // sort users with first, then last name, then login
-	    Comparator<User> userComparator = new FirstNameAlphabeticComparator();
 	    for (OrganisationGroup group : groups) {
-		Set<User> sortedUsers = new TreeSet<>(userComparator);
+		Set<User> sortedUsers = new TreeSet<>();
 		sortedUsers.addAll(group.getUsers());
 		group.setUsers(sortedUsers);
 	    }

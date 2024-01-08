@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.sbmt.dto;
 
 import java.io.Serializable;
@@ -30,12 +28,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.lamsfoundation.lams.tool.sbmt.model.SubmitUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Manpreet Minhas
  * @serial 5900249986365640342L
  */
-public class SubmitUserDTO implements Serializable {
+public class SubmitUserDTO implements Serializable, IUserDetails {
 
     private static final long serialVersionUID = 5900249986365640342L;
     private Long toolSessionID;
@@ -58,10 +57,6 @@ public class SubmitUserDTO implements Serializable {
     //submit file list
     private List filesUploaded;
 
-    public SubmitUserDTO() {
-
-    }
-
     public SubmitUserDTO(SubmitUser user) {
 	this.userUid = user.getUid();
 	this.userID = user.getUserID();
@@ -80,7 +75,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param comments
-     *            The comments to set.
+     * 	The comments to set.
      */
     public void setComments(String comments) {
 	this.comments = comments;
@@ -95,7 +90,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param dateOfSubmission
-     *            The dateOfSubmission to set.
+     * 	The dateOfSubmission to set.
      */
     public void setDateOfSubmission(Date dateOfSubmission) {
 	this.dateOfSubmission = dateOfSubmission;
@@ -110,7 +105,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param fileDescription
-     *            The fileDescription to set.
+     * 	The fileDescription to set.
      */
     public void setFileDescription(String fileDescription) {
 	this.fileDescription = fileDescription;
@@ -125,7 +120,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param name
-     *            The name to set.
+     * 	The name to set.
      */
     public void setFileName(String name) {
 	this.fileName = name;
@@ -140,7 +135,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param marks
-     *            The marks to set.
+     * 	The marks to set.
      */
     public void setMarks(Float marks) {
 	this.marks = marks;
@@ -155,7 +150,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param toolSessionID
-     *            The toolSessionID to set.
+     * 	The toolSessionID to set.
      */
     public void setToolSessionID(Long toolSessionID) {
 	this.toolSessionID = toolSessionID;
@@ -170,7 +165,7 @@ public class SubmitUserDTO implements Serializable {
 
     /**
      * @param filesUploaded
-     *            The filesUploaded to set.
+     * 	The filesUploaded to set.
      */
     public void setFilesUploaded(List filesUploaded) {
 	this.filesUploaded = filesUploaded;

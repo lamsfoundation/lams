@@ -53,7 +53,6 @@ import org.lamsfoundation.lams.learning.kumalive.model.KumaliveScore;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.CommonConstants;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -69,7 +68,6 @@ public class KumaliveService implements IKumaliveService {
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##",
 	    new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final Comparator<User> USER_COMPARATOR = new LastNameAlphabeticComparator();
 
     private IKumaliveDAO kumaliveDAO;
     private ISecurityService securityService;
@@ -183,9 +181,8 @@ public class KumaliveService implements IKumaliveService {
 	// paging
 	int totalPages = 1;
 	if (rowLimit < kumalives.size()) {
-	    totalPages = new Double(
-		    Math.ceil(new Integer(kumalives.size()).doubleValue() / new Integer(rowLimit).doubleValue()))
-			    .intValue();
+	    totalPages = new Double(Math.ceil(
+		    new Integer(kumalives.size()).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
 	    int firstRow = (page - 1) * rowLimit;
 	    int lastRow = firstRow + rowLimit;
 
@@ -296,8 +293,8 @@ public class KumaliveService implements IKumaliveService {
 	}
 
 	// mapping batch (question ID) -> rubric ID -> score
-	Map<Long, Map<Long, Short>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, userId).stream()
-		.collect(Collectors.groupingBy(KumaliveScore::getBatch, LinkedHashMap::new,
+	Map<Long, Map<Long, Short>> scores = kumaliveDAO.findKumaliveScore(kumaliveId, userId).stream().collect(
+		Collectors.groupingBy(KumaliveScore::getBatch, LinkedHashMap::new,
 			Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore)));
 
 	ObjectNode resultJSON = JsonNodeFactory.instance.objectNode();
@@ -349,7 +346,7 @@ public class KumaliveService implements IKumaliveService {
      * Exports to Excel given Kumalives.
      */
     private List<ExcelSheet> export(List<Kumalive> kumalives) {
-	Map<User, Map<String, Map<Long, Double>>> learnerSummaries = new TreeMap<>(USER_COMPARATOR);
+	Map<User, Map<String, Map<Long, Double>>> learnerSummaries = new TreeMap<>();
 	List<ExcelSheet> sheets = new ArrayList<>();
 
 	ExcelSheet kumalivesSheet = buildReportKumalivesSheet(kumalives, learnerSummaries);
@@ -378,11 +375,10 @@ public class KumaliveService implements IKumaliveService {
 	    kumaliveNameRow.addCell(kumalive.getName(), false);
 
 	    // mapping user (sorted by name) -> batch (i.e. question ID) -> rubric -> score
-	    TreeMap<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO
-		    .findKumaliveScore(kumalive.getKumaliveId(), true).stream()
-		    .collect(Collectors.groupingBy(KumaliveScore::getUser, () -> new TreeMap<>(USER_COMPARATOR),
-			    Collectors.groupingBy(KumaliveScore::getBatch, TreeMap::new, Collectors
-				    .toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
+	    TreeMap<User, Map<Long, Map<Long, Short>>> scores = kumaliveDAO.findKumaliveScore(kumalive.getKumaliveId(),
+		    true).stream().collect(Collectors.groupingBy(KumaliveScore::getUser, () -> new TreeMap<>(),
+		    Collectors.groupingBy(KumaliveScore::getBatch, TreeMap::new,
+			    Collectors.toMap(score -> score.getRubric().getRubricId(), KumaliveScore::getScore))));
 
 	    if (scores.size() == 0) {
 		// no learners answered to question, carry on
@@ -516,8 +512,8 @@ public class KumaliveService implements IKumaliveService {
 		Map<Long, Double> learnerKumaliveSummary = learnerSummary.getValue().get(kumalive.getName());
 		boolean border = true;
 		for (KumaliveRubric rubric : kumalive.getRubrics()) {
-		    Double average = learnerKumaliveSummary == null ? null
-			    : learnerKumaliveSummary.get(rubric.getRubricId());
+		    Double average =
+			    learnerKumaliveSummary == null ? null : learnerKumaliveSummary.get(rubric.getRubricId());
 		    border = false;
 		    if (average != null) {
 			userRow.addCell(average, false, border ? 1 : 0);
