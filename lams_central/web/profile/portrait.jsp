@@ -122,7 +122,7 @@
 	</script>
 </lams:head>
 
-<body>
+<body class="component no-decoration">
 <c:set var="csrfToken"><csrf:token/></c:set>
 <form:form action="saveportrait.do?${csrfToken}" method="post" modelAttribute="PortraitActionForm" id="PortraitActionForm" >
 	<form:hidden path="portraitUuid" />

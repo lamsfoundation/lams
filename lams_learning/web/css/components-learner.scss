@@ -190,20 +190,6 @@
 	clear: both;
 }
 
-.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
-    box-shadow: 0px 3px 6px var(--bs-gray-400);
-}
-
-@media (width <= 768px) {
-	.component-page-wrapper .btn {
-		font-size: 12px;
-	}
-}
-
-.component-page-wrapper .btn:focus {
-    box-shadow: var(--bs-btn-focus-box-shadow);
-}
-
 .wave-orange {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' fill='%23d56a11' width='1240' height='200'><path opacity='.15' d='M0 0h1238.095l.752 190.678c-343.448 18.646-306.568-19.271-619.8-14.315S291.99 213.078 0 186.551z'/><path d='M1240 0H.953v177.116c54.117-3.757 103.637-16.013 192.612-15.869 36.91.06 80.359 1.001 133.284 3.277 180.507 7.762 245.7 38.085 508.083 8.653 64.239-7.206 123.098-11.571 176.575-13.095 42.717-1.217 82-.622 117.85 1.787 41.477 2.786 78.358 15.999 110.643 23.639z' fill='%23f93'/></svg>");
     text-align: center;

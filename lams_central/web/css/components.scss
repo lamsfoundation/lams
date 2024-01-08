@@ -89,8 +89,11 @@
 }
 
 body.component {
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-  background-color: var(--lams-background-gray);
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  
+	&:not(.no-decoration) {
+		background-color: var(--lams-background-gray);
+	}
 }
 
 @media (width <= 768px) {
@@ -335,8 +338,22 @@ body.component .cke_widget_inline {
   display: block !important;
 }
 
-body.component .btn {
-  border-radius: 1.0rem;
+body.component { 
+	.btn {
+		border-radius: 1.0rem;
+	  
+		@media (width <= 768px) {
+			font-size: 12px;
+		}
+	}
+	
+	.btn:focus {
+	    box-shadow: var(--bs-btn-focus-box-shadow);
+	}
+	
+	.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
+	    box-shadow: 0px 3px 6px var(--bs-gray-400);
+	}
 }
 
 body.component i.fa[role="button"] {

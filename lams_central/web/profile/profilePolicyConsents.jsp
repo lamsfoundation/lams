@@ -24,7 +24,7 @@
 	</script>
 </lams:head>
 
-<body>
+<body class="component no-decoration">
 	<div style="clear: both;"></div>
 	
 	<div class="container">
