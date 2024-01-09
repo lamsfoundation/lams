@@ -103,9 +103,6 @@ public class MonitoringController {
     public static final int LEARNER_MARKS_SORTING_LAST_NAME_ASC = 2;
     public static final int LEARNER_MARKS_SORTING_LAST_NAME_DESC = 3;
 
-    private static final Comparator<User> USER_NAME_COMPARATOR = Comparator.comparing(User::getFirstName)
-	    .thenComparing(User::getLastName).thenComparing(User::getLogin);
-
     @Autowired
     private IDokumaranService dokumaranService;
 
@@ -204,7 +201,7 @@ public class MonitoringController {
 	Integer isSortLastName = WebUtil.readIntParam(request, "column[1]", true);
 
 	// identify sorting type
-	int sorting = LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
+	int sorting = LEARNER_MARKS_SORTING_LAST_NAME_ASC;
 	if (isSortFirstName != null) {
 	    sorting = isSortFirstName.equals(1)
 		    ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
@@ -446,7 +443,7 @@ public class MonitoringController {
 		ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 		userJSON.put("value", "user-" + user.getUserId());
 
-		String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+		String name = user.getFullName() + " (" + user.getLogin() + ")";
 		if (grouping != null) {
 		    Group group = grouping.getGroupBy(user);
 		    if (group != null && !group.isNull()) {
@@ -470,8 +467,7 @@ public class MonitoringController {
 	Grouping grouping = dokumaranService.getGrouping(toolContentId);
 	// find User objects based on their userIDs and sort by name
 	List<User> users = timeLimitAdjustments.keySet().stream()
-		.map(userId -> userManagementService.getUserById(userId)).sorted(USER_NAME_COMPARATOR)
-		.collect(Collectors.toList());
+		.map(userId -> userManagementService.getUserById(userId)).sorted().collect(Collectors.toList());
 
 	if (grouping != null) {
 	    // Make a map group -> its users who have a time limit set
@@ -480,7 +476,7 @@ public class MonitoringController {
 		    .collect(Collectors.toMap(Group::getGroupName, group -> {
 			return group.getUsers().stream()
 				.filter(user -> timeLimitAdjustments.containsKey(user.getUserId()))
-				.collect(Collectors.toCollection(() -> new TreeSet<>(USER_NAME_COMPARATOR)));
+				.collect(Collectors.toCollection(() -> new TreeSet<>()));
 		    }, (s1, s2) -> {
 			s1.addAll(s2);
 			return s1;
@@ -499,7 +495,7 @@ public class MonitoringController {
 	    userJSON.put("userId", user.getUserId());
 	    userJSON.put("adjustment", timeLimitAdjustments.get(user.getUserId().intValue()));
 
-	    String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+	    String name = user.getFullName() + " (" + user.getLogin() + ")";
 	    if (grouping != null) {
 		Group group = grouping.getGroupBy(user);
 		if (group != null && !group.isNull()) {

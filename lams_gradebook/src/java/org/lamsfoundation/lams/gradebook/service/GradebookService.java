@@ -1097,7 +1097,7 @@ public class GradebookService implements IGradebookFullService {
 	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_START_PLACEHOLDER.length();
 	content.replace(placeholderStart, placeholderEnd,
 		messageService.getMessage("gradebook.monitor.releasemarks.email.content.start",
-			new Object[] { user.getFirstName() + " " + user.getLastName() }));
+			new Object[] { user.getFullName() }));
 
 	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER);
 	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER.length();

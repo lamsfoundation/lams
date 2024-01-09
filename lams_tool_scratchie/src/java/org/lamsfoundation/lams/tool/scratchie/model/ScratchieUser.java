@@ -38,6 +38,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Scratchie user.
@@ -46,7 +47,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_lascrt11_user")
-public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
+public class ScratchieUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(ScratchieUser.class);
 
     @Id
@@ -104,11 +105,6 @@ public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
 	}
 
 	return user;
-    }
-
-    @Override
-    public int compareTo(ScratchieUser user) {
-	return loginName.compareTo(user.getLoginName());
     }
 
     @Override
@@ -173,6 +169,11 @@ public class ScratchieUser implements Cloneable, Comparable<ScratchieUser> {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public ScratchieSession getSession() {

@@ -11,7 +11,7 @@
 						
 						<c:if test="${file.createBy != null}">
 							<span class="badge text-bg-warning bg-opacity-50 mx-2">
-								<c:out value="${file.createBy.firstName} ${file.createBy.lastName}" escapeXml="true" />
+								<c:out value="${file.createBy.getFullName()}" escapeXml="true" />
 							</span>
 						</c:if> 
 
@@ -28,4 +28,3 @@
 		</ul>
 	</div>
 </c:if>
-

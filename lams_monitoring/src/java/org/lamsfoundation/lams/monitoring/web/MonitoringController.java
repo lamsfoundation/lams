@@ -1495,7 +1495,7 @@ public class MonitoringController {
 	ArrayNode responseJSON = JsonNodeFactory.instance.arrayNode();
 	for (User user : users) {
 	    ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
-	    userJSON.put("label", user.getFirstName() + " " + user.getLastName() + " " + user.getLogin());
+	    userJSON.put("label", user.getFullName() + " " + user.getLogin());
 	    userJSON.put("value",
 		    user.getUserId() + (user.getPortraitUuid() == null ? "" : "_" + user.getPortraitUuid().toString()));
 

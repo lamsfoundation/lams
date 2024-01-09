@@ -88,7 +88,7 @@
                         <c:if test="${!image.createByAuthor && (image.createBy != null)}">
                         <c:set var="portrait"><lams:Portrait userId="${image.createBy.userId}"/></c:set>
                         <c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
-                        + '<div class="fst-italic"><fmt:message key="label.learning.added.by" /> <span class="mx-2">${portrait}</span><c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div>'
+                        + '<div class="fst-italic"><fmt:message key="label.learning.added.by" /> <span class="mx-2">${portrait}</span><c:out value="${image.createBy.getFullName()}" escapeXml="true"/></div>'
                     </c:if>
                     //html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
                     //fit: 'cover' // Override the global fit option.

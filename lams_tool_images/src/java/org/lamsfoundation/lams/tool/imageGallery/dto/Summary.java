@@ -83,7 +83,7 @@ public class Summary {
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? ""
-		    : item.getCreateBy().getFirstName() + " " + item.getCreateBy().getLastName();
+		    : item.getCreateBy().getFullName();
 	    this.userId = item.getCreateBy() == null ? null : item.getCreateBy().getUserId();
 	} else {
 	    this.itemUid = new Long(-1);

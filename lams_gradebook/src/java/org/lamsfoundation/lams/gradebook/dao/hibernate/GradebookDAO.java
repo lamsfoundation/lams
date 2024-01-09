@@ -347,8 +347,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id WHERE lesson.lesson_id = :lessonId "
 		+ " AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id "
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
-		+ "ORDER BY CONCAT(user.first_name, ' ', user.last_name) " + sortOrder;
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ "ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 
 	//when :sortBy='timeTaken'
 	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN = "SELECT DISTINCT user.* "
@@ -358,7 +358,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " ON progress.user_id=user.user_id AND progress.lesson_id=:lessonId "
 		+ " WHERE lesson.lesson_id = :lessonId AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id"
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ "ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time) " + sortOrder;
 
 	//when :sortBy='mark'
@@ -369,7 +369,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " ON user.user_id=gradebookUserLesson.user_id AND gradebookUserLesson.lesson_id =:lessonId "
 		+ " WHERE lesson.lesson_id = :lessonId AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id"
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ " ORDER BY gradebookUserLesson.mark " + sortOrder;
 
 	//when :sortBy='feedback'
@@ -380,7 +380,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " ON user.user_id=gradebookUserLesson.user_id AND gradebookUserLesson.lesson_id =:lessonId "
 		+ " WHERE lesson.lesson_id = :lessonId AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id"
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ " ORDER BY gradebookUserLesson.feedback " + sortOrder;
 
 	String queryString;
@@ -415,8 +415,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " FROM lams_lesson lesson, lams_grouping gi, lams_group g, lams_user_group ug "
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id  WHERE lesson.lesson_id = :lessonId "
 		+ " AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id AND ug.group_id=g.group_id"
-		+ " AND ug.group_id <> gi.staff_group_id AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY CONCAT(user.first_name, ' ', user.last_name) " + sortOrder;
+		+ " AND ug.group_id <> gi.staff_group_id AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 
 	//when :sortBy='timeTaken'
 	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_ACTIVITY = "SELECT DISTINCT user.* "
@@ -428,7 +428,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " AND completedActivityProgress.activity_id=:activityId  ON progress.user_id=user.user_id "
 		+ " WHERE lesson.lesson_id = :lessonId AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id "
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ "ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) "
 		+ sortOrder;
 
@@ -440,7 +440,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " ON user.user_id=gradebookUserActivity.user_id AND gradebookUserActivity.activity_id =:activityId "
 		+ " WHERE lesson.lesson_id = :lessonId AND lesson.class_grouping_id=gi.grouping_id AND gi.grouping_id=g.grouping_id "
 		+ " AND ug.group_id=g.group_id AND ug.group_id <> gi.staff_group_id"
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ "ORDER BY gradebookUserActivity.mark " + sortOrder;
 
 	String queryString;
@@ -474,8 +474,8 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 
 	final String LOAD_LEARNERS_ORDERED_BY_NAME = "SELECT DISTINCT user.* " + " FROM lams_user_group ug "
 		+ " INNER JOIN lams_user user ON ug.user_id=user.user_id " + " WHERE ug.group_id=:groupId "
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY CONCAT(user.first_name, ' ', user.last_name) " + sortOrder;
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 
 	//when :sortBy='timeTaken'
 	final String LOAD_LEARNERS_ORDERED_BY_TIME_TAKEN_GROUP = "SELECT DISTINCT user.* " + " FROM lams_user_group ug "
@@ -485,7 +485,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " ON completedActivityProgress.learner_progress_id=progress.learner_progress_id "
 		+ " AND completedActivityProgress.activity_id=:activityId " + " ON progress.user_id=user.user_id "
 		+ " WHERE ug.group_id=:groupId "
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ " ORDER BY TIMEDIFF(completedActivityProgress.completed_date_time, completedActivityProgress.start_date_time) "
 		+ sortOrder;
 
@@ -495,7 +495,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 		+ " LEFT OUTER JOIN lams_gradebook_user_activity gradebookUserActivity "
 		+ " ON user.user_id=gradebookUserActivity.user_id AND gradebookUserActivity.activity_id =:activityId "
 		+ " WHERE ug.group_id=:groupId "
-		+ " AND (CONCAT(user.first_name, ' ', user.last_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
 		+ "ORDER BY gradebookUserActivity.mark " + sortOrder;
 
 	String queryString;
@@ -544,7 +544,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	final String LOAD_LEARNERS_BY_ORG = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles roles"
 		+ " WHERE uo.organisation.organisationId=:orgId AND roles.role.name = '" + Role.LEARNER + "'"
 		+ " AND CONCAT(uo.user.firstName, ' ', uo.user.lastName) LIKE CONCAT('%', :searchString, '%') "
-		+ " ORDER BY uo.user.firstName " + sortOrder + ", uo.user.lastName " + sortOrder;
+		+ " ORDER BY uo.user.lastName " + sortOrder + ", uo.user.firstName " + sortOrder;
 
 	Query<User> query = getSession().createQuery(LOAD_LEARNERS_BY_ORG, User.class);
 	query.setParameter("orgId", orgId);
@@ -561,7 +561,7 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	final String COUNT_LEARNERS_BY_ORG = "SELECT COUNT(uo.user) FROM UserOrganisation uo"
 		+ " INNER JOIN uo.userOrganisationRoles roles"
 		+ " WHERE uo.organisation.organisationId=:orgId AND roles.role.name = '" + Role.LEARNER + "'"
-		+ " AND CONCAT(uo.user.firstName, ' ', uo.user.lastName) LIKE CONCAT('%', :searchString, '%') ";
+		+ " AND CONCAT(uo.user.lastName, ' ', uo.user.firstName) LIKE CONCAT('%', :searchString, '%') ";
 
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;

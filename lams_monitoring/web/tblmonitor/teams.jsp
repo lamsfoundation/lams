@@ -523,15 +523,15 @@
 											<td>
 												<c:choose>
 													<c:when test="${empty userDto.iraCorrectAnswerCount}">
-														<c:out value="${userDto.lastName}" />,&nbsp;<c:out value="${userDto.firstName}" />
+														<c:out value="${userDto.getFullName()}" />
 													</c:when>
 													<c:otherwise>
 														<a class="text-decoration-none ira-modal-link" data-bs-toggle="modal" data-bs-target="#ira-modal"
 														   data-user-id="${userDto.userID}"
 														   data-ira-correct-answer-count="${userDto.iraCorrectAnswerCount}">
 																	<span id="user-name-${userDto.userID}" class="belong-to-group-${groupDto.groupID} new-popover <c:if test="${userDto.groupLeader}">fw-bold</c:if>"
-																		  data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.lastName},&nbsp;${userDto.firstName}">
-																		<c:out value="${userDto.lastName}" />,&nbsp;<c:out value="${userDto.firstName}" />
+																		  data-portrait="${userDto.portraitUuid}" data-fullname="${userDto.getFullName()}">
+																		<c:out value="${userDto.getFullName()}" />
 																	</span>
 														</a>
 													</c:otherwise>

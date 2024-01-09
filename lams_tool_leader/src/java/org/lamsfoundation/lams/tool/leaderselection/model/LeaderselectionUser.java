@@ -36,6 +36,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
@@ -43,7 +44,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_lalead11_user")
-public class LeaderselectionUser implements Serializable {
+public class LeaderselectionUser implements Serializable, IUserDetails {
     private static final long serialVersionUID = -3701664859818409197L;
 
     @Id
@@ -122,6 +123,11 @@ public class LeaderselectionUser implements Serializable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public String getFirstName() {

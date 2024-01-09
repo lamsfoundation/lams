@@ -95,12 +95,12 @@ public class PolicyManagementController {
 	Integer policyStateId = policyForm.getPolicyStateId();
 	Boolean isMinorChange = policyForm.getMinorChange();
 
-	Policy oldPolicy = (policyUid != null) && ((Long) policyUid > 0)
-		? policyService.getPolicyByUid((Long) policyUid)
-		: null;
+	Policy oldPolicy =
+		(policyUid != null) && ((Long) policyUid > 0) ? policyService.getPolicyByUid((Long) policyUid) : null;
 
 	// set policyId: generate Unique long ID in case of new policy and reuse existing one otherwise
-	Long policyId = oldPolicy == null ? policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE
+	Long policyId = oldPolicy == null
+		? policyId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE
 		: oldPolicy.getPolicyId();
 
 	Policy policy;
@@ -134,8 +134,8 @@ public class PolicyManagementController {
 	    } else {
 		List<Policy> policyFamily = policyService.getPreviousVersionsPolicies(policyId);
 		for (Policy policyFromFamily : policyFamily) {
-		    if (!policyFromFamily.getUid().equals(policyUid)
-			    && Policy.STATUS_ACTIVE.equals(policyFromFamily.getPolicyStateId())) {
+		    if (!policyFromFamily.getUid().equals(policyUid) && Policy.STATUS_ACTIVE.equals(
+			    policyFromFamily.getPolicyStateId())) {
 			policyFromFamily.setPolicyStateId(Policy.STATUS_INACTIVE);
 			userManagementService.save(policyFromFamily);
 		    }
@@ -211,6 +211,7 @@ public class PolicyManagementController {
     }
 
     /**
+     *
      */
     @RequestMapping("getConsentsGridData")
     @ResponseBody
@@ -242,15 +243,15 @@ public class PolicyManagementController {
 	for (UserPolicyConsentDTO consentDto : consentDtos) {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(consentDto.getUserID());
-	    String firstName = consentDto.getFirstName() == null ? "" : consentDto.getFirstName();
-	    String lastName = consentDto.getLastName() == null ? "" : consentDto.getLastName();
-	    String fullName = HtmlUtils.htmlEscape(lastName) + " " + HtmlUtils.htmlEscape(firstName);
+
+	    String fullName = HtmlUtils.htmlEscape(consentDto.getFullName());
 	    userData.add(fullName);
 	    String consentedIcon = consentDto.isConsentGivenByUser()
 		    ? "<i class=\"icon fa fa-check-circle text-success fa-fw\" title=\"Consent given\"></i>"
 		    : "-";
 	    userData.add(consentedIcon);
-	    String dateAgreedOn = consentDto.getDateAgreedOn() == null ? ""
+	    String dateAgreedOn = consentDto.getDateAgreedOn() == null
+		    ? ""
 		    : DateUtil.convertToStringForJSON(consentDto.getDateAgreedOn(), request.getLocale());
 	    userData.add(HtmlUtils.htmlEscape(dateAgreedOn));
 

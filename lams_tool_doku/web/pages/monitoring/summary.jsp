@@ -307,7 +307,7 @@
 							rows += '<tr userId="' + userData['userId'] + '" ' + (isLeader ? 'class="info"' : '') + '>';
 
 							rows += '<td style="width: 80%">';
-							rows += 	userData['firstName'] + ' ' +userData['lastName'];
+							rows += 	userData['lastName'] + ' ' +userData['firstName'];
 							if (isLeader) {
 								rows += '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
 							}

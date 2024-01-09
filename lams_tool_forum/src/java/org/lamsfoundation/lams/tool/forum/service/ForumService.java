@@ -1385,7 +1385,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message) {
 	Forum forum = getForum(forumId);
 	ForumUser postAuthor = message.getCreatedBy();
-	String fullName = postAuthor.getLastName() + " " + postAuthor.getFirstName();
+	String fullName = postAuthor.getFullName();
 	ToolSession toolSession = toolService.getToolSession(sessionId);
 	Long activityId = toolSession.getToolActivity().getActivityId();
 	ToolActivity activity = (ToolActivity) activityDAO.getActivityByActivityId(activityId, ToolActivity.class);

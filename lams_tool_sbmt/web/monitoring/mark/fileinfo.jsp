@@ -3,7 +3,7 @@
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 <c:if test="${status.first}">
-			<div class="lead well" style="padding:5px"><lams:Portrait userId="${fileInfo.owner.userID}"/>&nbsp;<strong><c:out value="${fileInfo.owner.firstName}" />&nbsp;<c:out value="${fileInfo.owner.lastName}" /></strong> </div>
+			<div class="lead well" style="padding:5px"><lams:Portrait userId="${fileInfo.owner.userID}"/>&nbsp;<strong><c:out value="${fileInfo.owner.getFullName()}" /></strong> </div>
 </c:if> 
 
 <dl class="dl-horizontal">

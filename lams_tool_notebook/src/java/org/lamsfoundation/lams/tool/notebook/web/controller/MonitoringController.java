@@ -158,7 +158,7 @@ public class MonitoringController {
 	    responseRow.put("id", id++);
 	    responseRow.put(NotebookConstants.PARAM_USER_UID, user.getUid());
 	    responseRow.put(NotebookConstants.PARAM_NAME,
-		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
+		    HtmlUtils.htmlEscape(user.getFullName()));
 	    if (user.getNotebookEntry() != null) {
 		responseRow.put(NotebookConstants.PARAM_ENTRY, HtmlUtils.htmlEscape(user.getNotebookEntry()));
 	    }

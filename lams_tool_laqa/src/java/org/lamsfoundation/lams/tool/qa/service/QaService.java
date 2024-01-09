@@ -243,7 +243,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
     public QaQueUsr createUser(Long toolSessionID, Integer userId) {
 	User user = (User) userManagementService.findById(User.class, userId);
 	String userName = user.getLogin();
-	String fullName = user.getFirstName() + " " + user.getLastName();
+	String fullName = user.getFullName();
 	QaSession qaSession = getSessionById(toolSessionID.longValue());
 
 	QaQueUsr qaUser = new QaQueUsr(userId.longValue(), userName, fullName, qaSession, new TreeSet());
@@ -890,7 +890,7 @@ public class QaService implements IQaService, ToolContentManager, ToolSessionMan
 	// create user if he hasn't accessed this activity yet
 	if (qaUser == null) {
 	    String userName = user.getLogin();
-	    String fullName = user.getFirstName() + " " + user.getLastName();
+	    String fullName = user.getFullName();
 	    qaUser = new QaQueUsr(userId, userName, fullName, session, new TreeSet<>());
 	    qaQueUsrDAO.createUsr(qaUser);
 	}

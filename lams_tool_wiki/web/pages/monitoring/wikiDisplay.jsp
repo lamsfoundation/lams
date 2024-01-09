@@ -103,7 +103,7 @@
 		               </c:when>
 		               <c:otherwise>
 		                <c:set var="lastEditPortrait"><div class="pull-right"><lams:Portrait userId="${currentWikiPage.currentWikiContentDTO.editorDTO.userId}"/></div></c:set>
-		                  <c:set var="lastEditName"><c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" escapeXml="true"/></c:set>
+		                  <c:set var="lastEditName"><c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.getFullName()}" escapeXml="true"/></c:set>
 		               </c:otherwise>
 		             </c:choose>
 		             ${lastEditPortrait}
@@ -161,7 +161,7 @@
 											<c:choose>
 												<c:when test="${wikiContentPageVersion.editorDTO != null}">
 			                                     	<lams:Portrait userId="${wikiContentPageVersion.editorDTO.userId}"/>
-													${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.lastName}
+													${wikiContentPageVersion.editorDTO.getFullName()}
 												</c:when>
 												<c:otherwise>
 													<fmt:message key="label.wiki.history.editor.author"></fmt:message>
@@ -353,6 +353,3 @@
 
 	</body>
 </lams:html>
-
-
-

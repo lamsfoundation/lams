@@ -34,10 +34,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tl_lazoom10_user")
-public class ZoomUser implements java.io.Serializable {
+public class ZoomUser implements Serializable, IUserDetails {
     private static final long serialVersionUID = 8663555378960558429L;
 
     @Id
@@ -101,6 +104,11 @@ public class ZoomUser implements java.io.Serializable {
 
     public void setLastName(String lastName) {
 	this.lastName = lastName;
+    }
+
+    @Override
+    public String getLogin() {
+	return null;
     }
 
     public String getFirstName() {
@@ -167,8 +175,8 @@ public class ZoomUser implements java.io.Serializable {
 	}
 	ZoomUser castOther = (ZoomUser) other;
 
-	return ((this.getUid() == castOther.getUid())
-		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null
+		&& this.getUid().equals(castOther.getUid())));
     }
 
     @Override

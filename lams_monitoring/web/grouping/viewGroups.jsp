@@ -72,7 +72,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<td>
 												<lams:Portrait userId="${user.userId}"/>
 												<span class="loffset5">
-													<c:out value="${user.firstName} ${user.lastName}" />
+													<c:out value="${user.getFullName()}" />
 												</span>
 											</td>
 										</tr>

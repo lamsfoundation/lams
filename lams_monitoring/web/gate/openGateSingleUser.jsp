@@ -46,7 +46,7 @@
 								<input id="forbidden-${learner.userId}" class="form-check-input" 
 									   type="checkbox" value="${learner.userId}" onClick="javascript:updateSelectAll('forbidden')" />
 								<label for="forbidden-${learner.userId}" class="form-check-label">
-									<c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/>
+									<c:out value="${learner.getFullName()}" escapeXml="true"/>
 								</label>
 							</div>
 						</c:forEach>
@@ -72,7 +72,7 @@
 								<input id="waiting-${learner.userId}" class="form-check-input" 
 									   type="checkbox" value="${learner.userId}" onClick="javascript:updateSelectAll('waiting')" />
 								<label for="waiting-${learner.userId}" class="form-check-label">
-									<c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/>
+									<c:out value="${learner.getFullName()}" escapeXml="true"/>
 								</label>
 							</div>
 						</c:forEach>
@@ -92,7 +92,7 @@
 				<div class="card">
 					<div class="card-body gateLearners">
 						<c:forEach var="learner" items="${gateForm.allowedToPassLearnerList}">
-							<label class="form-check-label"><c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/></label>
+							<label class="form-check-label"><c:out value="${learner.getFullName()}" escapeXml="true"/></label>
 							<br />
 						</c:forEach>
 					</div>

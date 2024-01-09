@@ -39,13 +39,14 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Steve.Ni
  */
 @Entity
 @Table(name = "tl_lafrum11_forum_user")
-public class ForumUser implements Serializable, Cloneable {
+public class ForumUser implements Serializable, Cloneable, IUserDetails {
 
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(ForumUser.class);
@@ -198,6 +199,10 @@ public class ForumUser implements Serializable, Cloneable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    public String getLogin() {
+	return getLoginName();
     }
 
     /**

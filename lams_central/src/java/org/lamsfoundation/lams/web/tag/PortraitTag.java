@@ -57,7 +57,8 @@ public class PortraitTag extends BodyTagSupport {
     private static final String CSS_MEDIUM[] = { "portrait-md", "&version=3" };
     private static final String CSS_GENERIC_MEDIUM = "portrait-generic-md";
     private static final String STYLE_LARGE = "large";
-    private static final String CSS_LARGE[] = { "portrait-lg", "&version=2" };;
+    private static final String CSS_LARGE[] = { "portrait-lg", "&version=2" };
+    ;
     private static final String CSS_GENERIC_LARGE = "portrait-generic-lg";
     private static final String STYLE_XLARGE = "xlarge";
     private static final String CSS_XLARGE[] = { "portrait-xl", "&version=1" };
@@ -125,7 +126,9 @@ public class PortraitTag extends BodyTagSupport {
 	if (portraitId != null) {
 	    boolean isRound = (round != null ? Boolean.valueOf(round) : true);
 	    String[] sizes = getSizeClass();
-	    String alt = user == null || StringUtils.isBlank(user.getFirstName()) ? "user portrait" : user.getFirstName() + "'s portrait"; 
+	    String alt = user == null || StringUtils.isBlank(user.getFullName())
+		    ? "user portrait"
+		    : user.getFullName() + "'s portrait";
 	    StringBuilder bldr = new StringBuilder("<img alt=\"" + alt + "\" class=\"").append(sizes[0]);
 	    if (isRound) {
 		bldr.append(CSS_ROUND);
@@ -152,10 +155,9 @@ public class PortraitTag extends BodyTagSupport {
 		linkText = fullName;
 	    }
 	    return new StringBuilder(
-		    "<a tabindex=\"0\" class=\"popover-link new-popover\" role=\"button\" data-toggle=\"popover\" data-id=\"popover-")
-			    .append(userId).append("\" data-portrait=\"").append(portraitId)
-			    .append("\" data-fullname=\"").append(fullName).append("\">").append(linkText)
-			    .append("</a>").toString();
+		    "<a tabindex=\"0\" class=\"popover-link new-popover\" role=\"button\" data-toggle=\"popover\" data-id=\"popover-").append(
+			    userId).append("\" data-portrait=\"").append(portraitId).append("\" data-fullname=\"")
+		    .append(fullName).append("\">").append(linkText).append("</a>").toString();
 	} else {
 	    return linkText != null ? linkText : "";
 	}
@@ -163,8 +165,8 @@ public class PortraitTag extends BodyTagSupport {
 
     private IUserManagementService getUserManagementService() {
 	if (userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(pageContext.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    pageContext.getServletContext());
 	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return userManagementService;

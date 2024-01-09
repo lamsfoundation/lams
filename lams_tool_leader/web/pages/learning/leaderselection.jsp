@@ -62,7 +62,7 @@
     <div id="container-main">
         <c:choose>
             <c:when test="${not empty groupLeader}">
-                <lams:LeaderDisplay username="${groupLeader.firstName} ${groupLeader.lastName}" userId="${groupLeader.userId}" />
+                <lams:LeaderDisplay username="${groupLeader.getFullName()}" userId="${groupLeader.userId}" />
             </c:when>
             <c:otherwise>
                 <fmt:message key="label.no.leader.yet.title" var="alertTitle"/>
@@ -83,7 +83,7 @@
                         <div id="user-${user.userId}" role="listitem" class="col-md-4 my-2 text-md-start">
                             <lams:Portrait userId="${user.userId}" />
                             <span>
-								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+								<c:out value="${user.getFullName()}" escapeXml="true" />
 							</span>
                         </div>
                     </c:forEach>
@@ -142,7 +142,7 @@
                             <div id="user-${user.userId}-modal" class="ps-2">
                                 <lams:Portrait userId="${user.userId}" />
                                 <span class="ms-2">
-									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+									<c:out value="${user.getFullName()}" escapeXml="true" />
 								</span>
                             </div>
                         </c:forEach>

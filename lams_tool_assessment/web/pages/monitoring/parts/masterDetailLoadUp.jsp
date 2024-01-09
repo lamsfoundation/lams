@@ -39,7 +39,7 @@
 		 	    		("<b><spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody></b>")
 		 	    	</c:when>
 		 	    	<c:when test="${not empty questionResult.markedBy}">
-		 	  			"<c:out value='${questionResult.markedBy.fullName}' />"
+		 	  			"<c:out value='${questionResult.markedBy.getFullName()}' />"
 		 	    	</c:when>
 		 	    	<c:otherwise>
 		 	    		""
@@ -58,4 +58,3 @@
 	};
 	masterDetailLoadUp();
 </script>
-   	  

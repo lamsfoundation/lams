@@ -51,7 +51,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public GBUserGridRowDTO(User user) {
 	this.id = user.getUserId().toString();
-	this.rowName = HtmlUtils.htmlEscape(user.getFirstName() + " " + user.getLastName());
+	this.rowName = HtmlUtils.htmlEscape(user.getFullName());
 	this.firstName = user.getFirstName();
 	this.lastName = user.getLastName();
 	this.login = user.getLogin();

@@ -323,7 +323,7 @@
 							rows += '<tr userId="' + userData['userId'] + '" ' + (isLeader ? 'class="info"' : '') + '>';
 
 							rows += '<td style="width: 80%">';
-							rows += 	userData['firstName'] + ' ' +userData['lastName'];
+							rows += 	userData['lastName'] + ' ' +userData['firstName'];
 							if (isLeader) {
 								rows += '&nbsp;<i title="<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.team.leader"/></spring:escapeBody>" class="text-primary fa fa-star"></i>';
 							}

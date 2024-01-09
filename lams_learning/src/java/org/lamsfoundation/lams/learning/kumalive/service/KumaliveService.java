@@ -254,7 +254,7 @@ public class KumaliveService implements IKumaliveService {
 	    rowJSON.put(CommonConstants.ELEMENT_ID, user.getUserId());
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
-	    cellJSON.add(user.getFirstName() + " " + user.getLastName());
+	    cellJSON.add(user.getFullName());
 	    // calculate average of scores for the given rubric
 	    for (Long rubric : rubrics) {
 		Double score = null;

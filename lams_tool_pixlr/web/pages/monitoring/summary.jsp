@@ -73,7 +73,7 @@
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
+						<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.getFullName()}" escapeXml="true"/></lams:Portrait>
 					</td>
 					
 					<td>

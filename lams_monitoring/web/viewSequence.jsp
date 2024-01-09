@@ -36,7 +36,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<c:forEach items="${learners}" var="learner">
 				<tr>
 					<td>
-						<c:out value="${learner.firstName}"/> <c:out value="${learner.lastName}"/><BR>
+						<c:out value="${learner.getFullName()}"/><br>
 					</td>
 				</tr>
 				</c:forEach>
@@ -52,5 +52,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
     </body>
 </lams:html>
-
-

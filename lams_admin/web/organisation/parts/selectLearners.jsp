@@ -67,7 +67,7 @@
 					<c:out value="${user.login}" />
 				</td>
 				<td>
-					<c:out value="${user.title}" />&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
+					<c:out value="${user.title}" />&nbsp;<c:out value="${user.getFullName()}" />" />
 				</td>
 				<td>
 					<c:out value="${user.email}" />

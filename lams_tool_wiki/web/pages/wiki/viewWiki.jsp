@@ -20,7 +20,7 @@
 				<strong><fmt:message key="label.wiki.history.editor"></fmt:message>:</strong> 
 				<c:choose>
 					<c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO != null}">
-						${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.firstName}
+						${currentWikiPage.currentWikiContentDTO.editorDTO.getFullName()}
 					</c:when>
 					<c:otherwise>
 						<fmt:message key="label.wiki.history.editor.author"></fmt:message>

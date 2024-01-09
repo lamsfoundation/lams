@@ -44,51 +44,47 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Daco
  *
  * @author Dapeng Ni
- *
- *
- *
  */
 @Entity
 @Table(name = "tl_ladaco10_users")
-public class DacoUser implements Cloneable {
-    private static final long serialVersionUID = -7043502180037866257L;
+public class DacoUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(DacoUser.class);
 
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
-    
+
     @Column(name = "user_id")
     private Long userId;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "login_name")
     private String loginName;
-    
+
     @Column(name = "session_finished")
     private boolean sessionFinished;
 
-    @ManyToOne(fetch = FetchType.LAZY) 
-    @JoinColumn(name = "session_uid") 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_uid")
     private DacoSession session;
-    
-    @ManyToOne(fetch = FetchType.LAZY) 
-    @JoinColumn(name = "content_uid") 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "content_uid")
     private Daco daco;
-    
-    @OneToMany(fetch = FetchType.EAGER,
-	    mappedBy = "user")
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @OrderBy("recordId ASC, uid ASC")
     private Set<DacoAnswer> answers = new LinkedHashSet<DacoAnswer>();
 
@@ -182,6 +178,10 @@ public class DacoUser implements Cloneable {
 	this.loginName = loginName;
     }
 
+    public String getLogin() {
+	return getLoginName();
+    }
+
     public DacoSession getSession() {
 	return session;
     }
@@ -241,9 +241,5 @@ public class DacoUser implements Cloneable {
 
     public void setAnswers(Set<DacoAnswer> answers) {
 	this.answers = answers;
-    }
-
-    public String getFullName() {
-	return new StringBuilder(getLastName()).append(" ").append(getFirstName()).toString();
     }
 }

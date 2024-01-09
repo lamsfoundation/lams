@@ -74,7 +74,7 @@ public class ResourceItemDTO {
 	    this.itemTitle = item.getTitle();
 	    ResourceUser user = item.getCreateBy();
 	    if (user != null) {
-		this.username = user.getFirstName() + " " + user.getLastName() + " (" + user.getLoginName() + ")";
+		this.username = user.getFullName() + " (" + user.getLoginName() + ")";
 	    }
 
 	    this.setAllowRating(item.isAllowRating());

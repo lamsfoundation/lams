@@ -155,7 +155,7 @@ public class LearningController {
 		nbUser = new NoticeboardUser(userID);
 		UserDTO user = getUserDTO(request);
 		nbUser.setUsername(user.getLogin());
-		nbUser.setFullname(user.getFirstName() + " " + user.getLastName());
+		nbUser.setFullname(user.getFullName());
 		nbService.addUser(toolSessionID, nbUser);
 	    }
 	} else {

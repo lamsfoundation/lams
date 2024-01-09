@@ -40,13 +40,14 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Andrey Balan
  */
 @Entity
 @Table(name = "tl_latask10_user")
-public class TaskListUser implements Cloneable {
+public class TaskListUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(TaskListUser.class);
 
     @Id
@@ -187,6 +188,11 @@ public class TaskListUser implements Cloneable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public TaskListSession getSession() {

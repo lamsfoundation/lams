@@ -75,8 +75,8 @@ public class LoginAsController {
 
 		    // If the user is an integration learner and ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS if off do not let syadmin log in
 		    // as they will not be able to access the index page. This test should be the same test as found in IndexAction.
-		    Boolean allowDirectAccessIntegrationLearner = Configuration
-			    .getAsBoolean(ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
+		    Boolean allowDirectAccessIntegrationLearner = Configuration.getAsBoolean(
+			    ConfigurationKeys.ALLOW_DIRECT_ACCESS_FOR_INTEGRATION_LEARNERS);
 		    if (!allowDirectAccessIntegrationLearner) {
 			boolean isIntegrationUser = integrationService.isIntegrationUser(user.getUserId());
 			if (isIntegrationUser && isOnlyLearner(user.getUserId())) {
@@ -93,9 +93,8 @@ public class LoginAsController {
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    logEventService.logEvent(LogEvent.TYPE_LOGIN_AS, sysadmin.getUserID(), user.getUserId(), null, null,
 			    message);
-		    StringBuilder logMessageBuilder = new StringBuilder("logged in as user ")
-			    .append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
-			    .append(user.getLogin()).append(")");
+		    StringBuilder logMessageBuilder = new StringBuilder("logged in as user ").append(user.getFullName())
+			    .append(" (").append(user.getLogin()).append(")");
 		    AuditLogFilter.log(AuditLogFilter.LOGIN_AS_ACTION, logMessageBuilder);
 
 		    // login.jsp knows what to do with these
@@ -123,9 +122,9 @@ public class LoginAsController {
 	Map<Integer, Set<Integer>> orgRoleSets = userManagementService.getRolesForUser(userId);
 	for (Set<Integer> orgRoleSet : orgRoleSets.values()) {
 	    for (Integer role : orgRoleSet) {
-		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR)
-			|| role.equals(Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_APPADMIN)
-			|| role.equals(Role.ROLE_SYSADMIN)) {
+		if (role.equals(Role.ROLE_AUTHOR) || role.equals(Role.ROLE_MONITOR) || role.equals(
+			Role.ROLE_GROUP_MANAGER) || role.equals(Role.ROLE_APPADMIN) || role.equals(
+			Role.ROLE_SYSADMIN)) {
 		    return false;
 		}
 	    }

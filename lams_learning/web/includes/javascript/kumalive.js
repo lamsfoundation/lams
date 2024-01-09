@@ -263,7 +263,7 @@ function processParticipants(message) {
 		var profilePicture = $('.profilePicture', learnerDiv);
 		// use profile picture or a coloured icon
 		addPortrait(profilePicture, learner.portraitUuid, learner.id, "large", true, LAMS_URL);
-		$('.name', learnerDiv).text(learner.firstName + ' ' + learner.lastName);
+		$('.name', learnerDiv).text(learner.lastName + ' ' + learner.firstName);
 		
 		if (roleTeacher) {
 			// teacher can see logins and chooses who speaks
@@ -427,7 +427,7 @@ function processPoll(message) {
 					profilePicture = $('.profilePicture', voterDiv);
 				// use profile picture or a coloured icon
 				addPortrait(profilePicture, voter.portraitUuid, voter.id, "large", true, LAMS_URL);
-				$('.name', voterDiv).text(voter.firstName + ' ' + voter.lastName);
+				$('.name', voterDiv).text(voter.lastName + ' ' + voter.firstName);
 				
 				if (roleTeacher) {
 					// teacher can see logins and chooses who speaks

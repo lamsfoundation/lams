@@ -78,7 +78,7 @@
 				<c:forEach var="user" items="${userLessonsMap}">
 					<div style="display: inline-block">
 						<span class="loffset10"><lams:Portrait userId="${user.key.userId}"/>&nbsp;<strong><c:out
-								value="${user.key.firstName} ${user.key.lastName}" /></strong></span>
+								value="${user.key.getFullName()}" /></strong></span>
 						<c:choose>
 							<c:when test="${user.value ne null and not empty user.value}">
 								<ul>

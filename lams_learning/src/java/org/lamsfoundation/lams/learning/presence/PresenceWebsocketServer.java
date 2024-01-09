@@ -71,8 +71,8 @@ public class PresenceWebsocketServer {
 			Entry<Long, Set<Session>> entry = lessonIterator.next();
 			Long lessonId = entry.getKey();
 			Long lastSendTime = lastSendTimes.get(lessonId);
-			if ((lastSendTime == null)
-				|| ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
+			if ((lastSendTime == null) || ((System.currentTimeMillis() - lastSendTime)
+				>= SendWorker.CHECK_INTERVAL)) {
 			    SendWorker.send(lessonId, null);
 			}
 
@@ -239,12 +239,12 @@ public class PresenceWebsocketServer {
 	String login = websocket.getUserPrincipal().getName();
 	User user = PresenceWebsocketServer.getUserManagementService().getUserByLogin(login);
 
-	String nickname = user.getFirstName() + " " + user.getLastName();
+	String nickname = user.getFullName();
 	websocket.getUserProperties().put(PARAM_NICKNAME, nickname);
 	websocket.getUserProperties().put(AttributeNames.PARAM_LESSON_ID, lessonId);
 
-	PresenceWebsocketServer.getSecurityService().ensureLessonParticipant(lessonId, user.getUserId(),
-		"join lesson chat");
+	PresenceWebsocketServer.getSecurityService()
+		.ensureLessonParticipant(lessonId, user.getUserId(), "join lesson chat");
 
 	Set<Session> lessonWebsockets = PresenceWebsocketServer.websockets.get(lessonId);
 	if (lessonWebsockets == null) {
@@ -272,8 +272,8 @@ public class PresenceWebsocketServer {
 	}).start();
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
-	    PresenceWebsocketServer.log
-		    .debug("User " + nickname + " entered Presence Chat with lesson ID: " + lessonId);
+	    PresenceWebsocketServer.log.debug(
+		    "User " + nickname + " entered Presence Chat with lesson ID: " + lessonId);
 	}
     }
 
@@ -287,8 +287,9 @@ public class PresenceWebsocketServer {
 	PresenceWebsocketServer.removeWebsocket(websocket, lessonWebsockets);
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
-	    PresenceWebsocketServer.log.debug("User " + websocket.getUserProperties().get(PARAM_NICKNAME)
-		    + " left Presence Chat with lessonId: " + lessonId);
+	    PresenceWebsocketServer.log.debug(
+		    "User " + websocket.getUserProperties().get(PARAM_NICKNAME) + " left Presence Chat with lessonId: "
+			    + lessonId);
 	}
     }
 
@@ -337,8 +338,8 @@ public class PresenceWebsocketServer {
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
-		PresenceWebsocketServer.getPresenceChatService().createPresenceChatMessage(lessonId, from, finalTo,
-			new Date(), message);
+		PresenceWebsocketServer.getPresenceChatService()
+			.createPresenceChatMessage(lessonId, from, finalTo, new Date(), message);
 	    } finally {
 		HibernateSessionManager.closeSession();
 	    }
@@ -435,8 +436,8 @@ public class PresenceWebsocketServer {
 
     private static IPresenceChatService getPresenceChatService() {
 	if (PresenceWebsocketServer.presenceChatService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
 	    PresenceWebsocketServer.presenceChatService = (IPresenceChatService) ctx.getBean("presenceChatService");
 	}
 	return PresenceWebsocketServer.presenceChatService;
@@ -444,8 +445,8 @@ public class PresenceWebsocketServer {
 
     private static ISecurityService getSecurityService() {
 	if (PresenceWebsocketServer.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
 	    PresenceWebsocketServer.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return PresenceWebsocketServer.securityService;
@@ -453,8 +454,8 @@ public class PresenceWebsocketServer {
 
     private static ILessonService getLessonService() {
 	if (PresenceWebsocketServer.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
 	    PresenceWebsocketServer.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return PresenceWebsocketServer.lessonService;
@@ -462,10 +463,10 @@ public class PresenceWebsocketServer {
 
     private static IUserManagementService getUserManagementService() {
 	if (PresenceWebsocketServer.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getWebApplicationContext(SessionManager.getServletContext());
-	    PresenceWebsocketServer.userManagementService = (IUserManagementService) ctx
-		    .getBean("userManagementService");
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
+		    SessionManager.getServletContext());
+	    PresenceWebsocketServer.userManagementService = (IUserManagementService) ctx.getBean(
+		    "userManagementService");
 	}
 	return PresenceWebsocketServer.userManagementService;
     }

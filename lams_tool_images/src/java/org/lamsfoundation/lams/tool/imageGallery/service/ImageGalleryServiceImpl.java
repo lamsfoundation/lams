@@ -600,7 +600,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 
     @Override
     public void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser) {
-	String userName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
+	String userName = imageGalleryUser.getFullName();
 	String message = messageService.getMessage("event.imagesubmit.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }

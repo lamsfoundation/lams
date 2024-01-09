@@ -44,7 +44,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- *
  * Represents tool users.
  *
  * @author Ozgur Demirtas
@@ -84,7 +83,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     public QaQueUsr() {
 	this.qaUsrResps = new TreeSet<>();
-    };
+    }
 
     /** full constructor */
     public QaQueUsr(Long queUsrId, String username, String fullname, QaSession qaSession, Set<QaUsrResp> qaUsrResps) {
@@ -99,7 +98,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
      * Copy constructor; We copy all data except the hibernate id field.
      *
      * @param queUsr
-     *            the original survey question user object.
+     * 	the original survey question user object.
      * @return the survey question user object.
      */
     public QaQueUsr newInstance(QaQueUsr queUsr) {
@@ -116,7 +115,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param fullName
-     *            The fullName to set.
+     * 	The fullName to set.
      */
     public void setFullname(String fullname) {
 	this.fullname = fullname;
@@ -131,7 +130,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param qaSession
-     *            The qaSession to set.
+     * 	The qaSession to set.
      */
     public void setQaSession(QaSession qaSession) {
 	this.qaSession = qaSession;
@@ -146,7 +145,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param qaUsrResps
-     *            The qaUsrResps to set.
+     * 	The qaUsrResps to set.
      */
     public void setQaUsrResps(Set<QaUsrResp> qaUsrResps) {
 	this.qaUsrResps = qaUsrResps;
@@ -161,7 +160,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param queUsrId
-     *            The queUsrId to set.
+     * 	The queUsrId to set.
      */
     public void setQueUsrId(Long queUsrId) {
 	this.queUsrId = queUsrId;
@@ -176,7 +175,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param username
-     *            The username to set.
+     * 	The username to set.
      */
     public void setUsername(String username) {
 	this.username = username;
@@ -211,7 +210,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param uid
-     *            The uid to set.
+     * 	The uid to set.
      */
     public void setUid(Long uid) {
 	this.uid = uid;
@@ -226,7 +225,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param responseFinalized
-     *            The responseFinalized to set.
+     * 	The responseFinalized to set.
      */
     public void setResponseFinalized(boolean responseFinalized) {
 	this.responseFinalized = responseFinalized;
@@ -241,7 +240,7 @@ public class QaQueUsr implements Serializable, Comparable<QaQueUsr> {
 
     /**
      * @param learnerFinished
-     *            The learnerFinished to set.
+     * 	The learnerFinished to set.
      */
     public void setLearnerFinished(boolean learnerFinished) {
 	this.learnerFinished = learnerFinished;

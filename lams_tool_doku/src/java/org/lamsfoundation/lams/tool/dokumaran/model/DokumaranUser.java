@@ -39,6 +39,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Dokumaran user
@@ -47,7 +48,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_ladoku11_user")
-public class DokumaranUser implements Cloneable {
+public class DokumaranUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(DokumaranUser.class);
 
     @Id
@@ -187,6 +188,10 @@ public class DokumaranUser implements Cloneable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    public String getLogin() {
+	return getLoginName();
     }
 
     public DokumaranSession getSession() {

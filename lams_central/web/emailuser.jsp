@@ -98,7 +98,7 @@
 						value="" /> <span><label><fmt:message
 								key="email.to" />:</label> <c:if test="${not empty user}">
 							<lams:Portrait userId="${user.userId}"/> 
-							<c:out value="${user.lastName}, ${user.firstName}" /> &lt;<c:out
+							<c:out value="${user.getFullName()}" /> &lt;<c:out
 								value="${user.email}" />&gt;
 							 </c:if> </span>
 

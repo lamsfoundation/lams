@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.dto;
 
 import java.util.ArrayList;
@@ -69,7 +67,7 @@ public class MessageDTO {
 	MessageDTO dto = new MessageDTO();
 	dto.setMessage(msg);
 	if (msg.getCreatedBy() != null) {
-	    dto.setAuthor(msg.getCreatedBy().getFirstName() + " " + msg.getCreatedBy().getLastName());
+	    dto.setAuthor(msg.getCreatedBy().getFullName());
 	    dto.setAuthorUserId(msg.getCreatedBy().getUserId());
 	}
 	if ((msg.getAttachments() == null) || msg.getAttachments().isEmpty()) {
@@ -106,7 +104,7 @@ public class MessageDTO {
 	    MessageDTO msgDto = new MessageDTO();
 	    msgDto.setMessage(msg);
 	    if (msg.getCreatedBy() != null) {
-		msgDto.setAuthor(msg.getCreatedBy().getFirstName() + " " + msg.getCreatedBy().getLastName());
+		msgDto.setAuthor(msg.getCreatedBy().getFullName());
 		msgDto.setAuthorUserId(msg.getCreatedBy().getUserId());
 	    }
 

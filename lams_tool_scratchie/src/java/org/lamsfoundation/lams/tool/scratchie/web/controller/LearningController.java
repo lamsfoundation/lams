@@ -148,7 +148,7 @@ public class LearningController {
 	sessionMap.put(ScratchieConstants.ATTR_RESOURCE_INSTRUCTION, scratchie.getInstructions());
 	sessionMap.put(ScratchieConstants.ATTR_USER_ID, user.getUserId());
 	sessionMap.put(ScratchieConstants.ATTR_USER_UID, user.getUid());
-	String groupLeaderName = groupLeader.getFirstName() + " " + groupLeader.getLastName();
+	String groupLeaderName = groupLeader.getFullName();
 	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER_NAME, groupLeaderName);
 	sessionMap.put(ScratchieConstants.ATTR_GROUP_LEADER_USER_ID, groupLeader.getUserId());
 	boolean isUserLeader = toolSession.isUserGroupLeader(user.getUid());
@@ -264,8 +264,8 @@ public class LearningController {
 	if (questionEtherpadEnabled && scratchieService.isGroupedActivity(scratchie.getContentId())) {
 	    // get all users from the group, even if they did not reach the Scratchie yet
 	    // order them by first and last name
-	    Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream()
-		    .sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName())).collect(Collectors.toList());
+	    Collection<User> allGroupUsers = scratchieService.getAllGroupUsers(toolSessionID).stream().sorted()
+		    .collect(Collectors.toList());
 	    request.setAttribute(ScratchieConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
 	}
 
@@ -617,7 +617,8 @@ public class LearningController {
      * Finish learning session.
      */
     @RequestMapping("/finish")
-    public void finish(HttpServletRequest request, HttpServletResponse response) throws IOException, ScratchieApplicationException {
+    public void finish(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ScratchieApplicationException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	HttpSession ss = SessionManager.getSession();

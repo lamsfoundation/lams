@@ -40,9 +40,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Handles the learner interfaces for gradebook.
- * This is where marking for an activity/lesson takes place
- * 
+ * Handles the learner interfaces for gradebook. This is where marking for an activity/lesson takes place
+ *
  * @author lfoxton
  */
 @Controller
@@ -71,7 +70,8 @@ public class GradebookLearningController {
 		return "error";
 	    }
 	    if (!securityService.hasOrgRole(oranisationID, user.getUserID(),
-		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "get course gradebook for learner")) {
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER },
+		    "get course gradebook for learner")) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 		return null;
 	    }
@@ -79,10 +79,11 @@ public class GradebookLearningController {
 		logger.debug("Getting learner gradebook for organisation: " + oranisationID);
 	    }
 
-	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, oranisationID);
+	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
+		    oranisationID);
 	    request.setAttribute("organisationID", oranisationID);
 	    request.setAttribute("organisationName", organisation.getName());
-	    request.setAttribute("fullName", user.getFirstName() + " " + user.getLastName());
+	    request.setAttribute("fullName", user.getFullName());
 
 	    return "gradebookCourseLearner";
 	} catch (Exception e) {

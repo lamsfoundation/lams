@@ -27,7 +27,7 @@
 			<%-- Learner interface uses attribues, Monitor uses parameters --%>
 			presenceEnabled = ${param.presenceEnabledPatch eq 'true' or presenceEnabledPatch},
 			presenceShown = ${param.presenceShown eq 'true' or presenceShown},
-			nickname = '<lams:user property="firstName"/>' + ' ' + '<lams:user property="lastName"/>',
+			nickname = '<lams:user property="lastName"/>' + ' ' + '<lams:user property="firstName"/>',
 			// labels used in JS file
 			labelSend = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="learner.im.send"/></spring:escapeBody>',
 			labelUsers = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="learner.im.users"/></spring:escapeBody>',

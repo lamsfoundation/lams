@@ -27,7 +27,7 @@ public class PermissionGateDTO {
 	this.openTime = gate.getGateOpenTime();
 	User openUser = gate.getGateOpenUser();
 	if (openUser != null) {
-	    this.openUser = openUser.getFirstName() + " " + openUser.getLastName();
+	    this.openUser = openUser.getFullName();
 	}
     }
 

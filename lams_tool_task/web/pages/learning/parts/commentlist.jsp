@@ -26,7 +26,7 @@
 						
 				<c:choose>
 					<c:when test="${not empty comment.createBy.firstName or not empty comment.createBy.lastName}">
-						<c:out escapeXml="true" value="${comment.createBy.firstName} ${comment.createBy.lastName}"/>
+						<c:out escapeXml="true" value="${comment.createBy.lastName} ${comment.createBy.firstName}"/>
 					</c:when>
 					<c:otherwise>
 						<fmt:message key="label.default.user.name" />

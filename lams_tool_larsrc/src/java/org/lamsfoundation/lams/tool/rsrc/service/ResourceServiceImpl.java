@@ -500,10 +500,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	ResourceUser resourceUser = item.getCreateBy();
 	ResourceSession session = resourceUser.getSession();
 
-	String userName = new StringBuilder().append(
-			StringUtils.isBlank(resourceUser.getFirstName()) ? "" : resourceUser.getFirstName() + " ")
-		.append(StringUtils.isBlank(resourceUser.getLastName()) ? "" : resourceUser.getLastName() + " ")
-		.append("(").append(resourceUser.getLoginName()).append(")").toString();
+	String userName = new StringBuilder().append(resourceUser.getFullName()).append("(")
+		.append(resourceUser.getLoginName()).append(")").toString();
 	String resourceType = getLocalisedMessage(item.getType() == ResourceConstants.RESOURCE_TYPE_URL
 		? "label.authoring.basic.resource.url"
 		: "label.authoring.basic.resource.file", new Object[] {});

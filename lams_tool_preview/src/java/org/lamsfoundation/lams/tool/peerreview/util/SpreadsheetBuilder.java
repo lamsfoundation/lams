@@ -360,8 +360,8 @@ public class SpreadsheetBuilder {
 	    if (comment[1] != null) {
 		if (showForName && !isUserNameRowPrinted) {
 		    ExcelRow userNameRow = sessionSheet.initRow();
-		    userNameRow.addCell(service.getLocalisedMessage("label.for.user", new Object[] {
-			    StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()) }));
+		    userNameRow.addCell(service.getLocalisedMessage("label.for.user",
+			    new Object[] { StringEscapeUtils.escapeCsv(user.getFullName()) }));
 		    isUserNameRowPrinted = true;
 		}
 

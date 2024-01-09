@@ -561,7 +561,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     }
 
     private synchronized String createNickname(ChatUser chatUser) {
-	String desiredNickname = chatUser.getFirstName() + " " + chatUser.getLastName() + " ";
+	String desiredNickname = chatUser.getFullName() + " ";
 	String nickname = desiredNickname;
 
 	boolean valid = false;

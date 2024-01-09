@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.usermanagement.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 
 import java.util.Comparator;
@@ -23,4 +24,23 @@ public interface IUserDetails extends Comparable<IUserDetails> {
     String getLastName();
 
     String getLogin();
+
+    default String getFullName() {
+	String lastName = getLastName();
+	String firstName = getFirstName();
+	StringBuilder fullNameBuilder = new StringBuilder();
+	if (StringUtils.isNotBlank(lastName)) {
+	    fullNameBuilder.append(lastName);
+	}
+	if (StringUtils.isNotBlank(firstName)) {
+	    if (fullNameBuilder.length() > 0) {
+		fullNameBuilder.append(" ");
+	    }
+	    fullNameBuilder.append(firstName);
+	}
+	if (fullNameBuilder.length() == 0) {
+	    return "";
+	}
+	return fullNameBuilder.toString();
+    }
 }

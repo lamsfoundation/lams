@@ -587,7 +587,7 @@
 
         <c:if test="${isLeadershipEnabled}">
             <lams:LeaderDisplay idName="leader-info"
-                                username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
+                                username="${sessionMap.groupLeader.getFullName()}" userId="${sessionMap.groupLeader.userId}"/>
         </c:if>
 
         <c:if test="${assessment.allowDiscloseAnswers}">

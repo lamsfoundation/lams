@@ -517,7 +517,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	    return;
 	}
 
-	String userName = surveyUser.getLastName() + " " + surveyUser.getFirstName();
+	String userName = surveyUser.getFullName();
 	String message = getLocalisedMessage("event.answer.submit.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }

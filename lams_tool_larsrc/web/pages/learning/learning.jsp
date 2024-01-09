@@ -290,7 +290,7 @@
 
 								<c:if test="${!item.createByAuthor && item.createBy != null}">
 									<span class="badge text-bg-warning rounded-pill mx-2">
-										[<c:out value="${item.createBy.firstName} ${item.createBy.lastName}" escapeXml="true" />]
+										[<c:out value="${item.createBy.getFullName()}" escapeXml="true" />]
 									</span>
                                 </c:if>
 							</button>

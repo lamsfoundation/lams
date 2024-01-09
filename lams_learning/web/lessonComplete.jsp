@@ -161,7 +161,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<i class="fa-regular fa-lg fa-circle-check text-success"></i>&nbsp;
 			<fmt:message key="message.lesson.finished">
 				<fmt:param>
-					<strong><c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/></strong>
+					<strong><c:out value="${lastName}" escapeXml="true"/>&nbsp;<c:out value="${firstName}" escapeXml="true"/></strong>
 				</fmt:param>
 			</fmt:message>
 		</div>

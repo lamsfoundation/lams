@@ -47,7 +47,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " AS u WHERE u.userId =? AND u.session.sessionId=?";
 
     private static final String FIND_BY_SESSION_ID = "FROM " + PeerreviewUser.class.getName()
-	    + " AS u WHERE u.session.sessionId=? AND u.hidden=0 ORDER BY u.firstName, u.lastName";
+	    + " AS u WHERE u.session.sessionId=? AND u.hidden=0 ORDER BY u.lastName, u.firstName";
 
     private static final String GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER = "SELECT COUNT(*) FROM "
 	    + PeerreviewUser.class.getName() + " AS u WHERE u.session.sessionId=? AND u.userId!=? AND u.hidden=0";
@@ -160,10 +160,10 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		sortingOrder = " ORDER BY user.user_id";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = " ORDER BY user.first_name ASC";
+		sortingOrder = " ORDER BY user.last_name ASC";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = " ORDER BY user.first_name DESC";
+		sortingOrder = " ORDER BY user.last_name DESC";
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
 		if (criteria.isCommentRating()) {
@@ -258,10 +258,10 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		sortingOrder = " ORDER BY user.user_id";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = " ORDER BY user.first_name ASC";
+		sortingOrder = " ORDER BY user.last_name ASC";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = " ORDER BY user.first_name DESC";
+		sortingOrder = " ORDER BY user.last_name DESC";
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
 		sortingOrder = " ORDER BY rating.comment_count ASC";
@@ -293,7 +293,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     public List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting,
 	    String searchString) {
 
-	String GET_USERS_FOR_SESSION = "SELECT user.uid, user.hidden, CONCAT(user.firstName, ' ', user.lastName) FROM "
+	String GET_USERS_FOR_SESSION = "SELECT user.uid, user.hidden, CONCAT(user.lastName, ' ', user.firstName) FROM "
 		+ PeerreviewUser.class.getName() + " user WHERE user.session.sessionId = :toolSessionId ";
 
 	String sortingOrder = "";

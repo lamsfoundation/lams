@@ -575,8 +575,7 @@ public class PeerreviewServiceImpl
     @Override
     public Map<PeerreviewUser, StyledCriteriaRatingDTO> getRubricsLearnerData(Long toolSessionId,
 	    RatingCriteria criteria, Collection<RatingCriteria> criterias) {
-	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>(
-		Comparator.comparing(PeerreviewUser::getFirstName).thenComparing(PeerreviewUser::getLastName));
+	Map<PeerreviewUser, StyledCriteriaRatingDTO> learnerData = new TreeMap<>();
 
 	criterias = criterias.stream()
 		.filter(c -> criteria.getRatingCriteriaGroupId().equals(c.getRatingCriteriaGroupId()))

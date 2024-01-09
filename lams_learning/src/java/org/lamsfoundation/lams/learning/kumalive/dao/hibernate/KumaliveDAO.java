@@ -45,7 +45,7 @@ public class KumaliveDAO extends LAMSBaseDAO implements IKumaliveDAO {
     private static final String FIND_RUBRICS_BY_ORGANISATION = "FROM " + KumaliveRubric.class.getName()
 	    + " AS r WHERE r.organisation.organisationId = ? AND r.kumalive IS NULL ORDER BY r.orderId ASC";
     private static final String FIND_SCORE_BY_KUMALIVE = "FROM " + KumaliveScore.class.getName()
-	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? ORDER BY s.user.firstName ";
+	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? ORDER BY s.user.lastName ";
     private static final String FIND_SCORE_BY_KUMALIVE_AND_USER = "FROM " + KumaliveScore.class.getName()
 	    + " AS s WHERE s.rubric.kumalive.kumaliveId = ? AND s.user.userId = ?";
     private static final String FIND_CURRENT_POLL_BY_KUMALIVE = "FROM " + KumalivePoll.class.getName()

@@ -59,9 +59,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 /**
  * @author jliew
  *
- *         Saves roles for users that were just added.
- *         Uses session scope because using request scope doesn't copy the form data
- *         into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
+ * 	Saves roles for users that were just added. Uses session scope because using request scope doesn't copy the form
+ * 	data into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
  */
 @Controller
 @SessionAttributes("userOrgRoleForm")
@@ -116,16 +115,16 @@ public class UserOrgRoleSaveController {
 	    }
 
 	    List<String> userRolesList = Arrays.asList(roleIds);
-	    if (userRolesList.contains(Role.ROLE_SYSADMIN.toString())
-		    && !userRolesList.contains(Role.ROLE_APPADMIN.toString())) {
+	    if (userRolesList.contains(Role.ROLE_SYSADMIN.toString()) && !userRolesList.contains(
+		    Role.ROLE_APPADMIN.toString())) {
 		//all sysadmins are also appadmins
 		userRolesList = new ArrayList<>(userRolesList);
 		userRolesList.add(Role.ROLE_APPADMIN.toString());
 	    }
 	    userManagementService.setRolesForUserOrganisation(user, orgId, userRolesList);
 
-	    if (userRolesList.contains(Role.ROLE_APPADMIN.toString())
-		    && !userRolesList.contains(Role.ROLE_SYSADMIN.toString())) {
+	    if (userRolesList.contains(Role.ROLE_APPADMIN.toString()) && !userRolesList.contains(
+		    Role.ROLE_SYSADMIN.toString())) {
 		// appadmin need to have 2FA on, unless sysadmin says otherwise in user edit panels
 		user.setTwoFactorAuthenticationEnabled(true);
 		userManagementService.save(user);
@@ -140,10 +139,11 @@ public class UserOrgRoleSaveController {
 		}
 	    }
 
-	    List<String> roles = Stream.of(roleIds).collect(Collectors
-		    .mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)), Collectors.toUnmodifiableList()));
-	    logMessageBuilder.append("to user ").append(user.getFirstName()).append(" ").append(user.getLastName())
-		    .append(" (").append(user.getLogin()).append(") assigned roles ").append(roles);
+	    List<String> roles = Stream.of(roleIds).collect(
+		    Collectors.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)),
+			    Collectors.toUnmodifiableList()));
+	    logMessageBuilder.append("to user ").append(user.getFullName()).append(" (").append(user.getLogin())
+		    .append(") assigned roles ").append(roles);
 	    if (i < userBeans.size() - 1) {
 		logMessageBuilder.append(", ");
 	    }

@@ -147,11 +147,11 @@ public class AuditLogFilter extends OncePerRequestFilter {
 	if (StringUtils.isBlank(login)) {
 	    logMessageBuilder.append("Unauthenticated user | ");
 	} else {
-	    if (StringUtils.isNotBlank(firstName)) {
-		logMessageBuilder.append(firstName).append(" ");
-	    }
 	    if (StringUtils.isNotBlank(lastName)) {
 		logMessageBuilder.append(lastName).append(" ");
+	    }
+	    if (StringUtils.isNotBlank(firstName)) {
+		logMessageBuilder.append(firstName).append(" ");
 	    }
 	    logMessageBuilder.append("(").append(login).append(") | ");
 	}

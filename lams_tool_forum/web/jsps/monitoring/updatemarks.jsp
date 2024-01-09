@@ -24,8 +24,7 @@
 		
 			<p>
 				<fmt:message key="message.assign.mark" />&nbsp;
-				<c:out value="${user.firstName}" />&nbsp;
-				<c:out value="${user.lastName}" />&nbsp;
+				<c:out value="${user.getFullName()}" />&nbsp;
 				<lams:Date value="${topic.message.updated}" timeago="true"/>
 			</p>		
 			
@@ -86,6 +85,3 @@
 			</lams:Page>
 	</body>
 </lams:html>
-
-
-

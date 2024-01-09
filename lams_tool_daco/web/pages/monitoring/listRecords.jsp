@@ -69,7 +69,7 @@
 		</tr>
 		<tr>
 			<td style="height: 20px;">
-				 <c:out value="${user.fullName}" escapeXml="true"/>
+				 <c:out value="${user.getFullName()}" escapeXml="true"/>
 			</td>
 			<td>
 				 ${user.recordCount}
