@@ -1,5 +1,15 @@
 @import "_lams_variables.scss";
 
+.instructions, #all-questions {
+	-webkit-user-select: none; 
+	user-select: none;
+}
+
+@media print {
+	.instructions, #all-questions {
+		display: none;
+	}	
+}
 
 .innerforms {
 	border: 0px;
