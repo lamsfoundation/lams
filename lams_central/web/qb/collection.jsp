@@ -378,7 +378,7 @@
 
 			<c:if test="${isAiEnabled}">
 			function importOpenAi() {
-				launchPopup('<lams:LAMSURL/>ai/authoring/ratMcq.do', 'OpenAiForm');
+				launchPopup('<lams:LAMSURL/>ai/authoring/tbl/ratMcq.do', 'OpenAiForm');
 			}
 			</c:if>
 
