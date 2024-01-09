@@ -49,11 +49,11 @@
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-        <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
-        <lams:JSImport src="includes/javascript/websocket.js" />
-        <lams:JSImport src="includes/javascript/dialog5.js" />
-        <lams:JSImport src="includes/javascript/common.js" />
         <c:if test="${showHeader}">
+	        <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
+	        <lams:JSImport src="includes/javascript/websocket.js" />
+	        <lams:JSImport src="includes/javascript/dialog5.js" />
+	        <lams:JSImport src="includes/javascript/common.js" />
         	<lams:JSImport src="learning/includes/javascript/learnerPage.js" />
 	        <script>
 	            const LAMS_URL = '<lams:LAMSURL/>',
@@ -121,7 +121,7 @@
 			</c:if>
 	
 			<div class="component-page-content">
-	            <a href="#component-main-content" class="visually-hidden-focusable p-2">
+	            <a href="#component-main-content" class="visually-hidden-focusable btn btn-sm btn-light p-2">
 	            	<fmt:message key='label.skip.to.main.content'/>
 	            </a>
 	
