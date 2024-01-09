@@ -155,7 +155,7 @@
 		                            <div class="col-6 text-start p-0">
 		                                <fmt:message key='label.progress'/>
 		                            </div>
-		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value"></div>
+		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value">%</div>
 		                        </div>
 		                        <div class="progress mt-1 mb-2">
 		                        	<div class="progress-bar bg-success" role="progressbar"

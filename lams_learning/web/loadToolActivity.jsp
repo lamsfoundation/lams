@@ -98,7 +98,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<div class="col-6 text-start p-0">
 							<fmt:message key='label.progress'/>
 						</div>
-						<div class="col-6 text-end p-0" id="progress-bar-widget-value">0%</div>
+						<div class="col-6 text-end p-0" id="progress-bar-widget-value">%</div>
 					</div>
 					<div class="progress mt-1 mb-2">
 						<div class="progress-bar bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%;"></div>
