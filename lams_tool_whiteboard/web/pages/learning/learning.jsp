@@ -292,20 +292,21 @@
                     </c:when>
 
                     <c:otherwise>
-						<a href="#nogo" name="FinishButton" id="finish-button"
-						   class="btn btn-primary voffset5 pull-right na"
-								<c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
-									style="display: none"
-								</c:if>>
+                        <button name="FinishButton" id="finish-button"
+                                class="btn btn-primary voffset5 pull-right na"
+                                <c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
+                                    style="display: none"
+                                </c:if>>
 							<span class="nextActivity">
-                            <c:choose>
-                                <c:when test="${sessionMap.isLastActivity}">
-                                    <fmt:message key="label.submit" />
-                                </c:when>
-                                <c:otherwise>
-                                    <fmt:message key="label.finished" />
-                                </c:otherwise>
-                            </c:choose>
+                                <c:choose>
+                                    <c:when test="${sessionMap.isLastActivity}">
+                                        <fmt:message key="label.submit" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <fmt:message key="label.finished" />
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
                         </button>
                     </c:otherwise>
                 </c:choose>
