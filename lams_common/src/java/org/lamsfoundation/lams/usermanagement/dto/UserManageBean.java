@@ -21,37 +21,28 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.usermanagement.dto;
+
+import org.lamsfoundation.lams.usermanagement.Role;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lamsfoundation.lams.usermanagement.Role;
-
 /**
  * @author Jun-Dir Liew
  *
- *         Created at 13:34:33 on 9/06/2006
+ * 	Created at 13:34:33 on 9/06/2006
  */
 public class UserManageBean implements Comparable {
 
-    /**
-     * UserManageBean Constructor
-     *
-     * @param
-     */
-    public UserManageBean() {
-	super();
-
-    }
-
     private Integer userId;
     private String login;
+    private String email;
     private String title;
     private String firstName;
     private String lastName;
-    private List<Role> roles = new ArrayList<Role>();;
+    private List<Role> roles = new ArrayList<Role>();
+    ;
 
     public Integer getUserId() {
 	return this.userId;
@@ -67,6 +58,14 @@ public class UserManageBean implements Comparable {
 
     public void setLogin(String login) {
 	this.login = login;
+    }
+
+    public String getEmail() {
+	return email;
+    }
+
+    public void setEmail(String email) {
+	this.email = email;
     }
 
     public String getTitle() {
