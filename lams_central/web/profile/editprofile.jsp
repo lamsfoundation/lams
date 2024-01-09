@@ -45,7 +45,7 @@
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
-		<lams:errors path="*"/>
+		<lams:errors5 path="*"/>
 
 		<div style="clear: both;"></div>
 		<div class="container">

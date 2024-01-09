@@ -19,7 +19,8 @@
 			$(document).ready(function(){
 				// validate signup form on keyup and submit
 				var validator = $("#ltiConsumerForm").validate({
-					errorClass: 'text-danger form-text font-italic',
+					validClass: "is-valid",
+				  	errorClass: 'is-invalid',
 					rules: {
 						serverid: "required",
 						serverkey: "required",

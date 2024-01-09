@@ -69,11 +69,10 @@
 			initFileUpload('${resourceItemForm.tmpFileUploadId}', extensionValidation, '<lams:user property="localeLanguage"/>');
 		});	
 					
-		$('#resourceItemForm').submit(submitResourceForm)
-							  .validate({
+		$('#resourceItemForm').submit(submitResourceForm).validate({
 				ignore: 'hidden, div.cke_editable',
-				errorClass: "text-danger",
-				wrapper: "span",
+				validClass: "is-valid",
+			  	errorClass: 'is-invalid',
 				rules: {
 				    title: {
 				    	required: true

@@ -62,11 +62,6 @@
 		.ui-jqgrid-btable tr.success > td {
 			background-color: transparent !important;
 		}
-		
-		#formValidationErrors {
-			display: none;
-			text-align: center;		
-		}
 	</style>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -115,7 +110,7 @@
 												grid.slideUp();
 												pass.val(null).prop('disabled', true);
 											}
-										});
+									});
 	
 			// generate new password on click
 			$('.generatePassword').click(function(){
@@ -130,12 +125,10 @@
 				});
 			});
 			
-			
-			
 			// Setup form validation 
 			$("#orgPasswordChangeForm").validate({
-				errorLabelContainer : '#formValidationErrors',
-				errorClass : 'errorMessage',
+				validClass: "is-valid",
+				errorClass: 'is-invalid',
 				rules : {
 					learnerPass : {
 						required: false,
@@ -151,7 +144,6 @@
 						charactersAllowed : true,
 						pwcheck : true
 					}
-					
 				},
 	
 				// Specify the validation error messages
@@ -411,10 +403,7 @@
 								<h4><fmt:message key="admin.org.password.change.success" /></h4>
 							</lams:Alert5>
 						</c:if>
-						
-						<div id="formValidationErrors">
-							<ul></ul>
-						</div>
+
 						<h4><fmt:message key="admin.org.password.change.choose" /></h4>
 						<table id="changeTable">
 							<tbody>
