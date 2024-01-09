@@ -233,8 +233,7 @@
 			sortInitialOrder: 'asc',
 			sortList: [[0]],
 			widgets: [ "uitheme", "resizable", "editable" ],
-			headers: { 0: { sorter: true}, 1: { sorter: true}  },
-			sortList : [[0,1]],
+			headers: { 0: { sorter: true}, 1: { sorter: false}  },
 			showProcessing: false,
 			widgetOptions: {
 				resizable: true,

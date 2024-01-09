@@ -94,10 +94,8 @@ public class MonitoringController {
 
     public static Logger log = Logger.getLogger(MonitoringController.class);
 
-    public static final int LEARNER_MARKS_SORTING_FIRST_NAME_ASC = 0;
-    public static final int LEARNER_MARKS_SORTING_FIRST_NAME_DESC = 1;
-    public static final int LEARNER_MARKS_SORTING_LAST_NAME_ASC = 2;
-    public static final int LEARNER_MARKS_SORTING_LAST_NAME_DESC = 3;
+    public static final int LEARNER_MARKS_SORTING_FULL_NAME_ASC = 0;
+    public static final int LEARNER_MARKS_SORTING_FULL_NAME_DESC = 1;
 
     @Autowired
     private IWhiteboardService whiteboardService;
@@ -184,19 +182,12 @@ public class MonitoringController {
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
-	Integer isSortFirstName = WebUtil.readIntParam(request, "column[0]", true);
-	Integer isSortLastName = WebUtil.readIntParam(request, "column[1]", true);
+	Integer isSortFullName = WebUtil.readIntParam(request, "column[0]", true);
 
 	// identify sorting type
-	int sorting = LEARNER_MARKS_SORTING_LAST_NAME_ASC;
-	if (isSortFirstName != null) {
-	    sorting = isSortFirstName.equals(1)
-		    ? LEARNER_MARKS_SORTING_FIRST_NAME_DESC
-		    : LEARNER_MARKS_SORTING_FIRST_NAME_ASC;
-	} else if (isSortLastName != null) {
-	    sorting = isSortLastName.equals(1)
-		    ? LEARNER_MARKS_SORTING_LAST_NAME_DESC
-		    : LEARNER_MARKS_SORTING_LAST_NAME_ASC;
+	int sorting = LEARNER_MARKS_SORTING_FULL_NAME_ASC;
+	if (isSortFullName != null && isSortFullName.equals(1)) {
+	    sorting = LEARNER_MARKS_SORTING_FULL_NAME_DESC;
 	}
 
 	// get all session users and sort them according to the parameter from tablesorter
@@ -207,7 +198,7 @@ public class MonitoringController {
 	ObjectNode responsedata = JsonNodeFactory.instance.objectNode();
 	if (!users.isEmpty()) {
 	    // reverse if sorting is descending
-	    if (sorting == LEARNER_MARKS_SORTING_FIRST_NAME_DESC || sorting == LEARNER_MARKS_SORTING_LAST_NAME_DESC) {
+	    if (sorting == LEARNER_MARKS_SORTING_FULL_NAME_DESC) {
 		Collections.reverse(users);
 	    }
 
