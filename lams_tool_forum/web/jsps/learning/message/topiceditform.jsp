@@ -49,6 +49,6 @@
 
 	<button type="submit" class="btn btn-secondary" id="submitButton">
 		<i class="fa-solid fa-check me-1"></i>
-		<fmt:message key="button.submit" />
+		<fmt:message key="label.post" />
 	</button>
 </div>

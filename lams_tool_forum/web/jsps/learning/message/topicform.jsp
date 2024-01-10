@@ -36,7 +36,7 @@
 </c:set>
 <button type="submit" class="btn btn-primary mt-2 ms-2 float-end" id="submitButton">
 	<i class="fa-solid fa-check me-1"></i>
-	<fmt:message key="button.submit" />
+	<fmt:message key="label.post" />
 </button>
 
 <button type="button" name="goback" onclick="javascript:location.href='${backToForum}';" class="btn btn-secondary btn-icon-cancel mt-2 float-end" id="cancelButton">
