@@ -56,14 +56,23 @@
 										</jsp:include>
 									</c:when>
 									
-									<c:when test="${sessionMap.userFinished || item.unraveled || !isUserLeader || (mode == 'teacher') || showResults}">
+									<c:when test="${sessionMap.userFinished || item.unraveled || (mode == 'teacher') || showResults}">
 										<jsp:include page='parts/scratchieSvg.jsp'>
 											<jsp:param name="type" value="letter"/>
 											<jsp:param name="svgId" value="${svgId}"/>
 											<jsp:param name="letter" value="${status.index}"/>
 										</jsp:include>
 									</c:when>
-									
+
+									<c:when test="${!isUserLeader}">
+										<jsp:include page='parts/scratchieSvg.jsp'>
+											<jsp:param name="type" value="full"/>
+											<jsp:param name="svgId" value="${svgId}"/>
+											<jsp:param name="letter" value="${status.index}"/>
+											<jsp:param name="isHidden" value="false"/>
+										</jsp:include>
+									</c:when>
+
 									<c:otherwise>
 										<a href="#" role="button"
 												id="imageLink-${svgId}" class="scratchie-link"
