@@ -339,7 +339,9 @@
 		</lams:Alert5>
 
 		<c:if test="${showResults}">
+			<div id="questionListArea">
 			<%@ include file="scratchies.jsp"%>
+			</div>
 		</c:if>
 		
 		<!-- Display burningQuestionItemDtos -->
