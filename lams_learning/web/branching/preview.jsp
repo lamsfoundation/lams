@@ -28,23 +28,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		refresh="60;URL=${WebAppURL}/branching/performBranching.do?${formParameters}${(branchingForm.previewLesson == true) ? '&force=true' : ''}">
 
 	<script type="text/javascript">
-		function validate() {
-			var validated = false, form = document.forms[0], elements = form.elements;
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].name == "branchID") {
-					if (elements[i].checked) {
-						validated = true;
-						break;
-					}
-				}
-			}
-
-			if (validated) {
-				return true;
-			}
-
-			alert("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.activity.options.noActivitySelected' /></spring:escapeBody>");
-			return false;
+		function submitForm(activityId) {
+			$("#branch-id").val(activityId);
+			document.getElementById('branchingForm').submit();
 		}
 	</script>
 		
@@ -53,72 +39,42 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<em><fmt:message key="label.branching.preview.message" /> </em>
 		</p>
 		
-		<form:form action="forceBranching.do?${formParameters}" modelAttribute="branchingForm" target="_self" onsubmit="return validate();">
-		<fieldset>
-			<legend class="visually-hidden">
-				<fmt:message key="message.activity.options.noActivitySelected" />
-			</legend>
+		<form:form action="forceBranching.do?${formParameters}" modelAttribute="branchingForm" target="_self">
+			<input type="hidden" name="branchID" id="branch-id">
 		
-			<div class="ltable table-striped no-header">
+			<div class="ltable no-header table-hover">
 				<c:forEach items="${branchingForm.activityURLs}" var="activityURL" varStatus="loop">
-					<div class="row">
-						<div class="col">
-							<div class="form-check">
-								<c:choose>
-									<c:when test="${activityURL.complete}">
-										<i class="fa fa-check"></i>
-									</c:when>
-									<c:when test="${activityURL.defaultURL}">
-										<input type="radio" class="form-check-input" name="branchID"
-											id="activityID-${activityURL.activityId}"
-											value="<c:out value="${activityURL.activityId}"/>"
-											checked="checked">
-									</c:when>
-									<c:otherwise>
-										<input type="radio" class="form-check-input" name="branchID"
-											id="activityID-${activityURL.activityId}"
-											value="<c:out value="${activityURL.activityId}"/>">
-									</c:otherwise>
-								</c:choose>
+					<div class="row align-items-center">
+						<div class="col-sm">
+							<c:choose>
+								<c:when test="${activityURL.complete}">
+									<i class="fa fa-check"></i>
+								</c:when>
+								<c:otherwise>
+									&nbsp;&nbsp;&nbsp;
+								</c:otherwise>
+							</c:choose>
 
-								<c:choose>
-									<c:when test="${activityURL.complete}">
-										<!-- No Label tags -->
-										<c:choose>
-											<c:when test="${activityURL.defaultURL}">
-												<strong><c:out value="${activityURL.title}" /> </strong>
-											</c:when>
-											<c:otherwise>
-												<c:out value="${activityURL.title}" />
-											</c:otherwise>
-										</c:choose>
-									</c:when>
-									<c:otherwise>
-										<!-- With Label tags -->
-										<label class="form-check-label" for="activityID-${activityURL.activityId}">
-											<c:choose>
-												<c:when test="${activityURL.defaultURL}">
-													<strong><c:out value="${activityURL.title}" /> </strong>
-												</c:when>
-												<c:otherwise>
-													<c:out value="${activityURL.title}" />
-												</c:otherwise>
-											</c:choose>
-										</label>
-									</c:otherwise>
-		
-								</c:choose>
-		
-							</div>
+							<c:choose>
+								<c:when test="${activityURL.defaultURL}">
+									<strong><c:out value="${activityURL.title}" /> </strong>
+								</c:when>
+								<c:otherwise>
+									<c:out value="${activityURL.title}" />
+								</c:otherwise>
+							</c:choose>
+						</div>
+						
+						<div class="col-sm-4">
+							<button type="button" class="btn btn-secondary float-end"
+									onclick="submitForm(${activityURL.activityId})">
+								<i class="fa-regular fa-circle-check me-1"></i>
+								<fmt:message key="label.activity.options.choose" />
+							</button>	
 						</div>
 					</div>
 				</c:forEach>
 			</div>
-			
-			<button type="submit" class="btn btn-secondary float-end mb-2">
-				<fmt:message key="label.activity.options.choose" />
-			</button>
-		</fieldset>
 		</form:form>
 
 		<div class="activity-bottom-buttons">
