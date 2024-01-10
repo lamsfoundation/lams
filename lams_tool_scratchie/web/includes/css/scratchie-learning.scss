@@ -1,5 +1,16 @@
 @import "_lams_variables.scss";
 
+.instructions, #questionListArea {
+	-webkit-user-select: none; 
+	user-select: none;
+}
+
+@media print {
+	.instructions, #questionListArea {
+		display: none;
+	}	
+}
+
 .scratches a, .scratches a:hover {
 	border-bottom: none;
 }

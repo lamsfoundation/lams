@@ -551,5 +551,12 @@
             <%@ include file="questionlist.jsp"%>
         </div>
 
+        <c:if test="${mode != 'teacher'}">
+            <div class="activity-bottom-buttons">
+                <button type="button" name="finishButton" id="finishButton" onclick="return finish(false);" class="btn btn-primary na">
+                    <fmt:message key="label.submit" />
+                </button>
+            </div>
+        </c:if>        
     </div>
 </lams:PageLearner>
