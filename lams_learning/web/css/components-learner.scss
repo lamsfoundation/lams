@@ -3,6 +3,20 @@
 
 
 @media (width <= 768px) {
+	body.component:not(.no-decoration) {
+		background-color: unset;
+	  }
+	.component-page-wrapper {
+		border-radius: unset;
+	}
+	.instructions {
+		margin-bottom: 0.5rem;
+		padding-bottom: 0.3rem;
+		padding-top: 0.5rem;
+	}
+	.form-control, body.component .cke_textarea_inline, .form-select {
+		font-size: 12px;
+	}
     .p-3 {
         padding: 0rem !important;
     }
