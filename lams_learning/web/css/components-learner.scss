@@ -3,12 +3,6 @@
 
 
 @media (width <= 768px) {
-	body.component:not(.no-decoration) {
-		background-color: unset;
-	  }
-	.component-page-wrapper {
-		border-radius: unset;
-	}
 	.instructions {
 		margin-bottom: 0.5rem;
 		padding-bottom: 0.3rem;
@@ -23,12 +17,6 @@
 	.mb-3 {
 		margin-bottom: 0.3rem !important;
 	}
-}
-
-@media (width <= 768px) {
-  .component-page-wrapper .component-page-content {
-     padding: 0.5rem 1rem 1rem 1rem;
-  }
 }
 
 .component-page-wrapper h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
@@ -60,7 +48,7 @@
 }
 
 .component-page-wrapper .component-page-content #header {
-	padding: 2.8rem 2rem 0.2rem;
+	padding: 2.8rem 2rem 0;
     margin: -2rem -2rem 0.5rem;
     box-shadow: 0px 1px 0px var(--bs-gray-300);
     
@@ -70,8 +58,7 @@
 	}
 	
 	#lesson-name {
-	    margin-left: 3rem;
-	    margin-top: .2rem;
+		margin-left: 0.7rem;
 	}
 	
 	.btn {
@@ -88,9 +75,9 @@
 	}
 	
 	#hamb {
-	    font-size: 1.8rem;
+	    font-size: 1rem;
 		margin: -0.2rem 0 0.3rem -0.5rem;
-    	padding: 0.25rem 0.75rem;
+		padding: 7px 10px;
         color: var(--bs-gray-700);
 	}
 	
@@ -100,6 +87,10 @@
 		
 		.btn {
 			margin-left: 0.75rem;
+		}
+		
+		#profile-picture {
+			padding: 0.2rem;
 		}
 		
 		#progress-bar-widget {
@@ -118,10 +109,34 @@
 		}
 		
 		#return-to-index {
-			padding: 1.275rem 1.3rem;
+			padding: 0.8rem;
 		    opacity: 1;
-		}	
-	} 
+		}
+	}
+	
+	@media (width > 768px) {
+		padding-bottom: 0.2rem;
+		
+		#lesson-name {
+		    margin-left: 3rem;
+		    margin-top: .2rem;
+		}
+		
+		#hamb {
+	    	font-size: 1.8rem;
+	    	padding: 0.25rem 0.75rem;
+		}
+		
+		.top-menu {
+			#profile-picture {
+				padding: initial;
+			}
+			
+			#return-to-index {
+				padding: 1.275rem 1.3rem;
+			}
+		}
+	}
 }
 
 .component-page-wrapper #component-offcanvas {

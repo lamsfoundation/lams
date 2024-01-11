@@ -140,7 +140,7 @@
 		                </div>
 		                
 		                <div class="top-menu">
-		                    <button id="profile-picture" class="btn btn-light no-decoration px-3" type="button"
+		                    <button id="profile-picture" class="btn btn-light no-decoration d-none d-sm-block px-md-3" type="button"
 		                            onclick="javascript:showMyPortraitDialog()" title="<fmt:message key='label.your.portrait'/>" >
 		                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="<fmt:message key='label.your.portrait'/>">
 		                    </button>

@@ -27,6 +27,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="title"><fmt:message key="learner.title" /></c:set>
 
 <lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true">
+	<style>
+		main#component-main-content.p-3 {
+			padding: 1rem !important;
+		} 
+	</style>
+
 	<script type="text/javascript" src="${lams}includes/javascript/lottie/lottie-player.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/nprogress.js"></script>		
 	<c:if test="${!empty activityForm.activityURLs}">
@@ -84,12 +90,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 				<h1 id="lesson-name" class="placeholder-wave flex-grow-2 col-md-6 col-9">
 					<span class="placeholder placeholder-sm bg-secondary bg-opacity-50 col-5"></span>
-					<span class="placeholder placeholder-sm bg-secondary bg-opacity-50 col-4"></span>
+					<span class="placeholder placeholder-sm bg-secondary bg-opacity-50 col-md-4"></span>
 				</h1>
 			</div>
 
 			<div class="top-menu">
-				<button id="profile-picture" class="btn btn-light no-decoration px-3 disabled" type="button" disabled>
+				<button id="profile-picture" class="btn btn-light no-decoration d-none d-sm-block px-md-3 disabled" type="button" disabled>
 					<img class="portrait-sm portrait-round" src="${lams}images/css/john-doe-portrait.jpg" alt="Your profile portrait">
 				</button>
 		                    
