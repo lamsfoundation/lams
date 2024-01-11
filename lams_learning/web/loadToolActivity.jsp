@@ -25,6 +25,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="learnerAppUrl"><lams:WebAppURL /></c:set>
 <c:set var="title"><fmt:message key="learner.title" /></c:set>
+<c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
+<c:choose>
+    <c:when test="${not empty pageLearnerPortraitUuid}">
+        <c:set var="pageLearnerPortraitSrc">${lams}download/?uuid=${pageLearnerPortraitUuid}&preferDownload=false&version=4</c:set>
+    </c:when>
+    <c:otherwise>
+        <c:set var="pageLearnerPortraitSrc">${lams}images/css/john-doe-portrait.jpg</c:set>
+    </c:otherwise>
+</c:choose>
 
 <lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true">
 	<style>
@@ -96,7 +105,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 			<div class="top-menu">
 				<button id="profile-picture" class="btn btn-light no-decoration d-none d-sm-block px-md-3 disabled" type="button" disabled>
-					<img class="portrait-sm portrait-round" src="${lams}images/css/john-doe-portrait.jpg" alt="Your profile portrait">
+					<img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="<fmt:message key='label.your.portrait'/>">
 				</button>
 		                    
 				<button type="button" id="progress-bar-widget" class="btn btn-light no-decoration d-none d-sm-none d-md-block disabled" disabled>

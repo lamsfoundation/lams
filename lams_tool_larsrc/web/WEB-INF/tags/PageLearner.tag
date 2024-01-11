@@ -23,8 +23,6 @@
         <c:set var="pageLearnerPortraitSrc">${lams}images/css/john-doe-portrait.jpg</c:set>
     </c:otherwise>
 </c:choose>
-<c:set var="pageLearnerFirstName"><lams:user property="firstName" /></c:set>
-<c:set var="pageLearnerLastName"><lams:user property="lastName" /></c:set>
 
 <lams:html>
     <lams:head>
