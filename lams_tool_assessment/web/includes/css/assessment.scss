@@ -134,6 +134,19 @@ table.table-row-spacing {
     padding: 12px 0 !important;
 }
 
+@media (width <= 768px) {
+  #countdown {
+     font-size: 14px;
+	 width: 120px;
+   }
+   .blockPage {
+     width: 130px;
+   }
+}
+.is-countdown {
+  border-radius: 5px;
+}
+
 /*----------countdown growl----------------*/
 .jGrowl {
   	font-size: 22px;
@@ -143,9 +156,8 @@ table.table-row-spacing {
 .jGrowl-notification {
 	opacity: .8;
 	border-radius: 10px;
-	width: 400px;
 	margin: 10px 20px;
-	background: #eedc94 url(#{$url_css_directory}/check48.png) no-repeat 10px 10px;
+	background: #eedc94 url(#{$url_css_directory}/check.png) no-repeat 10px 10px;
 	padding-bottom: 20px;
 }
 .jGrowl-message {

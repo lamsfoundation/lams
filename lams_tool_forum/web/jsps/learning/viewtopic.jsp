@@ -143,7 +143,9 @@
 			});
 		</script>
 			
-		${buttonPanel}
+		<div class="activity-bottom-buttons">
+			${buttonPanel}
+		</div>
 
 	</div>
 </lams:PageLearner>

@@ -86,8 +86,8 @@
 			$('#resourceItemForm').submit(submitResourceForm);
 			$('#resourceItemForm').validate({
 				ignore: 'hidden, div.cke_editable',
-				errorClass: "text-danger",
-				wrapper: "span",
+				validClass: "is-valid",
+			  	errorClass: 'is-invalid',
 				rules: {
 					url: {
 						required: true,

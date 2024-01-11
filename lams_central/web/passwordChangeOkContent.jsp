@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
 
-<body>
+<body class="component no-decoration">
 	<div class="container">
 		<div class="col-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 mt-3 mx-auto">
 			<lams:Alert5 type="info" id="msgPasswordChanged">

@@ -58,10 +58,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<div class="ltable table-striped mb-0">
 						<c:forEach var="group" items="${groups}">
 							<div class="row">
-								<div class="col-2">
+								<div class="col-md-2">
 									<strong><c:out value="${group.groupName}" /></strong>
 								</div>
-								<div class="col-10">
+								<div class="col-md-10">
 									<c:choose>
 										<c:when test="${RestrictedGroupUserNames && !group.userBelongsToGroup}">
 											<fmt:message key="label.learners">

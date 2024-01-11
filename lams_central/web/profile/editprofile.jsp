@@ -40,12 +40,12 @@
 	</script>
 </lams:head>
 
-<body>
+<body class="component no-decoration">
 	<form:form action="/lams/saveprofile.do" modelAttribute='newForm' method="post" id='newForm'>
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="editNameOnly" value="${editOnlyName}" />
 
-		<lams:errors path="*"/>
+		<lams:errors5 path="*"/>
 
 		<div style="clear: both;"></div>
 		<div class="container">

@@ -124,10 +124,11 @@
 
         <lams:errors5/>
         
-        <div id="instructions" class="instructions">
-            <c:out value="${sessionMap.instruction}" escapeXml="false" />
-        </div>
-
+        <c:if test="${not empty sessionMap.instructions}">
+            <div id="instructions" class="instructions">
+                <c:out value="${sessionMap.instruction}" escapeXml="false" />
+            </div>
+        </c:if>
         <!-- main UI -->
         <%@ include file="/jsps/learning/message/topiclist.jsp"%>
 

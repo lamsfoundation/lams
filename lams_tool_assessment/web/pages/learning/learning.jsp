@@ -207,7 +207,6 @@
                     left: '',
                     right: '0%',
                     opacity: '.8',
-                    width: '230px',
                     cursor: 'default',
                     border: 'none'
                 }
@@ -232,11 +231,11 @@
                     var hours = $("#countdown").countdown('getTimes')[4];
                     var minutes = $("#countdown").countdown('getTimes')[5];
                     if (screenCountdown.data("hours") != hours || screenCountdown.data("minutes") != minutes) {
-                        var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.countdown.time.left' /></spring:escapeBody> ";
+                        var timeLeftText = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.countdown.time.left' /></spring:escapeBody> ";
                         if (hours > 0) {
-                            timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.hours' /></spring:escapeBody> ";
+                            timeLeftText += hours + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.summary.hours' /></spring:escapeBody> ";
                         }
-                        timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.minutes' /></spring:escapeBody> ";
+                        timeLeftText += minutes + " <spring:escapeBody javaScriptEscape='true'><fmt:message key='label.learning.summary.minutes' /></spring:escapeBody> ";
                         screenCountdown.html(timeLeftText);
 
                         screenCountdown.data("hours", hours);
@@ -616,9 +615,12 @@
 
         <lams:errors5/>
 
-        <div id="instructions" class="instructions">
-            <c:out value="${assessment.instructions}" escapeXml="false"/>
-        </div>
+        <c:if test="${not empty assessment.instructions}">
+            <div id="instructions" class="instructions">
+              <c:out value="${assessment.instructions}" escapeXml="false"/>
+            </div>
+        </c:if>        
+
 
         <%@ include file="parts/paging.jsp"%>
 

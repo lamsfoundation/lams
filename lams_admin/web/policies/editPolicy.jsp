@@ -18,25 +18,26 @@
 		$(document).ready(function(){
 			// validate signup form on keyup and submit
 			var validator = $("#policy-form").validate({
-				errorClass: 'text-danger form-text font-italic',
+				validClass: "is-valid",
+			  	errorClass: 'is-invalid',
 				ignore: [],
 				rules: {
 					policyName: "required", 
 					summary:{
 	                	required: function() {
-	
-	                		//var ckeditorData = CKEDITOR.instances.summary.getData();
+	                		var ckeditorData = CKEDITOR.instances.summary.getData();
 	                		//skip out empty values
 	                		//CKEDITOR.instances.summary.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
 	
 	                    	CKEDITOR.instances.summary.updateElement();
-	                    	//alert("s"+ckeditorData);
-	                    	//return false;
+	                    	return (ckeditorData == null || ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0);
 	                	}
 	            	},
 	            	fullPolicy:{
 	                	required: function() {
+	                		var ckeditorData = CKEDITOR.instances.fullPolicy.getData();
 	                    	CKEDITOR.instances.fullPolicy.updateElement();
+	                    	return (ckeditorData == null || ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0);
 	                	}
 	            	}
 				},
@@ -47,11 +48,22 @@
 				},
 				errorPlacement: function(error, element) {
 					var placement = $(element).data('error');
-					
+
+					//show error below CKEditor
 			        if (element.attr("name") == "summary" ) { //Id of input field
 			        	error.appendTo('#summary-error');
+
+						//add .is-invalid to the CKEditor div
+			        	$("#summary").next().addClass("is-invalid");
+
+			        //show error below CKEditor
 			        } else if (element.attr("name") == "fullPolicy" )  {//Id of input field
 			            error.appendTo('#full-policy-error');
+
+			          	//add .is-invalid to the CKEditor div
+			        	$("#fullPolicy").next().addClass("is-invalid");
+
+			        //show error at the default place
 			        } else {
 			            error.insertAfter(element);
 			        }

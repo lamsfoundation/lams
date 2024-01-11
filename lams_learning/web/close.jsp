@@ -21,27 +21,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <!-- Load Tool Activity (comment needed for the test harness) -->
 
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-
-<lams:head>
-	<title><fmt:message key="learner.title" />
-	</title>
-
-	<lams:css />
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript"
-		src="${lams}includes/javascript/common.js"></script>
-</lams:head>
-
-<body class="stripes">
-	<script language="JavaScript" type="text/Javascript">
+<c:set var="title"><fmt:message key="learner.title" /></c:set>
+<lams:PageLearner title="${title}" toolSessionID="" hideHeader="true" hideTitle="true">
+	<script type="text/Javascript">
 	    function doCloseRedirect() {
 	        if ( window.name.match("LearnerActivity") != null ) {
 	        	<%-- In popup window (ie have revisited a completed activity. Just the one activity in the window so close --%>
@@ -62,15 +46,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	    window.onload = doCloseRedirect;
 	</script>
 	
-	<lams:Page type="admin">
-	
-		<div class="voffset10"><fmt:message key="message.window.closing"/></div>
-	
-	</lams:Page>
+	<div id="container-main">
+		<div class="mt-2">
+			<fmt:message key="message.window.closing"/>
+		</div>
+	</div>
 	
 	<c:if test="${not empty lessonFinishUrl}">
 		<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
 	</c:if>
-</body>
-
-</lams:html>
+</lams:PageLearner>

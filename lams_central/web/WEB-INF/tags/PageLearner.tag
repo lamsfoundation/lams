@@ -140,7 +140,7 @@
 		                </div>
 		                
 		                <div class="top-menu">
-		                    <button id="profile-picture" class="btn btn-light no-decoration px-3" type="button"
+		                    <button id="profile-picture" class="btn btn-light no-decoration d-none d-sm-block px-md-3" type="button"
 		                            onclick="javascript:showMyPortraitDialog()" title="<fmt:message key='label.your.portrait'/>" >
 		                        <img class="portrait-sm portrait-round" src="${pageLearnerPortraitSrc}" alt="<fmt:message key='label.your.portrait'/>">
 		                    </button>
@@ -155,7 +155,7 @@
 		                            <div class="col-6 text-start p-0">
 		                                <fmt:message key='label.progress'/>
 		                            </div>
-		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value"></div>
+		                            <div class="col-6 text-end p-0" id="progress-bar-widget-value">%</div>
 		                        </div>
 		                        <div class="progress mt-1 mb-2">
 		                        	<div class="progress-bar bg-success" role="progressbar"

@@ -11,20 +11,20 @@
 
 <lams:html>
 <lams:head>
-
 	<c:set var="title"><fmt:message key="admin.user.changePassword"/></c:set>
 	
 	<title>${title}</title>
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
-<lams:css/>
-
-<%-- javascript --%>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-<script type="text/javascript">
+	<%-- javascript --%>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+	<script type="text/javascript">
      var mustHaveUppercase = ${mustHaveUppercase},
      mustHaveNumerics  = ${mustHaveNumerics},
      mustHaveLowercase  = ${mustHaveLowercase},
@@ -44,7 +44,8 @@
 	$(function() {
 		// Setup form validation 
 		$("#userForm").validate({
-							errorClass : 'help-block',
+							validClass: "is-valid",
+		  					errorClass: 'is-invalid',
 							//  validation rules
 							rules : {
 								password : {
@@ -58,7 +59,6 @@
 								password2 : {
 									equalTo : "#password"
 								}
-								
 							},
 
 							// Specify the validation error messages
@@ -76,19 +76,17 @@
 								password2: {
 									equalTo : "<fmt:message key='error.password.mismatch'/>"
 								}
-								
 							},
 
 							submitHandler : function(form) {
 								form.submit();
 							}
 		});
-
 	});
-</script>
+	</script>
 </lams:head>
 
-<body class="stripes">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
 	<%-- Build breadcrumb --%>
 	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
 	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
@@ -96,16 +94,15 @@
 	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/user/edit.do?userId=${param.userId} | <fmt:message key="admin.user.edit"/></c:set>
 	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.changePassword" /></c:set>	
 
-<lams:Page5 type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
-
-
-						<lams:Alert5 type="info" id="passwordConditions" close="false">
-							<fmt:message key='label.password.must.contain' />:
-		<ul class="list-unstyled ml-2" style="line-height: 1.2">
-			<li><span class="fa fa-check"  aria-hidden="true"></span> <fmt:message
+	<lams:Page5 type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
+		<lams:Alert5 type="info" id="passwordConditions" close="false">
+			<fmt:message key='label.password.must.contain' />:
+			<ul class="list-unstyled ml-2" style="line-height: 1.2">
+				<li><span class="fa fa-check"  aria-hidden="true"></span> <fmt:message
 										key='label.password.min.length'>
 										<fmt:param value='${minNumChars}' />
-									</fmt:message></li>
+									</fmt:message>
+				</li>
 
 								<c:if test="${mustHaveUppercase}">
 				<li><span class="fa fa-check" aria-hidden="true"></span> <fmt:message
@@ -133,42 +130,39 @@
 								<li><span class="fa fa-check"></span>
 									<fmt:message key='label.password.common' />
 								</li>
-							</ul>
-						</lams:Alert5>
-						
-	<div class="row">
+			</ul>
+		</lams:Alert5>
+	
 		<div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-
 			<form id="userForm" modelAttribute="userForm" action="usersave/changePass.do" method="post">
 				<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 				<input type="hidden" name="userId" value='<c:out value="${param.userId}" />' />
 							
-						<lams:errors path="password"/>
+				<lams:errors5 path="password"/>
 						
-						<div>
+				<div>
 					<h2><fmt:message key="admin.user.login" />:
 					<span id="login"><c:out value="${param.login}" escapeXml="true"/></span></h2>
-						</div>
-						<div class="form-group">
-												<label for="password"><fmt:message
+				</div>
+				<div class="mb-3">
+					<label for="password"><fmt:message
 							key="admin.user.password" />:</label> 
 					<input type="password" name="password" maxlength="50" id="password" minlength="${minNumChars}"
 						class="form-control  form-control-sm" required >
 				</div>
-				<div class="form-group">
+				<div class="mb-3">
 					<label for="password2"><fmt:message
 							key="admin.user.password.confirm" />:</label> 
 					<input type="password" name="password2" maxlength="50"  minlength="${minNumChars}" id="password2" class="form-control form-control-sm" required>
 				</div>
-						<div class="pull-right">
-							<a href="javascript:history.back();" class="btn btn-default">
-								<fmt:message key="admin.cancel" />
-					</a> <input type="submit" id="saveButton" class="btn btn-primary" value="<fmt:message key="admin.save" />" />
-						</div>
-			</form>		
-					</div>
+				<div class="float-end">
+					<a href="javascript:history.back();" class="btn btn-secondary">
+						<fmt:message key="admin.cancel" />
+					</a> 
+					<input type="submit" id="saveButton" class="btn btn-primary" value="<fmt:message key="admin.save" />" />
 				</div>
-	
-</lams:Page5>	
+			</form>		
+		</div>
+	</lams:Page5>	
 </body>
 </lams:html>

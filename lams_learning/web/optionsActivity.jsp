@@ -176,7 +176,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 						<c:if test="${!optionsActivityForm.maxActivitiesReached}">
 							<div class="col-sm-4">
-								<button type="button" id="choose-branch-button" class="btn btn-secondary float-end" 
+								<button type="button" class="btn btn-secondary float-end" 
 										data-bs-toggle="modal" data-bs-target="#confirmationModal" 
 										data-activity-id="${activityURL.activityId}">
 									<i class="fa-regular fa-circle-check me-1"></i>

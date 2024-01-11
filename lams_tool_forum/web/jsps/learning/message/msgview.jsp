@@ -49,7 +49,7 @@
 				</c:choose>
             </span><br/>
 
-            <div class="${textClass} font-size-init">
+            <div class="${textClass}">
 				<c:set var="msgAuthor" value="${msgDto.author}" />
 				<c:if test="${empty msgAuthor}">
 					<c:set var="msgAuthor"><fmt:message key="label.default.user.name" /></c:set>

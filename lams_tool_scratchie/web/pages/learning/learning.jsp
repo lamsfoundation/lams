@@ -387,7 +387,6 @@
                     left: '',
                     right: '0%',
                     opacity: '.8',
-                    width: '230px',
                     cursor: 'default',
                     border: 'none'
                 }
@@ -542,9 +541,11 @@
 
         <lams:errors5/>
 
-        <div id="instructions" class="instructions">
-            <c:out value="${scratchie.instructions}" escapeXml="false" />
-        </div>
+        <c:if test="${not empty scratchie.instructions}">
+            <div id="instructions" class="instructions">
+                <c:out value="${scratchie.instructions}" escapeXml="false" />
+            </div>
+        </c:if>
 
         <div id="questionListArea">
             <%@ include file="questionlist.jsp"%>

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -60,7 +59,8 @@
 			$(function() {
 				// Setup form validation
 				$("#userForm").validate({
-					errorClass : 'text-danger form-text font-italic',
+					validClass: "is-valid",
+				  	errorClass: 'is-invalid',
 					//  validation rules
 					rules : {
 						login : {
@@ -315,8 +315,10 @@
 					</div>
 
 					<div class="mb-3">
-						<label class="form-label" for="title"> <fmt:message key="admin.user.title" />:
-						</label> <input id="title" name="title" class="form-control" type="text"
+						<label class="form-label" for="title"> 
+							<fmt:message key="admin.user.title" />:
+						</label> 
+						<input id="title" name="title" class="form-control" type="text"
 										value="${userForm.title}" size="32" maxlength="32"
 										autocomplete=honorific-prefix">
 					</div>
@@ -324,7 +326,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="firstName"> <fmt:message
 								key="admin.user.first_name" />:&nbsp;<span class="text-danger">*</span>
-						</label> <input id="firstName" name="firstName" required
+						</label> 
+						<input id="firstName" name="firstName" required
 										class="form-control" type="text" value="${userForm.firstName}"
 										maxlength="128" autocomplete="given-name"> <small
 							id="firstNameHelpBlock" class="form-text text-muted"> <lams:errors
@@ -335,7 +338,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="lastName"> <fmt:message
 								key="admin.user.last_name" />:&nbsp;<span class="text-danger">*</span>
-						</label> <input id="lastName" name="lastName" class="form-control"
+						</label> 
+						<input id="lastName" name="lastName" class="form-control"
 										type="text" value="${userForm.lastName}" required maxlength="128"
 										autocomplete="family-name"> <small id="lastNameHelpBlock"
 																		   class="form-text text-muted"> <lams:errors path="lastName" />
@@ -345,7 +349,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="email"> <fmt:message key="admin.user.email" />:&nbsp;<span
 								class="text-danger">*</span>
-						</label> <input id="email" name="email" class="form-control" type="text"
+						</label> 
+						<input id="email" name="email" class="form-control" type="text"
 										value="${userForm.email}" maxlength="128" required
 										autocomplete="email"> <small id="emailHelpBlock"
 																	 class="form-text text-muted"> <lams:errors path="email" />
@@ -356,7 +361,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="addressLine1"> <fmt:message
 								key="admin.user.address_line_1" />:
-						</label> <input id="addressLine1" name="addressLine1" class="form-control"
+						</label> 
+						<input id="addressLine1" name="addressLine1" class="form-control"
 										type="text" value="${userForm.addressLine1}" maxlength="64"
 										autocomplete="address-line1">
 					</div>
@@ -365,7 +371,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="addressLine2"> <fmt:message
 								key="admin.user.address_line_2" />:
-						</label> <input id="addressLine2" name="addressLine2" class="form-control"
+						</label> 
+						<input id="addressLine2" name="addressLine2" class="form-control"
 										type="text" value="${userForm.addressLine2}" maxlength="64"
 										autocomplete="address-line2">
 
@@ -374,7 +381,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="addressLine3"> <fmt:message
 								key="admin.user.address_line_3" />:
-						</label> <input id="addressLine3" name="addressLine3" class="form-control"
+						</label> 
+						<input id="addressLine3" name="addressLine3" class="form-control"
 										type="text" value="${userForm.addressLine3}" maxlength="64"
 										autocomplete="address-line3">
 
@@ -382,7 +390,8 @@
 
 					<div class="mb-3">
 						<label class="form-label" for="city"> <fmt:message key="admin.user.city" />:
-						</label> <input id="city" name="city" class="form-control" type="text"
+						</label> 
+						<input id="city" name="city" class="form-control" type="text"
 										value="${userForm.city}" maxlength="64"
 										autocomplete="address=line4">
 
@@ -392,7 +401,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="postcode"> <fmt:message
 								key="admin.user.postcode" />:
-						</label> <input id="postcode" name="postcode" class="form-control"
+						</label> 
+						<input id="postcode" name="postcode" class="form-control"
 										type="text" value="${userForm.postcode}"
 										value="${userForm.postcode}" maxlength="10">
 
@@ -424,7 +434,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="dayPhone"> <fmt:message
 								key="admin.user.day_phone" />:
-						</label> <input id="dayPhone" name="dayPhone" class="form-control"
+						</label> 
+						<input id="dayPhone" name="dayPhone" class="form-control"
 										type="text" value="${userForm.dayPhone}" maxlength="64"
 										autocomplete="tel">
 					</div>
@@ -432,7 +443,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="eveningPhone"> <fmt:message
 								key="admin.user.evening_phone" />:
-						</label> <input id="eveningPhone" name="eveningPhone" class="form-control"
+						</label> 
+						<input id="eveningPhone" name="eveningPhone" class="form-control"
 										type="text" value="${userForm.eveningPhone}" maxlength="64"
 										autocomplete="tel">
 					</div>
@@ -440,7 +452,8 @@
 					<div class="mb-3">
 						<label class="form-label" for="mobilePhone"> <fmt:message
 								key="admin.user.mobile_phone" />:
-						</label> <input id="mobilePhone" name="mobilePhone" class="form-control"
+						</label> 
+						<input id="mobilePhone" name="mobilePhone" class="form-control"
 										type="text" value="${userForm.mobilePhone}" maxlength="64"
 										autocomplete="tel">
 					</div>
@@ -523,7 +536,8 @@
 
 					<a href="javascript:history.back();" class="btn btn-secondary">
 						<fmt:message key="admin.cancel" />
-					</a> <input type="submit" id="saveButton"
+					</a> 
+					<input type="submit" id="saveButton"
 								class="btn btn-primary"
 								value="<fmt:message key="admin.save" />" />
 				</div>
@@ -540,7 +554,6 @@
 					<h4 class="mt-3">
 						<fmt:message key="admin.user.roles" />
 					</h4>
-
 
 					<c:if test="${not empty globalRoles}">
 						<div class="ml-2">
@@ -600,8 +613,6 @@
 				</div>
 			</div>
 			</c:if>
-
-
-			</lams:Page5>
+		</lams:Page5>
 	</body>
 </lams:html>

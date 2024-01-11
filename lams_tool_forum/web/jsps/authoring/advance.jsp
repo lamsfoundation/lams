@@ -19,22 +19,32 @@
 	</div>
 
 	<div class="checkbox">
-		<label for="allowEdit"><form:checkbox
-				path="forum.allowEdit" id="allowEdit" /> <fmt:message
-				key="label.authoring.advance.allow.edit" /></label>
+		<label for="allowEdit">
+			<form:checkbox
+				path="forum.allowEdit" id="allowEdit" /> 
+			<fmt:message
+				key="label.authoring.advance.allow.edit" />
+		</label>
 	</div>
 
 	<div class="checkbox">
-		<label for="allow-anon"><form:checkbox
-				path="forum.allowAnonym" id="allowAnonym" /> <fmt:message
-				key="label.authoring.advance.enable.anonymous.posts" /></label>
+		<label for="allowAnonym">
+			<form:checkbox
+				path="forum.allowAnonym" id="allowAnonym" /> 
+			<fmt:message
+				key="label.authoring.advance.enable.anonymous.posts" />
+		</label>
 	</div>
 
 	<div class="checkbox">
-		<label for="limited-min-characters"><form:checkbox
+		<label for="limited-min-characters">
+			<form:checkbox
 				path="forum.limitedMinCharacters"
-				id="limited-min-characters" /> <fmt:message
-				key="label.authoring.advance.min.limited.input" /> </label> <input
+				id="limited-min-characters" /> 
+			<fmt:message
+				key="label.authoring.advance.min.limited.input" /> 
+		</label> 
+		<input
 			type="number" name="forum.minCharacters" id="min-characters"
 			onchange="validatePostings(true);"
 			value="${forumForm.forum.minCharacters}"

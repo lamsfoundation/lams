@@ -22,7 +22,7 @@
 		});
 	</script>
 </lams:head>
-<body>
+<body class="component no-decoration">
 	<div class="container">
 		<div class="col-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 mx-auto">
 					<div class="text-center">

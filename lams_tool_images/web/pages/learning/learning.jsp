@@ -177,9 +177,11 @@
 
         <lams:errors5/>
 
-        <div id="instructions" class="instructions">
-            <c:out value="${imageGallery.instructions}" escapeXml="false"/>
-        </div>
+        <c:if test="${not empty imageGallery.instructions}">
+            <div id="instructions" class="instructions">
+                <c:out value="${imageGallery.instructions}" escapeXml="false"/>
+            </div>
+        </c:if>
 
         <%--Main image---------------------------------------------------%>
         <div class="card lcard">

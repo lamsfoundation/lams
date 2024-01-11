@@ -20,7 +20,8 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css">
 	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 	<style type="text/css">
 		.changeContainer .checkbox {
 			display: inline-block;
@@ -61,11 +62,6 @@
 		
 		.ui-jqgrid-btable tr.success > td {
 			background-color: transparent !important;
-		}
-		
-		#formValidationErrors {
-			display: none;
-			text-align: center;		
 		}
 	</style>
 	
@@ -115,7 +111,7 @@
 												grid.slideUp();
 												pass.val(null).prop('disabled', true);
 											}
-										});
+									});
 	
 			// generate new password on click
 			$('.generatePassword').click(function(){
@@ -130,12 +126,10 @@
 				});
 			});
 			
-			
-			
 			// Setup form validation 
 			$("#orgPasswordChangeForm").validate({
-				errorLabelContainer : '#formValidationErrors',
-				errorClass : 'errorMessage',
+				validClass: "is-valid",
+				errorClass: 'is-invalid',
 				rules : {
 					learnerPass : {
 						required: false,
@@ -151,7 +145,6 @@
 						charactersAllowed : true,
 						pwcheck : true
 					}
-					
 				},
 	
 				// Specify the validation error messages
@@ -317,7 +310,6 @@
 				    }
 			};
 	
-	
 		    var includedLearners = "<c:out value='${orgPasswordChangeForm.includedLearners}' />",
 		    	excludedLearners = "<c:out value='${orgPasswordChangeForm.excludedLearners}' />",
 		    	includedStaff = "<c:out value='${orgPasswordChangeForm.includedStaff}' />",
@@ -330,20 +322,23 @@
 			$("#staffGrid").data('excluded', excludedStaff ? JSON.parse(excludedStaff) : null)
 						   .data('included', includedStaff ? JSON.parse(includedStaff) : null)
 						   .jqGrid(jqGridSettings);
-	
 		});
 	</script>
-	
 </lams:head>
+
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems">
+	<lams:LAMSURL />admin/appadminstart.do | <fmt:message key="appadmin.maintain" />
+</c:set>
+<c:set var="breadcrumbItems">
+	${breadcrumbItems}, <lams:LAMSURL />admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" />
+</c:set>
+<c:set var="breadcrumbItems">
+	${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' /> | <fmt:message key="admin.user.manage" />
+</c:set>
     
-<body class="stripes">
-	<lams:Page5 type="admin" title="${title}">
-				<p>
-					<a href="<lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' />" class="btn btn-default">
-					<fmt:message key="admin.user.manage" /></a>
-				</p>
-				
-				<div class="panel panel-default panel-body">
+<body class="component pb-4 pt-2 px-2 px-sm-4">
+	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
 					<h3><c:out value='${orgPasswordChangeForm.orgName}' /></h3>
 					
 					<lams:Alert5 type="info" id="passwordConditions" close="false">
@@ -381,7 +376,6 @@
 								<fmt:message key='label.password.common' />
 							</li>
 						</ul>
-						
 					</lams:Alert5>
 					
 					<form:form action="changePassword.do" modelAttribute="orgPasswordChangeForm" id="orgPasswordChangeForm" method="post">
@@ -393,15 +387,17 @@
 						<form:hidden path="includedStaff" id="includedStaff" />
 						<form:hidden path="excludedStaff" id="excludedStaff" />
 						
-						<div class="form-group">
-							<div class="checkbox">
-								<label>
-									<form:checkbox path="email"/><fmt:message key="admin.org.password.change.email" />
+						<div class="mb-3">
+							<div class="form-check">
+								<form:checkbox path="email" cssClass="form-check-input"/>
+								<label class="form-check-label" for="email">
+									<fmt:message key="admin.org.password.change.email" />
 								</label>
 							</div>
-							<div class="checkbox">
-								<label>
-									<form:checkbox path="force"/><fmt:message key="admin.org.password.change.force" />
+							<div class="form-check">
+								<form:checkbox path="force" cssClass="form-check-input"/>
+								<label class="form-check-label" for="force">
+									<fmt:message key="admin.org.password.change.force" />
 								</label>
 							</div>
 						</div>
@@ -411,37 +407,38 @@
 								<h4><fmt:message key="admin.org.password.change.success" /></h4>
 							</lams:Alert5>
 						</c:if>
-						
-						<div id="formValidationErrors">
-							<ul></ul>
-						</div>
+
 						<h4><fmt:message key="admin.org.password.change.choose" /></h4>
 						<table id="changeTable">
 							<tbody>
 								<tr>
 									<td class="changeContainer">
-										<div class="checkbox">
-											<label>
-												<form:checkbox path="staffChange" id="staffChange" />
-													<fmt:message key="admin.org.password.change.is.staff" />
+										<div class="form-check">
+											<form:checkbox path="staffChange" id="staffChange" cssClass="form-check-input"/>
+											<label class="form-check-label" for="staffChange">
+												<fmt:message key="admin.org.password.change.is.staff" />
 											</label>
 										</div>
+										
 										<form:input path="staffPass" id="staffPass" cssClass="pass form-control" maxlength="50"
 												   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>
+									
 									<td class="changeContainer">
-										<div class="checkbox">
-											<label>
-												<form:checkbox path="learnerChange" id="learnerChange" />
-													<fmt:message key="admin.org.password.change.is.learner" />
+										<div class="form-check">
+											<form:checkbox path="learnerChange" id="learnerChange" cssClass="form-check-input"/>
+											<label class="form-check-label" for="learnerChange">
+												<fmt:message key="admin.org.password.change.is.learner" />
 											</label>
 										</div>
+										
 										<form:input path="learnerPass" id="learnersPass" cssClass="pass form-control" maxlength="50"
 											   title="<fmt:message key='admin.org.password.change.custom' />" />
 										<i class="fa fa-refresh generatePassword" title="<fmt:message key='admin.org.password.change.generate' />"></i>
 									</td>
 								</tr>
+								
 								<tr>
 									<td class="gridCell">
 										<table id="staffGrid"></table>
@@ -452,15 +449,10 @@
 								</tr>
 							</tbody>
 						</table>
-						<div class="pull-right mt-3">
+						<div class="float-end mt-3">
 							<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
 						</div>
 					</form:form>
-				</div>
 	</lams:Page5>
 </body>
 </lams:html>
-
-
-
-

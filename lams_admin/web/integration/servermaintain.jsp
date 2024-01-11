@@ -29,7 +29,8 @@
 
 				// validate signup form on keyup and submit
 				var validator = $("#extServerForm").validate({
-					errorClass: 'text-danger form-text font-italic',
+					validClass: "is-valid",
+				  	errorClass: 'is-invalid',
 					rules: {
 						serverid: "required",
 						serverkey: "required",
@@ -83,7 +84,7 @@
 					</div>
 					<div class="mb-3">
 						<label for="serverkey" class="form-label"><fmt:message key="sysadmin.serverkey" /></label>&nbsp;<span class="text-danger">*</span>
-						<input id="serverkey" name="serverkey" value="${extServerForm.serverkey} " class="form-control" maxlength="32" required/>
+						<input id="serverkey" name="serverkey" value="${extServerForm.serverkey}" class="form-control" maxlength="32" required/>
 					</div>
 					<div class="mb-3">
 						<label for="servername" class="form-label"><fmt:message key="sysadmin.servername" /></label>&nbsp;<span class="text-danger">*</span>

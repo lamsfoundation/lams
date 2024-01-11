@@ -5,6 +5,15 @@
     @extend .container-lg;
 }
 
+@media (width <= 768px) {
+	#container-main {
+		--bs-gutter-x: 0.1rem;
+		--bs-gutter-y: 0.1rem;
+		padding-right: calc(var(--bs-gutter-x) * -5.5);
+		padding-left: calc(var(--bs-gutter-x) * 0.5);
+	}
+}
+
 .btn-secondary-darker {
 	@extend .btn-secondary;
 	background-color: shade-color($secondary, 20%);
@@ -80,8 +89,19 @@
 }
 
 body.component {
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-  background-color: var(--lams-background-gray);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+	@media (width <= 768px) {	
+    	font-size: 12px;
+    }
+    
+    @media (width > 768px) {
+		font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+		
+		&:not(.no-decoration) {
+			background-color: var(--lams-background-gray);
+		}
+	}
 }
 
 body.component .btn-success,
@@ -318,8 +338,22 @@ body.component .cke_widget_inline {
   display: block !important;
 }
 
-body.component .btn {
-  border-radius: 1.0rem;
+body.component { 
+	.btn {
+		border-radius: 1.0rem;
+	  
+		@media (width <= 768px) {
+			font-size: 12px;
+		}
+	}
+	
+	.btn:focus {
+	    box-shadow: var(--bs-btn-focus-box-shadow);
+	}
+	
+	.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
+	    box-shadow: 0px 3px 6px var(--bs-gray-400);
+	}
 }
 
 body.component i.fa[role="button"] {
@@ -481,12 +515,15 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 }
 
 .component-page-wrapper {
-  min-height: 100vh;
-  border-radius: 2.8rem;
-  overflow: hidden;
-  background-color: var(--bs-white);
-  margin: $component-page-wrapper-margin;
-  min-height: calc(100vh - 2*$component-page-wrapper-margin);
+	min-height: 100vh;
+	overflow: hidden;
+	background-color: var(--bs-white);
+  
+ 	@media (width > 768px) {
+		 border-radius: 2.8rem;
+		 margin: $component-page-wrapper-margin;
+		 min-height: calc(100vh - 2*$component-page-wrapper-margin);
+	}
 }
 
 .component-page-wrapper button.no-decoration {
@@ -503,6 +540,10 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
   padding: 1rem 2rem 2rem 2rem;
   transition: all .3s ease;
   vertical-align: top;
+  
+	@media (width <= 768px) {
+	     padding: 0.5rem 1rem 1rem 1rem;
+	}
 }
 
 .component-page-wrapper .component-sidebar {

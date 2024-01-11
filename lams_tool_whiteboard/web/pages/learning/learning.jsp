@@ -249,6 +249,7 @@
             <c:out value="${whiteboard.instructions}" escapeXml="false" />
         </div>
 
+		<div class='card lcard'>
         <div class="full-screen-content-div">
             <div class="full-screen-flex-div">
                 <button type="button" class="btn btn-secondary float-end ms-1 full-screen-launch-button" onclick="javascript:launchIntoFullscreen(this)"
@@ -267,21 +268,22 @@
                 </div>
             </div>
         </div>
+        </div>
 
         <c:if test="${mode != 'teacher'}">
             <div class="activity-bottom-buttons">
                 <c:choose>
                     <c:when test="${whiteboard.galleryWalkEnabled}">
                         <button type="button" data-bs-toggle="tooltip" class="btn btn-primary na ${mode == 'author' ? '' : 'disabled'}"
-                                <c:choose>
-                                    <c:when test="${mode == 'author'}">
+                        	<c:choose>
+                            	<c:when test="${mode == 'author'}">
                                         title="<fmt:message key='label.gallery.walk.wait.start.preview' />"
                                         onClick="javascript:location.href = location.href + '&galleryWalk=forceStart'"
-                                    </c:when>
-                                    <c:otherwise>
+                                </c:when>
+                                <c:otherwise>
                                         title="<fmt:message key='label.gallery.walk.wait.start' />"
-                                    </c:otherwise>
-                                </c:choose>
+                                </c:otherwise>
+                        	</c:choose>
                         >
                             <fmt:message key="label.continue" />
                         </button>
@@ -292,21 +294,18 @@
                     </c:when>
 
                     <c:otherwise>
-                        <button name="FinishButton" id="finish-button"
-                                class="btn btn-primary voffset5 pull-right na"
-                                <c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
-                                    style="display: none"
-                                </c:if>>
-							<span class="nextActivity">
-                                <c:choose>
-                                    <c:when test="${sessionMap.isLastActivity}">
-                                        <fmt:message key="label.submit" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <fmt:message key="label.finished" />
-                                    </c:otherwise>
-                                </c:choose>
-                            </span>
+						<button type="button" name="FinishButton" id="finish-button" class="btn btn-primary na"
+								<c:if test="${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}">
+									style="display: none"
+								</c:if>>
+                            <c:choose>
+                                <c:when test="${sessionMap.isLastActivity}">
+                                    <fmt:message key="label.submit" />
+                                </c:when>
+                                <c:otherwise>
+                                    <fmt:message key="label.finished" />
+                                </c:otherwise>
+                            </c:choose>
                         </button>
                     </c:otherwise>
                 </c:choose>
