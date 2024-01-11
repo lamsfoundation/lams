@@ -23,8 +23,6 @@
         <c:set var="pageLearnerPortraitSrc">${lams}images/css/john-doe-portrait.jpg</c:set>
     </c:otherwise>
 </c:choose>
-<c:set var="pageLearnerFirstName"><lams:user property="firstName" /></c:set>
-<c:set var="pageLearnerLastName"><lams:user property="lastName" /></c:set>
 
 <lams:html>
     <lams:head>
@@ -127,7 +125,7 @@
 	
 				<c:if test="${showHeader}">
 		            <header id="header" class="d-flex justify-content-between align-items-center" role="banner">
-		                <div class="d-flex align-items-center">
+		                <div class="d-flex align-items-center w-100">
 							<button class="btn btn-light no-decoration" id="hamb" type="button" accesskey="p" 
 									data-bs-toggle="offcanvas" data-bs-target="#component-offcanvas"
 									aria-controls="component-offcanvas"
@@ -136,7 +134,10 @@
 								<i class="fa-solid fa-fw fa-bars" aria-hidden="true"></i>
 							</button>
 		
-		                    <h1 id="lesson-name" title="<fmt:message key='label.lesson.name'/>"></h1>
+		                    <h1 id="lesson-name" class="placeholder-wave flex-grow-2 col-md-6 col-9" title="<fmt:message key='label.lesson.name'/>">
+								<span class="placeholder placeholder-sm bg-secondary bg-opacity-50 col-5"></span>
+								<span class="placeholder placeholder-sm bg-secondary bg-opacity-50 col-md-4"></span>
+							</h1>
 		                </div>
 		                
 		                <div class="top-menu">

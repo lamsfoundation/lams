@@ -10,7 +10,7 @@ function initLearnerPage(toolSessionId, lessonId, userId) {
         cache: false,
         dataType: 'json',
         success: function (result) {
-            $('.component-page-wrapper .component-page-content #lesson-name').text(result.lessonName);
+            $('.component-page-wrapper .component-page-content #lesson-name').text(result.lessonName).removeClass();
 
             // draw support activities if they exist
             const ACTIVITY_ITEM_TEMPLATE = '<li><div class="row align-items-center"><div class="icon"></div><div class="col text-center"></div></div></li>';
