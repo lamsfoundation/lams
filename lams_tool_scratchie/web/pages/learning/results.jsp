@@ -71,6 +71,16 @@
 			overflow:auto; 
 			margin-top: -20px;
 		}
+		
+		/* fix ui-jqgrid-titlebar-close */
+		a.btn-outline-primary.ui-jqgrid-titlebar-close {
+			--bs-btn-hover-bg: none !important;
+			--bs-btn-active-bg: none !important;
+			margin-right: 10px;
+		}
+		.ui-jqgrid .ui-jqgrid-titlebar > .ui-jqgrid-titlebar-close > span.fas:before {
+			color:white;
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
