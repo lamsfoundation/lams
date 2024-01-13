@@ -758,7 +758,7 @@
 			</button>
 		</div>
 
-		<div id="time-limit-widget-individual" class="expired-hide-container">
+		<div id="time-limit-widget-individual">
 		</div>
 	</div>
 </div>
