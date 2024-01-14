@@ -76,6 +76,18 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 
 	public TimeCache() {
 	}
+
+	@Override
+	public String toString() {
+	    final StringBuilder sb = new StringBuilder("{");
+	    sb.append("relativeTimeLimit=").append(relativeTimeLimit);
+	    sb.append(", absoluteTimeLimit=").append(absoluteTimeLimit);
+	    sb.append(", absoluteTimeLimitFinish=").append(absoluteTimeLimitFinish);
+	    sb.append(", timeLimitLaunchedDate=").append(timeLimitLaunchedDate);
+	    sb.append(", timeLimitAdjustment=").append(timeLimitAdjustment);
+	    sb.append('}');
+	    return sb.toString();
+	}
     }
 
     /**
@@ -173,7 +185,7 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	}
 
 	TimeCache timeCache = timeCaches.get(toolContentId);
-	// first time a learner entered the activity, so there is not cache yet
+	// first time a learner entered the activity, so there is no cache yet
 	if (timeCache == null) {
 	    timeCache = new TimeCache();
 	    timeCaches.put(toolContentId, timeCache);
@@ -208,6 +220,11 @@ public abstract class AbstractTimeLimitWebsocketServer extends ServerEndpointCon
 	if (!existingTimeSettings.timeLimitAdjustment.equals(timeCache.timeLimitAdjustment)) {
 	    timeCache.timeLimitAdjustment = existingTimeSettings.timeLimitAdjustment;
 	    updateAllUsers = true;
+	}
+
+	if (updateAllUsers && log.isDebugEnabled()) {
+	    log.debug("Time limit settings changed for activity with tool content ID " + toolContentId + ": "
+		    + existingTimeSettings);
 	}
 
 	for (Session websocket : websockets) {
