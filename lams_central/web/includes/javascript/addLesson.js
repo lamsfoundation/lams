@@ -644,6 +644,12 @@ function loadRecentlyAccessedLearningDesigns(){
 					}
 					// display "loading" animation and finally LD thumbnail
 					loadLearningDesignSVG(learningDesignID);
+				})
+				.dblclick(function(){
+					let accessEntry = $(this),
+						learningDesignID = +accessEntry.data('learningDesignId'),
+						title = accessEntry.data('title');
+					addLesson(learningDesignID, title);
 				});
 		});
 	}
