@@ -152,6 +152,16 @@
                 <append value="true" />
             </periodic-rotating-file-handler>
 
+            <periodic-rotating-file-handler name="LAMSASSESSMENTAUTOSAVE"
+                autoflush="true">
+                <formatter>
+                    <named-formatter name="LAMSAUDITPATTERN" />
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="autosave.log" />
+                <suffix value="'.'yyyy-MM-dd" />
+                <append value="true" />
+            </periodic-rotating-file-handler>
+
             <!-- ISO8601 date format -->
             <formatter name="HIBERNATEPATTERN">
                 <pattern-formatter pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %-5p %c - %m%n" />
@@ -291,7 +301,16 @@
                     <handler name="LAMSAUDIT" />
                 </handlers>
             </logger>
-            
+
+            <!-- Change level to TRACE to enable autosave logs -->
+            <logger category="org.lamsfoundation.lams.tool.assessment.service.AssessmentServiceImpl_autosave"
+                    use-parent-handlers="false">
+                <level name="INFO" />
+                <handlers>
+                    <handler name="LAMSASSESSMENTAUTOSAVE" />
+                </handlers>
+            </logger>
+
             <!-- On production change below settings to INFO -->
             
            	 <logger category="io.undertow.request">
