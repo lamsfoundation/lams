@@ -805,7 +805,7 @@
 				<span><fmt:message key="force.complete.remove.content.no"/></span>
 			</button>
 
-			<button id="forceBackwardsRemoveContentYesButton" class="btn btn-primary me-1">
+			<button id="forceBackwardsRemoveContentYesButton" class="btn btn-danger me-1">
 				<span><fmt:message key="force.complete.remove.content.yes" /></span>
 			</button>
 
