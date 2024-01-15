@@ -347,12 +347,12 @@ body.component {
 		}
 	}
 	
-	.btn:focus {
-	    box-shadow: var(--bs-btn-focus-box-shadow);
+	.btn:not(.no-shadow) {
+	    box-shadow: 0px 3px 6px var(--bs-gray-400);
 	}
 	
-	.activity-bottom-buttons button, .activity-bottom-buttons a, button.btn:not(.no-shadow) {
-	    box-shadow: 0px 3px 6px var(--bs-gray-400);
+	.btn:focus {
+	    box-shadow: var(--bs-btn-focus-box-shadow);
 	}
 }
 
