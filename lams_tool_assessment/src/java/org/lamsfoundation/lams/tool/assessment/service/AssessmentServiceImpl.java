@@ -135,6 +135,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -1474,13 +1475,14 @@ public class AssessmentServiceImpl
 	    Set<AssessmentQuestionResult> questionResults = lastFinishedResult.getQuestionResults();
 
 	    //prepare list of the questions to display in user master detail table, filtering out questions that aren't supposed to be answered
-	    SortedSet<AssessmentQuestionResult> questionResultsToDisplay = new TreeSet<>();
+	    Set<AssessmentQuestionResult> questionResultsToDisplay;
 	    //in case there is at least one random question - we need to show all questions
 	    if (assessment.hasRandomQuestion()) {
-		questionResultsToDisplay.addAll(questionResults);
+		questionResultsToDisplay = new TreeSet<>(questionResults);
 
 		//otherwise show only questions from the question list
 	    } else {
+		questionResultsToDisplay = new LinkedHashSet<>();
 		for (QuestionReference reference : questionReferences) {
 		    for (AssessmentQuestionResult questionResult : questionResults) {
 			if (reference.getQuestion().getUid().equals(questionResult.getQbToolQuestion().getUid())) {
