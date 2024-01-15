@@ -154,6 +154,7 @@ public class AssessmentServiceImpl
 	implements IAssessmentService, ICommonAssessmentService, ToolContentManager, ToolSessionManager,
 	ToolRestManager, IQbToolService {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
+    private static Logger logAutosave = Logger.getLogger(AssessmentServiceImpl.class.getName() + "_autosave");
 
     private AssessmentDAO assessmentDao;
 
@@ -855,6 +856,21 @@ public class AssessmentServiceImpl
 			questionResult.getAnswerFloat(), questionDto.getAnswerFloat()) || !Objects.equals(
 			questionResult.getAnswer(), questionDto.getAnswer());
 
+	// this is for logging every autosave as requested by Imperial
+	// it produces a lot of logs, so it goes to a separate file
+	StringBuilder autosaveLogBuilder = null;
+	if (logAutosave.isTraceEnabled()) {
+	    autosaveLogBuilder = new StringBuilder("For learner ").append(assessmentResult.getUser().getUid())
+		    .append(" \"").append(assessmentResult.getUser().getLoginName()).append("\" for question ")
+		    .append(questionDto.getUid()).append(" for question result ").append(questionResult.getUid())
+		    .append(" answer was \"").append(questionResult.getAnswer()).append("\" and it is now \"")
+		    .append(questionDto.getAnswer()).append("\", answerBoolean was \"")
+		    .append(questionResult.getAnswerBoolean()).append("\" and it is now \"")
+		    .append(questionDto.getAnswerBoolean()).append("\", answerFloat was \"")
+		    .append(questionResult.getAnswerFloat()).append("\" and it is now \"")
+		    .append(questionDto.getAnswerFloat()).append("\"");
+	}
+
 	// store question answer values
 	questionResult.setAnswerBoolean(questionDto.getAnswerBoolean());
 	questionResult.setAnswerFloat(questionDto.getAnswerFloat());
@@ -882,6 +898,12 @@ public class AssessmentServiceImpl
 		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerBoolean(), optionDto.getAnswerBoolean());
 	    }
 
+	    if (logAutosave.isTraceEnabled()) {
+		autosaveLogBuilder.append(", for option ").append(optionDto.getUid()).append(" option result ")
+			.append(optionAnswer.getUid()).append(" was \"").append(optionAnswer.getAnswerBoolean())
+			.append("\" and it is now \"").append(optionDto.getAnswerBoolean()).append("\"");
+	    }
+
 	    // store option answer values
 	    optionAnswer.setAnswerBoolean(optionDto.getAnswerBoolean());
 	    if (questionDto.getType() == QbQuestion.TYPE_ORDERING) {
@@ -891,6 +913,10 @@ public class AssessmentServiceImpl
 		isAnswerModified |= !Objects.equals(optionAnswer.getAnswerInt(), optionDto.getAnswerInt());
 		optionAnswer.setAnswerInt(optionDto.getAnswerInt());
 	    }
+	}
+
+	if (logAutosave.isTraceEnabled()) {
+	    logAutosave.trace(autosaveLogBuilder);
 	}
 
 	// store confidence levels entered by the learner
