@@ -225,6 +225,7 @@
 				&nbsp;
 			</c:if>
 			${question.question}
+			<div class="clearfix"></div>
 		</div>
 					
 		<div class="panel-body" id="question-area-${status.index}">

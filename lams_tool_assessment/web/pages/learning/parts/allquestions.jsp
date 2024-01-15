@@ -46,6 +46,7 @@
 					&nbsp;
 				</c:if>
 				${question.question}
+				<div class="clearfix"></div>
 			</div>
 					
 			<div class="panel-body question-area" id="question-area-${status.index}">

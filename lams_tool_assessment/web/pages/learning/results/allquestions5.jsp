@@ -210,6 +210,7 @@
 					</h3>
 					
 					${question.question}
+					<div class="clearfix"></div>
 				</div>
 							
 				<div class="card-body" id="question-area-${status.index}">
