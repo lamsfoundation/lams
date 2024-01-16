@@ -34,20 +34,6 @@
 					<label class="form-check-label" for="enableLessonNotifications">
 						<fmt:message key="sysadmin.lesson.notification" />
 		    </label>
-		</div>
-
-				<div class="form-check mb-2">
-					<form:checkbox id="learnerPresenceAvailable" path="learnerPresenceAvailable" cssClass="form-check-input" styleId="learnerPresenceAvailable" />
-					<label class="form-check-label" for="learnerPresenceAvailable">
-						<fmt:message key="sysadmin.lesson.presence" />
-		    </label>
-		</div>
-
-				<div class="form-check mb-2">
-					<form:checkbox id="learnerImAvailable" path="learnerImAvailable" cssClass="form-check-input" styleId="learnerImAvailable" />
-					<label class="form-check-label" for="learnerImAvailable">
-						<fmt:message key="sysadmin.lesson.im" />
-		    </label>
-		</div>			
+		</div>		
 	</div>
 

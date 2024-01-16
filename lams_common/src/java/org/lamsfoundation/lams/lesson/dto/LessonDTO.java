@@ -56,8 +56,6 @@ public class LessonDTO {
     private String createDateTimeString;
     private Date startDateTime;
     private Long learningDesignID;
-    private Boolean learnerPresenceAvailable;
-    private Boolean learnerImAvailable;
     private Boolean displayMonitor;
 
     //---------------------------------------------------------------------
@@ -78,8 +76,6 @@ public class LessonDTO {
 	this.createDateTime = lesson.getCreateDateTime();
 	this.createDateTimeString = lesson.getCreateDateTime().toString();
 	this.startDateTime = lesson.getStartDateTime();
-	this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
-	this.learnerImAvailable = lesson.getLearnerImAvailable();
     }
 
     //---------------------------------------------------------------------
@@ -141,14 +137,6 @@ public class LessonDTO {
 	return learningDesignID;
     }
 
-    public Boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public Boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
     public Boolean getDisplayMonitor() {
 	return displayMonitor;
     }
@@ -174,8 +162,6 @@ public class LessonDTO {
 	sb.append("createDateTime='" + getCreateDateTime() + "'; ");
 	sb.append("createDateTimeString='" + getCreateDateTimeString() + "'; ");
 	sb.append("startDateTime='" + getStartDateTime() + "'; ");
-	sb.append("learnerPresenceAvailable='" + getLearnerPresenceAvailable() + "'; ");
-	sb.append("learnerImAvailable='" + getLearnerImAvailable() + "'; ");
 	sb.append("displayMonitor='" + getDisplayMonitor() + "'; ");
 	return sb.toString();
     }

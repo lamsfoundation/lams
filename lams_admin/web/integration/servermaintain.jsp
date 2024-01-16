@@ -23,10 +23,6 @@
 					}
 				});
 
-				$('#learnerPresenceAvailable').change(function(){
-					$('#learnerImAvailable').prop('disabled', !$(this).is(':checked'));
-				}).change();
-
 				// validate signup form on keyup and submit
 				var validator = $("#extServerForm").validate({
 					validClass: "is-valid",

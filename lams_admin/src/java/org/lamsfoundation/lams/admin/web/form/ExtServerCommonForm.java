@@ -23,10 +23,6 @@ public abstract class ExtServerCommonForm {
 
     private boolean disabled = false;
 
-    private Boolean learnerPresenceAvailable;
-
-    private Boolean learnerImAvailable;
-
     private Boolean liveEditEnabled;
 
     private Boolean enableLessonNotifications;
@@ -110,22 +106,6 @@ public abstract class ExtServerCommonForm {
 
     public void setDisabled(boolean disabled) {
 	this.disabled = disabled;
-    }
-
-    public Boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
-	this.learnerPresenceAvailable = learnerPresenceAvailable;
-    }
-
-    public Boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
-    public void setLearnerImAvailable(Boolean learnerImAvailable) {
-	this.learnerImAvailable = learnerImAvailable;
     }
 
     public Boolean getLiveEditEnabled() {

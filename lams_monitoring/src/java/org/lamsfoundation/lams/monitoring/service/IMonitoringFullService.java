@@ -31,30 +31,6 @@ public interface IMonitoringFullService extends IMonitoringService {
     /** Get the message service, which gives access to the I18N text */
     MessageService getMessageService();
 
-    /**
-     * Set whether or not the learner presence button is available in monitor. Checks that the user is a staff member of
-     * this lesson before updating.
-     *
-     * @param lessonId
-     * @param userId
-     * @param learnerPresenceAvailable
-     * @return new value for learnerPresenceAvailable. Normally will be same as input parameter, will only be different
-     * 	if the value cannot be updated for some reason.
-     */
-    Boolean togglePresenceAvailable(long lessonId, Integer userId, Boolean learnerPresenceAvailable);
-
-    /**
-     * Set whether or not the learner IM button is available in monitor. Checks that the user is a staff member of this
-     * lesson before updating.
-     *
-     * @param lessonId
-     * @param userId
-     * @param learnerImPresenceAvailable
-     * @return new value for learnerPresenceImAvailable. Normally will be same as input parameter, will only be
-     * 	different if the value cannot be updated for some reason.
-     */
-    Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean learnerPresenceImAvailable);
-
     /** Set whether or not to display the gradebook activity scores at the end of a lesson */
     Boolean toggleGradebookOnComplete(long lessonId, Integer userId, Boolean gradebookOnComplete);
 

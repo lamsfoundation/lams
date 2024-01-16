@@ -156,13 +156,6 @@ public class LessonManagerServlet extends HttpServlet {
 	String lastNames = request.getParameter("lastNames");
 	String emails = request.getParameter("emails");
 
-	String presenceEnableString = WebUtil.readStrParam(request, CentralConstants.PARAM_LEARNER_PRESENCE_ENABLE,
-		true);
-	Boolean presenceEnable = presenceEnableString == null ? null : Boolean.valueOf(presenceEnableString);
-
-	String imEnableString = WebUtil.readStrParam(request, CentralConstants.PARAM_LEARNER_IM_ENABLE, true);
-	Boolean imEnable = imEnableString == null ? null : Boolean.valueOf(imEnableString);
-
 	String enableNotificationString = WebUtil.readStrParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS,
 		true);
 	Boolean enableNotifications = enableNotificationString == null ? null
@@ -193,8 +186,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (method.equals(CentralConstants.METHOD_START)) {
 		ldId = Long.parseLong(ldIdStr);
 		Long lessonId = startLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			enforceAllowLearnerRestart, country, locale, customCSV, presenceEnable, imEnable,
-			enableNotifications);
+			enforceAllowLearnerRestart, country, locale, customCSV, enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -202,7 +194,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_PREVIEW)) {
 		ldId = Long.parseLong(ldIdStr);
 		Long lessonId = startPreview(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			country, locale, customCSV, presenceEnable, imEnable);
+			country, locale, customCSV);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -210,8 +202,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    } else if (method.equals(CentralConstants.METHOD_SCHEDULE)) {
 		ldId = Long.parseLong(ldIdStr);
 		Long lessonId = scheduleLesson(serverId, datetime, hashValue, username, ldId, courseId, title, desc,
-			enforceAllowLearnerRestart, startDate, country, locale, customCSV, presenceEnable, imEnable,
-			enableNotifications);
+			enforceAllowLearnerRestart, startDate, country, locale, customCSV, enableNotifications);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
@@ -393,7 +384,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     private Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String countryIsoCode,
-	    String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable, Boolean enableNotifications)
+	    String langIsoCode, String customCSV, Boolean enableNotifications)
 	    throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
@@ -407,8 +398,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, organisation.getOrganisationId(),
 		    user.getUserId(), customCSV, false, false,
-		    presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
-		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
+		    extServer.getLiveEditEnabled(),
 		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
 		    extServer.getForceLearnerRestart(),
 		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
@@ -428,8 +418,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String startDate,
-	    String countryIsoCode, String langIsoCode, String customCSV, Boolean presenceEnable, Boolean imEnable,
-	    Boolean enableNotifications) throws RemoteException {
+	    String countryIsoCode, String langIsoCode, String customCSV, Boolean enableNotifications)
+	    throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -439,8 +429,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
-		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled(),
+		    false, extServer.getLiveEditEnabled(),
 		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
 		    extServer.getForceLearnerRestart(),
 		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
@@ -739,9 +728,8 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
-	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
-	    Boolean presenceEnable, Boolean imEnable) throws RemoteException {
-
+	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
+	    throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -752,8 +740,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLessonForPreview(title, desc, ldId, userId, customCSV,
-		    presenceEnable == null ? extServer.getLearnerPresenceAvailable() : presenceEnable,
-		    imEnable == null ? extServer.getLearnerImAvailable() : imEnable, extServer.getLiveEditEnabled());
+		    extServer.getLiveEditEnabled());
 	    // 2. create lessonClass for lesson
 	    monitoringService.createPreviewClassForLesson(userId, lesson.getLessonId());
 

@@ -273,20 +273,6 @@
 
 							<div class="checkbox">
 								<label>
-									<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"/>
-									<fmt:message key="label.tab.advanced.field.presence" />
-								</label>
-							</div>
-
-							<div class="checkbox">
-								<label>
-									<input id="imEnableField" name="imEnable" value="true" type="checkbox" disabled="disabled"/>
-									<fmt:message key="label.tab.advanced.field.im" />
-								</label>
-							</div>
-
-							<div class="checkbox">
-								<label>
 									<input id="splitLearnersField" type="checkbox"/>
 									<fmt:message key="label.tab.advanced.field.split" />
 								</label>

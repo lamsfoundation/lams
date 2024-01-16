@@ -57,8 +57,6 @@ public class LessonDetailsDTO {
     private Boolean lockedForEdit;
     private Integer lockedForEditUserId;
     private String lockedForEditUsername;
-    private Boolean learnerPresenceAvailable;
-    private Boolean learnerImAvailable;
     private Boolean liveEditEnabled;
     private Boolean isPreview;
     private String encodedLessonID;
@@ -116,9 +114,6 @@ public class LessonDetailsDTO {
 
 	this.numberPossibleLearners = lesson.getAllLearners().size();
 	this.numberStartedLearners = 0;
-
-	this.learnerPresenceAvailable = lesson.getLearnerPresenceAvailable();
-	this.learnerImAvailable = lesson.getLearnerImAvailable();
 
 	this.liveEditEnabled = lesson.getLiveEditEnabled();
 
@@ -278,14 +273,6 @@ public class LessonDetailsDTO {
 	return numberPossibleLearners;
     }
 
-    public Boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public Boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
     public Boolean getLockedForEdit() {
 	return lockedForEdit;
     }
@@ -381,14 +368,6 @@ public class LessonDetailsDTO {
 
     public void setNumberPossibleLearners(Integer numberPossibleLearners) {
 	this.numberPossibleLearners = numberPossibleLearners;
-    }
-
-    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
-	this.learnerPresenceAvailable = learnerPresenceAvailable;
-    }
-
-    public void setLearnerImAvailable(Boolean learnerImAvailable) {
-	this.learnerImAvailable = learnerImAvailable;
     }
 
     public void setLockedForEdit(Boolean lockedForEdit) {

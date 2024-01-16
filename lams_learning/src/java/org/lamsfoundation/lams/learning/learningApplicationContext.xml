@@ -109,27 +109,6 @@
 				<prop key="start*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
-	</bean> 
-	
-	<bean id="presenceChatService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name ="target">
-			<bean class="org.lamsfoundation.lams.learning.presence.service.PresenceChatService">
-				<property name="presenceChatDAO"><ref bean="presenceChatDAO" /></property>
-			</bean>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-			</props>
-		</property>
 	</bean>
 	
 	<bean id="discussionSentimentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -150,11 +129,7 @@
 				<prop key="*">PROPAGATION_REQUIRED</prop>
    			</props>
 		</property>
-	</bean> 
-	
-	<bean id="presenceChatDAO" class="org.lamsfoundation.lams.learning.presence.dao.hibernate.PresenceChatDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>	
+	</bean>
 	
 	<bean id="commandDAO" class="org.lamsfoundation.lams.learning.command.dao.hibernate.CommandDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>

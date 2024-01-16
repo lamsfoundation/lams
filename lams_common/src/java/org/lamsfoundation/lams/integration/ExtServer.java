@@ -82,12 +82,6 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     @Column(name = "add_staff_to_all_lessons")
     private boolean addStaffToAllLessons;
 
-    @Column(name = "learner_presence_avail")
-    private Boolean learnerPresenceAvailable;
-
-    @Column(name = "learner_im_avail")
-    private Boolean learnerImAvailable;
-
     @Column(name = "live_edit_enabled")
     private Boolean liveEditEnabled;
 
@@ -374,22 +368,6 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public boolean isLtiConsumer() {
 	return getServerTypeId().intValue() == ExtServer.LTI_CONSUMER_SERVER_TYPE;
-    }
-
-    public Boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public void setLearnerPresenceAvailable(Boolean learnerPresenceAvailable) {
-	this.learnerPresenceAvailable = learnerPresenceAvailable;
-    }
-
-    public Boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
-    public void setLearnerImAvailable(Boolean learnerImAvailable) {
-	this.learnerImAvailable = learnerImAvailable;
     }
 
     public Boolean getLiveEditEnabled() {

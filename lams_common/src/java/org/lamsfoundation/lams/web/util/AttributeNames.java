@@ -67,10 +67,6 @@ public class AttributeNames {
     public static final String PARAM_LESSON_ID = "lessonID";
     public static final String PARAM_DIRECTORY_NAME = "directoryName";
     public static final String PARAM_FILENAME = "filename";
-    public static final String PARAM_PRESENCE_ENABLED = "presenceEnabledPatch";
-    // PARAM_PRESENCE_ENABLED = "presenceEnabledPatch" : strange name used to avoid Java overwriting values in its a
-    // hashmap used in learner action in HomeAction.java
-    public static final String PARAM_PRESENCE_IM_ENABLED = "presenceImEnabled";
     public static final String PARAM_CURRENT_TAB = "currentTab";
     public static final String PARAM_CUSTOM_CSV = "customCSV";
     public static final String PARAM_EXT_LMS_ID = "extlmsid";

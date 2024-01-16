@@ -5,7 +5,6 @@ var lessonId = lessonId || null,
 	isHorizontalBar = isHorizontalBar || false,
 	hasContentFrame = hasContentFrame || true,
 	hasDialog = hasDialog || false,
-	presenceEnabled = presenceEnabled || false,
 	REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity',
 
 	//SVG paths for activity shapes

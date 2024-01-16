@@ -249,8 +249,6 @@ public class MonitoringController {
 	long ldId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNINGDESIGN_ID);
 	Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 	String customCSV = request.getParameter("customCSV");
-	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
-	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
 	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
 	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
@@ -259,12 +257,12 @@ public class MonitoringController {
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
 	    newLesson = monitoringService.initializeLessonForPreview(title, desc, ldId, getUserId(), customCSV,
-		    learnerPresenceAvailable, learnerImAvailable, liveEditEnabled);
+		    liveEditEnabled);
 	} else {
 	    try {
 		newLesson = monitoringService.initializeLesson(title, desc, ldId, organisationId, getUserId(),
-			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
-			forceRestart, allowRestart, gradebookOnComplete, null, null);
+			customCSV, false, false, liveEditEnabled, false, forceRestart, allowRestart,
+			gradebookOnComplete, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -366,8 +364,6 @@ public class MonitoringController {
 	boolean startMonitor = WebUtil.readBooleanParam(request, "startMonitor", false);
 	boolean enableLiveEdit = WebUtil.readBooleanParam(request, "liveEditEnable", false);
 	boolean notificationsEnable = WebUtil.readBooleanParam(request, "notificationsEnable", false);
-	boolean presenceEnable = WebUtil.readBooleanParam(request, "presenceEnable", false);
-	boolean imEnable = WebUtil.readBooleanParam(request, "imEnable", false);
 	Integer splitNumberLessons = WebUtil.readIntParam(request, "splitNumberLessons", true);
 	boolean schedulingEnable = WebUtil.readBooleanParam(request, "schedulingEnable", false);
 	Long orgGroupingId = WebUtil.readLongParam(request, "orgGroupingId", true);
@@ -445,7 +441,7 @@ public class MonitoringController {
 		Lesson lesson = null;
 		try {
 		    lesson = monitoringService.initializeLesson(lessonInstanceName, introDescription, learningDesignID,
-			    organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable,
+			    organisationId, userId, null, introEnable, introImage, 
 			    enableLiveEdit, notificationsEnable, forceRestart, allowRestart, gradebookOnComplete,
 			    timeLimitIndividual, precedingLessonId);
 
@@ -1613,50 +1609,8 @@ public class MonitoringController {
     }
 
     /**
-     * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
-     * presenceAvailable.
-     */
-    @RequestMapping(path = "/presenceAvailable", method = RequestMethod.POST)
-    public String presenceAvailable(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	Integer userID = getUserId();
-	Boolean presenceAvailable = WebUtil.readBooleanParam(request, "presenceAvailable", false);
-
-	try {
-	    monitoringService.togglePresenceAvailable(lessonID, userID, presenceAvailable);
-
-	    if (!presenceAvailable) {
-		monitoringService.togglePresenceImAvailable(lessonID, userID, false);
-	    }
-	} catch (SecurityException e) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	}
-	return null;
-    }
-
-    /**
-     * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
-     * presenceImAvailable.
-     */
-    @RequestMapping(path = "/presenceImAvailable", method = RequestMethod.POST)
-    public String presenceImAvailable(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
-	Long lessonID = new Long(WebUtil.readLongParam(request, "lessonID"));
-	Integer userID = getUserId();
-	Boolean presenceImAvailable = WebUtil.readBooleanParam(request, "presenceImAvailable", false);
-
-	try {
-	    monitoringService.togglePresenceImAvailable(lessonID, userID, presenceImAvailable);
-	} catch (SecurityException e) {
-	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
-	}
-	return null;
-    }
-
-    /**
      * Set whether or not the activity scores / gradebook values are shown to the learner at the end of the lesson.
-     * Expects parameters lessonID and presenceAvailable.
+     * Expects parameters lessonID and gradebookOnComplete.
      */
     @RequestMapping(path = "/gradebookOnComplete", method = RequestMethod.POST)
     public String gradebookOnComplete(HttpServletRequest request, HttpServletResponse response) throws IOException {
