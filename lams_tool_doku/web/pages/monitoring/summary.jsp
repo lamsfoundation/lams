@@ -523,11 +523,11 @@
 					'dataType': 'text',
 					'cache': 'false',
 					'data': {
-						'promptKey' : 'essay.review.prompt.main',
+						'promptKey' : 'writing.task.review.prompt.criteria',
 						'promptParameters' : [task,  response.content]
 					},
 					success: function (response) {
-						content.text(response);
+						content.html(response);
 					},
 					error: function () {
 						content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')

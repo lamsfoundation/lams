@@ -104,7 +104,7 @@ public class MonitoringController {
     public static final int LEARNER_MARKS_SORTING_LAST_NAME_DESC = 3;
 
     private static final String AI_REVIEW_TEMPLATE_INSTRUCTIONS = "The instructions are:";
-    private static final String AI_REVIEW_TEMPLATE_DESCRIPTION = "The essay they are writing should address the following:";
+    private static final String AI_REVIEW_TEMPLATE_DESCRIPTION = "The answer they are writing should address the following:";
 
     private static final Comparator<User> USER_NAME_COMPARATOR = Comparator.comparing(User::getFirstName)
 	    .thenComparing(User::getLastName).thenComparing(User::getLogin);
