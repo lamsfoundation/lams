@@ -579,9 +579,9 @@ public class MonitoringController {
 	return formattedDate;
     }
 
-    @RequestMapping(path = "/aiReview", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(path = "/getAiReviewPromptData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public String aiReview(@RequestParam Long toolSessionId) {
+    public String getAiReviewPromptData(@RequestParam Long toolSessionId) {
 	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
 	if (!isAiEnabled) {
 	    throw new UnsupportedOperationException("AI module is not enabled");
@@ -595,9 +595,8 @@ public class MonitoringController {
 			    .append(dokumaran.getInstructions()).append("\n\n").toString());
 	}
 	if (StringUtils.isNotBlank(dokumaran.getDescription())) {
-	    responseJSON.put("description",
-		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n").append(dokumaran.getDescription())
-			    .append("\n\n").toString());
+	    responseJSON.put("description", new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n")
+		    .append(dokumaran.getDescription()).append("\n\n").toString());
 	}
 	try {
 	    String padContent = dokumaranService.getPadText(toolSessionId);
@@ -609,6 +608,22 @@ public class MonitoringController {
 	    return null;
 	}
 	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/saveAiReview", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void saveAiReview(@RequestParam Long toolSessionId, @RequestParam(required = false) String review) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
+	if (StringUtils.isBlank(review)) {
+	    review = null;
+	}
+	session.setAiReview(review);
+	dokumaranService.saveOrUpdate(session);
     }
 
     private Integer getUserId() {

@@ -502,7 +502,7 @@
 		container.children('.ai-review-button-clearfix').remove();
 
 		$.ajax({
-			'url': '<c:url value="/monitoring/aiReview.do"/>',
+			'url': '<c:url value="/monitoring/getAiReviewPromptData.do"/>',
 			'type': 'get',
 			'dataType': 'json',
 			'cache': 'false',
@@ -528,9 +528,19 @@
 					},
 					success: function (response) {
 						content.html(response);
+						$.ajax({
+							'url': '<c:url value="/monitoring/saveAiReview.do"/>',
+							'type': 'post',
+							'dataType': 'text',
+							'cache': 'false',
+							'data': {
+								'toolSessionId': toolSessionId,
+								'review' : response
+							}
+						});
 					},
 					error: function () {
-						content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
+						content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
 					},
 					complete: function (){
 						content.removeClass('hidden');
@@ -780,12 +790,16 @@
 							title='<fmt:message key="label.monitoring.ai.review.tooltip" />'>
 						<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review"/>
 					</button>
-					<div class="ai-review-button-clearfix clearfix"></div>
-					<h4 class="ai-review-header hidden">
+					<c:if test="${empty groupSummary.aiReview}">
+						<div class="ai-review-button-clearfix clearfix"></div>
+					</c:if>
+					<h4 class='ai-review-header ${empty groupSummary.aiReview ? "hidden" : ""}'>
 						<fmt:message key="label.monitoring.ai.review"/>
 					</h4>
 					<div class="clearfix"></div>
-					<div class="ai-review-content hidden"></div>
+					<div class="ai-review-content ${empty groupSummary.aiReview ? "hidden" : ""}">
+						<c:out value="${groupSummary.aiReview}" escapeXml="false"/>
+					</div>
 				</div>
 			</c:if>
 

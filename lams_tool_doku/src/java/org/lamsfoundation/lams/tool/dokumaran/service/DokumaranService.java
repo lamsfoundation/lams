@@ -530,6 +530,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    group.setSessionFinished(DokumaranConstants.COMPLETED == session.getStatus());
 	    group.setPadId(session.getPadId());
 	    group.setReadOnlyPadId(session.getEtherpadReadOnlyId());
+	    group.setAiReview(session.getAiReview());
 
 	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
 	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(
