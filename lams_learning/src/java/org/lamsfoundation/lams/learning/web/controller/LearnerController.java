@@ -23,15 +23,28 @@
 
 package org.lamsfoundation.lams.learning.web.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TimeZone;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxMap;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ILearnerFullService;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -73,23 +86,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriUtils;
-import reactor.core.publisher.Flux;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TimeZone;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import reactor.core.publisher.Flux;
 
 /**
  * <p>
@@ -375,16 +377,6 @@ public class LearnerController {
 	return responseJSON;
     }
 
-    @RequestMapping("/getPresenceChatActiveUserCount")
-    @ResponseBody
-    public String getPresenceChatActiveUserCount(HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	int count = PresenceWebsocketServer.getActiveUserCount(lessonId);
-
-	return String.valueOf(count);
-    }
-
     /**
      * Forces a move to a destination Activity in the learning sequence, redirecting to the new page rather.
      */
@@ -537,8 +529,6 @@ public class LearnerController {
 	responseJSON.put(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
 	responseJSON.put(AttributeNames.PARAM_TITLE, lesson.getLessonName());
 	responseJSON.put("allowRestart", lesson.getAllowLearnerRestart());
-	responseJSON.put(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
-	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
 
 	response.setContentType("application/json;charset=utf-8");
 

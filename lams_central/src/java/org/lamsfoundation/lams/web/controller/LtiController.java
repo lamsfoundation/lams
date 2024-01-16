@@ -281,8 +281,7 @@ public class LtiController {
 	Boolean liveEditEnabled = extServer.getLiveEditEnabled() == null ? false : extServer.getLiveEditEnabled();
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
 		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
-		extServer.getLearnerPresenceAvailable(), extServer.getLearnerImAvailable(), liveEditEnabled,
-		extServer.getEnableLessonNotifications(), extServer.getForceLearnerRestart(),
+		liveEditEnabled, extServer.getEnableLessonNotifications(), extServer.getForceLearnerRestart(),
 		extServer.getAllowLearnerRestart(), extServer.getGradebookOnComplete(), null, null);
 	Long lessonId = lesson.getLessonId();
 	// 2. create lessonClass for lesson

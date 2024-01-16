@@ -23,6 +23,20 @@
 
 package org.lamsfoundation.lams.tool.commonCartridge.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
 import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
@@ -65,22 +79,6 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * @author Andrey Balan
@@ -336,8 +334,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
     @Override
     public List<CommonCartridgeUser> getUserListBySessionItem(Long sessionId, Long itemUid) {
-	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao.getCommonCartridgeItemLogBySession(
-		sessionId, itemUid);
+	List<CommonCartridgeItemVisitLog> logList = commonCartridgeItemVisitDao
+		.getCommonCartridgeItemLogBySession(sessionId, itemUid);
 	List<CommonCartridgeUser> userList = new ArrayList(logList.size());
 	for (CommonCartridgeItemVisitLog visit : logList) {
 	    CommonCartridgeUser user = visit.getUser();
@@ -548,8 +546,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    CommonCartridgeUser user = commonCartridgeUserDao.getUserByUserIDAndContentID(
-		    new Long(newUserUid.longValue()), toolContentId);
+	    CommonCartridgeUser user = commonCartridgeUserDao
+		    .getUserByUserIDAndContentID(new Long(newUserUid.longValue()), toolContentId);
 	    if (user == null) {
 		user = new CommonCartridgeUser();
 		UserDTO sysUser = ((User) userManagementService.findById(User.class, newUserUid)).getUserDTO();
@@ -691,8 +689,8 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	    Iterator<CommonCartridgeItem> itemIterator = cartridge.getCommonCartridgeItems().iterator();
 	    while (itemIterator.hasNext()) {
 		CommonCartridgeItem item = itemIterator.next();
-		CommonCartridgeItemVisitLog visitLog = commonCartridgeItemVisitDao.getCommonCartridgeItemLog(
-			item.getUid(), userId.longValue());
+		CommonCartridgeItemVisitLog visitLog = commonCartridgeItemVisitDao
+			.getCommonCartridgeItemLog(item.getUid(), userId.longValue());
 		if (visitLog != null) {
 		    commonCartridgeItemVisitDao.removeObject(CommonCartridgeItemVisitLog.class, visitLog.getUid());
 		}

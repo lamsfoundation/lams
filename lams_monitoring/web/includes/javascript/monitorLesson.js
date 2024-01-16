@@ -293,61 +293,6 @@ function initCommonElements(){
         $('#forceBackwardsDialog').modal('hide');
     });
 
-
-    $('#presenceButton').change(function(){
-        var checked = $(this).prop('checked'),
-            data = {
-                'presenceAvailable' : checked,
-                'lessonID'      : lessonId
-            };
-        data[csrfTokenName] = csrfTokenValue;
-        $.ajax({
-            url : LAMS_URL + 'monitoring/monitoring/presenceAvailable.do',
-            type : 'POST',
-            cache : false,
-            data : data,
-            success : function() {
-                // updatePresenceAvailableCount();
-                if (checked) {
-                    $('#imButtonWrapper').show();
-                    showToast(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
-                } else {
-                    $('#imButtonWrapper, #openImButton').hide();
-                    $('#imButton').prop('checked', false);
-                    showToast(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
-                }
-            }
-        });
-    });
-
-    // sets instant messaging availability
-    $('#imButton').click(function(){
-        var checked = $(this).prop('checked'),
-            data = {
-                'presenceImAvailable' : checked,
-                'lessonID'      : lessonId
-            };
-        data[csrfTokenName] = csrfTokenValue;
-        $.ajax({
-            url : LAMS_URL + 'monitoring/monitoring/presenceImAvailable.do',
-            type : 'POST',
-            cache : false,
-            data : data,
-            success : function() {
-                if (checked) {
-                    $('#openImButton').show();
-                    $('#openImButton').prop('disabled', false);
-                    showToast(LABELS.LESSON_IM_ENABLE_ALERT);
-                } else {
-                    $('#openImButton').hide();
-                    showToast(LABELS.LESSON_IM_DISABLE_ALERT);
-                }
-            }
-        });
-    });
-
-    $('#openImButton').click(openChatWindow);
-
     //enable renaming of lesson title
     $('#lesson-name').editable({
         type: 'text',
@@ -1051,16 +996,6 @@ function getSelectedClassUserList(containerId) {
     return list;
 }
 
-
-function openChatWindow(){
-    // variables are set in JSP page
-    window.open(LAMS_URL + 'learning/presenceChat.jsp?lessonID=' + lessonId
-        + '&presenceEnabledPatch=true&presenceImEnabled=true&presenceShown=true&createDateTime='
-        + createDateTimeStr
-        ,'Chat'
-        ,'width=650,height=350,resizable=no,scrollbars=no,status=no,menubar=no,toolbar=no');
-}
-
 function showEmailDialog(userId){
 
     //check whether current window is a top level one (otherwise it's an iframe or popup)
@@ -1088,28 +1023,6 @@ function showEmailDialog(userId){
         }
     }, false, true);
 }
-
-/*
-function updatePresenceAvailableCount(){
-	var checked = $('#presenceButton').prop('checked');
-		counter = $('#presenceCounter');
-	if (checked) {
-		$.ajax({
-			dataType : 'text',
-			url : LAMS_URL + 'learning/learner/getPresenceChatActiveUserCount.do?',
-			cache : false,
-			data : {
-				'lessonID'      : lessonId
-			},
-			success : function(result) {
-				counter.text(result).show();
-			}
-		});
-	} else {
-		counter.hide();
-	}
-}
-*/
 
 function updateContributeActivities(contributeActivities) {
     let requiredTasksPanel = $('#required-tasks'),

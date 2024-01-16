@@ -75,13 +75,6 @@
 			        content: "<spring:escapeBody javaScriptEscape='true'><fmt:message key="tour.display.activity.scores.content"/></spring:escapeBody>",
 			        placement: "top",
 			      },{
-			        element: "#tour-lesson-im",
-			        title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key="lesson.im"/></spring:escapeBody>",
-			        content: "<spring:escapeBody javaScriptEscape='true'><p><fmt:message key="tour.lesson.im.content.1"/></p><p><fmt:message key="tour.lesson.im.content.2"/></p><p><fmt:message key="tour.lesson.im.content.3"/></p><p><fmt:message key="tour.lesson.im.content.4"/></p></spring:escapeBody>",
-			        placement: "bottom",
-			        onShow: revealIM,
-			        onHide: hideIM
-			      },{
 			        element: "#sendProgressEmail", 
 			        title: "<spring:escapeBody javaScriptEscape='true'><fmt:message key="tour.progress.email.send.title"/></spring:escapeBody>",
 			        content: "<spring:escapeBody javaScriptEscape='true'><fmt:message key="tour.progress.email.send.content"/></spring:escapeBody>",
@@ -254,32 +247,6 @@
 		}
 		
 		$("body").on("click","button.morehelp", openWikiHelp);
-	}
-	
- 	function revealIM(tour) { 
-		var checked = $('#presenceButton').hasClass('btn-success');
-		if (!checked) {
-			$("#imButton").css('display', 'block');
-			$('#imButton').prop('disabled', true);
-		}			
-		checked = $('#imButton').hasClass('btn-success');
-		if (!checked) {
-			$("#openImButton").css('display', 'block');
-			$('#openImButton').prop('disabled', true);
-		}				
-	}
-	
- 	function hideIM(tour) { 
-		$('#imButton').prop('disabled', false);
-		var checked = $('#presenceButton').hasClass('btn-success');
-		if (!checked) {
-			$("#imButton").css('display', 'none');
-		}				
-		$('#openImButton').prop('disabled', false);
-		checked = $('#imButton').hasClass('btn-success');
-		if (!checked) {
-			$("#openImButton").css('display', 'none');
-		}				
 	}
 
 	// These two functions call functions from gradebook page so do not risk breaking tour if they are missing or broken

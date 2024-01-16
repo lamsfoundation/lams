@@ -108,10 +108,6 @@
 						SAVE_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.save'/></spring:escapeBody>",
 						CANCEL_BUTTON : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='button.cancel'/></spring:escapeBody>",
 						LEARNER_FINISHED_DIALOG_TITLE : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='learner.finished.dialog.title'/></spring:escapeBody>",
-						LESSON_PRESENCE_ENABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.enable.presence.alert'/></spring:escapeBody>",
-						LESSON_PRESENCE_DISABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.disable.presence.alert'/></spring:escapeBody>",
-						LESSON_IM_ENABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.enable.im.alert'/></spring:escapeBody>",
-						LESSON_IM_DISABLE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.disable.im.alert'/></spring:escapeBody>",
 						LESSON_REMOVE_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.remove.alert'/></spring:escapeBody>",
 						LESSON_REMOVE_DOUBLECHECK_ALERT : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.remove.doublecheck.alert'/></spring:escapeBody>",
 						LESSON_STATE_CREATED : "<spring:escapeBody javaScriptEscape='true'><fmt:message key='lesson.state.created'/></spring:escapeBody>",
@@ -464,33 +460,6 @@
 								<lams:Switch id="gradebookOnCompleteButton" checked="${lesson.gradebookOnComplete}"
 											 labelKey="label.display.activity.scores" iconClass="fa fa-sm fa-list-ol" />
 							</div>
-						</dd>
-
-						<!-- IM & Presence -->
-						<dt><fmt:message key="lesson.im"/>:</dt>
-						<dd>
-
-							<lams:Switch id="presenceButton" checked="${lesson.learnerPresenceAvailable}"
-										 labelKey="lesson.presence" iconClass="fa fa-sm fa-wifi"	/>
-
-							<!-- <span id="presenceCounter" class="badge">0</span> -->
-
-							<div id="imButtonWrapper"
-									<c:if test="${not lesson.learnerPresenceAvailable}">
-										style="display: none"
-									</c:if>
-							>
-								<lams:Switch id="imButton" checked="${lesson.learnerImAvailable}"
-											 labelKey="lesson.im" iconClass="fa fa-sm fa-comments"	/>
-							</div>
-
-							<button id="openImButton" class="btn btn-primary btn-sm"
-									<c:if test="${not lesson.learnerImAvailable}">
-										style="display: none"
-									</c:if>
-							><i class="fa fa-sm fa-comments"></i>
-								<span class="hidden-xs"><fmt:message key="button.open.im"/></span>
-							</button>
 						</dd>
 
 						<!-- Progress Emails -->

@@ -222,10 +222,6 @@ function initAdvancedTab(){
 		}
 	});
 
-	$('#presenceEnableField').change(function(){
-		$('#imEnableField').prop('disabled', !$(this).is(':checked'));
-	});
-
 	$('#schedulingEnableField').change(function(){
 		if ($(this).is(':checked')) {
 			$('#scheduleStartTime').show('slow');

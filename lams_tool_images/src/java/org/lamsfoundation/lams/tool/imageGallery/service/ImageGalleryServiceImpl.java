@@ -23,6 +23,26 @@
 
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.confidencelevel.ConfidenceLevelDTO;
@@ -72,27 +92,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.imgscalr.ResizePictureUtil;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeSet;
 
 /**
  * @author Andrey Balan
@@ -521,9 +520,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    if (mediumIS == null) {
 		throw new UploadImageGalleryFileException("Impossible to resize image");
 	    }
-	    String mediumFileName =
-		    ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.'))
-			    + ".jpg";
+	    String mediumFileName = ImageGalleryServiceImpl.MEDIUM_FILENAME_PREFIX
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey mediumNodeKey = imageGalleryToolContentHandler.uploadFile(mediumIS, mediumFileName, "image/jpeg");
 	    image.setMediumFileUuid(mediumNodeKey.getNodeId());
 	    image.setMediumFileDisplayUuid(mediumNodeKey.getUuid());
@@ -537,9 +535,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // prepare thumbnail image
 	    InputStream originalIS2 = imageGalleryToolContentHandler.getFileInputStream(nodeKey.getNodeId());
 	    InputStream thumbnailIS = ResizePictureUtil.resize(originalIS2, thumbnailImageDimensions);
-	    String thumbnailFileName =
-		    ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX + fileName.substring(0, fileName.indexOf('.'))
-			    + ".jpg";
+	    String thumbnailFileName = ImageGalleryServiceImpl.THUMBNAIL_FILENAME_PREFIX
+		    + fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 	    NodeKey thumbnailNodeKey = imageGalleryToolContentHandler.uploadFile(thumbnailIS, thumbnailFileName,
 		    "image/jpeg");
 	    image.setThumbnailFileUuid(thumbnailNodeKey.getNodeId());
@@ -873,8 +870,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public void removeToolContent(Long toolContentId) throws ToolException {
 	ImageGallery imageGallery = imageGalleryDao.getByContentId(toolContentId);
 	if (imageGallery == null) {
-	    ImageGalleryServiceImpl.log.warn(
-		    "Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    ImageGalleryServiceImpl.log
+		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -896,8 +893,8 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 	ImageGallery gallery = imageGalleryDao.getByContentId(toolContentId);
 	if (gallery == null) {
-	    ImageGalleryServiceImpl.log.warn(
-		    "Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    ImageGalleryServiceImpl.log
+		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -971,12 +968,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    session.setStatus(ImageGalleryConstants.COMPLETED);
 	    imageGallerySessionDao.saveObject(session);
 	} else {
-	    ImageGalleryServiceImpl.log.error(
-		    "Fail to leave tool Session.Could not find shared imageGallery " + "session by given session id: "
-			    + toolSessionId);
-	    throw new DataMissingException(
-		    "Fail to leave tool Session." + "Could not find shared imageGallery session by given session id: "
-			    + toolSessionId);
+	    ImageGalleryServiceImpl.log.error("Fail to leave tool Session.Could not find shared imageGallery "
+		    + "session by given session id: " + toolSessionId);
+	    throw new DataMissingException("Fail to leave tool Session."
+		    + "Could not find shared imageGallery session by given session id: " + toolSessionId);
 	}
 	return toolService.completeToolSession(toolSessionId, learnerId);
     }

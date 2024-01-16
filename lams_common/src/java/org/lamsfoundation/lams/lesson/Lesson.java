@@ -226,12 +226,6 @@ public class Lesson implements Serializable {
     @Column(name = "locked_for_edit")
     private boolean lockedForEdit = false;
 
-    @Column(name = "learner_presence_avail")
-    private boolean learnerPresenceAvailable = false;
-
-    @Column(name = "learner_im_avail")
-    private boolean learnerImAvailable = false;
-
     @Column(name = "live_edit_enabled")
     private boolean liveEditEnabled = false;
 
@@ -287,14 +281,12 @@ public class Lesson implements Serializable {
      */
     public Lesson(String name, String description, Date createDateTime, User user, Integer lessonStateId,
 	    Integer previousLessonStateId, LearningDesign learningDesign, Set<LearnerProgress> learnerProgresses,
-	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
 	    Integer scheduledNumberDaysTolessonFinish) {
-	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
-		enableLessonIntro, displayDesignImage, false, learningDesign, null, null, learnerProgresses,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysTolessonFinish);
+	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId, enableLessonIntro, displayDesignImage, false,
+		learningDesign, null, null, learnerProgresses, liveEditEnabled, enableLessonNotifications, forceLearnerRestart, allowLearnerRestart,
+		gradebookOnComplete, scheduledNumberDaysTolessonFinish);
     }
 
     /** full constructor */
@@ -302,7 +294,7 @@ public class Lesson implements Serializable {
 	    Date endDateTime, User user, Integer lessonStateId, Integer previousLessonStateId,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean lockedForEdit, LearningDesign learningDesign,
 	    LessonClass lessonClass, Organisation organisation, Set<LearnerProgress> learnerProgresses,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
+	    Boolean liveEditEnabled,
 	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
 	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish) {
 	this.lessonId = lessonId;
@@ -316,8 +308,6 @@ public class Lesson implements Serializable {
 	this.previousLessonStateId = previousLessonStateId;
 	this.enableLessonIntro = enableLessonIntro != null ? enableLessonIntro : false;
 	this.displayDesignImage = displayDesignImage != null ? displayDesignImage : false;
-	this.learnerPresenceAvailable = learnerPresenceAvailable != null ? learnerPresenceAvailable : false;
-	this.learnerImAvailable = learnerImAvailable != null ? learnerImAvailable : false;
 	this.lockedForEdit = false;
 	this.learningDesign = learningDesign;
 	this.lessonClass = lessonClass;
@@ -344,14 +334,13 @@ public class Lesson implements Serializable {
      * @return the lesson created.
      */
     public static Lesson createNewLessonWithoutClass(String lessonName, String lessonDescription, User user,
-	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
+	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean liveEditEnabled, Boolean enableLessonNotifications,
 	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
 	    Integer scheduledNumberDaysToLessonFinish) {
 	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
 		null, ld, new HashSet<LearnerProgress>(), enableLessonIntro, displayDesignImage,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		forceLearnerRestart, allowLearnerRestart, gradebookOnComplete, scheduledNumberDaysToLessonFinish);
+		liveEditEnabled, enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, 
+		gradebookOnComplete, scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -638,22 +627,6 @@ public class Lesson implements Serializable {
 
     public void setLockedForEdit(boolean lockedForEdit) {
 	this.lockedForEdit = lockedForEdit;
-    }
-
-    public boolean getLearnerPresenceAvailable() {
-	return learnerPresenceAvailable;
-    }
-
-    public void setLearnerPresenceAvailable(boolean learnerPresenceAvailable) {
-	this.learnerPresenceAvailable = learnerPresenceAvailable;
-    }
-
-    public boolean getLearnerImAvailable() {
-	return learnerImAvailable;
-    }
-
-    public void setLearnerImAvailable(boolean learnerImAvailable) {
-	this.learnerImAvailable = learnerImAvailable;
     }
 
     public boolean getLiveEditEnabled() {

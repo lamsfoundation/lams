@@ -48,10 +48,9 @@ public interface IMonitoringService {
      * Intialise lesson without creating Learning Design copy, i.e. the original LD will be used.
      */
     Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
-	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerPresenceAvailable,
-	    Boolean learnerImAvailable, Boolean liveEditEnabled, Boolean enableLessonNotifications,
-	    Boolean forceLearnerRestart, Boolean allowLearnerRestart, Boolean gradebookOnComplete,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
+	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean liveEditEnabled,
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Boolean gradebookOnComplete, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * <p>
@@ -71,31 +70,32 @@ public interface IMonitoringService {
      * </p>
      *
      * @param lessonName
-     * 	the name of the lesson
+     *            the name of the lesson
      * @param lessonDescription
-     * 	the description of the lesson.
+     *            the description of the lesson.
      * @param learningDesignId
-     * 	the selected learning design
+     *            the selected learning design
      * @param organisationId
-     * 	the copied sequence will be put in the default runtime sequence folder for this org, if such a folder exists.
+     *            the copied sequence will be put in the default runtime sequence folder for this org, if such a folder
+     *            exists.
      * @param userId
-     * 	the user who want to create this lesson.
+     *            the user who want to create this lesson.
      * @param customCSV
-     * 	the custom comma separated values to be used by toolAdapters
+     *            the custom comma separated values to be used by toolAdapters
      * @param enableLessonIntro
-     * 	display an intro page to the lesson
+     *            display an intro page to the lesson
      * @param displayDesignImage
-     * 	display the design image or not
+     *            display the design image or not
      * @param enableNotifications
-     * 	enable "email notifications" link for the current lesson
+     *            enable "email notifications" link for the current lesson
      * @param numberDaysToLessonFinish
-     * 	number of days the lesson will be available to user since he starts it. (lesson finish scheduling feature)
+     *            number of days the lesson will be available to user since he starts it. (lesson finish scheduling
+     *            feature)
      * @return the lesson initialized.
      */
     Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId, Integer organisationId,
 	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
-	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Boolean liveEditEnabled, Boolean enableNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
 	    Boolean gradebookOnComplete, Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
@@ -103,8 +103,7 @@ public interface IMonitoringService {
      * normal learning session. The design is not assigned to any workspace folder.
      */
     Lesson initializeLessonForPreview(String lessonName, String lessonDescription, long learningDesignId,
-	    Integer userID, String customCSV, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled);
+	    Integer userID, String customCSV, Boolean liveEditEnabled);
 
     /**
      * Setup the lesson class and organization for a lesson according to the input from monitoring GUI interface.

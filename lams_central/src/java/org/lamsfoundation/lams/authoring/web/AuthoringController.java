@@ -337,7 +337,7 @@ public class AuthoringController {
 	if (learningDesignID != null) {
 	    User user = (User) userManagementService.findById(User.class, userID);
 	    Lesson lesson = monitoringService.initializeLessonWithoutLDcopy(title, "", learningDesignID, user, null,
-		    false, false, false, false, true, true, false, false, true, null, null);
+		    false, false, false, true, false, false, true, null, null);
 	    Organisation organisation = monitoringService.getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<>();
