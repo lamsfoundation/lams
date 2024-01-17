@@ -134,7 +134,7 @@
 								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
 			  			  	{name:'marker', index:'marker', width: 80, search:false, title: false},
 				  			{name:'markerComment', index:'markerComment', width:120, search:false, editable:true, sortable: false,
-				  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
+				  			    editoptions: {maxlength: 600}, align:"left", classes: 'vertical-align', title : false },
 			  				{name:'userId', index:'userId', width:0, hidden: true},
 		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
 	  				   	],

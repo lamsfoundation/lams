@@ -107,7 +107,7 @@
 		  				   		editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },	
 	  			  			{name:'marker', index:'marker', width: 80, title: false},
 	  			  			{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
-	  			  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false }	
+	  			  			    editoptions: {maxlength: 600}, align:"left", classes: 'vertical-align', title : false }
 	  				   	],
 	  				   	multiselect: false,
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
