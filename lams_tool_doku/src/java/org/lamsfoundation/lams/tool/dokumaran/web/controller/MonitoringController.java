@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import netscape.javascript.JSObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -53,6 +54,9 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
@@ -117,6 +121,9 @@ public class MonitoringController {
 
     @Autowired
     private IGradebookService gradebookService;
+
+    @Autowired
+    private ILessonService lessonService;
 
     @Autowired
     @Qualifier("lamsCoreToolService")
@@ -588,16 +595,7 @@ public class MonitoringController {
 	}
 	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
 	Dokumaran dokumaran = session.getDokumaran();
-	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
-	if (StringUtils.isNotBlank(dokumaran.getInstructions())) {
-	    responseJSON.put("instructions",
-		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_INSTRUCTIONS).append("\n")
-			    .append(dokumaran.getInstructions()).append("\n\n").toString());
-	}
-	if (StringUtils.isNotBlank(dokumaran.getDescription())) {
-	    responseJSON.put("description", new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n")
-		    .append(dokumaran.getDescription()).append("\n\n").toString());
-	}
+	ObjectNode responseJSON = getAiReviewPromptData(dokumaran);
 	try {
 	    String padContent = dokumaranService.getPadText(toolSessionId);
 	    if (StringUtils.isNotBlank(padContent)) {
@@ -607,6 +605,28 @@ public class MonitoringController {
 	    log.error("Failed to get pad content for session " + toolSessionId, e);
 	    return null;
 	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getAiLearningOutcomesPromptData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAiLearningOutcomesPromptData(@RequestParam Long toolContentId) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
+	ObjectNode responseJSON = getAiReviewPromptData(dokumaran);
+
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	LearningDesign learningDesign = lesson == null ? null : lesson.getLearningDesign();
+	String lessonDescription = learningDesign != null && StringUtils.isNotBlank(learningDesign.getDescription())
+		? learningDesign.getDescription().strip()
+		: null;
+	if (lessonDescription != null) {
+	    responseJSON.put("lessonDescription", lessonDescription);
+	}
+
 	return responseJSON.toString();
     }
 
@@ -624,6 +644,20 @@ public class MonitoringController {
 	}
 	session.setAiReview(review);
 	dokumaranService.saveOrUpdate(session);
+    }
+
+    private ObjectNode getAiReviewPromptData(Dokumaran dokumaran) {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (StringUtils.isNotBlank(dokumaran.getInstructions())) {
+	    responseJSON.put("instructions",
+		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_INSTRUCTIONS).append("\n")
+			    .append(dokumaran.getInstructions()).append("\n\n").toString());
+	}
+	if (StringUtils.isNotBlank(dokumaran.getDescription())) {
+	    responseJSON.put("description", new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n")
+		    .append(dokumaran.getDescription()).append("\n\n").toString());
+	}
+	return responseJSON;
     }
 
     private Integer getUserId() {

@@ -120,6 +120,10 @@
 		border: 1px #EEEEEE solid;
 		border-radius: 5px;
 	}
+
+	.doku-monitoring-summary #ai-review-learning-outcomes {
+		margin-bottom: 1rem;
+	}
 </style>
 
 <script>
@@ -494,20 +498,109 @@
 	<c:if test="${isAiEnabled}">
 	function aiReview(toolSessionId) {
 		let container = $('#ai-review-container-' + toolSessionId),
-				button = 	container.children('button').prop('disabled', true),
+				button = container.children('button').prop('disabled', true),
 				header = $('.ai-review-header', container)
 						.removeClass('hidden')
 						.append('<i class="ai-review-loading-icon fa fa-circle-o-notch fa-spin loffset10"></i>'),
 				content = $('.ai-review-content', container).addClass('hidden').empty();
 		container.children('.ai-review-button-clearfix').remove();
 
+		getAiLearningOutcomes(function(learningOutcomes) {
+			$.ajax({
+				'url': '<c:url value="/monitoring/getAiReviewPromptData.do"/>',
+				'type': 'get',
+				'dataType': 'json',
+				'cache': 'false',
+				'data': {
+					'toolSessionId': toolSessionId
+				},
+				success: function (response) {
+					let task = "";
+					if (response.instructions) {
+						task += response.instructions;
+					}
+					if (response.description) {
+						task += response.description;
+					}
+					$.ajax({
+						'url': LAMS_URL + 'ai/general/custom.do',
+						'type': 'post',
+						'dataType': 'text',
+						'cache': 'false',
+						'data': {
+							'promptKey': 'writing.task.review.prompt.criteria',
+							'promptParameters': [task, response.content,
+								learningOutcomes ? learningOutcomes : "No learning outcomes provided, skip this step"]
+						},
+						success: function (response) {
+							content.html(response);
+							$.ajax({
+								'url': '<c:url value="/monitoring/saveAiReview.do"/>',
+								'type': 'post',
+								'dataType': 'text',
+								'cache': 'false',
+								'data': {
+									'toolSessionId': toolSessionId,
+									'review': response
+								}
+							});
+						},
+						error: function () {
+							content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
+						},
+						complete: function () {
+							content.removeClass('hidden');
+							button.prop('disabled', false);
+							header.children('.ai-review-loading-icon').remove();
+						}
+					});
+				},
+				error: function () {
+					content.removeClass('hidden')
+							.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
+					button.prop('disabled', false);
+					header.children('.ai-review-loading-icon').remove();
+				}
+			});
+		});
+	}
+
+	function aiReviewAll() {
+		let button = $('#ai-review-all-button').prop('disabled', true);
+		// re-enable review all button after 10 seconds
+		setTimeout(function () {
+			button.prop('disabled', false);
+		}, 10000);
+
+		getAiLearningOutcomes(function() {
+			$('.ai-review-container').each(function () {
+				aiReview($(this).data('session-id'));
+			});
+		});
+	}
+
+	function getAiLearningOutcomes(callback){
+		// Always start with fetching learning outcomes.
+		// If there are no learning outcomes yet, AI generates them based on the lesson and activity descriptions.
+		// If they are present, they are taken from the textarea. The textarea can be edited by the monitor.
+		let learningOutcomesTextarea = $('#ai-review-learning-outcomes'),
+				learningOutcomes = learningOutcomesTextarea.val().trim();
+		if (learningOutcomes) {
+			if (callback) {
+				callback(learningOutcomes);
+			}
+			return;
+		}
+		let header = $('#ai-review-learning-outcomes-header').removeClass('hidden')
+				.append('<i class="ai-review-loading-icon fa fa-circle-o-notch fa-spin loffset10"></i>');
+
 		$.ajax({
-			'url': '<c:url value="/monitoring/getAiReviewPromptData.do"/>',
+			'url': '<c:url value="/monitoring/getAiLearningOutcomesPromptData.do"/>',
 			'type': 'get',
 			'dataType': 'json',
 			'cache': 'false',
 			'data': {
-				'toolSessionId': toolSessionId
+				'toolContentId': ${sessionMap.toolContentID}
 			},
 			success: function (response) {
 				let task = "";
@@ -523,50 +616,33 @@
 					'dataType': 'text',
 					'cache': 'false',
 					'data': {
-						'promptKey' : 'writing.task.review.prompt.criteria',
-						'promptParameters' : [task,  response.content]
+						'promptKey' : 'writing.task.review.prompt.learning.outcomes',
+						'promptParameters' : [task,
+							// lesson description is optional
+							response.lessonDescription ? response.lessonDescription : "no lesson description provided"]
 					},
 					success: function (response) {
-						content.html(response);
-						$.ajax({
-							'url': '<c:url value="/monitoring/saveAiReview.do"/>',
-							'type': 'post',
-							'dataType': 'text',
-							'cache': 'false',
-							'data': {
-								'toolSessionId': toolSessionId,
-								'review' : response
-							}
-						});
+						learningOutcomes = response.trim();
+						learningOutcomesTextarea.val(learningOutcomes);
+						if (callback) {
+							callback(learningOutcomes);
+						}
 					},
 					error: function () {
-						content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
+						learningOutcomesTextarea.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
 					},
 					complete: function (){
-						content.removeClass('hidden');
-						button.prop('disabled', false);
+						learningOutcomesTextarea.removeClass('hidden');
 						header.children('.ai-review-loading-icon').remove();
 					}
 				});
+
 			},
 			error: function () {
-				content.removeClass('hidden')
-						.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
-				button.prop('disabled', false);
+				learningOutcomesTextarea.removeClass('hidden')
+						.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
 				header.children('.ai-review-loading-icon').remove();
 			}
-		});
-	}
-
-	function aiReviewAll() {
-		let button = $('#ai-review-all-button').prop('disabled', true);
-		// re-enable review all button after 10 seconds
-		setTimeout(function () {
-			button.prop('disabled', false);
-		}, 10000);
-
-		$('.ai-review-container').each(function () {
-			aiReview($(this).data('session-id'));
 		});
 	}
 	</c:if>
@@ -704,11 +780,15 @@
 	</c:if>
 
 	<c:if test="${isAiEnabled}">
-		<button id="ai-review-all-button" class="btn btn-primary pull-right roffset10" style="margin-bottom: 1rem"
-				onClick="javascript:aiReviewAll()">
+		<button id="ai-review-all-button" class="btn btn-primary pull-right roffset10"
+				style="margin-bottom: 1rem" onClick="javascript:aiReviewAll()">
 			<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
 		</button>
+		<h4 id="ai-review-learning-outcomes-header" class="hidden">
+			<fmt:message key="label.monitoring.ai.review.learning.outcomes"/>
+		</h4>
 		<div class="clearfix"></div>
+		<textarea id="ai-review-learning-outcomes" class="form-control hidden" rows="8"></textarea>
 	</c:if>
 
 	<c:if test="${sessionMap.isGroupedActivity}">
