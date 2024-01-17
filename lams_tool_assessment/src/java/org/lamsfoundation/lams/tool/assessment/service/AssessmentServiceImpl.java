@@ -1524,13 +1524,14 @@ public class AssessmentServiceImpl
 	if (!results.isEmpty()) {
 
 	    //prepare list of the questions to display, filtering out questions that aren't supposed to be answered
-	    Set<AssessmentQuestion> questions = new TreeSet<>();
+	    Set<AssessmentQuestion> questions = null;
 	    //in case there is at least one random question - we need to show all questions in a drop down select
 	    if (assessment.hasRandomQuestion()) {
-		questions.addAll(assessment.getQuestions());
+		questions = new TreeSet<>(assessment.getQuestions());
 
 		//otherwise show only questions from the question list
 	    } else {
+		questions = new LinkedHashSet<>();
 		for (QuestionReference reference : assessment.getQuestionReferences()) {
 		    questions.add(reference.getQuestion());
 		}
