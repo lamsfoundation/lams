@@ -161,7 +161,9 @@
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
 			COUNT_RATED_ITEMS = true,
-			ALLOW_RERATE = false;
+			ALLOW_RERATE = false,
+
+			savedAiLearningOutcomes = null;
 
 	$(document).ready(function () {
 		// show etherpads only on Group expand
@@ -505,7 +507,7 @@
 				content = $('.ai-review-content', container).addClass('hidden').empty();
 		container.children('.ai-review-button-clearfix').remove();
 
-		getAiLearningOutcomes(function(learningOutcomes) {
+		getAiLearningOutcomes(function() {
 			$.ajax({
 				'url': '<c:url value="/monitoring/getAiReviewPromptData.do"/>',
 				'type': 'get',
@@ -530,7 +532,7 @@
 						'data': {
 							'promptKey': 'writing.task.review.prompt.criteria',
 							'promptParameters': [task, response.content,
-								learningOutcomes ? learningOutcomes : "No learning outcomes provided, skip this step"]
+								savedAiLearningOutcomes ? savedAiLearningOutcomes : "No learning outcomes provided, skip this step"]
 						},
 						success: function (response) {
 							content.html(response);
@@ -586,8 +588,24 @@
 		let learningOutcomesTextarea = $('#ai-review-learning-outcomes'),
 				learningOutcomes = learningOutcomesTextarea.val().trim();
 		if (learningOutcomes) {
+
+			if (learningOutcomes != savedAiLearningOutcomes) {
+				if (savedAiLearningOutcomes !== null) {
+					$.ajax({
+						'url': '<c:url value="/monitoring/saveAiLearningOutcomes.do"/>',
+						'type': 'post',
+						'dataType': 'text',
+						'cache': 'false',
+						'data': {
+							'toolContentId': ${sessionMap.toolContentID},
+							'learningOutcomes': learningOutcomes
+						}
+					});
+				}
+				savedAiLearningOutcomes = learningOutcomes;
+			}
 			if (callback) {
-				callback(learningOutcomes);
+				callback();
 			}
 			return;
 		}
@@ -624,9 +642,24 @@
 					success: function (response) {
 						learningOutcomes = response.trim();
 						learningOutcomesTextarea.val(learningOutcomes);
-						if (callback) {
-							callback(learningOutcomes);
-						}
+						savedAiLearningOutcomes = learningOutcomes;
+
+						$.ajax({
+							'url': '<c:url value="/monitoring/saveAiLearningOutcomes.do"/>',
+							'type': 'post',
+							'dataType': 'text',
+							'cache': 'false',
+							'data': {
+								'toolContentId': ${sessionMap.toolContentID},
+								'learningOutcomes': savedAiLearningOutcomes
+							},
+							complete: function () {
+								if (callback) {
+									callback();
+								}
+							}
+						});
+
 					},
 					error: function () {
 						learningOutcomesTextarea.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
@@ -784,11 +817,13 @@
 				style="margin-bottom: 1rem" onClick="javascript:aiReviewAll()">
 			<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
 		</button>
-		<h4 id="ai-review-learning-outcomes-header" class="hidden">
+		<h4 id="ai-review-learning-outcomes-header" class='${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'>
 			<fmt:message key="label.monitoring.ai.review.learning.outcomes"/>
 		</h4>
 		<div class="clearfix"></div>
-		<textarea id="ai-review-learning-outcomes" class="form-control hidden" rows="8"></textarea>
+		<textarea id="ai-review-learning-outcomes"
+				  class='form-control ${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'
+				  rows="8"><c:out value="${dokumaran.aiLearningOutcomes}" escapeXml="false"/></textarea>
 	</c:if>
 
 	<c:if test="${sessionMap.isGroupedActivity}">

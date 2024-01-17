@@ -646,6 +646,23 @@ public class MonitoringController {
 	dokumaranService.saveOrUpdate(session);
     }
 
+    @RequestMapping(path = "/saveAiLearningOutcomes", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void saveAiLearningOutcomes(@RequestParam Long toolContentId,
+	    @RequestParam(required = false) String learningOutcomes) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
+	if (StringUtils.isBlank(learningOutcomes)) {
+	    learningOutcomes = null;
+	}
+	dokumaran.setAiLearningOutcomes(learningOutcomes);
+	dokumaranService.saveOrUpdate(dokumaran);
+    }
+
     private ObjectNode getAiReviewPromptData(Dokumaran dokumaran) {
 	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
 	if (StringUtils.isNotBlank(dokumaran.getInstructions())) {
