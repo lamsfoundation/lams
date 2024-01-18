@@ -185,6 +185,11 @@ public interface IDokumaranService extends ICommonToolService {
     String finishToolSession(Long toolSessionId, Long userId) throws DokumaranApplicationException;
 
     /**
+     * Mark session as finished after time limit is exceeded.
+     */
+    void finishExpiredSessions(Long toolContentId);
+
+    /**
      * Return monitoring summary list. The return value is list of dokumaran summaries for each groups.
      */
     List<SessionDTO> getSummary(Long contentId, Long ratingUserUid);

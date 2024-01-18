@@ -151,6 +151,7 @@ public class MonitoringController {
 	List<GradeStatsDTO> sessionDtos = service.getSessionDtos(contentId, false);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
+	service.finishExpiredAttempts(contentId);
 
 	//set SubmissionDeadline, if any
 	if (assessment.getSubmissionDeadline() != null) {

@@ -23,19 +23,9 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.flux.FluxRegistry;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
@@ -63,12 +53,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import reactor.core.publisher.Flux;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/tblmonitoring")
@@ -85,6 +82,7 @@ public class TblMonitorController {
     public String tra(HttpServletRequest request) throws IOException, ServletException {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	scratchieService.finishExpiredSessions(toolContentId);
 
 	int attemptedLearnersNumber = scratchieService.countUsersByContentId(toolContentId);
 	request.setAttribute("attemptedLearnersNumber", attemptedLearnersNumber);
@@ -122,6 +120,7 @@ public class TblMonitorController {
     public String traStudentChoices(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    Model model) throws IOException, ServletException {
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	scratchieService.finishExpiredSessions(toolContentId);
 
 	Map<String, Object> modelAttributes = scratchieService.prepareStudentChoicesData(scratchie);
 	model.addAllAttributes(modelAttributes);

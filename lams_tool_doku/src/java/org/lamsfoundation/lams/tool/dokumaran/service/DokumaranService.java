@@ -82,6 +82,7 @@ import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import java.security.InvalidParameterException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -480,6 +481,47 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    throw new DokumaranApplicationException(e);
 	}
 	return nextUrl;
+    }
+
+    @Override
+    public void finishExpiredSessions(Long toolContentId) {
+	Dokumaran dokumaran = dokumaranDao.getByContentId(toolContentId);
+	if (dokumaran == null) {
+	    throw new IllegalArgumentException("Dokumaran with tool content ID " + toolContentId + " not found");
+	}
+	LocalDateTime currentLocalDateTime = LocalDateTime.now();
+	if ((dokumaran.isGalleryWalkEnabled() && !dokumaran.isGalleryWalkFinished()) || (
+		dokumaran.getRelativeTimeLimit() == 0 && (dokumaran.getAbsoluteTimeLimitFinish() == null
+			|| Duration.between(dokumaran.getAbsoluteTimeLimitFinish(), currentLocalDateTime).toSeconds()
+			< 30))) {
+	    // there can be no expired timers or the absolute timer expired less than 30 seconds ago, so no need to do anything
+	    return;
+	}
+
+	Date currentDate = new Date();
+	List<DokumaranSession> sessions = dokumaranSessionDao.getByContentId(toolContentId);
+	for (DokumaranSession session : sessions) {
+	    if (session.getSessionEndDate() != null) {
+		// the result is already finished
+		continue;
+	    }
+	    List<DokumaranUser> users = dokumaranUserDao.getBySessionID(session.getSessionId());
+	    boolean allUsersFinished = true;
+	    for (DokumaranUser user : users) {
+		boolean timeLimitExceeded = checkTimeLimitExceeded(dokumaran, user.getUserId().intValue());
+		if (timeLimitExceeded) {
+		    // the timer has expired, finish the result
+		    user.setSessionFinished(true);
+		    dokumaranUserDao.update(user);
+		} else {
+		    allUsersFinished = false;
+		}
+	    }
+	    if (allUsersFinished) {
+		session.setSessionEndDate(currentDate);
+		dokumaranSessionDao.update(session);
+	    }
+	}
     }
 
     @Override

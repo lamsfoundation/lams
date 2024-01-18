@@ -103,6 +103,11 @@ public interface IWhiteboardService extends ICommonToolService {
     String finishToolSession(Long toolSessionId, Long userId) throws WhiteboardApplicationException;
 
     /**
+     * Mark session as finished after time limit is exceeded.
+     */
+    void finishExpiredSessions(Long toolContentId);
+
+    /**
      * Create refection entry into notebook tool.
      */
     Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,

@@ -1,15 +1,5 @@
 package org.lamsfoundation.lams.tool.assessment.web.controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -41,7 +31,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Controller
 @RequestMapping("/tblmonitoring")
@@ -68,6 +65,7 @@ public class TblMonitoringController {
     public String iraAssessmentStudentChoices(HttpServletRequest request) {
 	Long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	assessmentService.finishExpiredAttempts(toolContentId);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	request.setAttribute("assessment", assessment);
@@ -204,6 +202,8 @@ public class TblMonitoringController {
     public String assessment(@RequestParam(name = AttributeNames.PARAM_TOOL_CONTENT_ID) long toolContentId,
 	    Model model) {
 	Assessment assessment = assessmentService.getAssessmentByContentId(toolContentId);
+	assessmentService.finishExpiredAttempts(toolContentId);
+
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("allowDiscloseAnswers", assessment.isAllowDiscloseAnswers());
 

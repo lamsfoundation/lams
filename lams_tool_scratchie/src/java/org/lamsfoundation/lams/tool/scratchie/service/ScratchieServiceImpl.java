@@ -108,6 +108,7 @@ import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -811,6 +812,41 @@ public class ScratchieServiceImpl
 	    throw new ScratchieApplicationException(e);
 	}
 	return nextUrl;
+    }
+
+    @Override
+    public void finishExpiredSessions(Long toolContentId) {
+	Scratchie scratchie = getScratchieByContentId(toolContentId);
+	if (scratchie == null) {
+	    throw new IllegalArgumentException("Scratchie with tool content ID " + toolContentId + " not found");
+	}
+	LocalDateTime currentLocalDateTime = LocalDateTime.now();
+	if (scratchie.getRelativeTimeLimit() == 0 && (scratchie.getAbsoluteTimeLimitFinish() == null
+		|| Duration.between(scratchie.getAbsoluteTimeLimitFinish(), currentLocalDateTime).toSeconds() < 30)) {
+	    // there can be no expired timers or the absolute timer expired less than 30 seconds ago, so no need to do anything
+	    return;
+	}
+
+	List<ScratchieSession> sessions = scratchieSessionDao.getByContentId(toolContentId);
+	for (ScratchieSession session : sessions) {
+	    if (session.isScratchingFinished()) {
+		// the result is already finished
+		continue;
+	    }
+	    ScratchieUser user = session.getGroupLeader();
+	    boolean timeLimitExceeded = checkTimeLimitExceeded(toolContentId, user.getUserId().intValue());
+	    if (timeLimitExceeded) {
+		// the timer has expired, finish the result
+		session.setScratchingFinished(true);
+		session.setStatus(ScratchieConstants.COMPLETED);
+		scratchieSessionDao.update(session);
+		List<ScratchieUser> users = getUsersBySession(session.getSessionId());
+		for (ScratchieUser scratchieUser : users) {
+		    scratchieUser.setSessionFinished(true);
+		    scratchieUserDao.update(scratchieUser);
+		}
+	    }
+	}
     }
 
     @Override

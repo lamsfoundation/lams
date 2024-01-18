@@ -126,6 +126,7 @@ public class MonitoringController {
 	}
 
 	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(contentId);
+	dokumaranService.finishExpiredSessions(contentId);
 
 	//set SubmissionDeadline, if any
 	if (dokumaran.getSubmissionDeadline() != null) {

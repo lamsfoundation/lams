@@ -72,6 +72,7 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
@@ -385,6 +386,47 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	    throw new WhiteboardApplicationException(e);
 	}
 	return nextUrl;
+    }
+
+    @Override
+    public void finishExpiredSessions(Long toolContentId) {
+	Whiteboard whiteboard = whiteboardDao.getByContentId(toolContentId);
+	if (whiteboard == null) {
+	    throw new IllegalArgumentException("Whiteboard with tool content ID " + toolContentId + " not found");
+	}
+	LocalDateTime currentLocalDateTime = LocalDateTime.now();
+	if ((whiteboard.isGalleryWalkEnabled() && !whiteboard.isGalleryWalkFinished()) || (
+		whiteboard.getRelativeTimeLimit() == 0 && (whiteboard.getAbsoluteTimeLimitFinish() == null
+			|| Duration.between(whiteboard.getAbsoluteTimeLimitFinish(), currentLocalDateTime).toSeconds()
+			< 30))) {
+	    // there can be no expired timers or the absolute timer expired less than 30 seconds ago, so no need to do anything
+	    return;
+	}
+
+	Date currentDate = new Date();
+	List<WhiteboardSession> sessions = whiteboardSessionDao.getByContentId(toolContentId);
+	for (WhiteboardSession session : sessions) {
+	    if (session.getStatus() == WhiteboardConstants.COMPLETED) {
+		// the result is already finished
+		continue;
+	    }
+	    List<WhiteboardUser> users = whiteboardUserDao.getBySessionID(session.getSessionId());
+	    boolean allUsersFinished = true;
+	    for (WhiteboardUser user : users) {
+		boolean timeLimitExceeded = checkTimeLimitExceeded(whiteboard, user.getUserId().intValue());
+		if (timeLimitExceeded) {
+		    // the timer has expired, finish the result
+		    user.setSessionFinished(true);
+		    whiteboardUserDao.update(user);
+		} else {
+		    allUsersFinished = false;
+		}
+	    }
+	    if (allUsersFinished) {
+		session.setStatus(WhiteboardConstants.COMPLETED);
+		whiteboardSessionDao.update(session);
+	    }
+	}
     }
 
     @Override

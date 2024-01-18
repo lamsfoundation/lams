@@ -128,6 +128,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1409,6 +1410,47 @@ public class AssessmentServiceImpl
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(false);
 	assessmentUserDao.saveObject(user);
+    }
+
+    public void finishExpiredAttempts(Long toolContentId) {
+	Assessment assessment = getAssessmentByContentId(toolContentId);
+	if (assessment == null) {
+	    throw new IllegalArgumentException("Assessment with tool content ID " + toolContentId + " not found");
+	}
+	LocalDateTime currentLocalDateTime = LocalDateTime.now();
+	if (assessment.getRelativeTimeLimit() == 0 && (assessment.getAbsoluteTimeLimitFinish() == null
+		|| Duration.between(assessment.getAbsoluteTimeLimitFinish(), currentLocalDateTime).toSeconds() < 30)) {
+	    // there can be no expired timers or the absolute timer expired less than 30 seconds ago,
+	    // so no need to do anything
+	    return;
+	}
+
+	Date currentDate = new Date();
+	List<AssessmentResult> results = assessmentResultDao.getLastAssessmentResults(assessment.getUid());
+	boolean anyResultFinished = false;
+	for (AssessmentResult result : results) {
+	    if (result.getFinishDate() != null) {
+		// the result is already finished
+		continue;
+	    }
+	    AssessmentUser user = result.getUser();
+	    boolean timeLimitExceeded = checkTimeLimitExceeded(toolContentId, user.getUserId().intValue());
+	    if (timeLimitExceeded) {
+		anyResultFinished = true;
+		// the timer has expired, finish the result
+		result.setFinishDate(currentDate);
+		assessmentResultDao.update(result);
+		if (assessment.getAttemptsAllowed() <= 1) {
+		    // if there are multiple attempts allowed, do not finish the session yet
+		    user.setSessionFinished(true);
+		    assessmentUserDao.update(user);
+		}
+	    }
+	}
+	if (anyResultFinished) {
+	    // update charts
+	    FluxRegistry.emit(AssessmentConstants.LEARNER_TRAVERSED_SINK_NAME, toolContentId);
+	}
     }
 
     @Override

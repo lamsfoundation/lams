@@ -23,13 +23,6 @@
 
 package org.lamsfoundation.lams.tool.scratchie.service;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -48,6 +41,13 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.service.ICommonToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface that defines the contract that all ShareScratchie service provider must follow.
@@ -293,6 +293,11 @@ public interface IScratchieService extends ICommonToolService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException;
+
+    /**
+     * Mark scratching as finished after time limit is exceeded.
+     */
+    void finishExpiredSessions(Long toolContentId);
 
     ScratchieItem getScratchieItemByUid(Long itemUid);
 

@@ -391,6 +391,11 @@ public interface IAssessmentService extends ICommonToolService {
     void unsetSessionFinished(Long toolSessionId, Long userId);
 
     /**
+     * Mark results as finished after time limit is exceeded.
+     */
+    void finishExpiredAttempts(Long toolContentId);
+
+    /**
      * Returns sessionDtos containing only session ids and session names.
      *
      * @param contentId

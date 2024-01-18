@@ -140,6 +140,7 @@ public class MonitoringController {
 	}
 
 	Whiteboard whiteboard = whiteboardService.getWhiteboardByContentId(contentId);
+	whiteboardService.finishExpiredSessions(contentId);
 
 	//set SubmissionDeadline, if any
 	if (whiteboard.getSubmissionDeadline() != null) {
