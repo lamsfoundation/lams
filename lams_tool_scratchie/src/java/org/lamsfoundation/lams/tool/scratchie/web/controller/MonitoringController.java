@@ -23,27 +23,9 @@
 
 package org.lamsfoundation.lams.tool.scratchie.web.controller;
 
-import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -65,7 +47,14 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.service.IScratchieService;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.*;
+import org.lamsfoundation.lams.util.AlphanumComparator;
+import org.lamsfoundation.lams.util.CommonConstants;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.JsonUtil;
+import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.util.excel.ExcelSheet;
 import org.lamsfoundation.lams.util.excel.ExcelUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -82,9 +71,25 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/monitoring")
@@ -367,6 +372,7 @@ public class MonitoringController {
 	    userJSON.put("sessionId", session.getSessionId());
 	    userJSON.put("adjustment", session.getTimeLimitAdjustment());
 	    userJSON.put("name", groupLabel + session.getSessionName() + "\"");
+	    userJSON.put("finished", session.isScratchingFinished());
 
 	    responseJSON.add(userJSON);
 	}

@@ -436,6 +436,10 @@ public class MonitoringController {
 	    }
 	    userJSON.put("name", name);
 
+	    WhiteboardUser whiteboardUser = whiteboardService.getLearnerByIDAndContent(user.getUserId().longValue(),
+		    toolContentId);
+	    userJSON.put("finished", whiteboardUser != null && whiteboardUser.isSessionFinished());
+
 	    responseJSON.add(userJSON);
 	}
 	return responseJSON.toString();

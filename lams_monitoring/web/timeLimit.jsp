@@ -477,7 +477,7 @@
 
 					row.removeClass('hidden');
 
-					if (this.adjustment === 0){
+					if (this.adjustment === 0 || this.finished){
 						return true;
 					}
 					let secondsLeft = absoluteTimeLimitFinish - Math.round(now / 1000) + this.adjustment * 60;

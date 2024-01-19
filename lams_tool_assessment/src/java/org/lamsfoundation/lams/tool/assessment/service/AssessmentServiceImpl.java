@@ -819,6 +819,11 @@ public class AssessmentServiceImpl
 
 	assessmentResultDao.update(result);
 
+	if (!isAutosave && assessment.getTimeLimitAdjustments().containsKey(userId.intValue())) {
+	    // make time widget stop displaying individual extension for this user
+	    FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, assessment.getContentId());
+	}
+
 	// refresh non-leaders when leader changed his answers or submitted them
 	if (assessment.isUseSelectLeaderToolOuput() && (!isAutosave || isAnswerModified)) {
 	    AssessmentSession session = getSessionBySessionId(result.getSessionId());

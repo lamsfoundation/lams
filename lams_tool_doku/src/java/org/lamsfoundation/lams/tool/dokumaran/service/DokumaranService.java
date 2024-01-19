@@ -442,15 +442,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	user.setSessionFinished(true);
 	dokumaranUserDao.saveObject(user);
 
-	// DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
-	// session.setStatus(DokumaranConstants.COMPLETED);
-	// dokumaranSessionDao.saveObject(session);
+	DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
 
 	//finish Etherpad session. Encapsulate it in try-catch block as we don't want it to affect regular LAMS workflow.
 	try {
 	    EPLiteClient client = etherpadService.getClient();
-
-	    DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
 	    String groupId = session.getEtherpadGroupId();
 
 	    String userName = user.getFirstName() + " " + user.getLastName();
@@ -469,6 +465,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    }
 	} catch (Exception e1) {
 	    log.debug(e1.getMessage());
+	}
+
+	Dokumaran dokumaran = session.getDokumaran();
+	if (dokumaran.getTimeLimitAdjustments().containsKey(userId.intValue())) {
+	    FluxRegistry.emit(DokumaranConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, dokumaran.getContentId());
 	}
 
 	String nextUrl = null;
