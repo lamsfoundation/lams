@@ -633,7 +633,8 @@
 				</td>
 				<td class="text-center">
 					<button id="absolute-time-limit-finish-now" class="btn btn-warning"
-							onClick="timeLimitFinishNow()">
+							onClick="timeLimitFinishNow()"
+							title="<fmt:message key="label.monitoring.time.limit.finish.now.tooltip" />">
 						<fmt:message key="label.monitoring.time.limit.finish.now"/>
 					</button>
 				</td>
