@@ -508,6 +508,10 @@ public class MonitoringController {
 	    }
 	    userJSON.put("name", name);
 
+	    DokumaranUser dokumaranUser = dokumaranService.getLearnerByIDAndContent(user.getUserId().longValue(),
+		    toolContentId);
+	    userJSON.put("finished", dokumaranUser != null && dokumaranUser.isSessionFinished());
+
 	    responseJSON.add(userJSON);
 	}
 	return responseJSON.toString();

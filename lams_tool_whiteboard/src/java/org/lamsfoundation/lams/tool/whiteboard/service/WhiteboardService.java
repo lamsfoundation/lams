@@ -388,6 +388,12 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	user.setSessionFinished(true);
 	whiteboardUserDao.update(user);
 
+	// there is no Flux to update time limit panel yet, but we need to turn it on once it appears
+//	Whiteboard whiteboard = user.getWhiteboard();
+//	if (whiteboard.getTimeLimitAdjustments().containsKey(userId.intValue())) {
+//	    FluxRegistry.emit(WhiteboardConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, whiteboard.getContentId());
+//	}
+
 	String nextUrl = null;
 	try {
 	    nextUrl = this.leaveToolSession(toolSessionId, userId);

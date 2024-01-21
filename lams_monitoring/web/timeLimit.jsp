@@ -477,7 +477,7 @@
 
 					row.removeClass('hidden');
 
-					if (this.adjustment === 0){
+					if (this.adjustment === 0 || this.finished){
 						return true;
 					}
 					let secondsLeft = absoluteTimeLimitFinish - Math.round(now / 1000) + this.adjustment * 60;
@@ -665,7 +665,8 @@
 					</td>
 					<td class="centered">
 						<button id="absolute-time-limit-finish-now" class="btn btn-warning btn-xs"
-								onClick="timeLimitFinishNow()">
+								onClick="timeLimitFinishNow()"
+								title="<fmt:message key="label.monitoring.time.limit.finish.now.tooltip" />">
 							<fmt:message key="label.monitoring.time.limit.finish.now"/>
 						</button>
 					</td>

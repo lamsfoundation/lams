@@ -1054,6 +1054,10 @@ public class MonitoringController {
 	    }
 	    userJSON.put("name", name);
 
+	    AssessmentResult result = service.getLastAssessmentResult(assessment.getUid(),
+		    user.getUserId().longValue());
+	    userJSON.put("finished", result != null && result.getFinishDate() != null);
+
 	    responseJSON.add(userJSON);
 	}
 	return responseJSON.toString();

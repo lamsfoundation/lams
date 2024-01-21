@@ -775,6 +775,11 @@ public class ScratchieServiceImpl
 	scratchieSessionDao.saveObject(session);
 
 	recalculateMarkForSession(toolSessionId, false);
+
+	if (session.getTimeLimitAdjustment() != null) {
+	    FluxRegistry.emit(ScratchieConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME,
+		    session.getScratchie().getContentId());
+	}
     }
 
     @Override

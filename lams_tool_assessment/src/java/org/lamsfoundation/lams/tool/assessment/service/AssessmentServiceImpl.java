@@ -35,6 +35,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -813,6 +814,11 @@ public class AssessmentServiceImpl
 
 	assessmentResultDao.update(result);
 
+	if (!isAutosave && assessment.getTimeLimitAdjustments().containsKey(userId.intValue())) {
+	    // make time widget stop displaying individual extension for this user
+	    FluxRegistry.emit(AssessmentConstants.TIME_LIMIT_PANEL_UPDATE_SINK_NAME, assessment.getContentId());
+	}
+
 	// refresh non-leaders when leader changed his answers or submitted them
 	if (assessment.isUseSelectLeaderToolOuput() && (!isAutosave || isAnswerModified)) {
 	    AssessmentSession session = getSessionBySessionId(result.getSessionId());
@@ -1467,13 +1473,14 @@ public class AssessmentServiceImpl
 	if (!results.isEmpty()) {
 
 	    //prepare list of the questions to display, filtering out questions that aren't supposed to be answered
-	    Set<AssessmentQuestion> questions = new TreeSet<>();
+	    Set<AssessmentQuestion> questions = null;
 	    //in case there is at least one random question - we need to show all questions in a drop down select
 	    if (assessment.hasRandomQuestion()) {
-		questions.addAll(assessment.getQuestions());
+		questions = new TreeSet<>(assessment.getQuestions());
 
 		//otherwise show only questions from the question list
 	    } else {
+		questions = new LinkedHashSet<>();
 		for (QuestionReference reference : assessment.getQuestionReferences()) {
 		    questions.add(reference.getQuestion());
 		}
