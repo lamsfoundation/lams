@@ -118,14 +118,15 @@
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
 				
-			var interval = "30000"; // = 30 seconds
+			var interval = "30000", // = 30 seconds
+				autosaveWindowId = new Date().getTime(); // all we need for this ID is to be unique;
 			window.setInterval(learnerAutosave, interval);
 			
 			function learnerAutosave(isCommand){
                 // isCommand means that the autosave was triggered by force complete or another command websocket message
 			    // in this case do not check multiple tabs open, just autosave
 			    if (!isCommand) {
-				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(interval);
+				  let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveWindowId, interval);
 				  if (!shouldAutosave) {
 					return;
 				  }

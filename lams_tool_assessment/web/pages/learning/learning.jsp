@@ -284,13 +284,14 @@
 
 			//autosave feature
 			<c:if test="${hasEditRight && (mode != 'teacher')}">
-			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000}; // 30 or 10 seconds interval
+			var autosaveInterval = ${isLeadershipEnabled and isUserLeader ? 10000 : 30000},  // 30 or 10 seconds interval
+				autosaveWindowId = new Date().getTime(); // all we need for this ID is to be unique
 
 			function learnerAutosave(isCommand){
 				// isCommand means that the autosave was triggered by force complete or another command websocket message
 				// in this case do not check multiple tabs open, just autosave
 				if (!isCommand) {
-					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveWindowId, autosaveInterval);
 					if (!shouldAutosave) {
 						return;
 					}
