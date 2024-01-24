@@ -504,7 +504,7 @@ public class IntegrationService implements IIntegrationService {
 	    user.setCreateDate(new Date());
 	    user.setDisabledFlag(false);
 	    user.setLocale(LanguageUtil.getSupportedLocaleByNameOrLanguageCode(userData[12]));
-	    user.setTimeZone(TimeZoneUtil.getServerTimezone());
+	    user.setTimeZone(TimeZoneUtil.getServerTimeZone());
 	    user.setTheme(service.getDefaultTheme());
 	    service.saveUser(user);
 	}

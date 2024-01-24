@@ -34,6 +34,7 @@ import org.lamsfoundation.lams.policies.PolicyDTO;
 import org.lamsfoundation.lams.policies.service.IPolicyService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
@@ -57,6 +58,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -256,7 +258,7 @@ public class ProfileController {
 	}
 	userForm.setUserTheme(userSelectedTheme);
 
-	request.setAttribute("timezones", TimeZone.getAvailableIDs());
+	request.setAttribute("timezones", TimeZoneUtil.getTimeZones());
 
 	return "profile/editprofile";
     }

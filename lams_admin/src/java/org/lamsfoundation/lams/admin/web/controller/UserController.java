@@ -58,10 +58,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * @author Jun-Dir Liew
@@ -184,7 +184,7 @@ public class UserController {
 		log.debug(e);
 	    }
 
-	    userForm.setTimeZone(TimeZoneUtil.getServerTimezone());
+	    userForm.setTimeZone(TimeZoneUtil.getServerTimeZone());
 	}
 	userForm.setOrgId(org == null ? null : org.getOrganisationId());
 
@@ -198,7 +198,7 @@ public class UserController {
 	    request.setAttribute("canSetTwoFactorAuthentication", true);
 	}
 
-	request.setAttribute("timezones", TimeZone.getAvailableIDs());
+	request.setAttribute("timezones", TimeZoneUtil.getTimeZones());
 
 	// for breadcrumb links
 	if (org != null) {

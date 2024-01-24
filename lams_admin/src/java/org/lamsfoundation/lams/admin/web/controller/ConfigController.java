@@ -28,6 +28,7 @@ import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.timezone.TimeZoneUtil;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -82,7 +84,7 @@ public class ConfigController {
 	smtpAuthTypes.put("ssl", "SSL");
 	request.setAttribute("smtpAuthTypes", smtpAuthTypes);
 
-	request.setAttribute("timezones", TimeZone.getAvailableIDs());
+	request.setAttribute("timezones", TimeZoneUtil.getTimeZones());
 
 	return "config/editconfig";
     }

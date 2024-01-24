@@ -707,7 +707,7 @@ public class ImportService implements IImportService {
 
 	String timeZoneColumn = parseStringCell(row.getCell(ImportService.TIME_ZONE));
 	user.setTimeZone(
-		TimeZoneUtil.isTimezoneValid(timeZoneColumn) ? timeZoneColumn : TimeZoneUtil.getServerTimezone());
+		TimeZoneUtil.isTimeZoneValid(timeZoneColumn) ? timeZoneColumn : TimeZoneUtil.getServerTimeZone());
 
 	service.updatePassword(user, password);
 

@@ -82,7 +82,7 @@ public class SignupController {
 		user.setLastName(signupForm.getLastName());
 		user.setEmail(signupForm.getEmail());
 		user.setCountry(signupForm.getCountry());
-		user.setTimeZone(TimeZoneUtil.getServerTimezone());
+		user.setTimeZone(TimeZoneUtil.getServerTimeZone());
 
 		if (!ValidationUtil.isPasswordNotUserDetails(signupForm.getPassword(), user)) {
 		    errorMap.add("password", messageService.getMessage("label.password.restrictions"));
