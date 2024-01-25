@@ -206,7 +206,7 @@
 					return value;
 				}
 				if (value == "-") {
-					value = "0";
+					value = "";
 				}
 				return value;
 			},
