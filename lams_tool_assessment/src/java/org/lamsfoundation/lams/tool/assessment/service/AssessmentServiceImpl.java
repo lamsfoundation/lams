@@ -862,6 +862,21 @@ public class AssessmentServiceImpl
 	    }
 	}
 
+	StringBuilder autosaveLogBuilder = null;
+	if (StringUtils.isNotBlank(questionResult.getAnswer()) && "".equals(questionDto.getAnswer())) {
+	    autosaveLogBuilder = new StringBuilder("For learner ").append(assessmentResult.getUser().getUid())
+		    .append(" \"").append(assessmentResult.getUser().getLoginName()).append("\" for question ")
+		    .append(questionDto.getUid()).append(" for question result ").append(questionResult.getUid())
+		    .append(" answer was \"").append(questionResult.getAnswer())
+		    .append("\" and it is now blank, skipping save.");
+	    log.warn(autosaveLogBuilder);
+	    if (logAutosave.isTraceEnabled()) {
+		logAutosave.trace(autosaveLogBuilder);
+	    }
+	    questionResult.setAnswerModified(false);
+	    return questionResult;
+	}
+
 	boolean isAnswerModified =
 		!Objects.equals(questionResult.getAnswerBoolean(), questionDto.getAnswerBoolean()) || !Objects.equals(
 			questionResult.getAnswerFloat(), questionDto.getAnswerFloat()) || !Objects.equals(
@@ -869,7 +884,7 @@ public class AssessmentServiceImpl
 
 	// this is for logging every autosave as requested by Imperial
 	// it produces a lot of logs, so it goes to a separate file
-	StringBuilder autosaveLogBuilder = null;
+
 	if (logAutosave.isTraceEnabled()) {
 	    autosaveLogBuilder = new StringBuilder("For learner ").append(assessmentResult.getUser().getUid())
 		    .append(" \"").append(assessmentResult.getUser().getLoginName()).append("\" for question ")
@@ -937,8 +952,9 @@ public class AssessmentServiceImpl
 	}
 
 	// store justification entered by the learner
-	if (assessment.isAllowAnswerJustification() || (questionDto.getType().equals(QbQuestion.TYPE_MARK_HEDGING)
-		&& questionDto.isHedgingJustificationEnabled())) {
+	if (assessment.isAllowAnswerJustification() || (questionDto.getType().
+
+		equals(QbQuestion.TYPE_MARK_HEDGING) && questionDto.isHedgingJustificationEnabled())) {
 	    isAnswerModified |= !Objects.equals(questionResult.getJustification(), questionDto.getJustification());
 	    questionResult.setJustification(questionDto.getJustification());
 	}
@@ -3131,9 +3147,9 @@ public class AssessmentServiceImpl
 	}
     }
 
-    // *****************************************************************************
-    // private methods
-    // *****************************************************************************
+// *****************************************************************************
+// private methods
+// *****************************************************************************
 
     private Assessment getDefaultAssessment() throws AssessmentApplicationException {
 	Long defaultAssessmentId = getToolDefaultContentIdBySignature(AssessmentConstants.TOOL_SIGNATURE);
@@ -3157,9 +3173,9 @@ public class AssessmentServiceImpl
 	return contentId;
     }
 
-    // *****************************************************************************
-    // set methods for Spring Bean
-    // *****************************************************************************
+// *****************************************************************************
+// set methods for Spring Bean
+// *****************************************************************************
 
     public void setLogEventService(ILogEventService logEventService) {
 	this.logEventService = logEventService;
@@ -3205,9 +3221,9 @@ public class AssessmentServiceImpl
 	this.assessmentConfigDao = assessmentConfigDao;
     }
 
-    // *******************************************************************************
-    // ToolContentManager, ToolSessionManager methods
-    // *******************************************************************************
+// *******************************************************************************
+// ToolContentManager, ToolSessionManager methods
+// *******************************************************************************
 
     @Override
     public void exportToolContent(Long toolContentId, String rootPath) throws DataMissingException, ToolException {
