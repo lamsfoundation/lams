@@ -61,7 +61,7 @@
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>
 			<c:if test="${not empty sessionResults and (toolSessionID != session.sessionId or showRating)}">
-				<div class="row ${toolSessionID == session.sessionId ? 'bg-success' : ''}">
+				<div class="row">
 					<div class="w-25">
 						<lams:Portrait userId="${session.groupLeader.userId}"/>
 						
@@ -91,9 +91,9 @@
 						</c:if>
 				
 						<c:if test="${showRating}">
-							<%-- Do not allow voting for own answer, and for non-leaders if leader is enabled --%>
+							<%-- Do not allow voting for non-leaders if leader is enabled --%>
 							<lams:Rating5 itemRatingDto="${itemRatingDto}"
-										 isItemAuthoredByUser="${not canRate}"
+										 isDisplayOnly="${not canRate}"
 										 showAllComments="true"
 										 refreshOnComment="rating-table-${question.uid}" />
 						</c:if>	
@@ -101,16 +101,15 @@
 				</div>
 			</c:if>
 		</c:forEach>
-		
-		<c:if test="${question.groupsAnswersDisclosed and not empty toolSessionID}">
-			<div>
-				<button type="button"
-					class="btn btn-sm btn-secondary btn-icon-refresh float-end mt-2"
-					onClick="javascript:refreshToRating(${question.uid})">
-					<fmt:message key="label.refresh" />
-				</button>
-			</div>
-		</c:if>
 	</div>
-
+		
+	<c:if test="${question.groupsAnswersDisclosed and not empty toolSessionID}">
+		<div>
+			<button type="button"
+				class="btn btn-sm btn-secondary btn-icon-refresh float-end"
+				onClick="javascript:refreshToRating(${question.uid})">
+				<fmt:message key="label.refresh" />
+			</button>
+		</div>
+	</c:if>
 </c:if>

@@ -11,9 +11,7 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:PageLearner title="${generalLearnerFlowDTO.activityTitle}" toolSessionID="${sessionMap.toolSessionID}" >
-
-	<lams:css suffix="jquery.jRating"/>
-
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/qalearning.css">
@@ -121,7 +119,7 @@
 									<div class="text-center fs-4">
 										<fmt:message key="label.learning.rating" />
 									</div>
-									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
+									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isDisplayOnly="true"
 												 maxRates="${qaContent.maximumRates}" />
 								</div>
 							</c:if>
@@ -130,46 +128,6 @@
 
 					<!-- Others users' responses -->
 					<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
-
-						<!-- Rating limits info -->
-						<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
-							<lams:Alert5 id="rating-info" type="warning" close="true">
-								<c:choose>
-									<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
-										<fmt:message key="label.rate.limits.reminder">
-											<fmt:param value="${qaContent.minimumRates}" />
-											<fmt:param value="${qaContent.maximumRates}" />
-										</fmt:message>
-									</c:when>
-				
-									<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
-										<fmt:message key="label.rate.limits.reminder.min">
-											<fmt:param value="${qaContent.minimumRates}" />
-										</fmt:message>
-									</c:when>
-				
-									<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
-										<fmt:message key="label.rate.limits.reminder.max">
-											<fmt:param value="${qaContent.maximumRates}" />
-										</fmt:message>
-									</c:when>
-								</c:choose>
-								<br>
-				
-								<fmt:message key="label.rate.limits.topic.reminder">
-									<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>" />
-								</fmt:message>
-							</lams:Alert5>
-						</c:if>
-					
-						<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
-							<lams:Alert5 id="rating-comment-info-${status.count}" type="info" close="false" >
-								<fmt:message key="label.comment.minimum.number.words">
-									<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
-								</fmt:message>
-							</lams:Alert5>
-						</c:if>
-
 						<c:choose>
 							<c:when test="${isCommentsEnabled}">
 								<c:set var="numColumns" value="3" />
@@ -186,6 +144,45 @@
 							<div class="card-subheader mb-2">
 								<fmt:message key="label.other.learners.answers" />
 							</div>
+
+							<!-- Rating limits info -->
+							<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
+								<lams:Alert5 id="rating-info" type="info">
+									<c:choose>
+										<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates ne 0}">
+											<fmt:message key="label.rate.limits.reminder">
+												<fmt:param value="${qaContent.minimumRates}" />
+												<fmt:param value="${qaContent.maximumRates}" />
+											</fmt:message>
+										</c:when>
+					
+										<c:when test="${qaContent.minimumRates ne 0 and qaContent.maximumRates eq 0}">
+											<fmt:message key="label.rate.limits.reminder.min">
+												<fmt:param value="${qaContent.minimumRates}" />
+											</fmt:message>
+										</c:when>
+					
+										<c:when test="${qaContent.minimumRates eq 0 and qaContent.maximumRates ne 0}">
+											<fmt:message key="label.rate.limits.reminder.max">
+												<fmt:param value="${qaContent.maximumRates}" />
+											</fmt:message>
+										</c:when>
+									</c:choose>
+									<br>
+					
+									<fmt:message key="label.rate.limits.topic.reminder">
+										<fmt:param value="<span id='count-rated-items'>${sessionMap.countRatedItems}</span>" />
+									</fmt:message>
+								</lams:Alert5>
+							</c:if>
+						
+							<c:if test="${isCommentsEnabled && sessionMap.commentsMinWordsLimit != 0}">
+								<lams:Alert5 id="rating-comment-info-${status.count}" type="info">
+									<fmt:message key="label.comment.minimum.number.words">
+										<fmt:param>: ${sessionMap.commentsMinWordsLimit}</fmt:param>
+									</fmt:message>
+								</lams:Alert5>
+							</c:if>
 						
 							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter jRating">
 								<th title="<fmt:message key='label.sort.by.answer'/>">
@@ -251,9 +248,6 @@
 	</form:form>
 
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-
 		//vars for rating.js
 		var MAX_RATES = ${qaContent.maximumRates},
 				MIN_RATES = ${qaContent.minimumRates},
@@ -262,27 +256,24 @@
 				COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 				WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 				WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>",
-				ALLOW_RERATE = false,
 				SESSION_ID = ${toolSessionID};
 	</script>
-	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/rating5.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<lams:JSImport src="includes/javascript/portrait5.js" />
-
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionID}', '', function(){
 			submitMethod('endLearning');
 		});
 
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
-				YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-				IS_DISABLED =  ${sessionMap.isDisabled};
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			IS_DISABLED =  ${sessionMap.isDisabled};
 
 		$(document).ready(function(){
 
@@ -320,7 +311,7 @@
 							for (i = 0; i < data.rows.length; i++){
 								var userData = data.rows[i];
 								var itemId = userData["responseUid"];
-								var isItemAuthoredByUser = userData["isItemAuthoredByUser"];
+								var isDisplayOnly = userData["isDisplayOnly"];
 
 								rows += '<tr>';
 								rows += '<td style="vertical-align:top;">';
@@ -354,7 +345,7 @@
 									rows += '<td style="width:150px;vertical-align:top;">';
 
 									if (userData["visible"] == 'true') {
-										rows += '<div class="rating-stars-holder">';
+										rows += '<div class="starability-holder">';
 
 										// if the user has left a comment or done a rating in a batch of ratings, we need to keep all related ratings open.
 										usesRatings = true;
@@ -366,40 +357,16 @@
 										}
 										hasStartedRating = hasStartedRating || ${isCommentsEnabled} && userData["commentPostedByUser"] != "";
 
-										for (j = 0; j < userData.criteriaDtos.length; j++){
-											var criteriaDto = userData.criteriaDtos[j];
-											var objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId;
-											var averageRating = criteriaDto.averageRating;
-											var numberOfVotes = criteriaDto.numberOfVotes;
-											var userRating = criteriaDto.userRating;
-											var isCriteriaNotRatedByUser = userRating == "";
-											var averageRatingDisplayed = (isItemAuthoredByUser || !isCriteriaNotRatedByUser) ? averageRating : 0;
-											var ratingStarsClass = (IS_DISABLED || isItemAuthoredByUser || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES)  && (!hasStartedRating) || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
-
-											rows += '<strong>';
-											rows += 	 criteriaDto.title;
-											rows += '</strong>';
-
-											rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
-											rows += '</div>';
-
-											if (isItemAuthoredByUser) {
-												rows += '<div class="rating-stars-caption">';
-												rows += 	AVG_RATING_LABEL.replace("@1@", averageRating).replace("@2@", numberOfVotes);
-												rows += '</div>';
-
-											} else {
-												rows += '<div class="rating-stars-caption" id="rating-stars-caption-'+ objectId +'"';
-												if (isCriteriaNotRatedByUser) {
-													rows += ' style="visibility: hidden;"';
-												}
-												rows += '>';
-												var temp = YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-'+ objectId +'">'+ userRating + '</span>');
-												temp = temp.replace("@2@", '<span id="average-rating-'+ objectId +'">'+ averageRating + '</span>');
-												temp = temp.replace("@3@", '<span id="number-of-votes-'+ objectId +'">'+ numberOfVotes + '</span>');
-												rows += 	temp;
-												rows += '</div>';
-											}
+										for (j = 0; j < userData.criteriaDtos.length; j++){											
+											const criteriaDto = userData.criteriaDtos[j],
+												objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId,
+												averageRating = criteriaDto.averageRating,
+												numberOfVotes = criteriaDto.numberOfVotes,
+												userRating = criteriaDto.userRating,
+												isCriteriaRatedByUser = userRating != "",
+												isWidgetDisabled = (IS_DISABLED || isDisplayOnly || (MAX_RATES > 0) && (countRatedItems >= MAX_RATES) && (!hasStartedRating) || isCriteriaRatedByUser),
+												criteriaTitle = criteriaDto.title;
+											rows += createStarability(isDisplayOnly, objectId, averageRating, numberOfVotes, userRating, isWidgetDisabled, criteriaTitle);
 										}
 
 										rows += '</div>';
@@ -419,7 +386,7 @@
 										var commentPostedByUser = userData["commentPostedByUser"];
 
 										//show all comments needs to be shown
-										if (isItemAuthoredByUser) {
+										if (isDisplayOnly) {//user is an author of the response
 											for (j = 0; i < userData.comments.length; j++){
 												var comment = userData.comments[j];
 												rows += '<div class="rating-comment">';
@@ -469,7 +436,7 @@
 
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
-					initializeJRating();
+					initializeStarability();
 					jQuery("time.timeago").timeago();
 				});
 			});

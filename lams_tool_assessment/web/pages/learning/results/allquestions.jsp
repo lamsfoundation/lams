@@ -10,7 +10,7 @@
 <c:set var="showQuestionMonitoringActionButtons" value="${not empty sessions}" />
 
 <c:if test="${param.embedded}">
-    <lams:css suffix="jquery.jRating"/>
+    <link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
     <link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 </c:if>
 
@@ -24,12 +24,8 @@
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-<lams:JSImport src="includes/javascript/rating.js" />
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jRating.js"></script>
+<lams:JSImport src="includes/javascript/rating5.js" />
 <script type="text/javascript">
-    //var for jquery.jRating.js
-    var pathToImageFolder = "${lams}images/css/",
-
         //vars for rating.js
         AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
         YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
@@ -38,8 +34,7 @@
         MIN_RATES = 0,
         COUNT_RATED_ITEMS = true,
         COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
-        WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.image.comment.blank"/></spring:escapeBody>',
-        ALLOW_RERATE = false;
+        WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.image.comment.blank"/></spring:escapeBody>';
     <%-- Do not allow rating if it is a teacher view --%>
     <c:if test="${not empty toolSessionID}">
     var SESSION_ID = ${toolSessionID};

@@ -9,7 +9,7 @@
 <script>
 	$(document).ready(function(){
 		<c:if test="${sessionMap.rateItems}">
-			initializeJRating();
+			initializeStarability();
 		</c:if>
 		
 		var isDownload = ${isDownload},

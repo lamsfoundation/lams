@@ -1130,8 +1130,9 @@ public class LearningController implements QaAppConstants {
 		    }
 		}
 
-		boolean isItemAuthoredByUser = response.getQaQueUser().getQueUsrId().equals(userId);
-		responseRow.put("isItemAuthoredByUser", isItemAuthoredByUser);
+		//display only in case user is an author of the response
+		boolean isDisplayOnly = response.getQaQueUser().getQueUsrId().equals(userId);
+		responseRow.put("isDisplayOnly", isDisplayOnly);
 
 		ArrayNode criteriasRows = JsonNodeFactory.instance.arrayNode();
 		for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {

@@ -17,9 +17,6 @@
 <lams:JSImport src="includes/javascript/common.js" />
 <c:if test="${isImageSelected}">
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-		
 		//vars for rating.js
 		var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 		YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
@@ -30,13 +27,11 @@
 		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.image.comment.blank"/></spring:escapeBody>',
 		WARN_MIN_NUMBER_WORDS_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>',
-		ALLOW_RERATE = false,
 		SESSION_ID = ${toolSessionID};
 	</script>
-	<lams:JSImport src="includes/javascript/rating.js" />
+	<lams:JSImport src="includes/javascript/rating5.js" />
 </c:if>
 <lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('#voting-form-checkbox').click(function() {
@@ -64,9 +59,9 @@
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
-		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isItemAuthoredByUser="${sessionMap.isAuthor}"
+		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
-				minNumberWordsLabel="label.minimum.number.words" />
+				minNumberWordsLabel="label.minimum.number.words"/>
 	</c:if>
 
 	<div id="extra-controls" class="mb-3">
