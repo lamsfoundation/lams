@@ -2,16 +2,13 @@
 <c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
 
 <!-- ********************  CSS ********************** -->
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>/includes/css/learning.css'/>">
 
 <!-- ********************  javascript ********************** -->
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-
 		//vars for rating.js
 		var MAX_RATES = 0, // only applies to stars
 		MIN_RATES = 0, // only applies to stars
@@ -21,7 +18,6 @@
 		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
-		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId}; 
 
 		var	commentsSaved = true,
@@ -29,11 +25,10 @@
 			commentsOnOtherPages = ${countRatedItems};
 			numCommentsOnPage = 0;
 	</script>
-	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/rating5.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 	<script type="text/javascript">
 	$(document).ready(function(){
@@ -153,7 +148,7 @@
 			// bind to pager events
 			.bind('pagerInitialized pagerComplete', function(event, options){
 				commentsSaved = false;
-				initializeJRating();
+				initializeStarability();
 				checkButtons();
 			});
 

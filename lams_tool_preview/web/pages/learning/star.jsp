@@ -3,15 +3,13 @@
 <c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
 
 <!-- ********************  CSS ********************** -->
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+	<link rel="stylesheet" href="${lams}css/starability-basic.css">
 
 <!-- ********************  javascript ********************** -->	
-<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-
+	<script type="text/javascript">
 		//vars for rating.js
 		var MAX_RATES = ${maxRates},
 		MIN_RATES = ${minRates},
@@ -22,14 +20,12 @@
 		COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true">:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='warning.minimum.number.words'><fmt:param value='${criteriaRatings.ratingCriteria.commentsMinWordsLimit}'/></fmt:message></spring:escapeBody>",
-		ALLOW_RERATE = true,
 		SESSION_ID = ${toolSessionId};
-</script>
-	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
+	</script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/rating5.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 <script type="text/javascript">	
 	var YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message></spring:escapeBody>',
@@ -94,44 +90,33 @@
 							
 							var isMaximumRatesPerUserReached = (${peerreview.maximumRatesPerUser} != 0) && (userData.ratesPerUser >= ${peerreview.maximumRatesPerUser});
 							
-							rows += '<tr>' +
-										'<td class="username">' + 
-											'<div class="float-start me-2">' +
-												definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' ) +
-										 	'</div>' +
-											'<span class="portrait-sm-lineheight" id="username-' + itemId + '">' +
-												userData["itemDescription"] +
-											'</span>';
-								
+							rows += 
+								'<tr>' +
+									'<td class="username">' + 
+										'<div class="float-start me-2">' +
+											definePortrait( userData["itemDescription2"], itemId, 'small', true, '${lams}' ) +
+									 	'</div>' +
+										'<span class="portrait-sm-lineheight" id="username-' + itemId + '">' +
+											userData["itemDescription"] +
+										'</span>';
 							if (isMaximumRatesPerUserReached) {
-								rows += '<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.cant.rate" /></spring:escapeBody></div>';
+								rows +=	'<br/><div class="alert alert-warning"><i class="fa fa-exclamation-circle text-muted"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="label.cant.rate" /></spring:escapeBody></div>';
 							}
+							rows += '</td>' +
+									'<td class="rating">' +
+										'<div class="starability-holder">';	
 
-							rows += '</td>';
-							rows += '<td class="rating">';
-							rows += 	'<div class="rating-stars-holder text-center center-block">';		
-							
-							var isDisabled = IS_DISABLED || (MAX_RATES > 0) && ( COUNT_RATED_ITEMS >= MAX_RATES) || isMaximumRatesPerUserReached;
-							
-							var objectId = "${criteriaRatings.ratingCriteria.ratingCriteriaId}-" + itemId;
-							var userRating = userData["userRating"];
-							var isCriteriaNotRatedByUser = userRating == "";
-							var userRatingDisplayed = (!isCriteriaNotRatedByUser) ? userRating : 0;
-							let isWidgetDisabled = (isDisabled && isCriteriaNotRatedByUser);
-							var ratingStarsClass = isWidgetDisabled ? "rating-stars-disabled" : "rating-stars";
-							var tabindex = isWidgetDisabled ? "" : 'tabindex="0"';
-							
-							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ userRatingDisplayed +'" data-id="'+ objectId +'" role="button" aria-labelledby="theader-rating username-' + itemId + '" ' + tabindex + '>';
-							rows += '</div>';
-									
-							rows += '<div class="rating-stars-caption" id="rating-stars-caption-'+ objectId +'"';
-							if (isCriteriaNotRatedByUser) {
-								rows += ' style="visibility: hidden;"';	
-							}
-							rows += '>';
-							rows += YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-'+ objectId +'">'+ userRating + '</span>');							rows += '</div>';
-									
-							rows += '</td>';
+							let isDisplayOnly = false,
+								objectId = "${criteriaRatings.ratingCriteria.ratingCriteriaId}-" + itemId,
+								averageRating = userData["userRating"],//use userRating instead of averageRating for display only
+								numberOfVotes = null,
+								userRating = userData["userRating"],
+								isCriteriaRatedByUser = userRating != "",
+								isWidgetDisabled = (IS_DISABLED || isDisplayOnly || (MAX_RATES > 0) && (COUNT_RATED_ITEMS >= MAX_RATES) || isMaximumRatesPerUserReached) && !isCriteriaRatedByUser,
+								criteriaTitle = null;
+							rows +=		 	createStarability(isDisplayOnly, objectId, averageRating, numberOfVotes, userRating, isWidgetDisabled, criteriaTitle) +
+										'</div>' +	
+									'</td>';
 							
 							if (${criteriaRatings.ratingCriteria.commentsEnabled}) {
 								rows += '<td class="comment" id="comments-area-' + itemId + '">';
@@ -147,7 +132,7 @@
 								//show comments textarea and a submit button
 								} else if (!IS_DISABLED) {
 									rows += '<div id="add-comment-area-' + itemId;
-									if ( isCriteriaNotRatedByUser )
+									if ( !isCriteriaRatedByUser )
 										rows += '" style="visibility: hidden;';
 									rows += '">';	
 									commentPostedByUser = commentPostedByUser.replace(/<BR>/gi, '\n');
@@ -171,7 +156,7 @@
 			// bind to pager events
 			.bind('pagerInitialized pagerComplete', function(event, options){
 				commentsSaved = false;
-				initializeJRating();
+				initializeStarability();
 				onRatingSuccessCallback(); // show buttons if appropriate
 			});
 		});
@@ -179,8 +164,7 @@
 
 <c:choose>
 <c:when test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-	function submitEntry(next, url){	
-
+	function submitEntry(next, url){
 		hideButtons();
 
 		var validationFailed = false, 

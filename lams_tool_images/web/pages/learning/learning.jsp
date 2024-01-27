@@ -31,7 +31,7 @@
 <lams:PageLearner title="${imageGallery.title}" toolSessionID="${toolSessionID}" >
     <link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>/includes/css/fotorama.css"/>
     <link href="<lams:WebAppURL/>includes/css/imageGallery.css" rel="stylesheet" type="text/css">
-    <lams:css suffix="jquery.jRating"/>
+    <link rel="stylesheet" href="${lams}css/rating.css">
     <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
     <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
     <link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
@@ -46,9 +46,7 @@
     </script>
     <lams:JSImport src="includes/javascript/imageGallerycommon.js" relative="true" />
     <lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
-
 	<%@ include file="/common/uppylang.jsp"%>
-
     <lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     <lams:JSImport src="includes/javascript/upload.js" />
     <script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
@@ -58,7 +56,7 @@
 
         $(document).ready(function(){
             $('.fotorama')
-                .on('fotorama:show ',
+            	.on('fotorama:show ',
                     function (e, fotorama, extra) {
                         loadImageData(fotorama.activeFrame.id);
                     }
@@ -67,38 +65,37 @@
                     //TODO history   : true,
                     width: ${mediumImageDimensions + 60},
                     height: Math.round(${mediumImageDimensions + 60}*9/16),
-                maxwidth: '100%',
-                //ratio: 16/9,
-                allowfullscreen: true,
-                keyboard: true,
-                nav: 'thumbs',
-                fit: 'scaledown',
-                //thumbfit: 'contain',
-                loop: true,
-                thumbwidth: 80,//${thumbnailImageDimensions},
-                thumbheight: 80,//${thumbnailImageDimensions},
-                data: [
-                <c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
-                {
-                    img: "<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false",
-                    full: "<lams:WebAppURL />download/?uuid=${image.originalFileDisplayUuid}&preferDownload=false",
-                    id: '${image.uid}', // Custom anchor is used with the hash:true option.
-                    caption:'<div class="card-subheader fw-bold fs-6">${image.titleEscaped}</div>' +
-                        '<div>${image.descriptionEscaped}</div>'
-                        <c:if test="${!image.createByAuthor && (image.createBy != null)}">
-                        <c:set var="portrait"><lams:Portrait userId="${image.createBy.userId}"/></c:set>
-                        <c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
-                        + '<div class="fst-italic"><fmt:message key="label.learning.added.by" /> <span class="mx-2">${portrait}</span><c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div>'
-                    </c:if>
-                    //html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
-                    //fit: 'cover' // Override the global fit option.
-                    //any: 'Any data relative to the frame you want to store'
-                },
-                </c:forEach>
-            ]
-        }
-        );
-
+	                maxwidth: '100%',
+	                //ratio: 16/9,
+	                allowfullscreen: true,
+	                keyboard: true,
+	                nav: 'thumbs',
+	                fit: 'scaledown',
+	                //thumbfit: 'contain',
+	                loop: true,
+	                thumbwidth: 80,//${thumbnailImageDimensions},
+	                thumbheight: 80,//${thumbnailImageDimensions},
+	                data: [
+	                <c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
+	                {
+	                    img: "<lams:WebAppURL />download/?uuid=${image.mediumFileDisplayUuid}&preferDownload=false",
+	                    full: "<lams:WebAppURL />download/?uuid=${image.originalFileDisplayUuid}&preferDownload=false",
+	                    id: '${image.uid}', // Custom anchor is used with the hash:true option.
+	                    caption:'<div class="card-subheader fw-bold fs-6">${image.titleEscaped}</div>' +
+	                        '<div>${image.descriptionEscaped}</div>'
+	                        <c:if test="${!image.createByAuthor && (image.createBy != null)}">
+	                        <c:set var="portrait"><lams:Portrait userId="${image.createBy.userId}"/></c:set>
+	                        <c:set var="portrait">${fn:replace(portrait, "'", "\\'")}</c:set> <%-- escape the url --%>
+	                        + '<div class="fst-italic"><fmt:message key="label.learning.added.by" /> <span class="mx-2">${portrait}</span><c:out value="${image.createBy.firstName} ${image.createBy.lastName}" escapeXml="true"/></div>'
+	                    </c:if>
+	                    //html: $('selector'), // ...or '<div>123</div>'. Custom HTML inside the frame.
+	                    //fit: 'cover' // Override the global fit option.
+	                    //any: 'Any data relative to the frame you want to store'
+	                },
+	                </c:forEach>
+	            	]
+				}
+        	);
         });
 
         function checkNew(){

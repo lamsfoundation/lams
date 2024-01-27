@@ -18,7 +18,7 @@
 
 <lams:PageLearner title="${assessment.title}" toolSessionID="${toolSessionID}">
 	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<style>
 		.form-check-input[disabled] ~ .form-check-label, .form-check-input:disabled ~ .form-check-label {
 		    opacity: 1 !important; /* overwrite bootstrap rule only for results page */ 

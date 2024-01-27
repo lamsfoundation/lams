@@ -9,7 +9,7 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
 <lams:PageLearner title="${whiteboard.title}" toolSessionID="${toolSessionID}">
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<style>
 		#gallery-walk-rating-table {
 			width: 60%;
@@ -63,10 +63,8 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 	<script type="text/javascript">
-			//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/",
-			//vars for rating.js
-			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+		//vars for rating.js
+		var	AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
@@ -74,7 +72,6 @@
 			COMMENTS_MIN_WORDS_LIMIT = 0,
 			COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.comment.textarea.tip"/></spring:escapeBody>',
 			WARN_COMMENTS_IS_BLANK_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.comment.blank"/></spring:escapeBody>',
-			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 			
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
@@ -100,8 +97,7 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 		}
 	</script>
-	<lams:JSImport src="includes/javascript/rating.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>	
+	<lams:JSImport src="includes/javascript/rating5.js" />
 	<%@ include file="websocket.jsp"%>	
 
 <div id="container-main">
@@ -135,7 +131,7 @@
 					</div>
 					<div class="col">
 						<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
-								isItemAuthoredByUser="true"
+								isDisplayOnly="true"
 								hideCriteriaTitle="true" />
 					</div>
 				</div>
@@ -176,7 +172,7 @@
 	       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 	       	    	<div class="gallery-walk-rating-comment-container">
 	       	    		<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}"
-								     isItemAuthoredByUser="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+								     isDisplayOnly="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 					 </div>
 	       	    </c:if>
 	 

@@ -15,16 +15,13 @@
 
 <lams:PageLearner title="${peerreview.title}" toolSessionID="${toolSessionId}">
 	<!-- ********************  CSS ********************** -->
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 	<link rel="stylesheet" href="<lams:WebAppURL/>includes/css/learning.css">
 
 	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-		
 		//vars for rating.js
 		var MAX_RATES = 0,
 		MIN_RATES = 0,
@@ -36,12 +33,11 @@
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = "<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>";
 	</script>
-	<lams:JSImport src="includes/javascript/jquery.jRating.js" />
 	<lams:JSImport src="includes/javascript/jquery.tablesorter.js" />
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-widgets.js" />
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-pager.js" />
 	<lams:JSImport src="includes/javascript/common.js" />
-	<lams:JSImport src="includes/javascript/rating.js" />
+	<lams:JSImport src="includes/javascript/rating5.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
@@ -68,7 +64,7 @@
 		            } 
 		        } 
 			});
-			initializeJRating();
+			initializeStarability();
 		 });
 	
 		function finishSession(){

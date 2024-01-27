@@ -9,7 +9,7 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
 <lams:PageLearner title="${dokumaran.title}" toolSessionID="${toolSessionID}">
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<style>
 		#gallery-walk-rating-table {
 			width: 60%;
@@ -42,8 +42,6 @@
 
 	<script type="text/javascript" src="${lams}includes/javascript/etherpad.js"></script>
 	<script type="text/javascript">
-			//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/",
 			//vars for rating.js
 			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
@@ -53,7 +51,6 @@
 			COMMENT_TEXTAREA_TIP_LABEL = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.comment.textarea.tip" /></spring:escapeBody>',
 			WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="warning.comment.blank"/>',
 			COUNT_RATED_ITEMS = true,
-			ALLOW_RERATE = true,
 			SESSION_ID = ${toolSessionID};
 			
 		checkNextGateActivity('finish-button', '${toolSessionID}', '', finishSession);
@@ -78,8 +75,7 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 		}
 	</script>
-	<lams:JSImport src="includes/javascript/rating.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+	<lams:JSImport src="includes/javascript/rating5.js" />
 	<%@ include file="websocket.jsp"%>	
 
 <div id="container-main">
@@ -116,7 +112,7 @@
 					</div>
 					<div class="col">
 						<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
-									 isItemAuthoredByUser="true"
+									 isDisplayOnly="true"
 									 hideCriteriaTitle="true" />
 					</div>
 				</div>
@@ -158,7 +154,7 @@
 		       	<c:if test="${not dokumaran.galleryWalkReadOnly and (dokumaran.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 		       	   	<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
 		       	   			showComments="true"
-							isItemAuthoredByUser="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
+							isDisplayOnly="${dokumaran.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 		       	</c:if>
 		 
 				<lams:Etherpad groupId="${groupSummary.sessionId}"

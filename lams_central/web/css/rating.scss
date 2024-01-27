@@ -1,0 +1,72 @@
+@import 'starability/starability/grow';
+
+/** ----- customization of starability library  ----- **/
+
+.starability-grow .starability-focus-ring {
+	outline: unset;
+    box-shadow: 0 0 0 0.2rem rgba(99, 99, 99, 0.5);
+    border-radius: 1.25rem;
+}
+.starability-grow > legend ~ .starability-focus-ring {
+	top: 2rem;
+}
+.starability-grow > input:focus + label {
+	outline: unset;
+    box-shadow: 0 0 0 0.2rem #f5bd23;
+    border-radius: 1.25rem;
+}
+
+.starability-result {
+	$star-count-result: $star-count - 1;
+
+	@while $star-count-result >0 {
+		&[data-rating="#{$star-count-result}.5"]::after {
+			width: $star-count-result * $star-size + $star-size / 2;
+		}
+
+		$star-count-result: $star-count-result - 1;
+	}
+}
+
+/** ----- classes introduced by LAMS  ----- **/
+
+.extra-controls-inner:after {
+	content: " ";
+	display: block;
+	height: 0;
+	clear: both;
+}
+
+.starability-holder {
+	text-align: center;
+}
+
+.starability-caption {
+	/**width: $star-count * $star-size;**/
+	padding-top: 6px;
+	font-size: 12px;
+	text-align: center;
+}
+
+.starability {
+	margin: 0px auto;
+	min-height: 20px;
+}
+
+.rating-comment {
+	padding: 15px;
+	margin: 15px auto;
+}
+
+.rating-info {
+	margin-top: 0;
+	margin-bottom: 12px;
+}
+
+/** Remove the following once we move all tools to use Rating.tag.  **/
+.rating-stars-div {
+	float: right;
+	padding-right: 10px;
+	margin-top: -8px;
+	min-height: 45px;
+}
