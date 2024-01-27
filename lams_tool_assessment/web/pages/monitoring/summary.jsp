@@ -194,11 +194,20 @@
 				{name:'grade', index:'grade', width:80, sorttype:"float", editable:true,
 					editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
 				{name:'marker', index:'marker', width: 80, title: false},
-				{name:'markerComment', index:'markerComment', width:120, editable:true, sortable: false,
-					editoptions: {maxlength: 600}, align:"left", classes: 'vertical-align', title : false }
+				{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
+					sortable: false, editoptions: {maxlength: 600, rows:"8"}, title : false,
+					formatter:function(cellvalue, options, rowObject, event) {
+						if (event == "edit") {
+							cellvalue = cellvalue.replace(/\n/g, '\n<br>');
+						}
+						return cellvalue;
+					},
+					unformat:function(cellvalue, options, rowObject) {
+						return rowObject.innerText;
+					}
+				}
 			],
 			multiselect: false,
-
 			cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
 			cellEdit: true,
 			formatCell: function(rowid, name, value, iRow, iCol){

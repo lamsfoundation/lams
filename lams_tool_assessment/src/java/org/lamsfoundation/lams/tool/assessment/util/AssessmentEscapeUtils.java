@@ -22,9 +22,6 @@
 
 package org.lamsfoundation.lams.tool.assessment.util;
 
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.qb.model.QbOption;
@@ -37,6 +34,9 @@ import org.lamsfoundation.lams.tool.assessment.dto.UserSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.UserSummaryItem;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionResult;
+
+import java.util.List;
+import java.util.Set;
 
 public class AssessmentEscapeUtils {
 
@@ -85,7 +85,7 @@ public class AssessmentEscapeUtils {
 	}
     }
 
-    private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
+    public static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
 	String answer = questionResult.getAnswer();
 	if (answer != null) {
 	    String answerEscaped = StringEscapeUtils.escapeJavaScript(answer);
@@ -96,6 +96,12 @@ public class AssessmentEscapeUtils {
 	questionResult.setQuestionDto(questionDto);
 
 	AssessmentEscapeUtils.escapeQuotes(questionDto);
+
+	String markerCommentEscaped = "";
+	if (StringUtils.isNotBlank(questionResult.getMarkerComment())) {
+	    markerCommentEscaped = questionResult.getMarkerComment().replace("\n", "<br>").replace("\"", "\\\"");
+	}
+	questionResult.setMarkerCommentEscaped(markerCommentEscaped);
     }
 
     private static void escapeQuotes(QuestionDTO questionDto) {
@@ -192,8 +198,8 @@ public class AssessmentEscapeUtils {
 		case QbQuestion.TYPE_NUMERICAL:
 		case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		case QbQuestion.TYPE_ESSAY:
-		    responseStr
-			    .append(StringUtils.isBlank(questionResult.getAnswer()) ? "-" : questionResult.getAnswer());
+		    responseStr.append(
+			    StringUtils.isBlank(questionResult.getAnswer()) ? "-" : questionResult.getAnswer());
 		    break;
 
 		case QbQuestion.TYPE_ORDERING:
@@ -281,8 +287,8 @@ public class AssessmentEscapeUtils {
 	    case QbQuestion.TYPE_VERY_SHORT_ANSWERS:
 		return new AssessmentExcelCell(questionResult.getAnswer(), false);
 	    case QbQuestion.TYPE_TRUE_FALSE:
-		boolean isCorrect = questionResult.getQbQuestion().getCorrectAnswer() == questionResult
-			.getAnswerBoolean();
+		boolean isCorrect =
+			questionResult.getQbQuestion().getCorrectAnswer() == questionResult.getAnswerBoolean();
 		return new AssessmentExcelCell(questionResult.getAnswerBoolean(), isCorrect);
 	}
 	return null;

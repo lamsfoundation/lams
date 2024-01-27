@@ -23,9 +23,11 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.lamsfoundation.lams.qb.model.QbQuestion;
+import org.lamsfoundation.lams.qb.model.QbToolAnswer;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
+import org.lamsfoundation.lams.usermanagement.User;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -37,12 +39,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.lamsfoundation.lams.qb.model.QbQuestion;
-import org.lamsfoundation.lams.qb.model.QbToolAnswer;
-import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
-import org.lamsfoundation.lams.usermanagement.User;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Assessment Question Result
@@ -104,6 +103,8 @@ public class AssessmentQuestionResult extends QbToolAnswer {
     private QuestionDTO questionDto;
     @Transient
     private boolean answerModified;
+    @Transient
+    private String markerCommentEscaped;
 
     public QbQuestion getQbQuestion() {
 	return qbToolQuestion.getQbQuestion();
@@ -241,6 +242,14 @@ public class AssessmentQuestionResult extends QbToolAnswer {
 
     public void setanswerEscaped(String answerEscaped) {
 	this.answerEscaped = answerEscaped;
+    }
+
+    public String getMarkerCommentEscaped() {
+	return markerCommentEscaped;
+    }
+
+    public void setMarkerCommentEscaped(String markerCommentEscaped) {
+	this.markerCommentEscaped = markerCommentEscaped;
     }
 
     public QuestionDTO getQuestionDto() {

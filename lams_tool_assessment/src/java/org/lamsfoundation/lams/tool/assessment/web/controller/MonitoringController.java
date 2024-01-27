@@ -659,7 +659,11 @@ public class MonitoringController {
 			? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY) ? service.getMessage(
 			"label.monitoring.user.summary.grade.required") : "")
 			: questionResult.getMarkedBy().getFullName());
-		userData.add(questionResult.getMarkerComment());
+		String markerCommentEscaped = "";
+		if (StringUtils.isNotBlank(questionResult.getMarkerComment())) {
+		    markerCommentEscaped = questionResult.getMarkerComment().replace("\n", "<br>");
+		}
+		userData.add(markerCommentEscaped);
 	    } else {
 		userData.add("");
 		userData.add("");
