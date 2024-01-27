@@ -16,8 +16,8 @@
 <%@ attribute name="itemRatingDto" required="true" rtexprvalue="true" type="org.lamsfoundation.lams.rating.dto.ItemRatingDTO" %>
 
 <%-- Optional attribute --%>
-<%@ attribute name="disabled" required="false" rtexprvalue="true" %>
-<%@ attribute name="isItemAuthoredByUser" required="false" rtexprvalue="true" %>
+<%@ attribute name="disabled" required="false" rtexprvalue="true" %><%-- i.e. user has rating/comment rights but rating/comment should be disabled --%>
+<%@ attribute name="isDisplayOnly" required="false" rtexprvalue="true" %><%-- i.e. user has no rating/comment rights  --%>
 <%@ attribute name="maxRates" required="false" rtexprvalue="true" %>
 <%@ attribute name="countRatedItems" required="false" rtexprvalue="true" %>
 <%@ attribute name="yourRatingLabel" required="false" rtexprvalue="true" %>
@@ -36,8 +36,8 @@
 <c:if test="${empty disabled}">
 	<c:set var="disabled" value="false" scope="request"/>
 </c:if>
-<c:if test="${empty isItemAuthoredByUser}">
-	<c:set var="isItemAuthoredByUser" value="false" scope="request"/>
+<c:if test="${empty isDisplayOnly}">
+	<c:set var="isDisplayOnly" value="false" scope="request"/>
 </c:if>
 <c:if test="${empty maxRates}">
 	<c:set var="maxRates" value="0" scope="request"/>
@@ -90,7 +90,7 @@
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
-<div class="rating-stars-holder text-center center-block">
+<div class="starability-holder">
 
 	<c:set var="hasStartedRating" value="false"/>
 	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}">
@@ -100,31 +100,71 @@
 	
 	<c:forEach var="criteriaDto" items="${itemRatingDto.criteriaDtos}" varStatus="status">
 		<c:set var="objectId" value="${criteriaDto.ratingCriteria.ratingCriteriaId}-${itemRatingDto.itemId}"/>
-		<c:set var="isCriteriaNotRatedByUser" value='${criteriaDto.userRating == ""}'/>
-		<c:set var="isWidgetDisabled" value="${disabled || isItemAuthoredByUser || ((maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating) || !(isCriteriaNotRatedByUser || allowRetries)}"/>
-			
-		<c:if test="${not hideCriteriaTitle}">
-			<div class="text-muted fw-bold">
-				${criteriaDto.ratingCriteria.title}
-			</div>
-		</c:if>
-			
+		<c:set var="isCriteriaRatedByUser" value='${criteriaDto.userRating != ""}'/>
+		<c:set var="isWidgetDisabled" value="${disabled || isDisplayOnly || ((maxRates > 0) && (countRatedItems >= maxRates) && !hasStartedRating) || (isCriteriaRatedByUser && !allowRetries)}"/>
+		<c:set var="dataRating">
+			<c:choose>
+				<c:when test='${isDisplayOnly || isCriteriaRatedByUser}'>
+					<fmt:formatNumber value="${criteriaDto.averageRating-(criteriaDto.averageRating%1)}" pattern="#"></fmt:formatNumber>
+					${isWidgetDisabled && (criteriaDto.averageRating%1) >= 0.5 ? '.5' : ''}
+				</c:when>
+				<c:otherwise>
+					0
+				</c:otherwise>
+			</c:choose>
+		</c:set>
+		<c:set var="legend">
+			<c:if test="${not hideCriteriaTitle}">
+				<legend class="text-muted fw-bold">
+					${criteriaDto.ratingCriteria.title}
+				</legend>
+			</c:if>
+		</c:set>
+
 		<c:choose>
-			<c:when test='${isItemAuthoredByUser || not isCriteriaNotRatedByUser}'>
-				<c:set var="ratingDataAverage" value="${criteriaDto.averageRating}"/>
+			<c:when test='${isWidgetDisabled}'>
+				${legend}
+			
+				<div class="starability starability-result" data-rating="${dataRating}">
+					Rated: ${dataRating} stars
+				</div>
 			</c:when>
+			
 			<c:otherwise>
-				<c:set var="ratingDataAverage" value="0"/>
+				<fieldset class="starability starability-grow starability-new" data-average="${dataRating}" data-id="${objectId}" aria-label="<fmt:message key="${starsRateLabel}"/>">
+					${legend}
+					
+					<input type="radio" id="${objectId}-0" class="input-no-rate" name="${objectId}" value="0" aria-label="No rating." 
+							${dataRating == 0? 'checked' : ''}/>
+					
+					<input type="radio" id="${objectId}-1" name="${objectId}" value="1" 
+							${dataRating == 1? 'checked' : ''}/>
+					<label for="${objectId}-1" title="Terrible">1 star</label>
+					
+					<input type="radio" id="${objectId}-2" name="${objectId}" value="2" 
+							${dataRating == 2? 'checked' : ''}/>
+					<label for="${objectId}-2" title="Not good">2 stars</label>
+					
+					<input type="radio" id="${objectId}-3" name="${objectId}" value="3" 
+							${dataRating == 3? 'checked' : ''}/>
+					<label for="${objectId}-3" title="Average">3 stars</label>
+					
+					<input type="radio" id="${objectId}-4" name="${objectId}" value="4" 
+							${dataRating == 4? 'checked' : ''}/>
+					<label for="${objectId}-4" title="Very good">4 stars</label>
+					
+					<input type="radio" id="${objectId}-5" name="${objectId}" value="5" 
+							${dataRating == 5? 'checked' : ''}/>
+					<label for="${objectId}-5" title="Amazing">5 stars</label>
+					
+					<span class="starability-focus-ring"></span>
+				</fieldset>
 			</c:otherwise>
 		</c:choose>
-		
-		<div class="${isWidgetDisabled? 'rating-stars-disabled' : 'rating-stars'} rating-stars-new" data-average="${ratingDataAverage}" data-id="${objectId}" role="button" aria-label="<fmt:message key="${starsRateLabel}"/>"
-			<c:if test="${!isWidgetDisabled}">tabindex="0"</c:if>>
-		</div>
 			
 		<c:choose>
-			<c:when test="${isItemAuthoredByUser}">
-				<div class="rating-stars-caption">
+			<c:when test="${isDisplayOnly}">
+				<div class="starability-caption">
 					<fmt:message key="${averageRatingLabel}" >
 						<fmt:param>
 							<fmt:formatNumber value="${criteriaDto.averageRating}" type="number" maxFractionDigits="1" />
@@ -137,8 +177,8 @@
 			</c:when>
 				
 			<c:otherwise>
-				<div class="rating-stars-caption" id="rating-stars-caption-${objectId}"
-					<c:if test="${isCriteriaNotRatedByUser}">style="visibility: hidden;"</c:if>
+				<div class="starability-caption" id="starability-caption-${objectId}"
+					<c:if test="${!isCriteriaRatedByUser}">style="visibility: hidden;"</c:if>
 				>
 					<fmt:message key="${yourRatingLabel}" >
 						<fmt:param>
@@ -167,7 +207,7 @@
 <c:if test="${isCommentsEnabled}">
 	<div id="comments-area-${itemRatingDto.itemId}">
 		<c:choose>
-			<c:when test='${isItemAuthoredByUser or (showAllComments and not empty commentLeftByUser)}'>
+			<c:when test='${isDisplayOnly or (showAllComments and not empty commentLeftByUser)}'>
 				<c:forEach var="comment" items="${itemRatingDto.commentDtos}">
 					<div class="rating-comment">
 						<c:out value="${comment.comment}" escapeXml="false" />
