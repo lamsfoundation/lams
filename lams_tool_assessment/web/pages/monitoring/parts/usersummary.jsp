@@ -105,7 +105,7 @@
 						</c:if>
 						{name:'grade', index:'grade', width:80, sorttype:"float", editable:true,
 							editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
-						{name:'marker', index:'marker', width: 80, title: false},
+						{name:'marker', index:'marker', width: 110, title: false},
 						{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
 							sortable: false, editoptions: {maxlength: 3000, rows: 6}, title : false,
 							formatter:function(cellvalue, options, rowObject, event) {
@@ -127,7 +127,7 @@
 							return value;
 						}
 						if (value == "-") {
-							value = "0";
+							value = "";
 						}
 						return value;
 					},
@@ -210,15 +210,15 @@
 					</c:otherwise>
 					</c:choose>,
 					marker :
-							<c:choose>
-							<c:when test="${requiresMarking}">
-							("<b><fmt:message key='label.monitoring.user.summary.grade.required' /></b>")
+					<c:choose>
+					<c:when test="${requiresMarking}">
+							"<b>(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody>)</b>"
 					</c:when>
 					<c:when test="${not empty questionResult.markedBy}">
 					"<c:out value='${questionResult.markedBy.fullName}' />"
 					</c:when>
 					<c:otherwise>
-					""
+					"(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.auto' /></spring:escapeBody>)"
 					</c:otherwise>
 					</c:choose>,
 					markerComment: "${questionResult.markerCommentEscaped}"

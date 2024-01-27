@@ -193,7 +193,7 @@
 				</c:if>
 				{name:'grade', index:'grade', width:80, sorttype:"float", editable:true,
 					editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
-				{name:'marker', index:'marker', width: 80, title: false},
+				{name:'marker', index:'marker', width: 110, title: false},
 				{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
 					sortable: false, editoptions: {maxlength: 3000, rows: 6}, title : false,
 					formatter:function(cellvalue, options, rowObject, event) {
