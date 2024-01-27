@@ -1,20 +1,16 @@
 /**
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later
+ * version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
- * USA
+ * You should have received a copy of the GNU General Public License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * http://www.gnu.org/licenses/gpl.txt
  */
@@ -101,8 +97,10 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
-
+	String contextLabel = request.getParameter(BasicLTIConstants.CUSTOM_PREFIX + BasicLTIConstants.CONTEXT_LABEL);
+	if (StringUtils.isBlank(contextLabel)) {
+	    contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
+	}
 	//log all incoming request parameters, so we can use them later to debug future issues
 	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
 	Enumeration<String> parameterNames = request.getParameterNames();
@@ -198,23 +196,25 @@ public class LoginRequestLtiServlet extends HttpServlet {
 
 	// in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid + serverID + serverKey]
 	// regular case: [ts + uid + method + serverID + serverKey]
-	String plaintext = timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim()
-		+ method.toLowerCase().trim()
-		+ (IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) ? lessonId : "")
-		+ consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
+	String plaintext =
+		timestamp.toLowerCase().trim() + extUsername.toLowerCase().trim() + method.toLowerCase().trim() + (
+			IntegrationConstants.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
+				? lessonId
+				: "") + consumerKey.toLowerCase().trim() + secret.toLowerCase().trim();
 	String hash = HashUtil.sha256(plaintext);
 
 	// constructing redirectUrl by getting request.getQueryString() for POST requests
 	String redirectUrl = "lti.do";
 	redirectUrl = WebUtil.appendParameterToURL(redirectUrl, "_" + IntegrationConstants.PARAM_METHOD, method);
-	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+	for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements(); ) {
 	    String paramName = e.nextElement();
 
 	    //skip parameters starting with "oath_"
-	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName)
-		    || !paramName.startsWith(BasicLTIConstants.OAUTH_PREFIX)) {
+	    if (LtiUtils.OAUTH_CONSUMER_KEY.equals(paramName) || !paramName.startsWith(
+		    BasicLTIConstants.OAUTH_PREFIX)) {
 		//set "user_id" parameter taking into account extServer.getUserIdParamName() setting
-		String paramValue = BasicLTIConstants.USER_ID.equals(paramName) ? extUsername
+		String paramValue = BasicLTIConstants.USER_ID.equals(paramName)
+			? extUsername
 			: request.getParameter(paramName);
 		redirectUrl = WebUtil.appendParameterToURL(redirectUrl, paramName,
 			URLEncoder.encode(paramValue, "UTF-8"));
