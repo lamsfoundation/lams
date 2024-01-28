@@ -219,6 +219,22 @@
                     </c:choose>,
 					markerComment: "${questionResult.markerCommentEscaped}"
                 });
+                // set maxGrade attribute to cell DOM element
+                table.setCell(${i.index + 1}, "grade", "", null, {
+                    "title":
+                        <c:choose>
+                            <c:when test="${empty questionResult.maxMark}">
+                             ""
+                            </c:when>
+                        <c:otherwise>
+                             "<spring:escapeBody javaScriptEscape='true'>
+                                <fmt:message key='label.learning.max.mark'>
+                                    <fmt:param value='${questionResult.maxMark}'/>
+                                </fmt:message>
+                            </spring:escapeBody>"
+                        </c:otherwise>
+                        </c:choose>
+                    });
                 </c:forEach>
 
                 </c:forEach>

@@ -2,7 +2,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <script type="text/javascript">
-    function masterDetailLoadUp(){
+    function masterDetailLoadUp() {
         jQuery("#userSummary${param.tableName}").clearGridData().setGridParam({scrollOffset: 18});
 
         <c:forEach var="questionResult" items="${assessmentResult.questionResults}" varStatus="i">
@@ -17,12 +17,12 @@
         <c:set var="requiresMarking"
                value="${empty questionResult.markedBy and question.type eq 6 and questionResult.mark eq 0}" />
         table.addRowData(${i.index + 1}, {
-            id:"${i.index + 1}",
-            questionResultUid:"${questionResult.uid}",
-            title:"${fn:escapeXml(title)}",
-            response:responseStr,
+            id: "${i.index + 1}",
+            questionResultUid: "${questionResult.uid}",
+            title: "${fn:escapeXml(title)}",
+            response: responseStr,
             <c:if test="${sessionMap.assessment.enableConfidenceLevels}">
-            confidence:"${question.type == 8 ? -1 : questionResult.confidenceLevel}",
+            confidence: "${question.type == 8 ? -1 : questionResult.confidenceLevel}",
             </c:if>
             grade:
                 <c:choose>
@@ -33,7 +33,7 @@
             "<fmt:formatNumber value='${questionResult.mark}' maxFractionDigits='3'/>"
             </c:otherwise>
             </c:choose>,
-            marker :
+            marker:
                 <c:choose>
                 <c:when test="${requiresMarking}">
                 "<b>(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody>)</b>"
@@ -49,7 +49,22 @@
         });
 
         // set maxGrade attribute to cell DOM element
-        table.setCell(${i.index + 1}, "grade", "", null, {"maxGrade" :  "${questionResult.maxMark}"});
+        table.setCell(${i.index + 1}, "grade", "", null, {
+            "maxGrade": "${questionResult.maxMark}",
+            "title":
+                <c:choose>
+                    <c:when test="${empty questionResult.maxMark}">
+                      ""
+                    </c:when>
+                    <c:otherwise>
+                    "<spring:escapeBody javaScriptEscape='true'>
+                             <fmt:message key='label.learning.max.mark'>
+                                <fmt:param value='${questionResult.maxMark}'/>
+                             </fmt:message>
+                        </spring:escapeBody>"
+                    </c:otherwise>
+                </c:choose>
+        });
         </c:forEach>
 
         if (typeof CodeMirror != 'undefined') {

@@ -130,7 +130,7 @@
 						<c:if test="${questionDto.groupsAnswersDisclosed}">
 						{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
 						</c:if>
-						{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
+						{name:'grade', index:'grade', width:50, sorttype:"float", search:false, editable:true,
 							editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
 						{name:'marker', index:'marker', width: 110, search:false, title: false},
 						{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
