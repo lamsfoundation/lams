@@ -54,12 +54,12 @@
 
 	<c:if test="${usesWeights}">
 	function toggleWeight() {
-		if ( $("#weights").css("display") == "none" ) {
-			$("#weights").css("display","block");
+		if ($("#weights").hasClass("d-none")) {
+			$("#weights").removeClass("d-none");
 			$("#weightShown").css("display","inline");
 			$("#weightHidden").css("display","none");
 		} else {
-			$("#weights").css("display","none");
+			$("#weights").addClass("d-none");
 			$("#weightShown").css("display","none");
 			$("#weightHidden").css("display","inline");
 		}
@@ -92,7 +92,7 @@
 	*/
 	function expandAllRows(jqGridId, button) {
 		$(button).removeClass("collapsed");
-		
+
 		let jqGrid = $('#' + jqGridId),
 				ids = jqGrid.getDataIDs();
 		$.each(ids, function(){
@@ -846,7 +846,7 @@
 				</button>
 			</div>
 			<div id="weightHidden">
-				<button type="button" onClick="javascript:toggleWeight()" class="btn btn-sm btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
+				<button type="button" onClick="javascript:toggleWeight()" class="btn btn-secondary" title="<fmt:message key='label.button.show.weights'/>" >
 					<i class="fa-solid fa-balance-scale"></i> <span class="hidden-xs">
 					<fmt:message key="label.button.show.weights"/>
 					</span>
@@ -855,9 +855,9 @@
 		</div>
 	</c:if>
 
-	<!-- 
+	<!--
 	<div>
-		<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-secondary tour-button"> 
+		<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-secondary tour-button">
 			<i class="fa-solid fa-question-circle"></i> <span class="hidden-xs">Tour</span>
 		</button>
 	</div>
@@ -872,25 +872,15 @@
 </div>
 
 <c:if test="${usesWeights}">
-	<div id="weights" class="grid-holder voffset20" style="display:none" >
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<fmt:message key="label.weights.title"/>
-			</div>
-			<div class="panel-body">
-					<%-- Display weights in four columns --%>
-				<c:forEach var="weightArray" items="${weights}" varStatus="weightCounter">
-				<c:if test="${(weightCounter.index mod 3) == 0}">
-				<c:if test="${weightCounter.index gt 0}">
-			</div>
-			</c:if>
-			<div class="row">
-				</c:if>
-				<div class="col-sm-4">${weightArray[0]}: ${weightArray[2]}</div>
-				</c:forEach>
-			</div> <%-- close off row started in the loop --%>
+	<div id="weights" class="card mt-4 d-none" >
+		<div class="card-header">
+			<fmt:message key="label.weights.title"/>
 		</div>
-	</div>
+		<ul class="list-group list-group-flush">
+			<c:forEach var="weightArray" items="${weights}">
+				<li class="list-group-item">${weightArray[0]}: ${weightArray[2]}</li>
+			</c:forEach>
+		</ul>
 	</div>
 </c:if>
 
@@ -900,7 +890,7 @@
 			<fmt:message key="gradebook.grid.expand.all"/>
 		</button>
 	</div>
-	
+
 	<table id="userView" class="scroll" ></table>
 	<div id="userViewPager" class="scroll" ></div>
 
