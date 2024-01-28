@@ -257,7 +257,7 @@
 
                                 <%-- Get the needed piece of information from a complicated questionSummaries structure --%>
                                 <c:set var="questionSummary" value="${questionSummaries[question.uid]}" />
-                                <c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[questionIndex]}" />
+                                <c:set var="sessionResults" value="${questionSummary.questionResultsPerSession[status.index]}" />
                                 <c:set var="sessionResults" value="${sessionResults[fn:length(sessionResults)-1]}" />
 
                                 <c:if test="${not empty sessionResults.uid and not empty sessionResults.justification}">
