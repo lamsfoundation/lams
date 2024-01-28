@@ -96,18 +96,23 @@ When true, hides the names and groups the comments.  -->
 								</td>
 								
 								<td class="rating">
-									<div class="rating-stars-holder text-center center-block">
+									<div class="starability-holder">
 										<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
-										<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}">
+										<c:set var="dataRating">
+											<fmt:formatNumber value="${rating.averageRating-(rating.averageRating%1)}" pattern="#"></fmt:formatNumber>
+											${(rating.averageRating%1) >= 0.5 ? '.5' : ''}
+										</c:set>
+										<div class="starability starability-result" data-rating="${dataRating}">
+											Rated: ${dataRating} stars
 										</div>
-										<c:set var="userRating">${rating.userRating}</c:set>
-										<div class="rating-stars-caption" id="rating-stars-caption-${objectId}">
+										
+										<div class="starability-caption" id="starability-caption-${objectId}">
 											<c:choose>
-												<c:when test="${empty userRating}">
+												<c:when test="${empty rating.userRating}">
 													<fmt:message key="label.not.rated"></fmt:message>
 												</c:when>
 												<c:otherwise>
-													<fmt:message key="label.you.gave.rating"><fmt:param><span id="user-rating-${objectId}">${userRating}</span></fmt:param></fmt:message>
+													<fmt:message key="label.you.gave.rating"><fmt:param><span id="user-rating-${objectId}">${rating.userRating}</span></fmt:param></fmt:message>
 												</c:otherwise>
 											</c:choose>
 											<br/>
@@ -135,10 +140,17 @@ When true, hides the names and groups the comments.  -->
 				<c:forEach var="rating" items="${criteriaRatings.ratingDtos}" varStatus="status">
 					<c:if test="${status.first && not empty rating.averageRating}">
 						<div class="rating">
-							<div class="rating-stars-holder text-center center-block">
+							<div class="starability-holder">
 								<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
-								<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}"></div>
-								<div class="rating-stars-caption" id="rating-stars-caption-${objectId}-currentUser">
+								<c:set var="dataRating">
+									<fmt:formatNumber value="${rating.averageRating-(rating.averageRating%1)}" pattern="#"></fmt:formatNumber>
+									${(rating.averageRating%1) >= 0.5 ? '.5' : ''}
+								</c:set>
+								<div class="starability starability-result" data-rating="${dataRating}">
+									Rated: ${dataRating} stars
+								</div>
+								
+								<div class="starability-caption" id="starability-caption-${objectId}-currentUser">
 									<fmt:message key="label.avg.rating">
 										<fmt:param><span id="average-rating-${objectId}-currentUser">${rating.averageRating}</span></fmt:param>
 										<fmt:param><span id="number-of-votes-${objectId}-currentUser">${rating.numberOfVotes}</span></fmt:param>

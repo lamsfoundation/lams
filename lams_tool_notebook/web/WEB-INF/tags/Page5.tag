@@ -165,16 +165,19 @@
 				$('#sidebar').show();
 			}
 
-			function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
+			function preventLearnerAutosaveFromMultipleTabs(autosaveWindowId, autosaveInterval) {
 				let currentTime = new Date().getTime(),
-					lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
+						lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp'),
+						lamsAutosaveWindowId = +localStorage.getItem('lamsAutosaveWindowId');
 				// check if autosave does not happen too often
-				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
+				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime
+						&& lamsAutosaveWindowId && lamsAutosaveWindowId != autosaveWindowId) {
 					// this label is required only in tool which implement autosave
 					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.prevent.learner.autosave.mutliple.tabs" /></spring:escapeBody>');
 					return false;
 				}
 				localStorage.setItem('lamsAutosaveTimestamp', currentTime);
+				localStorage.setItem('lamsAutosaveWindowId', autosaveWindowId);
 				return true;
 			}
 
@@ -216,21 +219,6 @@
 								$('#navcontent').addClass('navcontent');
 							} else if ( showControlBar == 2 ) {
 								$('#navcontent').addClass('navcontent');
-							}
-							
-							var presenceEnabledPatch = result.presenceEnabledPatch;
-							var presenceImEnabled = result.presenceImEnabled;
-							if ( showIM && (presenceEnabledPatch || presenceImEnabled) ) {
-								presenceURL = LEARNING_URL+"presenceChat.jsp?presenceEnabledPatch="+presenceEnabledPatch
-										+"&presenceImEnabled="+presenceImEnabled+"&lessonID="+lessonId;
-								<c:if test="${not usePanel}">
-								presenceURL = presenceURL + "&reloadBootstrap=true";
-								</c:if>
-								$('#presenceEnabledPatchDiv').load(presenceURL, function( response, status, xhr ) {
-									if ( status == "error" ) {
-										alert("Unable to load IM: " + xhr.status);
-									} 
-								});
 							}
 
 							initWebsocket('commandWebsocket', LEARNING_URL.replace('http', 'ws')
@@ -381,10 +369,6 @@
 					<jsp:doBody />
 				</c:otherwise>
 				</c:choose>						
-				<%--  only have sidebar and presence in learner --%>
-				<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
-					<div id="presenceEnabledPatchDiv"></div>
-				</c:if>
 			</div>
 				</div>
 			</div>

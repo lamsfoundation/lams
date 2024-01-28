@@ -281,7 +281,7 @@
         }
 
         function checkAllCorrectMcqAnswersFound() {
-			var numberOfAvailableScratches = $('[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}]').length;
+            var numberOfAvailableScratches = $('[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}]').length;
             if (numberOfAvailableScratches > 0) {
                 $('#finishButton')
                     .prop('disabled', true)
@@ -451,14 +451,15 @@
 
         //autosave feature
         <c:if test="${isUserLeader && (mode != 'teacher')}">
-        var autosaveInterval = "60000"; // 60 seconds interval
+			var autosaveInterval = "60000", // 60 seconds interval
+					autosaveWindowId = new Date().getTime(); // all we need for this ID is to be unique
         window.setInterval(learnerAutosave,	autosaveInterval);
 
         function learnerAutosave(isCommand){
             // isCommand means that the autosave was triggered by force complete or another command websocket message
             // in this case do not check multiple tabs open, just autosave
             if (!isCommand) {
-                let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveInterval);
+					let shouldAutosave = preventLearnerAutosaveFromMultipleTabs(autosaveWindowId, autosaveInterval);
                 if (!shouldAutosave) {
                     return;
                 }
@@ -481,7 +482,7 @@
             var proceed = true;
             // ask for leave confirmation only if time limit is not expired
             if (!isTimelimitExpired) {
-				var numberOfAvailableScratches = $("[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}], [id^=type-your-answer-]:visible").length;
+                var numberOfAvailableScratches = $("[id^=imageLink-][${scratchie.revealOnDoubleClick ? "ondblclick" : "onclick"}], [id^=type-your-answer-]:visible").length;
                 proceed = numberOfAvailableScratches == 0 ||
                     confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.one.or.more.questions.not.completed'/></spring:escapeBody>");
             }
@@ -557,6 +558,6 @@
                     <fmt:message key="label.submit" />
                 </button>
             </div>
-        </c:if>        
+        </c:if>
     </div>
 </lams:PageLearner>

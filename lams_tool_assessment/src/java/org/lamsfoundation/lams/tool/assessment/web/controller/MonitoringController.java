@@ -650,11 +650,24 @@ public class MonitoringController {
 		//LDEV_NTU-11 Swapping Mark and Response columns in Assessment Monitor
 		userData.add(questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)
 			&& questionResult.getMarkedBy() == null ? "-" : questionResult.getMark().toString());
-		userData.add(questionResult.getMarkedBy() == null
-			? (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY) ? service.getMessage(
-			"label.monitoring.user.summary.grade.required") : "")
-			: questionResult.getMarkedBy().getFullName());
-		userData.add(questionResult.getMarkerComment());
+
+		String marker = "";
+		if (questionResult.getMarkedBy() == null) {
+		    if (questionResult.getQbQuestion().getType().equals(QbQuestion.TYPE_ESSAY)) {
+			marker = "<b>(" + service.getMessage("label.monitoring.user.summary.grade.required") + ")</b>";
+		    } else {
+			marker = "(" + service.getMessage("label.monitoring.user.summary.grade.auto") + ")";
+		    }
+		} else {
+		    marker = questionResult.getMarkedBy().getFullName();
+		}
+		userData.add(marker);
+
+		String markerCommentEscaped = "";
+		if (StringUtils.isNotBlank(questionResult.getMarkerComment())) {
+		    markerCommentEscaped = questionResult.getMarkerComment().replace("\n", "<br>");
+		}
+		userData.add(markerCommentEscaped);
 	    } else {
 		userData.add("");
 		userData.add("");

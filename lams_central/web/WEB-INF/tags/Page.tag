@@ -163,16 +163,19 @@
 				$('#sidebar').show();
 			}
 
-			function preventLearnerAutosaveFromMultipleTabs(autosaveInterval) {
+			function preventLearnerAutosaveFromMultipleTabs(autosaveWindowId, autosaveInterval) {
 				let currentTime = new Date().getTime(),
-					lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp');
+						lamsAutosaveTimestamp = +localStorage.getItem('lamsAutosaveTimestamp'),
+						lamsAutosaveWindowId = +localStorage.getItem('lamsAutosaveWindowId');
 				// check if autosave does not happen too often
-				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime) {
+				if (autosaveInterval > 0 && lamsAutosaveTimestamp && lamsAutosaveTimestamp + autosaveInterval/2 > currentTime
+						&& lamsAutosaveWindowId && lamsAutosaveWindowId != autosaveWindowId) {
 					// this label is required only in tool which implement autosave
 					alert('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.prevent.learner.autosave.mutliple.tabs" /></spring:escapeBody>');
 					return false;
 				}
 				localStorage.setItem('lamsAutosaveTimestamp', currentTime);
+				localStorage.setItem('lamsAutosaveWindowId', autosaveWindowId);
 				return true;
 			}
 			
