@@ -20,7 +20,6 @@
 <!-- ********************  javascript ********************** -->
 <lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 <lams:JSImport src="includes/javascript/upload.js" />
@@ -86,7 +85,7 @@
                                 $.ajaxSetup({ cache: true });
                                 $(messDiv).load(loadString, function() {
                                     $('#pb-msg'+messageUid).focus();
-                                    setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+                                    setupForumStarability("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
                                     highlightMessage();
                                 });
                             }

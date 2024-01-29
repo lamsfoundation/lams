@@ -10,7 +10,7 @@
 <lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
 
 	<!-- ********************  CSS ********************** -->
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<lams:css suffix="treetable"/>
 	<link type="text/css" href="${tool}css/treetable.forum.css" rel="stylesheet" />
 
@@ -19,21 +19,18 @@
 	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript">
 		var removeItemAttachmentUrl = "<lams:WebAppURL />learning/deleteAttachment.do";
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
 	</script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$.ajaxSetup({ cache: true });
-			setupJRatingSetPath();
+			setupForumStarabilitySetPath();
 		});
 
-		function setupJRatingSetPath() {
-			setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+		function setupForumStarabilitySetPath() {
+			setupForumStarability("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
 		}
 		
 		<c:set var="refresh">
@@ -139,7 +136,7 @@
 				loadingHtml: '<i class="fa fa-refresh fa-spin fa-fw"></i> ${loading_words}',
 				padding:30,
 				autoTrigger:true,
-				callback:setupJRatingSetPath
+				callback:setupForumStarabilitySetPath
 			});
 		</script>
 			

@@ -21,7 +21,6 @@
 <!-- ********************  javascript ********************** -->
 <lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 <lams:JSImport src="includes/javascript/upload.js" />
@@ -94,7 +93,7 @@
                                 var loadString = "<lams:WebAppURL />learning/viewTopicThread.do?topicID=" + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
                                 $.ajaxSetup({ cache: true });
                                 $(threadDiv).load(loadString, function() {
-                                    setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+                                	setupForumStarability("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
                                     highlightMessage();
                                     // expand up to the reply - in case it is buried down in a lot of replies
                                     // don't need to do this if we have started a new thread.
