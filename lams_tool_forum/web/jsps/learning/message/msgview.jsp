@@ -12,6 +12,12 @@
 	</c:otherwise>
 </c:choose>
 
+<style>
+	.extra-controls-inner {
+		float: left;
+	}
+</style>
+
 <%--  msgDto, messageUid, msgLevel needs to be in the session elsewhere --%>
 <%--  outermsg${msgDto.message.uid} is used to replace existing message areas when a message is edited. --%>
 <div id="outermsg${msgDto.message.uid}"
@@ -151,7 +157,13 @@
 		<div class="float-end">
 
 			<!--  Rating stars -->
-			<%@ include file="/jsps/learning/ratingStars.jsp"%>
+			<c:if test="${sessionMap.allowRateMessages}">
+				<c:set var="isDisabled" value='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock || sessionMap.noMoreRatings}'/>
+			
+				<lams:Rating5 itemRatingDto="${msgDto.itemRatingDto}" disabled="${isDisabled}" isDisplayOnly="${msgDto.isAuthor}"
+					allowRetries="true" hideCriteriaTitle="true"
+					averageRatingLabel="label.learning.number.of.votes"/>
+			</c:if>
 
 			<!--  Hide/Unhide Buttons -->
 			<c:if test='${sessionMap.mode == "teacher"}'>

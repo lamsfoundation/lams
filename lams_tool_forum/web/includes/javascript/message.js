@@ -55,32 +55,51 @@
 
 	}
 
-	function setupJRating(rateMessagePath) {
-		$(".rating-stars-new").filter($(".rating-stars")).jRating({
-			phpPath : rateMessagePath,
-			rateMax : 5,
-			decimalLength : 1,
-			onSuccess : function(data, messageId){
-				$("#averageRating" + messageId).html(data.averageRating);
-				$("#numberOfVotes" + messageId).html(data.numberOfVotes);
-				$("#numOfRatings").html(data.numOfRatings);
-
-				//disable rating feature in case maxRate limit reached
-				if (data.noMoreRatings) {
-					$(".rating-stars").each(function() {
-						$(this).jRating('readOnly');
-					});
-				}
-			},
-			onError : function(){
-				jError('Error : please retry');
+	function setupForumStarability(SERVLET_PATH) {
+		$(".starability-new").each(function() {
+			const id = "" + $(this).data('id'),  // get the id of the box
+				  messageId = id.substring(id.indexOf('-') + 1); 
+	
+			if (!$(this).hasClass('starability-disabled')) {
+				$("input[type=radio][name=" + id + "]").change(function() {
+					let element = this;
+					const rate = $(this).val();
+	
+					$.post(
+						SERVLET_PATH,
+						{
+							idBox: messageId,
+							rate: rate
+						},
+						function(data) {
+							if (!data.error) {
+								$("#average-rating-" + id).html(data.averageRating);
+								$("#number-of-votes-" + id).html(data.numberOfVotes);
+								//$("#starability-caption-" + id).css("visibility", "visible");
+								$("#numOfRatings").html(data.numOfRatings);
+					
+								//disable rating feature in case maxRate limit reached
+								if (data.noMoreRatings) {			
+									$(".starability").each(function() {
+							    		if (!$(this).hasClass('starability-result') && !$(this).hasClass('starability-disabled') ) {
+											const dataId = $(this).data('id');
+								        	$(this).addClass('starability-disabled');
+								        	$('input[type=radio][name=' + dataId +']').attr('disabled', 'disabled');//disable all internal radio buttons
+								        }
+							    	});	
+					    		}
+	
+							} else {
+								alert("Error saving rating. Please retry.");
+							}
+						},
+						'json'
+					);
+				});
 			}
 		});
-		$(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
-			rateMax : 5,
-			isDisabled : true
-		});
-		$(".rating-stars-new").removeClass("rating-stars-new");
+		
+		$(".starability-new").removeClass("starability-new");
 	}
 	
 	/**

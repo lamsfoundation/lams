@@ -41,7 +41,11 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolCompletionStatus;
@@ -95,6 +99,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -723,15 +728,32 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	for (Attachment attachment : message.getAttachments()) {
 	    attachment.setFileDisplayUuid(forumToolContentHandler.getFileUuid(attachment.getFileUuid()));
 	}
-	MessageDTO dto = MessageDTO.getMessageDTO(message);
-	dto.setLevel(msgSeq.getMessageLevel());
+	MessageDTO msgDTO = MessageDTO.getMessageDTO(message);
+	msgDTO.setLevel(msgSeq.getMessageLevel());
+
 	//set averageRating
 	if (message.getForum().isAllowRateMessages()) {
+	    ItemRatingDTO itemRatingDTO = new ItemRatingDTO();
+	    msgDTO.setItemRatingDto(itemRatingDTO);
+
+	    Long itemId = message.getUid();
+	    itemRatingDTO.setItemId(itemId);
+
+	    List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<>();
+	    itemRatingDTO.setCriteriaDtos(criteriaDtos);
+
+	    RatingCriteria criteria = new ToolActivityRatingCriteria();
+	    ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
+	    criteriaDto.setRatingCriteria(criteria);
+	    criteriaDto.setUserRating("0");
+
 	    AverageRatingDTO averageRating = getAverageRatingDTOByMessage(message.getUid());
-	    dto.setAverageRating(averageRating.getRating());
-	    dto.setNumberOfVotes(averageRating.getNumberOfVotes());
+	    criteriaDto.setAverageRating(averageRating.getRating());
+	    criteriaDto.setNumberOfVotes(averageRating.getNumberOfVotes());
+
+	    criteriaDtos.add(criteriaDto);
 	}
-	return dto;
+	return msgDTO;
     }
 
     /**

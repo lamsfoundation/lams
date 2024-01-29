@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.forum.model.ForumReport;
 import org.lamsfoundation.lams.tool.forum.model.Message;
 
@@ -45,9 +46,8 @@ public class MessageDTO {
     private String comment;
     private boolean released;
 
-    //rating fields
-    private String averageRating;
-    private String numberOfVotes;
+    //rating field used by lams:Rating tag
+    private ItemRatingDTO itemRatingDto;
 
     // number of posts the learner has made in this topic.
     // used when this message is a root topic.
@@ -200,22 +200,6 @@ public class MessageDTO {
 	this.released = isReleased;
     }
 
-    public String getAverageRating() {
-	return averageRating;
-    }
-
-    public void setAverageRating(String averageRating) {
-	this.averageRating = averageRating;
-    }
-
-    public String getNumberOfVotes() {
-	return numberOfVotes;
-    }
-
-    public void setNumberOfVotes(String numberOfVotes) {
-	this.numberOfVotes = numberOfVotes;
-    }
-
     public int getNumOfPosts() {
 	return numOfPosts;
     }
@@ -238,5 +222,13 @@ public class MessageDTO {
 
     public void setAuthorUserId(Long authorUserId) {
 	this.authorUserId = authorUserId;
+    }
+
+    public ItemRatingDTO getItemRatingDto() {
+	return itemRatingDto;
+    }
+
+    public void setItemRatingDto(ItemRatingDTO itemRatingDto) {
+	this.itemRatingDto = itemRatingDto;
     }
 }
