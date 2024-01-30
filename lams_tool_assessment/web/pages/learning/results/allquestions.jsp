@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="assessment" value="${sessionMap.assessment}" />
 <c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
