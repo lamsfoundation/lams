@@ -70,7 +70,7 @@ When true, hides the names and groups the comments.  -->
 
 		<c:choose>
 			<c:when test="${not currentUserDisplay}">
-				<table class="tablesorter jRating">
+				<table class="tablesorter">
 					<thead>
 					<tr>
 						<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" width="${criteriaRatings.ratingCriteria.commentsEnabled ? '25%' : '40%'}" >
