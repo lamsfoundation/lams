@@ -10,7 +10,7 @@
 	<title><fmt:message key="label.monitoring.heading" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" >
@@ -21,9 +21,6 @@
 	</style>
 
 	<script type="text/javascript">
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
-			
 		//vars for rating.js
 		var MAX_RATES = 0,
 			MIN_RATES = 0,
@@ -37,7 +34,6 @@
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<lams:JSImport src="includes/javascript/rating.js" />
 	<lams:JSImport src="includes/javascript/portrait.js" />
 </lams:head>

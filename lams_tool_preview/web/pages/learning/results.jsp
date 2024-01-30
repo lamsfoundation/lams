@@ -37,7 +37,7 @@
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-widgets.js" />
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-pager.js" />
 	<lams:JSImport src="includes/javascript/common.js" />
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	
@@ -99,7 +99,7 @@
 					</div>
 				</c:if>
 				
-				<lams:StyledRating5 criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
+				<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false"
 					   currentUserDisplay="false" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}"
 					   rubricsPivotView="${peerreview.rubricsView eq 2}" />
 			</div>
@@ -126,7 +126,7 @@
 					</c:if>
 					
 					<div class="card-body">
-			 		<lams:StyledRating5 criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true"
+			 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true"
 			 						   currentUserDisplay="true" rubricsInBetweenColumns="${peerreview.rubricsInBetweenColumns}" />
 			 		</div>
 			 		</div>

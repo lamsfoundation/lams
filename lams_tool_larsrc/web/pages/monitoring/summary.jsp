@@ -3,20 +3,18 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet"/>
 <link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <link type="text/css" href="<lams:WebAppURL/>css/monitor.css" rel="stylesheet" />
 
 <script type="text/javascript">
-	var pathToImageFolder = "${lams}images/css/",
-		LAMS_URL = '${lams}',
+	var LAMS_URL = '${lams}',
 		MAX_RATES = MAX_RATINGS_FOR_ITEM = MIN_RATES = COUNT_RATED_ITEMS = 0, // no restrictions
 		COMMENTS_MIN_WORDS_LIMIT = 0, // comments not used,
 		COMMENT_TEXTAREA_TIP_LABEL = WARN_COMMENTS_IS_BLANK_LABEL = WARN_MIN_NUMBER_WORDS_LABEL = '',
 		ALLOW_RERATE = false; 
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <lams:JSImport src="includes/javascript/rating.js" />
 
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
@@ -24,7 +22,6 @@
 <lams:JSImport src="includes/javascript/portrait.js" />
 <script type="text/javascript">
 	$(document).ready(function(){
-		
 		initializePortraitPopover("<lams:LAMSURL />");
 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
@@ -48,10 +45,10 @@
 					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.suggest' /></spring:escapeBody>",
 					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.views' /></spring:escapeBody>",
 						<c:if test="${groupSummary.allowRating}">
-					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.rating' /></spring:escapeBody>",
+					    	"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.rating' /></spring:escapeBody>",
 					   	</c:if>
 						<c:if test="${groupSummary.allowComments}">
-					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.comments' /></spring:escapeBody>",
+					   		"<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.comments' /></spring:escapeBody>",
 					   	</c:if>
 					    "<spring:escapeBody javaScriptEscape='true'><fmt:message key='monitoring.label.actions' /></spring:escapeBody>" 
 				],
@@ -63,10 +60,10 @@
 			   		{name:'suggest', index:'suggest', width:160, align:"center"},
 			   		{name:'viewNumber', index:'viewNumber', width:100, align:"center", sorttype:"int"},
 					<c:if test="${groupSummary.allowRating}">
-					{name:'rating', index:'rating', width:200, align:"center"},
+						{name:'rating', index:'rating', width:200, align:"center"},
 				   	</c:if>
 					<c:if test="${groupSummary.allowComments}">
-					{name:'comments', index:'comments', width:200, align:"center"},
+						{name:'comments', index:'comments', width:200, align:"center"},
 				   	</c:if>
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
@@ -107,12 +104,12 @@
 						   {name:'portraidId',index:'portraidId', hidden:true}
 						],
 						loadError: function(xhr,st,err) {
-						    	jQuery("#"+subgridTableId).clearGridData();
-						    	jQuery.jgrid.info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
+						    jQuery("#"+subgridTableId).clearGridData();
+						    jQuery.jgrid.info_dialog("<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.error'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='error.loaderror'/></spring:escapeBody>", "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.ok'/></spring:escapeBody>");
 					    },
 						loadComplete: function () {
 					   	 	initializePortraitPopover('<lams:LAMSURL/>');
-					    	}
+					    }
 					})
 					.jqGrid('filterToolbar', { 
 						searchOnEnter: false
@@ -148,33 +145,46 @@
 				</c:set>
 				
 				<c:if test="${groupSummary.allowRating}">
-				<c:set var="ratingHTML"><div class="rating-stars-holder"></c:set>
-				<c:choose>
-				<c:when test="${sessionsExist}">
-					<c:forEach var="criteriaDto" items="${item.ratingDTO.criteriaDtos}">
-						<c:set var="ratingHTML">${ratingHTML}<div class="rating-stars-new rating-stars-disabled" data-average="${criteriaDto.averageRating}" data-id="${criteriaDto.ratingCriteria.ratingCriteriaId}-${item.itemUid}"></div><div class="rating-stars-caption"><fmt:message key="label.average.rating"><fmt:param>${criteriaDto.averageRating}</fmt:param><fmt:param>${criteriaDto.numberOfVotes}</fmt:param></fmt:message></div></c:set>
-					</c:forEach>
-				</c:when>
-				<c:when test="${not sessionsExist and item.allowRating}">
-					<c:set var="ratingHTML">${ratingHTML}<i class="fa fa-check"></i></c:set>
-				</c:when>
-				</c:choose>
-				<c:set var="ratingHTML">${ratingHTML}</div></c:set>
+					<c:set var="ratingHTML">
+						<div class="starability-holder">
+					</c:set>
+					<c:choose>
+						<c:when test="${sessionsExist}">
+							<c:forEach var="criteriaDto" items="${item.ratingDTO.criteriaDtos}">
+								<c:set var="dataRating">
+									<fmt:formatNumber value="${criteriaDto.averageRating-(criteriaDto.averageRating%1)}" pattern="#"></fmt:formatNumber>
+									${(criteriaDto.averageRating%1) >= 0.5 ? '.5' : ''}
+								</c:set>
+							
+								<c:set var="ratingHTML">
+									${ratingHTML}<div class="starability starability-result" data-rating="${dataRating}"></div><div class="starability-caption"><fmt:message key="label.average.rating"><fmt:param>${criteriaDto.averageRating}</fmt:param><fmt:param>${criteriaDto.numberOfVotes}</fmt:param></fmt:message></div>
+								</c:set>
+							</c:forEach>
+						</c:when>
+						<c:when test="${not sessionsExist and item.allowRating}">
+							<c:set var="ratingHTML">
+								${ratingHTML}<i class="fa fa-check"></i>
+							</c:set>
+						</c:when>
+					</c:choose>
+					<c:set var="ratingHTML">
+						${ratingHTML}</div>
+					</c:set>
 				</c:if>
-				
+					
 				<c:if test="${groupSummary.allowComments}">
-				<c:set var="commentButtonText"><fmt:message key="label.view.comments"/></c:set>
-				<c:choose>
-				<c:when test="${item.allowComments and sessionsExist}">
-					<c:set var="commentHTML"><a href="#nogo" onclick="javascript:viewComments(${item.itemUid}, ${groupSummary.sessionId}); return false;">${commentButtonText}</a></c:set>
-				</c:when>
-				<c:when test="${item.allowComments and not sessionsExist}">
-					<c:set var="commentHTML"><i class="fa fa-check"></i></c:set>
-				</c:when>
-				<c:otherwise>
-					<c:set var="commentHTML">&nbsp;</c:set>
-				</c:otherwise>
-				</c:choose>
+					<c:set var="commentButtonText"><fmt:message key="label.view.comments"/></c:set>
+					<c:choose>
+					<c:when test="${item.allowComments and sessionsExist}">
+						<c:set var="commentHTML"><a href="#nogo" onclick="javascript:viewComments(${item.itemUid}, ${groupSummary.sessionId}); return false;">${commentButtonText}</a></c:set>
+					</c:when>
+					<c:when test="${item.allowComments and not sessionsExist}">
+						<c:set var="commentHTML"><i class="fa fa-check"></i></c:set>
+					</c:when>
+					<c:otherwise>
+						<c:set var="commentHTML">&nbsp;</c:set>
+					</c:otherwise>
+					</c:choose>
 				</c:if>
 				
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
@@ -185,10 +195,10 @@
    	   	     		suggest:	"${item.username}",
    	   	     		viewNumber:"	${item.viewNumber}",
 					<c:if test="${groupSummary.allowRating}">
-					rating: '${ratingHTML}',
+						rating: '${ratingHTML}',
 				   	</c:if>
 					<c:if test="${groupSummary.allowComments}">
-					comments: '${commentHTML}',
+						comments: '${commentHTML}',
 					</c:if>
    	   	     		actions:	"${changeItemVisibility}"
    	   	   	    });
@@ -196,7 +206,7 @@
 			
 		</c:forEach>
 
-		initializeJRating();
+		initializeStarability();
 
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {

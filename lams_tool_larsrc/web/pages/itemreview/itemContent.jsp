@@ -98,7 +98,7 @@
 
 	<c:if test="${mode eq 'learner' or mode eq 'author'}">
 		<c:if test="${sessionMap.rateItems && allowRating}">
-			<lams:Rating5 itemRatingDto="${ratingDTO}" 
+			<lams:Rating itemRatingDto="${ratingDTO}" 
 						 disabled="${mode == 'teacher' || finishedLock}" allowRetries="true" />
 		</c:if>
 

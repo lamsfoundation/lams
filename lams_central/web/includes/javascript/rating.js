@@ -1,8 +1,8 @@
 
 //Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, MAX_RATINGS_FOR_ITEM,
-//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE, RATING_STEP, SESSION_ID constants in parent document
+//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, SESSION_ID constants in parent document
 
-//constant indicating there is rting limits set up
+//constant indicating there is rating limits set up
 var HAS_RATING_LIMITS;
 
 // Which ones are being rated by the current user? Needed to control what is disabled when the max number of ratings is reached
@@ -13,81 +13,66 @@ var idsBeingRated = [];
 $(document).ready(function(){
 	HAS_RATING_LIMITS = MAX_RATES!=0 || MIN_RATES!=0;
 
-	initializeJRating();
+	initializeStarability();
 	
 	//check minimum rates limit initially
 	if (MIN_RATES != 0) {
 		checkMinimumRatesLimit(COUNT_RATED_ITEMS);
 	}
-	
 });
 
-//initialize jRating and post comment button. Note: we need the quotes around undefined for the typeof !
-function initializeJRating() {
-
-	var maxRatingsForItem;
-	if ( typeof MAX_RATINGS_FOR_ITEM === "undefined" || MAX_RATINGS_FOR_ITEM === undefined )
-		maxRatingsForItem = "";
-	else 
-		maxRatingsForItem = MAX_RATINGS_FOR_ITEM;
-	
-	var ratingLimitsByCriteria;
-	if ( typeof LIMIT_BY_CRITERIA === "undefined" || LIMIT_BY_CRITERIA === undefined )
-		ratingLimitsByCriteria = false;
-	else 
-		ratingLimitsByCriteria = LIMIT_BY_CRITERIA;
-
-	var canRateAgain; 
-	if ( typeof ALLOW_RERATE === "undefined" || ALLOW_RERATE === undefined ) {
-		canRateAgain = false; 
-	} else {
-		canRateAgain = ALLOW_RERATE;
-	}
-	
-	var step; 
-	if ( typeof RATING_STEP === "undefined" || RATING_STEP === undefined ) {
-		step = 0.5; 
-	} else {
-		step = RATING_STEP;
-	}
+//initialize starability and post comment button. Note: we need the quotes around undefined for the typeof !
+function initializeStarability() {
+	const maxRatingsForItem = (typeof MAX_RATINGS_FOR_ITEM === "undefined" || MAX_RATINGS_FOR_ITEM === undefined) ? "" : MAX_RATINGS_FOR_ITEM;
+	const ratingLimitsByCriteria = (typeof LIMIT_BY_CRITERIA === "undefined" || LIMIT_BY_CRITERIA === undefined) ? false : LIMIT_BY_CRITERIA;
 	
 	// if SESSION_ID is not defined do not allow them to update ratings as the servlet will fail.
-	// But in monitoring we will do initializeJRating to display the ratings properly so then SESSION_ID is undefined.
-	var phpPathValue;
-	if ( typeof SESSION_ID === "undefined" || SESSION_ID === undefined )
-		phpPathValue = "";
-	else 
-		phpPathValue = LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria 
-			+ "&maxRatingsForItem=" + maxRatingsForItem + "&toolSessionId=" + SESSION_ID;
+	// But in monitoring we will do initializeStarability to display the ratings properly so then SESSION_ID is undefined.
+	const SERVLET_PATH = (typeof SESSION_ID === "undefined" || SESSION_ID === undefined) ? "" :
+		LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria
+		+ "&maxRatingsForItem=" + maxRatingsForItem + "&toolSessionId=" + SESSION_ID; 
 
-	$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		phpPath : phpPathValue,
-		rateMax : 5,
-        decimalLength : 1,
-        step: step,
-		canRateAgain : canRateAgain,
-        nbRates : canRateAgain ? 100 : 0,
-		onSuccess : function(data, itemId){
-			$("#user-rating-" + itemId).html(data.userRating);
-			$("#average-rating-" + itemId).html(data.averageRating);
-			$("#number-of-votes-" + itemId).html(data.numberOfVotes);
-			$("#rating-stars-caption-" + itemId).css("visibility", "visible");
-			var parts = itemId.split('-');
-			$("#comment-tick-" + parts[1]).css("visibility", "visible");	
-			$("#add-comment-area-" + parts[1]).css("visibility", "visible");
-			
-			//handle rating limits if available
-			handleRatingLimits(data.countRatedItems, itemId);
-		},
-		onError : function(){
- 			handleError();
+	$(".starability-new").each(function() {
+		const id = $(this).data('id'); // get the id of the box 
+
+		if (!$(this).hasClass('starability-disabled')) {
+			$("input[type=radio][name=" + id + "]").change(function() {
+				let element = this;
+				const rate = $(this).val();
+
+				$.post(
+					SERVLET_PATH,
+					{
+						idBox: id,
+						rate: rate
+					},
+					function(data) {
+						if (!data.error) {
+							$("#user-rating-" + id).html(data.userRating);
+							$("#average-rating-" + id).html(data.averageRating);
+							$("#number-of-votes-" + id).html(data.numberOfVotes);
+							$("#starability-caption-" + id).css("visibility", "visible");
+							var parts = id.split('-');
+							$("#comment-tick-" + parts[1]).css("visibility", "visible");
+							$("#add-comment-area-" + parts[1]).css("visibility", "visible");
+
+							//handle rating limits if available
+							handleRatingLimits(data.countRatedItems, id);
+
+						} else {
+							handleError(element, rate);
+						}
+					},
+					'json'
+				);
+			});
 		}
 	});
 
 	// LDEV-4495 Add an already rated on to stash of already rated ids. Then they won't be disabled when the user has 
 	// already rated as many as they can but they return to the screen to reeerate
     if (HAS_RATING_LIMITS && MAX_RATES != 0) {
-		$(".rating-stars-new").filter($(".rating-stars")).each(function() {
+		$(".starability-new").each(function() {
 			var average = $(this).data("average"); // unrated have average 0 to start
 			if ( average > 0 ) {
 				var newItemId = getItemIdFromObjectId($(this).data("id"));
@@ -96,13 +81,8 @@ function initializeJRating() {
 			}
 		});
     }
-
-	$(".rating-stars-new").filter($(".rating-stars-disabled")).jRating({
-		rateMax : 5,
-		isDisabled : true
-	});
 		
-	$(".rating-stars-new").removeClass("rating-stars-new");
+	$(".starability-new").removeClass("starability-new");
 	
 	//addNewComment button handler
 	$(".add-comment-new").click(function() {
@@ -180,11 +160,92 @@ function initializeJRating() {
     }).removeClass("add-comment-new");
 }
 
+function createStarability(isDisplayOnly, objectId, averageRating, numberOfVotes, userRating, isWidgetDisabled, criteriaTitle) { 
+	let isCriteriaRatedByUser = userRating != "",
+		result = '',	
+		legend = '';
+		
+	if (criteriaTitle) {
+		legend = '<legend class="text-muted fw-bold">' +
+					criteriaTitle +
+				 '</legend>';
+	}
+
+	let dataRating;
+	if (isDisplayOnly || isCriteriaRatedByUser) {
+		dataRating = Math.floor(averageRating);
+		//half-round when widget is disabled
+		if (isWidgetDisabled && (averageRating % 1 >= 0.5)) {
+			dataRating += 0.5;
+		}
+
+	} else {
+		dataRating = 0;
+	}
+
+	if (isWidgetDisabled) {
+		result += 
+			legend +
+			'<div class="starability starability-result" data-rating="' + dataRating + '">' +
+				'Rated: ' + dataRating + ' stars' +
+			'</div>';
+
+	} else {
+		result +=
+			'<fieldset class="starability starability-grow starability-new" data-average="' + dataRating + '" data-id="' + objectId + '">' +
+				legend +
+
+				'<input type="radio" id="' + objectId + '-0" class="input-no-rate" name="' + objectId + '" value="0" aria-label="No rating."' +
+					(dataRating == 0 ? 'checked' : '') + '/>' +
+	
+				'<input type="radio" id="' + objectId + '-1" name="' + objectId + '" value="1"' +
+					(dataRating == 1 ? 'checked' : '') + '/>' +
+				'<label for="' + objectId + '-1" title="Terrible">1 star</label>' +
+	
+				'<input type="radio" id="' + objectId + '-2" name="' + objectId + '" value="2"' +
+					(dataRating == 2 ? 'checked' : '') + '/>' +
+				'<label for="' + objectId + '-2" title="Not good">2 stars</label>' +
+	
+				'<input type="radio" id="' + objectId + '-3" name="' + objectId + '" value="3"' +
+					(dataRating == 3 ? 'checked' : '') + '/>' +
+				'<label for="' + objectId + '-3" title="Average">3 stars</label>' +
+	
+				'<input type="radio" id="' + objectId + '-4" name="' + objectId + '" value="4"' +
+				(	dataRating == 4 ? 'checked' : '') + '/>' +
+				'<label for="' + objectId + '-4" title="Very good">4 stars</label>' +
+	
+				'<input type="radio" id="' + objectId + '-5" name="' + objectId + '" value="5"' +
+					(dataRating == 5 ? 'checked' : '') + '/>' +
+				'<label for="' + objectId + '-5" title="Amazing">5 stars</label>' +
+	
+				'<span class="starability-focus-ring"></span>' +
+			'</fieldset>';
+	}
+
+	if (isDisplayOnly) {
+		result += '<div class="starability-caption">' +
+			AVG_RATING_LABEL.replace("@1@", averageRating).replace("@2@", numberOfVotes) +
+			'</div>';
+
+	} else {
+		result += '<div class="starability-caption" id="starability-caption-' + objectId + '"';
+		if (!isCriteriaRatedByUser) {
+			result += ' style="visibility: hidden;"';
+		}
+		result += '>';
+		var temp = YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-' + objectId + '">' + userRating + '</span>');
+		temp = temp.replace("@2@", '<span id="average-rating-' + objectId + '">' + averageRating + '</span>');
+		temp = temp.replace("@3@", '<span id="number-of-votes-' + objectId + '">' + numberOfVotes + '</span>');
+		result += temp;
+		result += '</div>';
+	}
+	
+	return result;
+}
+
 // allowBlankComment is needed for Peer Review, where rating related comments are always checked even if minWords = 0
 // skipMinWordCheckOnBlank is used for the explicit comment type fields may be blank even when minWord > 0
 function validComment(textAreaId, allowBlankComment, skipMinWordCheckOnBlank) {
-
-	
 	//replace special characters with HTML tags
     var tempTextarea = jQuery('<textarea/>');
     filterData(document.getElementById(textAreaId), tempTextarea);
@@ -227,7 +288,6 @@ function getItemIdFromObjectId(objectId) {
 }
 
 function handleRatingLimits(countRatedItems, objectId) {
-		
     if (HAS_RATING_LIMITS) {
 
     	//update info box
@@ -249,11 +309,14 @@ function handleRatingLimits(countRatedItems, objectId) {
 		    	
 	    	//disable rating features in case MAX_RATES limit reached *except for the ones user is already rating*
 	    	if (countRatedItems >= MAX_RATES) {
-		    	$(".rating-stars").each(function() {
-		    		if ( ! $(this).hasClass('jDisabled') ) {
-		    			var itemId = getItemIdFromObjectId($(this).attr('data-id'));
+		    	$(".starability").each(function() {
+		    		if (!$(this).hasClass('starability-result') && !$(this).hasClass('starability-disabled') ) {
+						const dataId = $(this).data('id'),
+		    				  itemId = getItemIdFromObjectId(dataId);
 		    			if ( idsBeingRated.indexOf(itemId) == -1 ) {
-			        		$(this).unbind().css('cursor','default').addClass('jDisabled');
+			        		$(this).addClass('starability-disabled');
+			        		$('input[type=radio][name=' + dataId +']').attr('disabled', 'disabled');//disable all internal radio buttons
+			        		
 			        		$('#add-comment-area-' + itemId).children().remove();
 			        	}
 			        }
@@ -265,7 +328,6 @@ function handleRatingLimits(countRatedItems, objectId) {
 	    if (MIN_RATES != 0) {
 	    	checkMinimumRatesLimit(countRatedItems);
 	    }
-	    
     }
 }
 	

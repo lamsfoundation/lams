@@ -119,7 +119,7 @@
 									<div class="text-center fs-4">
 										<fmt:message key="label.learning.rating" />
 									</div>
-									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isDisplayOnly="true"
+									<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isDisplayOnly="true"
 												 maxRates="${qaContent.maximumRates}" />
 								</div>
 							</c:if>
@@ -184,7 +184,7 @@
 								</lams:Alert5>
 							</c:if>
 						
-							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter jRating">
+							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter">
 								<th title="<fmt:message key='label.sort.by.answer'/>">
 									<fmt:message key="label.learning.answer" />
 								</th>
@@ -262,7 +262,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating5.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 	<lams:JSImport src="includes/javascript/portrait5.js" />

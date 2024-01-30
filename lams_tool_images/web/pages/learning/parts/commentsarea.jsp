@@ -29,7 +29,7 @@
 		WARN_MIN_NUMBER_WORDS_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>',
 		SESSION_ID = ${toolSessionID};
 	</script>
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 </c:if>
 <lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
 <script type="text/javascript">
@@ -59,7 +59,7 @@
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
-		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
+		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
 				minNumberWordsLabel="label.minimum.number.words"/>
 	</c:if>

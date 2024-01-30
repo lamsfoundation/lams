@@ -60,7 +60,7 @@
 		   	pager: '#pager${toolSessionId}',
 		   	viewrecords:true,
 			loadComplete: function(){
-				initializeJRating();
+				initializeStarability();
 				initializePortraitPopover('<lams:LAMSURL/>');
 			},
 		   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar

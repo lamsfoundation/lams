@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.logevent.service.ILearnerInteractionService;
 import org.lamsfoundation.lams.qb.dto.QbStatsActivityDTO;
 import org.lamsfoundation.lams.qb.model.QbQuestion;
 import org.lamsfoundation.lams.qb.service.IQbService;
+import org.lamsfoundation.lams.rating.RatingUtil;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
@@ -629,19 +630,9 @@ public class MonitoringController {
 			    double ratingSum = ratings.stream().mapToDouble(Rating::getRating).sum();
 			    String averageRating = NumberUtil.formatLocalisedNumberForceDecimalPlaces(
 				    ratingSum / numberOfVotes, null, 2);
-
-			    starString = "<div class='rating-stars-holder'>";
-			    starString +=
-				    "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
-					    + "' data-id='" + ratingCriteriaId + "'>";
-			    starString += "</div>";
-			    starString +=
-				    "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId
-					    + "' >";
-			    String msg = service.getMessage("label.average.rating",
-				    new Object[] { averageRating, numberOfVotes });
-			    starString += msg;
-			    starString += "</div>";
+			    
+			    String averageRatingLabel = service.getMessage("label.average.rating", new Object[] { averageRating, numberOfVotes });
+			    starString = RatingUtil.constructRatingTagDisabled(averageRating, averageRatingLabel);
 			}
 		    }
 		    userData.add(starString);

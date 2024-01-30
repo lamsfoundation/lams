@@ -8,8 +8,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css suffix="jquery.jRating"/>
-
+		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
@@ -44,9 +43,6 @@
 				LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
 			};
 
-			//var for jquery.jRating.js
-			var pathToImageFolder = "${lams}images/css/";
-
 			//vars for rating.js
 			var MAX_RATES = 0,
 					MIN_RATES = 0,
@@ -58,10 +54,9 @@
 					WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
-		<lams:JSImport src="includes/javascript/portrait.js" />
-		<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+	 	<lams:JSImport src="includes/javascript/portrait.js" />
+	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
 		<lams:JSImport src="includes/javascript/rating.js" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
@@ -123,57 +118,87 @@
 						{name:'userName',index:'userName', width:83, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
 								return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
 							}},
-						{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
-						<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
-						{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
-						</c:if>
-						<c:if test="${questionDto.groupsAnswersDisclosed}">
-						{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
-						</c:if>
-						{name:'grade', index:'grade', width:50, sorttype:"float", search:false, editable:true,
-							editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
-						{name:'marker', index:'marker', width: 110, search:false, title: false},
-						{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
-							sortable: false, editoptions: {maxlength: 3000, rows: 6}, title : false,
-							formatter:function(cellvalue, options, rowObject, event) {
-								if (event == "edit") {
-									cellvalue = cellvalue.replace(/\n/g, '\n<br>');
-								}
-								return cellvalue;
-							},
-							unformat:function(cellvalue, options, rowObject) {
-								return rowObject.innerText;
-							}
-						},
-						{name:'userId', index:'userId', width:0, hidden: true},
-						{name:'portraitId', index:'portraitId', width:0, hidden: true}
-					],
-					multiselect: false,
-					caption: "${sessionDto.sessionName}",
-					cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
-					cellEdit: true,
-					formatCell: function(rowid, name, value, iRow, iCol){
-						if (name != "grade") {
-							return value;
-						}
-						if (value == "-") {
-							value = "";
-						}
-						return value;
-					},
-					beforeEditCell: function (rowid,name,val,iRow,iCol){
-						if (name != "grade") {
-							return;
-						}
-						previousCellValue = val;
-					},
-					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
-						if (name != "grade") {
-							return val;
-						}
-						if (isNaN(val)) {
-							return null;
-						}
+			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
+	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
+			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			  	</c:if>
+				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
+				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
+		  			  		</c:if>
+							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
+								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
+			  			  	{name:'marker', index:'marker', width: 80, search:false, title: false},
+				  			{name:'markerComment', index:'markerComment', width:120, search:false, editable:true, sortable: false,
+				  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
+			  				{name:'userId', index:'userId', width:0, hidden: true},
+		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
+	  				   	],
+	  				   	multiselect: false,
+	  				   	caption: "${sessionDto.sessionName}",
+	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
+	  				  	cellEdit: true,
+	  	  				formatCell: function(rowid, name, value, iRow, iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return value;
+	  	  	  	  			}
+	  	  	  				if (value == "-") {
+	  	  	  	  				value = "0";
+	  	  	  	  			}
+	  	  	  	  			return value;
+	  	  	  			},
+	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
+	  	  	  				if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
+	  				  		previousCellValue = val;
+	  				  	},
+	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
+	  						if (name != "grade") {
+	  	  	  	  				return val;
+	  	  	  	  			}
+	  						if (isNaN(val)) {
+	  	  						return null;
+	  	  					}
+	  						
+	  						var maxMark = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'maxMark');
+	  						
+	  						if (+val > +maxMark) {
+	  							return maxMark;
+	  						}
+	  					},
+	  				  	afterSaveCell : function (rowid,name,val,iRow,iCol){
+	  	  					if (name != "grade") {
+	  	  	  	  				return;
+	  	  	  	  			}
+	  				  		var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
+	  				  		if (isNaN(val) || (questionResultUid=="")) {
+	  				  			jQuery("#session${sessionDto.sessionId}").restoreCell(iRow,iCol); 
+	  				  		} else {
+	  				  			isEdited = true;
+	  				  		}
+  						},	  		
+	  				  	beforeSubmitCell : function (rowid,name,val,iRow,iCol){
+	  	  					if (name == "grade" && isNaN(val)) {
+	  	  						return {nan:true};
+	  	  					} else {
+	  	  						var questionResultUid = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'questionResultUid');
+	  	  						return {
+	  	  	  							questionResultUid:questionResultUid,
+	  	  	  						    column:name
+	  	  	  						   };		  				  		
+	  	  				  	}
+	  					},
+	  	  				afterSubmitCell : function (serverresponse, rowid, name, value, iRow, iCol) {
+	  	  	  				if (serverresponse.statusText == "OK") {
+	  	  	  	  				if (serverresponse.responseText != "") {
+	  	  	  	  					$(this).setCell(rowid, 'marker', serverresponse.responseText, {}, {});
+	  	  	  	  				}
+	  	  	  					return [true, ""];
+	  	  	  				}
+	  	  	  			},
+  						loadComplete: function () {
+  							initializeStarability();
+  					   	 	initializePortraitPopover('<lams:LAMSURL/>');
 
 						var maxMark = jQuery("#session${sessionDto.sessionId}").getCell(rowid, 'maxMark');
 

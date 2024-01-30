@@ -28,7 +28,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating5.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 	<script type="text/javascript">
 	$(document).ready(function(){

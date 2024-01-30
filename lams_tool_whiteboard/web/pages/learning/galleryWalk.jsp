@@ -97,7 +97,7 @@
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 		}
 	</script>
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<%@ include file="websocket.jsp"%>	
 
 <div id="container-main">
@@ -130,7 +130,7 @@
 						${groupSummary.sessionName}
 					</div>
 					<div class="col">
-						<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}" 
+						<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" 
 								isDisplayOnly="true"
 								hideCriteriaTitle="true" />
 					</div>
@@ -171,7 +171,7 @@
 				<%-- Do not show rating to own group before Gallery Walk is finished --%>
 	       	    <c:if test="${not whiteboard.galleryWalkReadOnly and (whiteboard.galleryWalkFinished or mode == 'teacher' or toolSessionID != groupSummary.sessionId)}">
 	       	    	<div class="gallery-walk-rating-comment-container">
-	       	    		<lams:Rating5 itemRatingDto="${groupSummary.itemRatingDto}"
+	       	    		<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
 								     isDisplayOnly="${whiteboard.galleryWalkFinished or not hasEditRight or mode == 'teacher'}" />
 					 </div>
 	       	    </c:if>

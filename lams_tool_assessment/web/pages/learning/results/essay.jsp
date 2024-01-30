@@ -55,7 +55,7 @@
 						<c:set var="itemRatingDto" value="${itemRatingDtos[sessionResults.uid]}" />
 					</c:otherwise>
 				</c:choose>
-				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
+				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader) && (mode != 'teacher')}" />
 				<c:set var="showRating" value="${canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating))}" />
 			</c:if>
 			
@@ -92,7 +92,7 @@
 				
 						<c:if test="${showRating}">
 							<%-- Do not allow voting for non-leaders if leader is enabled --%>
-							<lams:Rating5 itemRatingDto="${itemRatingDto}"
+							<lams:Rating itemRatingDto="${itemRatingDto}"
 										 isDisplayOnly="${not canRate}"
 										 showAllComments="true"
 										 refreshOnComment="rating-table-${question.uid}" />

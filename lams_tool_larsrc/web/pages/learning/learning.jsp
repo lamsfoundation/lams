@@ -93,7 +93,7 @@
                 YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
                 SESSION_ID = ${toolSessionID};
         </script>
-        <lams:JSImport src="includes/javascript/rating5.js" />
+        <lams:JSImport src="includes/javascript/rating.js" />
     </c:if>
     <lams:JSImport src="includes/javascript/rsrccommon.js" relative="true" />
     <lams:JSImport src="includes/javascript/rsrcembed.js" relative="true" />

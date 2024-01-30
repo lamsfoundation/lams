@@ -2,11 +2,6 @@
 
 /* ------- Further rules are modification done by LAMS  ------ */
 
-/* jRating */
-.tablesorter.jRating.table-striped > tbody > tr:nth-of-type(odd) > * {
-	--bs-table-accent-bg: none;
-}
-
 /* add border-radius */
 .tablesorter thead tr:first-child th:first-child {
     border-top-left-radius: 1rem;

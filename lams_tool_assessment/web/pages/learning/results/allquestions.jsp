@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="assessment" value="${sessionMap.assessment}" />
 <c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
@@ -24,7 +25,7 @@
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-<lams:JSImport src="includes/javascript/rating5.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
         //vars for rating.js
         AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
