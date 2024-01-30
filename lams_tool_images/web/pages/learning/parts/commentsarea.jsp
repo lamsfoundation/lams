@@ -59,7 +59,7 @@
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
-		<lams:Rating5 itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
+		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
 				minNumberWordsLabel="label.minimum.number.words"/>
 	</c:if>

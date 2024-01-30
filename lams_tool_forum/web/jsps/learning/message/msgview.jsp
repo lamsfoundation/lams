@@ -160,7 +160,7 @@
 			<c:if test="${sessionMap.allowRateMessages}">
 				<c:set var="isDisabled" value='${(sessionMap.mode == "teacher") || msgDto.isAuthor || sessionMap.finishedLock || sessionMap.noMoreRatings}'/>
 			
-				<lams:Rating5 itemRatingDto="${msgDto.itemRatingDto}" disabled="${isDisabled}" isDisplayOnly="${msgDto.isAuthor}"
+				<lams:Rating itemRatingDto="${msgDto.itemRatingDto}" disabled="${isDisabled}" isDisplayOnly="${msgDto.isAuthor}"
 					allowRetries="true" hideCriteriaTitle="true"
 					averageRatingLabel="label.learning.number.of.votes"/>
 			</c:if>

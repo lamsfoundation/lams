@@ -119,7 +119,7 @@
 									<div class="text-center fs-4">
 										<fmt:message key="label.learning.rating" />
 									</div>
-									<lams:Rating5 itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isDisplayOnly="true"
+									<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isDisplayOnly="true"
 												 maxRates="${qaContent.maximumRates}" />
 								</div>
 							</c:if>

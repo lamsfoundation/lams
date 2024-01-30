@@ -92,7 +92,7 @@
 				
 						<c:if test="${showRating}">
 							<%-- Do not allow voting for non-leaders if leader is enabled --%>
-							<lams:Rating5 itemRatingDto="${itemRatingDto}"
+							<lams:Rating itemRatingDto="${itemRatingDto}"
 										 isDisplayOnly="${not canRate}"
 										 showAllComments="true"
 										 refreshOnComment="rating-table-${question.uid}" />
