@@ -237,7 +237,7 @@
 						}
 					},
 					loadComplete: function () {
-						initializeJRating();
+						initializeStarability();
 						initializePortraitPopover('<lams:LAMSURL/>');
 
 						if (typeof CodeMirror != 'undefined') {
