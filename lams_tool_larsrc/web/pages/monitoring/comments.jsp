@@ -6,7 +6,7 @@
 <lams:PageLearner toolSessionID="${requestScope.toolSessionID}" title="${title}" hideHeader="true">
 	<div id="container-main">
 		<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>"
-			mode="${requestScope.mode}" toolItemId="${requestScope.itemUid}"  bootstrap5="true"
+			mode="${requestScope.mode}" toolItemId="${requestScope.itemUid}"
 		/>
 	</div>
 </lams:PageLearner>

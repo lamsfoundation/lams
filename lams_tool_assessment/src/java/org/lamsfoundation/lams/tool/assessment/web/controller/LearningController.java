@@ -1265,10 +1265,8 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
-	
-	boolean isBootstrap5 = WebUtil.readBooleanParam(request, "bootstrap5", false);
 
-	return "pages/learning/" + (isBootstrap5 ? "results" : "resultsbootstrap3") + (embedded ? "/allquestions" : "");
+	return "pages/learning/results" + (embedded ? "/allquestions" : "");
     }
 
     @RequestMapping(path = "/logLearnerInteractionEvent", method = RequestMethod.POST)
