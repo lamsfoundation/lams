@@ -5,7 +5,7 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 <link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
 <link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
 <style type="text/css">
@@ -18,9 +18,6 @@
 <lams:JSImport src="includes/javascript/common.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 <script type="text/javascript">
-	//var for jquery.jRating.js
-	var pathToImageFolder = "${lams}images/css/";
-
 	//vars for rating.js
 	var MAX_RATES = 0,
 			MIN_RATES = 0,
@@ -37,8 +34,7 @@
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<lams:JSImport src="includes/javascript/rating.js" />
+<lams:JSImport src="includes/javascript/rating5.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';

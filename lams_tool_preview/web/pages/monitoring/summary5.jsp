@@ -4,13 +4,10 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
 
 <script type="text/javascript">
-	//var for jquery.jRating.js
-	var pathToImageFolder = "${lams}images/css/";
-
 	//vars for rating.js
 	var MAX_RATES = 0,
 			MIN_RATES = 0,
@@ -22,9 +19,7 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
-
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-<lams:JSImport src="includes/javascript/rating.js" />
+<lams:JSImport src="includes/javascript/rating5.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';

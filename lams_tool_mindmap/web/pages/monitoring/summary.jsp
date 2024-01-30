@@ -2,7 +2,7 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="dto" value="${mindmapDTO}" />
 
-<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <style>
@@ -61,11 +61,8 @@
 		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
 
-
-	//var for jquery.jRating.js
-	var pathToImageFolder = "${lams}images/css/",
-		//vars for rating.js
-		AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+	//vars for rating.js
+	var	AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 		YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 		MAX_RATES = 0,
 		MIN_RATES = 0,
@@ -78,8 +75,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <lams:JSImport src="includes/javascript/portrait.js" />
-<lams:JSImport src="includes/javascript/rating.js" />
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<lams:JSImport src="includes/javascript/rating5.js" />
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -251,7 +247,7 @@
 							<td>${mindmapSession.sessionName}</td>
 							<td>
 								<lams:Rating itemRatingDto="${mindmapSession.itemRatingDto}" 
-											 isItemAuthoredByUser="true"
+											 isDisplayOnly="true"
 											 hideCriteriaTitle="true" />
 							</td>
 						</tr>

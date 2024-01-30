@@ -15,14 +15,11 @@
 	<lams:css />
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
-	<lams:css suffix="jquery.jRating"/>
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
 	<link type="text/css" rel="stylesheet" href="${tool}ncludes/css/qalearning.css">
 	<style media="screen,projection" type="text/css">
-		.rating-stars-div {
-			padding-top: 12px;
-		}
 		.dialog {
 			display: none;
 		}
@@ -49,9 +46,6 @@
 			messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 			messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 		};	
-	
-		//var for jquery.jRating.js
-		var pathToImageFolder = "${lams}images/css/";
 		
 		//vars for rating.js
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
@@ -71,11 +65,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
-	<lams:JSImport src="includes/javascript/rating.js" />
+	<lams:JSImport src="includes/javascript/rating5.js" />
 	<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
@@ -145,28 +138,19 @@
 									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
-										rows += '<div class="rating-stars-holder">';
+										rows += '<div class="starability-holder">';
 										
 										for (j = 0; j < userData.criteriaDtos.length; j++){
-											var criteriaDto = userData.criteriaDtos[j];
-											var objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId;
-											var averageRating = criteriaDto.averageRating;
-											var numberOfVotes = criteriaDto.numberOfVotes;
-											var userRating = criteriaDto.userRating;
-											var isCriteriaNotRatedByUser = userRating == "";
-											var averageRatingDisplayed = averageRating;
-											var ratingStarsClass = "rating-stars-disabled";
-								
-											rows += '<h4>';
-											rows += 	 criteriaDto.title;
-											rows += '</h4>';
-											
-											rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
-											rows += '</div>';
-											
-												rows += '<div class="rating-stars-caption">';
-												rows += 	AVG_RATING_LABEL.replace("@1@", averageRating).replace("@2@", numberOfVotes);
-												rows += '</div>';
+											const criteriaDto = userData.criteriaDtos[j],
+												isDisplayOnly = true,
+												objectId = criteriaDto["ratingCriteriaId"] + "-" + itemId,
+												averageRating = criteriaDto.averageRating,
+												numberOfVotes = criteriaDto.numberOfVotes,
+												userRating = criteriaDto.userRating,
+												isCriteriaRatedByUser = userRating != "",
+												isWidgetDisabled = true,
+												criteriaTitle = criteriaDto.title;
+											rows += createStarability(isDisplayOnly, objectId, averageRating, numberOfVotes, userRating, isWidgetDisabled, criteriaTitle);
 										}
 										
 										rows += '</div>';
@@ -212,7 +196,7 @@
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
 					$("time.timeago").timeago();
-					initializeJRating();
+					initializeStarability();
 					initializePortraitPopover('${lams}');
 				})
 			});

@@ -12,12 +12,9 @@
 		<c:set var="imageGallery" value="${sessionMap.imageGallery}" />		
 		
 		<%@ include file="/common/header.jsp"%>
-		<lams:css suffix="jquery.jRating"/>
+		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 		
 		<script type="text/javascript">
-			//var for jquery.jRating.js
-			var pathToImageFolder = "${lams}images/css/";
-		
 			//vars for rating.js
 			var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '',
@@ -32,8 +29,7 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<lams:JSImport src="includes/javascript/rating.js" />
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<lams:JSImport src="includes/javascript/rating5.js" />
 	</lams:head>
 	
 <body class="stripes">
@@ -78,7 +74,7 @@
 			
 			<c:if test="${imageGallery.allowRank}">
 				<lams:Rating itemRatingDto="${itemRatingDto}" disabled="true"
-						isItemAuthoredByUser="true"
+						isDisplayOnly="true"
 						maxRates="0" 
 						countRatedItems="0" />
 			</c:if>

@@ -24,8 +24,8 @@
 		</title>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		
-		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-		<lams:css suffix="jquery.jRating"/>
+		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css">
+		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
@@ -45,9 +45,6 @@
 		</style>
 		
 		<script type="text/javascript">
-			//var for jquery.jRating.js
-			var pathToImageFolder = "${lams}images/css/";
-		
 			//vars for rating.js
 			var AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '',
@@ -76,8 +73,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-		<lams:JSImport src="includes/javascript/rating.js" />
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+		<lams:JSImport src="includes/javascript/rating5.js" />
 		<script>
 			var initialTabId = "${initialTabId}";
 	

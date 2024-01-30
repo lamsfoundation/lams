@@ -184,7 +184,7 @@
 								</lams:Alert5>
 							</c:if>
 						
-							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter jRating">
+							<lams:TSTable5 numColumns="${numColumns}" dataId='data-question-uid="${question.uid}"' tableClass="tablesorter">
 								<th title="<fmt:message key='label.sort.by.answer'/>">
 									<fmt:message key="label.learning.answer" />
 								</th>

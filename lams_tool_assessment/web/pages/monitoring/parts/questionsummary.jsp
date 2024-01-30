@@ -8,7 +8,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css suffix="jquery.jRating"/>
+		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 		
 		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
@@ -44,9 +44,6 @@
 				LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
 			};
 			
-			//var for jquery.jRating.js
-			var pathToImageFolder = "${lams}images/css/";
-			
 			//vars for rating.js
 			var MAX_RATES = 0,
 				MIN_RATES = 0,
@@ -61,8 +58,7 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
-		<lams:JSImport src="includes/javascript/rating.js" />
+		<lams:JSImport src="includes/javascript/rating5.js" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
@@ -202,7 +198,7 @@
 	  	  	  				}
 	  	  	  			},
   						loadComplete: function () {
-  							initializeJRating();
+  							initializeStarability();
   					   	 	initializePortraitPopover('<lams:LAMSURL/>');
 
 	  						if (typeof CodeMirror != 'undefined') {

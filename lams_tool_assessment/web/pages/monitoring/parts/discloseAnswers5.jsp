@@ -5,7 +5,7 @@
 		var toolContentId = resultsPane.data('toolContentId');
 		// load an embedded results list
 		// show details button needs to be set in the page which included this page
-		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&bootstrap5=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
+		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
 						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, function(){
 			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane').length 
 					? $(this).closest('.assessment-questions-pane') : $('.assessment-questions-pane-ira'),

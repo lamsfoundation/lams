@@ -16,7 +16,7 @@
 
 <%@ page import="org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants"%>
 
-<lams:css suffix="jquery.jRating"/>
+<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css" />
@@ -163,10 +163,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/fullscreen.js"></script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">
-	//var for jquery.jRating.js
-	var pathToImageFolder = "${lams}images/css/",
-			//vars for rating.js
-			AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
+	//vars for rating.js
+	var		AVG_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message></spring:escapeBody>',
 			YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message></spring:escapeBody>',
 			MAX_RATES = 0,
 			MIN_RATES = 0,
@@ -487,8 +485,7 @@
 	}
 
 </script>
-<lams:JSImport src="includes/javascript/rating.js" />
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<lams:JSImport src="includes/javascript/rating5.js" />
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
 <div id="whiteboard-monitoring-summary-${sessionMap.toolContentID}" class="whiteboard-monitoring-summary">
@@ -595,7 +592,7 @@
 								<td>${groupSummary.sessionName}</td>
 								<td>
 									<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}"
-												 isItemAuthoredByUser="true"
+												 isDisplayOnly="true"
 												 hideCriteriaTitle="true" />
 								</td>
 							</tr>

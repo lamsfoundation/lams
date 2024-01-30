@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.rating.RatingUtil;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -257,21 +258,14 @@ public class MonitoringController {
 	    for (JsonNode rawNode : rawRows) {
 		ObjectNode rawRow = (ObjectNode) rawNode;
 		String averageRating = JsonUtil.optString(rawRow, "averageRating");
-		Object numberOfVotes = rawRow.get("numberOfVotes");
+		String numberOfVotes = JsonUtil.optString(rawRow, "numberOfVotes");
 
 		if (averageRating != null && averageRating.length() > 0) {
 		    if (criteria.isStarStyleRating()) {
-			String starString = "<div class='rating-stars-holder'>";
-			starString +=
-				"<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
-					+ "' data-id='" + criteriaId + "'>";
-			starString += "</div>";
-			starString +=
-				"<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
-			String msg = service.getLocalisedMessage("label.average.rating",
+			String averageRatingLabel = service.getLocalisedMessage("label.average.rating",
 				new Object[] { averageRating, numberOfVotes });
-			starString += msg;
-			starString += "</div>";
+			String starString = RatingUtil.constructRatingTagDisabled(averageRating, averageRatingLabel);
+			
 			rawRow.put("rating", starString);
 			rawRow.put("email", generatePreviewButton(toolSessionId, JsonUtil.optLong(rawRow, "itemId"),
 				emailResultsText));

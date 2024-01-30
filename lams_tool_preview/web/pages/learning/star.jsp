@@ -289,7 +289,7 @@
 		<c:set var="numColumns" value="3"/>
 	</c:if>
 	
-	<lams:TSTable5 numColumns="${numColumns}" tableClass="tablesorter jRating">
+	<lams:TSTable5 numColumns="${numColumns}" tableClass="tablesorter">
 		<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"> 
 			<fmt:message key="label.user.name" />
 		</th>

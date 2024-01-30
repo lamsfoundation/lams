@@ -71,7 +71,7 @@
 						<c:when test="${sessionMap.imageGallery.allowRank}">	
 							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
 								<lams:Rating itemRatingDto="${summary.itemRatingDto}" disabled="true" 
-										isItemAuthoredByUser="true"
+										isDisplayOnly="true"
 										maxRates="0" 
 										countRatedItems="0" />
 							</td>

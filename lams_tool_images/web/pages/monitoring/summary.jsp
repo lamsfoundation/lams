@@ -137,7 +137,7 @@ $(document).ready(function(){
 						<c:when test="${sessionMap.imageGallery.allowRank}">
 							<td style="vertical-align:middle; padding-left:0px; text-align:center;">
 								<lams:Rating itemRatingDto="${summary.itemRatingDto}" disabled="true" showComments="false"
-										isItemAuthoredByUser="true"
+										isDisplayOnly="true"
 										maxRates="0" 
 										countRatedItems="0" />
 							</td>
