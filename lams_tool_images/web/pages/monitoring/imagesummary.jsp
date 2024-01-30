@@ -29,7 +29,7 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<lams:JSImport src="includes/javascript/rating5.js" />
+		<lams:JSImport src="includes/javascript/rating.js" />
 	</lams:head>
 	
 <body class="stripes">

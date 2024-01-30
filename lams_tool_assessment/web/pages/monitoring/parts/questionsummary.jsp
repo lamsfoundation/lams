@@ -58,7 +58,7 @@
 	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
 	 	<lams:JSImport src="includes/javascript/portrait.js" />
 	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-		<lams:JSImport src="includes/javascript/rating5.js" />
+		<lams:JSImport src="includes/javascript/rating.js" />
 
 		<c:if test="${not empty questionDto.codeStyle}">
 			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>

@@ -15,7 +15,7 @@
 		COMMENT_TEXTAREA_TIP_LABEL = WARN_COMMENTS_IS_BLANK_LABEL = WARN_MIN_NUMBER_WORDS_LABEL = '',
 		ALLOW_RERATE = false; 
 </script>
-<lams:JSImport src="includes/javascript/rating5.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />

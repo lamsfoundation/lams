@@ -19,7 +19,7 @@
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 </script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
-<lams:JSImport src="includes/javascript/rating5.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';

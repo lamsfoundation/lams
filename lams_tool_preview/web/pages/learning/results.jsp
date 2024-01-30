@@ -37,7 +37,7 @@
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-widgets.js" />
 	<lams:JSImport src="includes/javascript/jquery.tablesorter-pager.js" />
 	<lams:JSImport src="includes/javascript/common.js" />
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<script type="text/javascript">
 		checkNextGateActivity('finishButton', '${toolSessionId}', '', finishSession);
 	

@@ -29,7 +29,7 @@
 		WARN_MIN_NUMBER_WORDS_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message></spring:escapeBody>',
 		SESSION_ID = ${toolSessionID};
 	</script>
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 </c:if>
 <lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
 <script type="text/javascript">

@@ -25,7 +25,7 @@
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/rating5.js" type="text/javascript" ></script> 	
+	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
 	<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 <script type="text/javascript">	
 	var YOUR_RATING_LABEL = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message></spring:escapeBody>',

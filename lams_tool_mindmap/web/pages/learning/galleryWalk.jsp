@@ -65,7 +65,7 @@
 			document.location.href ='<c:url value="/learning/finishActivity.do?toolSessionID=${toolSessionID}"/>';
 		}
 	</script>
-	<lams:JSImport src="includes/javascript/rating5.js" />
+	<lams:JSImport src="includes/javascript/rating.js" />
 	<%@ include file="websocket.jsp"%>	
 
 <div id="container-main">

@@ -73,7 +73,7 @@
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-		<lams:JSImport src="includes/javascript/rating5.js" />
+		<lams:JSImport src="includes/javascript/rating.js" />
 		<script>
 			var initialTabId = "${initialTabId}";
 	

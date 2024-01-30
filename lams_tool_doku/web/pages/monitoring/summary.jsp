@@ -483,7 +483,7 @@
 	}
 
 </script>
-<lams:JSImport src="includes/javascript/rating5.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 
 <!-- Extra container div to isolate content from multiple Application Excercise tabs in TBL monitoring -->
 <div id="doku-monitoring-summary-${sessionMap.toolContentID}" class="doku-monitoring-summary">

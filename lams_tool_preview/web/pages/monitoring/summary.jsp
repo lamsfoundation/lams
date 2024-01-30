@@ -34,7 +34,7 @@
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
 <script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-<lams:JSImport src="includes/javascript/rating5.js" />
+<lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">
 	function exportResults() {
 		var exportExcelUrl = '<c:url value="/monitoring/exportTeamReport.do"/>?<csrf:token/>&sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
