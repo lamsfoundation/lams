@@ -48,7 +48,7 @@
 		<c:set var="mode" value="${sessionScope[sessionMapID].mode}" />
 	</c:if>
 
-	<%--  only have sidebar and presence in learner main window, not in popup windows --%>
+	<%--  only have sidebar in learner main window, not in popup windows --%>
 	<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
@@ -215,21 +215,6 @@
 							} else if ( showControlBar == 2 ) {
 								$('#navcontent').addClass('navcontent');
 							}
-							
-							var presenceEnabledPatch = result.presenceEnabledPatch;
-							var presenceImEnabled = result.presenceImEnabled;
-							if ( showIM && (presenceEnabledPatch || presenceImEnabled) ) {
-								presenceURL = LEARNING_URL+"presenceChat.jsp?presenceEnabledPatch="+presenceEnabledPatch
-										+"&presenceImEnabled="+presenceImEnabled+"&lessonID="+lessonId;
-								<c:if test="${not usePanel}">
-								presenceURL = presenceURL + "&reloadBootstrap=true";
-								</c:if>
-								$('#presenceEnabledPatchDiv').load(presenceURL, function( response, status, xhr ) {
-									if ( status == "error" ) {
-										alert("Unable to load IM: " + xhr.status);
-									} 
-								});
-							}
 
 							initWebsocket('commandWebsocket', LEARNING_URL.replace('http', 'ws')
 									+ 'commandWebsocket?lessonID=' + lessonId,
@@ -379,10 +364,6 @@
 					<jsp:doBody />
 				</c:otherwise>
 				</c:choose>						
-				<%--  only have sidebar and presence in learner --%>
-				<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
-					<div id="presenceEnabledPatchDiv"></div>
-				</c:if>
 			</div>
 				</div>
 			</div>

@@ -352,11 +352,7 @@
    	<tag-file>
        <name>Rating</name>
        <path>/WEB-INF/tags/Rating.tag</path>
-   	</tag-file> 
-   	<tag-file>
-       <name>Rating5</name>
-       <path>/WEB-INF/tags/Rating5.tag</path>
-   	</tag-file> 
+   	</tag-file>
    	<tag-file>
    		<name>RestrictedUsageAccordian</name>
    		<path>/WEB-INF/tags/RestrictedUsageAccordian.tag</path>
@@ -376,10 +372,6 @@
    	<tag-file>
        <name>StyledRating</name>
        <path>/WEB-INF/tags/StyledRating.tag</path>
-   	</tag-file>
-   	<tag-file>
-       <name>StyledRating5</name>
-       <path>/WEB-INF/tags/StyledRating5.tag</path>
    	</tag-file>
    	<tag-file>
        <name>Switch</name>
