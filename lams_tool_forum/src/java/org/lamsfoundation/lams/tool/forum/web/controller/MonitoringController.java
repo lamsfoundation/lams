@@ -285,7 +285,7 @@ public class MonitoringController {
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
 	    if (userData.length > 1 && userData[1] != null) {
-		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userData[2]);
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userData[1]);
 	    }
 
 	    rows.add(responseRow);
