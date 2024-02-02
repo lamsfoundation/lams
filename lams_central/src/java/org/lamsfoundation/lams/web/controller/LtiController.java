@@ -85,8 +85,9 @@ public class LtiController {
      * pages
      */
     @RequestMapping("")
-    public String unspecified(HttpServletRequest request, HttpServletResponse respnse) throws IOException,
-	    UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
+    public String unspecified(HttpServletRequest request, HttpServletResponse respnse)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException,
+	    UserInfoValidationException {
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String tcGradebookId = request.getParameter(BasicLTIConstants.LIS_RESULT_SOURCEDID);
@@ -126,8 +127,9 @@ public class LtiController {
 
 	    //check if the new lesson should be created after course copy, that potentially has happened on LMS side;
 	    //(we can detect it by comparing orgId of the custom_lessonid's organisation and CONTEXT_ID's one).
-	    boolean isLessonCopyRequired = lesson.getOrganisation() != null
-		    && !lesson.getOrganisation().getOrganisationId().equals(currentOrganisationId);
+	    boolean isLessonCopyRequired =
+		    lesson.getOrganisation() != null && !lesson.getOrganisation().getOrganisationId()
+			    .equals(currentOrganisationId);
 	    if (isLessonCopyRequired) {
 
 		//add users to the course
@@ -193,8 +195,9 @@ public class LtiController {
      * design and start a lesson.
      */
     @RequestMapping("/addLesson")
-    private String addLesson(HttpServletRequest request, HttpServletResponse response) throws IOException,
-	    UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException, UserInfoValidationException {
+    private String addLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException, UserInfoFetchException,
+	    UserInfoValidationException {
 	Integer userId = getUser().getUserID();
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String customContextMembershipUrl = request.getParameter(LtiUtils.CUSTOM_CONTEXT_MEMBERSHIPS_URL);
@@ -239,7 +242,8 @@ public class LtiController {
 	    request.setAttribute(LtiUtils.CONTENT_ITEM_RETURN_URL, contentItemReturnUrl);
 	    request.setAttribute("title", request.getParameter("title"));
 	    //text parameter can be null in case of BB server
-	    String description = request.getParameter("text") == null ? ""
+	    String description = request.getParameter("text") == null
+		    ? ""
 		    : request.getParameter("text").replaceAll("\\<[^>]*>", "");
 	    request.setAttribute("desc", description);
 	    request.setAttribute("data", request.getParameter("data"));
@@ -252,8 +256,9 @@ public class LtiController {
      * Starts a lesson. Then prompts to learnerMonitor page or autosubmitForm (in case of ContentItemSelectionRequest).
      */
     @RequestMapping("/startLesson")
-    public String startLesson(HttpServletRequest request, HttpServletResponse response) throws IOException,
-	    UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
+    public String startLesson(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException,
+	    UserInfoFetchException {
 	Integer userId = getUser().getUserID();
 	User user = getRealUser(getUser());
 
@@ -280,21 +285,25 @@ public class LtiController {
 	// 1. init lesson
 	Boolean liveEditEnabled = extServer.getLiveEditEnabled() == null ? false : extServer.getLiveEditEnabled();
 	Lesson lesson = monitoringService.initializeLesson(title, desc, new Long(ldIdStr),
-		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro,
-		liveEditEnabled, extServer.getEnableLessonNotifications(), extServer.getForceLearnerRestart(),
+		organisation.getOrganisationId(), user.getUserId(), null, false, enableLessonIntro, liveEditEnabled,
+		extServer.getEnableLessonNotifications(), extServer.getForceLearnerRestart(),
 		extServer.getAllowLearnerRestart(), extServer.getGradebookOnComplete(), null, null);
 	Long lessonId = lesson.getLessonId();
 	// 2. create lessonClass for lesson
 	List<User> staffList = new LinkedList<>();
 	staffList.add(user);
 	List<User> learnerList = new LinkedList<>();
-	Vector<User> learnerVector = userManagementService
-		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
+	Vector<User> learnerVector = userManagementService.getUsersFromOrganisationByRole(
+		organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
 	monitoringService.createLessonClassForLesson(lessonId, organisation, organisation.getName() + "Learners",
 		learnerList, organisation.getName() + "Staff", staffList, user.getUserId());
-	// 3. start lesson
-	monitoringService.startLesson(lessonId, user.getUserId());
+
+	if (!extServer.isStartInMonitor()) {
+	    // 3. start lesson
+	    monitoringService.startLesson(lessonId, user.getUserId());
+	}
+
 	// store information which extServer has started the lesson
 
 	/*
@@ -308,8 +317,8 @@ public class LtiController {
 	 * BUT if there is another integration client which does not use deep linking and sends proper resource link ID
 	 * right away, then we use this link. Currently we are aware of desire2learn that uses this approach.
 	 */
-	boolean useResourceLinkId = toolConsumerFamily == null
-		|| !toolConsumerFamily.toLowerCase().contains("blackboard");
+	boolean useResourceLinkId =
+		toolConsumerFamily == null || !toolConsumerFamily.toLowerCase().contains("blackboard");
 	integrationService.createExtServerLessonMap(lessonId, useResourceLinkId ? resourceLinkId : null, extServer);
 
 	integrationService.addUsersUsingMembershipService(extServer, lessonId, extCourseId, resourceLinkId,
@@ -469,8 +478,9 @@ public class LtiController {
      * Once lesson was created, start showing learnerMonitor page to everybody regardless of his role.
      */
     @RequestMapping("/learnerMonitor")
-    public String learnerMonitor(HttpServletRequest request, HttpServletResponse response) throws IOException,
-	    UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException, UserInfoFetchException {
+    public String learnerMonitor(HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException, UserInfoValidationException,
+	    UserInfoFetchException {
 	Integer userId = getUser().getUserID();
 	String consumerKey = request.getParameter(LtiUtils.OAUTH_CONSUMER_KEY);
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
