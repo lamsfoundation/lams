@@ -101,19 +101,19 @@
                         </c:if>
                         {name:'grade', index:'grade', width:80, sorttype:"float", editable:true,
                             editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false },
-						{name:'marker', index:'marker', width: 110, title: false},
-						{name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
-							sortable: false, editoptions: {maxlength: 3000, rows: 6}, title : false,
-							formatter:function(cellvalue, options, rowObject, event) {
-								if (event == "edit") {
-									cellvalue = cellvalue.replace(/\n/g, '\n<br>');
-								}
-								return cellvalue;
-							},
-							unformat:function(cellvalue, options, rowObject) {
-								return rowObject.innerText;
-							}
-						}
+                        {name:'marker', index:'marker', width: 110, title: false},
+                        {name:'markerComment', index:'markerComment', width:300, editable:true, edittype: 'textarea',
+                            sortable: false, editoptions: {maxlength: 3000, rows: 6}, title : false,
+                            formatter:function(cellvalue, options, rowObject, event) {
+                                if (event == "edit") {
+                                    cellvalue = cellvalue.replace(/\n/g, '\n<br>');
+                                }
+                                return cellvalue;
+                            },
+                            unformat:function(cellvalue, options, rowObject) {
+                                return rowObject.innerText;
+                            }
+                        }
                     ],
                     multiselect: false,
                     cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
@@ -123,7 +123,7 @@
                             return value;
                         }
                         if (value == "-") {
-							value = "";
+                            value = "";
                         }
                         return value;
                     },
@@ -208,33 +208,33 @@
                     marker :
                         <c:choose>
                         <c:when test="${requiresMarking}">
-							"<b>(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody>)</b>"
+                        "<b>(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody>)</b>"
                     </c:when>
                     <c:when test="${not empty questionResult.markedBy}">
                     "<c:out value='${questionResult.markedBy.fullName}' />"
                     </c:when>
                     <c:otherwise>
-					"(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.auto' /></spring:escapeBody>)"
+                    "(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.auto' /></spring:escapeBody>)"
                     </c:otherwise>
                     </c:choose>,
-					markerComment: "${questionResult.markerCommentEscaped}"
+                    markerComment: "${questionResult.markerCommentEscaped}"
                 });
                 // set maxGrade attribute to cell DOM element
                 table.setCell(${i.index + 1}, "grade", "", null, {
                     "title":
                         <c:choose>
-                            <c:when test="${empty questionResult.maxMark}">
-                             ""
-                            </c:when>
-                        <c:otherwise>
-                             "<spring:escapeBody javaScriptEscape='true'>
-                                <fmt:message key='label.learning.max.mark'>
-                                    <fmt:param value='${questionResult.maxMark}'/>
-                                </fmt:message>
-                            </spring:escapeBody>"
-                        </c:otherwise>
-                        </c:choose>
-                    });
+                        <c:when test="${empty questionResult.maxMark}">
+                        ""
+                    </c:when>
+                    <c:otherwise>
+                    "<spring:escapeBody javaScriptEscape='true'>
+                    <fmt:message key='label.learning.max.mark'>
+                    <fmt:param value='${questionResult.maxMark}'/>
+                    </fmt:message>
+                    </spring:escapeBody>"
+                    </c:otherwise>
+                    </c:choose>
+                });
                 </c:forEach>
 
                 </c:forEach>
