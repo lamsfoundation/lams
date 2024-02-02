@@ -21,7 +21,14 @@
 						<fmt:message key="sysadmin.lesson.allow.restart" />
 		    </label>
 		</div>
-		    
+
+				<div class="form-check mb-2">
+					<form:checkbox id="startInMonitor" path="startInMonitor" cssClass="form-check-input"/>
+					<label class="form-check-label" for="startInMonitor">
+						<fmt:message key="sysadmin.lesson.start.in.monitor" />
+		    </label>
+		</div>
+
 				<div class="form-check mb-2">
 					<form:checkbox id="liveEditEnabled" path="liveEditEnabled" cssClass="form-check-input"/>
 					<label class="form-check-label" for="liveEditEnabled">
@@ -36,4 +43,3 @@
 		    </label>
 		</div>		
 	</div>
-

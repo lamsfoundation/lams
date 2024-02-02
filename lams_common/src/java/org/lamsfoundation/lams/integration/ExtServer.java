@@ -89,18 +89,21 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
     private Boolean enableLessonNotifications;
 
     /**
-     * Should Learner start the lesson from the beginning each time he enters it.
-     * Content is not removed, LessonProgress is deleted, not archived.
+     * Should Learner start the lesson from the beginning each time he enters it. Content is not removed, LessonProgress
+     * is deleted, not archived.
      */
     @Column(name = "force_restart")
     private Boolean forceLearnerRestart;
 
     /**
-     * Should Learners be allowed to restart the lesson after finishing it.
-     * Content is not removed, LessonProgress is archived and then deleted.
+     * Should Learners be allowed to restart the lesson after finishing it. Content is not removed, LessonProgress is
+     * archived and then deleted.
      */
     @Column(name = "allow_restart")
     private Boolean allowLearnerRestart;
+
+    @Column(name = "start_in_monitor")
+    private boolean startInMonitor;
 
     /**
      * Should learners be displayed activity gradebook on lesson complete.
@@ -400,6 +403,14 @@ public class ExtServer implements Serializable, Comparable<ExtServer> {
 
     public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
 	this.allowLearnerRestart = allowLearnerRestart;
+    }
+
+    public boolean isStartInMonitor() {
+	return startInMonitor;
+    }
+
+    public void setStartInMonitor(boolean startInMonitor) {
+	this.startInMonitor = startInMonitor;
     }
 
     public Boolean getGradebookOnComplete() {
