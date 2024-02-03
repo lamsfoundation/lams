@@ -1,41 +1,57 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
-<div class="voffset10">
-
 	
  <c:if test="${isGroupedActivity}">
-	<table class="table table-striped table-condensed">
-		<tr><td colspan="${allowComments ? 3 : 2}"><fmt:message key="heading.totalLearnersInGroup" /></td></tr>
+	<div class="ltable table-striped">
+		<div>
+			<fmt:message key="heading.totalLearnersInGroup" />
+		</div>
 	
 		<c:forEach var="group" items="${monitoringDTO.groupStatsMap}">
-			<tr><td width="40%"><c:out value="${group.key}" /></td> 
-				<td><c:out value="${group.value}" /></td>
+			<div class="row align-items-center">
+				<div class="col">
+					<c:out value="${group.key}" />
+				</div>
+				<div class="col">
+					<c:out value="${group.value}" />
+				</div>
+				
 				<c:if test="${allowComments}">
-				<td width="20%">
-				<c:url value="/monitoring/viewComments.do" var="commentURL">
-					<c:param name="toolSessionID" value="${monitoringDTO.sessionIdMap[group.key]}" />
-				</c:url>
-				<a href="javascript:launchPopup('${commentURL}')" class="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></a></td>
+					<div class="col">
+						<c:url value="/monitoring/viewComments.do" var="commentURL">
+							<c:param name="toolSessionID" value="${monitoringDTO.sessionIdMap[group.key]}" />
+						</c:url>
+						<button type="button" onclick="launchPopup('${commentURL}')" class="btn btn-secondary btn-sm float-end">
+							<fmt:message key="label.view.comments" />
+						</button>
+					</div>
 				</c:if>
-			</tr>
+			</div>
 		</c:forEach>
-	</table>
+	</div>
 </c:if>
 
-<table class="table table-striped table-condensed">
-	<tr>
-		<td width="40%"><fmt:message key="heading.totalLearners" /></td>
-		<td><c:out value="${monitoringDTO.totalLearners}" /></td>
+<div class="ltable table-striped no-header">
+	<div class="row align-items-center">
+		<div class="col">
+			<fmt:message key="heading.totalLearners" />
+		</div>
+		<div class="col">
+			<c:out value="${monitoringDTO.totalLearners}" />
+		</div>
+		
 		<c:if test="${allowComments && !isGroupedActivity}">
 			<c:forEach var="group" items="${monitoringDTO.sessionIdMap}">
-			<c:url value="/monitoring/viewComments.do" var="commentURL">
+				<c:url value="/monitoring/viewComments.do" var="commentURL">
 					<c:param name="toolSessionID" value="${group.value}" />
-			</c:url>
-			<td width="20%"><a href="javascript:launchPopup('${commentURL}')" cssClass="btn btn-default btn-sm pull-right"><fmt:message key="label.view.comments" /></a></td>
+				</c:url>
+				<div class="col">
+					<button type="button" onclick="launchPopup('${commentURL}')" class="btn btn-secondary btn-sm float-end">
+						<i class="fa-regular fa-comments me-1"></i>
+						<fmt:message key="label.view.comments" />
+					</button>
+				</div>
 			</c:forEach>
 		</c:if>
-	</tr>
-</table>
- 
+	</div>
 </div>

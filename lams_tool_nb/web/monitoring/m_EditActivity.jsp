@@ -1,43 +1,39 @@
 <%@ include file="/includes/taglibs.jsp"%>
 
-<div class="voffset10">
-
 <c:if test="${monitoringDTO.totalLearners >= 1}">
-	<lams:Alert type="warn" id="no-edit" close="false">
+	<lams:Alert5 type="warn" id="no-edit">
 		<fmt:message key="message.alertContentEdit" />
-	</lams:Alert>
+	</lams:Alert5>
 </c:if>
 
-<table class="table table-condensed">
-	<tr>
-		<td class="field-name">
+<div class="ltable table-condensed no-header">
+	<div class="row">
+		<div class="col field-name">
 			<fmt:message key="basic.title" />
-		</td>
-		<td>
+		</div>
+		<div class="col">
 			<c:out value="${monitoringDTO.title}" escapeXml="true" />
-		</td>
-	</tr>
-	<tr>
-		<td class="field-name">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col field-name">
 			<fmt:message key="basic.content" />
-		</td>
-		<td>
+		</div>
+		<div class="col">
 			<c:out value="${monitoringDTO.basicContent}" escapeXml="false" />
-		</td>
-	</tr>
-</table>
+		</div>
+	</div>
+</div>
 
-<p class="align-right">
+<div class="float-end">
 	<form id='define-later-form' method='post' action='../authoring/definelater.do' target='definelater'>
 		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 		<input type="hidden" name="toolContentID" value="${toolContentID}" />
 		<input type="hidden" name="contentFolderID" value="${contentFolderID}" />
 	</form>
-		
-	<a href="#nogo" onclick="javascript:launchDefineLaterPopup()" class="btn btn-default pull-right">
+	
+	<button type="button" onclick="launchDefineLaterPopup()" class="btn btn-secondary btn-icon-pen">
 		<fmt:message key="button.edit" />
-	</a>
-</p>
-
+	</button>
 </div>
 

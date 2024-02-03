@@ -1,0 +1,65 @@
+@import "../../../lams_central/web/css/components.scss";
+@import "_lams_variables.scss";
+
+body.component nav.navbar {
+	padding-top: 0;
+    /*box-shadow: 0px 1px 0px var(--bs-gray-300);*/
+    
+	#tabs {
+		border-bottom: none;
+		padding-left: 0.5rem;
+		
+		@include media-breakpoint-down(md) {
+			flex-direction: column
+		}
+
+		.nav-link {
+			border-radius: 30px;
+			/*padding: 0.9rem 8rem;*/
+			padding-bottom: 0.9rem;
+			padding-top: 0.9rem;
+			margin-right: 0.5rem;
+			border: none;
+
+			&.active {
+				color: #fff !important;
+				background-color: RGBA(5, 112, 213, var(--bs-bg-opacity, 1)) !important;
+				box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); //shadow
+			}
+			&:focus-visible {
+	    		box-shadow: 0 0 0 0.2rem rgba(99, 99, 99, 0.5);
+	    	}
+			&:not(.active) {
+				background: #e9ecef;
+			}
+		}
+	}
+	
+	.nav-link {
+		background-color: var(--bs-gray-200);
+	    border-radius: 1.25rem;
+	    box-shadow: 0px 3px 6px var(--bs-gray-100);
+	    
+	    &:hover {
+		    background-color: var(--bs-gray-300) !important;
+		}
+		&:focus {
+    		box-shadow: 0 0 0 0.2rem rgba(99, 99, 99, 0.5);
+    	}
+	}
+	
+	#page-actions {
+		.btn {
+			margin-left: 0.75rem;
+		}
+		
+		#help-tag {
+			padding: 1rem 1.3rem;
+		}
+		
+		#btn-close {
+			padding: 1.275rem 1.3rem;
+			opacity: 1;
+		}
+	}
+}

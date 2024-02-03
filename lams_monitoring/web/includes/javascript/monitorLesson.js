@@ -1483,19 +1483,18 @@ function updateSequenceTab() {
                     activityGroup.css('cursor', 'pointer');
 
                     // double click on activity shape to open Monitoring for this activity
-                    if (isGate) {
-                        dblTap(activityGroup, function(){
-                            openGateSelectively(LAMS_URL + activity.url);
-                        });
-                    } else if (isGrouping) {
-                        dblTap(activityGroup, function(){
-                            document.location.href = LAMS_URL + activity.url;
-                        });
-                    } else {
-                        dblTap(activityGroup, function(){
-                            openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
-                        });
-                    }
+					if (isGate) {
+						dblTap(activityGroup, function(){  
+							openGateSelectively(LAMS_URL + activity.url);
+						});
+					} else {
+						dblTap(activityGroup, function(){
+							window.open(LAMS_URL + activity.url + "&lessonID=" + lessonId, "_self");
+							//document.location.href = LAMS_URL + activity.url;
+							
+							//openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
+						});
+					}
                 }
             });
 

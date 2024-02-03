@@ -104,15 +104,15 @@ public class HelpTag extends TagSupport {
 			return Tag.SKIP_BODY;
 		    }
 
-		    writer.println("<span onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
-			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</span>");
+		    writer.println("<button type=\"button\" class=\"nav-link no-decoration\" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
+			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</button>");
 
 		} else if (page != null) {
 
 		    String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
-		    writer.println("<span onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
-			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</span>");
+		    writer.println("<button type=\"button\" class=\"nav-link no-decoration\" onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
+			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</button>");
 
 		} else {
 		    HelpTag.log.error("HelpTag unable to write out due to unspecified values.");
