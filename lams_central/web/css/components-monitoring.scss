@@ -20,6 +20,7 @@ body.component nav.navbar {
 			padding-top: 0.9rem;
 			margin-right: 0.5rem;
 			border: none;
+			color: unset;
 
 			&.active {
 				color: #fff !important;
@@ -31,6 +32,9 @@ body.component nav.navbar {
 	    	}
 			&:not(.active) {
 				background: #e9ecef;
+			}
+			&:hover {
+				color: unset;
 			}
 		}
 	}
