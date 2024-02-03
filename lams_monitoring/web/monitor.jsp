@@ -75,8 +75,8 @@
 					contentFolderId = '${contentFolderID}',
 					lessonStateId = ${lesson.lessonStateID},
 					createDateTimeStr = '${lesson.createDateTimeStr}',
-					lessonStartDate = '${lesson.scheduleStartDate}',
-					lessonEndDate = '${lesson.scheduleEndDate}',
+					lessonStartDate = '${lesson.scheduleStartDate.toGMTString()}',
+					lessonEndDate = '${lesson.scheduleEndDate.toGMTString()}',
 					liveEditEnabled = ${enableLiveEdit && lesson.liveEditEnabled},
 					TOTAL_LESSON_LEARNERS_NUMBER = ${lesson.numberPossibleLearners},
 
