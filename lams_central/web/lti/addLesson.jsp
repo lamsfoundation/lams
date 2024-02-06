@@ -228,7 +228,8 @@
 			<div id="updatesequence"></div>
 					
 			<p>
-				<input type="checkbox" name="enableLessonIntro" class="noBorder" id="design-image" value="true"/>
+				<input type="checkbox" name="enableLessonIntro" class="noBorder"
+					   id="design-image" value="true" checked />
 				<label for="design-image">
 					<fmt:message key="label.display.design.image" />
 				</label>
