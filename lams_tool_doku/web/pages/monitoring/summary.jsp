@@ -114,6 +114,7 @@
 		line-height: 1.7;
 	}
 
+	<c:if test="${isAiEnabled}">
 	.doku-monitoring-summary .ai-review-content {
 		padding: 1rem;
 		margin: 1rem;
@@ -124,6 +125,24 @@
 	.doku-monitoring-summary #ai-review-learning-outcomes {
 		margin-bottom: 1rem;
 	}
+
+	.doku-monitoring-summary #ai-review-comparison table th:first-child {
+		min-width: 12rem;
+	}
+
+	.doku-monitoring-summary #ai-review-comparison table th[scope="col"] {
+		vertical-align: top;
+	}
+
+	.doku-monitoring-summary #ai-review-comparison table th[scope="row"] {
+		text-align: left;
+		font-weight: bold;
+	}
+
+	.doku-monitoring-summary #ai-review-comparison table td {
+		text-align: center;
+	}
+	</c:if>
 </style>
 
 <script>
@@ -160,10 +179,23 @@
 			MAX_RATES = 0,
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
+			TOOL_URL = '<lams:WebAppURL/>',
 			COUNT_RATED_ITEMS = true,
 			ALLOW_RERATE = false,
 
-			savedAiLearningOutcomes = null;
+			toolContentId = <c:out value="${sessionMap.toolContentID}" />;
+
+	<c:if test="${isAiEnabled}">
+		var	AI_REVIEW_ERROR = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>',
+				AI_REVIEW_GROUPS_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.label.group"/></spring:escapeBody>',
+				AI_REVIEW_CRITERIA_1 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.1"/></spring:escapeBody>',
+				AI_REVIEW_CRITERIA_2 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.2"/></spring:escapeBody>',
+				AI_REVIEW_CRITERIA_3 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.3"/></spring:escapeBody>',
+				AI_REVIEW_SCORE_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.score"/></spring:escapeBody>',
+				AI_REVIEW_LEARNING_OUTCOMES_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.learning.outcomes"/></spring:escapeBody>',
+				AI_REVIEW_GOOD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.good"/></spring:escapeBody>',
+				AI_REVIEW_BAD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.bad"/></spring:escapeBody>';
+	</c:if>
 
 	$(document).ready(function () {
 		// show etherpads only on Group expand
@@ -496,190 +528,12 @@
 			alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>');
 		}
 	}
-
-	<c:if test="${isAiEnabled}">
-	function aiReview(toolSessionId) {
-		let container = $('#ai-review-container-' + toolSessionId),
-				button = container.children('button').prop('disabled', true),
-				header = $('.ai-review-header', container)
-						.removeClass('hidden')
-						.append('<i class="ai-review-loading-icon fa fa-circle-o-notch fa-spin loffset10"></i>'),
-				content = $('.ai-review-content', container).addClass('hidden').empty();
-		container.children('.ai-review-button-clearfix').remove();
-
-		getAiLearningOutcomes(function() {
-			$.ajax({
-				'url': '<c:url value="/monitoring/getAiReviewPromptData.do"/>',
-				'type': 'get',
-				'dataType': 'json',
-				'cache': 'false',
-				'data': {
-					'toolSessionId': toolSessionId
-				},
-				success: function (response) {
-					let task = "";
-					if (response.instructions) {
-						task += response.instructions;
-					}
-					if (response.description) {
-						task += response.description;
-					}
-					$.ajax({
-						'url': LAMS_URL + 'ai/general/custom.do',
-						'type': 'post',
-						'dataType': 'text',
-						'cache': 'false',
-						'data': {
-							'promptKey': 'writing.task.review.prompt.criteria',
-							'promptParameters': [task, response.content,
-								savedAiLearningOutcomes ? savedAiLearningOutcomes : "No learning outcomes provided, skip this step"]
-						},
-						success: function (response) {
-							content.html(response);
-							$.ajax({
-								'url': '<c:url value="/monitoring/saveAiReview.do"/>',
-								'type': 'post',
-								'dataType': 'text',
-								'cache': 'false',
-								'data': {
-									'toolSessionId': toolSessionId,
-									'review': response
-								}
-							});
-						},
-						error: function () {
-							content.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
-						},
-						complete: function () {
-							content.removeClass('hidden');
-							button.prop('disabled', false);
-							header.children('.ai-review-loading-icon').remove();
-						}
-					});
-				},
-				error: function () {
-					content.removeClass('hidden')
-							.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>')
-					button.prop('disabled', false);
-					header.children('.ai-review-loading-icon').remove();
-				}
-			});
-		});
-	}
-
-	function aiReviewAll() {
-		let button = $('#ai-review-all-button').prop('disabled', true);
-		// re-enable review all button after 10 seconds
-		setTimeout(function () {
-			button.prop('disabled', false);
-		}, 10000);
-
-		getAiLearningOutcomes(function() {
-			$('.ai-review-container').each(function () {
-				aiReview($(this).data('session-id'));
-			});
-		});
-	}
-
-	function getAiLearningOutcomes(callback){
-		// Always start with fetching learning outcomes.
-		// If there are no learning outcomes yet, AI generates them based on the lesson and activity descriptions.
-		// If they are present, they are taken from the textarea. The textarea can be edited by the monitor.
-		let learningOutcomesTextarea = $('#ai-review-learning-outcomes'),
-				learningOutcomes = learningOutcomesTextarea.val().trim();
-		if (learningOutcomes) {
-
-			if (learningOutcomes != savedAiLearningOutcomes) {
-				if (savedAiLearningOutcomes !== null) {
-					$.ajax({
-						'url': '<c:url value="/monitoring/saveAiLearningOutcomes.do"/>',
-						'type': 'post',
-						'dataType': 'text',
-						'cache': 'false',
-						'data': {
-							'toolContentId': ${sessionMap.toolContentID},
-							'learningOutcomes': learningOutcomes
-						}
-					});
-				}
-				savedAiLearningOutcomes = learningOutcomes;
-			}
-			if (callback) {
-				callback();
-			}
-			return;
-		}
-		let header = $('#ai-review-learning-outcomes-header').removeClass('hidden')
-				.append('<i class="ai-review-loading-icon fa fa-circle-o-notch fa-spin loffset10"></i>');
-
-		$.ajax({
-			'url': '<c:url value="/monitoring/getAiLearningOutcomesPromptData.do"/>',
-			'type': 'get',
-			'dataType': 'json',
-			'cache': 'false',
-			'data': {
-				'toolContentId': ${sessionMap.toolContentID}
-			},
-			success: function (response) {
-				let task = "";
-				if (response.instructions) {
-					task += response.instructions;
-				}
-				if (response.description) {
-					task += response.description;
-				}
-				$.ajax({
-					'url': LAMS_URL + 'ai/general/custom.do',
-					'type': 'post',
-					'dataType': 'text',
-					'cache': 'false',
-					'data': {
-						'promptKey' : 'writing.task.review.prompt.learning.outcomes',
-						'promptParameters' : [task,
-							// lesson description is optional
-							response.lessonDescription ? response.lessonDescription : "no lesson description provided"]
-					},
-					success: function (response) {
-						learningOutcomes = response.trim();
-						learningOutcomesTextarea.val(learningOutcomes);
-						savedAiLearningOutcomes = learningOutcomes;
-
-						$.ajax({
-							'url': '<c:url value="/monitoring/saveAiLearningOutcomes.do"/>',
-							'type': 'post',
-							'dataType': 'text',
-							'cache': 'false',
-							'data': {
-								'toolContentId': ${sessionMap.toolContentID},
-								'learningOutcomes': savedAiLearningOutcomes
-							},
-							complete: function () {
-								if (callback) {
-									callback();
-								}
-							}
-						});
-
-					},
-					error: function () {
-						learningOutcomesTextarea.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
-					},
-					complete: function (){
-						learningOutcomesTextarea.removeClass('hidden');
-						header.children('.ai-review-loading-icon').remove();
-					}
-				});
-
-			},
-			error: function () {
-				learningOutcomesTextarea.removeClass('hidden')
-						.text('<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>');
-				header.children('.ai-review-loading-icon').remove();
-			}
-		});
-	}
-	</c:if>
 </script>
+
+<c:if test="${isAiEnabled}">
+	<lams:JSImport src="ai/includes/javascript/dokuReview.js"/>
+</c:if>
+
 <lams:JSImport src="includes/javascript/rating.js"/>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
@@ -824,6 +678,11 @@
 		<textarea id="ai-review-learning-outcomes"
 				  class='form-control ${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'
 				  rows="8"><c:out value="${dokumaran.aiLearningOutcomes}" escapeXml="false"/></textarea>
+
+		<h4 id="ai-review-comparison-header" class='voffset20 ${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'>
+			<fmt:message key="label.monitoring.ai.review.comparison"/>
+		</h4>
+		<div id="ai-review-comparison"></div>
 	</c:if>
 
 	<c:if test="${sessionMap.isGroupedActivity}">
@@ -838,7 +697,8 @@
 		        	<span class="panel-title collapsable-icon-left">
 		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}"
 						   aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-							<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+							<fmt:message key="monitoring.label.group" />&nbsp;
+							<span id="session-name-${groupSummary.sessionId}">${groupSummary.sessionName}</span>
 						</a>
 					</span>
 						<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
