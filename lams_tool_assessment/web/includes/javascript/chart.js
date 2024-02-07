@@ -1,16 +1,9 @@
-function drawCompletionCharts(toolContentId, animate) {
-
-	const source = new EventSource( WEB_APP_URL + 'monitoring/getCompletionChartsData.do?toolContentId=' + toolContentId);
-
-	source.onmessage = function (event) {
-		if (!event.data) {
-			return;
-		}
-		var data = JSON.parse(decodeURIComponent(event.data));
-		drawActivityCompletionChart(data, animate);
-		drawAnsweredQuestionsChart(data, animate);
-	}
-}
+var GRAPH_COLORS = {
+	blue: 'rgba(1, 117, 226, 0.85)',
+	yellow: 'rgba(249, 248, 113, 0.85)',
+	green: 'rgba(0, 145, 74, 0.85)',
+	gray: '#6c757d'
+};
 
 function drawActivityCompletionChart(data, animate){
 	// prepare data for the chart
@@ -62,18 +55,15 @@ function drawActivityCompletionChart(data, animate){
 	activityCompletionChart = new Chart(ctx, {
 		type : 'doughnut',
 		data : {
-			elements : {
-				arc : {
-					borderWidth : 0,
-					fontSize : 0,
-				}
-			},
 			datasets : [ {
 				data : newData,
-				backgroundColor : [ 'rgba(5, 204, 214, 1)',
-					'rgba(255, 195, 55, 1)',
-					'rgba(253, 60, 165, 1)',
-				]
+				backgroundColor : [
+					GRAPH_COLORS.blue,
+					GRAPH_COLORS.yellow,
+					GRAPH_COLORS.green
+				],
+				borderWidth : 1,
+				borderColor : COLORS.gray
 			} ],
 			labels : [ LABELS.ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS,
 				LABELS.ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS,
@@ -89,13 +79,16 @@ function drawActivityCompletionChart(data, animate){
 				title : {
 					display: true,
 					font : {
-						size : 15
+						size : 18
 					},
 					text : LABELS.ACTIVITY_COMPLETION_CHART_TITLE
 				},
 				legend : {
 					position: 'bottom',
 					labels : {
+						font : {
+							size: 16
+						},
 						generateLabels : function(chart) {
 							var data = chart.data;
 							if (data.labels.length && data.datasets.length) {
@@ -108,7 +101,7 @@ function drawActivityCompletionChart(data, animate){
 										text: label + ": " + value,
 										fillStyle: style.backgroundColor,
 										strokeStyle: style.borderColor,
-										lineWidth: style.borderWidth,
+										lineWidth: 0,
 										hidden: isNaN(value) || meta.data[i].hidden,
 
 										// Extra data used for toggling the
@@ -135,6 +128,7 @@ function drawActivityCompletionChart(data, animate){
 
 function drawAnsweredQuestionsChart(data, animate){
 	if (!data.answeredQuestionsByUsers) {
+		$('#answered-questions-chart-none').show();
 		return;
 	}
 
@@ -145,6 +139,9 @@ function drawAnsweredQuestionsChart(data, animate){
 		// no sessions yet, so no chart placeholder
 		return;
 	}
+
+	$('#answered-questions-chart-none').hide();
+
 	// store current data for custom tooltip
 	chartPlaceholder.data('tooltip-input', data.answeredQuestionsByUsers);
 	chartPlaceholder.data('useGroupsAsNames', useGroupsAsNames);
@@ -168,8 +165,8 @@ function drawAnsweredQuestionsChart(data, animate){
 		data : {
 			datasets : [ {
 				data :  Object.values(data.answeredQuestionsByUsersCount),
-				backgroundColor : 'rgba(255, 195, 55, 1)'
-			}],
+				backgroundColor : GRAPH_COLORS.green
+			} ],
 			labels :  Object.keys(data.answeredQuestionsByUsersCount),
 		},
 		options : {
@@ -178,22 +175,22 @@ function drawAnsweredQuestionsChart(data, animate){
 			},
 			interaction : {
 				mode : 'index',
-				intersect : suggestedBarMax <= 20
+				intersect : suggestedBarMax <= 21
 			},
 			scales : {
 				x : {
 					title: {
-						display: true,
+						display : true,
 						text: LABELS.ANSWERED_QUESTIONS_CHART_X_AXIS,
 						font : {
-							size : 14
+							size : 16
 						}
 					}
 				},
 				y :
 					{
 						beginAtZero   : true,
-						suggestedMax  : suggestedBarMax,
+						suggestedMax : suggestedBarMax,
 						ticks : {
 							stepSize      : 1,
 							maxTicksLimit : 5,
@@ -202,17 +199,17 @@ function drawAnsweredQuestionsChart(data, animate){
 							display : true,
 							text : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS,
 							font : {
-								size : 14
+								size : 16
 							}
 						}
 					}
 			},
 			plugins : {
 				title : {
-					display: true,
+					display : true,
 					font : {
-						size : 15,
-						lineHeight: 3
+						size : 18,
+						lineHeight: 2
 					},
 					text : useGroupsAsNames ? LABELS.ANSWERED_QUESTIONS_CHART_TITLE_GROUPS : LABELS.ANSWERED_QUESTIONS_CHART_TITLE
 
@@ -241,7 +238,6 @@ function listCompletionChartLearners(chartPlaceholder) {
 		// if it should be hidden, there is nothing to do
 		return;
 	}
-
 	// iterate over learners, get their names and portraits
 	var counter = 0,
 		data = chartPlaceholder.data('tooltip-input'),
@@ -257,36 +253,37 @@ function listCompletionChartLearners(chartPlaceholder) {
 	var tooltipEl = $('<div />').addClass(tooltipClassName)
 		.appendTo(document.body)
 		.css({
-			'opacity' : 1,
-			'position' :'absolute',
-			'pointerEvents' : 'none',
-			'background-color' : 'white',
-			'padding' : '15px',
-			'border'  : 'thin solid #ddd',
-			'border-radius' : '25px'
+			'opacity': 1,
+			'position': 'absolute',
+			'pointerEvents': 'none',
+			'background-color': 'white',
+			'padding': '15px',
+			'border': 'thin solid #ddd',
+			'border-radius': '25px'
 		});
 
-	$(users).each(function(){
+
+	$(users).each(function () {
 		var portraitDiv = $(definePortrait(this.portraitUuid, this.id, STYLE_SMALL, true, LAMS_URL)).css({
-				'vertical-align' : 'middle'
+				'vertical-align': 'middle'
 			}),
 			userDiv = $('<div />').append(portraitDiv).appendTo(tooltipEl).css({
-				'padding-bottom' : '5px'
+				'padding-bottom': '5px'
 			});
 
 		$('<span />').text(useGroupsAsNames ? this.group + ' (' + this.name + ')'
 			: (this.name + (isGrouped && this.group ? ' (' + this.group + ') ' : '')))
 			.appendTo(userDiv).css({
-			'padding-left' : '10px'
+			'padding-left': '10px'
 		});
 
 		if (counter === 15) {
 			// do not display more than 15 learners
 			if (users.length > 16) {
 				$('<div />').text('...').appendTo(tooltipEl).css({
-					'font-weight' : 'bold',
-					'font-size'   : '20px',
-					'text-align'  : 'center'
+					'font-weight': 'bold',
+					'font-size': '20px',
+					'text-align': 'center'
 				});
 			}
 			return false;
@@ -296,12 +293,12 @@ function listCompletionChartLearners(chartPlaceholder) {
 
 	// do not add padding for the last element as the tooltip does not look symmetric
 	tooltipEl.children(':last-child').css({
-		'padding-bottom' : '0'
+		'padding-bottom': '0'
 	});
 
 	var position = this.chart.canvas.getBoundingClientRect();
 	tooltipEl.css({
-		'left'  : Math.max(25, position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60) + 'px',
-		'top'   : Math.max(10, position.top  + window.pageYOffset + tooltipModel.caretY - tooltipEl.height()/2) + 'px',
+		'left' : Math.max(120, position.left + window.pageXOffset + tooltipModel.caretX - tooltipEl.width() - 60) + 'px',
+		'top'  : Math.max(10, position.top + window.pageYOffset + tooltipModel.caretY - tooltipEl.height() / 2) + 'px',
 	});
 }

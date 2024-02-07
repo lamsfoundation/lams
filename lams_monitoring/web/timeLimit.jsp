@@ -5,36 +5,27 @@
 		color: #FF3333 !important;
 	}
 
-	#time-limit-table th {
-		vertical-align: middle;
-	}
-
-	#time-limit-table td.centered {
-		text-align: center;
+	#time-limit-table .btn-success {
+		color: var(--bs-white);
 	}
 
 	#time-limit-widget {
 		/* The main widget sticks to right browser edge */
 		position: fixed;
-		top: 45px;
+		top: 100px;
 		right: 0;
 		/* Collapsed by default */
-		width: 130px;
+		width: 145px;
 		display: none;
+		z-index: 3;
+		transition: all 0s linear 0s;
 	}
 
 	#time-limit-widget .btn-success {
 		float: none;
 	}
 
-	#time-limit-widget .panel-heading a:after, #time-limit-widget .panel-heading a:after {
-		content: none;
-	}
-
-	#time-limit-widget .panel-title a {
-		/* Underlining the link in title does not look nice*/
-		text-decoration: none !important;
-		color: black;
+	#time-limit-widget .card-title {
 		font-size: 20px;
 		font-weight: normal;
 	}
@@ -52,10 +43,6 @@
 		display: inline-block;
 		margin-left: 5px;
 	}
-
-	#time-limit-widget .time-limit-widget-individual-row {
-		border-top: thin solid #ddd;
-	}
 </style>
 
 <script>
@@ -67,6 +54,7 @@
 			absoluteTimeLimitFinish = <c:out value="${empty param.absoluteTimeLimitFinish ? 'null' : param.absoluteTimeLimitFinish}" />;
 
 	$(document).ready(function(){
+
 		let timeLimitWidget = $('#time-limit-widget'),
 				timeLimitContent = $('#time-limit-widget-content', timeLimitWidget)
 						.on('hidden.bs.collapse', function () {
@@ -74,7 +62,7 @@
 							$('.panel-heading', timeLimitWidget).removeClass('collapsable-icon-left');
 
 							timeLimitWidget.animate({
-								width: '130px'
+								width: '145px'
 							}, function(){
 								// if hideTimeLimitLearnerWidget() set it to true, then we are deleting the widget
 								var remove = timeLimitContent.data('remove');
@@ -101,7 +89,7 @@
 							sessionStorage.setItem('lams-time-limit-widget-open', true);
 						});
 
-		$('#time-limit-widget-toggle', timeLimitWidget).click(function(){
+		$('#time-limit-widget-heading', timeLimitWidget).click(function(){
 			if ($(this).data('prevent-toggle') === true){
 				return;
 			}
@@ -187,7 +175,7 @@
 			if (toggle !== null) {
 				// whatever is done with the predefined absolute time limit, do these actions
 				$('#absolute-time-limit-await-trigger, #absolute-time-limit-await-trigger-value').remove();
-				$('.absolute-time-limit-stepper').removeClass('hidden');
+				$('.absolute-time-limit-stepper').removeClass('d-none');
 				absoluteTimeLimit = 0;
 
 				// start/stop
@@ -273,15 +261,15 @@
 				$('#relative-time-limit-value').text(relativeTimeLimit);
 
 				if (relativeTimeLimit > 0) {
-					$('#relative-time-limit-disabled').addClass('hidden');
-					$('#relative-time-limit-cancel').removeClass('hidden');
-					$('#relative-time-limit-enabled').removeClass('hidden');
-					$('#relative-time-limit-start').addClass('hidden');
+					$('#relative-time-limit-disabled').addClass('d-none');
+					$('#relative-time-limit-cancel').removeClass('d-none');
+					$('#relative-time-limit-enabled').removeClass('d-none');
+					$('#relative-time-limit-start').addClass('d-none');
 				} else {
-					$('#relative-time-limit-disabled').removeClass('hidden');
-					$('#relative-time-limit-cancel').addClass('hidden');
-					$('#relative-time-limit-enabled').addClass('hidden');
-					$('#relative-time-limit-start').removeClass('hidden').prop('disabled', true);
+					$('#relative-time-limit-disabled').removeClass('d-none');
+					$('#relative-time-limit-cancel').addClass('d-none');
+					$('#relative-time-limit-enabled').addClass('d-none');
+					$('#relative-time-limit-start').removeClass('d-none').prop('disabled', true);
 				}
 
 				if (absoluteTimeLimitFinish === null) {
@@ -290,18 +278,18 @@
 					$('.absolute-time-limit-value').empty();
 					hideTimeLimitWidget(true);
 
-					$('#absolute-time-limit-disabled').removeClass('hidden');
-					$('#absolute-time-limit-cancel').addClass('hidden');
-					$('#absolute-time-limit-enabled').addClass('hidden');
-					$('#absolute-time-limit-start').removeClass('hidden').prop('disabled', true);
+					$('#absolute-time-limit-disabled').removeClass('d-none');
+					$('#absolute-time-limit-cancel').addClass('d-none');
+					$('#absolute-time-limit-enabled').addClass('d-none');
+					$('#absolute-time-limit-start').removeClass('d-none').prop('disabled', true);
 					$('#absolute-time-limit-finish-now').prop('disabled', false);
 				} else {
 					showTimeLimitWidget(false);
 
-					$('#absolute-time-limit-disabled').addClass('hidden');
-					$('#absolute-time-limit-cancel').removeClass('hidden');
-					$('#absolute-time-limit-enabled').removeClass('hidden');
-					$('#absolute-time-limit-start').addClass('hidden');
+					$('#absolute-time-limit-disabled').addClass('d-none');
+					$('#absolute-time-limit-cancel').removeClass('d-none');
+					$('#absolute-time-limit-enabled').removeClass('d-none');
+					$('#absolute-time-limit-start').addClass('d-none');
 					$('#absolute-time-limit-finish-now').prop('disabled', absoluteTimeLimitFinish <= Math.round(new Date().getTime() / 1000));
 				}
 			}
@@ -352,8 +340,8 @@
 							// check for 30 seconds or less and display timer in red
 							var secondsLeft = $.countdown.periodsToSeconds(periods),
 									keepOpen = secondsLeft <= 60 && secondsLeft > 0
-											&& $('#absolute-time-limit-start').hasClass('hidden'),
-									widgetToggle = $('#time-limit-widget-toggle'),
+											&& $('#absolute-time-limit-start').hasClass('d-none'),
+									widgetToggle = $('#time-limit-widget-heading'),
 									expiredHideContainers = $('.expired-hide-container');
 
 							counters.data('keepOpen', keepOpen);
@@ -374,7 +362,7 @@
 								expiredHideContainers.hide();
 							}
 						},
-						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
+						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
 					});
 		} else {
 			// if counter is paused, we can not adjust time, so resume it for a moment
@@ -393,9 +381,9 @@
 	}
 
 	function timeLimitFinishNow(){
-		if (confirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.finish.now.confirm" /></spring:escapeBody>')) {
+		showConfirm('<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.time.limit.finish.now.confirm" /></spring:escapeBody>', function(){
 			updateTimeLimit('absolute', 'stop');
-		}
+		});
 	}
 
 
@@ -463,8 +451,9 @@
 					return;
 				}
 
-				var template = $('#individual-time-limit-template-row'),
+				let template = $('#individual-time-limit-template-row'),
 						now = new Date().getTime();
+
 				$.each(users, function(){
 					var row = template.clone()
 							.attr('id', 'individual-time-limit-row-' + this.userId)
@@ -474,8 +463,7 @@
 							.appendTo(table);
 					$('.individual-time-limit-user-name', row).text(this.name);
 					$('.individual-time-limit-value', row).text(this.adjustment);
-
-					row.removeClass('hidden');
+					row.removeClass('d-none');
 
 					if (this.adjustment === 0 || this.finished){
 						return true;
@@ -485,9 +473,9 @@
 						return true;
 					}
 
-					let widgetRow = $('<div class="row time-limit-widget-individual-row"></div>').appendTo(individualExtensionContainer);
-					$('<div class="col-xs-6"></div>').text(this.name).appendTo(widgetRow);
-					$('<div class="col-xs-6 time-limit-widget-individual-counter"></div>').appendTo(widgetRow)
+					let widgetRow = $('<div class="row border-top"></div>').appendTo(individualExtensionContainer);
+					$('<div class="col"></div>').text(this.name).appendTo(widgetRow);
+					$('<div class="col time-limit-widget-individual-counter"></div>').appendTo(widgetRow)
 							.countdown({
 								until: '+' + secondsLeft +'S',
 								format: 'hMS',
@@ -503,7 +491,7 @@
 	function hideTimeLimitWidget(remove){
 		var timeLimitWidget = $('#time-limit-widget'),
 				timeLimitContent = $('#time-limit-widget-content', timeLimitWidget);
-		if (timeLimitContent.hasClass('in')){
+		if (timeLimitContent.hasClass('show')){
 			// if the widget is expanded, collapse it and then hide it
 			timeLimitContent.data('remove', remove).collapse('hide');
 		} else if (remove){
@@ -517,9 +505,9 @@
 				timeLimitContent = $('#time-limit-widget-content', timeLimitWidget);
 		timeLimitWidget.show();
 
-		if (expand && !timeLimitContent.hasClass('in')){
+		if (expand && !timeLimitContent.hasClass('show')){
 			if (immediateExpand) {
-				timeLimitContent.addClass('in');
+				timeLimitContent.addClass('show');
 				timeLimitWidget.css('width', '200px');
 			} else {
 				timeLimitContent.collapse('show');
@@ -528,9 +516,10 @@
 	}
 
 	function scrollToTimeLimitPanel() {
+
 		$([document.documentElement, document.body]).animate({
 			scrollTop: $("#time-limit-panel").offset().top
-		}, 2000);
+		}, 500);
 
 		$('#time-limit-collapse').collapse('show');
 
@@ -540,262 +529,237 @@
 	}
 </script>
 
-<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish}" />
+<c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish and param.absoluteTimeLimitFinish != 'null'}" />
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 
-<div class="panel panel-default ${param.isTbl ? 'voffset20' : ''}" id="time-limit-panel">
-	<c:choose>
-	<c:when test="${param.isTbl}">
-	<div class="panel-heading">
-	        	<span class="panel-title">
-	        		<fmt:message key="label.monitoring.time.limit"/>
-	      		</span>
+<div class="card mt-4" id="time-limit-panel">
+	<div class="card-header">
+       	<span class="card-title">
+       		<fmt:message key="label.monitoring.time.limit"/>
+     	</span>
 	</div>
-	<div class="panel-body">
-		</c:when>
-		<c:otherwise>
-		<div class="panel-heading collapsable-icon-left" id="time-limit-heading">
-	        	<span class="panel-title">
-			    	<a class="collapsed" role="button" data-toggle="collapse" href="#time-limit-collapse" aria-expanded="false" aria-controls="time-limit-collapse" >
-		          		<fmt:message key="label.monitoring.time.limit"/>
-		        	</a>
-	      		</span>
-		</div>
-		<div id="time-limit-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="time-limit-heading">
-			</c:otherwise>
-			</c:choose>
-
-			<table id="time-limit-table" class="table">
-				<tr class="info">
-					<td colspan="6"><h4><fmt:message key="label.monitoring.time.limit.relative"/></h4>
-						<p><fmt:message key="label.monitoring.time.limit.relative.desc"/></p>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<span id="relative-time-limit-value"><c:out value="${param.relativeTimeLimit}" /></span>&nbsp;
-						<fmt:message key="label.monitoring.time.limit.minutes"/>
-					</td>
-					<td class="centered">
-						<div id="relative-time-limit-enabled" class="text-success ${relativeTimeLimitEnabled ? '' : 'hidden'}">
-							<fmt:message key="label.monitoring.time.limit.enabled"/>
-						</div>
-						<div id="relative-time-limit-disabled" class="text-danger ${relativeTimeLimitEnabled ? 'hidden' : ''}">
-							<fmt:message key="label.monitoring.time.limit.disabled"/>
-						</div>
-					</td>
-					<td class="centered">
-						<button id="relative-time-limit-start" class="btn btn-success btn-xs ${relativeTimeLimitEnabled ? 'hidden' : ''}"
-								onClick="updateTimeLimit('relative', true)" disabled>
-							<fmt:message key="label.monitoring.time.limit.start"/>
-						</button>
-						<button id="relative-time-limit-cancel" class="btn btn-danger btn-xs ${relativeTimeLimitEnabled ? '' : 'hidden'}"
-								onClick="updateTimeLimit('relative', false)">
-							<fmt:message key="label.monitoring.time.limit.cancel"/>
-						</button>
-					</td>
-					<td>
-						<!-- Finish now button at absolute time limit row -->
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit('relative', null, 1)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
-						</button>
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit('relative', null, 5)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
-						</button>
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit('relative', null, -5)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
-						</button>
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit('relative', null, -1)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
-						</button>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="6">
-						<div style="height: 30px; overflow:hidden;">
-						</div>
-					</td>
-				</tr>
-				<tr class="info">
-					<td colspan="6"><h4><fmt:message key="label.monitoring.time.limit.absolute"/></h4>
-						<p><fmt:message key="label.monitoring.time.limit.absolute.desc"/></p>
-					</td>
-				</tr>
-				<tr>
-					<td id="absolute-time-limit-panel-value" class="absolute-time-limit-value">
-						<c:if test="${param.absoluteTimeLimit > 0}">
+	<div class="card-body">
+		<table id="time-limit-table" class="table align-middle">
+			<tr>
+				<td colspan="6"><h4><fmt:message key="label.monitoring.time.limit.relative"/></h4>
+					<p><fmt:message key="label.monitoring.time.limit.relative.desc"/></p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span id="relative-time-limit-value"><c:out value="${param.relativeTimeLimit}" /></span>&nbsp;
+					<fmt:message key="label.monitoring.time.limit.minutes"/>
+				</td>
+				<td class="text-center">
+					<div id="relative-time-limit-enabled" class="text-success ${relativeTimeLimitEnabled ? '' : 'd-none'}">
+						<fmt:message key="label.monitoring.time.limit.enabled"/>
+					</div>
+					<div id="relative-time-limit-disabled" class="text-danger ${relativeTimeLimitEnabled ? 'd-none' : ''}">
+						<fmt:message key="label.monitoring.time.limit.disabled"/>
+					</div>
+				</td>
+				<td class="text-center">
+					<button id="relative-time-limit-start" class="btn btn-success ${relativeTimeLimitEnabled ? 'd-none' : ''}"
+							onClick="updateTimeLimit('relative', true)" disabled>
+						<fmt:message key="label.monitoring.time.limit.start"/>
+					</button>
+					<button id="relative-time-limit-cancel" class="btn btn-danger ${relativeTimeLimitEnabled ? '' : 'd-none'}"
+							onClick="updateTimeLimit('relative', false)">
+						<fmt:message key="label.monitoring.time.limit.cancel"/>
+					</button>
+				</td>
+				<td>
+					<!-- Finish now button at absolute time limit row -->
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary mb-1"
+							onClick="updateTimeLimit('relative', null, 1)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
+					</button>
+					<button class="btn btn-secondary mb-1"
+							onClick="updateTimeLimit('relative', null, 5)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
+					</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary mb-1"
+							onClick="updateTimeLimit('relative', null, -5)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
+					</button>
+					<button class="btn btn-secondary mb-1"
+							onClick="updateTimeLimit('relative', null, -1)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="6" class="pt-3"><h4><fmt:message key="label.monitoring.time.limit.absolute"/></h4>
+					<p><fmt:message key="label.monitoring.time.limit.absolute.desc"/></p>
+				</td>
+			</tr>
+			<tr>
+				<td id="absolute-time-limit-panel-value" class="absolute-time-limit-value">
+					<c:if test="${param.absoluteTimeLimit > 0}">
 						<span id="absolute-time-limit-await-trigger-value">
 							<c:out value="${param.absoluteTimeLimit}"/>&nbsp;
 							<fmt:message key="label.monitoring.time.limit.minutes"/>
 						</span>
-						</c:if>
-					</td>
-					<td>
-						<div id="absolute-time-limit-enabled" class="text-success ${absoluteTimeLimitEnabled ? '' : 'hidden'}">
-							<fmt:message key="label.monitoring.time.limit.enabled"/>
-						</div>
-						<div id="absolute-time-limit-disabled"
-							 class="text-danger ${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'hidden' : ''}">
-							<fmt:message key="label.monitoring.time.limit.disabled"/>
-						</div>
-						<div id="absolute-time-limit-await-trigger"
-							 class="text-success ${absoluteTimeLimitEnabled or param.absoluteTimeLimit eq 0 ? 'hidden' : ''}">
-							<fmt:message key="label.monitoring.time.limit.absolute.await.trigger"/>
-						</div>
-					</td>
-					<td class="centered">
-						<button id="absolute-time-limit-start" class="btn btn-success btn-xs
-							${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', true)" disabled>
-							<fmt:message key="label.monitoring.time.limit.start"/>
-						</button>
-						<button id="absolute-time-limit-cancel" class="btn btn-danger btn-xs
-							${absoluteTimeLimitEnabled or param.absoluteTimeLimit > 0 ? '' : 'hidden'}"
-								onClick="updateTimeLimit('absolute', false)">
-							<fmt:message key="label.monitoring.time.limit.cancel"/>
-						</button>
-					</td>
-					<td class="centered">
-						<button id="absolute-time-limit-finish-now" class="btn btn-warning btn-xs"
-								onClick="timeLimitFinishNow()"
-								title="<fmt:message key="label.monitoring.time.limit.finish.now.tooltip" />">
-							<fmt:message key="label.monitoring.time.limit.finish.now"/>
-						</button>
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', null, 1)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
-						</button>
-						<button class="btn btn-default btn-xs absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', null, 5)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
-						</button>
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', null, -5)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
-						</button>
-						<button class="btn btn-default btn-xs absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'hidden' : ''}"
-								onClick="updateTimeLimit('absolute', null, -1)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
-						</button>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="6">
-						<div style="height: 30px; overflow:hidden;">
-						</div>
-					</td>
-				</tr>
+					</c:if>
+				</td>
+				<td class="text-center">
+					<div id="absolute-time-limit-enabled" class="text-success ${absoluteTimeLimitEnabled ? '' : 'd-none'}">
+						<fmt:message key="label.monitoring.time.limit.enabled"/>
+					</div>
+					<div id="absolute-time-limit-disabled"
+						 class="text-danger ${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}">
+						<fmt:message key="label.monitoring.time.limit.disabled"/>
+					</div>
+					<div id="absolute-time-limit-await-trigger"
+						 class="${absoluteTimeLimitEnabled or param.absoluteTimeLimit eq 0 ? 'd-none' : ''}">
+						<fmt:message key="label.monitoring.time.limit.absolute.await.trigger"/>
+					</div>
+				</td>
+				<td class="text-center">
+					<button id="absolute-time-limit-start" class="btn btn-success
+						${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							onClick="updateTimeLimit('absolute', true)" disabled>
+						<fmt:message key="label.monitoring.time.limit.start"/>
+					</button>
+					<button id="absolute-time-limit-cancel" class="btn btn-danger
+							${absoluteTimeLimitEnabled or param.absoluteTimeLimit > 0 ? '' : 'd-none'}"
+							onClick="updateTimeLimit('absolute', false)">
+						<fmt:message key="label.monitoring.time.limit.cancel"/>
+					</button>
+				</td>
+				<td class="text-center">
+					<button id="absolute-time-limit-finish-now" class="btn btn-warning"
+							onClick="timeLimitFinishNow()"
+							title="<fmt:message key="label.monitoring.time.limit.finish.now.tooltip" />">
+						<fmt:message key="label.monitoring.time.limit.finish.now"/>
+					</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
+								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							onClick="updateTimeLimit('absolute', null, 1)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
+					</button>
+					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
+								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							onClick="updateTimeLimit('absolute', null, 5)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
+					</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
+								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							onClick="updateTimeLimit('absolute', null, -5)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
+					</button>
+					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
+								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							onClick="updateTimeLimit('absolute', null, -1)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
+					</button>
+				</td>
+			</tr>
 
-				<tr>
-					<td colspan="6" class="info">
-						<h4><fmt:message key="label.monitoring.time.limit.individual"/></h4>
-						<p><fmt:message key="label.monitoring.time.limit.individual.desc"/></p>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="6">
-						<div class="input-group">
-							<span class="input-group-addon"><i class="fa fa-search"></i></span>
-							<input id="individual-time-limit-autocomplete" type="text" class="ui-autocomplete-input form-control input-sm"
-								   placeholder='<fmt:message key="label.monitoring.time.limit.individual.placeholder" />' />
-						</div>
-					</td>
-				</tr>
+			<tr>
+				<td colspan="6" class="pt-3">
+					<h4><fmt:message key="label.monitoring.time.limit.individual"/></h4>
+					<p><fmt:message key="label.monitoring.time.limit.individual.desc"/></p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<div class="input-group">
+						<input id="individual-time-limit-autocomplete" type="text" class="form-control border-end-0"
+							   placeholder='<fmt:message key="label.monitoring.time.limit.individual.placeholder" />'>
+						<span class="input-group-text bg-white border-start-0">
+					    	<i class="fa-solid fa-fw fa-magnifying-glass"></i>
+					    </span>
+					</div>
+				</td>
+				<td colspan="3"></td>
+			</tr>
 
-				<tr id="individual-time-limit-template-row" class="hidden">
-					<td class="individual-time-limit-user-name"></td>
-					<td  class="centered">
-						<span class="individual-time-limit-value"></span>
-						<fmt:message key="label.monitoring.time.limit.minutes"/>
-						<!-- (<time class="timeago" />)  -->
-					</td>
-					<td class="centered">
-						<button id="individual-time-limit-cancel" class="btn btn-danger btn-xs"
-								onClick="updateTimeLimit.call(this, 'individual', false)">
-							<fmt:message key="label.monitoring.time.limit.cancel"/>
-						</button>
-					</td>
-					<td>
-						<!-- Finish now button at absolute time limit row -->
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit.call(this, 'individual', null, 1)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
-						</button>
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit.call(this, 'individual', null, 5)">
-							<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
-						</button>
-					</td>
-					<td class="centered">
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit.call(this, 'individual', null, -5)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
-						</button>
-						<button class="btn btn-default btn-xs"
-								onClick="updateTimeLimit.call(this, 'individual', null, -1)">
-							<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
-						</button>
-					</td>
-				</tr>
+			<tr id="individual-time-limit-template-row" class="d-none">
+				<td class="individual-time-limit-user-name"></td>
+				<td  class="text-center">
+					<span class="individual-time-limit-value"></span>
+					<fmt:message key="label.monitoring.time.limit.minutes"/>
+					<!-- (<time class="timeago" />)  -->
+				</td>
+				<td class="text-center">
+					<button id="individual-time-limit-cancel" class="btn btn-danger"
+							onClick="updateTimeLimit.call(this, 'individual', false)">
+						<fmt:message key="label.monitoring.time.limit.cancel"/>
+					</button>
+				</td>
+				<td>
+					<!-- Finish now button at absolute time limit row -->
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary"
+							onClick="updateTimeLimit.call(this, 'individual', null, 1)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
+					</button>
+					<button class="btn btn-secondary"
+							onClick="updateTimeLimit.call(this, 'individual', null, 5)">
+						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
+					</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-secondary"
+							onClick="updateTimeLimit.call(this, 'individual', null, -5)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
+					</button>
+					<button class="btn btn-secondary"
+							onClick="updateTimeLimit.call(this, 'individual', null, -1)">
+						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
+					</button>
+				</td>
+			</tr>
 
-			</table>
-		</div>
+		</table>
 	</div>
+</div>
 
-	<div class="panel panel-default" id="time-limit-widget">
-		<div class="panel-heading"
-			 id="time-limit-widget-heading">
-       	<span class="panel-title">
-	    	<a class="collapsed" role="button" id="time-limit-widget-toggle">
-	    	   <i class="fa fa-clock-o"></i>
-	    	   <div id="absolute-time-limit-widget-value" class="absolute-time-limit-value"
-					title="<fmt:message key="label.monitoring.time.limit" />"></div>
-	       	</a>
+<div class="card" id="time-limit-widget">
+	<div class="card-header collapsed" role="button"
+		 id="time-limit-widget-heading">
+       	<span class="card-title">
+    	   <i class="fa fa-clock"></i>
+    	   <div id="absolute-time-limit-widget-value" class="absolute-time-limit-value"
+				title="<fmt:message key="label.monitoring.time.limit" />"></div>
      	</span>
+	</div>
+
+	<div id="time-limit-widget-content" class="collapse card-body" role="tabpanel"
+		 aria-labelledby="time-limit-widget-heading">
+
+		<div class="expired-hide-container">
+			<button class="btn btn-sm btn-success" id="time-limit-widget-add-1-minute"
+					onClick="updateTimeLimit('absolute', null, 1)">
+				<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
+			</button>
 		</div>
 
-		<div id="time-limit-widget-content" class="panel-collapse collapse" role="tabpanel"
-			 aria-labelledby="time-limit-widget-heading">
-			<div class="expired-hide-container">
-				<button class="btn btn-success" id="time-limit-widget-add-1-minute"
-						onClick="updateTimeLimit('absolute', null, 1)">
-					<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
-				</button>
-			</div>
+		<div class="expired-hide-container">
+			<button class="btn btn-sm btn-danger"
+					onClick="updateTimeLimit('absolute', false)">
+				<fmt:message key="label.monitoring.time.limit.cancel"/>
+			</button>
+		</div>
 
-			<div class="expired-hide-container">
-				<button class="btn btn-danger"
-						onClick="updateTimeLimit('absolute', false)">
-					<fmt:message key="label.monitoring.time.limit.cancel"/>
-				</button>
-			</div>
+		<div>
+			<button class="btn btn-sm btn-secondary"
+					onClick="scrollToTimeLimitPanel()">
+				<fmt:message key="label.monitoring.time.limit.show.controls"/>
+			</button>
+		</div>
 
-			<div>
-				<button class="btn btn-default"
-						onClick="scrollToTimeLimitPanel()">
-					<fmt:message key="label.monitoring.time.limit.show.controls"/>
-				</button>
-			</div>
-
-			<div id="time-limit-widget-individual">
-			</div>
+		<div id="time-limit-widget-individual">
 		</div>
 	</div>
+</div>

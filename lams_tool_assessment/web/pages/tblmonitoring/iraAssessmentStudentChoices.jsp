@@ -1,7 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 
-<lams:JSImport src="includes/javascript/chart5.js" relative="true" />
+<lams:JSImport src="includes/javascript/chart.js" relative="true" />
 
 <script>
 	var WEB_APP_URL = '<lams:WebAppURL />',

@@ -1,15 +1,21 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
+
+<script>
+	$('#allocate-vsas-button').toggle(${vsaPresent});
+	$(function () {
+		$('[data-toggle="tooltip"]').tooltip();
+	})	
+</script>
+
 <!-- Table -->
 <c:if test="${not empty questions}">
-<div class="row no-gutter">
-<div class="col-xs-12 col-md-12 col-lg-12">
-<div class="panel">
-<div class="panel-body">
-<div class="table-responsive" style="margin:0">
-	<table id="questions-data" class="table table-striped table-bordered table-hover table-condensed">
+<div class="card">
+<div class="table-responsive table-hover card-body pb-0" style="margin:0">
+	<table id="questions-data" class="table table-bordered table-condensed">
 		<thead>
-			<tr role="row">
+			<tr role="row" class="border-top-0">
 				<th class="text-center">
 					<fmt:message key="label.monitoring.question.summary.question"/>
 				</th>
@@ -24,15 +30,48 @@
 		<tbody>
 			<c:forEach var="question" items="${questions}" varStatus="i">
 				<tr>
-					<td class="normal">
-						<a data-toggle="modal" href="#question${i.index}Modal">
+					<c:set var="correctOptionPercentage" value="-1" />
+					<c:forEach var="option" items="${question.optionDtos}">
+						<c:if test="${option.correct}">
+							<c:set var="correctOptionPercentage" value="${option.percentage}" />
+						</c:if>
+					</c:forEach>
+					<c:choose>
+						<c:when test="${correctOptionPercentage > 95}">
+							<c:set var="highlightClass" value="bg-success border-success" />
+							<c:set var="textClass" value="text-white" />
+						</c:when>
+						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 40}">
+							<c:set var="highlightClass" value="bg-danger border-danger" />
+							<c:set var="textClass" value="text-white" />
+						</c:when>
+						<c:when test="${correctOptionPercentage >= 0 and correctOptionPercentage < 75}">
+							<c:set var="highlightClass" value="bg-warning border-warning" />
+							<c:set var="textClass" value="" />
+						</c:when>
+						<c:otherwise>
+							<c:set var="highlightClass" value="" />
+							<c:set var="textClass" value="" />
+						</c:otherwise>
+					</c:choose>
+					
+					<td class="text-center">
+						<a data-bs-toggle="modal" data-bs-target="#question${i.index}Modal" href="#" class="${highlightClass} fs-5 ${textClass} aQuestionLink">
 							${i.index+1}
 						</a>
 					</td>
 					
 					<c:forEach var="option" items="${question.optionDtos}">
-						<td class="text-right normal <c:if test='${option.correct}'>success</c:if>">
-							<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
+						<td class="align-middle text-center
+							<c:if test="${option.correct}">
+								fw-bolder text-success fs-5" title="<fmt:message key="label.authoring.true.false.correct.answer"/>
+							</c:if>
+							"  data-toggle="tooltip" data-placement="top"
+							>
+							<c:choose>
+								<c:when test="${option.percentage == -1}">-</c:when>
+								<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
+							</c:choose>
 						</td>
 					</c:forEach>
 					
@@ -45,62 +84,48 @@
 	</table>
 </div>
 </div>
-</div>          
-</div>
-</div>
-
-<!-- End table -->
 
 <!-- Question detail modal -->
 <c:forEach var="question" items="${questions}" varStatus="i">
-	<div class="modal fade" id="question${i.index}Modal">
-	<div class="modal-dialog">
+	<div class="modal fade iraQuestionModal" id="question${i.index}Modal">
+	<div class="modal-dialog modal-dialog-centered">
 	<div class="modal-content">
-	<div class="modal-body">
-	
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-					<span class="float-left space-right">Q${i.index+1})</span>
-					<c:if test="${not empty question.title}">
-						<p><c:out value="${question.title}"  escapeXml="false" /></p>
-					</c:if>
-					${question.question}
-				</h4>
+		<div class="modal-header align-items-start">
+			<div class="modal-title">
+				<span>Q${i.index+1})</span>
+				<c:if test="${not empty question.title}">
+					<p><c:out value="${question.title}"  escapeXml="false" /></p>
+				</c:if>
+				${question.question}
 			</div>
-			<div class="panel-body">
-				<div class="table-responsive">
-					<table class="table table-striped table-hover">
-						<tbody>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<tbody>
+						<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
+							<c:set var="cssClass"><c:if test='${option.correct}'>bg-success</c:if></c:set>
+							<tr>
+								<td width="5px" class="${cssClass}">
+									${ALPHABET[j.index]}.
+								</td>
+								<td class="${cssClass}">
+									<c:out value="${option.name}" escapeXml="false"/>
+								</td>
+								<td class="${cssClass}">
+									<c:choose>
+										<c:when test="${option.percentage == -1}">-</c:when>
+										<c:otherwise><fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+						</c:forEach>
 						
-							<c:forEach var="option" items="${question.optionDtos}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${option.correct}'>bg-success</c:if></c:set>
-								<tr>
-									<td width="5px" class="${cssClass}">
-										${ALPHABET[j.index]}.
-									</td>
-									<td class="${cssClass}">
-										<c:out value="${option.name}" escapeXml="false"/>
-									</td>
-									<td class="${cssClass}">
-										<fmt:formatNumber type="number" maxFractionDigits="2" value="${option.percentage}"/>%
-									</td>
-								</tr>
-							</c:forEach>
-							
-						</tbody>
-					</table>
-				</div>
-			</div> 
+					</tbody>
+				</table>
+			</div>
 		</div>
-	            
-		<div class="modal-footer">	
-			<a href="#" data-dismiss="modal" class="btn btn-default">
-				<fmt:message key="label.ok"/>
-			</a>
-		</div>
-	
-	</div>
 	</div>
 	</div>
 	</div>

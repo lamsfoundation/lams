@@ -144,7 +144,7 @@ public class TblMonitoringController {
 	}
 	request.setAttribute("questions", questionDtos);
 
-	return "pages/monitoring/parts/mcqStudentChoices5";
+	return "pages/monitoring/parts/mcqStudentChoices";
     }
 
     private List<TblAssessmentDTO> getAssessmentDtos(String[] toolContentIds, String[] activityTitles) {

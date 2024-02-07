@@ -2,7 +2,7 @@
 <% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <c:set var="showQuestionMonitoringActionButtons" value="${attemptedLearnersNumber > 0}" />
 
-<%@ include file="/pages/monitoring/parts/discloseAnswers5.jsp"%>
+<%@ include file="/pages/monitoring/parts/discloseAnswers.jsp"%>
 
 <script>
 	//for allquestions.jsp to know whether to display an additional button
