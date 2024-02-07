@@ -74,7 +74,6 @@ function trimAll( strValue ) {
 }
 	
 function isEmpty( strValue ) {
-	
    var strTemp = strValue;
    strTemp = trimAll(strTemp);
    if (strTemp.length > 0) {
@@ -85,22 +84,25 @@ function isEmpty( strValue ) {
 	
 // refresh the parent window if the parent window is a tool monitoring window
 function refreshParentMonitoringWindow() {
-	if ( window.opener && ! window.opener.closed && window.opener.name.indexOf("MonitorActivity") >= 0 ) {
-		var monitoringURL = String(window.opener.location);
-		var currentTab = window.opener.selectedTabID;
+	let opener = window.opener;
+	if ( opener && ! opener.closed && String(opener.location).indexOf("tool") >= 0 && String(opener.location).indexOf("monitoring") >= 0 ) {
+		let monitoringURL = String(opener.location),
+			currentTab = opener.$("#tabs button.nav-link.active");
+		
 		if ( currentTab ) {
-			var indexStart = monitoringURL.indexOf("&currentTab=");
+			let indexStart = monitoringURL.indexOf("&currentTab="),
+				currentTabId = currentTab.attr("id").substring(4);
 			if ( indexStart != -1 ) {
-				var indexEnd = monitoringURL.indexOf("&",indexStart+1);
+				let indexEnd = monitoringURL.indexOf("&",indexStart+1);
 				if ( indexEnd == -1 ) {
 					monitoringURL = monitoringURL.substring(0,indexStart);
 				} else {
 					monitoringURL = monitoringURL.substring(0,indexStart)+monitoringURL.substring(indexEnd);
 				}
 			}
-			monitoringURL = monitoringURL+"&currentTab="+currentTab;
+			monitoringURL = monitoringURL+"&currentTab="+currentTabId;
 		}
-		window.opener.location.href = monitoringURL;
+		opener.location.href = monitoringURL;
 	}
 }
 	
