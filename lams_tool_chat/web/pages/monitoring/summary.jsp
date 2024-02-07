@@ -29,7 +29,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
 
 <div class="panel">
 	<h4>

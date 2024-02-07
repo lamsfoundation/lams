@@ -6,7 +6,7 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 				
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
+<script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
 
 <script type="text/javascript">
 	function exportSummary(){

@@ -35,7 +35,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 	<lams:JSImport src="includes/javascript/rating.js" />
-	<lams:JSImport src="includes/javascript/portrait.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
 </lams:head>
 
 <body class="stripes">

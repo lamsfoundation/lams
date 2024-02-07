@@ -20,7 +20,7 @@
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
-		<lams:JSImport src="includes/javascript/portrait.js" />
+		<lams:JSImport src="includes/javascript/portrait5.js" />
 		<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 	</lams:head>
 

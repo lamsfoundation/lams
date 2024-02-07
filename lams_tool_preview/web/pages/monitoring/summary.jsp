@@ -32,7 +32,7 @@
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 
 <script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
-<script src="${lams}includes/javascript/portrait.js" type="text/javascript" ></script>
+<script src="${lams}includes/javascript/portrait5.js" type="text/javascript" ></script>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript">

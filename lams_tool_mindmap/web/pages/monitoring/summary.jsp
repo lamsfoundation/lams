@@ -74,7 +74,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/portrait5.js" />
 <lams:JSImport src="includes/javascript/rating.js" />
 
 <script type="text/javascript">

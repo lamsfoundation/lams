@@ -36,7 +36,7 @@
  	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 
- 	<lams:JSImport src="includes/javascript/portrait.js" />
+ 	<lams:JSImport src="includes/javascript/portrait5.js" />
  
 	 <script>
 			var initialTabId = "${initialTabId}";

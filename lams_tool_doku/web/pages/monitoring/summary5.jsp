@@ -17,7 +17,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants"%>
 
 <link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css"/>
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css" />
 
 <style media="screen,projection" type="text/css">
@@ -106,7 +106,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-editable.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
-<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/portrait5.js" />
 <lams:JSImport src="includes/javascript/etherpad.js" />
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <script type="text/javascript">

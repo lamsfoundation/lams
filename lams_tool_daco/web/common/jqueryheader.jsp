@@ -6,8 +6,8 @@
  	<!-- ********************  CSS ********************** -->
 	<link href="<c:url value='/includes/css/daco.css'/>" rel="stylesheet" type="text/css">
 	<lams:css/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css"> 
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css"> 
 
  	<!-- ********************  javascript ********************** -->
 	<lams:JSImport src="includes/javascript/common.js" />

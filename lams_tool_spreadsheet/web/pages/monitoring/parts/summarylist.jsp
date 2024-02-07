@@ -4,8 +4,8 @@
 
 <div id="summaryList2">
 
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 
 <script type="text/javascript">
 

@@ -9,8 +9,8 @@
 
  	<!-- ********************  CSS ********************** -->
 	<lams:css/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link type="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+	<link type="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 
  	<!-- ********************  javascript ********************** -->
 	<lams:JSImport src="includes/javascript/common.js" />

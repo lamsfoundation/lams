@@ -16,8 +16,8 @@
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
 	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager5.css"> 
 	<link type="text/css" rel="stylesheet" href="${tool}ncludes/css/qalearning.css">
 	<style media="screen,projection" type="text/css">
 		.dialog {
@@ -74,7 +74,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	<lams:JSImport src="includes/javascript/portrait.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<script type="text/javascript">
 	
 		var POSTED_BY_LABEL = '<fmt:message key="label.posted.by"><fmt:param>{0}</fmt:param><fmt:param>{1}</fmt:param></fmt:message>';

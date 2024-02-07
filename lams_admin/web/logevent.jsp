@@ -24,7 +24,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap5.bundle.min.js"></script>
-	<lams:JSImport src="includes/javascript/portrait.js" />
+	<lams:JSImport src="includes/javascript/portrait5.js" />
 	<script type="text/javascript">
 	
 		<fmt:message key="label.lesson.with.name" var="LESSON_LABEL_VAR"><fmt:param value="{0}"/></fmt:message>

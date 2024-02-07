@@ -26,8 +26,8 @@
 		
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
-		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
+		<link href="${lams}css/jquery.tablesorter.theme.bootstrap5.css" rel="stylesheet" >
+		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css">
 		<link href="${lams}css/uppy.min.css" rel="stylesheet" type="text/css" />
 		<link href="${lams}css/uppy.custom.css" rel="stylesheet" type="text/css" />
 		<style media="screen,projection" type="text/css">
@@ -89,10 +89,6 @@
 				// end optional tab controller stuff
 			    selectTab(tabId);
 		    }
-		   	
-		   	function onSelectTab(id) {
-		   		return;
-		   	}
 		        
 			function viewItem(imageUid,sessionMapID){
 				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&imageUid=" + imageUid + "&sessionMapID="+sessionMapID;

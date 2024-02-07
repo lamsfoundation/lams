@@ -2,7 +2,7 @@
 <c:set var="dto" value="${pixlrDTO}" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait.js" ></script>
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/portrait5.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		initializePortraitPopover("<lams:LAMSURL />");

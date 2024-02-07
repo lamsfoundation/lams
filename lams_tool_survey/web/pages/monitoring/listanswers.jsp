@@ -7,13 +7,13 @@
 <lams:html>
 <lams:head>
 	    <%@ include file="/common/header.jsp" %>
-	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
+	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.tablesorter.pager5.css" rel="stylesheet">
 
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
-		<lams:JSImport src="includes/javascript/portrait.js" />
+		<lams:JSImport src="includes/javascript/portrait5.js" />
 
 <script type="text/javascript">
 

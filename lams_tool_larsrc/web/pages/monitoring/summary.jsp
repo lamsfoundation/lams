@@ -19,7 +19,7 @@
 
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
-<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/portrait5.js" />
 <script type="text/javascript">
 	$(document).ready(function(){
 		initializePortraitPopover("<lams:LAMSURL />");

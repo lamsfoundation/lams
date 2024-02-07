@@ -25,10 +25,10 @@
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-<lams:JSImport src="includes/javascript/portrait.js" />
+<lams:JSImport src="includes/javascript/portrait5.js" />
 
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+<link type="text/css" href="${lams}css/jquery.tablesorter.pager5.css" rel="stylesheet">
 
 <link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
