@@ -210,15 +210,6 @@
 	}
 }
 
-.component-page-wrapper .activity-bottom-buttons {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: $border-thin-grey;	
-    display: flex;
-    flex-direction: row-reverse;
-	clear: both;
-}
-
 .wave-orange {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' fill='%23d56a11' width='1240' height='200'><path opacity='.15' d='M0 0h1238.095l.752 190.678c-343.448 18.646-306.568-19.271-619.8-14.315S291.99 213.078 0 186.551z'/><path d='M1240 0H.953v177.116c54.117-3.757 103.637-16.013 192.612-15.869 36.91.06 80.359 1.001 133.284 3.277 180.507 7.762 245.7 38.085 508.083 8.653 64.239-7.206 123.098-11.571 176.575-13.095 42.717-1.217 82-.622 117.85 1.787 41.477 2.786 78.358 15.999 110.643 23.639z' fill='%23f93'/></svg>");
     text-align: center;
@@ -295,35 +286,6 @@
     margin: -16px;
     border-top-left-radius: 1.25rem;
     border-top-right-radius: 1.25rem;
-}
-
-.lcard {
-    border-top-left-radius: 1.25rem;
-    border-top-right-radius: 0rem;
-    border-bottom-right-radius: 1.25rem;
-    border: 0;
-    margin-bottom: 2rem;
-    @extend .shadow;
-}
-
-.lcard>.card-header {
-    border-top-left-radius: 1.25rem;
-    border-top-right-radius: 0rem;
-    font-size: 1.3rem;
-    padding: 1rem;
-    @extend .text-bg-secondary;
-}
-
-@media (width <= 768px) {
-
-    .lcard > .card-header {
-        font-size: 14px;
-    }
-
-}
-
-.font-size-init {
-	font-size: initial;
 }
 
 /* Assessment and Scratchie Countdown - growl settings need to be moved too */

@@ -25,6 +25,10 @@
     padding-top: 1rem;
 }
 
+.font-size-init {
+	font-size: initial;
+}
+
 /* For Boostrap 3 & 5 compability */
 .img-responsive {
   max-width: 100%;
@@ -102,6 +106,36 @@ body.component {
 		legend {
 			font-size: var(--bs-body-font-size);
 		} 
+	}
+
+	.lcard {
+		border-top-left-radius: 1.25rem;
+		border-top-right-radius: 0rem;
+		border-bottom-right-radius: 1.25rem;
+		border: 0;
+		margin-bottom: 2rem;
+		@extend .shadow;
+	
+		>.card-header {
+			border-top-left-radius: 1.25rem;
+			border-top-right-radius: 0rem;
+			font-size: 1.3rem;
+			padding: 1rem;
+			@extend .text-bg-secondary;
+	
+			@include media-breakpoint-down(md) {
+				font-size: 14px;
+			}
+		}
+	}
+	
+	.activity-bottom-buttons {
+	    margin-top: 1rem;
+	    padding-top: 1rem;
+	    border-top: $border-thin-grey;	
+	    display: flex;
+	    flex-direction: row-reverse;
+		clear: both;
 	}
 }
 
