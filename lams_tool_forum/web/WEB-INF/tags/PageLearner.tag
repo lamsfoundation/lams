@@ -8,7 +8,7 @@
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refresh" required="false" rtexprvalue="true"%>
 <%@ attribute name="hideHeader" required="false" rtexprvalue="true"%>
-<c:set var="showHeader">${empty hideHeader ? true : false }</c:set>
+<c:set var="showHeader">${empty hideHeader || !hideHeader ? true : false }</c:set>
 <%@ attribute name="hideTitle" required="false" rtexprvalue="true"%>
 <c:set var="hideTitle">${empty hideTitle ? false : true }</c:set>
 <%@ attribute name="lessonID" required="false" rtexprvalue="true"%>

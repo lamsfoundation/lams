@@ -7,10 +7,10 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="forum" value="${sessionMap.forum}" />
 
-<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
-<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
+<link type="text/css" href="${lams}css/jquery.tablesorter.pager5.css" rel="stylesheet">
  <style>
  	.group-mark-release-label {
  		margin-top: 8px;
@@ -19,7 +19,13 @@
  		font-size: small;
  	}
 </style>
-	
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -37,10 +43,8 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/portrait.js" ></script>
-
+<script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
 <script type="text/javascript">
-
 	function releaseMarks(sessionId){
 		$("#message-area-busy").show();
 		$.ajax({
@@ -118,13 +122,16 @@
 								rows += "-";
 								
 							} else {
-								var anyPostsMarked = (userData["anyPostsMarked"]) ? '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.yes"/></spring:escapeBody>' : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no"/></spring:escapeBody>';
-								rows += anyPostsMarked;	
-								
-								var viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${sessionMapID}&userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
-								rows += 	'<a href="javascript:launchPopup(\'' + viewUserMarkUrl + '\')" style="margin-left: 7px;" styleClass="button">';
-								rows += 		'<spring:escapeBody javaScriptEscape="true"><fmt:message key="lable.topic.title.mark" /></spring:escapeBody>';
-								rows += 	'</a>';
+								let anyPostsMarked = (userData["anyPostsMarked"]) ? '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.yes"/></spring:escapeBody>' : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.no"/></spring:escapeBody>',
+									viewUserMarkUrl = '<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${sessionMapID}&userUid=' + userData["userUid"] + "&toolSessionID=" + $(table).attr('data-session-id');
+
+								rows += '<div class="d-flex flex-row align-items-center">' +
+											anyPostsMarked +	
+											'<button type="button" onclick="launchPopup(\'' + viewUserMarkUrl + '\')" class="btn btn-sm btn-secondary d-flex align-items-center ms-1">' +
+												'<i class="fa-solid fa-marker me-1"></i>' +
+												'<spring:escapeBody javaScriptEscape="true"><fmt:message key="lable.topic.title.mark" /></spring:escapeBody>' +
+									 		'</button>' +
+									 	'</div>';
 							}
 							rows += '</td>';
 							
@@ -134,76 +141,70 @@
 						json.total = data.total_rows;
 						json.rows = $(rows);
 						return json;
-			            
 			    	}
 				}})
-			  .bind('pagerInitialized pagerComplete', function(event, options){
+				.bind('pagerInitialized pagerComplete', function(event, options){
 					initializePortraitPopover('${lams}');
 					$("time.timeago").timeago();
 				})
-			 
-			});
-	  	})
+		});
+	})
 	  	
-	  	function downloadMarks(sessionId){
+	function downloadMarks(sessionId){
 		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
 	    var reqIDVar = new Date();
 		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
 		url = url + param;
 		location.href = url;
 	}
-
 </script>
 
-<div class="panel">
-	<h4>
+<div class="instructions">
+	<div class="fs-4">
 	    <c:out value="${title}" escapeXml="true"/>
-	</h4>
-	<div class="instructions voffset5">
+	</div>
+	<div class="mt-2">
 	    <c:out value="${instruction}" escapeXml="false"/>
 	</div>
 	
 	<c:if test="${empty sessionMap.sessionDtos}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
+		<lams:Alert5 type="info" id="no-session-summary" close="false">
 			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
+		</lams:Alert5>
 	</c:if>
 	
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="message-area-busy"/>
 </div>
 
-<c:if test="${sessionMap.isGroupedActivity}">
-<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
-</c:if>
-
 <c:forEach var="sessionDto" items="${sessionMap.sessionDtos}" varStatus="status">
-
 	<c:if test="${sessionMap.isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${sessionDto.sessionID}">
-        	<span class="panel-title collapsable-icon-left">
-        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
-					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
-			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
+	    <div class="lcard card-secondary" >
+        <div class="card-header" id="heading${sessionDto.sessionID}">
+        	<span class="card-title collapsable-icon-left">
+        		<button type="button" class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" data-bs-toggle="collapse" data-bs-target="#collapse${sessionDto.sessionID}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >					
+					<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" />
+				</button>
 			</span>
         </div>
-        
-        <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
+
+        <div id="collapse${sessionDto.sessionID}" class="card-body p-2 collapse ${status.first ? 'show' : ''}">
 	</c:if>
 		
-		<lams:TSTable numColumns="4" dataId="data-session-id='${sessionDto.sessionID}'">
-				<th><fmt:message key="monitoring.user.fullname"/></th>
-				<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
-				<th width="25%" align="center"><fmt:message key="label.latest.posting.date"/></th>
-				<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
-		</lams:TSTable>
+	<lams:TSTable numColumns="4" dataId="data-session-id='${sessionDto.sessionID}'">
+		<th><fmt:message key="monitoring.user.fullname"/></th>
+		<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
+		<th width="25%" align="center"><fmt:message key="label.latest.posting.date"/></th>
+		<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
+	</lams:TSTable>
 
-		<P style="display: inline"> 
-			<div id="release-marks-info-${sessionDto.sessionID}" class="loffset5 group-mark-release-label"
+	<div class="clearfix">
+		<div class="float-end"> 
+			<div id="release-marks-info-${sessionDto.sessionID}" class="group-mark-release-label text-center ms-2 "
 					<c:if test="${!sessionDto.marksReleased}">style="display:none;"</c:if>>
-				<span class="label label-success">
-					<i class="fa fa-check-circle"></i>
+				<span class="badge bg-success">
+					<i class="fa fa-check-circle me-1"></i>
 					<fmt:message key="label.marks.released" />
 				</span>
 			</div>
@@ -211,37 +212,38 @@
 			<c:set var="viewforum">
 				<lams:WebAppURL />learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher
 			</c:set>
-			<a href="javascript:launchPopup('${viewforum}');" class="btn btn-default loffset5 voffset10">
+			<button type="button" onclick="launchPopup('${viewforum}');" class="btn btn-secondary ms-2 mt-3">
+				<i class="fa-solid fa-eye me-1"></i>
 				<fmt:message key="label.monitoring.summary.view.forum"/>
-			</a>
-			<button name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" class="btn btn-default loffset5 voffset10" >
+			</button>
+			<button type="button" name="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" class="btn btn-secondary ms-2 mt-3" >
+				<i class="fa-solid fa-box-open me-1"></i>
 				<fmt:message key="button.release.mark" />
 			</button>
+			
 			<c:set value="${sessionDto.sessionID}" var="toolSessionID"/>
-			<a href="javascript:downloadMarks(${toolSessionID});"
-				name="downloadMarks" class="btn btn-default voffset10 loffset5">
+			<button type="button"  onclick="downloadMarks(${toolSessionID});" name="downloadMarks" class="btn btn-secondary ms-2 mt-3">
+				<i class="fa-solid fa-download me-1"></i>
 				<fmt:message key="message.download.marks" />
-			</a>
+			</button>
 			<c:url value="/monitoring/monitoring.do" var="refreshMonitoring">
 				<c:param name="contentFolderID" value="${contentFolderID}"/>
 				<c:param name="toolContentID" value="${toolContentID}" />
+				<c:param name="lessonID" value="${param.lessonID}" />
 			</c:url>
-			<a href="${refreshMonitoring}" class="btn btn-default loffset5 voffset10" >
-					<fmt:message key="label.refresh" />
+			<a href="${refreshMonitoring}" class="btn btn-secondary btn-icon-refresh ms-2 mt-3" >
+				<fmt:message key="label.refresh" />
 			</a>
-		</P>
+		</div>
+	</div>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
 	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="mt-2">&nbsp;</div>' :  ''}
 </c:forEach>
 
-<c:if test="${sessionMap.isGroupedActivity}">
-	</div> <!--  end panel group -->
-</c:if>
 <%@include file="parts/advanceOptions.jsp"%>
-
+<div class="my-2"></div>
 <%@include file="parts/daterestriction.jsp"%>

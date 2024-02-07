@@ -7,7 +7,8 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
 
-<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}"
+		hideHeader='${sessionMap.mode == "teacher" || param.mode == "teacher"}'>
 
 	<!-- ********************  CSS ********************** -->
 	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">

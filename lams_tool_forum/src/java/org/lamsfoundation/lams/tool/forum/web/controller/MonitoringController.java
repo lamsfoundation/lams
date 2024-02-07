@@ -137,6 +137,7 @@ public class MonitoringController {
 	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	sessionMap.put(AttributeNames.PARAM_MODE, "teacher");
 
 	Forum forum = forumService.getForumByContentId(toolContentId);
 	sessionMap.put("forum", forum);
@@ -285,7 +286,7 @@ public class MonitoringController {
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
 	    if (userData.length > 1 && userData[1] != null) {
-		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userData[2]);
+		responseRow.put(ForumConstants.ATTR_PORTRAIT_ID, (String) userData[1]);
 	    }
 
 	    rows.add(responseRow);

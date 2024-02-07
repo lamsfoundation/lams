@@ -1,14 +1,12 @@
 <c:set var="adTitle"><spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.th.advancedSettings" /></spring:escapeBody></c:set>
-<lams:AdvancedAccordian title="${adTitle}">
-             
-<table class="table table-striped table-condensed">
-
-		<tr>
-			<td>
+<lams:AdvancedAccordian title="${adTitle}">             
+	<div class="ltable table-striped table-sm no-header mb-0">
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.lock.on.finished" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.lockWhenFinished == true}">
 						<fmt:message key="label.on" />
@@ -17,16 +15,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
-		
-		
-		<tr>
-			<td>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.allow.edit" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowEdit == true}">
 						<fmt:message key="label.on" />
@@ -35,15 +32,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.enable.anonymous.posts" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowAnonym}">
 						<fmt:message key="label.on" />
@@ -52,16 +49,16 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.allow.rate.postings" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowRateMessages}">
 						<fmt:message key="label.on" />
@@ -70,15 +67,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.minimum.reply" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.minimumRate == 0}">
 						<fmt:message key="label.authoring.advance.no.minimum" />
@@ -87,15 +84,15 @@
 						${forum.minimumRate}
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.maximum.reply" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.maximumRate == 0}">
 						<fmt:message key="label.authoring.advance.no.maximum" />
@@ -104,15 +101,15 @@
 						${forum.maximumRate}
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.allow.upload" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowUpload == true}">
 						<fmt:message key="label.on" />
@@ -121,15 +118,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.use.richeditor" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowRichEditor == true}">
 						<fmt:message key="label.on" />
@@ -138,15 +135,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.min.limited.input" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.limitedMinCharacters == true}">
 						<fmt:message key="label.on" />, ${forum.minCharacters}
@@ -155,15 +152,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.limited.input" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.limitedMaxCharacters == true}">
 						<fmt:message key="label.on" />, ${forum.maxCharacters}
@@ -172,15 +169,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.allow.new.topics" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.allowNewTopic == true}">
 						<fmt:message key="label.on" />
@@ -189,15 +186,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advance.number.reply" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<fmt:message key="label.authoring.advance.minimum.reply" />
 				<c:choose>
 					<c:when test="${forum.minimumReply != 0}">
@@ -218,15 +215,15 @@
 						<fmt:message key="label.authoring.advance.no.maximum" />
 					</c:otherwise>
 				</c:choose>
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.learners" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.notifyLearnersOnForumPosting == true}">
 						<fmt:message key="label.on" />
@@ -235,15 +232,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advanced.send.emails.to" /> <fmt:message key="label.authoring.advanced.teachers" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.notifyTeachersOnForumPosting == true}">
 						<fmt:message key="label.on" />
@@ -252,15 +249,15 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
+			</div>
+		</div>
 		
-		<tr>
-			<td>
+		<div class="row">
+			<div class="col">
 				<fmt:message key="label.authoring.advanced.notify.mark.release" />
-			</td>
+			</div>
 			
-			<td>
+			<div class="col text-start">
 				<c:choose>
 					<c:when test="${forum.notifyLearnersOnMarkRelease == true}">
 						<fmt:message key="label.on" />
@@ -269,7 +266,7 @@
 						<fmt:message key="label.off" />
 					</c:otherwise>
 				</c:choose>	
-			</td>
-		</tr>
-</table>
+			</div>
+		</div>
+	</div>
 </lams:AdvancedAccordian>

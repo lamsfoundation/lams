@@ -18,7 +18,8 @@
     <lams:WebAppURL />learning/viewForum.do?mode=${sessionMap.mode}&toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}
 </c:set>
 
-<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}">
+<lams:PageLearner title="${sessionMap.title}" toolSessionID="${sessionMap.toolSessionID}"
+		hideHeader='${sessionMap.mode == "teacher" || param.mode == "teacher"}'>
 
     <!-- ********************  javascript ********************** -->
     <lams:JSImport src="includes/javascript/common.js" />
@@ -34,7 +35,9 @@
         var EXE_FILE_TYPES = '${EXE_FILE_TYPES}';
         var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
 
-        checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitFinish);
+        <c:if test='${sessionMap.mode != "teacher"}'>
+        	checkNextGateActivity('finishButton', '${sessionMap.toolSessionID}', '', submitFinish);
+        </c:if>
 
         function submitFinish() {
             location.href = '${finish}';

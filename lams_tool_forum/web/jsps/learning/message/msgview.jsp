@@ -29,8 +29,8 @@
 
 			<c:choose>
 				<c:when test="${msgDto.message.isMonitor}">
- 	            	<c:set var="textClass" value="text-info"/>
- 	                <c:set var="bgClass" value="bg-info"/>
+ 	            	<c:set var="textClass" value="text-warning"/>
+ 	                <c:set var="bgClass" value="bg-warning"/>
  	            </c:when>
 				<c:otherwise>
  	            	<c:set var="textClass" value=""/>
@@ -55,7 +55,7 @@
 				</c:choose>
             </span><br/>
 
-            <div class="${textClass}">
+            <div class="font-size-init ${textClass}">
 				<c:set var="msgAuthor" value="${msgDto.author}" />
 				<c:if test="${empty msgAuthor}">
 					<c:set var="msgAuthor"><fmt:message key="label.default.user.name" /></c:set>
@@ -130,26 +130,26 @@
 		</c:if>
 
 		<c:if test="${((msgDto.released && msgDto.isAuthor) || sessionMap.mode=='teacher') && (not empty msgDto.mark)}">
-			<hr class="msg-hr">
-			<div>
-				<span class="label label-default">
+			<div class="mt-2">
+				<span class="badge bg-info me-1">
 					<fmt:message key="lable.topic.title.mark" />&nbsp;
 				</span>
-				
 				<fmt:formatNumber value="${msgDto.mark}" maxFractionDigits="2" />
 				<BR /> 
-				<span class="label label-default">
-					<fmt:message key="lable.topic.title.comment" />&nbsp;
-				</span>
 				
-				<c:choose>
-					<c:when test="${empty msgDto.comment}">
-						<fmt:message key="message.not.avaliable" />
-					</c:when>
-					<c:otherwise>
-						<c:out value="${msgDto.comment}" escapeXml="false" />
-					</c:otherwise>
-				</c:choose>
+				<div class="d-flex flex-row mt-2 align-items-center">
+					<span class="badge bg-info me-2">
+						<fmt:message key="lable.topic.title.comment" />&nbsp;
+					</span>
+					<c:choose>
+						<c:when test="${empty msgDto.comment}">
+							<fmt:message key="message.not.avaliable" />
+						</c:when>
+						<c:otherwise>
+							<c:out value="${msgDto.comment}" escapeXml="false" />
+						</c:otherwise>
+					</c:choose>
+				</div>
 			</div>
 		</c:if>
 
@@ -170,7 +170,8 @@
 				<c:set var="updateMark">
 					<lams:WebAppURL />monitoring/editMark.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&updateMode=viewForum
 				</c:set>
-				<a href="${updateMark}" class="comment">
+				<a href="${updateMark}" class="btn btn-light comment align-top ms-2">
+					<i class="fa-solid fa-marker me-1"></i>
 					<fmt:message key="lable.topic.title.mark" />
 				</a>
 				&middot;
@@ -182,7 +183,8 @@
 						<c:set var="hidetopic">
 							<lams:WebAppURL />learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=false
 						</c:set>
-						<a href="${hidetopic}" class="comment">
+						<a href="${hidetopic}" class="btn btn-light comment align-top ms-2">
+							<i class="fa-regular fa-eye me-1"></i>
 							<fmt:message key="label.show" />
 						</a>
 					</c:when>
@@ -191,7 +193,8 @@
 						<c:set var="hidetopic">
 							<lams:WebAppURL />learning/updateMessageHideFlag.do?sessionMapID=${sessionMapID}&topicID=${msgDto.message.uid}&hideFlag=true
 						</c:set>
-						<a href="${hidetopic}" class="comment">
+						<a href="${hidetopic}" class="btn btn-light comment align-top ms-2">
+							<i class="fa-regular fa-eye-slash me-1"></i>
 							<fmt:message key="label.hide" />
 						</a>
 					</c:otherwise>
