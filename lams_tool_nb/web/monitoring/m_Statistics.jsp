@@ -9,7 +9,7 @@
 	
 		<c:forEach var="group" items="${monitoringDTO.groupStatsMap}">
 			<div class="row align-items-center">
-				<div class="col">
+				<div class="col-md-2">
 					<c:out value="${group.key}" />
 				</div>
 				<div class="col">
@@ -33,7 +33,7 @@
 
 <div class="ltable table-striped no-header">
 	<div class="row align-items-center">
-		<div class="col">
+		<div class="col-md-2">
 			<fmt:message key="heading.totalLearners" />
 		</div>
 		<div class="col">

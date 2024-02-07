@@ -6,9 +6,9 @@
 	</lams:Alert5>
 </c:if>
 
-<div class="ltable table-condensed no-header">
+<div class="ltable no-header">
 	<div class="row">
-		<div class="col field-name">
+		<div class="col-2">
 			<fmt:message key="basic.title" />
 		</div>
 		<div class="col">
@@ -16,7 +16,7 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col field-name">
+		<div class="col-2">
 			<fmt:message key="basic.content" />
 		</div>
 		<div class="col">
