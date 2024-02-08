@@ -44,7 +44,7 @@
         </h2>
 
 		<div id="collapseAdvanced" class="accordion-collapse collapse" aria-labelledby="headingAdvanced">
-      		<div class="">
+      		<div>
       			<jsp:doBody />
       		</div>
       	</div>
