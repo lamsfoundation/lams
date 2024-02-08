@@ -72,7 +72,7 @@
 			// destroy existing absolute time limit counter before refresh
 			$('.absolute-time-limit-counter, .time-limit-widget-individual-counter').countdown('destroy');
 			let data = JSON.parse(event.data);
-			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
 					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
 					+ '&isTbl=true&controllerContext=tool/lascrt11/monitoring');
 		});

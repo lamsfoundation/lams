@@ -30,6 +30,6 @@
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager5.css" rel="stylesheet">
 
-<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet">

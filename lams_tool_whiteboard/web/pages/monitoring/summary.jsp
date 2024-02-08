@@ -17,7 +17,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.whiteboard.WhiteboardConstants"%>
 
 <link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-<link href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet" type="text/css">
+<link href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap5.css"/>
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager5.css" />
 <link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css">

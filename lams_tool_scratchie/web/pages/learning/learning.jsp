@@ -16,7 +16,7 @@
 
 <lams:PageLearner title="${title}" toolSessionID="${toolSessionID}">
     <!-- ********************  CSS ********************** -->
-    <link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" />
     <link rel="stylesheet" type="text/css" href="<lams:WebAppURL/>includes/css/scratchie.css">
     <link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
     <link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />

@@ -39,7 +39,7 @@
 	</script>
 	<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-	<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
 	<link type="text/css" href="${lams}/css/defaultHTML_chart.css" rel="stylesheet" />
 		

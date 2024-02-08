@@ -4,10 +4,10 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 <link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 <link type="text/css" href="${webapp}includes/css/learning.css" rel="stylesheet" >
-<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
 <style type="text/css">
 	#common-buttons-area {
 		overflow: auto;

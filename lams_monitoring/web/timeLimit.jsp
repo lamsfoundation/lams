@@ -726,8 +726,7 @@
 </div>
 
 <div class="card" id="time-limit-widget">
-	<div class="card-header collapsed" role="button"
-		 id="time-limit-widget-heading">
+	<div class="card-header collapsed" role="button" id="time-limit-widget-heading">
        	<span class="card-title">
     	   <i class="fa fa-clock"></i>
     	   <div id="absolute-time-limit-widget-value" class="absolute-time-limit-value"
@@ -735,9 +734,7 @@
      	</span>
 	</div>
 
-	<div id="time-limit-widget-content" class="collapse card-body" role="tabpanel"
-		 aria-labelledby="time-limit-widget-heading">
-
+	<div id="time-limit-widget-content" class="collapse card-body" role="tabpanel" aria-labelledby="time-limit-widget-heading">
 		<div class="expired-hide-container">
 			<button class="btn btn-sm btn-success" id="time-limit-widget-add-1-minute"
 					onClick="updateTimeLimit('absolute', null, 1)">

@@ -12,7 +12,7 @@
 		<lams:headItems />
 		
 		<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
-		<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 		<style media="screen,projection" type="text/css">
 			.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 10px;}
 			table {padding: 10px;}

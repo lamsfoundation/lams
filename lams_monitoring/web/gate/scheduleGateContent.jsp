@@ -24,7 +24,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html>
     <lams:head>
 		<lams:css/>
-		<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+		<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>

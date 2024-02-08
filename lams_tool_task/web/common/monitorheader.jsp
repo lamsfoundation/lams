@@ -6,8 +6,8 @@
  <!-- ********************  CSS ********************** -->
 <link href="<lams:WebAppURL/>includes/css/taskList.css" rel="stylesheet" type="text/css">
 <lams:css/>
-<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <!-- ********************  javascript ********************** -->

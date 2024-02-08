@@ -55,7 +55,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		 $('[data-toggle="tooltip"]').bootstrapTooltip();
+		 $('[data-bs-toggle="tooltip"]').tooltip();
 		 
 		var oldValue = 0;
 		

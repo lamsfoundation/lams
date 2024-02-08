@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-        $('[data-toggle="tooltip"]').bootstrapTooltip();
+        $('[data-bs-toggle="tooltip"]').tooltip();
         
 	   	// must display charts after screen is visible or cannot calculate widths.
 		drawHistogram('chartDiv', 
@@ -99,7 +99,7 @@
                 <a class="" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
                     <fmt:message key="label.qb.stats" />
                 </a>
-                <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Item analysis is a technique that analyses the student answers to evaluate the effectiveness of questions in an exam."></i>
+                <i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="" data-original-title="Item analysis is a technique that analyses the student answers to evaluate the effectiveness of questions in an exam."></i>
     		</span>
         </div>
         <div class="">
@@ -117,15 +117,15 @@
                         </th>
                         <th scope="col" class="text-center">
                             <fmt:message key="label.qb.difficulty.index"/>&nbsp;
-                            <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
+                            <i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="<fmt:message key="label.qb.difficulty.index.tooltip" />"></i>
                         </th>
                         <th scope="col" class="text-center">
                             <fmt:message key="label.qb.discrimination.index"/>&nbsp;
-							<i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
+							<i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="<fmt:message key="label.qb.discrimination.index.tooltip" />"></i>
                         </th>
                         <th scope="col" class="text-center">
                             <fmt:message key="label.qb.point.biserial"/>&nbsp;
-							 <i class="fa fa-question-circle" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
+							 <i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="<fmt:message key="label.qb.point.biserial.tooltip" />"></i>
                         </th>
                     </tr>
 

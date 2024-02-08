@@ -160,7 +160,7 @@
 				<c:if test="${not empty sessionDtos}">
 					<th class="text-center">
 						<fmt:message key="label.total"/>&nbsp;
-						<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+						<i class="fa fa-question-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" 
 						   title="<fmt:message key="label.total.1st.attempt.by.team"/>"></i>
 					</th>
 					<th class="text-center">
@@ -278,7 +278,7 @@
 				<c:set var="totalPercentSum" value="0" />
 				<tr>
 					<th><fmt:message key="label.total"/>&nbsp;
-					<i class="fa fa-question-circle text-primary" data-toggle="tooltip" data-placement="top" data-container="body" 
+					<i class="fa fa-question-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" 
 					   title="<fmt:message key="label.total.1st.attempt.by.question"/>"></i></th>
 					   
 					<c:forEach var="item" items="${items}">

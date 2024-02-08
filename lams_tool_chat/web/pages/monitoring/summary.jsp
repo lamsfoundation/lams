@@ -4,7 +4,7 @@
 </c:set>
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 
-<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <script type="text/javascript">

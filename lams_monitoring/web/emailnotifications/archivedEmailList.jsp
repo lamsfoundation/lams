@@ -10,7 +10,8 @@
 	</c:if>	
 	
 	<lams:css/>
-	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.min.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/free.ui.jqgrid.custom.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 	<style type="text/css">
 		td {
 			vertical-align: top;

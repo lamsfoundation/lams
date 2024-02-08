@@ -4,7 +4,7 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 
-<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit5.jsp</c:set>
+<c:set var="timeLimitPanelUrl"><lams:LAMSURL/>monitoring/timeLimit.jsp</c:set>
 <c:url var="timeLimitPanelUrl" value="${timeLimitPanelUrl}">
 	<c:param name="toolContentId" value="${dokumaran.contentId}"/>
 	<c:param name="absoluteTimeLimitFinish" value="${dokumaran.absoluteTimeLimitFinishSeconds}"/>
@@ -306,7 +306,7 @@
 			// destroy existing absolute time limit counter before refresh
 			$('.absolute-time-limit-counter, .time-limit-widget-individual-counter').countdown('destroy');
 			let data = JSON.parse(event.data);
-			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${dokumaran.contentId}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit.jsp?toolContentId=${dokumaran.contentId}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
 					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
 					+ '&isTbl=true&controllerContext=tool/ladoku11/monitoring');
 		});

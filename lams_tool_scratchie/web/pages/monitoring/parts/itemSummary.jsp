@@ -8,8 +8,8 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		
-		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-		<link href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet" type="text/css">
+		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+		<link href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet" type="text/css">
 		<style type="text/css">
 			/* remove jqGrid borders */
 			.ui-jqgrid {

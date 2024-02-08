@@ -11,8 +11,8 @@
 	<%@ include file="/common/header.jsp"%>
 
 	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
 	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" >
 	<style>
 		.tablediv {
