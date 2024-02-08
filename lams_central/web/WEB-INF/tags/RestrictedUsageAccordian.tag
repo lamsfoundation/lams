@@ -35,20 +35,18 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<div class="panel-group" id="accordionRestrictUsageDiv" role="tablist" aria-multiselectable="true"> 
-    <div class="panel panel-default" >
-        <div class="panel-heading collapsable-icon-left" id="headingRestrictedUsageDiv">
-        	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv" >
-          	${title}
-        	</a>
-      		</span>
-        </div>
+<div class="accordion" id="accordionRestrictUsageDiv"> 
+    <div class="accordion-item">
+    	<h2 class="accordion-header" id="headingRestrictedUsageDiv">
+        	<button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv">
+	          	${title}
+    		</button>
+        </h2>
 
-
-		<div id="restrictUsageDiv" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingRestrictedUsageDiv">
-		<jsp:doBody />
-		</div>
+		<div id="restrictUsageDiv" class="accordion-collapse collapse p-3" aria-labelledby="headingRestrictedUsageDiv">
+      		<div>
+      			<jsp:doBody />
+      		</div>
+      	</div>
 	</div>
 </div>
-		

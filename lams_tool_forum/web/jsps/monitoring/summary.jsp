@@ -245,5 +245,6 @@
 </c:forEach>
 
 <%@include file="parts/advanceOptions.jsp"%>
-<div class="my-2"></div>
-<%@include file="parts/daterestriction.jsp"%>
+
+<c:set var="restrictedTitle"><spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction" /></spring:escapeBody></c:set>
+<lams:RestrictedUsageAccordian title="${restrictedTitle}" submissionDeadline="${forum.submissionDeadline}" cssClass="my-2"/>
