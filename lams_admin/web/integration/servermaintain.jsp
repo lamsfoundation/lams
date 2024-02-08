@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+<c:set var="help"><fmt:message key="Integrations"/></c:set>
+<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/extserver/serverlist.do| <fmt:message key="appadmin.maintain.external.servers" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.server.edit"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>	
 
 <lams:html>
 	<lams:head>
@@ -13,6 +18,8 @@
 		<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 		<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function(){
@@ -50,23 +57,9 @@
 				});
 			});
 		</script>
-
 	</lams:head>
 
-	<body class="component pb-4 pt-2 px-2 px-sm-4">
-
-	<c:set var="help"><fmt:message key="Integrations"/></c:set>
-	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-		<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/extserver/serverlist.do| <fmt:message key="appadmin.maintain.external.servers" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.server.edit"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
-
-
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" formID="extServerForm" breadcrumbItems="${breadcrumbItems}">
-
-
+	<lams:PageAdmin title="${title}" titleHelpURL="${help}" formID="extServerForm" breadcrumbItems="${breadcrumbItems}">
 		<lams:errors/>
 		<form:form action="serversave.do" id="extServerForm" modelAttribute="extServerForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -149,7 +142,5 @@
 			</div>
 
 		</form:form>
-	</lams:Page5>
-
-	</body>
+	</lams:PageAdmin>
 </lams:html>

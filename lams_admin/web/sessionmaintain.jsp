@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
-
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | ${title}</c:set>
+	
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="appadmin.maintain.session"/></c:set>
@@ -30,15 +32,8 @@
 	    });
 	</script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | ${title}</c:set>
 
-
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
-		
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<div class="alert alert-info">${fn:length(sessions)}&nbsp;<fmt:message key="appadmin.maintain.session.count" /></div>
 
 		<table class="table table-striped table-hover bg-white sessionTable align-middle" id="sessionTable" data-sortlist="[[1]]">
@@ -72,14 +67,11 @@
 			</tbody>
 		</table>
 		<hr>
+		
 		<div class="text-end">
 			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary">
 				<fmt:message key="admin.cancel"/>
 			</a>
-		</div>		
-		
-	</lams:Page5>
-</body>
+		</div>
+	</lams:PageAdmin>
 </lams:html>
-
-

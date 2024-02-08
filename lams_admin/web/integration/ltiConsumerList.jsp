@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="label.manage.tool.consumers"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
 <lams:html>
 <lams:head>
@@ -19,14 +22,8 @@
 		}
 	</script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="label.manage.tool.consumers"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<div class="row">
 			<div class="col-8 offset-2">
 				<table class="table table-striped table-bordered">
@@ -116,8 +113,5 @@
 						onClick="javascript:document.location='../ltiConsumerManagement/edit.do'" />
 			</div>
 		</div>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>
-
-

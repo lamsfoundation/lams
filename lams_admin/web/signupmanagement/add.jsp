@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
-
+<c:set var="title"><fmt:message key="admin.add.edit.signup.page"/></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/signupManagement/start.do | <fmt:message key="admin.signup.title"/></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.signup.page"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>
+	
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.add.edit.signup.page"/></c:set>
@@ -13,19 +19,8 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<c:set var="title"><fmt:message key="admin.add.edit.signup.page"/></c:set>
 	
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/signupManagement/start.do | <fmt:message key="admin.signup.title"/></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.signup.page"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>
-
-	
-	<lams:Page5 type="admin" title="${title}" formID="signupForm" breadcrumbItems="${breadcrumbItems}">
-	
+	<lams:PageAdmin title="${title}" formID="signupForm" breadcrumbItems="${breadcrumbItems}">
 		<form:form action="add.do" modelAttribute="signupForm" id="signupForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="signupOrganisationId" />
@@ -98,7 +93,5 @@
 				</div>
 			</div>
 		</form:form>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>
-

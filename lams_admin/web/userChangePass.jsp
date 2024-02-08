@@ -3,11 +3,18 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
+
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usersearch.do | <fmt:message key="admin.user.management"/></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/user/edit.do?userId=${param.userId} | <fmt:message key="admin.user.edit"/></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.changePassword" /></c:set>	
 
 <lams:html>
 <lams:head>
@@ -86,15 +93,7 @@
 	</script>
 </lams:head>
 
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/usersearch.do | <fmt:message key="admin.user.management"/></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/user/edit.do?userId=${param.userId} | <fmt:message key="admin.user.edit"/></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.user.changePassword" /></c:set>	
-
-	<lams:Page5 type="admin" title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
+	<lams:PageAdmin title="${title}" formID="userForm" breadcrumbItems="${breadcrumbItems}">	
 		<lams:Alert5 type="info" id="passwordConditions" close="false">
 			<fmt:message key='label.password.must.contain' />:
 			<ul class="list-unstyled ml-2" style="line-height: 1.2">
@@ -163,6 +162,5 @@
 				</div>
 			</form>		
 		</div>
-	</lams:Page5>	
-</body>
+	</lams:PageAdmin>
 </lams:html>

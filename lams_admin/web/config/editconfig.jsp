@@ -1,8 +1,15 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem"%>
+    
+<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
+<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+	
+<%-- Build the breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.config.settings.edit"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
 <lams:html>
 <lams:head>
@@ -16,19 +23,8 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<c:set var="help"><fmt:message key="LAMS+Configuration"/></c:set>
-	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
 	
-	<%-- Build the breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="sysadmin.config.settings.edit"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
-
-	
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}"  breadcrumbItems="${breadcrumbItems}" formID="configForm" >
-	
+	<lams:PageAdmin title="${title}" titleHelpURL="${help}"  breadcrumbItems="${breadcrumbItems}" formID="configForm" >
 		<c:if test="${not empty error}">
 			<lams:Alert5 type="danger" id="error-messages" close="false">
 				<c:out value="${error}" />
@@ -111,8 +107,6 @@
 					</button>
 				</div>
 			</div>
-		</form:form>
-		
-	</lams:Page5>
-</body>
+		</form:form>		
+	</lams:PageAdmin>
 </lams:html>

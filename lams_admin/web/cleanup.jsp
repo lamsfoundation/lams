@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 <%@ page import="org.lamsfoundation.lams.util.TempDirectoryFilter" %>
 
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="sysadmin.cleanup"/></c:set>
+	
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="sysadmin.cleanup"/></c:set>
@@ -16,13 +19,8 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="sysadmin.cleanup"/></c:set>
 
-	<lams:Page5 type="admin" title="${title}" formID="cleanupForm" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" formID="cleanupForm" breadcrumbItems="${breadcrumbItems}">
 		<div class="card" >
 			<div class="card-header">
 				<fmt:message key="appadmin.batch.temp.file.delete" />
@@ -100,7 +98,5 @@
 			</div>
 		</div>
 	
-	</lams:Page5>
-
-</body>
+	</lams:PageAdmin>
 </lams:html>

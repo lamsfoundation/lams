@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
 <c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
+<%-- Build the breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems},. | ${title}</c:set>
 
 <lams:html>
 <lams:head>
@@ -139,16 +143,8 @@
 	  	})
 	</script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
 
-	<%-- Build the breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL/>admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems},. | ${title}</c:set>
-
-
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<div class="row mb-3">
 			<div class="col-2">
 				<input class="btn btn-primary" type="button" value="<fmt:message key="admin.user.create"/>" onclick="javascript:document.location='user/edit.do'" />
@@ -184,9 +180,6 @@
 			<a href="javascript:history.go(-1)" class="btn btn-secondary">
 				<fmt:message key="admin.cancel"/>
 			</a>
-		</div>		
-				
-	</lams:Page5>
-
-</body>
+		</div>
+	</lams:PageAdmin>
 </lams:html>

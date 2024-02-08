@@ -19,7 +19,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 
 <lams:html>
@@ -29,11 +28,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
     </lams:head>
-    
-    <body class="component">
-		<lams:Page5 type="admin" title="${title}">
-		
-			<div class="container-fluid">
+
+	<lams:PageAdmin title="${title}">
 				<c:choose>
 				<c:when test="${empty groups}">
 					<fmt:message key="label.grouping.no.groups.created"/>
@@ -85,12 +81,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					</c:forEach> 
 				</c:otherwise>
 				</c:choose>	
-			</div>
-			<div id="footer"></div>
-		</lams:Page5>
-
-		<div id="footer">
-		</div><!--closes footer-->
-
-    </body>
+	</lams:PageAdmin>
 </lams:html>

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="appadmin.batch.preview.lesson.delete"/></c:set>
 
 <lams:html>
 <lams:head>
@@ -72,14 +74,7 @@
 	</script>
 </lams:head>
 
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="appadmin.batch.preview.lesson.delete"/></c:set>
-
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">	
-
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">	
 		<fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
 		<div id="deletingBox" style="display: none">
 			<fmt:message key="label.cleanup.preview.lesson.progress" />
@@ -88,8 +83,5 @@
 		<div class="float-end">
 			<button id="deleteButton" class="btn btn-primary"><fmt:message key="admin.delete"/></button>
 		</div>
-	</lams:Page5>
-
-</body>
+	</lams:PageAdmin>
 </lams:html>
-

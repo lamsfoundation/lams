@@ -1,6 +1,23 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems">
+	<lams:LAMSURL />admin/appadminstart.do | <fmt:message
+		key="appadmin.maintain" />
+</c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL />admin/usersearch.do | <fmt:message
+		key="admin.user.management" />
+</c:set>
+<c:if test="${method == 'disable'}">
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message
+			key="admin.user.disable" />
+	</c:set>
+</c:if>
+<c:if test="${method == 'delete'}">
+	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message
+			key="admin.user.delete" />
+	</c:set>
+</c:if>
 
 <lams:html>
 <lams:head>
@@ -14,28 +31,8 @@
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems">
-		<lams:LAMSURL />admin/appadminstart.do | <fmt:message
-			key="appadmin.maintain" />
-	</c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, <lams:LAMSURL />admin/usersearch.do | <fmt:message
-			key="admin.user.management" />
-	</c:set>
-	<c:if test="${method == 'disable'}">
-		<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message
-				key="admin.user.disable" />
-		</c:set>
-	</c:if>
-	<c:if test="${method == 'delete'}">
-		<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message
-				key="admin.user.delete" />
-		</c:set>
-	</c:if>
 	
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 				<c:if test="${empty orgId}">
 					<c:url var="cancel" value="/usersearch.do" />
 				</c:if>
@@ -102,10 +99,5 @@
 						</div>
 					</div>
 				</c:if>
-				
-	<div id="footer"/>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>
-
-

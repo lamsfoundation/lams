@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 
 <lams:html>
@@ -12,9 +11,8 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>admin/css/admin.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 </lams:head>
-    
-<body class="stripes">
-	<lams:Page5 type="admin" title="${title}">
+
+	<lams:PageAdmin title="${title}">
 		<div align="center" id="jobList">
 			<div id="datatablecontainer">
 			<table width="100%" align="CENTER" 	class="form">
@@ -46,10 +44,5 @@
 			</table>
 			</div>
 		</div>
-
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>
-
-
-

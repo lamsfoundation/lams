@@ -28,7 +28,6 @@
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 		<lams:JSImport src="includes/javascript/dialog5.js" />
 		<lams:JSImport src="includes/javascript/orgGrouping.js" />
-
 		<script type="text/javascript">
 			var groupingActivityId = '<c:out value="${param.activityID}" />',
 					lessonMode = ${lessonMode},
@@ -52,8 +51,8 @@
 					};
 		</script>
 	</lams:head>
-	<body class="component">
-	<lams:Page5 type="admin" title="${title}">
+
+	<lams:PageAdmin title="${title}">
 	<c:if test="${not empty param.lessonID}">
 		<div class="row mb-2">
 			<div class="col-4 offset-4">
@@ -113,10 +112,9 @@
 				<span><fmt:message key='label.course.groups.grouping.create' /></span>
 			</div>
 		</div>
+	</div>
 
-		</lams:Page5>
-
-		<c:if test="${usedForBranching eq true}">
+	<c:if test="${usedForBranching eq true}">
 		<div id="groupMappingDialogContents" class="modal fade" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-dialog-centered modal-lg">
 				<div class="modal-content">
@@ -165,7 +163,6 @@
 				</div>
 			</div>
 		</div>
-		</c:if>
-
-	</body>
+	</c:if>
+	</lams:PageAdmin>
 </lams:html>

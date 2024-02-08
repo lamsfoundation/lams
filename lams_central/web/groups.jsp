@@ -110,8 +110,7 @@
 		</script>
 	</lams:head>
 
-	<body class="component my-2">
-	<lams:Page5 title="${title}" type="admin">
+	<lams:PageAdmin title="${title}">
 		<c:if test="${not empty lessonID}">
 			<a class="btn btn-primary mb-2" href="<lams:LAMSURL/>home/monitorLesson.do?lessonID=${lessonID}">
 				<i class="fa-solid fa-arrow-left"></i>&nbsp;<fmt:message key="label.grouping.return.to.monitoring"/>
@@ -290,6 +289,5 @@
 				</div>
 			</div>
 		</div>
-	</lams:Page5>
-	</body>
+	</lams:PageAdmin>
 </lams:html>

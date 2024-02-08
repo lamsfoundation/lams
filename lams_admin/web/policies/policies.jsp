@@ -1,6 +1,21 @@
-<%@ include file="/taglibs.jsp"%>
-
 <!DOCTYPE html>
+<%@ include file="/taglibs.jsp"%>
+<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:choose>
+    <c:when test="${viewPreviousVersions}">
+    	<c:set var="breadcrumbChild1"><lams:WebAppURL />policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
+    	<c:set var="breadcrumbActive">. | <fmt:message key="label.view.previous.versions"/></c:set>
+    		<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>	
+    	
+	</c:when>
+	<c:otherwise>
+		<c:set var="breadcrumbActive">. | <fmt:message key="admin.policies.title"/></c:set>
+			<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
+	</c:otherwise>
+</c:choose>
+
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.policies.title"/></c:set>
@@ -28,11 +43,7 @@
 	<script type="text/javascript">
 	    $(document).ready(function(){
 	        $("time.timeago").timeago();
-	    });
-    </script>
-	
-	<script type="text/javascript">
-		$(document).ready(function(){
+
 			//dialog displaying user consents given for the specified policy
 			$(".policy-consents-link").click(function() {
 				var policyUid = $(this).data("policy-uid"),
@@ -68,32 +79,11 @@
 					function() {}
 				);			
 			});
-	
 		});
 	</script>
 </lams:head>
 
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<c:set var="help"><lams:help style="small" page="LAMS+Policies" /></c:set>
-		
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-    <c:choose>
-    <c:when test="${viewPreviousVersions}">
-    	<c:set var="breadcrumbChild1"><lams:WebAppURL />policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
-    	<c:set var="breadcrumbActive">. | <fmt:message key="label.view.previous.versions"/></c:set>
-    		<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1}, ${breadcrumbActive}"/>	
-    	
-	</c:when>
-	<c:otherwise>
-		<c:set var="breadcrumbActive">. | <fmt:message key="admin.policies.title"/></c:set>
-			<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
-	</c:otherwise>
-	</c:choose>
-
-	
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
-
+	<lams:PageAdmin title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
 		<div id="policy-table">
 			<%@ include file="policyTable.jsp"%>
 		</div>
@@ -108,6 +98,5 @@
 				</a>
 			</c:if>
 		</div>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>

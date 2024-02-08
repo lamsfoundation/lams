@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/ltiConsumerManagement/start.do | <fmt:message key="label.manage.tool.consumers" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.server.edit"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
+
 <lams:html>
 	<lams:head>
 		<c:set var="title"><fmt:message key="label.edit.tool.consumer"/></c:set>
@@ -38,15 +44,7 @@
 		</script>
 	</lams:head>
 
-	<body class="component pb-4 pt-2 px-2 px-sm-4">
-		<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/ltiConsumerManagement/start.do | <fmt:message key="label.manage.tool.consumers" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.maintain.server.edit"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
-
-
-	<lams:Page5 type="admin" title="${title}" formID="ltiConsumerForm" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" formID="ltiConsumerForm" breadcrumbItems="${breadcrumbItems}">
 		<lams:errors path="*"/>
 		<form:form action="save.do" id="ltiConsumerForm" modelAttribute="ltiConsumerForm" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
@@ -237,6 +235,5 @@
 				</div>
 			</div>
 		</form:form>
-	</lams:Page5>
-	</body>
+	</lams:PageAdmin>
 </lams:html>

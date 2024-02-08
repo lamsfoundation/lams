@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.list.disabled.users"/></c:set>
 
 <lams:html>
 <lams:head>
@@ -14,14 +16,8 @@
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 </lams:head>
-    
-<body class="stripes">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.list.disabled.users"/></c:set>
 	
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
-	
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<table class="table table-striped table-bordered">
 		<thead>
 		<tr>
@@ -65,10 +61,5 @@
 				<fmt:message key="admin.cancel"/>
 			</a>
 		</div>	
-	</lams:Page5>
-
-</body>
+	</lams:PageAdmin>
 </lams:html>
-
-
-

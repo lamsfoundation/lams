@@ -1,6 +1,11 @@
-<%@ include file="/taglibs.jsp"%>
-
 <!DOCTYPE html>
+<%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.policy"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
+
 <lams:html>
 <lams:head>
 	<c:set var="title"><fmt:message key="admin.policies.title"/></c:set>
@@ -72,17 +77,9 @@
 		});
 	</script>
 </lams:head>
-<body class="component pb-4 pt-2 px-2 px-sm-4">
+
 	<c:set var="title"><fmt:message key="admin.add.edit.policy"/></c:set>
-	
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbChild1"><lams:LAMSURL/>admin/policyManagement/list.do | <fmt:message key="admin.policies.title" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="admin.add.edit.policy"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbChild1},${breadcrumbActive}"/>
-
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
-
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 	    <form:form action="../policyManagement/save.do" modelAttribute="policyForm" id="policy-form" cssClass="voffset20" method="post">
 			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
 			<form:hidden path="policyUid" />
@@ -175,6 +172,5 @@
 			</div>
 			
 		</form:form>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>

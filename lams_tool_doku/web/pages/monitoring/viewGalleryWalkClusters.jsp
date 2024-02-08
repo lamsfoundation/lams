@@ -20,7 +20,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 --%>
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="title"><fmt:message key="monitoring.gallery.walk.cluster.view"/></c:set>
 
 <lams:html>
@@ -44,9 +43,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	</lams:head>
 
-	<body class="component">
-	<lams:Page5 type="admin" title="${title}">
-
+	<lams:PageAdmin title="${title}">
 		<div class="d-flex flex-wrap">
 			<c:choose>
 				<c:when test="${empty groups}">
@@ -74,11 +71,5 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:otherwise>
 			</c:choose>
 		</div>
-		<div id="footer"></div>
-	</lams:Page5>
-
-	<div id="footer">
-	</div><!--closes footer-->
-
-	</body>
+	</lams:PageAdmin>
 </lams:html>

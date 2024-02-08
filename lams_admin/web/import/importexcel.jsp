@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
@@ -11,9 +10,16 @@
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
-
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set> 
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
+
+<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
+<c:set var="help"><fmt:message key="Import+Users"/></c:set>
+<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="admin.user.management"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
 
 <lams:html>
 <lams:head>
@@ -113,24 +119,10 @@
 					  hideCancelButton: true
 					});
 			}
-			
-
 	</script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-
-	<c:set var="title"><fmt:message key="admin.user.management"/></c:set>
-	<c:set var="help"><fmt:message key="Import+Users"/></c:set>
-	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="admin.user.management"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
 	
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" formID="importExcelForm" breadcrumbItems="${breadcrumbItems}">
-
-				
+	<lams:PageAdmin title="${title}" titleHelpURL="${help}" formID="importExcelForm" breadcrumbItems="${breadcrumbItems}">
 				<p>
 					<fmt:message key="msg.import.intro" />
 				</p>
@@ -208,6 +200,5 @@
 					</div>
 				
 				</form:form>
-			</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>

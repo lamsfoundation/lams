@@ -1,6 +1,6 @@
+<!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
 
-<!DOCTYPE html>
 <lams:html>
 <lams:head>
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/components.css">
@@ -17,7 +17,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/free.jquery.jqgrid.min.js"></script>
 	<script type="text/javascript">
-		
 		$(document).ready(function(){
 			// customise jqGrid's Boostrap theme
 			$.extend(true, $.jgrid.guiStyles.bootstrap4, {
@@ -94,18 +93,14 @@
 	        });
 	    };
 	</script>
-	
 </lams:head>
 
-<body>
 <c:set var="title"><c:out value='${policy.policyName}' escapeXml='true'/></c:set>
-<lams:Page5 type="admin" title="${title}" >
+<lams:PageAdmin title="${title}" >
 	<p><fmt:message key="label.version" />: <c:out value="${policy.version}" /></p>
 	
 	 <div class="grid-holder">
  		<table id="consents-grid" class="scroll"></table>
 	</div>
-
-</lams:Page5>
-</body>
+</lams:PageAdmin>
 </lams:html>

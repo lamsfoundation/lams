@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-
 <%@ page import="org.lamsfoundation.lams.signup.model.SignupOrganisation" %>
 <%@ include file="/taglibs.jsp"%>
+
+<c:set var="help"><fmt:message key="LAMS+Signup"/></c:set>
+<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbActive">. |<fmt:message key="admin.signup.title"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
 <lams:html>
 <lams:head>
@@ -23,17 +29,8 @@
 	    });
     </script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<c:set var="help"><fmt:message key="LAMS+Signup"/></c:set>
-	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-		<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. |<fmt:message key="admin.signup.title"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 	
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
-	
+	<lams:PageAdmin title="${title}" titleHelpURL="${help}" breadcrumbItems="${breadcrumbItems}">
 		<c:if test="${not empty error}">
 			<lams:Alert5 type="warn" id="errorMessage" close="false">	
 				<c:out value="${error}" />
@@ -104,7 +101,5 @@
 
 			<a href="<lams:LAMSURL/>admin/signupManagement/add.do" class="btn btn-primary"><fmt:message key="admin.add.new.signup.page"/></a>
 		</div>
-	</lams:Page5>
-
-</body>
+	</lams:PageAdmin>
 </lams:html>

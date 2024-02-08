@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL/></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="label.event.log"/></c:set>
 
 <lams:html>
 <lams:head>
@@ -230,14 +232,8 @@
 		}
 	 </script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="label.event.log"/></c:set>
 
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
-	
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 		<form class="row row-cols-lg-auto g-3 align-items-center">
   			<div class="col-12">
 				<select id="areaMenu" class="form-select form-select-sm d-inline" onchange="javascript:configureTypeDropdown(this.value)"></select>
@@ -272,8 +268,6 @@
 			<a href="<lams:LAMSURL/>admin/appadminstart.do" class="btn btn-secondary">
 				<fmt:message key="admin.cancel"/>
 			</a>
-		</div>		
-
-	</lams:Page5>
-</body>
+		</div>
+	</lams:PageAdmin>
 </lams:html>

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.lamsfoundation.lams.usermanagement.OrganisationType" %>
@@ -13,6 +11,13 @@
 <c:set var="classTypeId"><%= OrganisationType.CLASS_TYPE %></c:set>
 <c:set var="courseTypeId"><%= OrganisationType.COURSE_TYPE %></c:set>
 <c:set var="lams"><lams:LAMSURL/></c:set>
+
+<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
+<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.import.groups.title"/></c:set>
+<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>
 
 <lams:html>
 <lams:head>
@@ -117,19 +122,8 @@
 		
 	 </script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-
-	<c:set var="help"><fmt:message key="Import+Groups"/></c:set>
-	<c:set var="help"><lams:help style="small" page="${help}" /></c:set>
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbTop"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbActive">. | <fmt:message key="appadmin.import.groups.title"/></c:set>
-	<c:set var="breadcrumbItems" value="${breadcrumbTop}, ${breadcrumbActive}"/>	
-
 	
-	<lams:Page5 type="admin" title="${title}" titleHelpURL="${help}" formID="importForm" breadcrumbItems="${breadcrumbItems}">
-	
+<lams:PageAdmin title="${title}" titleHelpURL="${help}" formID="importForm" breadcrumbItems="${breadcrumbItems}">
 	<div id="main-page">
 	
 	<c:if test="${not empty results}">
@@ -199,7 +193,5 @@
 	</form:form>
 	
 	</div>
-	</lams:Page5>
-		
-</body>
+</lams:PageAdmin>
 </lams:html>

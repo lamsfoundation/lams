@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
+<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.themes.title"/></c:set>
 
 <lams:html>
 <lams:head>
@@ -13,7 +15,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>includes/font-awesome6/css/all.css">
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
-	
 	<script type="text/javascript">
 		function editTheme(name, description, imageDirectory, id, currentDefaultTheme) {
 			document.getElementById("name").value = name;
@@ -76,18 +77,10 @@
 				}
 			f.submit();
 		}
-		
 	</script>
 </lams:head>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<%-- Build breadcrumb --%>
-	<c:set var="breadcrumbItems"><lams:LAMSURL/>admin/appadminstart.do | <fmt:message key="appadmin.maintain" /></c:set>
-	<c:set var="breadcrumbItems">${breadcrumbItems}, . | <fmt:message key="admin.themes.title"/></c:set>
 
-
-	<lams:Page5 type="admin" title="${title}" formID="themeForm" breadcrumbItems="${breadcrumbItems}">	
-			
+	<lams:PageAdmin title="${title}" formID="themeForm" breadcrumbItems="${breadcrumbItems}">
 			<table class="table table-striped table-bordered bg-white align-middle" >
 				<thead>
 				<tr>
@@ -183,6 +176,5 @@
 					<a href="javascript:submitForm()" class="btn btn-primary"><fmt:message key="admin.save" /></a>
 				</div>
 			</form:form>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>

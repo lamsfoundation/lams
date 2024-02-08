@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.web.session.SessionManager" %>
 <%@ page import="org.lamsfoundation.lams.admin.service.IImportService" %>
@@ -43,8 +42,7 @@
 	%>
 	</c:set>	
 
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<lams:Page5 type="admin" title="${title}">
+	<lams:PageAdmin title="${title}">
 	
 		<div align="center">	
 			<h4><fmt:message key="msg.please.wait"/></h4>
@@ -53,7 +51,5 @@
 			
 		<lams:WaitingSpinner id="fileUpload_Busy"/> 
 		
-	</lams:Page5>
-</body>
-
+	</lams:PageAdmin>
 </lams:html>

@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <%@ include file="/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 
@@ -10,6 +8,16 @@
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+<%-- Build breadcrumb --%>
+<c:set var="breadcrumbItems">
+	<lams:LAMSURL />admin/appadminstart.do | <fmt:message key="appadmin.maintain" />
+</c:set>
+<c:set var="breadcrumbItems">
+	${breadcrumbItems}, <lams:LAMSURL />admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" />
+</c:set>
+<c:set var="breadcrumbItems">
+	${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' /> | <fmt:message key="admin.user.manage" />
+</c:set>
 	
 <lams:html>
 <lams:head>
@@ -326,19 +334,7 @@
 	</script>
 </lams:head>
 
-<%-- Build breadcrumb --%>
-<c:set var="breadcrumbItems">
-	<lams:LAMSURL />admin/appadminstart.do | <fmt:message key="appadmin.maintain" />
-</c:set>
-<c:set var="breadcrumbItems">
-	${breadcrumbItems}, <lams:LAMSURL />admin/orgmanage.do?org=1 | <fmt:message key="admin.course.manage" />
-</c:set>
-<c:set var="breadcrumbItems">
-	${breadcrumbItems}, <lams:LAMSURL/>admin/usermanage.do?org=<c:out value='${orgPasswordChangeForm.organisationID}' /> | <fmt:message key="admin.user.manage" />
-</c:set>
-    
-<body class="component pb-4 pt-2 px-2 px-sm-4">
-	<lams:Page5 type="admin" title="${title}" breadcrumbItems="${breadcrumbItems}">
+	<lams:PageAdmin title="${title}" breadcrumbItems="${breadcrumbItems}">
 					<h3><c:out value='${orgPasswordChangeForm.orgName}' /></h3>
 					
 					<lams:Alert5 type="info" id="passwordConditions" close="false">
@@ -453,6 +449,5 @@
 							<input type="submit" class="btn btn-primary" value="<fmt:message key='admin.org.password.change.submit' />" />
 						</div>
 					</form:form>
-	</lams:Page5>
-</body>
+	</lams:PageAdmin>
 </lams:html>
