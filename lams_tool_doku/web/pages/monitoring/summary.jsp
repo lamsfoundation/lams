@@ -115,33 +115,39 @@
 	}
 
 	<c:if test="${isAiEnabled}">
-	.doku-monitoring-summary .ai-review-content {
-		padding: 1rem;
-		margin: 1rem;
-		border: 1px #EEEEEE solid;
-		border-radius: 5px;
-	}
+		.doku-monitoring-summary .ai-review-content {
+			padding: 1rem;
+			margin: 1rem;
+			border: 1px #EEEEEE solid;
+			border-radius: 5px;
+		}
 
-	.doku-monitoring-summary #ai-review-learning-outcomes {
-		margin-bottom: 1rem;
-	}
+		.doku-monitoring-summary #ai-review-learning-outcomes {
+			margin-bottom: 1rem;
+		}
 
-	.doku-monitoring-summary #ai-review-comparison table th:first-child {
-		min-width: 12rem;
-	}
+		.doku-monitoring-summary #ai-review-comparison table {
+			margin-top: 3rem;
+			margin-bottom: 3rem;
+		}
 
-	.doku-monitoring-summary #ai-review-comparison table th[scope="col"] {
-		vertical-align: top;
-	}
+		.doku-monitoring-summary #ai-review-comparison table th:first-child {
+			min-width: 12rem;
+		}
 
-	.doku-monitoring-summary #ai-review-comparison table th[scope="row"] {
-		text-align: left;
-		font-weight: bold;
-	}
+		.doku-monitoring-summary #ai-review-comparison table th[scope="col"] {
+			vertical-align: top;
+		}
 
-	.doku-monitoring-summary #ai-review-comparison table td {
-		text-align: center;
-	}
+		.doku-monitoring-summary #ai-review-comparison table th[scope="row"] {
+			text-align: left;
+			font-weight: bold;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table td,
+		.doku-monitoring-summary #ai-review-comparison table th[scope="col"]:not(:first-child) {
+			text-align: center;
+		}
 	</c:if>
 </style>
 
@@ -186,15 +192,24 @@
 			toolContentId = <c:out value="${sessionMap.toolContentID}" />;
 
 	<c:if test="${isAiEnabled}">
-		var	AI_REVIEW_ERROR = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>',
-				AI_REVIEW_GROUPS_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.label.group"/></spring:escapeBody>',
-				AI_REVIEW_CRITERIA_1 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.1"/></spring:escapeBody>',
-				AI_REVIEW_CRITERIA_2 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.2"/></spring:escapeBody>',
-				AI_REVIEW_CRITERIA_3 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.3"/></spring:escapeBody>',
-				AI_REVIEW_SCORE_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.score"/></spring:escapeBody>',
-				AI_REVIEW_LEARNING_OUTCOMES_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.learning.outcomes"/></spring:escapeBody>',
-				AI_REVIEW_GOOD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.good"/></spring:escapeBody>',
-				AI_REVIEW_BAD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.bad"/></spring:escapeBody>';
+	var	AI_REVIEW_ERROR = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>',
+			AI_REVIEW_GROUPS_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.label.group"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_1 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.1"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_2 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.2"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_3 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.3"/></spring:escapeBody>',
+			AI_REVIEW_SCORE_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.score"/></spring:escapeBody>',
+			AI_REVIEW_LEARNING_OUTCOMES_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.learning.outcomes"/></spring:escapeBody>',
+			AI_REVIEW_GOOD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.good"/></spring:escapeBody>',
+			AI_REVIEW_BAD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.bad"/></spring:escapeBody>',
+			savedAiReviews = {
+				<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+					<c:if test="${not empty groupSummary.aiReview}">
+						${groupSummary.sessionId}: ${groupSummary.aiReview},
+					</c:if>
+				</c:forEach>
+				// so that the last comma is not a problem
+				'dummy': 'dummy'
+			};
 	</c:if>
 
 	$(document).ready(function () {
@@ -772,9 +787,7 @@
 						<fmt:message key="label.monitoring.ai.review"/>
 					</h4>
 					<div class="clearfix"></div>
-					<div class="ai-review-content ${empty groupSummary.aiReview ? "hidden" : ""}">
-						<c:out value="${groupSummary.aiReview}" escapeXml="false"/>
-					</div>
+					<div class="ai-review-content ${empty groupSummary.aiReview ? "hidden" : ""}"></div>
 				</div>
 			</c:if>
 
