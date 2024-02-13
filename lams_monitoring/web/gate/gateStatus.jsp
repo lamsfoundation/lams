@@ -34,6 +34,17 @@
 	</c:if>    
 </c:if>
 <c:if test="${gateForm.gate.gateOpen}">
+	<form:form action="closeGate.do">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+		<input type="hidden" name="activityId" value="${gateForm.activityId}" />
+		<input type="hidden" name="closingGate" value="true" />
+		<p>
+			<input type="submit" class="btn btn-danger"
+				   title="<fmt:message key="button.task.gate.close.tooltip"/>"
+				   value="<fmt:message key="button.task.gate.close"/>" />
+		</p>
+	</form:form>
+
 	<div id="gateStatus" class="alert alert-success p-3 mb-3">
 		<i class="fa fa-lg fa-sign-in"></i>
 		<strong>
@@ -48,16 +59,4 @@
 			</c:if>
 		</strong>
 	</div>
-	
-			
-	<form:form action="closeGate.do">
-		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-		<input type="hidden" name="activityId" value="${gateForm.activityId}" />
-		<input type="hidden" name="closingGate" value="true" />
-		<p>
-			<input type="submit" class="btn btn-danger"
-				   title="<fmt:message key="button.task.gate.close.tooltip"/>"
-				   value="<fmt:message key="button.task.gate.close"/>" />
-		</p>
-	</form:form>
 </c:if>
