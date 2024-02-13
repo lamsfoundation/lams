@@ -368,7 +368,7 @@ public class AuthoringController {
 		sections.add(section);
 		sectionCounter++;
 	    }
-	} while (sectionQuestionCount != null);
+	} while (sectionQuestionCount != null && sectionQuestionCount > 0);
 
 	assessmentPO.setSections(sections);
 
