@@ -410,6 +410,7 @@ function initCommonElements(){
         },
 
         success : function(response) {
+
             // update lesson state label
             lessonStateId = +response.lessonStateID;
             var label = null,
@@ -477,17 +478,19 @@ function initCommonElements(){
                 lessonFinishDateSpan = $('#lessonFinishDateSpan'),
                 lessonStateChanger = $('#lessonStateChanger'),
                 stateLabel = $('#lessonStateLabel');
+
             switch (lessonStateId) {
-                //created but not started lesson
+                // created but not started lesson
                 case 1:
                     scheduleControls.css('display','inline');
                     if ( response.finishDate ) {
                         lessonFinishDateSpan.text(LABELS.LESSON_FINISH.replace("%0",response.finishDate)).css('display','inline');
                         $("#scheduleDisableLessonButton").html(LABELS.RESCHEDULE);
                         $("#disableLessonButton").css('display', 'none');
+                    } else {
+                        lessonFinishDateSpan.hide();
                     }
                     startDateField.hide();
-                    lessonFinishDateSpan.hide();
                     lessonStateChanger.hide();
                     break;
                 //scheduled lesson
@@ -977,7 +980,7 @@ function startLesson(){
         cache : false,
         type : 'POST',
         success : function() {
-            loadTab();
+             document.location.reload();
         }
     });
 }
