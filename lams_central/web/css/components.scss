@@ -1,16 +1,14 @@
 @import "bootstrap5.custom.scss";
 @import "_lams_variables.scss";
 
-#container-main {
+#container-main, .container-main {
     @extend .container-lg;
-}
-
-@media (width <= 768px) {
-	#container-main {
+    
+    @include media-breakpoint-down(md) {
 		--bs-gutter-x: 0.1rem;
 		--bs-gutter-y: 0.1rem;
 		padding-right: calc(var(--bs-gutter-x) * -5.5);
-		padding-left: calc(var(--bs-gutter-x) * 0.5);
+		padding-left: calc(var(--bs-gutter-x) * 0.5);		
 	}
 }
 
@@ -136,6 +134,34 @@ body.component {
 	    display: flex;
 	    flex-direction: row-reverse;
 		clear: both;
+	}
+	
+	h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
+	    color: var(--bs-gray-dark);
+	}
+	
+	h1, .h1 {
+	    font-size: calc(1.2rem + 1vw);
+	}
+	
+	h2, .h2 {
+	    font-size: calc(1.2rem + 0.7vw);
+	}
+	
+	h3, .h3 {
+	    font-size: calc(1.2rem + 0.5vw);
+	}
+	
+	h4, .h4 {
+	    font-size: calc(1.1rem + 0.3vw);
+	}
+	
+	h5, .h5 {
+	    font-size: 1.1rem;
+	}
+	
+	h6, .h6 {
+	    font-size: 1rem;
 	}
 }
 
@@ -676,6 +702,22 @@ body.component .ui-jqgrid.ui-jqgrid-bootstrap .ui-search-toolbar .ui-search-tabl
 
 .ltable.table-hover > div:not(:first-child):hover,
 .ltable.table-hover.no-header > div:first-child:hover{
+  background-color: var(--bs-gray-200);
+}
+
+/*----------.div-hover----------------*/
+.div-hover > div {
+  align-items: center;
+  border-top: 1px solid #ddd;
+  padding: 12px;
+}
+
+@media (width <= 768px) {
+  .div-hover > div {
+    padding: 3px;
+  }
+}
+.div-hover > div:hover {
   background-color: var(--bs-gray-200);
 }
 
