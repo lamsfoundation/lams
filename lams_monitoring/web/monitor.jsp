@@ -507,7 +507,7 @@
 				</div>
 			</header>
 
-			<div class="tab-content pt-2">
+			<div class="tab-content mt-3">
 
 			</div>
 		</div>
@@ -819,8 +819,12 @@
 				<div class="modal-body">
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">Cancel</button>
-					<button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">Confirm</button>
+					<button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">
+						<fmt:message key='label.cancel'/>
+					</button>
+					<button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">
+						<fmt:message key='label.confirm'/>
+					</button>
 				</div>
 			</div>
 		</div>

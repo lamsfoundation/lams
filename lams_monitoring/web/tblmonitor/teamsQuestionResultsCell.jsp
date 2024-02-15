@@ -1,6 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
 
-
 <c:set var="highlightClass" value="" />
 <c:if test="${isHighlight}">
 	<c:set var="highlightClass">

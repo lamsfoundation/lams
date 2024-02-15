@@ -1,5 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <style>
 	#aes-tab .nav-tabs .nav-item {
@@ -54,18 +54,13 @@
 				nav.removeClass('active');
 			}
 		});
-
 	}
-	
 </script>
-<div id="aes-tab" class="container-fluid">
-	<div class="row">
-		<div class="col-10 offset-1 text-center">
-			<h3>
-				<fmt:message key="label.aes.questions.marks"/>
-			</h3>
-		</div>
-	</div>
+
+<div id="aes-tab" class="container-main ms-4">
+	<h3>
+		<fmt:message key="label.aes.questions.marks"/>
+	</h3>
 	
 	<ul class="nav nav-tabs">
 		<c:forEach var="aeToolContentId" items="${aeToolContentIds}" varStatus="status">

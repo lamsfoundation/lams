@@ -3,7 +3,6 @@
 <c:set var="ALPHABET_CAPITAL_LETTERS" value="${fn:split('A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z', ',')}" scope="request"/>
 
 <style>
-
 	#tbl-teams-tab-content .card-header,
 	#tbl-teams-tab-content a.card-title,
 	#tbl-teams-tab-content a.ira-modal-link,
@@ -263,41 +262,38 @@
 	}
 </script>
 
-
-<div id="tbl-teams-tab-content" class="container-fluid">
+<div id="tbl-teams-tab-content" class="container-main ms-4">
 	<!-- Tables -->
-
-	<div class="row">
-		<div class="col-10 offset-1">
-			<div class="float-end">
-				<c:if test="${not empty groupsSetupUrl}">
-					<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary">
-						<fmt:message key="label.teams.setup"/>
-					</a>
-				</c:if>
-			</div>
-			<h3 id="tbl-teams-tab-title" class="text-right">
-				<fmt:message key="label.students.teams"/>
-			</h3>
-		</div>
+	<div class="float-end">
+		<c:if test="${not empty groupsSetupUrl}">
+			<a href="<lams:LAMSURL/>${groupsSetupUrl}" class="btn btn-secondary">
+				<i class="fa fa-people-group me-1"></i>
+				<fmt:message key="label.teams.setup"/>
+			</a>
+		</c:if>
 	</div>
-	<div class="row">
-		<div class="col-10 offset-1">
-			<c:if test="${not empty chartNamesDataset}">
-				<canvas id="summary-chart" class="mt-3"></canvas>
-			</c:if>
+	<h3 id="tbl-teams-tab-title">
+		<fmt:message key="label.students.teams"/>
+	</h3>
+	
+	<c:if test="${not empty chartNamesDataset}">
+		<canvas id="summary-chart" class="mt-3"></canvas>
+	</c:if>
 
-			<div class="card mt-5 mb-3">
-				<h5 class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse-0">
-					<a class="text-decoration-none">
-						<fmt:message key="label.ira.tra.summary"/>
-					</a>
-					</h4>
+	<div class="lcard mt-5 mb-3">
+		<div class="card-header" id="heading-all-learners">
+	        <span class="card-title collapsable-icon-left">
+	       		<button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#collapse-0" 
+						aria-expanded="true" aria-controls="collapse-0">
+					<fmt:message key="label.ira.tra.summary"/>
+				</button>
+			</span>
+		</div>
 
-					<div id="collapse-0" class="card-body collapse show">
-						<div class="table-responsive">
-							<table class="table table-hover table-condensed">
-								<thead>
+		<div id="collapse-0" class="card-body collapse show">
+			<div class="table-responsive">
+				<table class="table table-hover table-condensed">
+							<thead>
 								<tr>
 									<th style="width: 30%">
 										<fmt:message key="label.teams"/>
@@ -321,14 +317,16 @@
 										</c:if>
 									</c:if>
 								</tr>
-								</thead>
+							</thead>
 
-								<tbody>
+							<tbody>
 								<c:forEach var="groupDto" items="${groupDtos}">
-
 									<tr>
 										<td>
-											<a href="#teams-panel-${groupDto.groupID}"><c:out value="${groupDto.groupName}" /></a>
+											<c:out value="${groupDto.groupName}" />										
+											<a href="#teams-panel-${groupDto.groupID}" class="btn btn-sm btn-light ms-1">
+												<i class="fa-regular fa-hand-point-down"></i>
+											</a>
 										</td>
 
 										<c:if test="${isIraAvailable}">
@@ -356,7 +354,6 @@
 										</c:if>
 
 										<c:if test="${isScratchieAvailable}">
-
 											<td class="text-center">
 												<c:choose>
 													<c:when test="${empty groupDto.traCorrectAnswerCount}">
@@ -451,23 +448,28 @@
 										</c:if>
 									</tr>
 								</c:if>
-								</tbody>
-							</table>
-						</div>
-					</div>
+							</tbody>
+				</table>
 			</div>
+		</div>
+	</div>
 
-			<div id="question-results-panel"></div>
+	<div id="question-results-panel"></div>
 
-			<c:forEach var="groupDto" items="${groupDtos}">
-				<div class="card mb-3" id="teams-panel-${groupDto.groupID}" tabindex="0">
-					<h5 class="card-header" data-bs-toggle="collapse" data-bs-target="#collapse-${groupDto.groupID}">
-						<a class="text-decoration-none" id="group-name-${groupDto.groupID}">
+	<c:forEach var="groupDto" items="${groupDtos}">
+		<div class="lcard mb-3" id="teams-panel-${groupDto.groupID}">
+			<div class="card-header" id="heading-all-learners">
+		        <span class="card-title collapsable-icon-left">
+		       		<button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#collapse-${groupDto.groupID}" 
+							aria-expanded="true" aria-controls="collapse-${groupDto.groupID}">
+						<span id="group-name-${groupDto.groupID}">
 							<c:out value="${groupDto.groupName}" />
-						</a>
-					</h5>
-
-					<div id="collapse-${groupDto.groupID}" class="card-body collapse show">
+						</span>
+					</button>
+				</span>
+			</div>
+	
+			<div id="collapse-${groupDto.groupID}" class="card-body collapse show p-2">
 						<c:if test="${isScratchieAvailable}">
 							<c:choose>
 								<c:when test="${empty groupDto.traCorrectAnswerCount}">
@@ -518,7 +520,6 @@
 									<c:set var="lowestCorrectAnswerCountPercentDelta" value="${groupDto.lowestCorrectAnswerCountPercentDelta}" />
 
 									<c:forEach var="userDto" items="${groupDto.userList}">
-
 										<tr>
 											<td>
 												<c:choose>
@@ -620,8 +621,7 @@
 						</c:if>
 
 						<!-- Change leader and Compare buttons -->
-						<div class="row">
-							<div class="col-xs-12 col-md-12 col-lg-12">
+						<div class="clearfix">
 								<c:if test="${isIraAvailable and isScratchieAvailable and not empty groupDto.userList and not empty groupDto.traCorrectAnswerCount}">
 									<button href="#" data-bs-toggle="modal" data-bs-target="#comparison-modal" type="button" class="btn btn-sm btn-secondary float-end"
 											data-ira-scores="
@@ -641,28 +641,22 @@
 								<c:if test="${not empty leaderselectionToolActivityId and not empty groupDto.userList}">
 									<button onClick="javascript:showChangeLeaderModal(${groupDto.groupID})" type="button"
 											class="btn btn-sm btn-secondary float-end me-2">
+										<i class="fa-solid fa-user-pen me-1"></i>
 										<fmt:message key="label.change.leader"/>
 									</button>
 								</c:if>
-							</div>
 						</div>
 						<!-- End change leader -->
-
-
-					</div>
-				</div>
-			</c:forEach>
-
+			</div>
 		</div>
-		<div class="col-2"></div>
-	</div>
+	</c:forEach>
 </div>
 
 <!-- modal chart -->
 <div class="modal fade" id="comparison-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-header">
+			<div class="modal-header text-bg-warning">
 				<h4 class="modal-title" id="exampleModalLabel">
 					<fmt:message key="label.bar.chart"/>
 				</h4>
@@ -682,7 +676,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 
-			<div class="modal-header">
+			<div class="modal-header text-bg-warning">
 				<div class="modal-title">
 					<h4>
 						<fmt:message key="label.ira.responses.for"/>: <span id="ira-user-name-label"></span>
@@ -697,6 +691,7 @@
 
 			<div class="modal-footer">
 				<a href="#" data-bs-dismiss="modal" class="btn btn-primary">
+					<i class="fa fa-check fa-lg me-1"></i>
 					<fmt:message key="button.ok"/>
 				</a>
 			</div>
@@ -711,7 +706,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 
-			<div class="modal-header">
+			<div class="modal-header text-bg-warning">
 				<div class="modal-title">
 					<h4>
 						<fmt:message key="label.tra.responses.for"/>: <span id="tra-user-name-label"></span>
@@ -728,6 +723,7 @@
 
 			<div class="modal-footer">
 				<a href="#" data-bs-dismiss="modal" class="btn btn-primary">
+					<i class="fa fa-check fa-lg me-1"></i>
 					<fmt:message key="button.ok"/>
 				</a>
 			</div>

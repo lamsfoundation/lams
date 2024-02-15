@@ -5,8 +5,14 @@
 		color: #FF3333 !important;
 	}
 
-	#time-limit-table .btn-success {
-		color: var(--bs-white);
+	#time-limit-table { 
+		.btn-success {
+			color: var(--bs-white);
+		}
+		
+		.no-border-bottom {
+			border-bottom: none !important;
+		}
 	}
 
 	#time-limit-widget {
@@ -36,7 +42,7 @@
 	}
 
 	#time-limit-widget #time-limit-widget-content > div button {
-		width: 70%;
+		width: 85%;
 	}
 
 	#time-limit-widget #absolute-time-limit-widget-value {
@@ -327,8 +333,7 @@
 			counters = $('<div />').attr('id', 'absolute-time-limit-panel-counter')
 					.addClass('absolute-time-limit-counter')
 					.appendTo('#absolute-time-limit-panel-value')
-					.add(
-							$('<div />').attr('id', 'absolute-time-limit-widget-counter')
+					.add($('<div />').attr('id', 'absolute-time-limit-widget-counter')
 									.addClass('absolute-time-limit-counter')
 									.appendTo('#absolute-time-limit-widget-value'))
 					.countdown({
@@ -362,7 +367,7 @@
 								expiredHideContainers.hide();
 							}
 						},
-						expiryText : '<span class="countdown-timeout"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
+						expiryText : '<span class="text-bg-danger p-1 mt-4"><spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.time.limit.expired" /></spring:escapeBody></span>'
 					});
 		} else {
 			// if counter is paused, we can not adjust time, so resume it for a moment
@@ -508,7 +513,7 @@
 		if (expand && !timeLimitContent.hasClass('show')){
 			if (immediateExpand) {
 				timeLimitContent.addClass('show');
-				timeLimitWidget.css('width', '200px');
+				timeLimitWidget.css('width', '240px');
 			} else {
 				timeLimitContent.collapse('show');
 			}
@@ -533,7 +538,7 @@
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 
 <div class="card mt-4" id="time-limit-panel">
-	<div class="card-header">
+	<div class="card-header text-bg-secondary">
        	<span class="card-title">
        		<fmt:message key="label.monitoring.time.limit"/>
      	</span>
@@ -541,16 +546,13 @@
 	<div class="card-body">
 		<table id="time-limit-table" class="table align-middle">
 			<tr>
-				<td colspan="6"><h4><fmt:message key="label.monitoring.time.limit.relative"/></h4>
+				<td colspan="6" class="no-border-bottom">
+					<h4><fmt:message key="label.monitoring.time.limit.relative"/></h4>
 					<p><fmt:message key="label.monitoring.time.limit.relative.desc"/></p>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<span id="relative-time-limit-value"><c:out value="${param.relativeTimeLimit}" /></span>&nbsp;
-					<fmt:message key="label.monitoring.time.limit.minutes"/>
-				</td>
-				<td class="text-center">
 					<div id="relative-time-limit-enabled" class="text-success ${relativeTimeLimitEnabled ? '' : 'd-none'}">
 						<fmt:message key="label.monitoring.time.limit.enabled"/>
 					</div>
@@ -559,12 +561,18 @@
 					</div>
 				</td>
 				<td class="text-center">
+					<span id="relative-time-limit-value"><c:out value="${param.relativeTimeLimit}" /></span>&nbsp;
+					<fmt:message key="label.monitoring.time.limit.minutes"/>
+				</td>
+				<td class="text-center">
 					<button id="relative-time-limit-start" class="btn btn-success ${relativeTimeLimitEnabled ? 'd-none' : ''}"
 							onClick="updateTimeLimit('relative', true)" disabled>
+						<i class="fa-solid fa-circle-play me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.start"/>
 					</button>
 					<button id="relative-time-limit-cancel" class="btn btn-danger ${relativeTimeLimitEnabled ? '' : 'd-none'}"
 							onClick="updateTimeLimit('relative', false)">
+						<i class="fa-solid fa-circle-stop me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.cancel"/>
 					</button>
 				</td>
@@ -572,33 +580,43 @@
 					<!-- Finish now button at absolute time limit row -->
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary mb-1"
-							onClick="updateTimeLimit('relative', null, 1)">
+					<button class="btn btn-light mb-1" onClick="updateTimeLimit('relative', null, 1)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 					</button>
-					<button class="btn btn-secondary mb-1"
-							onClick="updateTimeLimit('relative', null, 5)">
+					<button class="btn btn-light mb-1" onClick="updateTimeLimit('relative', null, 5)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary mb-1"
-							onClick="updateTimeLimit('relative', null, -5)">
+					<button class="btn btn-light mb-1" onClick="updateTimeLimit('relative', null, -5)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
 					</button>
-					<button class="btn btn-secondary mb-1"
-							onClick="updateTimeLimit('relative', null, -1)">
+					<button class="btn btn-light mb-1" onClick="updateTimeLimit('relative', null, -1)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
 					</button>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="pt-3"><h4><fmt:message key="label.monitoring.time.limit.absolute"/></h4>
+				<td colspan="6" class="no-border-bottom pt-3">
+					<h4><fmt:message key="label.monitoring.time.limit.absolute"/></h4>
 					<p><fmt:message key="label.monitoring.time.limit.absolute.desc"/></p>
 				</td>
 			</tr>
 			<tr>
 				<td id="absolute-time-limit-panel-value" class="absolute-time-limit-value">
+					<div id="absolute-time-limit-enabled" class="text-success ${absoluteTimeLimitEnabled ? '' : 'd-none'}">
+						<fmt:message key="label.monitoring.time.limit.enabled"/>
+					</div>
+					<div id="absolute-time-limit-disabled"
+						 	class="text-danger ${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}">
+						<fmt:message key="label.monitoring.time.limit.disabled"/>
+					</div>
+					<div id="absolute-time-limit-await-trigger"
+						 	class="${absoluteTimeLimitEnabled or param.absoluteTimeLimit eq 0 ? 'd-none' : ''}">
+						<fmt:message key="label.monitoring.time.limit.absolute.await.trigger"/>
+					</div>
+				</td>
+				<td class="text-center">
 					<c:if test="${param.absoluteTimeLimit > 0}">
 						<span id="absolute-time-limit-await-trigger-value">
 							<c:out value="${param.absoluteTimeLimit}"/>&nbsp;
@@ -607,57 +625,47 @@
 					</c:if>
 				</td>
 				<td class="text-center">
-					<div id="absolute-time-limit-enabled" class="text-success ${absoluteTimeLimitEnabled ? '' : 'd-none'}">
-						<fmt:message key="label.monitoring.time.limit.enabled"/>
-					</div>
-					<div id="absolute-time-limit-disabled"
-						 class="text-danger ${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}">
-						<fmt:message key="label.monitoring.time.limit.disabled"/>
-					</div>
-					<div id="absolute-time-limit-await-trigger"
-						 class="${absoluteTimeLimitEnabled or param.absoluteTimeLimit eq 0 ? 'd-none' : ''}">
-						<fmt:message key="label.monitoring.time.limit.absolute.await.trigger"/>
-					</div>
-				</td>
-				<td class="text-center">
 					<button id="absolute-time-limit-start" class="btn btn-success
-						${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+							${absoluteTimeLimitEnabled or param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
 							onClick="updateTimeLimit('absolute', true)" disabled>
+						<i class="fa-solid fa-circle-play me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.start"/>
 					</button>
 					<button id="absolute-time-limit-cancel" class="btn btn-danger
 							${absoluteTimeLimitEnabled or param.absoluteTimeLimit > 0 ? '' : 'd-none'}"
 							onClick="updateTimeLimit('absolute', false)">
+						<i class="fa-solid fa-circle-stop me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.cancel"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button id="absolute-time-limit-finish-now" class="btn btn-warning"
+					<button id="absolute-time-limit-finish-now" class="btn btn-danger"
 							onClick="timeLimitFinishNow()"
 							title="<fmt:message key="label.monitoring.time.limit.finish.now.tooltip" />">
+						<i class="fa-solid fa-power-off me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.finish.now"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+					<button class="btn btn-light mb-1 absolute-time-limit-stepper
+							${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
 							onClick="updateTimeLimit('absolute', null, 1)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 					</button>
-					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+					<button class="btn btn-light mb-1 absolute-time-limit-stepper
+							${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
 							onClick="updateTimeLimit('absolute', null, 5)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+					<button class="btn btn-light mb-1 absolute-time-limit-stepper
+							${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
 							onClick="updateTimeLimit('absolute', null, -5)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
 					</button>
-					<button class="btn btn-secondary mb-1 absolute-time-limit-stepper
-								   ${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
+					<button class="btn btn-light mb-1 absolute-time-limit-stepper
+							${param.absoluteTimeLimit != 0 ? 'd-none' : ''}"
 							onClick="updateTimeLimit('absolute', null, -1)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
 					</button>
@@ -665,13 +673,13 @@
 			</tr>
 
 			<tr>
-				<td colspan="6" class="pt-3">
+				<td colspan="6" class="no-border-bottom pt-3">
 					<h4><fmt:message key="label.monitoring.time.limit.individual"/></h4>
 					<p><fmt:message key="label.monitoring.time.limit.individual.desc"/></p>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="3">
+				<td colspan="3" class="no-border-bottom">
 					<div class="input-group">
 						<input id="individual-time-limit-autocomplete" type="text" class="form-control border-end-0"
 							   placeholder='<fmt:message key="label.monitoring.time.limit.individual.placeholder" />'>
@@ -680,7 +688,7 @@
 					    </span>
 					</div>
 				</td>
-				<td colspan="3"></td>
+				<td colspan="3" class="no-border-bottom"></td>
 			</tr>
 
 			<tr id="individual-time-limit-template-row" class="d-none">
@@ -693,6 +701,7 @@
 				<td class="text-center">
 					<button id="individual-time-limit-cancel" class="btn btn-danger"
 							onClick="updateTimeLimit.call(this, 'individual', false)">
+						<i class="fa-solid fa-circle-stop me-1"></i>
 						<fmt:message key="label.monitoring.time.limit.cancel"/>
 					</button>
 				</td>
@@ -700,21 +709,21 @@
 					<!-- Finish now button at absolute time limit row -->
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-btn-light"
 							onClick="updateTimeLimit.call(this, 'individual', null, 1)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-light"
 							onClick="updateTimeLimit.call(this, 'individual', null, 5)">
 						<fmt:message key="label.monitoring.time.limit.plus.minute.5"/>
 					</button>
 				</td>
 				<td class="text-center">
-					<button class="btn btn-secondary"
+					<button class="btn btn-light"
 							onClick="updateTimeLimit.call(this, 'individual', null, -5)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.5"/>
 					</button>
-					<button class="btn btn-secondary"
+					<button class="btn btn-light"
 							onClick="updateTimeLimit.call(this, 'individual', null, -1)">
 						<fmt:message key="label.monitoring.time.limit.minus.minute.1"/>
 					</button>
@@ -736,22 +745,21 @@
 
 	<div id="time-limit-widget-content" class="collapse card-body" role="tabpanel" aria-labelledby="time-limit-widget-heading">
 		<div class="expired-hide-container">
-			<button class="btn btn-sm btn-success" id="time-limit-widget-add-1-minute"
-					onClick="updateTimeLimit('absolute', null, 1)">
+			<button class="btn btn-sm btn-success" id="time-limit-widget-add-1-minute" onClick="updateTimeLimit('absolute', null, 1)">
 				<fmt:message key="label.monitoring.time.limit.plus.minute.1"/>
 			</button>
 		</div>
 
 		<div class="expired-hide-container">
-			<button class="btn btn-sm btn-danger"
-					onClick="updateTimeLimit('absolute', false)">
+			<button class="btn btn-sm btn-danger" onClick="updateTimeLimit('absolute', false)">
+				<i class="fa-solid fa-circle-stop me-1"></i>
 				<fmt:message key="label.monitoring.time.limit.cancel"/>
 			</button>
 		</div>
 
 		<div>
-			<button class="btn btn-sm btn-secondary"
-					onClick="scrollToTimeLimitPanel()">
+			<button class="btn btn-sm btn-secondary" onClick="scrollToTimeLimitPanel()">
+				<i class="fa-solid fa-gear me-1"></i>
 				<fmt:message key="label.monitoring.time.limit.show.controls"/>
 			</button>
 		</div>

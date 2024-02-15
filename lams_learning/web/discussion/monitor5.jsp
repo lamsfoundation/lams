@@ -239,12 +239,16 @@
 	       	 </fmt:message>
 	       	)
      	</div>
-     	<div class="btn btn-secondary discussion-sentiment-start-button" onClick="javascript:startDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}', true)">
+     	<button type="button" class="btn btn-sm btn-light discussion-sentiment-start-button" 
+     			onClick="startDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}', true)">
+     		<i class="fa-solid fa-circle-play me-1"></i>
 			<fmt:message key="label.discussion.restart"/>
-		</div>
-  		<div class="btn btn-secondary discussion-sentiment-stop-button" onClick="javascript:stopDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}')">
+		</button>
+  		<button type="button" class="btn btn-sm btn-light discussion-sentiment-stop-button" 
+  				onClick="stopDiscussionSentiment(${param.toolQuestionUid}, '${param.burningQuestionUid}')">
+  			<i class="fa-solid fa-circle-stop me-1"></i>
 			<fmt:message key="label.discussion.stop"/>
-		</div>
+		</button>
     </div>
 
     <div id="discussion-sentiment-chart-card-content-${idSuffix}" class="card-body container-fluid">
