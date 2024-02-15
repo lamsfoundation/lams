@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <lams:html>
 <lams:head>

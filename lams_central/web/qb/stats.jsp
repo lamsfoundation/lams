@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="question" value="${stats.question}" />
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <lams:html>
 <lams:head>
