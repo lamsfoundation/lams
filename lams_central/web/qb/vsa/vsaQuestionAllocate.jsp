@@ -1,29 +1,25 @@
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
 <%@ include file="/common/taglibs.jsp"%>
-
-
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 <c:set var="qbQuestion" value="${toolQuestion.qbQuestion}" />
 <c:set var="isTbl" value="${qbQuestion.isVsaAndCompatibleWithTbl()}" />
 <c:set var="optionsArray" value="${qbQuestion.qbOptions.toArray()}" />
 
-<div class="panel panel-default">
-	<div class="panel-heading">
-		<div class="panel-title">
-			${toolQuestionStatus.count})&nbsp;<c:out value="${qbQuestion.name}" escapeXml="true"/>
-		</div>
+<div class="lcard">
+	<div class="card-header">
+		${toolQuestionStatus.count})&nbsp;<c:out value="${qbQuestion.name}" escapeXml="true"/>
 	</div>
 		
-	<div class="panel-body">
-		<lams:errors/>
+	<div class="card-body p-2">
+		<lams:errors5/>
          
         <c:if test="${not empty qbQuestion.description}">
-	        <div class="question-description">
+	        <div class="question-description instructions">
 	        	<c:out value="${qbQuestion.description}" escapeXml="false"/>
 			</div>
 		</c:if>
 		
         <!--allocate responses-->
-		<div class="row">
+		<div class="row mb-3">
 			<div class="col-sm-4 text-center">
 				<c:set var="option0" value="${optionsArray[0]}"/>
 				<h4>
@@ -51,8 +47,11 @@
 						 data-option-uid="${option0.uid}"
 						 data-option-correct="${option0.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option0.name, newLineChar)}">
-							<button type="button" class="btn btn-xs ${isTbl ? 'btn-success' : 'btn-primary'}"
-									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+							<button type="button" class="btn btn-sm ${isTbl ? 'btn-success' : 'btn-primary'}"
+									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>
+								${answer}
+								<i class="fa-solid fa-circle-xmark ms-1"></i>
+							</button>
 						</c:forEach>
 					</div>
 				</c:if>
@@ -114,8 +113,11 @@
 							 data-option-uid="${option1.uid}"
 							 data-option-correct="${option1.maxMark > 0}">
 							<c:forEach var="answer" items="${fn:split(option1.name, newLineChar)}">
-								<button type="button" class="btn btn-xs ${isTbl ? 'btn-danger' : 'btn-primary'}"
-										title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+								<button type="button" class="btn btn-sm ${isTbl ? 'btn-danger' : 'btn-primary'}"
+										title='<fmt:message key="label.vsa.deallocate.button.tip" />'>
+									${answer}
+									<i class="fa-solid fa-circle-xmark ms-1"></i>
+								</button>
 							</c:forEach>
 						</div>
 					</c:if>
@@ -126,7 +128,7 @@
 		<c:forEach var="option" items="${optionsArray}" begin="2" varStatus="status">
 		
 			<c:if test="${status.count % 3 == 1}">
-				<div class="row">
+				<div class="row mb-3">
 			</c:if>
 		
 			<div class="col-sm-4 text-center">
@@ -144,8 +146,11 @@
 						 data-option-uid="${option.uid}"
 						 data-option-correct="${option.maxMark > 0}">
 						<c:forEach var="answer" items="${fn:split(option.name, newLineChar)}">
-							<button type="button" class="btn btn-xs btn-primary"
-									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>${answer}</button>
+							<button type="button" class="btn btn-sm btn-primary"
+									title='<fmt:message key="label.vsa.deallocate.button.tip" />'>
+								${answer}
+								<i class="fa-solid fa-circle-xmark ms-1"></i>
+							</button>
 						</c:forEach>
 					</div>
 				</c:if>

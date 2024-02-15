@@ -3,77 +3,52 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 
-<lams:html>
-	<lams:head>
-	
-		<title><fmt:message key="label.vsa.allocate.button" /></title>
-		
-		<lams:css />
-		<link href="${lams}css/vsaAllocate.css" rel="stylesheet" type="text/css">
-		<style>
-			#questions-container {
-				max-width: 1550px;
-				margin: auto;
-			}
+<c:set var="title"><fmt:message key="label.vsa.allocate.button" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<link href="${lams}css/vsaAllocate.css" rel="stylesheet" type="text/css">
+	<style>
+		#questions-container {
+			margin: auto;
+		}
 			
-			#page-description {
-				max-width: 1550px;
-				text-align: center;
-				background-color: white;
-				padding: 20px;
-				margin: 5px auto;
-			}
-			
-			.question-description {
-				margin-bottom: 20px;
-			}
-			
-			#questions-refresh-button {
-				position: fixed;
-				top: 10px;
-				right: 10px;
-				z-index: 2;
-			}
-		</style>
-		
-		<lams:JSImport src="includes/javascript/common.js" />
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-	 	<lams:JSImport src="includes/javascript/portrait.js" />
-	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-  	    <script>
-			var VS_ANSWER_ALLOCATED_ALERT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.someone.allocated.this.answer' /></spring:escapeBody>",
-				VS_ANSWER_DEALLOCATE_CONFIRM = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.vsa.deallocate.confirm' /></spring:escapeBody>",
-				LAMS_URL = "${lams}",
-				csrfTokenName = "<csrf:tokenname/>",
-				csrfTokenValue = "<csrf:tokenvalue/>";
-  	    
-	   		function refreshPage() { 
-	       		location.reload();
-	   		}
-  		</script>
-  		<lams:JSImport src="includes/javascript/vsaAllocate.js" />
-	</lams:head>
-	
-<body class="stripes">
-	<a href="#nogo" onclick="javascript:refreshPage()" class="btn btn-primary" id="questions-refresh-button">
-		<i class="fa fa-refresh"></i>
-		<fmt:message key="label.refresh" /> 
-	</a>
-		
-		
-	<h4 id="page-description"><fmt:message key="label.vsa.allocate.description" /></h4>
+		.question-description {
+			margin-bottom: 20px;
+		}
+	</style>
 
-	<div id="questions-container">
-		<c:forEach var="toolQuestionEntry" items="${toolQuestions}" varStatus="toolQuestionStatus">
-			<c:set var="toolQuestion" value="${toolQuestionEntry.key}" />
-			<c:set var="notAllocatedAnswers" value="${toolQuestionEntry.value}" />
-			<%@ include file="vsaQuestionAllocate.jsp"%>
-		</c:forEach>		
-	</div>
+	<lams:JSImport src="includes/javascript/portrait5.js" />
+	<lams:JSImport src="includes/javascript/Sortable.js" />
+	<script>
+		var VS_ANSWER_ALLOCATED_ALERT = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.someone.allocated.this.answer' /></spring:escapeBody>",
+			VS_ANSWER_DEALLOCATE_CONFIRM = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.vsa.deallocate.confirm' /></spring:escapeBody>",
+			LAMS_URL = "${lams}",
+			csrfTokenName = "<csrf:tokenname/>",
+			csrfTokenValue = "<csrf:tokenvalue/>";
+  	    
+	   	function refreshPage() { 
+	    	location.reload();
+	  	}
+  	</script>
+  	<lams:JSImport src="includes/javascript/vsaAllocate.js" />
+  	
+  	<div id="container-main">
+		<h1 class="fs-4 mb-4">
+			<fmt:message key="label.vsa.allocate.description" />
+		</h1>
 	
-	<div id="footer">
+		<div id="questions-container">
+			<c:forEach var="toolQuestionEntry" items="${toolQuestions}" varStatus="toolQuestionStatus">
+				<c:set var="toolQuestion" value="${toolQuestionEntry.key}" />
+				<c:set var="notAllocatedAnswers" value="${toolQuestionEntry.value}" />
+				<%@ include file="vsaQuestionAllocate.jsp"%>
+			</c:forEach>		
+		</div>
+		
+		<div class="activity-bottom-buttons">
+			<button type="button" onclick="refreshPage()" class="btn btn-primary">
+				<i class="fa fa-refresh me-1"></i>
+				<fmt:message key="label.refresh" /> 
+			</button>
+		</div>
 	</div>
-</body>
-</lams:html>
+</lams:PageMonitor>
