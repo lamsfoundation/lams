@@ -200,7 +200,7 @@ public class MonitoringController {
 	    model.addAttribute("availableLearners", availableLearners.split(","));
 	}
 
-	return "/pages/monitoring/changeLeaderDialog5";
+	return "/pages/monitoring/changeLeaderDialog";
     }
 
     /**

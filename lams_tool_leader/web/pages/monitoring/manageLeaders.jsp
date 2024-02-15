@@ -1,74 +1,68 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
-<lams:html>
-	<lams:head>
-		<lams:css />
-		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet"/>
+<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet"/>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-
-  	    <script>
-    		function save()  {
-	    		$('#leaders').ajaxSubmit({
-    		   		success: function (responseText, statusText)  {
-    		   			self.parent.location.reload();
-    	    		}
-	    		});
-    		}
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+  	<script>
+    	function save()  {
+	   		$('#leaders').ajaxSubmit({
+    	   		success: function (responseText, statusText)  {
+    	   			self.parent.location.reload();
+        		}
+	   		});
+    	}
 	  		
-    		function closeThickboxPage()  {
-        		self.parent.tb_remove();
-    		}
-  		</script>
-		
-	</lams:head>
+    	function closeThickboxPage()  {
+       		self.parent.tb_remove();
+    	}
+  	</script>
 	
-	<body class="stripes">
+	<h1 class="fs-3 mb-4">
+		${title}
+	</h1>
 
-	<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
-	<lams:Page type="learner" title="${title}">
-		<form action="<c:url value='/monitoring/saveLeaders.do'/>" method="post" id="leaders">
-			<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
-                <input name="sessionMapID" type="hidden" value="${sessionMapID}"/>
-				<c:forEach var="session" items="${sessionMap.leaderselectionDT0.sessionDTOs}" varStatus="status">
-					<h1></h1>
-					<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-						<c:if test="${sessionMap.isGroupedActivity}">
-							<div style="padding-bottom: 5px; font-size: small;">
-								<B><fmt:message key="monitoring.label.group" /></B> ${session.sessionName}
-							</div>
-						</c:if>
+	<form action="<c:url value='/monitoring/saveLeaders.do'/>" method="post" id="leaders">
+		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+        <input name="sessionMapID" type="hidden" value="${sessionMapID}"/>
+        
+		<c:forEach var="session" items="${sessionMap.leaderselectionDT0.sessionDTOs}" varStatus="status">
+			<div class="lcard">
+				<c:if test="${sessionMap.isGroupedActivity}">
+					<div class="card-header">
+						<B><fmt:message key="monitoring.label.group" /></B> 
+						${session.sessionName}
+					</div>
+				</c:if>
 						
-						<c:forEach var="user" items="${session.userDTOs}">
-							<div class="voffset5">
-								<input type="radio" name="sessionId${session.sessionID}" value="${user.uid}" <c:if test="${session.groupLeader.uid == user.uid}">checked="checked"</c:if>/>
-								&nbsp;<lams:Portrait userId="${user.userId}"/>&nbsp;
-								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-							</div>
-						</c:forEach>
+				<c:forEach var="user" items="${session.userDTOs}">
+					<div class="card-body align-items-center d-flex p-2">
+						<input type="radio" name="sessionId${session.sessionID}" id="sessionId${session.sessionID}-${user.uid}" 
+								value="${user.uid}" class="form-check-input me-2"
+								<c:if test="${session.groupLeader.uid == user.uid}">checked="checked"</c:if>/>
+								
+						<label for="sessionId${session.sessionID}-${user.uid}" class="form-check-label">
+							<lams:Portrait userId="${user.userId}"/>&nbsp;
+							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+						</label>
 					</div>
 				</c:forEach>
-			</form>
-
-			<div class="pull-right">
-				<a href="#" onclick="closeThickboxPage();" class="btn btn-default">
-					<fmt:message key="button.cancel" /> 
-				</a>
-				<a href="#" onclick="save();" class="btn btn-primary">
-					<fmt:message key="button.save" /> 
-				</a>
 			</div>
+		</c:forEach>
+	</form>
 
-		</div>
-		<!--closes content-->
-	
-		<div id="footer"></div>
-
-	</lams:Page>		
-	</body>
-</lams:html>
+	<div class="activity-bottom-buttons">
+		<button type="button"onclick="save();" class="btn btn-primary ms-2">
+			<i class="fa fa-check fa-lg me-1"></i>
+			<fmt:message key="button.save" /> 
+		</button>
+		<button type="button" onclick="closeThickboxPage();" class="btn btn-secondary">
+			<i class="fa fa-xmark fa-lg me-1"></i>
+			<fmt:message key="button.cancel" /> 
+		</button>
+	</div>
+</lams:PageMonitor>

@@ -29,7 +29,7 @@
 				        }
 		            }
 		       	});
-			});
+		});
 	});
 </script>
 
@@ -37,20 +37,26 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 		
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-lg fa-close"></i></button>
-				<h4 class="modal-title">
-					<fmt:message key="label.change.leader"/>
-				</h4>
-				<c:if test="${empty toolSessionId}">
-					<small>
-						<fmt:message key="label.note.leader.change"/>
-					</small>
-				</c:if>
+			<div class="modal-header text-bg-warning">
+				<div class="modal-title">
+					<h4>
+						<fmt:message key="label.change.leader">
+							<fmt:param>${groupName}</fmt:param>
+						</fmt:message>
+					</h4>
+				</div>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			
 			<div class="modal-body">
-				<h4>${groupName}</h4> 
+				<c:if test="${empty toolSessionId}">
+					<lams:Alert5 id="note" type="warning">
+						<small>
+							<fmt:message key="label.note.leader.change"/>
+						</small>
+					</lams:Alert5>
+				</c:if>
+					
 				<fmt:message key="label.current.leader"/>&nbsp;
 				<c:choose>
 					<c:when test="${empty groupLeader}">
@@ -63,10 +69,11 @@
 				
 				<div id="usersInGroup">
 					<c:forEach var="user" items="${members}">
-						<div class="voffset10 loffset10">
-							<label>
-								<input type="radio" name="change-leader-radio-${groupId}" value="${user.userId}">
-								<lams:Portrait userId="${user.userId}"/>
+						<div class="mt-3 ms-3 form-check">
+							  <input class="form-check-input mt-2" type="radio" name="change-leader-radio-${groupId}"
+							         id="change-leader-radio-${groupId}-${user.userId}" value="${user.userId}">
+							  <label class="form-check-label" for="change-leader-radio-${groupId}-${user.userId}">
+							    <lams:Portrait userId="${user.userId}"/>
 								<span>
 									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
 									<c:forEach var="availableLearnerId" items="${availableLearners}">
@@ -75,17 +82,19 @@
 										</c:if>
 									</c:forEach>
 								</span>
-							</label>
+							  </label>
 						</div>
 					</c:forEach>
 				</div>
 			</div>
 			
 			<div class="modal-footer">	
-				<a href="#" data-dismiss="modal" class="btn btn-default">
+				<a href="#" data-bs-dismiss="modal" class="btn btn-secondary">
+					<i class="fa fa-xmark fa-lg me-1"></i>
 					<fmt:message key="button.cancel"/>
 				</a>
-				<a href="#" data-dismiss="modal" class="btn btn-default change-leader-button">
+				<a href="#" data-bs-dismiss="modal" class="btn btn-primary change-leader-button">
+					<i class="fa fa-check fa-lg me-1"></i>
 					<fmt:message key="button.save"/>
 				</a>
 			</div>

@@ -2,43 +2,41 @@
 <c:set var="dto" value="${leaderselectionDTO}" />
 
 <c:forEach var="session" items="${dto.sessionDTOs}">
-
 	<c:if test="${isGroupedActivity}">
-		<div class="panel panel-default" >
-        <div class="panel-heading" id="headingStats${session.sessionID}">
-   	    	<span class="panel-title collapsable-icon-left">
-	       		<a role="button" data-toggle="collapse" href="#collapseStats${session.sessionID}" 
-						aria-expanded="false" aria-controls="collapseStats${session.sessionID}" >
+		<div class="lcard" >
+        <div class="card-header" id="headingStats${session.sessionID}">
+   	    	<span class="card-title collapsable-icon-left">
+	       		<button type="button" data-bs-toggle="collapse" class="btn btn-secondary-darker no-shadow" data-bs-target="#collapseStats${session.sessionID}" 
+						aria-expanded="true" aria-controls="collapseStats${session.sessionID}" >
 					${session.sessionName}
-				</a>
+				</button>
 			</span>
        	</div>
        
-        <div id="collapseStats${session.sessionID}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingStats${session.sessionID}">
+        <div id="collapseStats${session.sessionID}" class="card-body collapse show">
 	</c:if>
 
-		<table class="table table-condensed">
-			<tr>
-				<td class="field-name" width="40%">
-					<fmt:message>heading.totalLearnersInGroup</fmt:message>
-				</td>
-				<td width="70%">
-					${session.numberOfLearners}
-				</td>
-			</tr>
-			<tr>
-				<td class="field-name" width="40%">
-					<fmt:message>heading.totalFinishedLearnersInGroup</fmt:message>
-				</td>
-				<td width="70%">
-					${session.numberOfFinishedLearners}
-				</td>
-			</tr>
-		</table>
+	<div class="ltable">
+		<div class="row">
+			<div class="col">
+				<fmt:message>heading.totalLearnersInGroup</fmt:message>
+			</div>
+			<div class="col">
+				${session.numberOfLearners}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<fmt:message>heading.totalFinishedLearnersInGroup</fmt:message>
+			</div>
+			<div class="col">
+				${session.numberOfFinishedLearners}
+			</div>
+		</div>
+	</div>
 	
 	<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
-	</c:if>
-		
+	</c:if>		
 </c:forEach>
