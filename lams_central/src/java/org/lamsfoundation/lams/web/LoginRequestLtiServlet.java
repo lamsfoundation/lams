@@ -97,7 +97,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
 	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
 
-	/* LKC-178 custom context label
+	/* LKC-178 custom context label. Do not change this comment.
 	String customContextLabel = request.getParameter(BasicLTIConstants.RESOURCE_LINK_TITLE);
 	if (StringUtils.isBlank(customContextLabel)) {
 	    customContextLabel = request.getParameter(BasicLTIConstants.CUSTOM_PREFIX + BasicLTIConstants.CONTEXT_LABEL);
@@ -106,7 +106,7 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	    customContextLabel = contextLabel;
 	}
 	contextLabel = customContextLabel;
-	*/
+	End of LKC-178 customisation */
 
 	//log all incoming request parameters, so we can use them later to debug future issues
 	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
