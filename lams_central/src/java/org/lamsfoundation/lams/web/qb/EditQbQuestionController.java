@@ -76,7 +76,8 @@ public class EditQbQuestionController {
 	    @RequestParam(required = false) Long collectionUid) throws ServletException, IOException {
 
 	form.setUid(-1L);//which signifies it's a new question
-	form.setQuestionId(qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
+	form.setQuestionId(
+		qbService.generateNextQuestionId()); // generate a new question ID right away, so another user won't "take it"
 	form.setMaxMark(1);
 	form.setPenaltyFactor("0");
 
@@ -124,11 +125,12 @@ public class EditQbQuestionController {
 	    throw new RuntimeException("QbQuestion with uid:" + qbQuestionUid + " was not found!");
 	}
 	Integer userId = getUserId();
-	boolean editingAllowed = securityService.isAppadmin(userId, null, true)
-		|| qbService.isQuestionInPublicCollection(qbQuestion.getQuestionId())
-		|| qbService.isQuestionInUserOwnCollection(qbQuestion.getQuestionId(), userId)
-		|| qbService.isQuestionInUserSharedCollection(qbQuestion.getQuestionId(), userId)
-		|| qbService.isQuestionInUserMonitoredOrganisationFolder(qbQuestion.getQuestionId(), userId);
+	boolean editingAllowed =
+		securityService.isAppadmin(userId, null, true) || qbService.isQuestionInPublicCollection(
+			qbQuestion.getQuestionId()) || qbService.isQuestionInUserOwnCollection(
+			qbQuestion.getQuestionId(), userId) || qbService.isQuestionInUserSharedCollection(
+			qbQuestion.getQuestionId(), userId) || qbService.isQuestionInUserMonitoredOrganisationFolder(
+			qbQuestion.getQuestionId(), userId);
 	if (!editingAllowed) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN,
 		    "The user does not have access to given QB question editing");
@@ -163,10 +165,9 @@ public class EditQbQuestionController {
 	BeanUtils.copyProperties(form, qbQuestion);
 
 	Integer questionType = qbQuestion.getType();
-	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_ORDERING)
-		|| (questionType == QbQuestion.TYPE_MATCHING_PAIRS)
-		|| (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS) || (questionType == QbQuestion.TYPE_NUMERICAL)
-		|| (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
+	if ((questionType == QbQuestion.TYPE_MULTIPLE_CHOICE) || (questionType == QbQuestion.TYPE_ORDERING) || (
+		questionType == QbQuestion.TYPE_MATCHING_PAIRS) || (questionType == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
+		|| (questionType == QbQuestion.TYPE_NUMERICAL) || (questionType == QbQuestion.TYPE_MARK_HEDGING)) {
 	    List<QbOption> optionList = qbQuestion.getQbOptions();
 	    request.setAttribute(QbConstants.ATTR_OPTION_LIST, optionList);
 	}
@@ -216,21 +217,23 @@ public class EditQbQuestionController {
 		// new version of the old question gets created
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
+		qbQuestion.setUuid((UUID) null);
 		qbQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		qbQuestion.setCreateDate(new Date());
 		qbQuestion.setUuid(UUID.randomUUID());
 	    }
-		break;
+	    break;
 	    case IQbService.QUESTION_MODIFIED_ID_BUMP: {
 		// new question gets created
 		qbQuestion = qbQuestion.clone();
 		qbQuestion.clearID();
+		qbQuestion.setUuid((UUID) null);
 		qbQuestion.setVersion(1);
 		qbQuestion.setCreateDate(new Date());
 		qbQuestion.setUuid(UUID.randomUUID());
 		// no need to bump question ID as the new question already has a new ID generated in initNewQuestion()
 	    }
-		break;
+	    break;
 	}
 	userManagementService.save(qbQuestion);
 
@@ -239,14 +242,14 @@ public class EditQbQuestionController {
 	//take care about question's collections. add to collection first
 	Long oldCollectionUid = form.getOldCollectionUid();
 	Long newCollectionUid = form.getNewCollectionUid();
-	if (isAddingQuestion
-		|| (isRequestCameFromTool && oldCollectionUid != null && !newCollectionUid.equals(oldCollectionUid))) {
+	if (isAddingQuestion || (isRequestCameFromTool && oldCollectionUid != null && !newCollectionUid.equals(
+		oldCollectionUid))) {
 	    qbService.addQuestionToCollection(newCollectionUid, qbQuestion.getQuestionId(), false);
 	}
 
 	//remove from the old collection, if needed and the question is in users' collections
-	if (!isAddingQuestion && isRequestCameFromTool && oldCollectionUid != null
-		&& !newCollectionUid.equals(oldCollectionUid)) {
+	if (!isAddingQuestion && isRequestCameFromTool && oldCollectionUid != null && !newCollectionUid.equals(
+		oldCollectionUid)) {
 	    qbService.removeQuestionFromCollectionByQuestionId(oldCollectionUid, qbQuestion.getQuestionId(), false);
 	}
 
@@ -276,8 +279,8 @@ public class EditQbQuestionController {
 	}
 
 	QbQuestion qbQuestion = qbService.getQuestionByUid(form.getUid());
-	return String.valueOf(qbService.extractFormToQbQuestion(qbQuestion, form,
-		request) >= IQbService.QUESTION_MODIFIED_VERSION_BUMP);
+	return String.valueOf(qbService.extractFormToQbQuestion(qbQuestion, form, request)
+		>= IQbService.QUESTION_MODIFIED_VERSION_BUMP);
     }
 
     @RequestMapping("/returnQuestionUid")

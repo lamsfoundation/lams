@@ -418,6 +418,7 @@ public class AuthoringController implements QaAppConstants {
 		// new version of the old question gets created
 		updatedQuestion = qbQuestion.clone();
 		updatedQuestion.clearID();
+		updatedQuestion.setUuid((UUID) null);
 		updatedQuestion.setVersion(qbService.getMaxQuestionVersion(qbQuestion.getQuestionId()) + 1);
 		updatedQuestion.setCreateDate(new Date());
 		updatedQuestion.setUuid(UUID.randomUUID());
@@ -427,6 +428,7 @@ public class AuthoringController implements QaAppConstants {
 		// new question gets created
 		updatedQuestion = qbQuestion.clone();
 		updatedQuestion.clearID();
+		updatedQuestion.setUuid((UUID) null);
 		updatedQuestion.setVersion(1);
 		updatedQuestion.setCreateDate(new Date());
 		updatedQuestion.setUuid(UUID.randomUUID());

@@ -545,6 +545,7 @@ public class QbService implements IQbService {
 	    newQuestion.setVersion(1);
 	    newQuestion.setCreateDate(new Date());
 	    newQuestion.clearID();
+	    newQuestion.setUuid((UUID) null);
 	    qbDAO.insert(newQuestion);
 	}
 	qbDAO.addCollectionQuestion(collectionUid, addQbQuestionId);
