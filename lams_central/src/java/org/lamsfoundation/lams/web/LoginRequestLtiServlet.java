@@ -49,8 +49,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 /**
  * The LoginRequestLtiServlet handles login request by LTI tool consumers. This servlet checks for the correctly signed
- * by OAuth parameters,
- * and if it's valid it redirects it to LoginRequestServlet for actual authentication.
+ * by OAuth parameters, and if it's valid it redirects it to LoginRequestServlet for actual authentication.
  *
  * @author Andrey Balan
  */
@@ -94,13 +93,21 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	String locale = request.getParameter(BasicLTIConstants.LAUNCH_PRESENTATION_LOCALE);
 	String countryIsoCode = LoginRequestLtiServlet.getCountry(locale);
 	String langIsoCode = LoginRequestLtiServlet.getLanguage(locale);
-
 	String resourceLinkId = request.getParameter(BasicLTIConstants.RESOURCE_LINK_ID);
 	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-	String contextLabel = request.getParameter(BasicLTIConstants.CUSTOM_PREFIX + BasicLTIConstants.CONTEXT_LABEL);
-	if (StringUtils.isBlank(contextLabel)) {
-	    contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
+	String contextLabel = request.getParameter(BasicLTIConstants.CONTEXT_LABEL);
+
+	/* LKC-178 custom context label
+	String customContextLabel = request.getParameter(BasicLTIConstants.RESOURCE_LINK_TITLE);
+	if (StringUtils.isBlank(customContextLabel)) {
+	    customContextLabel = request.getParameter(BasicLTIConstants.CUSTOM_PREFIX + BasicLTIConstants.CONTEXT_LABEL);
 	}
+	if (StringUtils.isBlank(customContextLabel)) {
+	    customContextLabel = contextLabel;
+	}
+	contextLabel = customContextLabel;
+	*/
+
 	//log all incoming request parameters, so we can use them later to debug future issues
 	String logMessage = "LoginRequestLtiServlet is requested with the following parameters: ";
 	Enumeration<String> parameterNames = request.getParameterNames();
@@ -248,9 +255,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
     }
 
     /**
-     *
      * @param localeStr
-     *            the full balckboard locale string
+     * 	the full balckboard locale string
      * @return the language
      */
     private static String getLanguage(String localeStr) {
@@ -262,9 +268,8 @@ public class LoginRequestLtiServlet extends HttpServlet {
     }
 
     /**
-     *
      * @param localeStr
-     *            the full balckboard locale string
+     * 	the full balckboard locale string
      * @return the country
      */
     private static String getCountry(String localeStr) {
