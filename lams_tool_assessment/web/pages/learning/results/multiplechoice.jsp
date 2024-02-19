@@ -30,13 +30,13 @@
 				   			 ? question.correctAnswersDisclosed : assessment.allowWrongAnswersAfterQuestion)
 				    		&& (option.maxMark <= 0)}" />
 	
-			<div class="row ${isCorrect ? 'text-success' : '' }">
+			<div class="row ${isCorrect ? 'bg-success bg-opacity-25 rounded' : '' }">
 				<div class="complete-item-gif">
 				    <c:if test="${option.answerBoolean && isCorrect}">
-					    <i class="fa fa-check text-success"></i>
+					    <i class="fa fa-solid fa-check fa-lg text-success"></i>
 		            </c:if>
 				    <c:if test="${option.answerBoolean && isWrong}">
-					    <i class="fa fa-times text-danger"></i>	
+					    <i class="fa fa-lg fa-xmark text-danger"></i>	
 					</c:if>			
 				</div>
 	                
@@ -108,9 +108,9 @@
 						
 					<c:if test="${not empty teams}">
 						<div class="selected-by-groups mt-2">
-							<div class="${isCorrect ? 'text-success' : '' }">
+							<div class="fst-italic fw-semibold">
 								<fmt:message key="label.learning.summary.selected.by" />
-								${teams}
+								&nbsp;${teams}
 							</div>
 						</div>
 					</c:if>
