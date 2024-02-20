@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <style>
 	.question-title {
@@ -15,10 +15,8 @@
 </style>
 
 <lams:JSImport src="includes/javascript/chart.js" relative="true" />
-
 <script>
 	var WEB_APP_URL = '<lams:WebAppURL />',
-
 			LABELS = $.extend(LABELS, {
 				ACTIVITY_COMPLETION_CHART_TITLE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.completion" /></spring:escapeBody>',
 				ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.completion.possible" /></spring:escapeBody>',
@@ -30,7 +28,6 @@
 				ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.answered.questions.y.axis.students" /></spring:escapeBody>',
 				ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.answered.questions.y.axis.groups" /></spring:escapeBody>'
 			}),
-
 			activityCompletionChart = null,
 			answeredQuestionsChart = null,
 			COMPLETION_CHART_UPDATE_INTERVAL = 10 * 1000;
@@ -44,7 +41,7 @@
 			// destroy existing absolute time limit counters before refresh
 			$('.absolute-time-limit-counter, .time-limit-widget-individual-counter').countdown('destroy');
 			let data = JSON.parse(event.data);
-			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
 					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
 					+ '&isTbl=true&controllerContext=tool/laasse10/monitoring');
 		});
@@ -71,35 +68,33 @@
 		form.submit();
 	};
 
-
 	function openActivityMonitoring(){
-		openPopUp('<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&contentFolderID='
-				+ contentFolderId, "MonitorActivity", popupHeight, popupWidth, true, true);
+		window.open("<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&lessonID=" + lessonId + "&contentFolderID=" + contentFolderId, "_self");
 	}
 </script>
 
-<div class="container-fluid">
+<div class="container-main ms-4">
 
 	<!-- Notifications -->
 	<div class="row">
 		<div class="col-10 offset-1 text-end">
-			<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa-solid fa-circle-info"></i>
+			<button type="button" onclick="openActivityMonitoring()" class="btn btn-secondary buttons_column">
+				<i class="fa-solid fa-circle-info me-1"></i>
 				<fmt:message key="label.activity.monitoring"/>
-			</a>
-			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
-			   onclick="javascript:loadAePane(${toolContentID}, 'default'); return false;">
-				<i class="fa fa-clipboard-question"></i>
+			</button>
+			<button type="button" class="btn btn-secondary buttons_column"
+					onclick="loadAePane(${toolContentID}, 'default')">
+				<i class="fa fa-clipboard-question me-1"></i>
 				<fmt:message key="label.hide.students.choices"/>
-			</a>
-			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-print"></i>
+			</button>
+			<button type="button" onclick="printTable()" class="btn btn-secondary buttons_column">
+				<i class="fa fa-print me-1"></i>
 				<fmt:message key="label.print"/>
-			</a>
-			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-file-excel"></i>
+			</button>
+			<button type="button" onclick="exportExcel()" class="btn btn-secondary buttons_column">
+				<i class="fa fa-file-excel me-1"></i>
 				<fmt:message key="label.excel.export"/>
-			</a>
+			</button>
 		</div>
 	</div>
 	<!-- End notifications -->
@@ -124,11 +119,8 @@
 	</div>
 
 	<!-- Table -->
-	<div class="row">
-		<div class="col-10 offset-1">
-			<div class="card">
-				<div class="card-body table-responsive p-0">
-
+	<div class="card">
+		<div class="card-body table-responsive p-0">
 					<table id="questions-data" class="table table-responsive table-bordered table-condensed p-2">
 						<thead>
 						<tr role="row" class="border-top-0">
@@ -172,13 +164,8 @@
 						<tbody id="student-choices-table">
 						</tbody>
 					</table>
-				</div>
-			</div>
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-10 offset-1" id="time-limit-panel-placeholder">
-		</div>
-	</div>
+	<div id="time-limit-panel-placeholder"></div>
 </div>

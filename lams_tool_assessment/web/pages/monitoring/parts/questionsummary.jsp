@@ -1,81 +1,80 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="questionDto" value="${questionSummary.questionDto}"/>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
-		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/free.ui.jqgrid.min.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
-		<c:if test="${not empty questionDto.codeStyle}">
-			<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
-		</c:if>
-		<style>
-			pre {
-				background-color: initial;
-				border: none;
-			}
+<c:set var="title">
+	<fmt:message key="label.monitoring.question.summary.question" />: <c:out value="${questionDto.title}" escapeXml="true"/>
+</c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<!-- ********************  CSS ********************** -->
+	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
+	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery.jqGrid.confidence-level-formattter.css" rel="stylesheet">
+	<c:if test="${not empty questionDto.codeStyle}">
+		<link rel="stylesheet" type="text/css" href="${lams}css/codemirror.css" />
+	</c:if>
+	<style>
+		pre {
+			background-color: initial;
+			border: none;
+		}
 
-			#bottom-buttons {
-				text-align: right;
-				margin: 10px 10px 10px 0;
-			}
+		.requires-grading {
+			background-color: rgba(255, 195, 55, .6);
+		}
+	</style>
 
-			.requires-grading {
-				background-color: rgba(255, 195, 55, .6);
-			}
-		</style>
+	<!-- ********************  javascript ********************** -->
+	<lams:JSImport src="includes/javascript/common.js" />
+	<script>
+		// pass settings to jquery.jqGrid.confidence-level-formattter.js
+		var confidenceLevelsSettings = {
+			type: "${assessment.confidenceLevelsType}",
+			LABEL_NOT_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.confident" /></spring:escapeBody>',
+			LABEL_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confident" /></spring:escapeBody>',
+			LABEL_VERY_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.confident" /></spring:escapeBody>',
+			LABEL_NOT_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.sure" /></spring:escapeBody>',
+			LABEL_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.sure" /></spring:escapeBody>',
+			LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
+		};
 
-		<script>
-			// pass settings to jquery.jqGrid.confidence-level-formattter.js
-			var confidenceLevelsSettings = {
-				type: "${assessment.confidenceLevelsType}",
-				LABEL_NOT_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.confident" /></spring:escapeBody>',
-				LABEL_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.confident" /></spring:escapeBody>',
-				LABEL_VERY_CONFIDENT : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.confident" /></spring:escapeBody>',
-				LABEL_NOT_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.not.sure" /></spring:escapeBody>',
-				LABEL_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.sure" /></spring:escapeBody>',
-				LABEL_VERY_SURE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.very.sure" /></spring:escapeBody>'
-			};
-
-			//vars for rating.js
-			var MAX_RATES = 0,
-					MIN_RATES = 0,
-					COMMENTS_MIN_WORDS_LIMIT = 0,
-					LAMS_URL = '',
-					COUNT_RATED_ITEMS = 0,
-					COMMENT_TEXTAREA_TIP_LABEL = '',
-					WARN_COMMENTS_IS_BLANK_LABEL = '',
-					WARN_MIN_NUMBER_WORDS_LABEL = '';
-		</script>
-		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
-	 	<lams:JSImport src="includes/javascript/portrait.js" />
-	 	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
-		<lams:JSImport src="includes/javascript/rating.js" />
-
-		<c:if test="${not empty questionDto.codeStyle}">
-			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
-			<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
-			<c:choose>
-				<c:when test="${questionDto.codeStyle == 1}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
-				</c:when>
-				<c:when test="${questionDto.codeStyle == 2}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
-				</c:when>
-				<c:when test="${questionDto.codeStyle >= 3}">
-					<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
-				</c:when>
-			</c:choose>
-		</c:if>
-
-		<script>
+		//vars for rating.js
+		var MAX_RATES = 0,
+			MIN_RATES = 0,
+			COMMENTS_MIN_WORDS_LIMIT = 0,
+			LAMS_URL = '',
+			COUNT_RATED_ITEMS = 0,
+			COMMENT_TEXTAREA_TIP_LABEL = '',
+			WARN_COMMENTS_IS_BLANK_LABEL = '',
+			WARN_MIN_NUMBER_WORDS_LABEL = '';
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.confidence-level-formattter.js"></script>
+	<lams:JSImport src="includes/javascript/portrait5.js" />
+	<script type="text/javascript" src="${lams}includes/javascript/Sortable.js"></script>
+	<lams:JSImport src="includes/javascript/rating.js" />
+	<c:if test="${not empty questionDto.codeStyle}">
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/runmode-standalone.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/codemirror/addon/runmode/colorize.js"></script>
+		<c:choose>
+			<c:when test="${questionDto.codeStyle == 1}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/python.js"></script>
+			</c:when>
+			<c:when test="${questionDto.codeStyle == 2}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/javascript.js"></script>
+			</c:when>
+			<c:when test="${questionDto.codeStyle >= 3}">
+				<script type="text/javascript" src="${lams}includes/javascript/codemirror/mode/clike.js"></script>
+			</c:when>
+		</c:choose>
+	</c:if>
+	<script>
 			var isEdited = false;
 			var previousCellValue = "";
 			$(document).ready(function(){
@@ -100,10 +99,10 @@
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.summary.user.name" /></spring:escapeBody>",
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.response" /></spring:escapeBody>",
 						<c:if test="${assessment.enableConfidenceLevels and questionDto.type != 8}">
-						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.confidence" /></spring:escapeBody>",
+							"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.confidence" /></spring:escapeBody>",
 						</c:if>
 						<c:if test="${questionDto.groupsAnswersDisclosed}">
-						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.answer.rating.title" /></spring:escapeBody>",
+							"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.answer.rating.title" /></spring:escapeBody>",
 						</c:if>
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.grade" /></spring:escapeBody>",
 						"<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.user.summary.marker" /></spring:escapeBody>",
@@ -115,24 +114,24 @@
 					colModel:[
 						{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 						{name:'maxMark', index:'maxMark', width:0, hidden: true},
-						{name:'userName',index:'userName', width:83, searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
-								return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
-							}},
-			  			   	{name:'response', index:'response', width:400, sortable:false, search:false, formatter: responseFormatter},
-	  		  			   	<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
-			  			   		{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
-			  			  	</c:if>
-				  			<c:if test="${questionDto.groupsAnswersDisclosed}">
-				  				{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
-		  			  		</c:if>
-							{name:'grade', index:'grade', width:30, sorttype:"float", search:false, editable:true,
-								editoptions: {size:4, maxlength: 4}, align:"right", classes: 'vertical-align', title : false},
-			  			  	{name:'marker', index:'marker', width: 80, search:false, title: false},
-				  			{name:'markerComment', index:'markerComment', width:120, search:false, editable:true, sortable: false,
-				  			    editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
-			  				{name:'userId', index:'userId', width:0, hidden: true},
-		  				   	{name:'portraitId', index:'portraitId', width:0, hidden: true}
-	  				   	],
+						{name:'userName',index:'userName', width:83, labelAlign:'left', searchoptions: { clearSearch: false }, formatter : function(cellvalue, options, rowObject) {
+							return definePortraitPopover(rowObject[rowObject.length - 1], rowObject[rowObject.length - 2], rowObject[2]);
+						}},
+			  			{name:'response', index:'response', width:400, labelAlign:'left', classes: 'vertical-align', sortable:false, search:false, formatter: responseFormatter},
+	  		  			<c:if test="${sessionMap.assessment.enableConfidenceLevels and questionDto.type != 8}">
+			  				{name:'confidence', index:'confidence', width: 80, search:false, classes: 'vertical-align', formatter: gradientNumberFormatter},
+			  			</c:if>
+				  		<c:if test="${questionDto.groupsAnswersDisclosed}">
+				  			{name:'rating', index:'rating', width:120, align:"center", sortable:false, search:false},
+		  			  	</c:if>
+						{name:'grade', index:'grade', width:80, labelAlign:'center', sorttype:"float", search:false, editable:true,
+								editoptions: {size:4, maxlength: 4}, align:"center", classes: 'vertical-align', title : false},
+			  			{name:'marker', index:'marker', width: 80, labelAlign:'left', search:false, title: false},
+				  		{name:'markerComment', index:'markerComment', width:120, labelAlign:'left', search:false, editable:true, sortable: false,
+				  		    	editoptions: {maxlength: 100}, align:"left", classes: 'vertical-align', title : false },
+			  			{name:'userId', index:'userId', width:0, hidden: true},
+		  				{name:'portraitId', index:'portraitId', width:0, hidden: true}
+	  				],
 	  				   	multiselect: false,
 	  				   	caption: "${sessionDto.sessionName}",
 	  				  	cellurl: '<c:url value="/monitoring/saveUserGrade.do?sessionMapID=${sessionMapID}"/>&<csrf:token/>',
@@ -249,7 +248,7 @@
 						reloadOnExpand : false,
 						hasSubgrid: function (options) {
 							// if there are no ratings for the given answer, there will be no subgrid
-							return options.data.rating != '-';
+							return options.data.rating && options.data.rating != '-';
 						}
 					},
 					subGridRowExpanded: function(subgrid_id, row_id) {
@@ -280,7 +279,8 @@
 							],
 							colModel:[
 								{name:'ratingId', index:'ratingId', width:0, hidden:true},
-								{name:'userName',index:'userName', width: 35, formatter : function(cellvalue, options, rowObject) {
+								{name:'userName',index:'userName', width: 35, labelAlign:'left', 
+									formatter : function(cellvalue, options, rowObject) {
 										var columnParts = rowObject[1].split('<BR>'),
 												userName = columnParts[0];
 										// get portrait UUID, user ID and user name
@@ -289,8 +289,8 @@
 										columnParts[1] = '<b>' + columnParts[1] + '</b>';
 										return columnParts.join('<BR>');
 									}},
-								{name:'rating', index:'rating', width: 10,  align:"center"},
-								{name:'comment', index:'comment'},
+								{name:'rating', index:'rating', width: 10, align:"center"},
+								{name:'comment', index:'comment', labelAlign:'left'},
 								{name:'userId', index:'userId', width:0, hidden: true},
 								{name:'portraitId', index:'portraitId', width:0, hidden: true}
 							],
@@ -303,13 +303,12 @@
 						});
 					}
 				})
-				<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
+					<c:if test="${!sessionMap.assessment.useSelectLeaderToolOuput}">
 						.jqGrid('filterToolbar', {
 							searchOnEnter: false
 						})
-						</c:if>
+					</c:if>
 						.navGrid("#pager${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false, refresh:true});
-
 				</c:forEach>
 
 				//jqgrid autowidth (http://stackoverflow.com/a/1610197)
@@ -342,83 +341,74 @@
 				var codeStyle = ${empty questionDto.codeStyle ? 'null' : questionDto.codeStyle};
 				return codeStyle ? "<pre class='code-style' data-lang='${questionDto.codeStyleMime}'>" + cellvalue + "</pre>" : cellvalue;
 			}
-		</script>
-	</lams:head>
+	</script>
 
-	<body class="stripes">
+	<h1 class="fs-3">
+		${title}
+	</h1>
 
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<fmt:message key="label.monitoring.question.summary.question" />: <c:out value="${questionDto.title}" escapeXml="true"/>
-			</div>
-		</div>
+	<lams:errors5/>
 
-		<div class="panel-body">
-			<lams:errors/>
-
-			<c:out value="${questionDto.question}" escapeXml="false"/>
-
-			<div class="row"><div class="col-xs-12 col-sm-6">
-				<h5><fmt:message key="label.question.options"/></h5>
-				<table class="table table-condensed table-striped">
-					<c:if test="${questionDto.type == 1}">
-						<tr>
-							<td>
-								<fmt:message key="label.incorrect.answer.nullifies.mark" />:
-							</td>
-							<td style="text-align: right;">
-								<c:out value="${questionDto.incorrectAnswerNullifiesMark}" escapeXml="false"/>
-							</td>
-						</tr>
-					</c:if>
-					<tr>
-						<td>
-							<fmt:message key="label.monitoring.question.summary.default.mark" />:
-						</td>
-						<td style="text-align: right;">
-							<c:out value="${questionDto.maxMark}" escapeXml="true"/>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<fmt:message key="label.monitoring.question.summary.penalty" />:
-						</td>
-						<td style="text-align: right;">
-							<c:out value="${questionDto.penaltyFactor}" escapeXml="true"/>
-						</td>
-					</tr>
-				</table>
-			</div></div>
-
-			<!--history responses-->
-			<c:if test="${not empty sessionDtos}">
-				<h5><fmt:message key="label.monitoring.question.summary.history.responses" /></h5>
-				<c:forEach var="sessionDto" items="${sessionDtos}">
-					<div class="voffset20">
-						<table id="session${sessionDto.sessionId}"></table>
-						<div id="pager${sessionDto.sessionId}"></div>
-					</div>
-				</c:forEach>
-			</c:if>
-
-			<div id="bottom-buttons">
-				<a href="#nogo" onclick="javascript:refreshQuestionSummaryPage()" class="btn btn-default btn-sm">
-					<i class="fa fa-refresh"></i>
-					<fmt:message key="label.refresh" />
-				</a>
-
-				<a href="#nogo" onclick="javascript:refreshSummaryPage()" class="btn btn-default btn-sm loffset10">
-					<i class="fa fa-close"></i>
-					<fmt:message key="label.close" />
-				</a>
-			</div>
-		</div>
-		<!--closes content-->
-
-		<div id="footer">
-		</div>
-		<!--closes footer-->
+	<div class="instructions">
+		<c:out value="${questionDto.question}" escapeXml="false"/>
 	</div>
-	</body>
-</lams:html>
+
+	<div class="fs-5 card-subheader">
+		<fmt:message key="label.question.options"/>
+	</div>
+					
+	<div class="ltable table-hover no-header alert alert-secondary shadow col-md-8">
+		<c:if test="${questionDto.type == 1}">
+			<div class="row">
+				<div class="col-10">
+					<fmt:message key="label.incorrect.answer.nullifies.mark" />:
+				</div>
+				<div class="col-2 text-end">
+					<c:out value="${questionDto.incorrectAnswerNullifiesMark}" escapeXml="false"/>
+				</div>
+			</div>
+		</c:if>
+		<div class="row">
+			<div class="col-10">
+				<fmt:message key="label.monitoring.question.summary.default.mark" />:
+			</div>
+			<div class="col-2 text-end">
+				<c:out value="${questionDto.maxMark}" escapeXml="true"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-10">
+				<fmt:message key="label.monitoring.question.summary.penalty" />:
+			</div>
+			<div class="col-2 text-end">
+				<c:out value="${questionDto.penaltyFactor}" escapeXml="true"/>
+			</div>
+		</div>
+	</div>
+
+	<!--history responses-->
+	<c:if test="${not empty sessionDtos}">
+		<div class="fs-5 card-subheader mt-4">
+			<fmt:message key="label.monitoring.question.summary.history.responses" />
+		</div>
+				
+		<c:forEach var="sessionDto" items="${sessionDtos}">
+			<div class="mb-4">
+				<table id="session${sessionDto.sessionId}"></table>
+				<div id="pager${sessionDto.sessionId}"></div>
+			</div>
+		</c:forEach>
+	</c:if>
+
+	<div class="activity-bottom-buttons">
+		<button type="button" onclick="refreshSummaryPage()" class="btn btn-primary ms-2">
+			<i class="fa fa-close"></i>
+			<fmt:message key="label.close" />
+		</button>
+		
+		<button type="button" onclick="refreshQuestionSummaryPage()" class="btn btn-secondary">
+			<i class="fa fa-refresh"></i>
+			<fmt:message key="label.refresh" />
+		</button>
+	</div>
+</lams:PageMonitor>

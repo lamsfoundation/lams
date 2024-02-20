@@ -102,7 +102,7 @@
                     <%@ include file="confidencelevel.jsp"%>
                 </c:if>
 
-                    <%--Display jsutification for each question --%>
+                <%--Display jsutification for each question --%>
                 <c:if test="${(assessment.allowAnswerJustification || (question.type == 8 && question.hedgingJustificationEnabled))
 							&& justificationEligible && (!isLeadershipEnabled or isUserLeader)}">
                     <div class="answer-justification-container mt-4 mb-2">
@@ -145,7 +145,7 @@
                 </button>
 
                 <div id="question-etherpad-${question.uid}" class="question-etherpad-collapse collapse">
-                    <div class="panel panel-default question-etherpad">
+                    <div class="card question-etherpad">
                         <lams:Etherpad groupId="etherpad-assessment-${toolSessionID}-question-${question.uid}"
                                        showControls="${mode eq 'teacher'}" showChat="false" heightAutoGrow="true" showOnDemand="true"
                         >${questionEtherpadContent}</lams:Etherpad>

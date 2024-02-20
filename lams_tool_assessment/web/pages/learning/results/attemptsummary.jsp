@@ -1,4 +1,4 @@
-<div id="attempt-summary" class="alert alert-secondary shadow mx-auto col-sm-8 ltable no-header table-hover">
+<div id="attempt-summary" class="ltable table-hover no-header alert alert-secondary shadow col-sm-8 mx-auto">
 	<div class="row">
 		<div class="col-sm-5">
 			<fmt:message key="label.learning.summary.started.on" />

@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+
 <c:forEach var="session" items="${sessions}" varStatus="i">
 	<tr>
 		<td class="text-center sticky-left-header">
@@ -11,6 +12,5 @@
 					${questionResultDto.answer}
 			</td>
 		</c:forEach>
-
 	</tr>
 </c:forEach>

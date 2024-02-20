@@ -24,7 +24,7 @@
 }
 
 .ui-jqgrid .ui-jqgrid-bdiv {
-	overflow: inherit;
+	/*overflow: inherit;*/ /*removed as it prevents a scroll bar to appear*/
 }
 
 .ui-jqgrid-htable th {
@@ -178,4 +178,30 @@
 
 .ui-jqgrid.ui-jqgrid-bootstrap .ui-jqgrid-btable .table-success {
 	background-color: rgba(0, 145, 74, 0.1);
+}
+
+/*   Copied from bootstrap 3 .css file to support hightlighting of selected rows */
+.ui-jqgrid.ui-jqgrid-bootstrap {
+	.table>tbody>tr.success>td,
+	.table>tbody>tr.success>th,
+	.table>tbody>tr>td.success,
+	.table>tbody>tr>th.success,
+	.table>tfoot>tr.success>td,
+	.table>tfoot>tr.success>th,
+	.table>tfoot>tr>td.success,
+	.table>tfoot>tr>th.success,
+	.table>thead>tr.success>td,
+	.table>thead>tr.success>th,
+	.table>thead>tr>td.success,
+	.table>thead>tr>th.success {
+		background-color: #dff0d8
+	}
+
+	.table-hover>tbody>tr.success:hover>td,
+	.table-hover>tbody>tr.success:hover>th,
+	.table-hover>tbody>tr:hover>.success,
+	.table-hover>tbody>tr>td.success:hover,
+	.table-hover>tbody>tr>th.success:hover {
+		background-color: #d0e9c6
+	}
 }

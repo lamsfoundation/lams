@@ -1,12 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 <c:set var="leaderDto" value="${sessionMap.leaderDto}"/>
 <c:set var="activityDto" value="${sessionMap.activityDto}"/>
 
+<lams:css suffix="chart"/>
+
+<script type="text/javascript" src="${lams}includes/javascript/chartjs/chart.umd.js"></script>
+<lams:JSImport src="includes/javascript/chart.js" relative="true" />
 <script type="text/javascript">
 	$(document).ready(function(){
-		$('[data-toggle="tooltip"]').bootstrapTooltip();
+		$('[data-bs-toggle="tooltip"]').tooltip();
 		
 		$('#activity-evaluation').on('focus', function(){
 			$(this).data('previousValue', this.value);
@@ -35,7 +40,6 @@
 			});
 			
 		});
-		
 
 	   	// must display charts after screen is visible or cannot calculate widths.
  		<c:choose>
@@ -56,30 +60,28 @@
 			</c:forEach>	
 		</c:otherwise>
 		</c:choose>
-
- 
 	});		
 </script>
 
 <c:choose>
-
 <c:when test="${empty sessionDtos}">
-	<lams:Alert type="warn" id="no-edit" close="false">
+	<lams:Alert5 type="warn" id="no-edit">
 		<fmt:message key="message.monitoring.summary.no.session" />
-	</lams:Alert>
+	</lams:Alert5>
 </c:when>
 	
 <c:otherwise>
-	
-	<p><fmt:message key="label.graph.help"/></p>
+	<em>
+		<fmt:message key="label.graph.help"/>
+	</em>
 	
 	<c:choose>
 	<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput}">	
-		<div class="panel panel-default" >
-       	<div class="panel-body">
+		<div class="lcard" >
+       	<div class="card-body">
  		<div class="row">
-			 <div class="col-xs-12"></div>
-				 <div id="chartDivLeader${sessionMap.toolContentID}" class="markChartDiv"></div>
+			<div class="col-12"></div>
+			<div id="chartDivLeader${sessionMap.toolContentID}" class="markChartDiv"></div>
 		</div>
             
         <div class="row"> 
@@ -147,15 +149,17 @@
 		
 	<c:otherwise>
 		<c:if test="${sessionMap.isGroupedActivity}">
-			<h4 class="voffset20"><fmt:message key="label.activity.stats"/></h4>
+			<div class="card-subheader fs-4 mt-4 mb-2">
+				<fmt:message key="label.activity.stats"/>
+			</div>
 		</c:if>
-		<div class="panel panel-default" >
-       		<div class="panel-body">
+		
+		<div class="lcard" >
+       		<div class="card-body">
             <div class="row">
-                 <div class="col-xs-12" ></div>
+                 <div class="col-12" ></div>
                  <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
             </div>
-
 
 			<div class="row"> 
 				<div class="col-md-6" style="padding: 0px 20px 0px 20px;">
@@ -215,23 +219,23 @@
                     </table>
 				</div>
 			</div>	
-					
 			</div>
 		</div>
 		
 		<c:if test="${sessionMap.isGroupedActivity}">
-			<h4 class="voffset20"><fmt:message key="label.group.stats"/></h4>
+			<div class="card-subheader fs-4 mt-4 mb-2">
+				<fmt:message key="label.group.stats"/>
+			</div>
+			
 			<c:forEach var="sessionDto" items="${sessionDtos}">
-			    <div class="panel panel-default" >
-			        <div class="panel-heading" id="heading${sessionDto.sessionId}">
-						<span class="panel-title">
-							<fmt:message key="monitoring.label.group" />: <c:out value="${sessionDto.sessionName}" />
-						</span>
+			    <div class="lcard" >
+			        <div class="card-header" id="heading${sessionDto.sessionId}">
+						<fmt:message key="monitoring.label.group" />: <c:out value="${sessionDto.sessionName}" />
 			        </div>
-		       		<div class="panel-body">
-                        
+			        
+		       		<div class="card-body">    
 					<div class="row">
-						 <div class="col-xs-12"></div>
+						 <div class="col-12"></div>
 		 				 <div id="chartDivSession${sessionDto.sessionId}" class="markChartDiv"></div>
 				    </div>
                         
@@ -302,20 +306,20 @@
 	</c:choose>		
 	
 	<div id="accordion-qb-stats" class="panel-group voffset20" role="tablist" aria-multiselectable="true"> 
-	    <div class="panel panel-default">
-	        <div class="panel-heading collapsable-icon-left" id="heading-qb-stats">
-	        	<span class="panel-title">
-			    	<a class="collapsed" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
+	    <div class="lcard">
+	        <div class="card-header" id="heading-qb-stats">
+	        	<span class="card-title collapsable-icon-left">
+					<button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#qb-stats" 
+							aria-expanded="true" aria-controls="qb-stats">
 		          		<fmt:message key="label.qb.stats" />
-		          	</a>
+		          	</button>
 		          	<lams:Popover>
 		          		<fmt:message key="label.qb.stats.tooltip" />
 		          	</lams:Popover>
-
 	      		</span>
 	        </div>
 	
-			<div aria-expanded="false" id="qb-stats" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="heading-qb-stats">
+			<div id="qb-stats" class="card-body collapse show">
 				<table class="table table-striped table-hover table-condensed">
 					<tr>		
 						<th scope="col"  class="text-left">

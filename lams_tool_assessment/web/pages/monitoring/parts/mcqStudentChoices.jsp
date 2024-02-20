@@ -1,20 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
 
 <script>
 	$('#allocate-vsas-button').toggle(${vsaPresent});
 	$(function () {
-		$('[data-toggle="tooltip"]').tooltip();
+		$('[data-bs-toggle="tooltip"]').tooltip();
 	})	
 </script>
 
 <!-- Table -->
 <c:if test="${not empty questions}">
-<div class="card">
-<div class="table-responsive table-hover card-body pb-0" style="margin:0">
-	<table id="questions-data" class="table table-bordered table-condensed">
-		<thead>
+	<div class="table-responsive shadow rounded-4">
+	<table id="questions-data" class="table table-hover">
+		<thead class="text-bg-secondary">
 			<tr role="row" class="border-top-0">
 				<th class="text-center">
 					<fmt:message key="label.monitoring.question.summary.question"/>
@@ -66,7 +64,7 @@
 							<c:if test="${option.correct}">
 								fw-bolder text-success fs-5" title="<fmt:message key="label.authoring.true.false.correct.answer"/>
 							</c:if>
-							"  data-toggle="tooltip" data-placement="top"
+							"  data-bs-toggle="tooltip" data-bs-placement="top"
 							>
 							<c:choose>
 								<c:when test="${option.percentage == -1}">-</c:when>
@@ -82,25 +80,27 @@
 			</c:forEach>
 		</tbody>
 	</table>
-</div>
-</div>
+	</div>
 
 <!-- Question detail modal -->
 <c:forEach var="question" items="${questions}" varStatus="i">
 	<div class="modal fade iraQuestionModal" id="question${i.index}Modal">
 	<div class="modal-dialog modal-dialog-centered">
 	<div class="modal-content">
-		<div class="modal-header align-items-start">
-			<div class="modal-title">
+		<div class="modal-header align-items-start text-bg-warning">
+			<div class="modal-title d-flex">
 				<span>Q${i.index+1})</span>
 				<c:if test="${not empty question.title}">
-					<p><c:out value="${question.title}"  escapeXml="false" /></p>
+					<div>
+						<c:out value="${question.title}"  escapeXml="false" />
+					</div>
 				</c:if>
-				${question.question}
 			</div>
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		</div>
 		<div class="modal-body">
+			${question.question}
+		
 			<div class="table-responsive">
 				<table class="table table-hover">
 					<tbody>

@@ -110,66 +110,87 @@
 
     <div class="card lcard">
         <div class="card-header">
-
-            <c:if test="${param.embedded and empty toolSessionID}">
-                <div class="monitor-question-buttons">
+			<div class="d-flex flex-column float-end text-right align-items-end">
+				<c:if test="${assessment.displayMaxMark || question.answerRequired}">
+					<div class="mb-2">
+			            <c:if test="${assessment.displayMaxMark}">
+							<span class="float-end badge alert alert-info fw-normal m-1 p-1">
+								<fmt:message key="label.learning.max.mark">
+			                        <fmt:param value="${question.maxMark}" />
+			                    </fmt:message>
+							</span>
+			            </c:if>
+			
+			            <c:if test="${question.answerRequired}">
+							<span class="asterisk float-end">
+								<i class="fa fa-asterisk text-danger"
+			                       title="<fmt:message key="label.answer.required"/>"
+			                       alt="<fmt:message key="label.answer.required"/>"></i>
+							</span>
+			            </c:if>
+					</div>
+				</c:if>
+            
+           		<c:if test="${param.embedded and empty toolSessionID}">
                     <c:if test="${assessment.allowDiscloseAnswers and showQuestionMonitoringActionButtons}">
-                        <div class="btn-group-sm disclose-button-group ms-2" questionUid="${question.uid}">
+                        <div class="btn-group disclose-button-group ms-2 mb-3" questionUid="${question.uid}">
                                 <%-- Allow disclosing correct answers only for multiple choice questions --%>
                             <c:if test="${question.type == 1}">
-                                <div class="btn btn-secondary disclose-correct-button"
-                                <c:if test="${question.correctAnswersDisclosed}">
-                                     disabled="disabled"><i class="fa fa-check">&nbsp;</i
-                                </c:if>>
-                                    <fmt:message key="label.disclose.correct.answers" />
-                                </div>
+                                <button type="button" class="btn btn-sm btn-light disclose-correct-button"
+                                		${question.correctAnswersDisclosed ? "disabled='disabled'" : ""}>
+                                	<c:choose>
+                                		<c:when test="${question.correctAnswersDisclosed}">
+                                			<i class="fa fa-check text-success me-1"></i>
+                                			<fmt:message key="label.disclosed.correct.answers" />
+                                		</c:when>
+                                		
+                                		<c:otherwise>
+                                			<i class="fa-solid fa-eye me-1"></i>
+                                			<fmt:message key="label.disclose.correct.answers" />
+                                		</c:otherwise>
+                                	</c:choose>
+                                </button>
                             </c:if>
-                            <div class="btn btn-secondary disclose-groups-button"
-                                 <c:if test="${question.groupsAnswersDisclosed}">disabled="disabled">
-                                <i class="fa fa-check">&nbsp;</i</c:if>>
-                                <fmt:message key="label.disclose.groups.answers" />
-                            </div>
+                            
+                            <button type="button" class="btn btn-sm btn-light disclose-groups-button"
+		                            ${question.groupsAnswersDisclosed ? "disabled='disabled'" : ""}>
+		                        <c:choose>
+                                	<c:when test="${question.groupsAnswersDisclosed}">
+                                		<i class="fa fa-check text-success me-1"></i>
+                                		<fmt:message key="label.disclosed.groups.answers" />
+                                	</c:when>
+                                		
+                                	<c:otherwise>
+                                		<i class="fa-solid fa-eye me-1"></i>
+                                		<fmt:message key="label.disclose.groups.answers" />
+                                	</c:otherwise>
+                                </c:choose>
+                            </button>
                         </div>
                     </c:if>
 
                     <c:if test="${param.showQuestionDetailsButton or assessment.allowDiscussionSentiment}">
-                        <div class="btn-group-sm mt-3">
+                        <div class="btn-group">
                             <c:if test="${param.showQuestionDetailsButton}">
-                                <a class="thickbox btn btn-secondary"
-                                   href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
-                                    <i class="fa fa-info-circle"></i>&nbsp; <fmt:message
-                                        key="label.monitoring.summary.results.question" />
+                                <a class="thickbox btn btn-sm btn-light"
+                                		href='<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>&questionUid=${question.uid}&KeepThis=true&TB_iframe=true&modal=true'>
+                                    <i class="fa fa-info-circle"></i>&nbsp; 
+                                    <fmt:message key="label.monitoring.summary.results.question" />
                                 </a>
                             </c:if>
 
                             <c:if test="${assessment.allowDiscussionSentiment and showQuestionMonitoringActionButtons}">
-                                <div id="discussion-sentiment-start-button-${question.uid}"
-                                     class="btn btn-secondary discussion-sentiment-start-button"
-                                     onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
-                                    <i class="fa fa-comments"></i>&nbsp;
+                                <button type="button" id="discussion-sentiment-start-button-${question.uid}"
+                                		class="btn btn-sm btn-light discussion-sentiment-start-button"
+                                		onClick="javascript:startDiscussionSentiment(${question.uid}, null, true)">
+                            		<i class="fa fa-comments"></i>&nbsp;
                                     <fmt:message key="label.monitoring.discussion.start" />
-                                </div>
+                                </button>
                             </c:if>
                         </div>
                     </c:if>
-                </div>
-            </c:if>
-
-            <c:if test="${assessment.displayMaxMark}">
-				<span class="float-end badge alert alert-info fw-normal m-1 p-1">
-					<fmt:message key="label.learning.max.mark">
-                        <fmt:param value="${question.maxMark}" />
-                    </fmt:message>
-				</span>
-            </c:if>
-
-            <c:if test="${question.answerRequired}">
-				<span class="asterisk float-end">
-					<i class="fa fa-asterisk text-danger"
-                       title="<fmt:message key="label.answer.required"/>"
-                       alt="<fmt:message key="label.answer.required"/>"></i>
-				</span>
-            </c:if>
+            	</c:if>
+            </div>
 
             <div class="card-title">
                 <c:if test="${assessment.numbered}">
@@ -300,7 +321,7 @@
             </c:if>
 
             <c:if test="${param.embedded and empty toolSessionID and assessment.allowDiscussionSentiment}">
-                <div id="discussion-sentiment-chart-card-container-${question.uid}"></div>
+                <div id="discussion-sentiment-chart-card-container-${question.uid}" class="mt-3"></div>
             </c:if>
         </div>
     </div>

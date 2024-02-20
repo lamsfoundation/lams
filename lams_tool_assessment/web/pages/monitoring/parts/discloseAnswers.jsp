@@ -115,6 +115,7 @@
 	}
 
 	function disabledAndCheckButton(button){
-		button.attr('disabled', true).html('<i class="fa fa-check">&nbsp;</i>' + button.text());
+		button.find('i').remove();
+		button.attr('disabled', true).html('<i class="fa fa-check text-success">&nbsp;</i>' + button.text());
 	}
 </script>

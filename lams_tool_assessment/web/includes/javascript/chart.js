@@ -5,6 +5,20 @@ var GRAPH_COLORS = {
 	gray: '#6c757d'
 };
 
+function drawCompletionCharts(toolContentId, animate) {
+
+	const source = new EventSource( WEB_APP_URL + 'monitoring/getCompletionChartsData.do?toolContentId=' + toolContentId);
+
+	source.onmessage = function (event) {
+		if (!event.data) {
+			return;
+		}
+		var data = JSON.parse(decodeURIComponent(event.data));
+		drawActivityCompletionChart(data, animate);
+		drawAnsweredQuestionsChart(data, animate);
+	}
+}
+
 function drawActivityCompletionChart(data, animate){
 	// prepare data for the chart
 	let notStartedLearners = data.possibleLearners.filter(function (learner) {
@@ -63,7 +77,7 @@ function drawActivityCompletionChart(data, animate){
 					GRAPH_COLORS.green
 				],
 				borderWidth : 1,
-				borderColor : COLORS.gray
+				borderColor : GRAPH_COLORS.gray
 			} ],
 			labels : [ LABELS.ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS,
 				LABELS.ACTIVITY_COMPLETION_CHART_STARTED_LEARNERS,

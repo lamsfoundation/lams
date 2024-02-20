@@ -11,5 +11,4 @@
 	tab3Label="titleHeading.statistics"
 	tab1Jsp="m_Summary.jsp"
 	tab2Jsp="m_EditActivity.jsp"
-	tab3Jsp="m_Statistics.jsp">
-</lams:PageMonitor>
+	tab3Jsp="m_Statistics.jsp"/>

@@ -1,11 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <lams:JSImport src="includes/javascript/chart.js" relative="true" />
 
 <script>
 	var WEB_APP_URL = '<lams:WebAppURL />',
-
 			LABELS = $.extend(LABELS, {
 				ACTIVITY_COMPLETION_CHART_TITLE : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.completion" /></spring:escapeBody>',
 				ACTIVITY_COMPLETION_CHART_POSSIBLE_LEARNERS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.completion.possible" /></spring:escapeBody>',
@@ -17,7 +16,6 @@
 				ANSWERED_QUESTIONS_CHART_Y_AXIS_STUDENTS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.answered.questions.y.axis.students" /></spring:escapeBody>',
 				ANSWERED_QUESTIONS_CHART_Y_AXIS_GROUPS : '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.monitoring.summary.answered.questions.y.axis.groups" /></spring:escapeBody>'
 			}),
-
 			activityCompletionChart = null,
 			answeredQuestionsChart = null,
 			pageInitialised = false;
@@ -31,7 +29,7 @@
 			// destroy existing absolute time limit counter before refresh
 			$('.absolute-time-limit-counter, .time-limit-widget-individual-counter').countdown('destroy');
 			let data = JSON.parse(event.data);
-			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit5.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
+			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
 					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
 					+ '&isTbl=true&controllerContext=tool/laasse10/monitoring');
 		});
@@ -70,48 +68,41 @@
 	};
 
 	function openActivityMonitoring(){
-		openPopUp('<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&contentFolderID='
-				+ contentFolderId, "MonitorActivity", popupHeight, popupWidth, true, true);
+		window.open("<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&lessonID=" + lessonId + "&contentFolderID=" + contentFolderId, "_self");
 	}
 </script>
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-10 offset-1 text-right">
-			<!-- Notifications -->
-			<div class="float-end">
-				<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
-					<i class="fa-solid fa-circle-info"></i>
-					<fmt:message key="label.activity.monitoring"/>
-				</a>
-				<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
-				   onclick="javascript:loadTab('irat', $('#load-irat-tab-btn'))">
-					<i class="fa fa-clipboard-question"></i>
-					<fmt:message key="label.hide.students.choices"/>
-				</a>
-				<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
-					<i class="fa fa-print"></i>
-					<fmt:message key="label.print"/>
-				</a>
-				<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
-					<i class="fa fa-file-excel"></i>
-					<fmt:message key="label.excel.export"/>
-				</a>
-				<c:if test="${vsaPresent}">
-					<a class="btn btn-secondary buttons_column" target="_blank" id="allocate-vsas-button"
-					   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
-						<fmt:message key="label.vsa.allocate.button" />
-					</a>
-				</c:if>
-			</div>
-			<!-- End notifications -->
-			<h3>
-				<fmt:message key="label.ira.questions.marks"/>
-			</h3>
-		</div>
+<div class="container-main ms-4">
+	<div class="float-end">
+		<button type="button" onclick="openActivityMonitoring()" class="btn btn-secondary buttons_column">
+			<i class="fa-solid fa-circle-info me-1"></i>
+			<fmt:message key="label.activity.monitoring"/>
+		</button>
+		<button type="button" type="button" class="btn btn-secondary buttons_column"
+				onclick="loadTab('irat', $('#load-irat-tab-btn'))">
+			<i class="fa fa-clipboard-question me-1"></i>
+			<fmt:message key="label.hide.students.choices"/>
+		</button>
+		<button type="button" onclick="printTable()" class="btn btn-secondary buttons_column">
+			<i class="fa fa-print me-1"></i>
+			<fmt:message key="label.print"/>
+		</button>
+		<button type="button" onclick="exportExcel()" class="btn btn-secondary buttons_column">
+			<i class="fa fa-file-excel me-1"></i>
+			<fmt:message key="label.excel.export"/>
+		</button>
+		<c:if test="${vsaPresent}">
+			<a class="btn btn-secondary buttons_column" target="_blank" id="allocate-vsas-button"
+					href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${toolContentID}'>
+				<fmt:message key="label.vsa.allocate.button" />
+			</a>
+		</c:if>
 	</div>
+	<h3>
+		<fmt:message key="label.ira.questions.marks"/>
+	</h3>
 
 	<div class="row" id="completion-charts-container">
-		<div class="col-md-5 col-sm-12 offset-md-1 me-2 my-4">
+		<div class="col-md-6 col-sm-12 my-4">
 			<div class="monitoring-panel">
 				<div style="max-width: 400px; margin: auto">
 					<canvas id="activity-completion-chart"></canvas>
@@ -119,7 +110,7 @@
 			</div>
 		</div>
 
-		<div class="col-md-5 col-sm-12 ms-2 my-4">
+		<div class="col-md-6 col-sm-12 my-4">
 			<div class="monitoring-panel">
 				<h4 id="answered-questions-chart-none" class="text-center position-relative top-50">
 					<fmt:message key="label.monitoring.student.choices.none" />
@@ -130,13 +121,7 @@
 	</div>
 
 	<%-- Include student's choices part --%>
-	<div class="row">
-		<div class="col-10 offset-1" id="student-choices-table">
-		</div>
-	</div>
+	<div id="student-choices-table"></div>
 
-	<div class="row">
-		<div class="col-10 offset-1" id="time-limit-panel-placeholder">
-		</div>
-	</div>
+	<div id="time-limit-panel-placeholder"></div>
 </div>

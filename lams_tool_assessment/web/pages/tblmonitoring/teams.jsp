@@ -6,7 +6,7 @@
 	<div class="card mb-3">
 		<div class="card-header">
 			<span class="card-title fw-bold">
-				<span class="float-start space-right">Q${i.index+1})</span> 
+				<span class="float-start me-1">Q${i.index+1})</span> 
 				<c:out value="${question.title}" escapeXml="false"/>
 			</span> 
 		</div>
@@ -21,15 +21,15 @@
 									<c:forEach var="option" items="${question.optionDtos}">
 										<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 											<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
-												<div class="clearfix">
+												<div class="d-flex align-items-center">
 													${option.name}
 												
 													<c:choose>
 														<c:when test="${option.maxMark == 1}">
-															<i class="fa fa-check-square text-success"></i>
+															<i class="fa fa-lg fa-check-square text-success ms-1"></i>
 														</c:when>
 														<c:when test="${option.maxMark <= 0}">
-															<i class="fa fa-minus-square text-danger"></i>
+															<i class="fa fa-lg fa-minus-square text-danger ms-1"></i>
 														</c:when>
 													</c:choose>
 												</div>
@@ -44,7 +44,7 @@
 											<div style="float: left;">
 												${option.matchingPair}
 											</div>
-											<div style=" float: right; width: 50%;">
+											<div style=" float: right; width: 50%;" class="d-flex align-items-center">
 															 - 
 												<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 													<c:if test="${option.uid == optionAnswer.optionUid}">
@@ -54,10 +54,10 @@
 																
 																<c:choose>
 																	<c:when test="${optionAnswer.optionUid == optionAnswer.answerInt}">
-																		<i class="fa fa-check-square text-success"></i>
+																		<i class="fa fa-lg fa-check-square text-success ms-1"></i>
 																	</c:when>
 																	<c:otherwise>
-																		<i class="fa fa-minus-square text-danger"></i>
+																		<i class="fa fa-lg fa-minus-square text-danger ms-1"></i>
 																	</c:otherwise>
 																</c:choose>
 															</c:if>
@@ -75,10 +75,10 @@
 
 									<c:choose>
 										<c:when test="${not empty questionResult.qbOption && questionResult.qbOption.maxMark == 1}">
-											<i class="fa fa-check-square text-success"></i>
+											<i class="fa fa-lg fa-check-square text-success ms-1"></i>
 										</c:when>
 										<c:when test="${empty questionResult.qbOption || not empty questionResult.qbOption && questionResult.qbOption.maxMark <= 0}">
-											<i class="fa fa-minus-square text-danger"></i>
+											<i class="fa fa-lg fa-minus-square text-danger ms-1"></i>
 										</c:when>
 									</c:choose>
 								</c:when>
@@ -89,10 +89,10 @@
 										
 										<c:choose>
 											<c:when test="${questionResult.answerBoolean == question.correctAnswer}">
-												<i class="fa fa-check-square"></i>
+												<i class="fa fa-lg fa-check-square ms-1"></i>
 											</c:when>
 											<c:otherwise>
-												<i class="fa fa-minus-square"></i>
+												<i class="fa fa-lg fa-minus-square ms-1"></i>
 											</c:otherwise>
 										</c:choose>
 									</c:if>
@@ -129,7 +129,7 @@
 														${optionAnswer.answerInt}
 														
 														<c:if test="${optionAnswer.answerInt > 0 && option.correct}">
-															<i class="fa fa-check-square text-success"></i>
+															<i class="fa fa-lg fa-check-square text-success ms-1"></i>
 														</c:if>
 													</c:if>
 												</c:forEach>										
