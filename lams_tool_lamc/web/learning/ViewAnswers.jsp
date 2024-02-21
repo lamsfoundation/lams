@@ -86,8 +86,8 @@
 			<div class="card lcard">
 				<div class="card-header">
 					<div class="row align-items-center">
-						<div style="width:50px;">
-							${status.count})
+						<div style="width: 60px;">
+							${status.count}.
 						</div>
 	
 						<div class="col">
