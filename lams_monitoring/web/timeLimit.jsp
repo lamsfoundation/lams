@@ -537,13 +537,15 @@
 <c:set var="absoluteTimeLimitEnabled" value="${not empty param.absoluteTimeLimitFinish and param.absoluteTimeLimitFinish != 'null'}" />
 <c:set var="relativeTimeLimitEnabled" value="${param.relativeTimeLimit != 0}" />
 
-<div class="card mt-4" id="time-limit-panel">
-	<div class="card-header text-bg-secondary">
-       	<span class="card-title">
-       		<fmt:message key="label.monitoring.time.limit"/>
-     	</span>
-	</div>
-	<div class="card-body">
+<div class="accordion mt-2" id="time-limit-panel"> 
+<div class="accordion-item">
+	<h2 class="accordion-header" id="time-limit-header">
+       	<button class="accordion-button text-bg-secondary ${param.isTbl ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#time-limit-collapse" aria-expanded="${param.isTbl}" aria-controls="time-limit-collapse">
+          	<fmt:message key="label.monitoring.time.limit"/>
+   		</button>
+    </h2>
+        
+	<div id="time-limit-collapse" class="accordion-collapse collapse ${param.isTbl ? 'show' : ''}" aria-labelledby="time-limit-header">
 		<table id="time-limit-table" class="table align-middle">
 			<tr>
 				<td colspan="6" class="no-border-bottom">
@@ -732,6 +734,7 @@
 
 		</table>
 	</div>
+</div>
 </div>
 
 <div class="card" id="time-limit-widget">

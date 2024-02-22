@@ -75,7 +75,7 @@
 			let data = JSON.parse(event.data);
 			$('#time-limit-panel-placeholder').load('<lams:LAMSURL/>monitoring/timeLimit.jsp?toolContentId=${toolContentID}&absoluteTimeLimitFinish=' + data.absoluteTimeLimitFinish
 					+ '&relativeTimeLimit=' + data.relativeTimeLimit + '&absoluteTimeLimit=' + data.absoluteTimeLimit
-					+ '&isTbl=true&controllerContext=tool/lascrt11/monitoring');
+					+ '&isTbl=${isTbl}&controllerContext=tool/lascrt11/monitoring');
 		});
 
 		<c:if test="${fn:length(sessionDtos) > 10}">
