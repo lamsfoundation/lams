@@ -2,7 +2,7 @@
 
 <div class="lcard">
     <div class="card-header" id="heading-tool-output">
-      	<span class="panel-title collapsable-icon-left">
+      	<span class="card-title collapsable-icon-left">
 	    	<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#tool-output" aria-expanded="false" aria-controls="tool-output">
           		<fmt:message key="label.tool.output" />
           	</button>

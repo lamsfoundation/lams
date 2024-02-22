@@ -246,5 +246,4 @@
 
 <%@include file="parts/advanceOptions.jsp"%>
 
-<c:set var="restrictedTitle"><spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction" /></spring:escapeBody></c:set>
-<lams:RestrictedUsageAccordian title="${restrictedTitle}" submissionDeadline="${forum.submissionDeadline}" cssClass="my-2"/>
+<lams:RestrictedUsageAccordian submissionDeadline="${forum.submissionDeadline}" cssClass="my-2"/>

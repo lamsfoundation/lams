@@ -435,7 +435,7 @@
 
 <c:choose>
 	<c:when test="${empty sessionDtos}">
-		<lams:Alert5 type="info" id="no-session-summary" close="false">
+		<lams:Alert5 type="info" id="no-session-summary">
 			<fmt:message key="message.monitoring.summary.no.session" />
 		</lams:Alert5>
 	</c:when>
@@ -665,7 +665,6 @@
 
 <div id="time-limit-panel-placeholder"></div>
 
-<c:set var="restrictedTitle"><fmt:message key="monitor.summary.date.restriction" /></c:set>
-<lams:RestrictedUsageAccordian title="${restrictedTitle}" submissionDeadline="${submissionDeadline}" cssClass="my-2"/>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}" cssClass="my-2"/>
 
 <div id="change-leader-modals"></div>

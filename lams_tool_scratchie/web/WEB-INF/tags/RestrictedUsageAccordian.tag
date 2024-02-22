@@ -23,25 +23,28 @@
 	 */
 
 	/**
-	 * AdvancedAccordian.tag
+	 *  RestrictedUsageAccordian.tag
 	 *	Author: Fiona Malikoff
 	 *	Description: Creates the show/hide entry for the Restricted Usage Settings in Monitoring.
-	 * Wiki: 
 	 */
 %>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<%@ attribute name="title" required="true" rtexprvalue="true"%>
+<%@ attribute name="titleLabel" required="false" rtexprvalue="true"%>
 <%@ attribute name="submissionDeadline" required="false" rtexprvalue="true"%>
 <%@ attribute name="cssClass" required="false" rtexprvalue="true"%>
+
+<c:if test="${empty titleLabel}">
+	<c:set var="titleLabel" value="monitor.summary.date.restriction" />
+</c:if>
 
 <div class="accordion ${cssClass}" id="accordionRestrictUsageDiv"> 
     <div class="accordion-item">
     	<h2 class="accordion-header" id="headingRestrictedUsageDiv">
         	<button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv">
-	          	${title}
+	          	<fmt:message key="${titleLabel}" />
     		</button>
         </h2>
 
