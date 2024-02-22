@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-	<table id="questions-data" class="table table-bordered table-hover table-condensed">
+	<table id="questions-data" class="table table-bordered table-striped table-hover table-condensed">
 		<thead>
 			<tr role="row" class="border-top-0">
 				<th></th>
@@ -35,7 +35,6 @@
 			</tr>
 		</thead>
 		<tbody>
-		
 			<tr>
 				<th>
 					<b>

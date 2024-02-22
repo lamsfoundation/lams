@@ -128,8 +128,9 @@ public class TblMonitorController {
 
 	model.addAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId);
 	model.addAttribute("scratchie", scratchie);
+	model.addAttribute("isTbl", true);
 
-	return "pages/monitoring/studentChoices5";
+	return "pages/monitoring/studentChoices";
     }
 
     @RequestMapping("/traStudentChoicesTable")
@@ -220,8 +221,9 @@ public class TblMonitorController {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
 	request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
+	request.setAttribute("isTbl", true);
 
-	return "pages/monitoring/parts/burningQuestions5";
+	return "pages/tblmonitoring/burningQuestions";
     }
 
     /**
@@ -231,6 +233,7 @@ public class TblMonitorController {
     public String burningQuestionsTable(HttpServletRequest request) throws IOException, ServletException {
 	long toolContentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = scratchieService.getScratchieByContentId(toolContentId);
+	request.setAttribute("isTbl", WebUtil.readBooleanParam(request, "isTbl"));
 
 	//find available burningQuestionDtos, if any
 	if (scratchie.isBurningQuestionsEnabled()) {
@@ -247,7 +250,7 @@ public class TblMonitorController {
 	    request.setAttribute("discussionSentimentEnabled", scratchie.isDiscussionSentimentEnabled());
 	}
 
-	return "pages/monitoring/parts/burningQuestionsTable";
+	return "pages/tblmonitoring/burningQuestionsTable";
     }
 
     /**

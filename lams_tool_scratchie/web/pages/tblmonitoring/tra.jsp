@@ -1,5 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
+
 <style>
 	#barChart {
 		width: 515px !important; 
@@ -55,53 +56,42 @@
 	});
 </script>
 
-<div class="container-fluid">
-	 <div class="row">
-		<div class="col-10 offset-1">
-			<div class="float-end">
-				<button class="btn btn-secondary" type="button"
-					 onclick="javascript:loadTab('tratStudentChoices', $('#load-trat-student-choices-tab-btn'))">
-					<i class="fa fa-list-check"></i> 
-					<fmt:message key="label.show.students.choices"/>
-				</button>   
-			</div>                 
+<div class="container-main ms-4">
+	<div class="float-end">
+		<button class="btn btn-primary btn-icon-return" type="button"
+				 onclick="loadTab('tratStudentChoices', $('#load-trat-student-choices-tab-btn'))">
+			<fmt:message key="label.show.students.choices"/>
+		</button>   
+	</div>                 
 
-			<h3>
-				<fmt:message key="label.tra.questions.marks"/>
-			</h3>
-		</div>
-	</div>
+	<h3>
+		<fmt:message key="label.tra.questions.marks"/>
+	</h3>
 	
-	<div class="row mb-3">
-		<div class="col-5 offset-1 pt-1">
-			<h4>
-				<i class="fa fa-users text-secondary"></i> 
-				<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
-			</h4> 
+	<div class="pt-1 mb-3">
+		<div>
+			<i class="fa fa-users text-secondary"></i> 
+			<fmt:message key="label.attendance"/>: <span>${attemptedLearnersNumber}</span>/<span class="total-learners-number"></span> 
 		</div>
-	</div>
-	<!-- End notifications -->              
+	</div>          
 	
 	<!-- Tables -->
-	<c:forEach var="item" items="${items}" varStatus="i">
-		<div class="row mb-3">
-			<div class="col-10 offset-1">			
-				<div class="card" tabindex="0">
-					<div class="card-header">			
-						<h3 class="card-title mb-3" style="font-size: initial">
-							${i.index+1}. <c:out value="${item.qbQuestion.name}" escapeXml="false"/>
-						</h3> 
-						<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
-					</div>
+	<c:forEach var="item" items="${items}" varStatus="i">		
+		<div class="lcard mb-3">
+			<div class="card-header">
+				${i.index+1}. <c:out value="${item.qbQuestion.name}" escapeXml="false"/>
+			</div>
 			
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table">
-								<tbody>
-									<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
-										<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
-										<tr>
-											<c:choose>
+			<div class="card-body">
+				<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
+						
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<tbody>
+							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
+								<c:set var="cssClass"><c:if test='${qbOption.correct}'>text-bg-success</c:if></c:set>
+								<tr>
+									<c:choose>
 												<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
 													<td width="5px" class="${cssClass}">
 														<c:if test="${item.qbQuestion.prefixAnswersWithLetters}">
@@ -127,30 +117,24 @@
 														${fn:replace(qbOption.name, newLineChar, ', ')}
 													</td>
 												</c:otherwise>
-											</c:choose>
-										</tr>					
-									</c:forEach>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>  
+									</c:choose>
+								</tr>					
+							</c:forEach>
+						</tbody>
+					</table>
+				</div>
 			</div>
-		</div>
+		</div>  
 	</c:forEach>
 	<!-- End tables -->
 	
-	<div class="row">
-		<div class="col-8 offset-2 text-center">
-			<div class="card">
-				<div class="card-header">
-					<fmt:message key="label.tra.results.by.team"/>&nbsp;<small>(<fmt:message key="label.average"/>)</small>
-				</div>
-				
-				<div class="card-body">
-					<canvas id="barChart" height="240" width="515"></canvas>
-				</div>
-			</div>  
+	<div class="lcard">
+		<div class="card-header">
+			<fmt:message key="label.tra.results.by.team"/>&nbsp;<small>(<fmt:message key="label.average"/>)</small>
 		</div>
-	</div>
+				
+		<div class="card-body">
+			<canvas id="barChart" height="240" width="515"></canvas>
+		</div>
+	</div> 
 </div>

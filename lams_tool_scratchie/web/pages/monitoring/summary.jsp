@@ -1,9 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
-
+<c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
-	
+
+<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/thickbox.css" rel="stylesheet"  media="screen">
+<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
+<link href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet" type="text/css" >
+<lams:css suffix="chart"/>
 <style type="text/css">
 	/* remove jqGrid borders */
 	.ui-jqgrid {
@@ -53,6 +58,19 @@
 	}
 </style>
 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script> 
+<lams:JSImport src="includes/javascript/portrait5.js" />
+<!--  File Download -->
+<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
+ <!--  Marks Chart -->
+ <script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+ <script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		 $('[data-bs-toggle="tooltip"]').tooltip();
@@ -60,7 +78,6 @@
 		var oldValue = 0;
 		
 		<c:forEach var="summary" items="${summaryList}" varStatus="status">
-		
 			jQuery("#list${summary.sessionId}").jqGrid({
 				datatype: "local",
 				rowNum: 10000,
@@ -266,10 +283,16 @@
 	};
 
 	function showChangeLeaderModal(toolSessionId) {
-		$('#change-leader-modals').empty()
-		.load('<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',{
-			toolSessionID : toolSessionId
-		});
+		let modalContainer = $('#change-leader-modals');
+		modalContainer.empty().load(
+			'<c:url value="/monitoring/displayChangeLeaderForGroupDialogFromActivity.do" />',
+			{
+				toolSessionID : toolSessionId
+			}, 
+			function(){
+				modalContainer.children('.modal').modal('show');
+			}
+		);
 	}
 
 	function onChangeLeaderCallback(response, leaderUserId, toolSessionId){
@@ -308,118 +331,130 @@
 		messageRestrictionSet: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
 		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
-
-
 </script>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
+<div class="instructions">
 	<c:if test="${not empty summaryList}">
-		<button onclick="return exportExcel();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
-			<i class="fa fa-download" aria-hidden="true"></i> 
+		<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
+		<div class="clearfix">
+			<div class="badge text-bg-info float-end px-5 py-3 mt-2" id="messageArea"></div>
+		</div>
+	
+		<c:if test="${vsaPresent}">
+			<a class="btn btn-sm btn-secondary float-end ms-2" target="_blank"
+				   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+				<i class="fa-solid fa-arrow-down-1-9 me-1"></i>
+				<fmt:message key="label.vsa.allocate.button" />
+			</a>
+		</c:if>
+	
+		<button type="button" onclick="exportExcel()" class="btn btn-secondary btn-sm btn-disable-on-submit float-end">
+			<i class="fa fa-file-excel me-1" aria-hidden="true"></i> 
 			<fmt:message key="label.export.excel" />
 		</button>
 	</c:if>
 
-	<div class="panel">
-		<h4>
-		    <c:out value="${scratchie.title}" escapeXml="true"/>
-		</h4>
-		<div class="instructions voffset5">
-		    <c:out value="${scratchie.instructions}" escapeXml="false"/>
-		</div>
-		
-		<c:if test="${empty summaryList}">
-			<lams:Alert type="info" id="no-session-summary" close="false">
-				 <fmt:message key="message.monitoring.summary.no.session" />
-			</lams:Alert>
-		</c:if>
-	
-		<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
-		<div class="voffset5 help-block" id="messageArea"></div>
-	
+	<div class="fs-4">
+		<c:out value="${scratchie.title}" escapeXml="true"/>
 	</div>
 	
-	<c:set var="showStudentChoicesTableOnly" value="true" />
-	<c:set var="isTbl" value="false" />
-	<h4><fmt:message key="monitoring.tab.summary" /></h4>
-	<%@ include file="studentChoices.jsp"%>
+	<div class="mt-2">
+		<c:out value="${scratchie.instructions}" escapeXml="false"/>
+	</div>
+</div>
+
+<c:if test="${empty summaryList}">
+	<lams:Alert5 type="info" id="no-session-summary">
+		 <fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert5>
+</c:if>
 	
-	<div class="form-group">
-		<!-- Dropdown menu for choosing scratchie item -->
-		<label for="item-uid"><h4><fmt:message key="label.monitoring.summary.report.by.scratchie" /></h4></label>
-		<select id="item-uid" class="form-control">
-			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-   			<c:forEach var="item" items="${scratchie.scratchieItems}" varStatus="questionCount">
-				<option value="${item.uid}">${questionCount.count})&nbsp;<c:out value="${item.qbQuestion.name}" escapeXml="true"/></option>
-		   	</c:forEach>
-		</select>
-		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
+<c:set var="showStudentChoicesTableOnly" value="true" />
+<c:set var="isTbl" value="false" />
+<c:set var="toolContentID" value="${scratchie.contentId}" />
+<div class="card-subheader fs-4">
+	<fmt:message key="monitoring.tab.summary" />
+</div>
+<%@ include file="studentChoices.jsp"%>
+
+<!-- Dropdown menu for choosing scratchie item -->
+<div class="mb-4 mt-2">
+	<div class="card-subheader fs-4">
+		<label for="item-uid">
+			<fmt:message key="label.monitoring.summary.report.by.scratchie" />
+		</label>
 	</div>
 	
-	<c:if test="${vsaPresent}">
-		<a class="btn btn-sm btn-default buttons_column" target="_blank"
-		   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
-			<fmt:message key="label.vsa.allocate.button" />
-		</a>
+	<select id="item-uid" class="form-select">
+		<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
+   		<c:forEach var="item" items="${scratchie.scratchieItems}" varStatus="questionCount">
+			<option value="${item.uid}">${questionCount.count})&nbsp;<c:out value="${item.qbQuestion.name}" escapeXml="true"/></option>
+	   	</c:forEach>
+	</select>
+	<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
+</div>
+
+<div class="mb-3">
+	<div class="card-subheader fs-4">
+		<fmt:message key="label.report.by.team.tra" />
+	</div>
+	<em>
+		<fmt:message key="label.monitoring.summary.select.student" />
+	</em>
+</div>
+
+<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
+<c:forEach var="summary" items="${summaryList}" varStatus="status">
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<c:set var="summaryTitle"><strong><fmt:message key="monitoring.label.group" /></strong> ${summary.sessionName}</c:set>
 	</c:if>
-
-	<h4 style="padding-top: 10px"><fmt:message key="label.report.by.team.tra" /></h4>
-	<fmt:message key="label.monitoring.summary.select.student" />
-
-	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
-	<c:forEach var="summary" items="${summaryList}" varStatus="status">
-
-		<c:if test="${sessionMap.isGroupedActivity}">
-			<c:set var="summaryTitle"><strong><fmt:message key="monitoring.label.group" /></strong> ${summary.sessionName}</c:set>
-		</c:if>
 		
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${summary.sessionId}">
-        	<span class="panel-title collapsable-icon-left">
-        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${summary.sessionId}" 
-					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${summary.sessionId}" >
-				${summaryTitle}</a>
+	<div class="lcard" >
+        <div class="card-header" id="heading${summary.sessionId}">
+        	<span class="card-title collapsable-icon-left">
+        		<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${summary.sessionId}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${summary.sessionId}" >
+					${summaryTitle}
+				</button>
 			</span>
 			<c:if test="${fn:length(summary.users) > 0 and not summary.scratchingFinished}">
-				<button type="button" class="btn btn-default btn-xs pull-right"
-						onClick="javascript:showChangeLeaderModal(${summary.sessionId})">
+				<button type="button" class="btn btn-light btn-sm float-end"
+						onClick="showChangeLeaderModal(${summary.sessionId})">
+					<i class="fa-solid fa-user-pen me-1"></i>
 					<fmt:message key='label.monitoring.change.leader'/>
 				</button>
 			</c:if>
         </div>
         
-        <div id="collapse${summary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
-
-		<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-		
-		</div> <!-- end collapse area  -->
-		</div> <!-- end collapse panel  -->
-	
-	</c:forEach>
-
-	<!-- Display burningQuestionItemDtos -->
-	<c:if test="${scratchie.burningQuestionsEnabled}">
-		<div class="panel-group" style="padding-top: 10px" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
-		    <div class="panel panel-default" >
-		        <div class="panel-heading collapsable-icon-left" id="headingBurning">
-		        	<span class="panel-title">
-			    	<a role="button" data-toggle="collapse" href="#collapseBurning" aria-expanded="false" aria-controls="collapseBurning" >
-		          	<fmt:message key="label.burning.questions" />
-		        	</a>
-		      		</span>
-		        </div>
-		
-		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning" style="padding: 10px;">
-					<%@ include file="parts/burningQuestions.jsp"%>
-				</div>
-			</div>
+        <div id="collapse${summary.sessionId}" class="card-collapse collapse ${status.first ? 'show' : ''}">
+			<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>	
 		</div>
-	</c:if>
+	</div>	
+</c:forEach>
+
+<!-- Display burningQuestionItemDtos -->
+<c:if test="${scratchie.burningQuestionsEnabled}">
+	<div class="lcard" >
+		<div class="card-header collapsable-icon-left">
+			<span class="card-title">
+			    <button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" 
+			    		data-bs-target="#collapseBurning" aria-expanded="true" aria-controls="collapseBurning" >
+		          	<fmt:message key="label.burning.questions" />
+		        </button>
+			</span>
+		</div>
+		
+		<div id="collapseBurning" class="card-body collapse show">
+			<%@ include file="../tblmonitoring/burningQuestions.jsp"%>
+		</div>
+	</div>
+</c:if>
 	
 <%@ include file="parts/advanceOptions.jsp"%>
 
 <div id="time-limit-panel-placeholder"></div>
 
-<%@ include file="parts/dateRestriction.jsp"%>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}" cssClass="my-2"/>
 
 <div id="change-leader-modals"></div>

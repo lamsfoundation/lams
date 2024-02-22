@@ -17,6 +17,27 @@
 <script>
 	// global variable that stores information which burning question collapse panel was expanded before reload
 	var lamsTratBurningQuestionExpanded = null;
+
+	// copied from parent window's monitorLesson.js
+	<c:if test="${!isTbl}">
+	    var eventSources = [],
+	    	traToolContentId = ${scratchie.contentId};
+	    	
+		function openEventSource(url, onMessageFunction, skipExisting) {
+		    if (skipExisting) {
+		        for (let i = 0; i < eventSources.length; i++) {
+		            if (eventSources[i].url === url) {
+		                return eventSources[i];
+		            }
+		        }
+		    }
+	
+		    const eventSource = new EventSource(url);
+		    eventSources.push(eventSource);
+		    eventSource.onmessage = onMessageFunction;
+		    return eventSource;
+		}
+	</c:if>
 	
 	$(document).ready(function(){
 		openEventSource('<lams:WebAppURL />tblmonitoring/burningQuestionsFlux.do?toolContentId=' + traToolContentId, function (event) {
@@ -32,7 +53,7 @@
 					}						
 				);
 			});		
-			$("#burningQuestionsTable").load('<lams:WebAppURL />tblmonitoring/burningQuestionsTable.do?toolContentID=' + traToolContentId,
+			$("#burningQuestionsTable").load('<lams:WebAppURL />tblmonitoring/burningQuestionsTable.do?isTbl=${isTbl}&toolContentID=' + traToolContentId,
 					function(){
 						// expand same panels as before the reload
 						lamsTratBurningQuestionExpanded.forEach(function(entry){
@@ -44,11 +65,12 @@
 								$('#options-' + entry.itemUid, collapse).show();
 							}
 						});
-			});
+					}
+			);
 		});
 	});
 
-	<c:if test="${discussionSentimentEnabled}">
+	<c:if test="${isTbl and discussionSentimentEnabled}">
 		function startDiscussionSentiment(toolQuestionUid, burningQuestionUid, markAsActive) {
 			var idSuffix = toolQuestionUid + '-' + burningQuestionUid,
 				chartRow = $('#discussion-sentiment-chart-row-' + idSuffix).css('display', 'table-row');
@@ -61,11 +83,11 @@
 					markAsActive       : markAsActive
 				},
 				function(){
-					$('#discussion-sentiment-start-button-' + idSuffix).closest('td').remove();
+					$('#discussion-sentiment-start-button-' + idSuffix).remove();
 				}
 			)
 		}
 	</c:if>
 </script>
 
-<div id="burningQuestionsTable" class="container-fluid"></div>
+<div id="burningQuestionsTable" class="${isTbl ? 'container-main ms-4' : 'p-2'}"></div>

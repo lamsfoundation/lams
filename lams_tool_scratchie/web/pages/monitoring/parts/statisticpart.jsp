@@ -10,12 +10,13 @@
 	   	// must display charts after screen is visible or cannot calculate widths.
 		drawHistogram('chartDiv', 
 					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
-					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.groups.in.mark.range"/></spring:escapeBody>');
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', 
+					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.groups.in.mark.range"/></spring:escapeBody>'
+		);
 	});		
 </script>
 
 <c:choose>
-
 <c:when test="${empty summaryList}">
 	<lams:Alert type="info" id="no-session-summary" close="false">
 		<fmt:message key="message.monitoring.summary.no.session" />
@@ -23,16 +24,18 @@
 </c:when>
 	
 <c:otherwise>
-	
-	<p><fmt:message key="label.graph.help"/></p>
-	
-	<div class="panel panel-default" >
-      	<div class="panel-body">
+	<div class="lcard" >
+      	<div class="card-body">
+			<em class="p-2">
+				<fmt:message key="label.graph.help"/>
+			</em>
+			
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div id="chartDiv" class="markChartDiv"></div>
                 </div>    
             </div>
+            
             <div class="row">
                 <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
 					<table class="table table-striped table-hover table-condensed">
@@ -62,6 +65,7 @@
                         </tr>
                     </table>    
                 </div>
+                
                 <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
 					<table class="table table-striped table-hover table-condensed">
                         <tr>
@@ -91,21 +95,22 @@
                     </table>
                 </div>
             </div>
+		</div>
+	</div>
 
-            <div id="accordion-qb-stats" class="panel-group voffset20" role="tablist" aria-multiselectable="true">             
-	<div class="panel panel-default" >
-        <div class="panel-heading collapsable-icon-left" id="heading-qb-stats">
-            <span class="panel-title">
-                <a class="" role="button" data-toggle="collapse" href="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
+	<div class="lcard" >
+        <div class="card-header collapsable-icon-left" id="heading-qb-stats">
+            <span class="card-title">
+                <button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#qb-stats" aria-expanded="true" aria-controls="qb-stats">
                     <fmt:message key="label.qb.stats" />
-                </a>
-                <i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="" data-original-title="Item analysis is a technique that analyses the student answers to evaluate the effectiveness of questions in an exam."></i>
+                </button>
+                <i class="fa fa-question-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="right" title="Item analysis is a technique that analyses the student answers to evaluate the effectiveness of questions in an exam."></i>
     		</span>
         </div>
-        <div class="">
-            <div aria-expanded="true" id="qb-stats" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="heading-qb-stats" style="">
-                <table class="table table-striped table-hover table-condensed">
-                    <tr>		
+        
+		<div aria-expanded="true" id="qb-stats" class="card-body panel-collapse collapse show">
+                <table class="table table-striped table-condensed">
+                    <tr>
                         <th scope="col" class="text-left">
                             #
                         </th>
@@ -161,9 +166,7 @@
                         </tr>
                     </c:forEach>	
                 </table>
-            </div>
-	    </div>
+		</div>
     </div>
-	
 </c:otherwise>
 </c:choose>	

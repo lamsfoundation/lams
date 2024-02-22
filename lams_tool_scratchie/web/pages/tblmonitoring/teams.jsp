@@ -15,7 +15,6 @@
 				<tbody>
 					<c:forEach var="optionDto" items="${item.optionDtos}" varStatus="j">
 						<c:if test="${optionDto.scratched}">
-								
 							<tr>
 								<td width="5px">
 									${ALPHABET[j.index]}.
@@ -33,7 +32,6 @@
 									</c:choose>
 								</td>
 							</tr>
-									
 						</c:if>
 					</c:forEach>
 				</tbody>

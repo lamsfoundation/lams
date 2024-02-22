@@ -4,41 +4,44 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
+<c:set var="title">
+	<fmt:message key="label.monitoring.summary.report.for" >
+		<fmt:param>${fn:escapeXml(item.qbQuestion.name)}</fmt:param>
+	</fmt:message>
+</c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<link href="<lams:WebAppURL/>includes/css/assessment.css" rel="stylesheet" type="text/css">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+	<link href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet" type="text/css">
+	<style type="text/css">
+		/* remove jqGrid borders */
+		.ui-jqgrid {
+			border-left-style: none !important;
+			border-right-style: none !important;
+			border-bottom-style: none !important;
+		}
 		
-		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
-		<link href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet" type="text/css">
-		<style type="text/css">
-			/* remove jqGrid borders */
-			.ui-jqgrid {
-				border-left-style: none !important;
-				border-right-style: none !important;
-				border-bottom-style: none !important;
-			}
-			.ui-jqgrid tr {
-				border-left-style: none !important;
-			}
-			.ui-jqgrid td {
-				border-style: none !important;
-			}
-			
-			/* remove jqGrid border radius */
-			.ui-jqgrid.ui-jqgrid-bootstrap {
-			    border-radius:0;
-			    -moz-border-radius:0;
-			    -webkit-border-radius:0;
-			    -khtml-border-radius:0;
-			}
-		</style>
+		.ui-jqgrid tr {
+			border-left-style: none !important;
+		}
 		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
- 		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-  	    <script>
-	  	  	$(document).ready(function(){
+		.ui-jqgrid td {
+			border-style: none !important;
+		}
+		
+		/* remove jqGrid border radius */
+		.ui-jqgrid.ui-jqgrid-bootstrap {
+			border-radius: 0;
+			-moz-border-radius: 0;
+			-webkit-border-radius: 0;
+			-khtml-border-radius: 0;
+		}
+	</style>
+
+ 	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
+  	<script>
+		$(document).ready(function(){
 	  			<c:forEach var="summary" items="${summaryList}" varStatus="status">
-		  			
 	  				jQuery("#session${summary.sessionId}").jqGrid({
 	  					datatype: "local",
 	  					autoencode:false,
@@ -70,7 +73,6 @@
 	  	   	     			</c:forEach>
 	  	   	   	   	    });
 	  		        </c:forEach>			
-	  				
 	  			</c:forEach>
 	  			
 	  	        //jqgrid autowidth
@@ -85,44 +87,35 @@
 	  	            });
 	  	        };
 	  	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-	  	        
-	  		});  	
+	  	});  	
 
-    		function refreshSummaryPage()  {
-        		self.parent.tb_remove();
-    		}
-  		</script>
-	</lams:head>
-	<body class="stripes">
-	
-		<c:set var="title">
-			<fmt:message key="label.monitoring.summary.report.for" >
-				<fmt:param>${fn:escapeXml(item.qbQuestion.name)}</fmt:param>
-			</fmt:message>
-		</c:set>
-		<lams:Page type="learning" title="${title}">
+    	function refreshSummaryPage()  {
+        	self.parent.tb_remove();
+    	}
+  	</script>
+  		
+	<h1 class="fs-3">
+		${title}
+	</h1>
 		
-			<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
-			<br>
+	<div class="instructions">
+		<c:out value="${item.qbQuestion.description}" escapeXml="false"/>
+	</div>
 			
-			<c:forEach var="summary" items="${summaryList}" varStatus="status">
-				<div class="panel panel-default" >
-		        	<div class="panel-heading">
-						<span class="panel-title">
-							<fmt:message key="label.monitoring.item.summary.group" />&nbsp;${summary.sessionName}
-						</span>
-					</div>
+	<c:forEach var="summary" items="${summaryList}" varStatus="status">
+		<div class="lcard" >
+	       	<div class="card-header">
+				<fmt:message key="label.monitoring.item.summary.group" />&nbsp;${summary.sessionName}
+			</div>
 				
-					<table id="session${summary.sessionId}" class="scroll"></table>
-				</div>
-			</c:forEach>	
+			<table id="session${summary.sessionId}" class="scroll"></table>
+		</div>
+	</c:forEach>	
 
-			<a href="#" onclick="refreshSummaryPage();" class="btn btn-default pull-right">
-				<fmt:message key="button.close" /> 
-			</a>
-	
-		<div id="footer"></div>
-
-		</lams:Page>	
-	</body>
-</lams:html>
+	<div class="activity-bottom-buttons">
+		<button type="button" onclick="refreshSummaryPage()" class="btn btn-primary ms-2">
+			<i class="fa fa-close"></i>
+			<fmt:message key="button.close" />
+		</button>
+	</div>
+</lams:PageMonitor>

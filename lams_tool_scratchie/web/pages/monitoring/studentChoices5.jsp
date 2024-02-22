@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<% pageContext.setAttribute("newLineChar", "\r\n"); %>
+<c:set var="newLineChar" value="<%= \"\r\n\" %>" />
 
 <style>
 	/* show horizontal scroller for iPads */
@@ -39,24 +39,25 @@
 	  background-color: #d9534f; }
 </style>
 
-
 <script>
 	// tell TBL monitor that this element is scrollable horizontally
 	tlbMonitorHorizontalScrollElement = '#questions-data-container';
-	
-	function exportExcel(){
-		//dynamically create a form and submit it
-		var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
-		var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
-	    var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
-	    form.append(hiddenInput);
-	    $(document.body).append(form);
-	    form.submit();
-	};
+
+	<c:if test="${!isTbl}">
+		function exportExcel(){
+			//dynamically create a form and submit it
+			var exportExcelUrl = "<lams:LAMSURL/>tool/lascrt11/tblmonitoring/exportExcel.do?toolContentID=${toolContentID}&reqID=" + (new Date()).getTime();
+			var form = $('<form method="post" action="' + exportExcelUrl + '"></form>');
+		    var hiddenInput = $('<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"></input>');
+		    form.append(hiddenInput);
+		    $(document.body).append(form);
+		    form.submit();
+		};
+	</c:if>
 
 	function openActivityMonitoring(){
-		openPopUp('<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&contentFolderID='
-				+ contentFolderId, "MonitorActivity", popupHeight, popupWidth, true, true);
+		window.open("<lams:WebAppURL />monitoring/summary.do?toolContentID=${toolContentID}&lessonID=" + lessonId + 
+				"&contentFolderID=" + contentFolderId + "&reqID=" + (new Date()).getTime(), "_self");
 	}
 
 	$(document).ready(function(){
@@ -98,46 +99,43 @@
 	});
 </script>
 
-<div class="container-fluid">
-	 <div class="col-10 offset-1 pb-2">
-		<!-- Notifications -->  
+<div class="${isTbl ? 'container-main ms-4' : ''}">
+	<c:if test="${isTbl}">
 		<div class="float-end">
-			<a href="#nogo" onclick="javascript:openActivityMonitoring(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa-solid fa-circle-info"></i>
+			<button onclick="openActivityMonitoring()" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa-solid fa-circle-info me-1"></i>
 				<fmt:message key="label.activity.monitoring"/>
-			</a>
-			<a href="#nogo" type="button" class="btn btn-secondary buttons_column"
-					onclick="javascript:loadTab('trat', $('#load-trat-tab-btn'))">
-				<i class="fa fa-clipboard-question"></i>
+			</button>
+			<button type="button" class="btn btn-secondary buttons_column"
+					onclick="loadTab('trat', $('#load-trat-tab-btn'))">
+				<i class="fa fa-clipboard-question me-1"></i>
 				<fmt:message key="label.hide.students.choices"/>
-			</a>
-			<a href="#nogo" onclick="javascript:printTable(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-print"></i>
+			</button>
+			<button onclick="printTable()" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa fa-print me-1"></i>
 				<fmt:message key="label.print"/>
-			</a>
-			<a href="#nogo" onclick="javascript:exportExcel(); return false;" type="button" class="btn btn-secondary buttons_column">
-				<i class="fa fa-file"></i>
+			</button>
+			<button onclick="exportExcel()" type="button" class="btn btn-secondary buttons_column">
+				<i class="fa fa-file-excel me-1"></i>
 				<fmt:message key="label.export.excel"/>
-			</a>
+			</button>
 			<c:if test="${vsaPresent}">
 				<a class="btn btn-secondary buttons_column" target="_blank"
-				   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+					   href='<lams:LAMSURL />qb/vsa/displayVsaAllocate.do?toolContentID=${scratchie.contentId}'>
+					<i class="fa-solid fa-arrow-down-1-9 me-1"></i>
 					<fmt:message key="label.vsa.allocate.button" />
 				</a>
 			</c:if>
 		</div>
-		<!-- End notifications -->
+			
 		<h3>
 			<fmt:message key="label.tra.questions.marks"/>
 		</h3>
-	</div>
-	<div class="row">
-		<div class="col-10 offset-1">
-			<div class="card">
-				<div id="questions-data-container" class="table-responsive card-body">
-				</div>
-			</div>
-		</div>          
+	</c:if>
+
+	<div class="lcard ${isTbl ? 'mt-5' : ''}">
+		<div id="questions-data-container" class="table-responsive card-body">
+		</div>
 	</div>
 		
 	<!-- Question detail modal -->
@@ -145,22 +143,26 @@
 		<div class="modal fade" id="question${i.index}Modal">
 		<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-			<div class="modal-header align-items-start">
-				<div class="modal-title">
-					<span>Q${i.index+1})</span>
+			<div class="modal-header align-items-start text-bg-warning">
+				<div class="modal-title d-flex">
+					<span class="me-2">
+						Q${i.index+1})
+					</span>
 					<c:if test="${not empty item.qbQuestion.name}">
-						<p><c:out value="${item.qbQuestion.name}"  escapeXml="false" /></p>
+						<div><c:out value="${item.qbQuestion.name}"  escapeXml="false" /></div>
 					</c:if>
-					${item.qbQuestion.description}
 				</div>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
+			
 			<div class="modal-body">
+				${item.qbQuestion.description}
+					
 				<div class="table-responsive voffset10">
 					<table class="table table-striped table-hover">
 						<tbody>
 							<c:forEach var="qbOption" items="${item.qbQuestion.qbOptions}" varStatus="j">
-								<c:set var="cssClass"><c:if test='${qbOption.correct}'>bg-success</c:if></c:set>
+								<c:set var="cssClass"><c:if test='${qbOption.correct}'>text-bg-success</c:if></c:set>
 									<tr>
 										<c:choose>
 											<c:when test="${item.qbQuestion.type == 1 or item.qbQuestion.type == 8}">
@@ -195,6 +197,7 @@
 			</div> 
 			<div class="modal-footer">	
 				<a href="#" data-bs-dismiss="modal" class="btn btn-secondary">
+					<i class="fa fa-check fa-lg me-1"></i>
 					<fmt:message key="button.close"/>
 				</a>
 			</div>
@@ -204,8 +207,8 @@
 	</c:forEach>
 	<!-- End question detail modal -->
 	
-	<div class="row">
-		<div class="col-10 offset-1" id="time-limit-panel-placeholder">
+	<c:if test="${isTbl}">
+		<div id="time-limit-panel-placeholder">
 		</div>
-	</div>
+	</c:if>
 </div>
