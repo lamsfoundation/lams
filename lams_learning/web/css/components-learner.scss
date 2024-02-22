@@ -314,6 +314,10 @@
     @extend .text-bg-secondary;
 }
 
+.lcard > .card-header *:not(.badge, .btn, button) {
+	@extend .text-bg-secondary;
+}
+
 @media (width <= 768px) {
 
     .lcard > .card-header {
