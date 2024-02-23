@@ -11,9 +11,13 @@ CREATE TRIGGER before_insert_qb_question
   FOR EACH ROW
   SET new.uuid = IFNULL(new.uuid, UUID_TO_BIN(UUID()));
 
+ALTER TABLE lams_qb_question ADD INDEX UQ_uuid (uuid);
+
 -- Remove duplicate UUIDs and make sure they are unique in the future
 UPDATE lams_qb_question AS q1, lams_qb_question AS q2 SET q2.uuid = UUID_TO_BIN(UUID())
 WHERE q1.uuid = q2.uuid AND q1.uid < q2.uid;
+
+ALTER TABLE lams_qb_question DROP INDEX UQ_uuid;
 
 ALTER TABLE lams_qb_question ADD CONSTRAINT UQ_uuid UNIQUE (uuid);
 
