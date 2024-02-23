@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.authoring;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,15 +107,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Manpreet Minhas
  * @author Mailing Truong
  *
- *         This is a utility class for extracting the information from the JSON packet sent by Authoring.
+ * 	This is a utility class for extracting the information from the JSON packet sent by Authoring.
  *
- *         The following rules are applied: The client sends a subset of all possible data. If a field is included, then
- *         the value associated with this field should be persisted (the value maybe a new value or an unchanged value)
- *         If a field is not included then the server should assume that the value is unchanged. If the value of a field
- *         is one of the special null values, then null should be persisted.
+ * 	The following rules are applied: The client sends a subset of all possible data. If a field is included, then the
+ * 	value associated with this field should be persisted (the value maybe a new value or an unchanged value) If a field
+ * 	is not included then the server should assume that the value is unchanged. If the value of a field is one of the
+ * 	special null values, then null should be persisted.
  *
- *         Object extractor has member data, so it should not be used as a singleton.
- *
+ * 	Object extractor has member data, so it should not be used as a singleton.
  */
 public class ObjectExtractor implements IObjectExtractor {
 
@@ -329,8 +329,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	if (copyTypeID == null) {
 	    copyTypeID = LearningDesign.COPY_TYPE_NONE;
 	}
-	if ((learningDesign != null) && (learningDesign.getCopyTypeID() != null)
-		&& !learningDesign.getCopyTypeID().equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
+	if ((learningDesign != null) && (learningDesign.getCopyTypeID() != null) && !learningDesign.getCopyTypeID()
+		.equals(copyTypeID) && !learningDesign.getEditOverrideLock()) {
 	    throw new ObjectExtractorException(
 		    "Unable to save learning design. Cannot change copy type on existing design.");
 	}
@@ -459,8 +459,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		ComplexActivity complex = defaultActivityMap.get(defaultChildUIID);
 		Activity defaultActivity = newActivityMap.get(defaultChildUIID);
 		if (defaultActivity == null) {
-		    String msg = "Unable to find the default child activity (" + defaultChildUIID
-			    + ") for the activity (" + complex + ") referred to in First Child to Sequence map.";
+		    String msg =
+			    "Unable to find the default child activity (" + defaultChildUIID + ") for the activity ("
+				    + complex + ") referred to in First Child to Sequence map.";
 		    throw new ObjectExtractorException(msg);
 		} else {
 		    complex.setDefaultActivity(defaultActivity);
@@ -474,9 +475,9 @@ public class ObjectExtractor implements IObjectExtractor {
 			defaultActivity.setOrderId(1);
 
 			int nextOrderId = 2;
-			Activity nextActivity = defaultActivity.getTransitionFrom() != null
-				? defaultActivity.getTransitionFrom().getToActivity()
-				: null;
+			Activity nextActivity =
+				defaultActivity.getTransitionFrom() != null ? defaultActivity.getTransitionFrom()
+					.getToActivity() : null;
 			while (nextActivity != null) {
 			    boolean removed = unprocessedChildren.remove(nextActivity);
 			    if (!removed) {
@@ -486,9 +487,8 @@ public class ObjectExtractor implements IObjectExtractor {
 				break;
 			    }
 			    nextActivity.setOrderId(nextOrderId++);
-			    nextActivity = nextActivity.getTransitionFrom() != null
-				    ? nextActivity.getTransitionFrom().getToActivity()
-				    : null;
+			    nextActivity = nextActivity.getTransitionFrom() != null ? nextActivity.getTransitionFrom()
+				    .getToActivity() : null;
 			}
 
 			if (unprocessedChildren.size() > 0) {
@@ -520,8 +520,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void intialiseBranchActivityMappings() {
-	oldbranchActivityEntryList = branchActivityEntryDAO
-		.getEntriesByLearningDesign(learningDesign.getLearningDesignId());
+	oldbranchActivityEntryList = branchActivityEntryDAO.getEntriesByLearningDesign(
+		learningDesign.getLearningDesignId());
     }
 
     /**
@@ -566,16 +566,17 @@ public class ObjectExtractor implements IObjectExtractor {
 
 			Activity activity = oldActivityMap.get(uiid);
 			if (toolSessions.size() > 1) {
-			    throw new ObjectExtractorException("More than one tool session exists for activity "
-				    + activity.getTitle() + " (" + uiid
-				    + ") but this shouldn't be possible. Cannot delete this tool session so editing is not allowed!");
+			    throw new ObjectExtractorException(
+				    "More than one tool session exists for activity " + activity.getTitle() + " ("
+					    + uiid
+					    + ") but this shouldn't be possible. Cannot delete this tool session so editing is not allowed!");
 			} else if (toolSessions.size() == 1) {
 
 			    ToolSession toolSession = (ToolSession) toolSessions.get(0);
 			    if (activity.isGroupingActivity()) {
-				throw new ObjectExtractorException("Activity " + activity.getTitle() + " ("
-					+ activity.getActivityUIID()
-					+ ") has a tool session but it is grouped. Cannot delete this tool session so editing is not allowed!");
+				throw new ObjectExtractorException(
+					"Activity " + activity.getTitle() + " (" + activity.getActivityUIID()
+						+ ") has a tool session but it is grouped. Cannot delete this tool session so editing is not allowed!");
 			    }
 
 			    // all okay, do ahead and delete the tool session
@@ -635,9 +636,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    createRandomGrouping((RandomGrouping) grouping, groupingDetails);
 	} else if (grouping.isChosenGrouping()) {
 	    createChosenGrouping((ChosenGrouping) grouping, groupingDetails);
-	}
-
-	else if (grouping.isLearnerChoiceGrouping()) {
+	} else if (grouping.isLearnerChoiceGrouping()) {
 	    createLearnerChoiceGrouping((LearnerChoiceGrouping) grouping, groupingDetails);
 	} else {
 	    createLessonClass((LessonClass) grouping, groupingDetails);
@@ -645,19 +644,21 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	grouping.setMaxNumberOfGroups(JsonUtil.optInt(groupingDetails, "maxNumberOfGroups"));
 
-	Set<Group> groupsToDelete = new HashSet<>(grouping.getGroups());
+	Set<Group> existingGroups = new HashSet<>(grouping.getGroups());
+	grouping.getGroups().clear();
 
 	ArrayNode groupsList = JsonUtil.optArray(groupingDetails, "groups");
 	if (groupsList != null) {
 	    for (JsonNode groupDetails : groupsList) {
-		Group group = extractGroupObject((ObjectNode) groupDetails, grouping);
+		Group group = extractGroupObject((ObjectNode) groupDetails, existingGroups);
+		group.setGrouping(grouping);
 		groups.put(group.getGroupUIID(), group);
-		groupsToDelete.remove(group);
+		existingGroups.remove(group);
 	    }
 	}
 
-	if (groupsToDelete.size() > 0) {
-	    Iterator iter = groupsToDelete.iterator();
+	if (existingGroups.size() > 0) {
+	    Iterator iter = existingGroups.iterator();
 	    while (iter.hasNext()) {
 		Group group = (Group) iter.next();
 		if (group.getBranchActivities() != null) {
@@ -668,13 +669,13 @@ public class ObjectExtractor implements IObjectExtractor {
 		    }
 		    group.getBranchActivities().clear();
 		}
-		grouping.getGroups().remove(group);
+		groupDAO.deleteGroup(group);
 	    }
 	}
 	return grouping;
     }
 
-    private Group extractGroupObject(ObjectNode groupDetails, Grouping grouping) {
+    private Group extractGroupObject(ObjectNode groupDetails, Collection<Group> groups) {
 
 	Group group = null;
 	Integer groupUIID = JsonUtil.optInt(groupDetails, AuthoringJsonTags.GROUP_UIID);
@@ -688,10 +689,10 @@ public class ObjectExtractor implements IObjectExtractor {
 	// worst case, which is the group
 	// is created at runtime but then modified in authoring (and has has a
 	// new UI ID added) is handled.
-	if ((grouping.getGroups() != null) && (grouping.getGroups().size() > 0)) {
+	if ((groups != null) && (groups.size() > 0)) {
 	    Group uiid_match = null;
 	    Group id_match = null;
-	    Iterator iter = grouping.getGroups().iterator();
+	    Iterator iter = groups.iterator();
 	    while ((uiid_match == null) && iter.hasNext()) {
 		Group possibleGroup = (Group) iter.next();
 		if (groupUIID != null && groupUIID.equals(possibleGroup.getGroupUIID())) {
@@ -706,11 +707,9 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (group == null) {
 	    group = new Group();
-	    grouping.getGroups().add(group);
 	}
 
 	group.setGroupName(JsonUtil.optString(groupDetails, AuthoringJsonTags.GROUP_NAME));
-	group.setGrouping(grouping);
 	group.setGroupUIID(groupUIID);
 	group.setOrderId(JsonUtil.optInt(groupDetails, AuthoringJsonTags.ORDER_ID, 0));
 
@@ -871,8 +870,9 @@ public class ObjectExtractor implements IObjectExtractor {
 
 		    Activity parentActivity = newActivityMap.get(parentUIID);
 		    if (parentActivity == null) {
-			throw new ObjectExtractorException("Parent activity " + parentUIID + " missing for activity "
-				+ existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
+			throw new ObjectExtractorException(
+				"Parent activity " + parentUIID + " missing for activity " + existingActivity.getTitle()
+					+ ": " + existingActivity.getActivityUIID());
 		    }
 		    existingActivity.setParentActivity(parentActivity);
 		    existingActivity.setParentUIID(parentUIID);
@@ -1129,8 +1129,8 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildOptionsActivity(OptionsActivity optionsActivity, ObjectNode activityDetails) {
 	optionsActivity.setMaxNumberOfOptions(JsonUtil.optInt(activityDetails, AuthoringJsonTags.MAX_OPTIONS));
 	optionsActivity.setMinNumberOfOptions(JsonUtil.optInt(activityDetails, AuthoringJsonTags.MIN_OPTIONS));
-	optionsActivity
-		.setOptionsInstructions(JsonUtil.optString(activityDetails, AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
+	optionsActivity.setOptionsInstructions(
+		JsonUtil.optString(activityDetails, AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
     }
 
     private void buildOptionsWithSequencesActivity(OptionsWithSequencesActivity optionsActivity,
@@ -1157,8 +1157,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	// copy content if its the default one
 	Long toolContentId = JsonUtil.optLong(activityDetails, AuthoringJsonTags.TOOL_CONTENT_ID);
 	if ((toolContentId == null) || toolContentId.equals(tool.getDefaultToolContentId())) {
-	    if ((toolActivity.getToolContentId() == null)
-		    || toolActivity.getToolContentId().equals(tool.getDefaultToolContentId())) {
+	    if ((toolActivity.getToolContentId() == null) || toolActivity.getToolContentId()
+		    .equals(tool.getDefaultToolContentId())) {
 		toolContentId = getLamsCoreToolService().notifyToolToCopyContent(toolActivity, null);
 	    } else {
 		toolContentId = toolActivity.getToolContentId();
@@ -1236,10 +1236,10 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (existingTransition == null) {
 	    if (false/*
-		      * It will eventually be implemented in Authoring. Now we need to check what kind of transition are
-		      * we
-		      * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
-		      */) {
+	     * It will eventually be implemented in Authoring. Now we need to check what kind of transition are
+	     * we
+	     * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
+	     */) {
 		transition = new DataTransition();
 	    } else {
 		transition = new Transition();
@@ -1300,8 +1300,8 @@ public class ObjectExtractor implements IObjectExtractor {
      * activity but not a too activity. These cases should be picked up by Authoring, but just in case.
      */
     private void cleanupTransition(Transition transition) {
-	if ((transition.getFromActivity() != null)
-		&& transition.equals(transition.getFromActivity().getTransitionFrom())) {
+	if ((transition.getFromActivity() != null) && transition.equals(
+		transition.getFromActivity().getTransitionFrom())) {
 	    transition.getFromActivity().setTransitionFrom(null);
 	}
 	if ((transition.getToActivity() != null) && transition.equals(transition.getToActivity().getTransitionTo())) {
@@ -1550,8 +1550,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    Integer conditionUIID = JsonUtil.optInt(conditionDetails, AuthoringJsonTags.CONDITION_UIID);
 	    String conditionType = JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_TYPE);
 
-	    if (BranchCondition.OUTPUT_TYPE_COMPLEX.equals(conditionType)
-		    || BranchCondition.OUTPUT_TYPE_STRING.equals(conditionType)) {
+	    if (BranchCondition.OUTPUT_TYPE_COMPLEX.equals(conditionType) || BranchCondition.OUTPUT_TYPE_STRING.equals(
+		    conditionType)) {
 		// This is different than "conditionID" !!!
 		Long newConditionID = condition == null
 			? JsonUtil.optLong(conditionDetails, AuthoringJsonTags.CONDITION_ID)
@@ -1579,8 +1579,8 @@ public class ObjectExtractor implements IObjectExtractor {
 			JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 	    } else {
 		condition.setConditionUIID(conditionUIID);
-		condition
-			.setDisplayName(JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_DISPLAY_NAME));
+		condition.setDisplayName(
+			JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_DISPLAY_NAME));
 		condition.setEndValue(JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE));
 		condition.setExactMatchValue(
 			JsonUtil.optString(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
