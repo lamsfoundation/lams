@@ -56,7 +56,7 @@
 					</c:otherwise>
 				</c:choose>
 				<c:set var="canRate" value="${toolSessionID != session.sessionId and (!isLeadershipEnabled or isUserLeader)}" />
-				<c:set var="showRating" value="${canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating))}" />
+				<c:set var="showRating" value="${assessment.allowAnswerRating and (canRate or (not empty itemRatingDto.commentDtos and (toolSessionID != session.sessionId or questionSummary.showOwnGroupRating)))}" />
 			</c:if>
 			
 			<%-- Show answers for all other teams, and just rating if someone has already commented on this team's answer --%>

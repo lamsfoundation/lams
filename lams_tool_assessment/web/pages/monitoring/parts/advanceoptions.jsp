@@ -176,7 +176,24 @@
 				</c:choose>	
 			</td>
 		</tr>
-		
+
+		<tr>
+			<td>
+				<fmt:message key="label.authoring.advance.rate.answers" />
+			</td>
+
+			<td>
+				<c:choose>
+					<c:when test="${assessment.allowAnswerRating}">
+						<fmt:message key="label.on" />
+					</c:when>
+					<c:otherwise>
+						<fmt:message key="label.off" />
+					</c:otherwise>
+				</c:choose>
+			</td>
+		</tr>
+
 		<tr>
 			<td>
 				<fmt:message key="label.authoring.advance.allow.students.right.answers" />
