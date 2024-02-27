@@ -652,6 +652,7 @@ public class ObjectExtractor implements IObjectExtractor {
 	    for (JsonNode groupDetails : groupsList) {
 		Group group = extractGroupObject((ObjectNode) groupDetails, existingGroups);
 		group.setGrouping(grouping);
+		grouping.getGroups().add(group);
 		groups.put(group.getGroupUIID(), group);
 		existingGroups.remove(group);
 	    }
