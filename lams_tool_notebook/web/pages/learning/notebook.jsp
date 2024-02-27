@@ -3,7 +3,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <lams:PageLearner title="${notebookDTO.title}" toolSessionID="${messageForm.toolSessionID}" >
-		<script type="text/javascript">
+	<script type="text/javascript">
 			checkNextGateActivity('finishButton', '${messageForm.toolSessionID}', '', function(){
 				submitForm('finish');
 			});
@@ -16,7 +16,9 @@
 			}
 
 			function textAreaReady() {
-				document.getElementById("finishButton").style.visibility = 'visible';
+				if (document.getElementById("finishButton")) {
+					document.getElementById("finishButton").style.visibility = 'visible';
+				}
 			}
 			
 			function submitForm(methodName) {
@@ -28,13 +30,11 @@
 			      	var isEmpty = editorcontent.length === 0;
 
 					if (forceResponse =="true" && isEmpty ) {
-
 						retValue = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.alertforceResponse</fmt:message></spring:escapeBody>");
 						textAreaReady();
 						return retValue;
 						
 					} else if  (forceResponse =="false" && isEmpty && mode == "learner") {
-			
 						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.input</fmt:message></spring:escapeBody>")) {
 							// otherwise, focus on the text area
 							textAreaReady();
@@ -44,13 +44,11 @@
 				</c:when>		
 				<c:otherwise>
 					if (forceResponse =="true" && document.forms.messageForm.entryText.value == "") {
-
 						retValue = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.alertforceResponse</fmt:message></spring:escapeBody>");
 						textAreaReady();
 						return retValue;
 						
 					} else if  (forceResponse =="false" && document.forms.messageForm.entryText.value == "" && mode == "learner") {
-			
 						if (!confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message>message.learner.blank.input</fmt:message></spring:escapeBody>")) {
 							// otherwise, focus on the text area
 							textAreaReady();
@@ -72,7 +70,7 @@
 					}
 				</c:if>
 			}
-		</script>
+	</script>
 
 	<div id="container-main">
 	<form:form action="learning/finishActivity.do" method="post" modelAttribute="messageForm" id="messageForm">

@@ -81,40 +81,42 @@
             document.addEventListener("webkitfullscreenchange", whiteboardFullScreenChanged);
             document.addEventListener("msfullscreenchange", whiteboardFullScreenChanged);
 
-            let timeLimitExceeded = ${timeLimitExceeded};
-            initWebsocket('whiteboardTimeLimit${sessionMap.toolContentID}',
-                '<lams:WebAppURL />'.replace('http', 'ws')
-                + 'learningWebsocket?toolContentID=${sessionMap.toolContentID}',
-                function (e) {
-                    // create JSON object
-                    var input = JSON.parse(e.data);
-
-                    if (input.clearTimer == true) {
-                        // teacher stopped the timer, destroy it
-                        $('#countdown').countdown('destroy').remove();
-                    } else if (typeof input.secondsLeft != 'undefined'){
-                        // teacher updated the timer
-                        var secondsLeft = +input.secondsLeft,
-                            counterInitialised = $('#countdown').length > 0;
-
-                        if (counterInitialised) {
-                            // just set the new time
-                            $('#countdown').countdown('option', 'until', secondsLeft + 'S');
-                        } else if (timeLimitExceeded){
-                            if (secondsLeft > 0) {
-                                // teacher gave extra time, reload to writable Whiteboard
-                                location.reload();
-                                return;
-                            }
-                        } else {
-                            // initialise the timer
-                            displayCountdown(secondsLeft);
-                        }
-                    }
-
-                    // reset ping timer
-                    websocketPing('whiteboardTimeLimit${sessionMap.toolContentID}', true);
-                });
+            <c:if test="${mode != 'teacher'}">
+            	let timeLimitExceeded = ${timeLimitExceeded};
+            	initWebsocket('whiteboardTimeLimit${sessionMap.toolContentID}',
+                	'<lams:WebAppURL />'.replace('http', 'ws') + 'learningWebsocket?toolContentID=${sessionMap.toolContentID}',
+	                function (e) {
+	                    // create JSON object
+	                    var input = JSON.parse(e.data);
+	
+	                    if (input.clearTimer == true) {
+	                        // teacher stopped the timer, destroy it
+	                        $('#countdown').countdown('destroy').remove();
+	                    } else if (typeof input.secondsLeft != 'undefined'){
+	                        // teacher updated the timer
+	                        var secondsLeft = +input.secondsLeft,
+	                            counterInitialised = $('#countdown').length > 0;
+	
+	                        if (counterInitialised) {
+	                            // just set the new time
+	                            $('#countdown').countdown('option', 'until', secondsLeft + 'S');
+	                        } else if (timeLimitExceeded){
+	                            if (secondsLeft > 0) {
+	                                // teacher gave extra time, reload to writable Whiteboard
+	                                location.reload();
+	                                return;
+	                            }
+	                        } else {
+	                            // initialise the timer
+	                            displayCountdown(secondsLeft);
+	                        }
+	                    }
+	
+	                    // reset ping timer
+	                    websocketPing('whiteboardTimeLimit${sessionMap.toolContentID}', true);
+	                }
+                );
+            </c:if>
         });
 
         if (${!hasEditRight && mode != "teacher" && !finishedLock}) {

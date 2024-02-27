@@ -148,6 +148,7 @@ public class LearningController {
 	sessionMap.put(DacoConstants.ATTR_USER_FINISHED, dacoUser != null && dacoUser.isSessionFinished());
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	sessionMap.put(AttributeNames.PARAM_USER_ID, dacoUser.getUserId());
 	sessionMap.put(DacoConstants.ATTR_DACO, daco);
 	String currentView = request.getParameter(DacoConstants.ATTR_LEARNING_VIEW);
 	sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW,
@@ -893,16 +894,20 @@ public class LearningController {
     protected String changeView(HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	Long userId = (Long) sessionMap.get(AttributeNames.PARAM_USER_ID);
+	
 	String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
 	if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
 	    currentView = DacoConstants.LEARNING_VIEW_VERTICAL;
 	} else {
 	    currentView = DacoConstants.LEARNING_VIEW_HORIZONTAL;
 	}
-	return "redirect:start.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "="
-		+ sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID) + "&" + AttributeNames.PARAM_MODE + "="
-		+ sessionMap.get(AttributeNames.PARAM_MODE) + "&" + DacoConstants.ATTR_LEARNING_VIEW + "="
-		+ currentView;
+	
+	return "redirect:start.do?" + AttributeNames.PARAM_TOOL_SESSION_ID + "=" + sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID) + 
+		"&" + AttributeNames.PARAM_MODE + "=" + sessionMap.get(AttributeNames.PARAM_MODE) + 
+		(mode.isTeacher() ? "&" + AttributeNames.PARAM_USER_ID + "=" + userId : "") +
+		"&" + DacoConstants.ATTR_LEARNING_VIEW + "=" + currentView;
     }
 
     @RequestMapping("/refreshQuestionSummaries")

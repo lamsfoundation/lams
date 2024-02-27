@@ -167,6 +167,7 @@ public class LearningController {
 
 	nbLearnerForm.copyValuesIntoForm(nbContent, readOnly, mode.toString());
 
+	request.setAttribute("mode", mode);
 	request.setAttribute("allowComments", nbContent.isAllowComments());
 	request.setAttribute("likeAndDislike", nbContent.isCommentsLikeAndDislike());
 	request.setAttribute("anonymous", nbContent.isAllowAnonymous());

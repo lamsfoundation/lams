@@ -26,20 +26,22 @@
                 $("#leaderSelectionDialog").modal('show');
             }
 
-            initWebsocket('leaderSelection${toolSessionID}',
-                '<lams:WebAppURL />'.replace('http', 'ws')
-                + 'learningWebsocket?toolSessionID=${toolSessionID}',
-                function (e) {
-                    // create JSON object
-                    var input = JSON.parse(e.data);
-
-                    // The leader has just been selected and all non-leaders should refresh their pages in order
-                    // to see new leader's name and a Finish button.
-                    if (input.pageRefresh) {
-                        location.reload();
-                        return;
-                    }
-                });
+            <c:if test="${mode != 'teacher'}">
+            	initWebsocket('leaderSelection${toolSessionID}',
+                	'<lams:WebAppURL />'.replace('http', 'ws') + 'learningWebsocket?toolSessionID=${toolSessionID}',
+	                function (e) {
+	                    // create JSON object
+	                    var input = JSON.parse(e.data);
+	
+	                    // The leader has just been selected and all non-leaders should refresh their pages in order
+	                    // to see new leader's name and a Finish button.
+	                    if (input.pageRefresh) {
+	                        location.reload();
+	                        return;
+	                    }
+	                }
+                );
+            </c:if>
         });
 
         function leaderSelection() {
@@ -90,30 +92,31 @@
                 </div>
             </div>
         </div>
-
-        <div id="actionbuttons" class="activity-bottom-buttons">
-            <c:if test="${!isSelectLeaderActive}">
-                <button type="button" class="btn btn-primary na" id="finishButton">
-                    <c:choose>
-                        <c:when test="${isLastActivity}">
-                            <fmt:message key="button.submit" />
-                        </c:when>
-                        <c:otherwise>
-                            <fmt:message key="button.finish" />
-                        </c:otherwise>
-                    </c:choose>
-                </button>
-            </c:if>
-
-            <button type="button" onclick="location.reload();"
-                    class="btn btn-secondary me-2 d-flex align-items-center">
-                <i class="fa fa-refresh me-1"></i>
-                <span class="d-none d-sm-block">
-					<fmt:message key="label.refresh" />
-				</span>
-            </button>
-        </div>
-
+        
+		<c:if test="${mode != 'teacher'}">
+	        <div id="actionbuttons" class="activity-bottom-buttons">
+	            <c:if test="${!isSelectLeaderActive}">
+	                <button type="button" class="btn btn-primary na" id="finishButton">
+	                    <c:choose>
+	                        <c:when test="${isLastActivity}">
+	                            <fmt:message key="button.submit" />
+	                        </c:when>
+	                        <c:otherwise>
+	                            <fmt:message key="button.finish" />
+	                        </c:otherwise>
+	                    </c:choose>
+	                </button>
+	            </c:if>
+	
+	            <button type="button" onclick="location.reload();"
+	                    class="btn btn-secondary me-2 d-flex align-items-center">
+	                <i class="fa fa-refresh me-1"></i>
+	                <span class="d-none d-sm-block">
+						<fmt:message key="label.refresh" />
+					</span>
+	            </button>
+	        </div>
+        </c:if>
     </div>
 
     <!-- leaderSelection dialog -->
