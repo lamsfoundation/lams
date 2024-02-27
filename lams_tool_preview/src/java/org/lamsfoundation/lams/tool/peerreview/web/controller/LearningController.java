@@ -299,7 +299,6 @@ public class LearningController {
 		}
 		request.setAttribute("stepNumber", stepNum);
 	    }
-
 	}
 
 	sessionMap.put("isDisabled",
@@ -308,7 +307,7 @@ public class LearningController {
 	sessionMap.put("isSessionCompleted", user.getSession().getStatus() == PeerreviewConstants.COMPLETED);
 
 	// finally, work out which page to go to!
-	if (user.isSessionFinished()) {
+	if (user.isSessionFinished() || mode.isTeacher()) {
 	    String redirectURL = SHOW_RESULTS_REDIRECT;
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    return redirectURL;

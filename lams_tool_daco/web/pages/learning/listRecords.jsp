@@ -97,9 +97,8 @@
 						<div class="card-header">
 							<fmt:message key="label.learning.heading.recordnumber" />&nbsp;${recordStatus.index+1}
 							
-							<c:if test='${includeMode=="learning" and not finishedLock}'>
 							<%-- If the record can be edited, display these links. --%>
-								
+							<c:if test='${includeMode=="learning" and not finishedLock and (mode != "teacher")}'>
 								<div class="float-end">
 									<button type="button" class="no-decoration fa fa-trash text-bg-danger shadow rounded p-2"
 									   title="<fmt:message key="label.common.delete" />"

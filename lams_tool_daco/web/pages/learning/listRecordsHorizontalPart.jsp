@@ -48,8 +48,8 @@
 				<span class="bigNumber">
 					${recordStatus.index+1}
 				</span>
-					
-				<c:if test='${includeMode=="learning" and not finishedLock}'>
+
+				<c:if test='${includeMode=="learning" and not finishedLock and (sessionMap.mode != "teacher")}'>
 					<span class="float-end me-2">
 						<%-- If the record can be edited, display these links. --%>
 						<button type="button" class="no-decoration fa fa-trash text-bg-danger shadow rounded p-2"

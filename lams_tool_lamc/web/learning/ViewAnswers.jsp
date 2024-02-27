@@ -234,8 +234,8 @@
 			<form:hidden path="userOverPassMark" />
 			<form:hidden path="passMarkApplicable" />
 				
-			<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
-					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+			<c:if test="${mode != 'teacher' && ((mcGeneralLearnerFlowDTO.retries != 'true') 
+					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
 				<form:hidden path="learnerFinished" value="Finished" />
 
 				<button type="button" class="btn btn-primary na" id="finishButton">

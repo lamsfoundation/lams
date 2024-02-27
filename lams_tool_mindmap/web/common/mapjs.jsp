@@ -51,27 +51,27 @@
 				sessionId: "${sessionId}", mode: "${mode}" } , 
 	        dataType: "json", 
 	        success: function (response) {
-		        	initialActionId = response.lastActionId;
+		        initialActionId = response.lastActionId;
 		        lastActionId = initialActionId;
 		        var idea = content(response.mindmap);
 
 		        <c:if  test="${multiMode}">
     				window.mapModel.setLabelGenerator(labelGenerator, "CreatorNameLabels");
-    				</c:if>
+    			</c:if>
     				
 			    window.mapModel.setIdea(idea);
 		        <c:if test="${!contentEditable}">
 		    		    window.mapModel.setEditingEnabled(false);
-    			    </c:if>
+    			</c:if>
 		        <c:if  test="${multiMode && contentEditable}">
 			        idea.addEventListener('changed', onIdeaChangedLAMS); 
 		        </c:if>
 		        contentAggregate = window.mapModel.getIdea();
-		        <c:if  test="${multiMode && contentEditable}">
-
-				<%-- Websockets used to get the node updates from the server --%>
-				<%-- init the connection with server using server URL but with different protocol --%>
-				initWebsocket('mindmapNodes${sessionId}',
+		        
+		        <c:if  test="${multiMode && contentEditable && mode != 'teacher'}">
+					<%-- Websockets used to get the node updates from the server --%>
+					<%-- init the connection with server using server URL but with different protocol --%>
+					initWebsocket('mindmapNodes${sessionId}',
 						'<lams:WebAppURL />'.replace('http', 'ws')
 						+ 'learningWebsocket?toolSessionID=${sessionId}&lastActionId=' + initialActionId,
 						function (e) {
@@ -126,10 +126,10 @@
 							if ( valuesChanged ) {
 								window.mapModel.rebuildRequired();
 							}
-						// reset ping timer
-						websocketPing('mindmapNodes${sessionId}', true);
-					});
-
+							// reset ping timer
+							websocketPing('mindmapNodes${sessionId}', true);
+						}
+					);
 			    </c:if>
 			},
 			error: function (response) {
