@@ -3838,6 +3838,7 @@ public class AssessmentServiceImpl
 	assessment.setAllowQuestionFeedback(
 		JsonUtil.optBoolean(toolContentJSON, "allowQuestionFeedback", Boolean.FALSE));
 	assessment.setAllowDiscloseAnswers(JsonUtil.optBoolean(toolContentJSON, "allowDiscloseAnswers", Boolean.FALSE));
+	assessment.setAllowDiscloseAnswers(JsonUtil.optBoolean(toolContentJSON, "allowAnswerRating", Boolean.TRUE));
 	assessment.setAllowRightAnswersAfterQuestion(
 		JsonUtil.optBoolean(toolContentJSON, "allowRightAnswersAfterQuestion", Boolean.FALSE));
 	assessment.setAllowWrongAnswersAfterQuestion(
