@@ -314,7 +314,7 @@
     @extend .text-bg-secondary;
 }
 
-.lcard > .card-header *:not(.badge, .btn, button) {
+.lcard > .card-header *:not(.badge, .badge *, .btn, .btn *, button, button *) {
 	@extend .text-bg-secondary;
 }
 
