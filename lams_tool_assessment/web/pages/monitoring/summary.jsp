@@ -665,6 +665,6 @@
 
 <div id="time-limit-panel-placeholder"></div>
 
-<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}" cssClass="my-2"/>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
 
 <div id="change-leader-modals"></div>

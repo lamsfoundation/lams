@@ -259,4 +259,4 @@
 
 <%@ include file="parts/advanceQuestions.jsp"%>
 <%@ include file="parts/advanceOptions.jsp"%>
-<%@ include file="parts/dateRestriction.jsp"%>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>

@@ -160,5 +160,4 @@
 	
 <%@include file="advanceoptions.jsp"%>
 
-<%@include file="daterestriction.jsp"%>
-	
+<lams:RestrictedUsageAccordian submissionDeadline="${sessionMap.submissionDeadline}"/>	

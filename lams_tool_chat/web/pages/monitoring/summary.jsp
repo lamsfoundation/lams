@@ -122,4 +122,4 @@
 </c:if>
 
 <%@include file="advanceOptions.jsp"%>
-<%@include file="daterestriction.jsp"%>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>

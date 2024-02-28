@@ -691,7 +691,7 @@
 
 	<div id="time-limit-panel-placeholder"></div>
 
-	<%@ include file="dateRestriction.jsp"%>
+	<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
 
 	<div id="change-leader-modals"></div>
 </div>

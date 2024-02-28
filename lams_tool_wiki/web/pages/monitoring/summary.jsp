@@ -216,4 +216,5 @@
 	
 </table>
 </lams:AdvancedAccordian> 
-<%@include file="daterestriction.jsp"%>
+
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>

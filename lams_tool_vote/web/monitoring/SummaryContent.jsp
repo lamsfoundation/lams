@@ -82,6 +82,6 @@
  
 <%@include file="AdvanceOptions.jsp"%>
  
-<%@include file="daterestriction.jsp"%>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
  
 <div id="change-leader-modals"></div>

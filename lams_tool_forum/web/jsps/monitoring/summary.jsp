@@ -246,4 +246,4 @@
 
 <%@include file="parts/advanceOptions.jsp"%>
 
-<lams:RestrictedUsageAccordian submissionDeadline="${forum.submissionDeadline}" cssClass="my-2"/>
+<lams:RestrictedUsageAccordian submissionDeadline="${forum.submissionDeadline}"/>

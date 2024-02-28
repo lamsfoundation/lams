@@ -373,4 +373,4 @@
 
 <%@ include file="advanceOptions.jsp"%>
 
-<%@include file="dateRestriction.jsp"%>
+<lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
