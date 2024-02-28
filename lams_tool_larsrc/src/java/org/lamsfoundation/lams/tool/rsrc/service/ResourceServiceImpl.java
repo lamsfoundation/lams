@@ -1172,31 +1172,33 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	// **************************** Handle topic *********************
 	ArrayNode resources = JsonUtil.optArray(toolContentJSON, "resources");
 	Set<ResourceItem> itemList = new LinkedHashSet<>();
-	for (JsonNode itemData : resources) {
-	    ResourceItem item = new ResourceItem();
-	    item.setTitle(JsonUtil.optString(itemData, "title"));
-	    item.setType(JsonUtil.optInt(itemData, "type").shortValue());
-	    item.setCreateBy(resourceUser);
-	    item.setCreateDate(updateDate);
-	    item.setComplete(false);
-	    item.setCreateByAuthor(true);
-	    item.setHide(false);
-	    item.setOrderId(JsonUtil.optInt(itemData, RestTags.DISPLAY_ORDER));
+	if (resources != null) {
+	    for (JsonNode itemData : resources) {
+		ResourceItem item = new ResourceItem();
+		item.setTitle(JsonUtil.optString(itemData, "title"));
+		item.setType(JsonUtil.optInt(itemData, "type").shortValue());
+		item.setCreateBy(resourceUser);
+		item.setCreateDate(updateDate);
+		item.setComplete(false);
+		item.setCreateByAuthor(true);
+		item.setHide(false);
+		item.setOrderId(JsonUtil.optInt(itemData, RestTags.DISPLAY_ORDER));
 
-	    item.setInstructions(JsonUtil.optString(itemData, "instructions"));
-	    item.setFileName(JsonUtil.optString(itemData, "name"));
-	    item.setFileType(JsonUtil.optString(itemData, "fileType"));
-	    item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
-	    item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
-	    item.setUrl(JsonUtil.optString(itemData, "url"));
+		item.setInstructions(JsonUtil.optString(itemData, "instructions"));
+		item.setFileName(JsonUtil.optString(itemData, "name"));
+		item.setFileType(JsonUtil.optString(itemData, "fileType"));
+		item.setFileUuid(JsonUtil.optLong(itemData, "crUuid"));
+		item.setFileVersionId(JsonUtil.optLong(itemData, "crVersionId"));
+		item.setUrl(JsonUtil.optString(itemData, "url"));
 
-	    // TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
-	    if ((item.getFileName() != null) || (item.getFileUuid() != null)) {
-		throw new IOException(
-			"Only URLS supported via REST interface currently - files and learning objects are not supported.");
+		// TODO files - need to save it somehow, validate the file size, etc. Needed for websites, files & LO
+		if ((item.getFileName() != null) || (item.getFileUuid() != null)) {
+		    throw new IOException(
+			    "Only URLS supported via REST interface currently - files and learning objects are not supported.");
+		}
+
+		itemList.add(item);
 	    }
-
-	    itemList.add(item);
 	}
 	resource.setResourceItems(itemList);
 
