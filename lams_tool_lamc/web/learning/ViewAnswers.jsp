@@ -86,8 +86,8 @@
 			<div class="card lcard">
 				<div class="card-header">
 					<div class="row align-items-center">
-						<div style="width:50px;">
-							${status.count})
+						<div style="width: 60px;">
+							${status.count}.
 						</div>
 	
 						<div class="col">
@@ -234,8 +234,8 @@
 			<form:hidden path="userOverPassMark" />
 			<form:hidden path="passMarkApplicable" />
 				
-			<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
-					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+			<c:if test="${mode != 'teacher' && ((mcGeneralLearnerFlowDTO.retries != 'true') 
+					|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true'))}">
 				<form:hidden path="learnerFinished" value="Finished" />
 
 				<button type="button" class="btn btn-primary na" id="finishButton">

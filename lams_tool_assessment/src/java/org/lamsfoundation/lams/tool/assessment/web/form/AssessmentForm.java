@@ -57,6 +57,7 @@ public class AssessmentForm {
 	assessment.setAllowOverallFeedbackAfterQuestion(false);
 	assessment.setAllowQuestionFeedback(false);
 	assessment.setAllowDiscloseAnswers(false);
+	assessment.setAllowDiscloseAnswers(true);
 	assessment.setAllowRightAnswersAfterQuestion(false);
 	assessment.setAllowWrongAnswersAfterQuestion(false);
 	assessment.setDefineLater(false);

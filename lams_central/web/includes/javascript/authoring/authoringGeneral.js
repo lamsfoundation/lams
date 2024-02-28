@@ -1516,11 +1516,11 @@ GeneralLib = {
 						activity = complex.end.transitions.from.length == 0 ?
 								null : complex.end.transitions.from[0].toActivity;
 						column = (complex.end.column + 1) % maxColumns;
+						if (row <= complex.branchingRow) {
+							row = complex.branchingRow;
+						}
 						if (column == 0) {
 							row++;
-						}
-						if (row < complex.branchingRow) {
-							row = complex.branchingRow;
 						}
 						complex.end.column = null;
 						complex = null;

@@ -181,7 +181,7 @@
                                 </small>
                             </div>
 
-                            <div class="ltable no-header table-striped div-hover mt-2 mb-4">
+                            <div class="ltable no-header table-striped mt-2 mb-4">
                                 <c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
                                     <div class="p-3">
                                         <!--The name of the File -->
@@ -190,37 +190,37 @@
                                                 <c:set var="downloadURL">
                                                     <c:url value="/download?uuid=${file.displayUuid}&versionID=${file.versionID}&preferDownload=true" />
                                                 </c:set>
-                                                <i class="fa-regular fa-file" aria-label="false"></i> &nbsp;
                                                 <a class="fw-bold" style="color: var(--bs-link-hover-color)" href="${downloadURL}" aria-label="<fmt:message key="label.download" />">
                                                     <c:out value="${file.filePath}" />
                                                 </a>
 
                                                 <div class="float-end">
-                                                    <c:if test="${empty file.marks && hasEditRight}">
+                                                    <c:if test="${empty file.marks && hasEditRight && (mode != 'teacher')}">
                                                         <button type="button" onclick="javascript:deleteLearnerFile(${file.submissionID}, '${file.filePath}');"
-                                                                class="btn btn-danger btn-disable-on-submit px-2"
+                                                                class="btn btn-danger btn-disable-on-submit px-2 me-2"
                                                                 title="<fmt:message key="label.monitoring.original.learner.file.delete"/>">
                                                             <i class="fa fa-trash fa-lg" aria-label="<fmt:message key="label.monitoring.original.learner.file.delete"/>"></i>
                                                         </button>
                                                     </c:if>
 
-                                                    <a href="${downloadURL}" class="btn btn-secondary btn-disable-on-submit px-2" title="<fmt:message key="label.download" />" >
-                                                        <i class="fa fa-download fa-lg" aria-label="<fmt:message key="label.download" />"></i>
+                                                    <a href="${downloadURL}" class="btn btn-light btn-disable-on-submit" title="<fmt:message key="label.download" />" >
+                                                        <i class="fa fa-download fa-lg me-1" aria-label="<fmt:message key="label.download" />"></i>
+                                                        <fmt:message key="label.download" />
                                                     </a>
                                                 </div>
-
-                                                <br>
-                                                <small>
-                                                    <fmt:message key="label.learner.time" />&nbsp;<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
-                                                </small>
                                             </div>
                                         </c:if>
+                                        
+                                        <!--The description of the File -->
+                                        <div id="fileDescription">
+                                            <lams:out value="${file.fileDescription}" escapeHtml="true" />
+                                        </div>
 
-                                        <div>
-                                            <!--The description of the File -->
-                                            <div id="fileDescription">
-                                                <lams:out value="${file.fileDescription}" escapeHtml="true" />
+                                        <c:if test="${file.currentLearner}">
+                                            <div class="badge text-bg-light">
+                                               <fmt:message key="label.learner.time" />&nbsp;<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
                                             </div>
+                                        </c:if>
 
                                             <!--Marks-->
                                             <c:if test="${sessionMap.isMarksReleased and not empty file.marks}">
@@ -257,7 +257,6 @@
                                                 </div>
 
                                             </c:if>
-                                        </div>
                                     </div>
                                 </c:forEach>
                             </div>

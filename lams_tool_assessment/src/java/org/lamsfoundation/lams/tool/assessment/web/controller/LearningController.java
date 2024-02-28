@@ -74,6 +74,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -293,7 +294,7 @@ public class LearningController {
 
 	//user is allowed to answer questions if assessment activity doesn't have leaders or he is the leader
 	boolean hasEditRight =
-		!assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader;
+		(!assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader) && !mode.isTeacher();
 
 	//showResults if user has finished the last result
 	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
@@ -464,7 +465,7 @@ public class LearningController {
     /**
      * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
      */
-    @RequestMapping("/nextPage")
+    @PostMapping("/nextPage")
     public String nextPage(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	return nextPage(request, false, -1);
@@ -586,7 +587,7 @@ public class LearningController {
      * @throws IllegalAccessException
      */
     @SuppressWarnings("unchecked")
-    @RequestMapping("/submitAll")
+    @PostMapping("/submitAll")
     public String submitAll(HttpServletRequest request)
 	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -689,7 +690,7 @@ public class LearningController {
     /**
      * auto saves responses
      */
-    @RequestMapping("/autoSaveAnswers")
+    @PostMapping("/autoSaveAnswers")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public String autoSaveAnswers(HttpServletRequest request, HttpServletResponse response)

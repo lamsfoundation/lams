@@ -61,7 +61,7 @@
 				  messageId = id.substring(id.indexOf('-') + 1); 
 	
 			if (!$(this).hasClass('starability-disabled')) {
-				$("input[type=radio][name=" + id + "]").change(function() {
+				$("input[type=radio][name=" + id + "]").click(function() {
 					let element = this;
 					const rate = $(this).val();
 	

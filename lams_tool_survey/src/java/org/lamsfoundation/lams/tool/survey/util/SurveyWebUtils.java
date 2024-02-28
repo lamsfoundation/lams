@@ -69,12 +69,4 @@ public class SurveyWebUtils {
 
 	return choiceList.split("&");
     }
-
-    /** Remove the html tags from the input string. Used for authoring, learning, monitoring and export! */
-    public static String removeHTMLTags(String input) {
-	// strip all images first in case they are base64 otherwise the next step causes a stack overflow
-	// then strip out any other HTML tags
-	return input.replaceAll("<img.*>", "").replaceAll("<(.|\n)*?>", "").replaceAll("&nbsp;", " ")
-		.replaceAll("[\r\n][\r\n]+", "\n");
-    }
 }

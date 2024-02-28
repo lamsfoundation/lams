@@ -322,7 +322,7 @@ function addLesson(learningDesignId, lessonName){
 
 	if (!learningDesignId) {
 		var ldNode = tree.treeview('getSelected')[0];
-		if (ldNode == null) {
+		if (ldNode == null || ldNode.learningDesignId == null) {
 			learningDesignId = +$('div#accessDiv .access-selected').data('learningDesignId');
 		} else {
 			learningDesignId = ldNode.learningDesignId;

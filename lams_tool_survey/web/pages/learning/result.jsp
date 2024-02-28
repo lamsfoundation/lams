@@ -78,6 +78,8 @@
 		</div>
 
 		<c:forEach var="element" items="${sessionMap.questionList}">
+			<c:set var="question" value="${element.value}" />
+			
 			<div class="card lcard">
 				<div class="card-header">
 					<c:if test="${not question.optional}">
@@ -86,7 +88,6 @@
 						</abbr>
 					</c:if>
 
-					<c:set var="question" value="${element.value}" />
 					<c:out value="${question.description}" escapeXml="false" />
 				</div>
 				

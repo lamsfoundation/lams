@@ -120,6 +120,10 @@ body.component {
 			font-size: 1.3rem;
 			padding: 1rem;
 			@extend .text-bg-secondary;
+			
+			*:not(.badge, .badge *, .btn, .btn *, button, button *) {
+				@extend .text-bg-secondary;
+			}
 	
 			@include media-breakpoint-down(md) {
 				font-size: 14px;

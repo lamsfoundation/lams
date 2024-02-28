@@ -1015,15 +1015,20 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 	// content.setMindmapExportContent(exportContent) only set by export, not by authoring
 	saveOrUpdateMindmap(content);
 
-	// creating default nodes for current mindmap
-	String rootNodeName = getMindmapMessageService().getMessage("node.root.defaultName");
-	String childNodeName1 = getMindmapMessageService().getMessage("node.child1.defaultName");
-	String childNodeName2 = getMindmapMessageService().getMessage("node.child2.defaultName");
-
-	MindmapNode rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, content, null);
-	saveOrUpdateMindmapNode(rootMindmapNode);
-	saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, content, null);
-	saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, content, null);
+	String rootNodeName = JsonUtil.optString(toolContentJSON, "rootNodeName");
+	if (rootNodeName == null) {
+	    // creating default nodes for current mindmap
+	    rootNodeName = getMindmapMessageService().getMessage("node.root.defaultName");
+	    String childNodeName1 = getMindmapMessageService().getMessage("node.child1.defaultName");
+	    String childNodeName2 = getMindmapMessageService().getMessage("node.child2.defaultName");
+	    MindmapNode rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, content, null);
+	    saveOrUpdateMindmapNode(rootMindmapNode);
+	    saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, content, null);
+	    saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, content, null);
+	} else {
+	    MindmapNode rootMindmapNode = saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, content, null);
+	    saveOrUpdateMindmapNode(rootMindmapNode);
+	}
     }
 
     @Override

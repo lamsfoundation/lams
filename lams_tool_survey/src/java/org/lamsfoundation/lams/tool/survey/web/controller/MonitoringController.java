@@ -266,13 +266,13 @@ public class MonitoringController {
 	    // survey title
 	    row = sheet.createRow(idx++);
 	    cell = row.createCell(0);
-	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(survey.getTitle()));
+	    cell.setCellValue(WebUtil.removeHTMLtags(survey.getTitle()));
 
 	    // survey instruction
 	    row = sheet.createRow(idx++);
 	    cell = row.createCell(0);
 	    cell.setCellValue(
-		    ExcelUtil.ensureCorrectCellLength(SurveyWebUtils.removeHTMLTags(survey.getInstructions())));
+		    ExcelUtil.ensureCorrectCellLength(WebUtil.removeHTMLtags(survey.getInstructions())));
 
 	    // display 2 empty row
 	    row = sheet.createRow(idx++);
@@ -287,7 +287,7 @@ public class MonitoringController {
 	    cell = row.createCell(0);
 	    cell.setCellValue(messageService.getMessage(MonitoringController.MSG_LABEL_SESSION_NAME));
 	    cell = row.createCell(1);
-	    cell.setCellValue(SurveyWebUtils.removeHTMLTags(session.getSessionName()));
+	    cell.setCellValue(WebUtil.removeHTMLtags(session.getSessionName()));
 
 	    // begin to display question and its answers
 	    Set<Entry<SurveyQuestion, List<AnswerDTO>>> questionEntries = map.entrySet();
@@ -308,7 +308,7 @@ public class MonitoringController {
 		cell.setCellValue(
 			messageService.getMessage(MonitoringController.MSG_LABEL_QUESTION) + " " + questionIdx);
 		cell = row.createCell(1);
-		cell.setCellValue(SurveyWebUtils.removeHTMLTags(question.getDescription()));
+		cell.setCellValue(WebUtil.removeHTMLtags(question.getDescription()));
 
 		// display options content
 		Set<SurveyOption> options = question.getOptions();
@@ -325,7 +325,7 @@ public class MonitoringController {
 		    cell.setCellValue(SurveyConstants.OPTION_SHORT_HEADER + optionIdx);
 		    cell = row.createCell(1);
 		    cell.setCellValue(
-			    ExcelUtil.ensureCorrectCellLength(SurveyWebUtils.removeHTMLTags(option.getDescription())));
+			    ExcelUtil.ensureCorrectCellLength(WebUtil.removeHTMLtags(option.getDescription())));
 		}
 		if (question.isAppendText() || question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 		    optionIdx++;
@@ -399,7 +399,7 @@ public class MonitoringController {
 			cell = row.createCell(++cellIdx);
 			if (answer.getAnswer() != null) {
 			    cell.setCellValue(ExcelUtil.ensureCorrectCellLength(
-				    SurveyWebUtils.removeHTMLTags(answer.getAnswer().getAnswerText())));
+				    WebUtil.removeHTMLtags(answer.getAnswer().getAnswerText())));
 			}
 		    }
 

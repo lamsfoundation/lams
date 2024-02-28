@@ -115,13 +115,13 @@ public class LessonManagerServlet extends HttpServlet {
      * This method is called when a form has its tag value method equals to get.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -158,14 +158,14 @@ public class LessonManagerServlet extends HttpServlet {
 
 	String enableNotificationString = WebUtil.readStrParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS,
 		true);
-	Boolean enableNotifications = enableNotificationString == null ? null
-		: Boolean.valueOf(enableNotificationString);
+	Boolean enableNotifications =
+		enableNotificationString == null ? null : Boolean.valueOf(enableNotificationString);
 
 	String allowLearnerRestartString = WebUtil.readStrParam(request, CentralConstants.PARAM_ALLOW_LEARNER_RESTART,
 		true);
 	// whether this lesson was created with this option ON
-	boolean enforceAllowLearnerRestart = StringUtils.isNotBlank(allowLearnerRestartString)
-		&& Boolean.valueOf(allowLearnerRestartString);
+	boolean enforceAllowLearnerRestart =
+		StringUtils.isNotBlank(allowLearnerRestartString) && Boolean.valueOf(allowLearnerRestartString);
 
 	Long ldId = null;
 	Long lsId = null;
@@ -215,8 +215,8 @@ public class LessonManagerServlet extends HttpServlet {
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
-	    } else if (method.equals(CentralConstants.METHOD_DELETE)
-		    || method.equals(CentralConstants.METHOD_REMOVE_LESSON)) {
+	    } else if (method.equals(CentralConstants.METHOD_DELETE) || method.equals(
+		    CentralConstants.METHOD_REMOVE_LESSON)) {
 		verifyPostRequestMethod(request);
 
 		lsId = Long.parseLong(lsIdStr);
@@ -264,8 +264,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    } else if (method.equals(CentralConstants.METHOD_JOIN_LESSON)) {
 		lsId = Long.parseLong(lsIdStr);
-		Thread t = new Thread(new AddUsersToLessonThread(serverId, datetime, username, hashValue, lsId,
-			courseId, locale, country, learnerIds, monitorIds, firstNames, lastNames, emails, request));
+		Thread t = new Thread(
+			new AddUsersToLessonThread(serverId, datetime, username, hashValue, lsId, courseId, locale,
+				country, learnerIds, monitorIds, firstNames, lastNames, emails, request));
 		t.start();
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
@@ -369,13 +370,13 @@ public class LessonManagerServlet extends HttpServlet {
      * This method is called when a form has its tag value method equals to post.
      *
      * @param request
-     *            the request send by the client to the server
+     * 	the request send by the client to the server
      * @param response
-     *            the response send by the server to the client
+     * 	the response send by the server to the client
      * @throws ServletException
-     *             if an error occurred
+     * 	if an error occurred
      * @throws IOException
-     *             if an error occurred
+     * 	if an error occurred
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -384,8 +385,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     private Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, boolean enforceAllowLearnerRestart, String countryIsoCode,
-	    String langIsoCode, String customCSV, Boolean enableNotifications)
-	    throws RemoteException {
+	    String langIsoCode, String customCSV, Boolean enableNotifications) throws RemoteException {
 	try {
 	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, hashValue);
@@ -397,16 +397,19 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    // 1. init lesson
 	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId, organisation.getOrganisationId(),
-		    user.getUserId(), customCSV, false, false,
-		    extServer.getLiveEditEnabled(),
+		    user.getUserId(), customCSV, false, false, extServer.getLiveEditEnabled(),
 		    enableNotifications == null ? extServer.getEnableLessonNotifications() : enableNotifications,
 		    extServer.getForceLearnerRestart(),
 		    enforceAllowLearnerRestart ? true : extServer.getAllowLearnerRestart(),
 		    extServer.getGradebookOnComplete(), null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, organisation, user);
-	    // 3. start lesson
-	    monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+
+	    if (!extServer.isStartInMonitor()) {
+		// 3. start lesson
+		monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+	    }
+
 	    // store information which extServer has started the lesson
 	    integrationService.createExtServerLessonMap(lesson.getLessonId(), extServer);
 
@@ -805,8 +808,8 @@ public class LessonManagerServlet extends HttpServlet {
 	List<User> staffList = new LinkedList<>();
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<>();
-	Vector<User> learnerVector = userManagementService
-		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, true);
+	Vector<User> learnerVector = userManagementService.getUsersFromOrganisationByRole(
+		organisation.getOrganisationId(), Role.LEARNER, true);
 	learnerList.addAll(learnerVector);
 	monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + " learners", learnerList, organisation.getName() + " staff", staffList,
@@ -880,18 +883,18 @@ public class LessonManagerServlet extends HttpServlet {
 
 		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
 		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
-		String[] firstNameArray = (firstNames != null)
-			? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
-			: new String[0];
-		String[] lastNameArray = (lastNames != null) ? lastNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
+		String[] firstNameArray = (firstNames != null) ? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",
+			-1) : new String[0];
+		String[] lastNameArray = (lastNames != null)
+			? lastNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
 			: new String[0];
 		String[] emailArray = (emails != null) ? emails.split(",") : new String[0];
 
 		// in case there is firstNames available - check all arrays have the same length, as otherwise it's
 		// prone to ArrayOutOfBounds exceptions
-		if ((firstNames != null) && ((firstNameArray.length != lastNameArray.length)
-			|| (firstNameArray.length != emailArray.length)
-			|| (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
+		if ((firstNames != null) && ((firstNameArray.length != lastNameArray.length) || (firstNameArray.length
+			!= emailArray.length) || (firstNameArray.length != (learnerIdArray.length
+			+ monitorIdArray.length)))) {
 		    log.error("Invalid parameters sent: wrong array length. " + "learnerIds=" + learnerIds
 			    + " &monitorIds=" + monitorIds + " &firstNames=" + firstNames + " &lastNames=" + lastNames
 			    + " &emails=" + emails + " &array lengths=" + learnerIdArray.length + "!"
@@ -965,7 +968,7 @@ public class LessonManagerServlet extends HttpServlet {
      * @param lessonId
      * @param courseID
      * @param outputsUser
-     *            if outputsUser is null return results for the whole lesson, otherwise - for the specified learner
+     * 	if outputsUser is null return results for the whole lesson, otherwise - for the specified learner
      * @return
      * @throws Exception
      */
@@ -1122,7 +1125,7 @@ public class LessonManagerServlet extends HttpServlet {
      * @param courseID
      * @param isAuthoredToolOutputs
      * @param outputsUser
-     *            if outputsUser is null return results for the whole lesson, otherwise - for the specified learner
+     * 	if outputsUser is null return results for the whole lesson, otherwise - for the specified learner
      * @return
      * @throws Exception
      */
@@ -1177,9 +1180,8 @@ public class LessonManagerServlet extends HttpServlet {
 	for (ToolActivity activity : activities) {
 	    Long toolContentId = activity.getToolContentId();
 	    if (toolOutputDefinitionsMap.get(toolContentId) == null) {
-		SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = lamsCoreToolService
-			.getOutputDefinitionsFromTool(toolContentId,
-				ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
+		SortedMap<String, ToolOutputDefinition> toolOutputDefinitions = lamsCoreToolService.getOutputDefinitionsFromTool(
+			toolContentId, ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION);
 		toolOutputDefinitionsMap.put(toolContentId, toolOutputDefinitions);
 	    }
 	}
@@ -1217,11 +1219,12 @@ public class LessonManagerServlet extends HttpServlet {
 			toolSession = dbToolSession;
 		    }
 		}
-		Map<String, ToolOutputDefinition> toolOutputDefinitions = toolOutputDefinitionsMap
-			.get(activity.getToolContentId());
+		Map<String, ToolOutputDefinition> toolOutputDefinitions = toolOutputDefinitionsMap.get(
+			activity.getToolContentId());
 
-		learnerElement.appendChild(getActivityOutputsElement(document, activity, learner, learnerProgress,
-			toolSession, toolOutputDefinitions, isAuthoredToolOutputs));
+		learnerElement.appendChild(
+			getActivityOutputsElement(document, activity, learner, learnerProgress, toolSession,
+				toolOutputDefinitions, isAuthoredToolOutputs));
 	    }
 
 	    toolOutputsElement.appendChild(learnerElement);
@@ -1280,8 +1283,8 @@ public class LessonManagerServlet extends HttpServlet {
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
-	Activity firstActivity = monitoringService
-		.getActivityById(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	Activity firstActivity = monitoringService.getActivityById(
+		lesson.getLearningDesign().getFirstActivity().getActivityId());
 	activities.add(firstActivity);
 	activities.addAll(lesson.getLearningDesign().getActivities());
 
@@ -1340,8 +1343,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    boolean completed = progress.getProgressState(activity) == LearnerProgress.ACTIVITY_COMPLETED;
 	    activityElement.setAttribute("completed", "" + completed);
 
-	    activityAttempted = completed
-		    || (progress.getProgressState(activity) == LearnerProgress.ACTIVITY_ATTEMPTED);
+	    activityAttempted =
+		    completed || (progress.getProgressState(activity) == LearnerProgress.ACTIVITY_ATTEMPTED);
 	    activityElement.setAttribute("attempted", "" + activityAttempted);
 
 	} else {
@@ -1357,8 +1360,8 @@ public class LessonManagerServlet extends HttpServlet {
 		    ToolOutputDefinition definition = toolOutputDefinitions.get(outputName);
 
 		    if (isAuthoredToolOutputs) {
-			ActivityEvaluation evaluation = (ActivityEvaluation) userManagementService
-				.findById(ActivityEvaluation.class, activity.getActivityId());
+			ActivityEvaluation evaluation = (ActivityEvaluation) userManagementService.findById(
+				ActivityEvaluation.class, activity.getActivityId());
 			if (evaluation != null) {
 			    if (outputName.equals(evaluation.getToolOutputDefinition())) {
 				ToolOutput toolOutput = lamsCoreToolService.getOutputFromTool(outputName, toolSession,
@@ -1378,8 +1381,9 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		} catch (RuntimeException e) {
-		    log.error("Runtime exception when attempted to get outputs for activity: "
-			    + activity.getActivityId() + ", continuing for other activities", e);
+		    log.error(
+			    "Runtime exception when attempted to get outputs for activity: " + activity.getActivityId()
+				    + ", continuing for other activities", e);
 		}
 	    }
 

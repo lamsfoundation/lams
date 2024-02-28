@@ -105,6 +105,8 @@
 		</div>
 		
 		<c:forEach var="element" items="${sessionMap.questionList}">
+			<c:set var="question" value="${element.value}" />
+			
 			<div class="card lcard mt-n3">
 				<div class="card-header">
 					<c:if test="${not question.optional}">
@@ -112,8 +114,7 @@
 							class="fa fa-xs fa-asterisk"></i>
 						</abbr>
 					</c:if>
-
-					<c:set var="question" value="${element.value}" />
+					
 					<c:out value="${question.description}" escapeXml="false" />
 				</div>
 				

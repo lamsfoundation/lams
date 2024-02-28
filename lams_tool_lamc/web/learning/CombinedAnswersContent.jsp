@@ -7,8 +7,8 @@
 	<div class="card lcard">
 		<div class="card-header">
 			<div class="row align-items-center">
-				<div style="width:50px;">
-					${answerDto.displayOrder})
+				<div style="width: 60px;">
+					${answerDto.displayOrder}.
 				</div>
 	                
 	            <div class="col">

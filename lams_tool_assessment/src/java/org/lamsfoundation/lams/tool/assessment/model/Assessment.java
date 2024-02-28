@@ -30,6 +30,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 import org.lamsfoundation.lams.qb.model.QbToolQuestion;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
+import org.lamsfoundation.lams.tool.assessment.web.form.AssessmentForm;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -132,6 +133,9 @@ public class Assessment implements Cloneable {
     @Column(name = "allow_disclose_answers")
     private boolean allowDiscloseAnswers;
 
+    @Column(name = "allow_answer_rating")
+    private Boolean allowAnswerRating = true;
+
     @Column(name = "allow_right_answers")
     private boolean allowRightAnswersAfterQuestion;
 
@@ -210,6 +214,11 @@ public class Assessment implements Cloneable {
     // **********************************************************
     // Function method for Assessment
     // **********************************************************
+
+    public Assessment() {
+	this.allowAnswerRating = true;
+    }
+
     public static Assessment newInstance(Assessment defaultContent, Long contentId) {
 	Assessment toContent = new Assessment();
 	toContent = (Assessment) defaultContent.clone();
@@ -593,6 +602,14 @@ public class Assessment implements Cloneable {
 
     public void setAllowDiscloseAnswers(boolean tblReleaseAnswers) {
 	this.allowDiscloseAnswers = tblReleaseAnswers;
+    }
+
+    public boolean getAllowAnswerRating() {
+	return allowAnswerRating == null ? true : allowAnswerRating;
+    }
+
+    public void setAllowAnswerRating(boolean allowAnswerRating) {
+	this.allowAnswerRating = allowAnswerRating;
     }
 
     public boolean isAllowRightAnswersAfterQuestion() {

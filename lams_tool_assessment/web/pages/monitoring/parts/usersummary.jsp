@@ -123,7 +123,7 @@
                             return value;
                         }
                         if (value == "-") {
-							value = "";
+                            value = "";
                         }
                         return value;
                     },

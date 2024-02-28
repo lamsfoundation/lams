@@ -54,12 +54,12 @@
 	}
 </script>
 
-<c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
+<c:if test="${(imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages)}">
 
 	<%--Ranking area---------------------------------------%>
 	
 	<c:if test="${imageGallery.allowRank && isImageSelected}">
-		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock}" isDisplayOnly="${sessionMap.isAuthor}"
+		<lams:Rating itemRatingDto="${sessionMap.itemRatingDto}" disabled="${finishedLock || (mode == 'teacher')}" isDisplayOnly="${sessionMap.isAuthor}"
 				maxRates="${imageGallery.maximumRates}" countRatedItems="${sessionMap.countRatedItems}"
 				minNumberWordsLabel="label.minimum.number.words"/>
 	</c:if>
@@ -74,7 +74,7 @@
 
 				<div id="favourite-button" class="form-check float-end">
 					<input type="checkbox" name="vote" class="form-check-input" id="voting-form-checkbox" 
-							<c:if test="${finishedLock}">disabled="disabled"</c:if>	
+							<c:if test="${finishedLock || (mode == 'teacher')}">disabled="disabled"</c:if>	
 							<c:if test="${sessionMap.isVoted}">checked="checked"</c:if>	
 					/>
 						
@@ -94,7 +94,7 @@
 			
 		<%--"Check for new", "Add new image" and "Delete" buttons---------------%>		
 		<div id="manage-image-buttons" class="btn-group" role="group" aria-label="Control buttons">	
-			<c:if test="${imageGallery.allowShareImages}">
+			<c:if test="${imageGallery.allowShareImages && (mode != 'teacher')}">
 				<button type="button" onclick="return checkNew()" class="btn btn-sm btn-outline-secondary btn-icon-refresh" id="check-for-new-button"> 
 					<fmt:message key="label.check.for.new" /> 
 				</button>

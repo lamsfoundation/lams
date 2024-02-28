@@ -372,7 +372,8 @@
 
                     // reset ping timer
                     websocketPing('scratchieTimeLimit${scratchie.contentId}', true);
-                });
+                }
+            );
         });
 
         function displayCountdown(secondsLeft){

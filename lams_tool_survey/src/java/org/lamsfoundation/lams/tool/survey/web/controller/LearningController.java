@@ -201,15 +201,16 @@ public class LearningController {
 	    surveyForm.setPosition(SurveyConstants.POSITION_FIRST);
 	}
 
-	// if session is finished go to result pages.
-	if (surveyUser.isSessionFinished() && !survey.isShowOtherUsersAnswers()) {
+	// if session is finished go to result pages
+	if ((surveyUser.isSessionFinished() || mode.isTeacher()) && !survey.isShowOtherUsersAnswers()) {
 	    return "pages/learning/result";
 
-	    //if show other users is ON and response is finalized - show results page with other users answers
-	} else if (survey.isShowOtherUsersAnswers() && surveyUser.isResponseFinalized()) {
+	//if show other users is ON and response is finalized - show results page with other users answers
+	} else if ((survey.isShowOtherUsersAnswers() || mode.isTeacher()) && surveyUser.isResponseFinalized()) {
 	    String redirectURL = "redirect:/learning/showOtherUsersAnswers.do";
 	    redirectURL = WebUtil.appendParameterToURL(redirectURL, SurveyConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	    return redirectURL;
+	    
 	} else {
 	    request.setAttribute("surveyForm", surveyForm);
 	    return "pages/learning/learning";

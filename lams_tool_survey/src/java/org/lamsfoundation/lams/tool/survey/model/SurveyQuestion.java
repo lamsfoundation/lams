@@ -47,6 +47,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.lamsfoundation.lams.tool.survey.util.SurveyWebUtils;
+import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author Dapeng Ni
@@ -216,9 +217,7 @@ public class SurveyQuestion implements Cloneable {
 
     /** Set the short title from the current description but strip HTML and shorten to SHORT_TITLE_LENGTH characters. */
     public void updateShortTitleFromDescription() {
-	// strip all images first in case they are base64 otherwise the next step causes a stack overflow
-	// then strip out any other HTML tags
-	String newInput = SurveyWebUtils.removeHTMLTags(this.description);
+	String newInput = WebUtil.removeHTMLtags(this.description);
 	this.shortTitle = StringUtils.abbreviate(newInput, SHORT_TITLE_LENGTH);
     }
 }

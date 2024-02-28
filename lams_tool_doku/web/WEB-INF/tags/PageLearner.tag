@@ -8,10 +8,12 @@
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refresh" required="false" rtexprvalue="true"%>
 <%@ attribute name="hideHeader" required="false" rtexprvalue="true"%>
-<c:set var="showHeader">${empty hideHeader || !hideHeader ? true : false }</c:set>
 <%@ attribute name="hideTitle" required="false" rtexprvalue="true"%>
-<c:set var="hideTitle">${empty hideTitle ? false : true }</c:set>
 <%@ attribute name="lessonID" required="false" rtexprvalue="true"%>
+
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="showHeader">${(param.mode != "teacher" && sessionMap.mode != "teacher" && mode != "teacher") && (empty hideHeader || !hideHeader ? true : false)}</c:set>
+<c:set var="hideTitle">${empty hideTitle ? false : true }</c:set>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="pageLearnerPortraitUuid"><lams:user property="portraitUuid" /></c:set>
@@ -47,16 +49,17 @@
         <script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
         <script src="<lams:LAMSURL/>includes/javascript/bootstrap5.bundle.min.js"></script>
+        <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
+        <lams:JSImport src="includes/javascript/websocket.js" />
+		<script>
+			const LAMS_URL = '<lams:LAMSURL/>';
+		</script>
         <c:if test="${showHeader}">
-	        <lams:JSImport src="learning/includes/javascript/gate-check5.js" />
-	        <lams:JSImport src="includes/javascript/websocket.js" />
 	        <lams:JSImport src="includes/javascript/dialog5.js" />
 	        <lams:JSImport src="includes/javascript/common.js" />
         	<lams:JSImport src="learning/includes/javascript/learnerPage.js" />
 	        <script>
-	            const LAMS_URL = '<lams:LAMSURL/>',
-	                decoderDiv = $('<div />'),
-	                LABEL_CLICK_TO_OPEN = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.click.to.open' /></spring:escapeBody>",
+	            const LABEL_CLICK_TO_OPEN = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.click.to.open' /></spring:escapeBody>",
 	                LABEL_SUPPORT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.support.activity' /></spring:escapeBody>",
 	                LABEL_COMPLETED_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.completed.activity' /></spring:escapeBody>",
 	                LABEL_CURRENT_ACTIVITY = "<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.current.activity' /></spring:escapeBody>",
@@ -184,7 +187,6 @@
 	                    	</span>
 	                    </${showHeader ? 'h2' : 'h1'} >
 	                </c:if>
-					
 	                <jsp:doBody/>
 	            </main>
 	        </div>

@@ -216,7 +216,7 @@
         </c:forEach>
     </div>
 
-    <c:if test='${includeMode=="learning"}'>
+    <c:if test='${includeMode=="learning" and mode != "teacher"}'>
         <button type="button" class="btn btn-secondary btn-icon-refresh btn-disable-on-submit float-end mb-3" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')">
             <fmt:message key="label.common.summary.refresh" />
         </button>

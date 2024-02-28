@@ -118,9 +118,9 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * synchornize method on grouping. If a group of this name already exists, returns null.
      *
      * @param grouping
-     *            the grouping this group belongs to.
+     * 	the grouping this group belongs to.
      * @param users
-     *            the users in this group.
+     * 	the users in this group.
      * @return the new learner group
      */
     public static Group createLearnerGroup(Grouping grouping, String groupName, Set<User> users) {
@@ -137,13 +137,13 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * method on grouping. If a group of this name already exists, returns null.
      *
      * @param grouping
-     *            the grouping this group belongs to.
+     * 	the grouping this group belongs to.
      * @param name
-     *            of this group
+     * 	of this group
      * @param users
-     *            the users in this group.
+     * 	the users in this group.
      * @param toolSessions
-     *            all tool sessions included in this group
+     * 	all tool sessions included in this group
      * @return the new learner group
      */
     public static Group createLearnerGroupWithToolSession(Grouping grouping, String groupName, Set<User> users,
@@ -159,12 +159,11 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      * Creation constructor for initializing staff group. The order is created using default constant.
      *
      * @param grouping
-     *            the grouping this group belongs to.
+     * 	the grouping this group belongs to.
      * @param name
-     *            of this group
+     * 	of this group
      * @param staffs
-     *            the users in this group.
-     *
+     * 	the users in this group.
      * @return the new staff group.
      */
     public static Group createStaffGroup(Grouping grouping, String groupName, Set<User> staffs) {
@@ -264,14 +263,13 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
 	}
 	Group castOther = (Group) other;
 	return new EqualsBuilder().append(this.getOrderId(), castOther.getOrderId())
-		.append(this.getGroupId(), castOther.getGroupId()).append(this.getGroupName(), castOther.getGroupName())
-		.append(this.getGroupUIID(), castOther.getGroupUIID()).isEquals();
+		.append(this.getGroupId(), castOther.getGroupId()).append(this.getGroupUIID(), castOther.getGroupUIID())
+		.isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(getGroupId()).append(getGroupName()).append(getOrderId())
-		.append(getGroupUIID()).toHashCode();
+	return new HashCodeBuilder().append(getOrderId()).append(getGroupId()).append(getGroupUIID()).toHashCode();
     }
 
     /**
@@ -281,20 +279,21 @@ public class Group implements Serializable, Nullable, Comparable<Group> {
      */
     @Override
     public int compareTo(Group group) {
-	return new CompareToBuilder()
-		.append(StringUtils.lowerCase(this.getGroupName()), StringUtils.lowerCase(group.getGroupName()))
-		.append(this.getOrderId(), group.getOrderId()).append(this.getGroupId(), group.getGroupId())
-		.append(this.getGroupUIID(), group.getGroupUIID()).toComparison();
+	return new CompareToBuilder().append(StringUtils.lowerCase(this.getGroupName()),
+			StringUtils.lowerCase(group.getGroupName())).append(this.getOrderId(), group.getOrderId())
+		.append(this.getGroupId(), group.getGroupId()).append(this.getGroupUIID(), group.getGroupUIID())
+		.toComparison();
     }
 
     // ---------------------------------------------------------------------
     // Field Access Methods
     // ---------------------------------------------------------------------
+
     /**
      * Return whether the target user is in this group or not.
      *
      * @param learner
-     *            the target user
+     * 	the target user
      * @return boolean value to indicate whether the user is in.
      */
     public boolean hasLearner(User learner) {

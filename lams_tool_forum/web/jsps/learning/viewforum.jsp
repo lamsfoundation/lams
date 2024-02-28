@@ -126,7 +126,7 @@
 
         <lams:errors5/>
         
-        <c:if test="${not empty sessionMap.instructions}">
+        <c:if test="${not empty sessionMap.instruction}">
             <div id="instructions" class="instructions">
                 <c:out value="${sessionMap.instruction}" escapeXml="false" />
             </div>

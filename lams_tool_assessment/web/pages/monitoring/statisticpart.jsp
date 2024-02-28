@@ -43,24 +43,24 @@
 
 	   	// must display charts after screen is visible or cannot calculate widths.
  		<c:choose>
-		<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput}">	
-			drawHistogram('chartDivLeader${sessionMap.toolContentID}', 
-					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
+		<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput and leaderDto.count > 0}">
+			drawHistogram('chartDivLeader${sessionMap.toolContentID}',
+					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>',
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.groups.in.mark.range"/></spring:escapeBody>');
 		</c:when>
-		<c:otherwise>
-			drawHistogram('chartDivActivity${sessionMap.toolContentID}', 
-				'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>', 
+		<c:when test="${activityDto.count > 0}">
+			drawHistogram('chartDivActivity${sessionMap.toolContentID}',
+				'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}"/>',
 				'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.learners.in.mark.range"/></spring:escapeBody>');
-			
+
 			<c:forEach var="sessionDto" items="${sessionDtos}">
-			drawHistogram('chartDivSession${sessionDto.sessionId}', 
-					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}"/>', 
+			drawHistogram('chartDivSession${sessionDto.sessionId}',
+					'<c:url value="/monitoring/getMarkChartData.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}"/>',
 					'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.marks"/></spring:escapeBody>', '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.number.learners.in.mark.range"/></spring:escapeBody>');
-			</c:forEach>	
-		</c:otherwise>
+			</c:forEach>
+		</c:when>
 		</c:choose>
-	});		
+	});
 </script>
 
 <c:choose>
@@ -69,7 +69,7 @@
 		<fmt:message key="message.monitoring.summary.no.session" />
 	</lams:Alert5>
 </c:when>
-	
+
 <c:otherwise>
 	<em>
 		<fmt:message key="label.graph.help"/>
@@ -79,10 +79,13 @@
 	<c:when test="${sessionMap.assessment.useSelectLeaderToolOuput}">	
 		<div class="lcard" >
        	<div class="card-body">
- 		<div class="row">
-			<div class="col-12"></div>
-			<div id="chartDivLeader${sessionMap.toolContentID}" class="markChartDiv"></div>
-		</div>
+       	
+       	<c:if test="${leaderDto.count > 0}">
+	 		<div class="row">
+				<div class="col-12"></div>
+				<div id="chartDivLeader${sessionMap.toolContentID}" class="markChartDiv"></div>
+			</div>
+		</c:if>
             
         <div class="row"> 
             <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
@@ -93,7 +96,7 @@
                         </td>
                         <td style="text-align:right;">
                              <c:out value="${leaderDto.count}" />
-                        </td>	 
+                        </td>
                     </tr>
                     <tr>
                         <td class="field-name">
@@ -105,7 +108,7 @@
                     </tr>
                     <tr>
                         <td class="field-name">
-                          <fmt:message key="label.median.mark"/> 
+                          <fmt:message key="label.median.mark"/>
                         </td>
                         <td style="text-align:right;">
                              <c:out value="${leaderDto.medianString}" />
@@ -125,7 +128,7 @@
                     </tr>
                     <tr>
                         <td class="field-name">
-                          <fmt:message key="label.highest.mark"/> 
+                          <fmt:message key="label.highest.mark"/>
                         </td>
                         <td style="text-align:right;">
                              <c:out value="${leaderDto.maxString}" />
@@ -141,12 +144,12 @@
                     </tr>
                 </table>
             </div>
-        </div>	        
+        </div>
 
 		</div>
 		</div>
 	</c:when>
-		
+
 	<c:otherwise>
 		<c:if test="${sessionMap.isGroupedActivity}">
 			<div class="card-subheader fs-4 mt-4 mb-2">
@@ -156,12 +159,15 @@
 		
 		<div class="lcard" >
        		<div class="card-body">
-            <div class="row">
-                 <div class="col-12" ></div>
-                 <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
-            </div>
+       		
+       		<c:if test="${activityDto.count > 0}">
+	            <div class="row">
+	                 <div class="col-12" ></div>
+	                 <div id="chartDivActivity${sessionMap.toolContentID}" class="markChartDiv"></div>
+	            </div>
+            </c:if>
 
-			<div class="row"> 
+			<div class="row">
 				<div class="col-md-6" style="padding: 0px 20px 0px 20px;">
 					<table class="table table-striped table-hover table-condensed">
 						<tr>
@@ -170,7 +176,7 @@
 							</td>
 							<td style="text-align:right;">
 								 <c:out value="${activityDto.count}" />
-							</td>	 
+							</td>
 						</tr>
                         <tr>
                             <td class="field-name">
@@ -182,7 +188,7 @@
                         </tr>
                         <tr>
                             <td class="field-name">
-                              <fmt:message key="label.median.mark"/> 
+                              <fmt:message key="label.median.mark"/>
                             </td>
                             <td style="text-align:right;">
                                  <c:out value="${activityDto.medianString}" />
@@ -202,7 +208,7 @@
                         </tr>
                         <tr>
                             <td class="field-name">
-                              <fmt:message key="label.highest.mark"/> 
+                              <fmt:message key="label.highest.mark"/>
                             </td>
                             <td style="text-align:right;">
                                  <c:out value="${activityDto.maxString}" />
@@ -218,10 +224,10 @@
                         </tr>
                     </table>
 				</div>
-			</div>	
+			</div>
 			</div>
 		</div>
-		
+
 		<c:if test="${sessionMap.isGroupedActivity}">
 			<div class="card-subheader fs-4 mt-4 mb-2">
 				<fmt:message key="label.group.stats"/>
@@ -234,12 +240,13 @@
 			        </div>
 			        
 		       		<div class="card-body">    
+
 					<div class="row">
 						 <div class="col-12"></div>
 		 				 <div id="chartDivSession${sessionDto.sessionId}" class="markChartDiv"></div>
 				    </div>
-                        
-                    <div class="row"> 
+
+                    <div class="row">
                         <div class="col-md-6" style="padding: 0px 20px 0px 20px;">
                             <table class="table table-striped table-hover table-condensed">
                                 <tr>
@@ -248,7 +255,7 @@
                                     </td>
                                     <td style="text-align:right;">
                                          <c:out value="${sessionDto.count}" />
-                                    </td>	 
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="field-name">
@@ -260,7 +267,7 @@
                                 </tr>
                                 <tr>
                                     <td class="field-name">
-                                      <fmt:message key="label.median.mark"/> 
+                                      <fmt:message key="label.median.mark"/>
                                     </td>
                                     <td style="text-align:right;">
                                         <c:out value="${sessionDto.medianString}" />
@@ -280,7 +287,7 @@
                                 </tr>
                                 <tr>
                                     <td class="field-name">
-                                      <fmt:message key="label.highest.mark"/> 
+                                      <fmt:message key="label.highest.mark"/>
                                     </td>
                                     <td style="text-align:right;">
                                         <c:out value="${sessionDto.maxString}" />
@@ -296,7 +303,7 @@
                                 </tr>
                             </table>
                         </div>
-                    </div>	
+                    </div>
 
 					</div>
 				</div>
@@ -321,7 +328,7 @@
 	
 			<div id="qb-stats" class="card-body collapse show">
 				<table class="table table-striped table-hover table-condensed">
-					<tr>		
+					<tr>
 						<th scope="col"  class="text-left">
 							#
 						</th>
@@ -336,7 +343,7 @@
 							<lams:Popover>
 				          		<fmt:message key="label.qb.difficulty.index.tooltip" />
 				          	</lams:Popover>
-							
+
 						</th>
 						<th scope="col" class="text-center">
 							<fmt:message key="label.qb.discrimination.index"/>&nbsp;
@@ -349,17 +356,17 @@
 							<lams:Popover>
 								<fmt:message key="label.qb.point.biserial.tooltip" />
 				          	</lams:Popover>
-	
+
 						</th>
 					</tr>
-						
+
 					<c:forEach var="activityDTO" items="${qbStats}" varStatus="i">
 						<tr>
 							<td class="text-left">
 								${i.index + 1}
 							</td>
 							<td class="text-left">
-								<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>			
+								<c:out value="${activityDTO.qbQuestion.name}" escapeXml="false"/>
 							</td>
 							<td class="text-center">
 								<c:out value="${activityDTO.participantCount}" />
@@ -383,7 +390,7 @@
 								</c:otherwise>
 							</c:choose>
 						</tr>
-					</c:forEach>	
+					</c:forEach>
 				</table>
 			</div>
 		</div>

@@ -548,7 +548,7 @@ public class LearningController {
     }
 
     /**
-     * Finish Mindmap Activity and save reflection if appropriate.
+     * Finish Mindmap Activity
      */
     @RequestMapping("/finishActivity")
     public String finishActivity(@ModelAttribute LearningForm learningForm, HttpServletRequest request,

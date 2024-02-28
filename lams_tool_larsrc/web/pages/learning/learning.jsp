@@ -293,7 +293,7 @@
 						</span>
 
                     <div class="float-end">
-                        <c:if test="${not finishedLock && !item.createByAuthor && userID == item.createBy.userId}">
+                        <c:if test="${not finishedLock && !item.createByAuthor && userID == item.createBy.userId && mode != 'teacher'}">
                             <button type="button" class="no-decoration fa fa-trash delete-item-button text-bg-danger shadow p-2"
                                     title="<fmt:message key="label.delete" />"
                                     aria-label="<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.delete" /></spring:escapeBody>"
@@ -303,16 +303,17 @@
 
                         <c:if test="${!item.complete && !finishedLock}">
                             <button type="button" onClick="javascript:completeItem(${item.uid})"
-                                    class="complete-item-button btn btn-success no-shadow ms-2">
+                                    class="complete-item-button btn btn-success no-shadow ms-2"
+                                    ${mode == 'teacher'? 'disabled' : ''}>
                                 <i class="fa-solid fa-pen-to-square fa-xl me-1"></i>
                                 <fmt:message key="label.mark.completed" />
                             </button>
                         </c:if>
 
                         <c:if test="${item.complete || !finishedLock}">
-								<span class="text-bg-success icon-complete shadow p-2 ms-2 ${(!item.complete && !finishedLock) ? 'd-none' : ''}">
-									<i class="fa-regular fa-square-check fa-xl" title='<fmt:message key="label.completed" />'></i>
-								</span>
+							<span class="text-bg-success icon-complete shadow p-2 ms-2 ${(!item.complete && !finishedLock) ? 'd-none' : ''}">
+								<i class="fa-regular fa-square-check fa-xl" title='<fmt:message key="label.completed" />'></i>
+							</span>
                         </c:if>
                     </div>
                 </div>
@@ -345,7 +346,7 @@
                         <fmt:message key="label.check.for.new" />
                     </button>
                 </c:if>
-                <c:if test="${not finishedLock}">
+                <c:if test="${not finishedLock && mode != 'teacher'}">
                     <c:choose>
                         <c:when test="${resource.allowAddFiles && resource.allowAddUrls}">
                             <button onclick="javascript:gotoURL()" type="button" class="btn btn-secondary">

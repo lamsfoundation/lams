@@ -194,7 +194,7 @@
             </div>
         </div>
 
-        <c:if test="${(mode != 'teacher') && (imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages) && imageGallery.allowShareImages && !finishedLock}">
+        <c:if test="${(imageGallery.allowRank || imageGallery.allowVote || imageGallery.allowShareImages) && imageGallery.allowShareImages && !finishedLock}">
             <div id="new-image-input-area" class="mt-4"></div>
         </c:if>
 
