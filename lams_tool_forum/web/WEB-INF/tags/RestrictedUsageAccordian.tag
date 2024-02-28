@@ -36,15 +36,15 @@
 <%@ attribute name="submissionDeadline" required="false" rtexprvalue="true"%>
 <%@ attribute name="cssClass" required="false" rtexprvalue="true"%>
 
-<c:if test="${empty titleLabel}">
-	<c:set var="titleLabel" value="monitor.summary.date.restriction" />
+<c:if test="${empty cssClass}">
+	<c:set var="cssClass" value="my-2" />
 </c:if>
 
 <div class="accordion ${cssClass}" id="accordionRestrictUsageDiv"> 
     <div class="accordion-item">
     	<h2 class="accordion-header" id="headingRestrictedUsageDiv">
         	<button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv">
-	          	<fmt:message key="${titleLabel}" />
+	          	<fmt:message key="monitor.summary.date.restriction" />
     		</button>
         </h2>
 

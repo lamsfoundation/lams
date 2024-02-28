@@ -127,20 +127,43 @@
 		  			</nav>
 	  			</c:if>
 
-	            <main class="p-3" id="component-main-content" tabindex="-1">
-	            	<c:if test="${showHeader}">
-						<div class="tab-content m-3" id="tabs-content">
-							<div class="tab-pane fade show active"  id="tab-1-content" role="tabpanel" aria-labelledby="tab-1" tabindex="0"><jsp:include page="${tab1Jsp}"/></div>
-							<div class="tab-pane fade" 				id="tab-2-content" role="tabpanel" aria-labelledby="tab-2" tabindex="0"><jsp:include page="${tab2Jsp}"/></div>
-							<div class="tab-pane fade" 				id="tab-3-content" role="tabpanel" aria-labelledby="tab-3" tabindex="0"><jsp:include page="${tab3Jsp}"/></div>
-						</div>
-						
-						<input type="hidden" name="currentTab" id="currentTab" />
-					</c:if>
-					
-	                <jsp:doBody/>
+	            <main id="component-main-content" class="px-1 py-3" tabindex="-1">
+	            	<c:choose>
+	            		<c:when test="${showHeader}">
+							<div class="container-main tab-content m-3" id="tabs-content">
+								<div class="tab-pane fade show active"  id="tab-1-content" role="tabpanel" aria-labelledby="tab-1" tabindex="0"><jsp:include page="${tab1Jsp}"/></div>
+								<div class="tab-pane fade" 				id="tab-2-content" role="tabpanel" aria-labelledby="tab-2" tabindex="0"><jsp:include page="${tab2Jsp}"/></div>
+								<div class="tab-pane fade" 				id="tab-3-content" role="tabpanel" aria-labelledby="tab-3" tabindex="0"><jsp:include page="${tab3Jsp}"/></div>
+							</div>
+							
+							<input type="hidden" name="currentTab" id="currentTab" />
+	            		</c:when>
+	            		
+	            		<c:otherwise>
+			                <jsp:doBody/>
+	            		</c:otherwise>
+	            	</c:choose>
 	            </main>
 	        </div>
 	    </div>
+	    
+		<c:if test="${showHeader}">
+		    <div id="confirmationDialog" class="modal dialogContainer fade" tabindex="-1" role="dialog">
+		        <div class="modal-dialog  modal-dialog-centered">
+		            <div class="modal-content">
+		                <div class="modal-body">
+		                </div>
+		                <div class="modal-footer">
+		                    <button type="button" class="btn btn-secondary" id="confirmationDialogCancelButton">
+		                    	<fmt:message key='label.cancel'/>
+		                    </button>
+		                    <button type="button" class="btn btn-primary" id="confirmationDialogConfirmButton">
+		                    	<fmt:message key='label.confirm'/>
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</c:if>
     </body>
 </lams:html>
