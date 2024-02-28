@@ -294,7 +294,7 @@ public class LearningController {
 
 	//user is allowed to answer questions if assessment activity doesn't have leaders or he is the leader
 	boolean hasEditRight =
-		!assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader;
+		(!assessment.isUseSelectLeaderToolOuput() || assessment.isUseSelectLeaderToolOuput() && isUserLeader) && !mode.isTeacher();
 
 	//showResults if user has finished the last result
 	boolean showResults = (lastResult != null) && (lastResult.getFinishDate() != null);
