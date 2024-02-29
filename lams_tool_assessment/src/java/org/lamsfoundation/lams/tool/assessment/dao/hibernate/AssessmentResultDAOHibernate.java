@@ -124,7 +124,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		    + "			(type = 7 AND mark > 0) OR          "
 		    + "			(type = 8 AND answer_int > 0)"
 		    + "			,1, 0)) AS answered_question_count FROM"
-		    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.last_name, ' ', u.first_name) AS user_name,"
+		    + "		(SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.last_name, ', ', u.first_name) AS user_name,"
 		    + "		 	s.session_name AS group_name, qbq.type, qr.mark, qbta.answer, oa.answer_boolean, oa.answer_int"
 		    + "         FROM      tl_laasse10_assessment        AS a"
 		    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"
@@ -145,7 +145,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 		    + "		GROUP BY qr.uid, u.user_id) AS answered_questions GROUP BY user_id ORDER BY user_name";
 
     private static final String FINISHED_LEARNERS_FOR_COMPLETION_CHART =
-	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.last_name, ' ', u.first_name) AS user_name, "
+	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, CONCAT(u.last_name, ', ', u.first_name) AS user_name, "
 		    + "  s.session_name AS group_name"
 		    + "         FROM      tl_laasse10_assessment        AS a"
 		    + "		JOIN      tl_laasse10_assessment_result AS ar   ON a.uid =  ar.assessment_uid"

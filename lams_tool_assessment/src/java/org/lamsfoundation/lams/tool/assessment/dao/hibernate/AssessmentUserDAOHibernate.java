@@ -84,7 +84,7 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 
     private static final String FIND_LEARNERS_BY_CONTENT_ID_FOR_COMPLETION_CHART =
 	    "SELECT u.user_id, BIN_TO_UUID(u.portrait_uuid) AS portrait_uuid, "
-		    + " CONCAT(u.last_name, ' ', u.first_name) AS user_name, s.session_name AS group_name"
+		    + " CONCAT(u.last_name, ', ', u.first_name) AS user_name, s.session_name AS group_name"
 		    + " FROM      tl_laasse10_assessment        AS a"
 		    + " JOIN      tl_laasse10_session           AS s    ON s.assessment_uid = a.uid"
 		    + " JOIN      tl_laasse10_user              AS au   ON au.session_uid = s.uid"

@@ -410,7 +410,6 @@ function initCommonElements(){
         },
 
         success : function(response) {
-
             // update lesson state label
             lessonStateId = +response.lessonStateID;
             var label = null,
@@ -478,9 +477,8 @@ function initCommonElements(){
                 lessonFinishDateSpan = $('#lessonFinishDateSpan'),
                 lessonStateChanger = $('#lessonStateChanger'),
                 stateLabel = $('#lessonStateLabel');
-
             switch (lessonStateId) {
-                // created but not started lesson
+                //created but not started lesson
                 case 1:
                     scheduleControls.css('display','inline');
                     if ( response.finishDate ) {
@@ -2431,12 +2429,12 @@ function updateLearnersTab(){
                 $('.accordion-button', itemHeader)
                     .attr('data-bs-target', '#' + itemCollapseId)
                     .attr('aria-controls', itemCollapseId)
-                    .prepend('<span>' + learner.lastName + ' ' + learner.firstName + '</span>')
+                    .prepend('<span>' + learner.lastName + ', ' + learner.firstName + '</span>')
                     .prepend(portraitSmall);
                 $('.accordion-completed-activity-count', itemHeader).text(learner.completedActivityCount).tooltip();
                 $('.accordion-completed-lesson', itemHeader).toggle(learner.completedLesson).tooltip();
 
-                $('.learners-accordion-name', item).text(learner.lastName + ' ' + learner.firstName);
+                $('.learners-accordion-name', item).text(learner.lastName + ', ' + learner.firstName);
                 $('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
                 $('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">'
                     + learner.email + '</a>');
