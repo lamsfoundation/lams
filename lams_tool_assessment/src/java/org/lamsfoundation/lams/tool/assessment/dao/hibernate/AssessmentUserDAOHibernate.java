@@ -214,8 +214,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    for (Object[] element : queryResults) {
 		Long userId = ((Number) element[0]).longValue();
 		Long sessionId = ((Number) element[1]).longValue();
-		String firstName = (String) element[2];
-		String lastName = (String) element[3];
+		String lastName = (String) element[2];
+		String firstName = (String) element[3];
 		String login = (String) element[4];
 		boolean resultSubmitted = element[5] != null;
 		float grade = resultSubmitted ? ((Number) element[5]).floatValue() : 0;
@@ -335,8 +335,8 @@ public class AssessmentUserDAOHibernate extends LAMSBaseDAO implements Assessmen
 	    for (Object[] element : list) {
 
 		Long questionResultUid = ((Number) element[0]).longValue();
-		String firstName = (String) element[1];
-		String lastName = (String) element[2];
+		String lastName = (String) element[1];
+		String firstName = (String) element[2];
 		String login = (String) element[3];
 		float grade = element[4] == null ? 0 : ((Number) element[4]).floatValue();
 		String portraitId = (String) element[5];

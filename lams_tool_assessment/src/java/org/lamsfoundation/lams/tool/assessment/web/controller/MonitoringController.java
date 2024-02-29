@@ -594,7 +594,7 @@ public class MonitoringController {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    if (questionResultUid != null) {

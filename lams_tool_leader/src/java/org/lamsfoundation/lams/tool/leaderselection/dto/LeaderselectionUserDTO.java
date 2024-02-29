@@ -21,13 +21,12 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.leaderselection.dto;
 
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
-public class LeaderselectionUserDTO implements Comparable {
+public class LeaderselectionUserDTO implements IUserDetails {
 
     private Long uid;
 
@@ -36,7 +35,7 @@ public class LeaderselectionUserDTO implements Comparable {
     private String firstName;
 
     private String lastName;
-    
+
     private Long userId;
 
     private boolean finishedActivity;
@@ -48,17 +47,6 @@ public class LeaderselectionUserDTO implements Comparable {
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
 	this.userId = user.getUserId();
-    }
-
-    @Override
-    public int compareTo(Object o) {
-	int returnValue;
-	LeaderselectionUserDTO toUser = (LeaderselectionUserDTO) o;
-	returnValue = this.lastName.compareTo(toUser.lastName);
-	if (returnValue == 0) {
-	    returnValue = this.uid.compareTo(toUser.uid);
-	}
-	return returnValue;
     }
 
     public String getFirstName() {
@@ -83,6 +71,11 @@ public class LeaderselectionUserDTO implements Comparable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public Long getUid() {

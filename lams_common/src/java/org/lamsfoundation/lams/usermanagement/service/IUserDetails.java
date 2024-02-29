@@ -34,7 +34,7 @@ public interface IUserDetails extends Comparable<IUserDetails> {
 	}
 	if (StringUtils.isNotBlank(firstName)) {
 	    if (fullNameBuilder.length() > 0) {
-		fullNameBuilder.append(" ");
+		fullNameBuilder.append(", ");
 	    }
 	    fullNameBuilder.append(firstName);
 	}

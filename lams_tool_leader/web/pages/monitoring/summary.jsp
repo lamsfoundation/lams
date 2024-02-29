@@ -49,7 +49,7 @@
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
 				<td width="30%">
-					<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/></lams:Portrait>
+					<lams:Portrait userId="${user.userId}" hover="true"><c:out value="${user.getFullName()}" escapeXml="true"/></lams:Portrait>
 				</td>
 				<td width="70%" align="center">
 					<c:choose>
