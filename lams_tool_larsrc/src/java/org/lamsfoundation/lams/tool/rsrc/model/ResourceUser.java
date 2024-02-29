@@ -40,6 +40,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Resource user
@@ -48,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_larsrc11_user")
-public class ResourceUser implements Cloneable {
+public class ResourceUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(ResourceUser.class);
 
     @Id
@@ -153,8 +154,8 @@ public class ResourceUser implements Cloneable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+
     /**
-     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -163,14 +164,13 @@ public class ResourceUser implements Cloneable {
 
     /**
      * @param uid
-     *            The uid to set.
+     * 	The uid to set.
      */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
     /**
-     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -179,7 +179,7 @@ public class ResourceUser implements Cloneable {
 
     /**
      * @param userId
-     *            The userId to set.
+     * 	The userId to set.
      */
     public void setUserId(Long userID) {
 	this.userId = userID;
@@ -207,6 +207,10 @@ public class ResourceUser implements Cloneable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    public String getLogin() {
+	return getLoginName();
     }
 
     public ResourceSession getSession() {

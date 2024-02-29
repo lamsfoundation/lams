@@ -43,7 +43,7 @@
 					<h4><fmt:message key="label.multimode" /></h4>
 				</c:when>
 				<c:otherwise>
-					<h4><c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/></h4>
+					<h4><c:out value="${userDTO.getFullName()}" escapeXml="true"/></h4>
 				</c:otherwise>
 				</c:choose>
 				

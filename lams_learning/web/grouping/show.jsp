@@ -75,7 +75,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 											<c:forEach items="${group.userList}" var="groupUser">
 												<div name="u-${groupUser.userID}" class="user-container ${groupUser.userID ==  userId ? 'alert alert-info you mb-0' : ''}">
 													<lams:Portrait userId="${groupUser.userID}"/>&nbsp;
-													<c:out value="${groupUser.firstName}" />&nbsp;<c:out value="${groupUser.lastName}" />
+													<c:out value="${groupUser.getFullName()}" />
 												</div>
 											</c:forEach>
 										</c:otherwise>

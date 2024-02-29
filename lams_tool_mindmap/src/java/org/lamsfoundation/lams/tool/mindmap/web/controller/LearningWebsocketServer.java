@@ -110,8 +110,9 @@ public class LearningWebsocketServer {
 
 		// send all requests since previousGlobalId
 	    } else {
-		Long currentMaxGlobalId = LearningWebsocketServer.getMindmapService().getLastGlobalIdByMindmapId(
-			mindmapSession.getMindmap().getUid(), mindmapSession.getSessionId());
+		Long currentMaxGlobalId = LearningWebsocketServer.getMindmapService()
+			.getLastGlobalIdByMindmapId(mindmapSession.getMindmap().getUid(),
+				mindmapSession.getSessionId());
 		if (currentMaxGlobalId > previousGlobalId) {
 		    responseJSON = SendWorker.getServerActionJSON(mindmapSession.getMindmap().getUid(),
 			    mindmapSession.getSessionId(), previousGlobalId);
@@ -134,7 +135,7 @@ public class LearningWebsocketServer {
 
 	    List<MindmapRequest> requestsList = mindmapService.getLastRequestsAfterGlobalId(lastActionId, mindmapId,
 		    toolSessionId);
-	    for (Iterator<MindmapRequest> iterator = requestsList.iterator(); iterator.hasNext();) {
+	    for (Iterator<MindmapRequest> iterator = requestsList.iterator(); iterator.hasNext(); ) {
 		MindmapRequest mindmapRequest = iterator.next();
 		int requestType = mindmapRequest.getType();
 
@@ -174,7 +175,7 @@ public class LearningWebsocketServer {
 		    String creator = null;
 		    MindmapUser mindmapUser = childMindmapNode.getUser();
 		    if (mindmapUser != null) {
-			creator = mindmapUser.getFirstName() + " " + mindmapUser.getLastName();
+			creator = mindmapUser.getFullName();
 		    } else {
 			creator = "Student";
 		    }
@@ -219,13 +220,14 @@ public class LearningWebsocketServer {
      */
     @OnOpen
     public void registerUser(Session websocket) throws IOException {
-	Long toolSessionId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	Long toolSessionId = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	String login = websocket.getUserPrincipal().getName();
 	MindmapUser user = LearningWebsocketServer.getMindmapService().getUserByLoginAndSessionId(login, toolSessionId);
 	if (user == null) {
-	    throw new SecurityException("User \"" + login
-		    + "\" is not a participant in Mindmap activity with tool session ID " + toolSessionId);
+	    throw new SecurityException(
+		    "User \"" + login + "\" is not a participant in Mindmap activity with tool session ID "
+			    + toolSessionId);
 	}
 
 	Long lastActionId = Long.valueOf(websocket.getRequestParameterMap().get("lastActionId").get(0));
@@ -237,8 +239,9 @@ public class LearningWebsocketServer {
 	sessionWebsockets.add(websocket);
 
 	if (LearningWebsocketServer.log.isDebugEnabled()) {
-	    LearningWebsocketServer.log.debug("User " + login + " entered Mindmap with toolSessionId: " + toolSessionId
-		    + " lastActionId: " + lastActionId);
+	    LearningWebsocketServer.log.debug(
+		    "User " + login + " entered Mindmap with toolSessionId: " + toolSessionId + " lastActionId: "
+			    + lastActionId);
 	}
 
 	new Thread(() -> {
@@ -258,14 +261,15 @@ public class LearningWebsocketServer {
      */
     @OnClose
     public void unregisterUser(Session websocket) {
-	Long toolSessionId = Long
-		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
+	Long toolSessionId = Long.valueOf(
+		websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	LearningWebsocketServer.websockets.get(toolSessionId).remove(websocket);
 
 	if (LearningWebsocketServer.log.isDebugEnabled()) {
 	    // If there was something wrong with the connection, put it into logs.
-	    LearningWebsocketServer.log.debug("User " + websocket.getUserPrincipal().getName()
-		    + " left Mindmap with Tool Session ID: " + toolSessionId);
+	    LearningWebsocketServer.log.debug(
+		    "User " + websocket.getUserPrincipal().getName() + " left Mindmap with Tool Session ID: "
+			    + toolSessionId);
 	}
     }
 
@@ -286,8 +290,8 @@ public class LearningWebsocketServer {
 
     private static IMindmapService getMindmapService() {
 	if (LearningWebsocketServer.mindmapService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(
+		    SessionManager.getServletContext());
 	    LearningWebsocketServer.mindmapService = (IMindmapService) wac.getBean("mindmapService");
 	}
 	return LearningWebsocketServer.mindmapService;

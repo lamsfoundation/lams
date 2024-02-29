@@ -445,7 +445,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    EPLiteClient client = etherpadService.getClient();
 	    String groupId = session.getEtherpadGroupId();
 
-	    String userName = user.getFirstName() + " " + user.getLastName();
+	    String userName = user.getFullName();
 	    Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
 	    String authorId = map.get("authorID");
 
@@ -1066,8 +1066,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public void createEtherpadCookieForMonitor(UserDTO user, Long contentId, HttpServletResponse response)
 	    throws EtherpadException {
 
-	String authorId = etherpadService.createAuthor(user.getUserID(),
-		user.getFirstName() + " " + user.getLastName());
+	String authorId = etherpadService.createAuthor(user.getUserID(), user.getFullName());
 
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	if (sessionList.isEmpty()) {

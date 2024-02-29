@@ -1087,10 +1087,9 @@ public class ScratchieServiceImpl
 
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(leader.getUserId().intValue());
-		    String userName =
-			    StringUtils.isBlank(leader.getFirstName()) && StringUtils.isBlank(leader.getLastName())
-				    ? leader.getLoginName()
-				    : leader.getFirstName() + " " + leader.getLastName();
+		    String userName = StringUtils.isBlank(leader.getFullName())
+			    ? leader.getLoginName()
+			    : leader.getFullName();
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(leader.getPortraitId());
 		    //don't show confidence level
@@ -1734,7 +1733,7 @@ public class ScratchieServiceImpl
 		    continue;
 		}
 		row = researchAndAnalysisSheet.initRow();
-		row.addCell(user.getFirstName() + " " + user.getLastName());
+		row.addCell(user.getFullName());
 		row.addCell(Long.valueOf(summary.getTotalAttempts()));
 		Double mark = summary.getTotalAttempts() == 0 ? null : summary.getMark();
 		row.addCell(mark == null ? "" : LeaderResultsDTO.format(mark));
@@ -1862,7 +1861,7 @@ public class ScratchieServiceImpl
 
 	    if (groupLeader != null) {
 		row = researchAndAnalysisSheet.initRow();
-		row.addCell(groupLeader.getFirstName() + " " + groupLeader.getLastName(), true);
+		row.addCell(groupLeader.getFullName(), true);
 		row.addCell(getMessage("label.attempts") + ":");
 		Long attempts = (long) scratchieAnswerVisitDao.getLogCountTotal(sessionId);
 		row.addCell(attempts);
@@ -1968,7 +1967,7 @@ public class ScratchieServiceImpl
 
 		    row = spssAnalysisSheet.initRow();
 		    // learner name
-		    row.addCell(user.getFirstName() + " " + user.getLastName());
+		    row.addCell(user.getFullName());
 		    // username
 		    row.addCell(user.getLoginName());
 		    // group name

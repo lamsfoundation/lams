@@ -54,7 +54,7 @@
 			</c:if>
 			<c:if test="${not empty gateForm.gate.gateOpenUser}">
 				&nbsp;<fmt:message key="label.gate.gate.open.user">
-					<fmt:param value="${gateForm.gate.gateOpenUser.firstName} ${gateForm.gate.gateOpenUser.lastName}" />
+					<fmt:param value="${gateForm.gate.gateOpenUser.getFullName()}" />
 				</fmt:message>
 			</c:if>
 		</strong>

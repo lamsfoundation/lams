@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.notebook.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -35,17 +36,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.loader.custom.Return;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
- *
- *
  */
 @Entity
 @Table(name = "tl_lantbk11_user")
-public class NotebookUser implements java.io.Serializable {
+public class NotebookUser implements Serializable, IUserDetails {
 
     private static final long serialVersionUID = -3701664859818409197L;
 
@@ -75,7 +76,7 @@ public class NotebookUser implements java.io.Serializable {
 
     @Column(name = "notebook_entry")
     private String notebookEntry;
-    
+
     @Column(name = "notebook_entry_modified_date")
     private Date notebookEntryModifiedDate;
 
@@ -133,6 +134,10 @@ public class NotebookUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
+    public String getLogin() {
+	return getLoginName();
+    }
+
     public String getFirstName() {
 	return this.firstName;
     }
@@ -164,14 +169,14 @@ public class NotebookUser implements java.io.Serializable {
     public void setNotebookEntry(String notebookEntry) {
 	this.notebookEntry = notebookEntry;
     }
-    
-    public Date getNotebookEntryModifiedDate() {
-   	return notebookEntryModifiedDate;
-       }
 
-       public void setNotebookEntryModifiedDate(Date notebookEntryModifiedDate) {
-   	this.notebookEntryModifiedDate = notebookEntryModifiedDate;
-       }
+    public Date getNotebookEntryModifiedDate() {
+	return notebookEntryModifiedDate;
+    }
+
+    public void setNotebookEntryModifiedDate(Date notebookEntryModifiedDate) {
+	this.notebookEntryModifiedDate = notebookEntryModifiedDate;
+    }
 
     public String getTeachersComment() {
 	return teachersComment;
@@ -205,8 +210,8 @@ public class NotebookUser implements java.io.Serializable {
 	}
 	NotebookUser castOther = (NotebookUser) other;
 
-	return ((this.getUid() == castOther.getUid())
-		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null
+		&& this.getUid().equals(castOther.getUid())));
     }
 
     @Override

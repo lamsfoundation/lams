@@ -357,7 +357,7 @@ public class MonitoringController {
 		String gradeString = request.getParameter(AssessmentConstants.PARAM_GRADE);
 		if (StringUtils.isNotBlank(gradeString) && !gradeString.strip().equals("-")) {
 		    newGrade = Float.valueOf(gradeString);
-		    responseText = teacher.getLastName() + " " + teacher.getFirstName();
+		    responseText = teacher.getFullName();
 		}
 	    } else if (column.equals(AssessmentConstants.PARAM_MARKER_COMMENT)) {
 		markerComment = request.getParameter(AssessmentConstants.PARAM_MARKER_COMMENT);
@@ -484,7 +484,7 @@ public class MonitoringController {
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    userData.add(userDto.getUserId());
 	    userData.add(userDto.getSessionId());
-	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 	    userData.add(fullName);
 	    userData.add(userDto.getGrade());
 	    if (userDto.getPortraitId() != null) {
@@ -594,7 +594,7 @@ public class MonitoringController {
 	for (AssessmentUserDTO userDto : userDtos) {
 
 	    Long questionResultUid = userDto.getQuestionResultUid();
-	    String fullName = HtmlUtils.htmlEscape(userDto.getFirstName() + " " + userDto.getLastName());
+	    String fullName = HtmlUtils.htmlEscape(userDto.getFullName());
 
 	    ArrayNode userData = JsonNodeFactory.instance.arrayNode();
 	    if (questionResultUid != null) {
@@ -1005,7 +1005,7 @@ public class MonitoringController {
 		ObjectNode userJSON = JsonNodeFactory.instance.objectNode();
 		userJSON.put("value", "user-" + user.getUserId());
 
-		String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+		String name = user.getFullName() + " (" + user.getLogin() + ")";
 		if (grouping != null) {
 		    Group group = grouping.getGroupBy(user);
 		    if (group != null && !group.isNull()) {
@@ -1058,7 +1058,7 @@ public class MonitoringController {
 	    userJSON.put("userId", user.getUserId());
 	    userJSON.put("adjustment", timeLimitAdjustments.get(user.getUserId().intValue()));
 
-	    String name = user.getFirstName() + " " + user.getLastName() + " (" + user.getLogin() + ")";
+	    String name = user.getFullName() + " (" + user.getLogin() + ")";
 	    if (grouping != null) {
 		Group group = grouping.getGroupBy(user);
 		if (group != null && !group.isNull()) {

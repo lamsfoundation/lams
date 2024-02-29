@@ -76,7 +76,7 @@
 						<form:select path="appointedScribeUID" cssClass="form-control input-sm loffset5">
 							<c:forEach var="user" items="${session.userDTOs}">
  								<form:option value="${user.uid}">
- 									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+ 									<c:out value="${user.getFullName()}" escapeXml="true"/>
 								</form:option>
  							</c:forEach>
 						</form:select>

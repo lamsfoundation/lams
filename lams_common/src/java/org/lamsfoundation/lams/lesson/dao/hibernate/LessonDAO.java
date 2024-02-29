@@ -179,7 +179,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    }
 	}
 	String order = orderAscending ? "ASC" : "DESC";
-	queryTextBuilder.append(" ORDER BY users.firstName ").append(order).append(", users.lastName ").append(order)
+	queryTextBuilder.append(" ORDER BY users.lastName ").append(order).append(", users.firstName ").append(order)
 		.append(", users.login ").append(order);
 	Query query = getSession().createQuery(queryTextBuilder.toString()).setLong("lessonId", lessonId);
 	if (limit != null) {

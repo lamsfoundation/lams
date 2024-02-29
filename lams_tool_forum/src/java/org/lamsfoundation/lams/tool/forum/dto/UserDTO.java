@@ -15,7 +15,7 @@ public class UserDTO {
 
     public UserDTO(ForumUser user) {
 	this.setLoginName(user.getLoginName());
-	this.setFullName(user.getFirstName() + " " + user.getLastName());
+	this.setFullName(user.getFullName());
 	this.setUserUid(user.getUid());
 
     }

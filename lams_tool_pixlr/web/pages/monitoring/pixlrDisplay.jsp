@@ -29,7 +29,7 @@
 				<tr>
 					<td colspan="2">
 						<h2>
-							${userDTO.firstName} ${userDTO.lastName }
+							${userDTO.getFullName() }
 						</h2>
 					</td>
 				</tr>

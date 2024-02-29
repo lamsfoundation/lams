@@ -384,7 +384,7 @@ public abstract class WikiPageController {
 	IEventNotificationService notificationService = wikiService.getEventNotificationService();
 
 	String subject = wikiService.getLocalisedMessage(subjectLangKey, new Object[] { wikiSession.getSessionName() });
-	String fullName = wikiUser.getFirstName() + " " + wikiUser.getLastName();
+	String fullName = wikiUser.getFullName();
 
 	// Notify all the monitors
 	if (wikiSession.getWiki().isNotifyUpdates()) {

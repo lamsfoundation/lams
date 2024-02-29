@@ -20,18 +20,17 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.lesson.util;
 
 import java.util.Comparator;
 
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Compares two learner progress objects, based on user name.
  *
  * @author Marcin Cieslak
- *
  */
 public class LearnerProgressNameComparator implements Comparator<LearnerProgress> {
 
@@ -44,9 +43,6 @@ public class LearnerProgressNameComparator implements Comparator<LearnerProgress
 	    return 1;
 	}
 
-	String o1Name = o1.getUser().getFirstName() + o1.getUser().getLastName();
-	String o2Name = o2.getUser().getFirstName() + o2.getUser().getLastName();
-	return o1Name.compareTo(o2Name);
+	return User.COMPARATOR.compare(o1.getUser(), o2.getUser());
     }
-
 }

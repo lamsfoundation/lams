@@ -38,11 +38,11 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     private static final String FIND_RATING_BY_CRITERIA_AND_USER_AND_ITEM = "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.learner.userId=? AND r.itemId=?";
 
-    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.firstName, ' ', r.learner.lastName), r.postedDate "
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.lastName, ' ', r.learner.firstName), r.postedDate "
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId=:itemId";
 
-    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.firstName, ' ', r.learner.lastName), r.postedDate "
+    private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.lastName, ' ', r.learner.firstName), r.postedDate "
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds)";
 

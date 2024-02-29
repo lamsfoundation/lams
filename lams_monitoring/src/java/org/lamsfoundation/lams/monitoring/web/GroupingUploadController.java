@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
@@ -73,6 +74,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -173,7 +175,9 @@ public class GroupingUploadController {
 	    }
 	    Vector<User> learners = userManagementService.getUsersFromOrganisationByRole(organisationId, Role.LEARNER,
 		    true);
-	    sheets = exportLearnersForGrouping(learners, null, groups);
+	    Set<User> sorterLearners = new TreeSet<>(IUserDetails.COMPARATOR);
+	    sorterLearners.addAll(learners);
+	    sheets = exportLearnersForGrouping(sorterLearners, null, groups);
 	}
 
 	// set cookie that will tell JS script that export has been finished

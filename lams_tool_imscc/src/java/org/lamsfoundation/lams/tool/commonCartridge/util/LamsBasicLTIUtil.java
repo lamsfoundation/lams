@@ -145,7 +145,7 @@ public class LamsBasicLTIUtil {
 		LamsBasicLTIUtil.setProperty(launchProperties, BasicLTIConstants.LIS_PERSON_NAME_FAMILY,
 			user.getLastName());
 		LamsBasicLTIUtil.setProperty(launchProperties, BasicLTIConstants.LIS_PERSON_NAME_FULL,
-			user.getLastName() + " " + user.getFirstName());
+			user.getFullName());
 	    }
 
 	    String isExposeUserEmail = service.getConfigItem(CommonCartridgeConfigItem.KEY_EXPOSE_USER_EMAIL)

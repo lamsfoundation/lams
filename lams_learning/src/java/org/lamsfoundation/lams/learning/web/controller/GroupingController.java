@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -56,7 +57,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- *
  * <p>
  * The action servlet that triggers the system driven grouping (random grouping) and allows the learner to view the
  * result of the grouping.
@@ -68,7 +68,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * </p>
  *
  * @author Jacky Fang
- *
  */
 @Controller
 @RequestMapping("/grouping")
@@ -79,7 +78,7 @@ public class GroupingController {
     private ILearnerFullService learnerService;
     @Autowired
     private ActivityMapping activityMapping;
-    
+
     // ---------------------------------------------------------------------
     // Class level constants - Session Attributes
     // ---------------------------------------------------------------------
@@ -111,16 +110,16 @@ public class GroupingController {
 	    return "error";
 	}
 	Long lessonId = learnerProgress.getLesson().getLessonId();
-	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
-		currentUserId, forceGroup);
+	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(), currentUserId,
+		forceGroup);
 
 	groupingForm.setPreviewLesson(learnerProgress.getLesson().isPreviewLesson());
 	groupingForm.setTitle(activity.getTitle());
 	groupingForm.setActivityID(activity.getActivityId());
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
-	
+
 	prepareDataForShowPage(currentUserId, request);
-	
+
 	//Load up the grouping information and forward to the jsp page to display all the groups and members.
 	if (groupingDone) {
 	    request.setAttribute(GroupingController.FINISHED_BUTTON, Boolean.TRUE);
@@ -136,35 +135,36 @@ public class GroupingController {
 	    return "grouping/show";
 
 	} else
-	// forward to group choosing page
-	if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
-	    Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
-	    Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
-		    groupingId);
+	    // forward to group choosing page
+	    if (((GroupingActivity) activity).getCreateGrouping().isLearnerChoiceGrouping()) {
+		Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
+		Integer maxNumberOfLeaernersPerGroup = learnerService.calculateMaxNumberOfLearnersPerGroup(lessonId,
+			groupingId);
 
-	    LearnerChoiceGrouping groupingDb = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
-	    request.setAttribute(GroupingController.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
-	    request.setAttribute(GroupingController.VIEW_STUDENTS_BEFORE_SELECTION,
-		    groupingDb.getViewStudentsBeforeSelection());
-	    return "grouping/choose";
-	    
-	} else {
-	    return "grouping/wait";
-	}
+		LearnerChoiceGrouping groupingDb = (LearnerChoiceGrouping) learnerService.getGrouping(groupingId);
+		request.setAttribute(GroupingController.MAX_LEARNERS_PER_GROUP, maxNumberOfLeaernersPerGroup);
+		request.setAttribute(GroupingController.VIEW_STUDENTS_BEFORE_SELECTION,
+			groupingDb.getViewStudentsBeforeSelection());
+		return "grouping/choose";
+
+	    } else {
+		return "grouping/wait";
+	    }
     }
-    
+
     /**
-     * Load up the grouping information and forward to the jsp page to display all the groups and members. This method is used only to show show.jsp page to the teacher.
+     * Load up the grouping information and forward to the jsp page to display all the groups and members. This method
+     * is used only to show show.jsp page to the teacher.
      */
     @RequestMapping("/viewGrouping")
     public String viewGrouping(HttpServletRequest request) throws IOException, ServletException {
 	int userId = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
 	prepareDataForShowPage(userId, request);
-	
+
 	request.setAttribute(GroupingController.FINISHED_BUTTON, false);
 	return "grouping/show";
     }
-    
+
     /**
      * Common method for performGrouping(GroupingForm, HttpServletRequest) and viewGrouping(HttpServletRequest)
      */
@@ -176,7 +176,7 @@ public class GroupingController {
 	if (grouping != null) {
 	    for (Group group : grouping.getGroups()) {
 		GroupDTO groupDTO = new GroupDTO(group, true);
-		groupDTO.getUserList().sort(UserBasicDTO.USER_BASIC_DTO_COMPARATOR);
+		groupDTO.getUserList().sort(IUserDetails.COMPARATOR);
 
 		//set isUserBelongsToGroup
 		for (UserBasicDTO userDto : groupDTO.getUserList()) {

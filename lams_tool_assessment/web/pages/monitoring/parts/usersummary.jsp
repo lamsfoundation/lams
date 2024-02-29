@@ -211,7 +211,7 @@
                         "<b>(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.required' /></spring:escapeBody>)</b>"
                     </c:when>
                     <c:when test="${not empty questionResult.markedBy}">
-                    "<c:out value='${questionResult.markedBy.fullName}' />"
+	  	 			 	 "<c:out value='${questionResult.markedBy.getFullName()}' />"
                     </c:when>
                     <c:otherwise>
                     "(<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.user.summary.grade.auto' /></spring:escapeBody>)"
@@ -295,7 +295,7 @@
                         <fmt:message key="label.monitoring.user.summary.user.name" />
                     </th>
                     <td >
-                        <c:out value="${userSummary.user.lastName}, ${userSummary.user.firstName}" />
+						<c:out value="${userSummary.user.getFullName()}" />
                     </td>
                 </tr>
 

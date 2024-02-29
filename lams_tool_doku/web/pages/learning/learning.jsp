@@ -63,7 +63,7 @@
                     'showLineNumbers':'${dokumaran.showLineNumbers}',
                     'height':'' + ($(window).height() - 200)
                         <c:if test="${hasEditRight}">
-                        <c:set var="fullName"><lams:user property="firstName" />&nbsp;<lams:user property="lastName" /></c:set>
+                        <c:set var="fullName"><lams:user property="lastName" />&nbsp;<lams:user property="firstName" /></c:set>
                             ,'userName': encodeURIComponent("<c:out value='${fullName}' />")
                         </c:if>
             });

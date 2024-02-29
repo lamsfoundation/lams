@@ -24,7 +24,9 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -57,6 +59,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.SortNatural;
@@ -67,11 +70,12 @@ import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.dto.ThemeDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserBasicDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.util.LanguageUtil;
 
 @Entity
 @Table(name = "lams_user")
-public class User implements Serializable, Comparable<User> {
+public class User implements IUserDetails, Serializable {
     private static final long serialVersionUID = 8711215689846731994L;
 
     @Id
@@ -291,14 +295,6 @@ public class User implements Serializable, Comparable<User> {
 	this.lastName = lastName;
     }
 
-    public String getFullName() {
-	return this.getFirstName() + " " + this.getLastName();
-    }
-
-    public String getFullNameMonitoringStyle() {
-	return new StringBuilder(this.getLastName()).append(", ").append(this.getFirstName()).toString();
-    }
-
     public String getAddressLine1() {
 	return addressLine1;
     }
@@ -503,11 +499,6 @@ public class User implements Serializable, Comparable<User> {
     }
 
     @Override
-    public int compareTo(User user) {
-	return login.compareTo(user.getLogin());
-    }
-
-    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getUserId()).toHashCode();
     }
@@ -536,7 +527,8 @@ public class User implements Serializable, Comparable<User> {
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null, timeZone, authenticationMethod.getAuthenticationMethodId(),
-		fckLanguageMapping, (firstLogin == null || firstLogin ? true : false), // assume no firstLogin value means they haven't logged in
+		fckLanguageMapping, (firstLogin == null || firstLogin ? true : false),
+		// assume no firstLogin value means they haven't logged in
 		lastVisitedOrganisationId, portraitUuid == null ? null : portraitUuid.toString());
     }
 

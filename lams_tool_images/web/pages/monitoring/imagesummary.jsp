@@ -109,7 +109,7 @@
 						
 							<tr>
 								<td>
-									<c:out value="${userImageContribution.user.firstName} ${userImageContribution.user.lastName}" escapeXml="true"/>
+									<c:out value="${userImageContribution.user.getFullName()}" escapeXml="true"/>
 								</td>
 													
 								<td style="padding-left:0px; text-align:center;">

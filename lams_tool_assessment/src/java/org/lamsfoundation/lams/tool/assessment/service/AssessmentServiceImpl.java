@@ -1874,7 +1874,7 @@ public class AssessmentServiceImpl
 	    for (AssessmentUserDTO userDto : userDtos) {
 		ExcelRow userResultRow = summarySheet.initRow();
 		userResultRow.addCell(userDto.getLogin());
-		userResultRow.addCell(userDto.getFirstName() + " " + userDto.getLastName());
+		userResultRow.addCell(userDto.getFullName());
 		userResultRow.addCell(userDto.isResultSubmitted() ? userDto.getGrade() : "-");
 	    }
 	    summarySheet.addEmptyRow();
@@ -3463,10 +3463,9 @@ public class AssessmentServiceImpl
 				ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 
 				confidenceLevelDto.setUserId(user.getUserId().intValue());
-				String userName = StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(
-					user.getLastName())
+				String userName = StringUtils.isBlank(user.getFullName())
 					? user.getLoginName()
-					: user.getFirstName() + " " + user.getLastName();
+					: user.getFullName();
 				confidenceLevelDto.setUserName(userName);
 				confidenceLevelDto.setPortraitUuid(
 					portraitUuid == null ? null : portraitUuid.toString());
@@ -3486,10 +3485,9 @@ public class AssessmentServiceImpl
 			    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 
 			    confidenceLevelDto.setUserId(user.getUserId().intValue());
-			    String userName =
-				    StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(user.getLastName())
-					    ? user.getLoginName()
-					    : user.getFirstName() + " " + user.getLastName();
+			    String userName = StringUtils.isBlank(user.getFullName())
+				    ? user.getLoginName()
+				    : user.getFullName();
 			    confidenceLevelDto.setUserName(userName);
 			    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 			    confidenceLevelDto.setQbQuestionUid(qbQuestion.getUid());
@@ -3569,10 +3567,9 @@ public class AssessmentServiceImpl
 
 		    ConfidenceLevelDTO confidenceLevelDto = new ConfidenceLevelDTO();
 		    confidenceLevelDto.setUserId(user.getUserId().intValue());
-		    String userName =
-			    StringUtils.isBlank(user.getFirstName()) && StringUtils.isBlank(user.getLastName())
-				    ? user.getLoginName()
-				    : user.getFirstName() + " " + user.getLastName();
+		    String userName = StringUtils.isBlank(user.getFullName())
+			    ? user.getLoginName()
+			    : user.getFullName();
 		    confidenceLevelDto.setUserName(userName);
 		    confidenceLevelDto.setPortraitUuid(portraitUuid == null ? null : portraitUuid.toString());
 		    confidenceLevelDto.setLevel(questionResult.getConfidenceLevel());

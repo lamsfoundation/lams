@@ -68,7 +68,7 @@ public class EmailAnalysisBuilder {
     // HTML Styles
     private static final String width100pc = "width:100%;";
     private static final String tableBorderedStyle = "border-collapse:collapse;border-width:1px;border-style:solid;border-color:#777;";
-	private static final String divSpaSapaInfoBorderStyle = "margin: auto;width: 50%;border-width:1px;border-style:solid;border-color:#777;background:#ffd236;padding:10px;";
+    private static final String divSpaSapaInfoBorderStyle = "margin: auto;width: 50%;border-width:1px;border-style:solid;border-color:#777;background:#ffd236;padding:10px;";
     private static final String centeredStyle = "text-align:center;";
     private static final String headerBackgroundStyle = "background:#B9CDE5;";
     private static final String highlightBackgroundStyle = "background:#D7E4BD;";
@@ -127,10 +127,11 @@ public class EmailAnalysisBuilder {
 	htmlText.append("<p>&nbsp;</p>\n");
 
 	if (peerreview.isSelfReview()) {
-		htmlText.append("<div style=\"").append(divSpaSapaInfoBorderStyle).append("\">\n<p style=\"font-size:large;font-weight:600;\">ℹ️ &nbsp;<strong>")
-				.append(getLocalisedMessage("email.label.spa.sapa.info.title")).append("</strong></p>\n")
-				.append("<p>").append(getLocalisedMessage("email.label.spa.info")).append("</p>")
-				.append("<p>").append(getLocalisedMessage("email.label.sapa.info")).append("</p></span></div>\n<p>&nbsp;</p>\n");
+	    htmlText.append("<div style=\"").append(divSpaSapaInfoBorderStyle)
+		    .append("\">\n<p style=\"font-size:large;font-weight:600;\">ℹ️ &nbsp;<strong>")
+		    .append(getLocalisedMessage("email.label.spa.sapa.info.title")).append("</strong></p>\n")
+		    .append("<p>").append(getLocalisedMessage("email.label.spa.info")).append("</p>").append("<p>")
+		    .append(getLocalisedMessage("email.label.sapa.info")).append("</p></span></div>\n<p>&nbsp;</p>\n");
 	    generateSAPASPAExplanation(htmlText, learnerData.getSPAFactor(), learnerData.getSAPAFactor());
 	    htmlText.append("<p>&nbsp;</p>\n");
 	}
@@ -225,8 +226,7 @@ public class EmailAnalysisBuilder {
 
 	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(session.getSessionId());
 	for (PeerreviewUser user : users) {
-	    learnerDataMap.put(user.getUserId(),
-		    new LearnerData(StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName())));
+	    learnerDataMap.put(user.getUserId(), new LearnerData(StringEscapeUtils.escapeCsv(user.getFullName())));
 	}
 
 	Map<Long, Double> criteriaMarkSumMap = new HashMap<>();
@@ -297,12 +297,10 @@ public class EmailAnalysisBuilder {
     }
 
     /**
-     * tally: hashmap<item id, hashmap<criteria id, summingData>>
-     * tallying done in Java as the code to do three calcs in one SQL is complex (and hence risks errors)
-     * and hopefully we are only dealing with small numbers of users in each session. The code that gets the existing
-     * data
-     * does a lot of processing that is not needed for the SPA/SAPA calculations so getting the raw data
-     * avoids that processing.
+     * tally: hashmap<item id, hashmap<criteria id, summingData>> tallying done in Java as the code to do three calcs in
+     * one SQL is complex (and hence risks errors) and hopefully we are only dealing with small numbers of users in each
+     * session. The code that gets the existing data does a lot of processing that is not needed for the SPA/SAPA
+     * calculations so getting the raw data avoids that processing.
      */
     @SuppressWarnings("unchecked")
     private HashMap<Long, HashMap<Long, SummingData>> processRawRatingData() {
@@ -383,9 +381,9 @@ public class EmailAnalysisBuilder {
 	String spaFactor = roundTo2PlacesAsString(learnerData.getSPAFactor());
 	StringBuilder spaFactorCellContents = new StringBuilder().append("<td>&nbsp;</td><td style=\"width:20%;")
 		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">")
-		.append(getLocalisedMessage("email.SPA.factor")).append("</span></td><td style=\"width:20%;text-align:center;")
-		.append(zebraOddRow).append("\"><span style=\"").append(bold).append("\">").append(spaFactor)
-		.append("</span></td>");
+		.append(getLocalisedMessage("email.SPA.factor"))
+		.append("</span></td><td style=\"width:20%;text-align:center;").append(zebraOddRow)
+		.append("\"><span style=\"").append(bold).append("\">").append(spaFactor).append("</span></td>");
 	htmlText.append("<table style=\"border-collapse:collapse;").append(width100pc).append("\">");
 	for (RatingCriteria criteria : criteriaForCriteriaTable) {
 	    SingleCriteriaData criteriaData = learnerData.criteriaDataMap.get(criteria.getRatingCriteriaId());
@@ -399,8 +397,9 @@ public class EmailAnalysisBuilder {
 		    String selfRating = roundTo2PlacesAsString(criteriaData.selfRating);
 		    htmlText.append("<td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\"><span style=\"").append(bold).append("\">").append(selfRatingString)
-			    .append("</span></td><td style=\"text-align:center;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			    .append("\">").append(selfRating).append("</td>");
+			    .append("</span></td><td style=\"text-align:center;")
+			    .append(evenRow ? zebraEvenRow : zebraOddRow).append("\">").append(selfRating)
+			    .append("</td>");
 		    if (!spaDone) {
 			htmlText.append(spaFactorCellContents);
 		    }
@@ -409,7 +408,8 @@ public class EmailAnalysisBuilder {
 
 		String peerRatingExcSelf = roundTo2PlacesAsString(criteriaData.peerRatingExcSelf);
 		htmlText.append("<td style=\"").append(evenRow ? zebraEvenRow : zebraOddRow).append("\"><span style=\"")
-			.append(bold).append("\">").append(peerRatingString).append("</span></td><td style=\"text-align:center;")
+			.append(bold).append("\">").append(peerRatingString)
+			.append("</span></td><td style=\"text-align:center;")
 			.append(evenRow ? zebraEvenRow : zebraOddRow).append("\">").append(peerRatingExcSelf)
 			.append("</td>");
 		if (!spaDone) {
@@ -417,8 +417,9 @@ public class EmailAnalysisBuilder {
 			String sapaFactor = roundTo2PlacesAsString(learnerData.getSAPAFactor());
 			htmlText.append("<td>&nbsp;</td><td style=\"width:20%;").append(zebraOddRow)
 				.append("\"><span style=\"").append(bold).append("\">")
-				.append(getLocalisedMessage("email.SAPA.factor")).append("</span></td><td style=\"text-align:center;")
-				.append(zebraOddRow).append("\"><span style=\"text-align:center;").append(bold).append("\">")
+				.append(getLocalisedMessage("email.SAPA.factor"))
+				.append("</span></td><td style=\"text-align:center;").append(zebraOddRow)
+				.append("\"><span style=\"text-align:center;").append(bold).append("\">")
 				.append(sapaFactor).append("</span></td>");
 		    } else {
 			htmlText.append(spaFactorCellContents);
@@ -431,9 +432,9 @@ public class EmailAnalysisBuilder {
 		if (isSelfReview) {
 		    htmlText.append("<tr><td style=\"width:20%;").append(evenRow ? zebraEvenRow : zebraOddRow)
 			    .append("\"><span style=\"").append(bold).append("\">").append("Self & Peers' Rating")
-			    .append("</span></td><td style=\"text-align:center;").append(evenRow ? zebraEvenRow : zebraOddRow)
-			    .append("\">").append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf))
-			    .append("</td>");
+			    .append("</span></td><td style=\"text-align:center;")
+			    .append(evenRow ? zebraEvenRow : zebraOddRow).append("\">")
+			    .append(roundTo2PlacesAsString(criteriaData.peerRatingIncSelf)).append("</td>");
 		    htmlText.append("</tr>\n");
 		}
 
@@ -530,12 +531,12 @@ public class EmailAnalysisBuilder {
 	    }
 	}
 
-	String customisedtableTextToModify = htmlOverallResultsTable
-		.replace(htmlORTHighlightedCellReplacementText + cellToHighlight, highlightBackgroundStyle);
+	String customisedtableTextToModify = htmlOverallResultsTable.replace(
+		htmlORTHighlightedCellReplacementText + cellToHighlight, highlightBackgroundStyle);
 	for (int i = 1; i < 10; i++) {
 	    if (i != cellToHighlight) {
-		customisedtableTextToModify = customisedtableTextToModify
-			.replaceAll(htmlORTHighlightedCellReplacementText + i, "");
+		customisedtableTextToModify = customisedtableTextToModify.replaceAll(
+			htmlORTHighlightedCellReplacementText + i, "");
 	    }
 	}
 
@@ -553,8 +554,8 @@ public class EmailAnalysisBuilder {
 	}
 	int colWidth = 100 / numCol;
 
-	StringBuilder tempBuffer = new StringBuilder("<span>")
-		.append(getLocalisedMessage("email.crtieria.table.explanation")).append("</span>");
+	StringBuilder tempBuffer = new StringBuilder("<span>").append(
+		getLocalisedMessage("email.crtieria.table.explanation")).append("</span>");
 	tempBuffer.append("<table style=\"").append(tableBorderedStyle).append(width100pc).append("\">")
 		.append("<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"").append(tableBorderedStyle)
 		.append(headerBackgroundStyle).append("\"><span style=\"").append(bold).append("\">")
@@ -588,8 +589,8 @@ public class EmailAnalysisBuilder {
 		.append(centeredStyle).append("\">")
 		.append(getLocalisedMessage("email.explanation.SPA.less", new Object[] { rangeStart }))
 		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
-		.append(centeredStyle).append("\">")
-		.append(tolerance == 0 ? getLocalisedMessage("email.explanation.SPA.one")
+		.append(centeredStyle).append("\">").append(tolerance == 0
+			? getLocalisedMessage("email.explanation.SPA.one")
 			: getLocalisedMessage("email.explanation.SPA.range", new Object[] { rangeStart, rangeEnd }))
 		.append("</td><td style=\"").append(tableBorderedStyle).append(headerBackgroundStyle)
 		.append(centeredStyle).append("\">")
@@ -606,7 +607,8 @@ public class EmailAnalysisBuilder {
 
 	tempBuffer.append("</tr>\n<tr style=\"").append(tableBorderedStyle).append("\"><td style=\"")
 		.append(tableBorderedStyle).append(headerBackgroundStyle).append(centeredStyle).append("\">")
-		.append(tolerance == 0 ? getLocalisedMessage("email.explanation.SAPA.one")
+		.append(tolerance == 0
+			? getLocalisedMessage("email.explanation.SAPA.one")
 			: getLocalisedMessage("email.explanation.SAPA.range", new Object[] { rangeStart, rangeEnd }))
 		.append("</td>");
 	addExplanationCell(tempBuffer, 4, "email.explanation.4");

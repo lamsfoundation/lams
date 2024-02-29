@@ -84,14 +84,13 @@ public class ProfileController {
     private MessageService messageService;
     @Autowired
     private IPolicyService policyService;
-    
+
     private static List<SupportedLocale> locales;
 
     @RequestMapping("/view")
     public String view(HttpServletRequest request) throws Exception {
 	User requestor = userManagementService.getUserByLogin(request.getRemoteUser());
-	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
-		+ " " + requestor.getLastName();
+	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFullName();
 	String email = requestor.getEmail();
 
 	request.setAttribute("fullName", fullName);
@@ -121,9 +120,8 @@ public class ProfileController {
 
 	    // insert or update bean if it is a course
 	    if (orgTypeId.equals(OrganisationType.COURSE_TYPE)) {
-		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId))
-			? new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId)
-			: orgBeansMap.get(orgId);
+		IndexOrgBean orgBean = (!orgBeansMap.containsKey(orgId)) ? new IndexOrgBean(org.getOrganisationId(),
+			org.getName(), orgTypeId) : orgBeansMap.get(orgId);
 		orgBean.addLesson(lessonBean);
 		orgBeansMap.put(orgId, orgBean);
 	    } else if (orgTypeId.equals(OrganisationType.CLASS_TYPE)) {
@@ -131,8 +129,9 @@ public class ProfileController {
 		// if it is a class, find existing or create new parent bean
 		Organisation parentOrg = org.getParentOrganisation();
 		Integer parentOrgId = parentOrg.getOrganisationId();
-		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId)) ? new IndexOrgBean(
-			parentOrg.getOrganisationId(), parentOrg.getName(), OrganisationType.COURSE_TYPE)
+		IndexOrgBean parentOrgBean = (!orgBeansMap.containsKey(parentOrgId))
+			? new IndexOrgBean(parentOrg.getOrganisationId(), parentOrg.getName(),
+			OrganisationType.COURSE_TYPE)
 			: orgBeansMap.get(parentOrgId);
 		// create new bean for class, or use existing bean
 		IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(), orgTypeId);

@@ -34,19 +34,18 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
+
+import java.io.Serializable;
 
 /**
- *
- * Caches the user details. This allows the tool to be more efficient at
- * displaying user names but means that when people's names change, they won't
- * change in the "old" tool data.
- *
- *
+ * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
+ * people's names change, they won't change in the "old" tool data.
  */
 
 @Entity
 @Table(name = "tl_lawiki10_user")
-public class WikiUser implements java.io.Serializable {
+public class WikiUser implements Serializable, IUserDetails {
 
     private static final long serialVersionUID = -534126658843778423L;
 
@@ -137,6 +136,11 @@ public class WikiUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
+    @Override
+    public String getLogin() {
+	return getLoginName();
+    }
+
     public String getFirstName() {
 	return this.firstName;
     }
@@ -201,8 +205,8 @@ public class WikiUser implements java.io.Serializable {
 	}
 	WikiUser castOther = (WikiUser) other;
 
-	return ((this.getUid() == castOther.getUid())
-		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null
+		&& this.getUid().equals(castOther.getUid())));
     }
 
     @Override

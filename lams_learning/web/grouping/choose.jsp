@@ -111,7 +111,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<c:if test="${viewStudentsBeforeSelection && !RestrictedGroupUserNames}">
 							<c:forEach items="${group.userList}" var="user">
 								<div name="u-${user.userID}" class="user-container">
-									<lams:Portrait userId="${user.userID}"/>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
+									<lams:Portrait userId="${user.userID}"/>&nbsp;<c:out value="${user.getFullName()}" />
 								</div>
 							</c:forEach>
 						</c:if>

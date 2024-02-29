@@ -56,7 +56,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + "where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
 
     private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "FROM LearnerProgress p WHERE p.lessonComplete > 0 "
-	    + "AND p.lesson.id = :lessonId ORDER BY p.user.firstName <ORDER>, p.user.lastName <ORDER>, p.user.login <ORDER>";
+	    + "AND p.lesson.id = :lessonId ORDER BY p.user.lastName <ORDER>, p.user.firstName <ORDER>, p.user.login <ORDER>";
 
     private final static String LOAD_LEARNERS_LATEST_COMPLETED_BY_LESSON = "SELECT p.user FROM LearnerProgress p WHERE "
 	    + "p.lessonComplete > 0 and p.lesson.id = :lessonId ORDER BY p.finishDate DESC";
@@ -103,10 +103,10 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     private final static String LOAD_LEARNERS_BY_ACTIVITIES = "SELECT prog.user FROM LearnerProgress prog WHERE "
 	    + " prog.currentActivity.id IN (:activityIds) "
-	    + "ORDER BY prog.user.firstName <ORDER>, prog.user.lastName <ORDER>, prog.user.login <ORDER>";
+	    + "ORDER BY prog.user.lastName <ORDER>, prog.user.firstName <ORDER>, prog.user.login <ORDER>";
 
     private final static String COUNT_LEARNERS_BY_LESSON = "COUNT(*) FROM LearnerProgress prog WHERE prog.lesson.id = :lessonId";
-    private final static String COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE = " ORDER BY prog.user.firstName ASC, prog.user.lastName ASC, prog.user.login ASC";
+    private final static String COUNT_LEARNERS_BY_LESSON_ORDER_CLAUSE = " ORDER BY prog.user.lastName ASC, prog.user.firstName ASC, prog.user.login ASC";
 
     // find Learners for the given Lesson first, then see if they have Progress, i.e. started the lesson
     private final static String LOAD_LEARNERS_BY_MOST_PROGRESS = "SELECT u.*, COUNT(comp.activity_id) AS comp_count FROM lams_lesson AS lesson "
@@ -117,7 +117,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + "LEFT JOIN lams_progress_completed AS comp USING (learner_progress_id) "
 	    + "WHERE lesson.lesson_id = :lessonId AND g.group_name NOT LIKE '%Staff%'";
     private final static String LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE = " GROUP BY u.user_id "
-	    + "ORDER BY prog.lesson_completed_flag DESC, comp_count DESC, u.first_name ASC, u.last_name ASC, u.login ASC";
+	    + "ORDER BY prog.lesson_completed_flag DESC, comp_count DESC, u.last_name ASC, u.first_name ASC, u.login ASC";
 
     private final static String FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT = "SELECT MAX(p.attemptId) FROM LearnerProgressArchive p "
 	    + "WHERE p.user.id = :learnerId AND p.lesson.id = :lessonId";

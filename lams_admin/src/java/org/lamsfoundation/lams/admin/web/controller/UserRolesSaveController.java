@@ -161,9 +161,9 @@ public class UserRolesSaveController {
 		: Stream.of(roleIds).collect(Collectors.mapping(roleId -> Role.ROLE_MAP.get(Integer.valueOf(roleId)),
 			Collectors.toUnmodifiableList()));
 	User targetUser = userManagementService.getUserById(userId);
-	StringBuilder auditLogMessage = new StringBuilder("to user ").append(targetUser.getFirstName()).append(" ")
-		.append(targetUser.getLastName()).append(" (").append(targetUser.getLogin()).append(") assigned roles ")
-		.append(roles).append(" in organisation \"").append(organisation.getName()).append("\"");
+	StringBuilder auditLogMessage = new StringBuilder("to user ").append(targetUser.getFullName()).append(" (")
+		.append(targetUser.getLogin()).append(") assigned roles ").append(roles).append(" in organisation \"")
+		.append(organisation.getName()).append("\"");
 	if (addToLessons) {
 	    auditLogMessage.append(" and added to all lessons");
 	}

@@ -42,6 +42,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Spreadsheet user
@@ -50,7 +51,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_lasprd10_user")
-public class SpreadsheetUser implements Cloneable, Serializable {
+public class SpreadsheetUser implements Cloneable, Serializable, IUserDetails {
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(SpreadsheetUser.class);
 
@@ -194,6 +195,11 @@ public class SpreadsheetUser implements Cloneable, Serializable {
 	this.loginName = loginName;
     }
 
+    @Override
+    public String getLogin() {
+	return getLoginName();
+    }
+
     public SpreadsheetSession getSession() {
 	return session;
     }
@@ -237,7 +243,7 @@ public class SpreadsheetUser implements Cloneable, Serializable {
     /** Username displayed in monitoring */
     public String getFullUsername() {
 	StringBuilder buf = new StringBuilder();
-	buf.append(getLastName()).append(" ").append(getFirstName()).append(" (").append(getLoginName()).append(")");
+	buf.append(getFullName()).append(" (").append(getLoginName()).append(")");
 	return buf.toString();
     }
 

@@ -181,8 +181,7 @@
 			sortInitialOrder: 'asc',
 			sortList: [[0]],
 			widgets: [ "uitheme", "resizable", "editable" ],
-			headers: { 0: { sorter: true}, 1: { sorter: true}  },
-			sortList : [[0,1]],
+			headers: { 0: { sorter: true}, 1: { sorter: false}  },
 			showProcessing: false,
 			widgetOptions: {
 				resizable: true,
@@ -271,7 +270,7 @@
 							rows += '<tr userId="' + userData['userId'] + '" ' + (isLeader ? 'class="info"' : '') + '>';
 
 							rows += '<td style="width: 80%">';
-							rows += 	userData['firstName'] + ' ' +userData['lastName'];
+							rows += 	userData['lastName'] + ' ' +userData['firstName'];
 							if (isLeader) {
 								rows += '&nbsp;<i title="<fmt:message key="label.monitoring.team.leader"/>" class="text-primary fa fa-star"></i>';
 							}

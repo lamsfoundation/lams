@@ -104,8 +104,7 @@
       		<a class="collapsed" role="button" data-toggle="collapse" href="#rubrics-user-collapse-${learnerData.key.uid}" 
 				aria-expanded="false" aria-controls="rubrics-user-collapse-${learnerData.key.uid}">
 			<lams:Portrait userId="${learnerData.key.userId}" hover="false" />
-			&nbsp;<c:out value="${learnerData.key.firstName}" escapeXml="true"/>
-			&nbsp;<c:out value="${learnerData.key.lastName}" escapeXml="true"/>
+			&nbsp;<c:out value="${learnerData.key.getFullName()}" escapeXml="true"/>
 		</a>
 	</span>
 	<button class="btn btn-default pull-right email-button btn-disable-on-submit"

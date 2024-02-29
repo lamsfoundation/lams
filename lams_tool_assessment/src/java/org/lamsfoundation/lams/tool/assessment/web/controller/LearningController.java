@@ -452,8 +452,7 @@ public class LearningController {
 	    if (questionEtherpadEnabled) {
 		// get all users from the group, even if they did not reach the Scratchie yet
 		// order them by first and last name
-		Collection<User> allGroupUsers = service.getAllGroupUsers(toolSessionId).stream()
-			.sorted(Comparator.comparing(u -> u.getFirstName() + u.getLastName()))
+		Collection<User> allGroupUsers = service.getAllGroupUsers(toolSessionId).stream().sorted()
 			.collect(Collectors.toList());
 		request.setAttribute(AssessmentConstants.ATTR_ALL_GROUP_USERS, allGroupUsers);
 	    }
@@ -1266,7 +1265,7 @@ public class LearningController {
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 	sessionMap.put(AssessmentConstants.CONFIG_KEY_HIDE_TITLES,
 		Boolean.valueOf(service.getConfigValue(AssessmentConstants.CONFIG_KEY_HIDE_TITLES)));
-	
+
 	boolean isBootstrap5 = WebUtil.readBooleanParam(request, "bootstrap5", false);
 
 	return "pages/learning/" + (isBootstrap5 ? "results" : "resultsbootstrap3") + (embedded ? "/allquestions" : "");
@@ -1305,7 +1304,7 @@ public class LearningController {
 	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored
 		&& assessment.isNotifyTeachersOnAttemptCompletion()) {
 	    AssessmentUser assessmentUser = getCurrentAssessmentUser(toolSessionId);
-	    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
+	    String fullName = assessmentUser.getFullName();
 	    service.notifyTeachersOnAttemptCompletion(toolSessionId, fullName);
 	}
 

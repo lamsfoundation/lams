@@ -40,6 +40,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * ImageGallery
@@ -48,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_laimag10_user")
-public class ImageGalleryUser implements Cloneable {
+public class ImageGalleryUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(ImageGalleryUser.class);
 
     @Id
@@ -186,6 +187,10 @@ public class ImageGalleryUser implements Cloneable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    public String getLogin() {
+	return getLoginName();
     }
 
     public ImageGallerySession getSession() {

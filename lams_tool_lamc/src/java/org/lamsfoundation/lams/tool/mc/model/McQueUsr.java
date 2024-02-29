@@ -99,7 +99,7 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 
     /**
      * @param responseFinalised
-     *            The responseFinalised to set.
+     * 	The responseFinalised to set.
      */
     public void setResponseFinalised(boolean responseFinalised) {
 	this.responseFinalised = responseFinalised;

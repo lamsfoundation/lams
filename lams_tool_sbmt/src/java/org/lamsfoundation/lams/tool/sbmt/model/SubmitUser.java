@@ -34,13 +34,14 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Steve.Ni
  */
 @Entity
 @Table(name = "tl_lasbmt11_user")
-public class SubmitUser implements Serializable, Cloneable {
+public class SubmitUser implements Serializable, Cloneable, IUserDetails {
     private static final long serialVersionUID = 4951104689120529660L;
     private static Logger log = Logger.getLogger(SubmitUser.class);
 
@@ -178,9 +179,5 @@ public class SubmitUser implements Serializable, Cloneable {
 
     public void setContentID(Long contentID) {
 	this.contentID = contentID;
-    }
-
-    public String getFullName() {
-	return new StringBuilder(getLastName()).append(" ").append(getFirstName()).toString();
     }
 }

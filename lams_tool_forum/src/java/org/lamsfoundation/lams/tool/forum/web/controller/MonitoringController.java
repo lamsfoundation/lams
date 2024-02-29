@@ -162,8 +162,8 @@ public class MonitoringController {
 	Date submissionDeadline = forum.getSubmissionDeadline();
 	if (submissionDeadline != null) {
 	    HttpSession ss = SessionManager.getSession();
-	    org.lamsfoundation.lams.usermanagement.dto.UserDTO learnerDto = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
-		    .getAttribute(AttributeNames.USER);
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO learnerDto = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(
+		    AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
@@ -189,8 +189,8 @@ public class MonitoringController {
 
 	// teacher timezone
 	HttpSession ss = SessionManager.getSession();
-	org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
-		.getAttribute(AttributeNames.USER);
+	org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(
+		AttributeNames.USER);
 	TimeZone teacherTimeZone = teacher.getTimeZone();
 
 	Long sessionId = WebUtil.readLongParam(request, "sessionId");
@@ -256,7 +256,7 @@ public class MonitoringController {
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
 	    responseRow.put(ForumConstants.ATTR_USER_ID, user.getUserId());
-	    responseRow.put("userName", HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put("userName", HtmlUtils.htmlEscape(user.getFullName()));
 
 	    int numberOfPosts = 0;
 	    boolean isAnyPostsMarked = false;
@@ -377,8 +377,7 @@ public class MonitoringController {
 
 		    cell = row.createCell(idx++);
 		    if (dto.getMessage() != null && dto.getMessage().getReport() != null) {
-			cell.setCellValue(
-				ExcelUtil.ensureCorrectCellLength(dto.getMessage().getReport().getComment()));
+			cell.setCellValue(ExcelUtil.ensureCorrectCellLength(dto.getMessage().getReport().getComment()));
 		    } else {
 			cell.setCellValue("");
 		    }
@@ -460,7 +459,7 @@ public class MonitoringController {
 	    int msgNum;
 	    float totalMsgMarkSum = 0;
 	    float msgMarkSum = 0;
-	    for (; iter.hasNext();) {
+	    for (; iter.hasNext(); ) {
 		MessageDTO msgDto = (MessageDTO) iter.next();
 		// get all message under this topic
 		List topicThread = forumService.getTopicThread(msgDto.getMessage().getUid());
@@ -675,7 +674,7 @@ public class MonitoringController {
 	    return "jsps/monitoring/viewmarks";
 
 	} else { // mark from view forum
-		 // display root topic rather than leaf one
+	    // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
 
 	    String redirect = "redirect:/learning/viewTopic.do";
@@ -703,8 +702,8 @@ public class MonitoringController {
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
-	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss
-		    .getAttribute(AttributeNames.USER);
+	    org.lamsfoundation.lams.usermanagement.dto.UserDTO teacher = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) ss.getAttribute(
+		    AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
 	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());

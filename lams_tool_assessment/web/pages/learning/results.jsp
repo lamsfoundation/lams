@@ -98,7 +98,7 @@
 		</c:if>
 		
 		<c:if test="${isLeadershipEnabled and not empty sessionMap.groupLeader}">
-			<lams:LeaderDisplay username="${sessionMap.groupLeader.firstName} ${sessionMap.groupLeader.lastName}" userId="${sessionMap.groupLeader.userId}"/>
+			<lams:LeaderDisplay username="${sessionMap.groupLeader.getFullName()}" userId="${sessionMap.groupLeader.userId}"/>
 		</c:if>
 		
 		<lams:errors5/>

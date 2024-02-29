@@ -110,7 +110,7 @@ public class FindUserLessonsController {
 	ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
 	for (User user : userSet) {
 	    ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
-	    jsonObject.put("label", user.getFirstName() + " " + user.getLastName());
+	    jsonObject.put("label", user.getFullName());
 	    jsonObject.put("value", user.getUserId());
 	    jsonArray.add(jsonObject);
 	}

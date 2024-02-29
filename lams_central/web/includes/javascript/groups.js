@@ -130,7 +130,7 @@ function fillGroup(users, container) {
 				.addClass('mb-2')
 				.appendTo(userDiv);
 			addPortrait(portraitDiv, userJSON.portraitId, userJSON.id, 'small', true, LAMS_URL );
-			$('<span/>').text(userJSON.firstName + ' ' + userJSON.lastName)
+			$('<span/>').text(userJSON.lastName + ', ' + userJSON.firstName)
 				.addClass('portrait-sm-lineheight ms-1')
 				.appendTo(userDiv);
 

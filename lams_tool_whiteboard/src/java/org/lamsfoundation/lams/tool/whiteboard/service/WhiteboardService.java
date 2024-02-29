@@ -742,16 +742,7 @@ public class WhiteboardService implements IWhiteboardService, ToolContentManager
 	if (user == null) {
 	    return null;
 	}
-	StringBuilder authorName = new StringBuilder();
-	if (StringUtils.isNotBlank(user.getFirstName())) {
-	    authorName.append(user.getFirstName());
-	}
-	if (StringUtils.isNotBlank(user.getLastName())) {
-	    if (authorName.length() > 0) {
-		authorName.append(" ");
-	    }
-	    authorName.append(user.getLastName());
-	}
+	StringBuilder authorName = new StringBuilder(user.getFullName());
 	return URLEncoder.encode(authorName.length() == 0 ? user.getLogin() : authorName.toString(),
 		FileUtil.ENCODING_UTF_8);
     }

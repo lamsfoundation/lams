@@ -107,7 +107,6 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
@@ -1882,13 +1881,7 @@ public class MonitoringService implements IMonitoringFullService {
 		break;
 	}
 
-	Set<User> sortedUsers = new TreeSet<>(new Comparator<User>() {
-	    @Override
-	    public int compare(User usr0, User usr1) {
-		return ((usr0.getLastName() + usr0.getFirstName() + usr0.getLogin()).compareTo(
-			usr1.getLastName() + usr1.getFirstName() + usr1.getLogin()));
-	    }
-	});
+	Set<User> sortedUsers = new TreeSet<>();
 	sortedUsers.addAll(users);
 
 	return sortedUsers;
@@ -2215,7 +2208,7 @@ public class MonitoringService implements IMonitoringFullService {
 		    "getClassMembersNotGrouped: Lesson " + lessonID + " has " + learners.size() + " learners.");
 	}
 
-	SortedSet sortedUsers = new TreeSet(new LastNameAlphabeticComparator());
+	SortedSet sortedUsers = new TreeSet();
 	sortedUsers.addAll(learners);
 	return sortedUsers;
     }

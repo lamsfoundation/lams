@@ -46,7 +46,7 @@
 								<tr>
 									<td width="30%">
 										<a href="javascript:openPopup('${pixlrImageFolderURL}/${learner.imageFileName}', ${learner.imageHeight}, ${learner.imageWidth})">
-											<c:out value="${learner.firstName} ${learner.lastName}" escapeXml="true"/>
+											<c:out value="${learner.getFullName()}" escapeXml="true"/>
 										</a>
 									</td>
 									

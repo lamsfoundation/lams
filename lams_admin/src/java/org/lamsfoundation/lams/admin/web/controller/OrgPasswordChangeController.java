@@ -158,7 +158,7 @@ public class OrgPasswordChangeController {
 	    rowJSON.put(AdminConstants.ELEMENT_ID, user.getUserID());
 
 	    ArrayNode cellJSON = JsonNodeFactory.instance.arrayNode();
-	    cellJSON.add(user.getFirstName() + " " + user.getLastName());
+	    cellJSON.add(user.getFullName());
 	    cellJSON.add(user.getLogin());
 	    cellJSON.add(user.getEmail());
 

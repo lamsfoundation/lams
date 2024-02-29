@@ -65,8 +65,8 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.*;
 import org.lamsfoundation.lams.util.excel.ExcelCell;
 import org.lamsfoundation.lams.util.excel.ExcelRow;
@@ -442,7 +442,7 @@ public class GradebookService implements IGradebookFullService {
 	    //size will be 0 in case of excel export
 	    if (size == 0) {
 		learners = new LinkedList<>(lesson.getAllLearners());
-		Collections.sort(learners, new LastNameAlphabeticComparator());
+		Collections.sort(learners);
 
 		userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
 		userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
@@ -1097,7 +1097,7 @@ public class GradebookService implements IGradebookFullService {
 	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_START_PLACEHOLDER.length();
 	content.replace(placeholderStart, placeholderEnd,
 		messageService.getMessage("gradebook.monitor.releasemarks.email.content.start",
-			new Object[] { user.getFirstName() + " " + user.getLastName() }));
+			new Object[] { user.getFullName() }));
 
 	placeholderStart = content.indexOf(RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER);
 	placeholderEnd = placeholderStart + RELEASE_MARKS_EMAIL_CONTENT_LESSON_NAME_PLACEHOLDER.length();
@@ -1318,7 +1318,7 @@ public class GradebookService implements IGradebookFullService {
 
 	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new LinkedHashMap<>();
 
-	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
+	Set<User> learners = new TreeSet<User>();
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
@@ -1348,7 +1348,7 @@ public class GradebookService implements IGradebookFullService {
 
 	    if (activity instanceof SequenceActivity) {
 		// use only a subset of learners for this branch of the branching activity based on who has started the branch
-		complexLearners = new TreeSet<User>(new LastNameAlphabeticComparator());
+		complexLearners = new TreeSet<User>();
 		for (User learner : learners) {
 		    LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
 		    if (learnerProgress != null && (learnerProgress.getCompletedActivities().get(activity) != null
@@ -1611,7 +1611,7 @@ public class GradebookService implements IGradebookFullService {
 	ExcelSheet learnerViewSheet = new ExcelSheet(getMessage("gradebook.export.learner.view"));
 	sheets.add(learnerViewSheet);
 
-	Set<User> learners = new TreeSet<User>(new LastNameAlphabeticComparator());
+	Set<User> learners = new TreeSet<User>();
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
@@ -1890,7 +1890,7 @@ public class GradebookService implements IGradebookFullService {
 	    }
 
 	    //sort users by last name
-	    TreeSet<User> sortedLearners = new TreeSet<User>(new LastNameAlphabeticComparator());
+	    TreeSet<User> sortedLearners = new TreeSet<User>();
 	    sortedLearners.addAll(allLearners);
 
 	    for (User learner : sortedLearners) {

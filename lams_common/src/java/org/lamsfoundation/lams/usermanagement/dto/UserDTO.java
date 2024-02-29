@@ -30,11 +30,12 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.themes.dto.ThemeDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Manpreet Minhas
  */
-public class UserDTO implements Serializable {
+public class UserDTO implements Serializable, IUserDetails {
 
     private static final long serialVersionUID = 5299784226270953691L;
 
@@ -69,7 +70,8 @@ public class UserDTO implements Serializable {
 	this.email = email;
 	this.theme = htmlTheme;
 	this.timeZone = timezone;
-	this.timeZoneOffsetSeconds = timeZone == null ? 0
+	this.timeZoneOffsetSeconds = timeZone == null
+		? 0
 		: ZoneId.of(timeZone.getID()).getRules().getOffset(Instant.now()).getTotalSeconds();
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
@@ -168,8 +170,8 @@ public class UserDTO implements Serializable {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("userID", getUserID()).append("firstName", getFirstName())
-		.append("lastName", getLastName()).append("login", getLogin())
+	return new ToStringBuilder(this).append("userID", getUserID()).append("lastName", getLastName())
+		.append("firstName", getFirstName()).append("login", getLogin())
 		.append("localeLanguage", getLocaleLanguage()).append("localeCountry", getLocaleCountry())
 		.append("direction", getDirection()).append("email", getEmail()).append("htmlTheme", getTheme())
 		.append("timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())

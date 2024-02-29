@@ -197,8 +197,7 @@ public class MonitoringController {
 	    ObjectNode responseRow = JsonNodeFactory.instance.objectNode();
 
 	    SurveyUser user = (SurveyUser) userAndAnswers[0];
-	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
-		    HtmlUtils.htmlEscape(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME, HtmlUtils.htmlEscape(user.getFullName()));
 	    responseRow.put(SurveyConstants.ATTR_USER_ID, user.getUserId());
 
 	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
@@ -242,8 +241,8 @@ public class MonitoringController {
     private void exportSurvey(HttpServletRequest request, HttpServletResponse response) throws IOException {
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> groupList = surveyService
-		.exportBySessionId(toolSessionID);
+	SortedMap<SurveySession, SortedMap<SurveyQuestion, List<AnswerDTO>>> groupList = surveyService.exportBySessionId(
+		toolSessionID);
 
 	// create an empty excel file
 	Workbook workbook = new SXSSFWorkbook();
@@ -375,7 +374,7 @@ public class MonitoringController {
 		    cell.setCellValue(answer.getReplier().getLoginName());
 		    cellIdx++;
 		    cell = row.createCell(cellIdx);
-		    cell.setCellValue(answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
+		    cell.setCellValue(answer.getReplier().getFullName());
 		    cellIdx++;
 		    cell = row.createCell(cellIdx);
 		    cell.setCellStyle(dateStyle);

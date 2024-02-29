@@ -42,7 +42,7 @@ public class CommentDTO {
 
     /**
      * Get a <code>CommentDTO</code> instance from a given <code>Comment</code>.
-     * 
+     *
      * @param msg
      * @return
      */
@@ -54,7 +54,7 @@ public class CommentDTO {
 	CommentDTO dto = new CommentDTO();
 	dto.setComment(comment);
 	if (comment.getCreatedBy() != null) {
-	    dto.setAuthorname(comment.getCreatedBy().getFirstName() + " " + comment.getCreatedBy().getLastName());
+	    dto.setAuthorname(comment.getCreatedBy().getFullName());
 	    dto.setAuthorUserId(comment.getCreatedBy().getUserId());
 	}
 
@@ -66,7 +66,7 @@ public class CommentDTO {
 
     /**
      * Get a list of <code>CommentDTO</code> according to given list of <code>Comment</code>.
-     * 
+     *
      * @param msgList
      * @return
      */

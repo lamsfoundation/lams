@@ -78,13 +78,13 @@ public class UserOrgSaveController {
 	// course manager can add existing users in any role except appadmin
 	// course admin can add existing users but only as learner
 	Integer rootOrgId = userManagementService.getRootOrganisation().getOrganisationId();
-	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN)
-		|| (userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
+	if (request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN) || (
+		userManagementService.isUserGlobalGroupManager() && !orgId.equals(rootOrgId))) {
 	    canEditRole = true;
 	} else {
 
-	    Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER))
-		    .getUserID();
+	    Integer loggeduserId = ((UserDTO) SessionManager.getSession()
+		    .getAttribute(AttributeNames.USER)).getUserID();
 	    Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	    if (organisation == null) {
 		String message = "Adding users to organisation: No permission to access organisation " + orgId;
@@ -113,7 +113,8 @@ public class UserOrgSaveController {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class, orgId);
 	Set uos = organisation.getUserOrganisations();
 
-	String[] userIds = StringUtils.isBlank(userOrgForm.getUserIds()) ? new String[0]
+	String[] userIds = StringUtils.isBlank(userOrgForm.getUserIds())
+		? new String[0]
 		: userOrgForm.getUserIds().split(",");
 	List<Integer> userIdList = Arrays.stream(userIds).filter(StringUtils::isNotBlank)
 		.collect(Collectors.mapping(userId -> Integer.valueOf(userId), Collectors.toList()));
@@ -160,9 +161,8 @@ public class UserOrgSaveController {
 	organisation.setUserOrganisations(uos);
 	userManagementService.save(organisation);
 
-	auditLog(organisation,
-		newUserOrganisations.stream().collect(
-			Collectors.mapping(uo -> uo.getUser().getUserId(), Collectors.toCollection(TreeSet::new))),
+	auditLog(organisation, newUserOrganisations.stream()
+			.collect(Collectors.mapping(uo -> uo.getUser().getUserId(), Collectors.toCollection(TreeSet::new))),
 		removedUserIds, canEditRole);
 
 	// if no new users, then finish; otherwise forward to where roles can be assigned for new users.
@@ -178,10 +178,9 @@ public class UserOrgSaveController {
 	    }
 	    return "redirect:/usermanage.do?org=" + orgId;
 	} else {
-	    request.setAttribute("roles",
-		    userManagementService.filterRoles(rolelist,
-			    request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN),
-			    organisation.getOrganisationType()));
+	    request.setAttribute("roles", userManagementService.filterRoles(rolelist,
+		    request.isUserInRole(Role.APPADMIN) || request.isUserInRole(Role.SYSADMIN),
+		    organisation.getOrganisationType()));
 	    request.setAttribute("newUserOrganisations", newUserOrganisations);
 	    request.setAttribute("orgId", orgId);
 	    return "forward:/userorgrole.do";
@@ -208,8 +207,7 @@ public class UserOrgSaveController {
 	StringBuilder userNames = new StringBuilder();
 	for (Integer userId : userIds) {
 	    User user = userManagementService.getUserById(userId);
-	    userNames.append(user.getFirstName()).append(" ").append(user.getLastName()).append(" (")
-		    .append(user.getLogin()).append("), ");
+	    userNames.append(user.getFullName()).append(" (").append(user.getLogin()).append("), ");
 	}
 	return userNames.delete(userNames.length() - 2, userNames.length()).toString();
     }

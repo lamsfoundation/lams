@@ -65,7 +65,7 @@
 						<fmt:message key="label.wiki.history.editor.author"></fmt:message>
 					</c:when>
 					<c:otherwise>
-						<c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.lastName}" />
+						<c:out value="${currentWikiPage.currentWikiContentDTO.editorDTO.getFullName()}" />
 					</c:otherwise>
 				</c:choose>
 			</fmt:param>
@@ -117,7 +117,7 @@
 							<td>
 								<c:choose>
 									<c:when test="${wikiContentPageVersion.editorDTO != null}">
-										<c:out value="${wikiContentPageVersion.editorDTO.firstName} ${wikiContentPageVersion.editorDTO.firstName}" escapeXml="true"/>
+										<c:out value="${wikiContentPageVersion.editorDTO.getFullName()}" escapeXml="true"/>
 									</c:when>
 									<c:otherwise>
 										<fmt:message key="label.wiki.history.editor.author"></fmt:message>

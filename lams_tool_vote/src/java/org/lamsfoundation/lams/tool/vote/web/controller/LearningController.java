@@ -660,9 +660,9 @@ public class LearningController implements VoteAppConstants {
 		    User userI = new User();
 		    userI.setUserId(qaUser.getQueUsrId().intValue());
 		    userI.setFirstName(qaUser.getFullname());
-	            return userI;
-	        }).collect(Collectors.toList());
-		
+		    return userI;
+		}).collect(Collectors.toList());
+
 		request.setAttribute(ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(TOOL_SESSION_ID, toolSessionID);
 		request.setAttribute(ATTR_CONTENT, voteContent);
@@ -824,8 +824,8 @@ public class LearningController implements VoteAppConstants {
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
 	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());
-	voteGeneralLearnerFlowDTO
-		.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput()).toString());
+	voteGeneralLearnerFlowDTO.setUseSelectLeaderToolOuput(
+		new Boolean(voteContent.isUseSelectLeaderToolOuput()).toString());
 	voteGeneralLearnerFlowDTO.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteGeneralLearnerFlowDTO.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
@@ -901,7 +901,7 @@ public class LearningController implements VoteAppConstants {
 	VoteQueUsr user = voteService.getVoteUserBySession(userId, session.getUid());
 	if (user == null) {
 	    String userName = toolUser.getLogin();
-	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+	    String fullName = toolUser.getFullName();
 
 	    user = new VoteQueUsr(userId, userName, fullName, session, new TreeSet<VoteUsrAttempt>());
 	    voteService.createVoteQueUsr(user);

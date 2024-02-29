@@ -39,10 +39,11 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 @Entity
 @Table(name = "tl_lawhiteboard11_user")
-public class WhiteboardUser implements Cloneable {
+public class WhiteboardUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(WhiteboardUser.class);
 
     @Id
@@ -169,6 +170,11 @@ public class WhiteboardUser implements Cloneable {
 
     public String getLoginName() {
 	return loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public void setLoginName(String loginName) {

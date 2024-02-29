@@ -40,6 +40,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Assessment User
@@ -48,7 +49,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_laasse10_user")
-public class AssessmentUser implements Cloneable {
+public class AssessmentUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(AssessmentUser.class);
 
     @Id
@@ -130,8 +131,8 @@ public class AssessmentUser implements Cloneable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+
     /**
-     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -140,14 +141,13 @@ public class AssessmentUser implements Cloneable {
 
     /**
      * @param uid
-     *            The uid to set.
+     * 	The uid to set.
      */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
     /**
-     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -156,14 +156,13 @@ public class AssessmentUser implements Cloneable {
 
     /**
      * @param userId
-     *            The userId to set.
+     * 	The userId to set.
      */
     public void setUserId(Long userID) {
 	this.userId = userID;
     }
 
     /**
-     *
      * @return
      */
     public String getLastName() {
@@ -175,7 +174,6 @@ public class AssessmentUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public String getFirstName() {
@@ -187,11 +185,14 @@ public class AssessmentUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public String getLoginName() {
 	return loginName;
+    }
+
+    public String getLogin() {
+	return getLoginName();
     }
 
     public void setLoginName(String loginName) {
@@ -199,7 +200,6 @@ public class AssessmentUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public AssessmentSession getSession() {
@@ -211,7 +211,6 @@ public class AssessmentUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public Assessment getAssessment() {
@@ -223,7 +222,6 @@ public class AssessmentUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSessionFinished() {
@@ -262,13 +260,4 @@ public class AssessmentUser implements Cloneable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
-
-    public String getFullName() {
-	if (firstName == null || lastName == null) {
-	    return null;
-	} else {
-	    return lastName + " " + firstName;
-	}
-    }
-
 }

@@ -417,7 +417,7 @@ public class McService
 	    UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    Long userId = toolUser.getUserID().longValue();
 	    String userName = toolUser.getLogin();
-	    String fullName = toolUser.getFirstName() + " " + toolUser.getLastName();
+	    String fullName = toolUser.getFullName();
 	    McSession mcSession = getMcSessionById(toolSessionID.longValue());
 
 	    McQueUsr user = new McQueUsr(userId, userName, fullName, mcSession);
@@ -1685,7 +1685,7 @@ public class McService
 	// create user if he hasn't accessed this activity yet
 	if (mcUser == null) {
 	    String userName = user.getLogin();
-	    String fullName = user.getFirstName() + " " + user.getLastName();
+	    String fullName = user.getFullName();
 	    mcUser = new McQueUsr(userId, userName, fullName, session);
 	    mcUserDAO.saveMcUser(mcUser);
 	}

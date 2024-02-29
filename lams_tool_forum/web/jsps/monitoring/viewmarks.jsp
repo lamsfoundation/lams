@@ -31,7 +31,7 @@
  			</c:if>
 
 			<p>
-				<strong><c:out value="${user.lastName}" />&nbsp;<c:out value="${user.firstName}" /></strong>&nbsp;
+				<strong><c:out value="${user.getFullName()}" /></strong>&nbsp;
 				<fmt:message key="monitoring.user.post.topic" />
 			</p>
 			
@@ -134,5 +134,3 @@
 			</lams:Page>
 	</body>
 </lams:html>
-
-

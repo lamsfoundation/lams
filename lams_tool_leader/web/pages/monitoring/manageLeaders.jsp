@@ -48,7 +48,7 @@
 							<div class="voffset5">
 								<input type="radio" name="sessionId${session.sessionID}" value="${user.uid}" <c:if test="${session.groupLeader.uid == user.uid}">checked="checked"</c:if>/>
 								&nbsp;<lams:Portrait userId="${user.userId}"/>&nbsp;
-								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+								<c:out value="${user.getFullName()}" escapeXml="true"/>
 							</div>
 						</c:forEach>
 					</div>

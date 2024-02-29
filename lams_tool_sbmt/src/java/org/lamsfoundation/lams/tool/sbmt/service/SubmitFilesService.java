@@ -67,8 +67,8 @@ import org.lamsfoundation.lams.tool.sbmt.util.SubmitFilesException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.dao.DataAccessException;
@@ -642,8 +642,7 @@ public class SubmitFilesService
 	    Locale currentLocale) {
 	List<SubmissionDetails> list = submissionDetailsDAO.getSubmissionDetailsBySession(sessionID);
 	if (list != null) {
-	    SortedMap<SubmitUserDTO, List<FileDetailsDTO>> map = new TreeMap<SubmitUserDTO, List<FileDetailsDTO>>(
-		    new LastNameAlphabeticComparator());
+	    SortedMap<SubmitUserDTO, List<FileDetailsDTO>> map = new TreeMap<>();
 	    Iterator<SubmissionDetails> iterator = list.iterator();
 	    List<FileDetailsDTO> userFileList;
 	    NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
@@ -1100,7 +1099,8 @@ public class SubmitFilesService
     @Override
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString) {
-	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, userManagementService);
+	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
+		userManagementService);
     }
 
     @Override

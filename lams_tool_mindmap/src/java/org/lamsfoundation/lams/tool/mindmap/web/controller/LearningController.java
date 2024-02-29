@@ -635,7 +635,7 @@ public class LearningController {
 	request.setAttribute("userUid", user == null ? null : user.getUid());
 	request.setAttribute("contentEditable", contentEditable);
 	request.setAttribute("mode", mode);
-	request.setAttribute("currentMindmapUser", user == null ? "" : user.getFirstName() + " " + user.getLastName());
+	request.setAttribute("currentMindmapUser", user == null ? "" : user.getFullName());
 	request.setAttribute("finishedActivity", user != null && user.isFinishedActivity());
     }
 }

@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.chat.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -36,17 +37,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
- *
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
- *
- *
  */
 @Entity
 @Table(name = "tl_lachat11_user")
-public class ChatUser implements java.io.Serializable {
+public class ChatUser implements Serializable, IUserDetails {
 
     private static final long serialVersionUID = -3701664859818409197L;
     @Id
@@ -130,6 +129,10 @@ public class ChatUser implements java.io.Serializable {
 	this.loginName = loginName;
     }
 
+    public String getLogin() {
+	return getLoginName();
+    }
+
     public String getFirstName() {
 	return this.firstName;
     }
@@ -194,8 +197,8 @@ public class ChatUser implements java.io.Serializable {
 	}
 	ChatUser castOther = (ChatUser) other;
 
-	return ((this.getUid() == castOther.getUid())
-		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null
+		&& this.getUid().equals(castOther.getUid())));
     }
 
     @Override

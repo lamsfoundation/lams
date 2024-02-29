@@ -59,7 +59,7 @@
 						<fmt:message key="label.current.leader.none"/>
 					</c:when>
 					<c:otherwise>
-						<c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true" />
+						<c:out value="${groupLeader.getFullName()}" escapeXml="true" />
 					</c:otherwise>
 				</c:choose>
 				
@@ -71,7 +71,7 @@
 							  <label class="form-check-label" for="change-leader-radio-${groupId}-${user.userId}">
 							    <lams:Portrait userId="${user.userId}"/>
 								<span>
-									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
+									<c:out value="${user.getFullName()}" escapeXml="true" />
 									<c:forEach var="availableLearnerId" items="${availableLearners}">
 										<c:if test="${user.userId eq availableLearnerId}">
 											&nbsp;<i class="fa fa-check text-success" title="<fmt:message key='label.learner.available.in.activity'/>"></i>

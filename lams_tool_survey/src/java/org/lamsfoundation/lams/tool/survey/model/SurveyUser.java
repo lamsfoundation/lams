@@ -37,6 +37,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * @author Dapeng Ni
@@ -44,7 +45,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 @Entity
 @Table(name = "tl_lasurv11_user")
-public class SurveyUser implements Cloneable {
+public class SurveyUser implements Cloneable, IUserDetails {
     private static Logger log = Logger.getLogger(SurveyUser.class);
 
     @Id
@@ -167,6 +168,11 @@ public class SurveyUser implements Cloneable {
 	return loginName;
     }
 
+    @Override
+    public String getLogin() {
+	return loginName;
+    }
+
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
     }
@@ -188,7 +194,6 @@ public class SurveyUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSessionFinished() {

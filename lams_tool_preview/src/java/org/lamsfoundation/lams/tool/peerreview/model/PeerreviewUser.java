@@ -38,6 +38,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
 /**
  * Peerreview User
@@ -46,7 +47,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  */
 @Entity
 @Table(name = "tl_laprev11_user")
-public class PeerreviewUser implements Cloneable {
+public class PeerreviewUser implements Cloneable, IUserDetails {
     private static final long serialVersionUID = -7043502180037866257L;
     private static Logger log = Logger.getLogger(PeerreviewUser.class);
 
@@ -129,8 +130,8 @@ public class PeerreviewUser implements Cloneable {
     // **********************************************************
     // Get/Set methods
     // **********************************************************
+
     /**
-     *
      * @return Returns the uid.
      */
     public Long getUid() {
@@ -139,14 +140,13 @@ public class PeerreviewUser implements Cloneable {
 
     /**
      * @param uid
-     *            The uid to set.
+     * 	The uid to set.
      */
     public void setUid(Long userID) {
 	this.uid = userID;
     }
 
     /**
-     *
      * @return Returns the userId.
      */
     public Long getUserId() {
@@ -155,14 +155,13 @@ public class PeerreviewUser implements Cloneable {
 
     /**
      * @param userId
-     *            The userId to set.
+     * 	The userId to set.
      */
     public void setUserId(Long userID) {
 	this.userId = userID;
     }
 
     /**
-     *
      * @return
      */
     public String getLastName() {
@@ -174,7 +173,6 @@ public class PeerreviewUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public String getFirstName() {
@@ -186,7 +184,6 @@ public class PeerreviewUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public String getLoginName() {
@@ -197,8 +194,11 @@ public class PeerreviewUser implements Cloneable {
 	this.loginName = loginName;
     }
 
+    public String getLogin() {
+	return getLoginName();
+    }
+
     /**
-     *
      * @return
      */
     public PeerreviewSession getSession() {
@@ -210,7 +210,6 @@ public class PeerreviewUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public Peerreview getPeerreview() {
@@ -222,7 +221,6 @@ public class PeerreviewUser implements Cloneable {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSessionFinished() {

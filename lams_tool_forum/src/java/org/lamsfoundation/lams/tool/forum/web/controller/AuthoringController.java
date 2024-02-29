@@ -179,7 +179,7 @@ public class AuthoringController {
 			    // get back login user DTO
 			    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 			    ForumUser fuser = new ForumUser(user, null);
-			    messageDTO.setAuthor(fuser.getFirstName() + " " + fuser.getLastName());
+			    messageDTO.setAuthor(fuser.getFullName());
 			}
 		    }
 		}
@@ -350,6 +350,7 @@ public class AuthoringController {
     // ******************************************************************************************************************
     // Topic functions
     // ******************************************************************************************************************
+
     /**
      * Display emtpy topic page for user input topic information. This page will contain all topics list which this
      * author posted before.
@@ -687,7 +688,6 @@ public class AuthoringController {
 
     /**
      * Forum validation method from STRUCT interface.
-     *
      */
     public MultiValueMap<String, String> validate(ForumForm form, HttpServletRequest request) {
 
@@ -710,8 +710,8 @@ public class AuthoringController {
 		    allowNewTopic = forumPO.isAllowNewTopic();
 		} else {
 		    // failure tolerance
-		    AuthoringController.log
-			    .error("ERROR: Can not found Forum by toolContentID:" + form.getToolContentID());
+		    AuthoringController.log.error(
+			    "ERROR: Can not found Forum by toolContentID:" + form.getToolContentID());
 		    allowNewTopic = true;
 		}
 	    }
@@ -731,21 +731,21 @@ public class AuthoringController {
 		}
 	    }
 	    if (!form.getForum().isAllowRichEditor()) {
-		if (form.getForum().getMaxCharacters() != 0
-			&& form.getForum().getMaxCharacters() < form.getForum().getMinCharacters()) {
+		if (form.getForum().getMaxCharacters() != 0 && form.getForum().getMaxCharacters() < form.getForum()
+			.getMinCharacters()) {
 		    errorMap.add("GLOBAL", messageService.getMessage("error.min.post.char.less"));
 		}
 	    }
 	    if (form.getForum().isAllowRateMessages()) {
-		if (form.getForum().getMaximumRate() != 0
-			&& form.getForum().getMaximumRate() < form.getForum().getMinimumRate()) {
+		if (form.getForum().getMaximumRate() != 0 && form.getForum().getMaximumRate() < form.getForum()
+			.getMinimumRate()) {
 		    errorMap.add("GLOBAL", messageService.getMessage("error.min.rate.less.max"));
 		}
 	    }
 
 	    if (!form.getForum().isAllowNewTopic()) {
-		if (form.getForum().getMaximumReply() != 0
-			&& form.getForum().getMaximumReply() < form.getForum().getMinimumReply()) {
+		if (form.getForum().getMaximumReply() != 0 && form.getForum().getMaximumReply() < form.getForum()
+			.getMinimumReply()) {
 		    errorMap.add("GLOBAL", messageService.getMessage("error.min.less.max"));
 		}
 	    }

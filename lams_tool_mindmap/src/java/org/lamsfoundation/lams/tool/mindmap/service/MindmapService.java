@@ -347,7 +347,7 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
 		if (mindmapNode.getUser() == null) {
 		    mindmapUserName = getMindmapMessageService().getMessage("node.instructor.label");
 		} else {
-		    mindmapUserName = mindmapNode.getUser().getFirstName() + " " + mindmapNode.getUser().getLastName();
+		    mindmapUserName = mindmapNode.getUser().getFullName();
 		}
 
 		int edit;

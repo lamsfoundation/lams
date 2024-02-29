@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,6 +55,7 @@ import org.lamsfoundation.lams.monitoring.service.MonitoringServiceException;
 import org.lamsfoundation.lams.monitoring.web.form.GateForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -231,17 +234,22 @@ public class GateController {
 	    Integer waitingLearnerCount = lessonService.getCountLearnersInCurrentActivity(gate);
 	    gateForm.setWaitingLearners(waitingLearnerCount);
 	    return "gate/sychGateContent";
-	} else if (gate.isScheduleGate()) {
+	}
+
+	if (gate.isScheduleGate()) {
 	    Integer waitingLearnerCount = lessonService.getCountLearnersInCurrentActivity(gate);
 	    gateForm.setWaitingLearners(waitingLearnerCount);
 	    return viewScheduleGate(gateForm, (ScheduleGateActivity) gate);
-	} else if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate() || gate.isPasswordGate()) {
+	}
+
+	if (gate.isPermissionGate() || gate.isSystemGate() || gate.isConditionGate() || gate.isPasswordGate()) {
 	    List<User> waitingLearnersList = monitoringService.getLearnersAttemptedActivity(gate);
+	    Collections.sort(waitingLearnersList, IUserDetails.COMPARATOR);
 	    gateForm.setWaitingLearners(waitingLearnersList.size());
 	    gateForm.setWaitingLearnerList(waitingLearnersList);
 	    gateForm.setAllowedToPassLearnerList(gate.getAllowedToPassLearners());
 	    Set<Group> learnerGroups = learnerService.getGroupsForGate(gate);
-	    Collection<User> forbiddenUsers = new HashSet<>();
+	    Collection<User> forbiddenUsers = new TreeSet<>();
 	    for (Group learnerGroup : learnerGroups) {
 		// only here users are fetched from DB as it is an extra-lazy collection
 		forbiddenUsers.addAll(learnerGroup.getUsers());
@@ -256,10 +264,11 @@ public class GateController {
 	    }
 
 	    return "gate/permissionGateContent";
-	} else {
-	    throw new MonitoringServiceException("Invalid gate activity. " + "gate id [" + gate.getActivityId()
-		    + "] - the type [" + gate.getActivityTypeId() + "] is not a gate type");
 	}
+
+	throw new MonitoringServiceException(
+		"Invalid gate activity. " + "gate id [" + gate.getActivityId() + "] - the type ["
+			+ gate.getActivityTypeId() + "] is not a gate type");
     }
 
     /**

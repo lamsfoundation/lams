@@ -2431,12 +2431,12 @@ function updateLearnersTab(){
                 $('.accordion-button', itemHeader)
                     .attr('data-bs-target', '#' + itemCollapseId)
                     .attr('aria-controls', itemCollapseId)
-                    .prepend('<span>' + learner.firstName + ' ' + learner.lastName + '</span>')
+                    .prepend('<span>' + learner.lastName + ' ' + learner.firstName + '</span>')
                     .prepend(portraitSmall);
                 $('.accordion-completed-activity-count', itemHeader).text(learner.completedActivityCount).tooltip();
                 $('.accordion-completed-lesson', itemHeader).toggle(learner.completedLesson).tooltip();
 
-                $('.learners-accordion-name', item).text(learner.firstName + ' ' + learner.lastName);
+                $('.learners-accordion-name', item).text(learner.lastName + ' ' + learner.firstName);
                 $('.learners-accordion-login', item).html('<i class="fa-regular fa-user"></i>' + learner.login);
                 $('.learners-accordion-email', item).html('<i class="fa-regular fa-envelope"></i><a href="mailto:' + learner.email + '">'
                     + learner.email + '</a>');

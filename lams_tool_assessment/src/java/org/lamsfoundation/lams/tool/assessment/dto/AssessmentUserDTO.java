@@ -22,7 +22,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.dto;
 
-public class AssessmentUserDTO {
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
+
+public class AssessmentUserDTO implements IUserDetails {
     private Long userId;
     private String firstName;
     private String lastName;

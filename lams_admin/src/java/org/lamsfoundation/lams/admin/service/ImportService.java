@@ -410,7 +410,7 @@ public class ImportService implements IImportService {
 	    placeholderEnd = placeholderStart + USER_IMPORT_PASSWORD_CHANGE_EMAIL_CONTENT_START_PLACEHOLDER.length();
 	    content.replace(placeholderStart, placeholderEnd,
 		    messageService.getMessage("user.import.password.change.email.content.start",
-			    new Object[] { user.getFirstName() + " " + user.getLastName() }));
+			    new Object[] { user.getFullName() }));
 
 	    StringBuilder changePasswordLink = new StringBuilder("<a href=\"").append(
 			    Configuration.get(ConfigurationKeys.SERVER_URL)).append("forgotPasswordChange.jsp?key=").append(key)

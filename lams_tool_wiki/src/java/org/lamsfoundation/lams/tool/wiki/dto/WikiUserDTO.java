@@ -21,13 +21,12 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.wiki.dto;
 
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
+import org.lamsfoundation.lams.usermanagement.service.IUserDetails;
 
-public class WikiUserDTO implements Comparable {
+public class WikiUserDTO implements IUserDetails {
 
     public Long uid;
 
@@ -56,17 +55,6 @@ public class WikiUserDTO implements Comparable {
 	notificationEnabled = false;
     }
 
-    @Override
-    public int compareTo(Object o) {
-	int returnValue;
-	WikiUserDTO toUser = (WikiUserDTO) o;
-	returnValue = this.lastName.compareTo(toUser.lastName);
-	if (returnValue == 0) {
-	    returnValue = this.uid.compareTo(toUser.uid);
-	}
-	return returnValue;
-    }
-
     public String getFirstName() {
 	return firstName;
     }
@@ -89,6 +77,11 @@ public class WikiUserDTO implements Comparable {
 
     public void setLoginName(String loginName) {
 	this.loginName = loginName;
+    }
+
+    @Override
+    public String getLogin() {
+	return getLoginName();
     }
 
     public Long getUid() {
