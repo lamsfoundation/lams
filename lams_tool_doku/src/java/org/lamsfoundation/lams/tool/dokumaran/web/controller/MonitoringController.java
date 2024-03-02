@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import netscape.javascript.JSObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.etherpad.EtherpadException;
@@ -53,6 +54,9 @@ import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.lesson.Lesson;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
@@ -101,6 +105,9 @@ public class MonitoringController {
     public static final int LEARNER_MARKS_SORTING_FULL_NAME_ASC = 0;
     public static final int LEARNER_MARKS_SORTING_FULL_NAME_DESC = 1;
 
+    private static final String AI_REVIEW_TEMPLATE_INSTRUCTIONS = "The instructions are:";
+    private static final String AI_REVIEW_TEMPLATE_DESCRIPTION = "The answer they are writing should address the following:";
+
     @Autowired
     private IDokumaranService dokumaranService;
 
@@ -109,6 +116,9 @@ public class MonitoringController {
 
     @Autowired
     private IGradebookService gradebookService;
+
+    @Autowired
+    private ILessonService lessonService;
 
     @Autowired
     @Qualifier("lamsCoreToolService")
@@ -181,6 +191,9 @@ public class MonitoringController {
 	    // add new sessionID cookie in order to access pad
 	    dokumaranService.createEtherpadCookieForMonitor(user, contentId, response);
 	}
+
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	request.setAttribute("isAiEnabled", isAiEnabled);
 
 	return "pages/monitoring/monitoring";
     }
@@ -562,6 +575,97 @@ public class MonitoringController {
 	dokumaranService.saveOrUpdate(dokumaran);
 
 	return formattedDate;
+    }
+
+    @RequestMapping(path = "/getAiReviewPromptData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAiReviewPromptData(@RequestParam Long toolSessionId) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
+	Dokumaran dokumaran = session.getDokumaran();
+	ObjectNode responseJSON = getAiReviewPromptData(dokumaran);
+	try {
+	    String padContent = dokumaranService.getPadText(toolSessionId);
+	    if (StringUtils.isNotBlank(padContent)) {
+		responseJSON.put("content", "\n" + padContent);
+	    }
+	} catch (EtherpadException e) {
+	    log.error("Failed to get pad content for session " + toolSessionId, e);
+	    return null;
+	}
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/getAiLearningOutcomesPromptData", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAiLearningOutcomesPromptData(@RequestParam Long toolContentId) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
+	ObjectNode responseJSON = getAiReviewPromptData(dokumaran);
+
+	Lesson lesson = lessonService.getLessonByToolContentId(toolContentId);
+	LearningDesign learningDesign = lesson == null ? null : lesson.getLearningDesign();
+	String lessonDescription = learningDesign != null && StringUtils.isNotBlank(learningDesign.getDescription())
+		? learningDesign.getDescription().strip()
+		: null;
+	if (lessonDescription != null) {
+	    responseJSON.put("lessonDescription", lessonDescription);
+	}
+
+	return responseJSON.toString();
+    }
+
+    @RequestMapping(path = "/saveAiReview", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void saveAiReview(@RequestParam Long toolSessionId, @RequestParam(required = false) String review) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	DokumaranSession session = dokumaranService.getDokumaranSessionBySessionId(toolSessionId);
+	if (StringUtils.isBlank(review)) {
+	    review = null;
+	}
+	session.setAiReview(review);
+	dokumaranService.saveOrUpdate(session);
+    }
+
+    @RequestMapping(path = "/saveAiLearningOutcomes", method = RequestMethod.POST)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public void saveAiLearningOutcomes(@RequestParam Long toolContentId,
+	    @RequestParam(required = false) String learningOutcomes) {
+	boolean isAiEnabled = Configuration.isLamsModuleAvailable(Configuration.AI_MODULE_CLASS);
+	if (!isAiEnabled) {
+	    throw new UnsupportedOperationException("AI module is not enabled");
+	}
+	Dokumaran dokumaran = dokumaranService.getDokumaranByContentId(toolContentId);
+	if (StringUtils.isBlank(learningOutcomes)) {
+	    learningOutcomes = null;
+	}
+	dokumaran.setAiLearningOutcomes(learningOutcomes);
+	dokumaranService.saveOrUpdate(dokumaran);
+    }
+
+    private ObjectNode getAiReviewPromptData(Dokumaran dokumaran) {
+	ObjectNode responseJSON = JsonNodeFactory.instance.objectNode();
+	if (StringUtils.isNotBlank(dokumaran.getInstructions())) {
+	    responseJSON.put("instructions",
+		    new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_INSTRUCTIONS).append("\n")
+			    .append(dokumaran.getInstructions()).append("\n\n").toString());
+	}
+	if (StringUtils.isNotBlank(dokumaran.getDescription())) {
+	    responseJSON.put("description", new StringBuilder("\n").append(AI_REVIEW_TEMPLATE_DESCRIPTION).append("\n")
+		    .append(dokumaran.getDescription()).append("\n\n").toString());
+	}
+	return responseJSON;
     }
 
     private Integer getUserId() {

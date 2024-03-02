@@ -37,6 +37,7 @@ public class SessionDTO {
     private ItemRatingDTO itemRatingDto;
     private int numberOfLearners;
     private boolean sessionFinished;
+    private String aiReview;
     private final Map<Long, String> galleryWalkClusterMembers = new LinkedHashMap<>();
 
     public Long getSessionId() {
@@ -101,6 +102,14 @@ public class SessionDTO {
 
     public void setSessionFinished(boolean sesssionFinished) {
 	this.sessionFinished = sesssionFinished;
+    }
+
+    public String getAiReview() {
+	return aiReview;
+    }
+
+    public void setAiReview(String aiReview) {
+	this.aiReview = aiReview;
     }
 
     public Map<Long, String> getGalleryWalkClusterMembers() {

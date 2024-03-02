@@ -69,6 +69,16 @@ public class EtherpadService implements IEtherpadService {
     }
 
     @Override
+    public String getPadText(String padId) throws EtherpadException {
+	EPLiteClient client = getClient();
+	Map<String, String> response = client.getText(padId);
+	if (response == null) {
+	    return null;
+	}
+	return response.get("text");
+    }
+
+    @Override
     public EPLiteClient getClient() throws EtherpadException {
 	// get the API key from the configuration and create EPLiteClient using it
 	String etherpadServerUrl = Configuration.get(ConfigurationKeys.ETHERPAD_SERVER_URL);
@@ -107,7 +117,7 @@ public class EtherpadService implements IEtherpadService {
 	if (!topLevelDomain.equals("localhost")) {
 	    cookieHeaderValue.append("Domain=").append(topLevelDomain).append("; ");
 	}
-	
+
 	cookieHeaderValue.append("Secure; SameSite=None");
 
 	response.setHeader("Set-Cookie", cookieHeaderValue.toString());
@@ -146,8 +156,8 @@ public class EtherpadService implements IEtherpadService {
 	String etherpadSessionId = null;
 	Set<String> otherEtherpadSessionIds = new HashSet<>();
 	for (String etherpadSessionIdIter : etherpadSessions.keySet()) {
-	    Map<String, Object> sessessionAttributes = (Map<String, Object>) etherpadSessions
-		    .get(etherpadSessionIdIter);
+	    Map<String, Object> sessessionAttributes = (Map<String, Object>) etherpadSessions.get(
+		    etherpadSessionIdIter);
 	    String groupIdIter = (String) sessessionAttributes.get("groupID");
 	    boolean isTargetGroup = groupIdIter.equals(etherpadGroupId);
 	    if (includeAllGroups || isTargetGroup) {

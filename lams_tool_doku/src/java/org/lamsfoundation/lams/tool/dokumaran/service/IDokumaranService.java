@@ -129,6 +129,9 @@ public interface IDokumaranService extends ICommonToolService {
      */
     void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranApplicationException;
 
+    // fetches pad content from Etherpad server side
+    String getPadText(long toolSessionId) throws EtherpadException;
+
     // ********** for user methods *************
 
     /**

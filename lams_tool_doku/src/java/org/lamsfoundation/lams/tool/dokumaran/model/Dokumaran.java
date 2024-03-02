@@ -130,6 +130,9 @@ public class Dokumaran implements Cloneable {
     @Column(name = "gallery_walk_instructions")
     private String galleryWalkInstructions;
 
+    @Column(name = "ai_learning_outcomes")
+    private String aiLearningOutcomes;
+
     // general information
     @Column(name = "create_date")
     private Date created;
@@ -141,6 +144,8 @@ public class Dokumaran implements Cloneable {
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "create_by")
     private DokumaranUser createdBy;
+
+
 
     // **********************************************************
     // Function method for Dokumaran
@@ -510,5 +515,13 @@ public class Dokumaran implements Cloneable {
 
     public void setGalleryWalkInstructions(String galleryWalkInstructions) {
 	this.galleryWalkInstructions = galleryWalkInstructions;
+    }
+
+    public String getAiLearningOutcomes() {
+	return aiLearningOutcomes;
+    }
+
+    public void setAiLearningOutcomes(String aiLearningOutcomes) {
+	this.aiLearningOutcomes = aiLearningOutcomes;
     }
 }

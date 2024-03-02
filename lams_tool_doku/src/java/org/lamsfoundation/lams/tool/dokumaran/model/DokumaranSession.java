@@ -81,6 +81,9 @@ public class DokumaranSession {
     @Column(name = "etherpad_read_only_id")
     private String etherpadReadOnlyId;
 
+    @Column(name = "ai_review")
+    private String aiReview;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "tl_ladoku11_gallery_walk_cluster", joinColumns = {
 	    @JoinColumn(name = "source_session_uid") }, inverseJoinColumns = {
@@ -198,6 +201,14 @@ public class DokumaranSession {
 
     public String getPadId() {
 	return EtherpadUtil.getPadId(etherpadGroupId);
+    }
+
+    public String getAiReview() {
+	return aiReview;
+    }
+
+    public void setAiReview(String aiReview) {
+	this.aiReview = aiReview;
     }
 
     public Set<DokumaranSession> getGalleryWalkCluster() {

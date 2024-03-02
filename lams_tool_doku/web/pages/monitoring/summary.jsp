@@ -113,6 +113,42 @@
 	.doku-monitoring-summary .marks-container .marks-header {
 		line-height: 1.7;
 	}
+
+	<c:if test="${isAiEnabled}">
+		.doku-monitoring-summary .ai-review-content {
+			padding: 1rem;
+			margin: 1rem;
+			border: 1px #EEEEEE solid;
+			border-radius: 5px;
+		}
+
+		.doku-monitoring-summary #ai-review-learning-outcomes {
+			margin-bottom: 1rem;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table {
+			margin-top: 3rem;
+			margin-bottom: 3rem;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table th:first-child {
+			min-width: 12rem;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table th[scope="col"] {
+			vertical-align: top;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table th[scope="row"] {
+			text-align: left;
+			font-weight: bold;
+		}
+
+		.doku-monitoring-summary #ai-review-comparison table td,
+		.doku-monitoring-summary #ai-review-comparison table th[scope="col"]:not(:first-child) {
+			text-align: center;
+		}
+	</c:if>
 </style>
 
 <script>
@@ -149,8 +185,32 @@
 			MAX_RATES = 0,
 			MIN_RATES = 0,
 			LAMS_URL = '${lams}',
+			TOOL_URL = '<lams:WebAppURL/>',
 			COUNT_RATED_ITEMS = true,
-			ALLOW_RERATE = false;
+			ALLOW_RERATE = false,
+
+			toolContentId = <c:out value="${sessionMap.toolContentID}" />;
+
+	<c:if test="${isAiEnabled}">
+	var	AI_REVIEW_ERROR = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.error"/></spring:escapeBody>',
+			AI_REVIEW_GROUPS_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="monitoring.label.group"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_1 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.1"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_2 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.2"/></spring:escapeBody>',
+			AI_REVIEW_CRITERIA_3 = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.criteria.3"/></spring:escapeBody>',
+			AI_REVIEW_SCORE_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.score"/></spring:escapeBody>',
+			AI_REVIEW_LEARNING_OUTCOMES_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.learning.outcomes"/></spring:escapeBody>',
+			AI_REVIEW_GOOD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.good"/></spring:escapeBody>',
+			AI_REVIEW_BAD_HEADER = '<spring:escapeBody javaScriptEscape='true'><fmt:message key="label.monitoring.ai.review.header.bad"/></spring:escapeBody>',
+			savedAiReviews = {
+				<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+					<c:if test="${not empty groupSummary.aiReview}">
+						${groupSummary.sessionId}: ${groupSummary.aiReview},
+					</c:if>
+				</c:forEach>
+				// so that the last comma is not a problem
+				'dummy': 'dummy'
+			};
+	</c:if>
 
 	$(document).ready(function(){
 		// show etherpads only on Group expand
@@ -471,19 +531,24 @@
 					'<csrf:tokenname/>' : '<csrf:tokenvalue/>'
 				},
 				success : function(){
-					alert("<fmt:message key='label.monitoring.leader.successfully.changed'/>");
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.successfully.changed'/></spring:escapeBody>');
 				},
 				error : function(){
-					alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+					alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>');
 				}
 			});
 
 		} else {
-			alert("<fmt:message key='label.monitoring.leader.not.changed'/>");
+			alert('<spring:escapeBody javaScriptEscape='true'><fmt:message key='label.monitoring.leader.not.changed'/></spring:escapeBody>');
 		}
 	}
 
 </script>
+
+<c:if test="${isAiEnabled}">
+	<lams:JSImport src="ai/includes/javascript/dokuReview.js"/>
+</c:if>
+
 <lams:JSImport src="includes/javascript/rating.js" />
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 
@@ -616,6 +681,25 @@
 		</div>
 	</c:if>
 
+	<c:if test="${isAiEnabled}">
+		<button id="ai-review-all-button" class="btn btn-primary pull-right roffset10"
+				style="margin-bottom: 1rem" onClick="javascript:aiReviewAll()">
+			<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
+		</button>
+		<h4 id="ai-review-learning-outcomes-header" class='${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'>
+			<fmt:message key="label.monitoring.ai.review.learning.outcomes"/>
+		</h4>
+		<div class="clearfix"></div>
+		<textarea id="ai-review-learning-outcomes"
+				  class='form-control ${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'
+				  rows="8"><c:out value="${dokumaran.aiLearningOutcomes}" escapeXml="false"/></textarea>
+
+		<h4 id="ai-review-comparison-header" class='voffset20 ${empty dokumaran.aiLearningOutcomes ? "hidden" : ""}'>
+			<fmt:message key="label.monitoring.ai.review.comparison"/>
+		</h4>
+		<div id="ai-review-comparison"></div>
+	</c:if>
+
 	<c:if test="${sessionMap.isGroupedActivity}">
 	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true">
 		</c:if>
@@ -628,7 +712,8 @@
 		        	<span class="panel-title collapsable-icon-left">
 		        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}"
 						   aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-							<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+							<fmt:message key="monitoring.label.group" />&nbsp;
+							<span id="session-name-${groupSummary.sessionId}">${groupSummary.sessionName}</span>
 						</a>
 					</span>
 						<c:if test="${dokumaran.useSelectLeaderToolOuput and groupSummary.numberOfLearners > 0 and not groupSummary.sessionFinished}">
@@ -686,6 +771,25 @@
 				</c:otherwise>
 			</c:choose>
 
+			<c:if test="${isAiEnabled}">
+				<!-- AI review section -->
+				<div id="ai-review-container-${groupSummary.sessionId}" data-session-id="${groupSummary.sessionId}"
+					 class="ai-review-container voffset10">
+					<button type="button" class="btn btn-primary pull-right roffset10"
+							onClick="javascript:aiReview(${groupSummary.sessionId})"
+							title='<fmt:message key="label.monitoring.ai.review.tooltip" />'>
+						<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review"/>
+					</button>
+					<c:if test="${empty groupSummary.aiReview}">
+						<div class="ai-review-button-clearfix clearfix"></div>
+					</c:if>
+					<h4 class='ai-review-header ${empty groupSummary.aiReview ? "hidden" : ""}'>
+						<fmt:message key="label.monitoring.ai.review"/>
+					</h4>
+					<div class="clearfix"></div>
+					<div class="ai-review-content ${empty groupSummary.aiReview ? "hidden" : ""}"></div>
+				</div>
+			</c:if>
 
 			<!-- Editable marks section -->
 			<div class="marks-container voffset10">
