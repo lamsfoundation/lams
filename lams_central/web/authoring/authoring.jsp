@@ -838,7 +838,7 @@
 					<fmt:message key="authoring.fla.page.prop.gate.stop.at.preceding" />
 				</td>
 				<td>
-					<input class="propertiesContentFieldStopAtPrecedingActivity" type="checkbox">
+					<input class="propertiesContentFieldStopAtPrecedingActivity" type="checkbox" checked>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowGateTypeBased propertiesContentRowGatePassword">

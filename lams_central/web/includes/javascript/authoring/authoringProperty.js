@@ -217,15 +217,18 @@ var PropertyDefs = {
 				activity.description = $('.propertiesContentFieldDescription', content).val();
 				
 				activity.gateType = $('.propertiesContentFieldGateType', content).val();
-				
+
+				$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').hide();
+
 				$('.propertiesContentRowGateTypeBased', content).hide();
 				if (activity.gateType == 'schedule') {
 					// show inputs for setting delay before the gate is closed
 					$(".propertiesContentRowGateSchedule", content).show();
+					$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').show();
 					activity.offsetDay = +$('.propertiesContentFieldOffsetDay', content).val();
 					activity.offsetHour = +$('.propertiesContentFieldOffsetHour', content).val();
 					activity.offsetMinute = +$('.propertiesContentFieldOffsetMinute', content).val();
-					
+
 					// both of these options must not be on at the same time
 					// stop-at-preceding-activity may prevent preceding activity from completion,
 					// meaning that timer-from-previous-activity-completion will never start
@@ -237,7 +240,7 @@ var PropertyDefs = {
 						activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
 						$('.propertiesContentFieldStopAtPrecedingActivity', content).prop('disabled', false);
 					}
-					
+
 					if (activity.gateStopAtPrecedingActivity) {
 						activity.gateActivityCompletionBased = false;
 						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', true).prop('checked', false);
@@ -245,30 +248,34 @@ var PropertyDefs = {
 						$('.propertiesContentFieldActivityCompletionBased', content).prop('disabled', false);
 					}
 				}
-				
+
 				if (activity.gateType == 'password') {
+					activity.gateStopAtPrecedingActivity = false;
 					$(".propertiesContentRowGatePassword", content).show();
 					activity.password = $('.propertiesContentFieldPassword', content).val();
 				}
-				
+
 				// Gate can be input-based
 				if (activity.gateType == 'condition') {
+					activity.gateStopAtPrecedingActivity = false;
 					var inputRow = $('.propertiesContentFieldInput', content).closest('tr'),
 						inputDefinitionRows = $('.propertiesContentRowConditions', content);
-						
-					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
-					
+
+
 					activity.input = inputRow.show().find('option:selected').data('input');
 					if (activity.input) {
 						inputDefinitionRows.show();
-					} else {
-						$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').show();
 					}
-				}			
-					
+				}
+
 				if (activity.gateType == 'permission') {
+					$('.propertiesContentFieldStopAtPrecedingActivity', content).closest('tr').show();
 					$(".propertiesContentRowPermission", content).show();
 					activity.gateStopAtPrecedingActivity = $('.propertiesContentFieldStopAtPrecedingActivity', content).is(':checked');
+				}
+
+				if (activity.gateType == 'sync') {
+					activity.gateStopAtPrecedingActivity = false;
 				}
 				
 				if (redrawNeeded) {
