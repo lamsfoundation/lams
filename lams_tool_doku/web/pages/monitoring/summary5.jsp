@@ -633,7 +633,7 @@
 				</div>
 			</c:if>
 
-		<c:if test="${isAiEnabled}">
+		<c:if test="${isAiEnabled and not empty summaryList}">
 			<button id="ai-review-all-button" class="btn btn-primary float-end mb-3" onClick="javascript:aiReviewAll()">
 				<i class="fa-solid fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
 			</button>
@@ -700,16 +700,16 @@
 
 						</c:when>
 						<c:otherwise>
-					<c:if test="${not empty groupSummary.galleryWalkClusterMembers}">
-						<c:set var="clusterMemberLinks" value="" />
-						<c:forEach var="clusterMember" items="${groupSummary.galleryWalkClusterMembers}" varStatus="status">
-							<c:set var="clusterMemberLinks">${clusterMemberLinks}${status.first ? "" : ",&nbsp;"}
-								<a href="#heading${clusterMember.key}"><c:out value="${clusterMember.value}" /></a></c:set>
-						</c:forEach>
-						<span class="ms-3">
-							<fmt:message key="monitoring.summary.gallery.walk.cluster.members" />&nbsp;${clusterMemberLinks}
-						</span>
-					</c:if>
+							<c:if test="${not empty groupSummary.galleryWalkClusterMembers}">
+								<c:set var="clusterMemberLinks" value="" />
+								<c:forEach var="clusterMember" items="${groupSummary.galleryWalkClusterMembers}" varStatus="status">
+									<c:set var="clusterMemberLinks">${clusterMemberLinks}${status.first ? "" : ",&nbsp;"}
+										<a href="#heading${clusterMember.key}"><c:out value="${clusterMember.value}" /></a></c:set>
+								</c:forEach>
+								<span class="ms-3">
+									<fmt:message key="monitoring.summary.gallery.walk.cluster.members" />&nbsp;${clusterMemberLinks}
+								</span>
+							</c:if>
 
 							<c:if test="${dokumaran.galleryWalkStarted and not dokumaran.galleryWalkReadOnly}">
 								<lams:Rating itemRatingDto="${groupSummary.itemRatingDto}" isItemAuthoredByUser="true" />

@@ -681,7 +681,7 @@
 		</div>
 	</c:if>
 
-	<c:if test="${isAiEnabled}">
+	<c:if test="${isAiEnabled and not empty summaryList}">
 		<button id="ai-review-all-button" class="btn btn-primary pull-right roffset10"
 				style="margin-bottom: 1rem" onClick="javascript:aiReviewAll()">
 			<i class="fa fa-microchip"></i>&nbsp;<fmt:message key="label.monitoring.ai.review.all"/>
