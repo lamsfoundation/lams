@@ -1499,11 +1499,11 @@ public class ScratchieServiceImpl
 		int answerCount = 1;
 		for (OptionDTO answer : item.getOptionDtos()) {
 		    if (answer.isCorrect()) {
-			correctAnswerLetter = String.valueOf((char) ((answerCount + 'A') - 1));
-			break;
+			correctAnswerLetter += ((char) ((answerCount + 'A') - 1)) + " ";
 		    }
 		    answerCount++;
 		}
+		correctAnswerLetter = correctAnswerLetter.trim().replace(" ", ", ");
 
 	    } else {
 		List<QbOption> options = item.getQbQuestion().getQbOptions();
@@ -2206,7 +2206,7 @@ public class ScratchieServiceImpl
 
 		    OptionDTO optionDto = new OptionDTO();
 		    optionDto.setAnswer(optionLetter);
-		    optionDto.setCorrect(correctOptionLetter.equals(optionLetter));
+		    optionDto.setCorrect(correctOptionLetter.contains(optionLetter));
 		    optionDtos.add(optionDto);
 		}
 
