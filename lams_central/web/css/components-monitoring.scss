@@ -1,6 +1,10 @@
 @import "../../../lams_central/web/css/components.scss";
 @import "_lams_variables.scss";
 
+.component-page-wrapper {
+	overflow: unset;
+}
+
 body.component nav.navbar {
 	padding-top: 0;
     /*box-shadow: 0px 1px 0px var(--bs-gray-300);*/

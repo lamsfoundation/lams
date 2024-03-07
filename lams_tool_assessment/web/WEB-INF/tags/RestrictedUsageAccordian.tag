@@ -43,7 +43,7 @@
 <div class="accordion ${cssClass}" id="accordionRestrictUsageDiv"> 
     <div class="accordion-item">
     	<h2 class="accordion-header" id="headingRestrictedUsageDiv">
-        	<button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv">
+        	<button class="accordion-button collapsed text-bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv">
 	          	<fmt:message key="monitor.summary.date.restriction" />
     		</button>
         </h2>

@@ -1,9 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div class="lcard">
-    <div class="card-header" id="heading-tool-output">
+<div class="card" id="heading-tool-output">
+    <div class="card-header text-bg-light">
       	<span class="card-title collapsable-icon-left">
-	    	<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#tool-output" aria-expanded="false" aria-controls="tool-output">
+	    	<button type="button" class="btn btn-light no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#tool-output" aria-expanded="false" aria-controls="tool-output">
           		<fmt:message key="label.tool.output" />
           	</button>
    		</span>

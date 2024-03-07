@@ -65,6 +65,206 @@
 	.complete-item-gif {
 	    display: none;
 	}
+
+
+@media (min-width: 992px) {
+    .bd-layout {
+        display:grid;
+        grid-template-areas: "sidebar main";
+        grid-template-columns: 1fr 5fr;
+        gap: 1.5rem
+    }
+}
+
+.bd-main {
+    grid-area: main
+}
+
+@media (max-width: 991.98px) {
+    .bd-main {
+        max-width:760px;
+        margin-inline:auto}
+}
+
+@media (min-width: 768px) {
+    .bd-main {
+        display:grid;
+        grid-template-areas: "intro" "toc" "content";
+        grid-template-rows: auto auto 1fr;
+        gap: inherit
+    }
+}
+
+@media (min-width: 992px) {
+    .bd-main {
+        grid-template-areas:"intro   toc" "content toc";
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 4fr 1fr
+    }
+}
+	
+.bd-intro {
+    grid-area: intro
+}
+
+.bd-toc {
+    grid-area: toc
+}
+
+.bd-content {
+    grid-area: content;
+    min-width: 1px
+}
+
+.bd-content>:target {
+    padding-top: 5rem;
+    margin-top: -5rem
+}
+
+.bd-content>h2:not(:first-child) {
+    margin-top: 3rem
+}
+
+.bd-content>h3 {
+    margin-top: 2rem
+}
+
+.bd-content>ul li,.bd-content>ol li {
+    margin-bottom: .25rem
+}
+
+.bd-content>ul li>p~ul,.bd-content>ol li>p~ul {
+    margin-top: -.5rem;
+    margin-bottom: 1rem
+}
+
+.bd-content>.table,.bd-content>.table-responsive .table {
+    margin-bottom: 1.5rem;
+    font-size: .875rem
+}
+
+@media (max-width: 991.98px) {
+    .bd-content>.table.table-bordered,.bd-content>.table-responsive .table.table-bordered {
+        border:0
+    }
+}
+
+.bd-content>.table thead,.bd-content>.table-responsive .table thead {
+    border-bottom: 2px solid currentcolor
+}
+
+.bd-content>.table tbody:not(:first-child),.bd-content>.table-responsive .table tbody:not(:first-child) {
+    border-top: 2px solid currentcolor
+}
+
+.bd-content>.table th:first-child,.bd-content>.table td:first-child,.bd-content>.table-responsive .table th:first-child,.bd-content>.table-responsive .table td:first-child {
+    padding-left: 0
+}
+
+.bd-content>.table th:not(:last-child),.bd-content>.table td:not(:last-child),.bd-content>.table-responsive .table th:not(:last-child),.bd-content>.table-responsive .table td:not(:last-child) {
+    padding-right: 1.5rem
+}
+
+.bd-content>.table th,.bd-content>.table td:first-child>code,.bd-content>.table-responsive .table th,.bd-content>.table-responsive .table td:first-child>code {
+    white-space: nowrap
+}
+
+@media (min-width: 992px) {
+    .bd-toc {
+        position:-webkit-sticky;
+        position: sticky;
+        top: 5rem;
+        right: 0;
+        z-index: 2;
+        height: calc(100vh - 7rem);
+        overflow-y: auto
+    }
+}
+
+.bd-toc nav {
+    font-size: .875rem
+}
+
+.bd-toc nav ul {
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none
+}
+
+.bd-toc nav ul ul {
+    padding-left: 1rem;
+    margin-top: .25rem
+}
+
+.bd-toc nav li {
+    margin-bottom: .25rem
+}
+
+.bd-toc nav a {
+    color: inherit
+}
+
+.bd-toc nav a:not(:hover) {
+    text-decoration: none
+}
+
+.bd-toc nav a code {
+    font: inherit
+}
+
+.bd-toc-toggle {
+    display: flex;
+    align-items: center
+}
+
+@media (max-width: 575.98px) {
+    .bd-toc-toggle {
+        justify-content:space-between;
+        width: 100%
+    }
+}
+
+@media (max-width: 767.98px) {
+    .bd-toc-toggle {
+        border:1px solid #dee2e6;
+        border-radius: .4rem
+    }
+
+    .bd-toc-toggle:hover,.bd-toc-toggle:focus,.bd-toc-toggle:active,.bd-toc-toggle[aria-expanded="true"] {
+        color: var(--bd-violet);
+        background-color: #fff;
+        border-color: var(--bd-violet)
+    }
+
+    .bd-toc-toggle:focus,.bd-toc-toggle[aria-expanded="true"] {
+        box-shadow: 0 0 0 3px rgba(var(--bd-violet-rgb), 0.25)
+    }
+}
+
+@media (max-width: 767.98px) {
+    .bd-toc-collapse nav {
+        padding:1.25rem;
+        background-color: var(--bs-gray-100);
+        border: 1px solid #dee2e6;
+        border-radius: .25rem
+    }
+}
+
+@media (min-width: 768px) {
+    .bd-toc-collapse {
+        display:block !important
+    }
+}
+
+@media (min-width: 1400px) {
+	 #container-main, .container-main {
+	    max-width: 1600px;
+	}
+}
+
+.nav-pills .nav-link {
+	padding: 0.25rem !important;
+}
 </style>
 
 <script>
@@ -149,8 +349,28 @@
 			showQuestionDetailsButton = true;
 
 	$(document).ready(function(){
+	    $.ajax({
+	        url: LAMS_URL + 'learning/learner/getLearnerProgress.do',
+	        data: {
+	            'toolSessionID': null,
+	            'lessonID': ${param.lessonID},
+	            'userID': null
+	        },
+	        cache: false,
+	        dataType: 'json',
+	        success: function (result) {
+	            $('.component-page-wrapper .component-page-content #lesson-name').text(result.lessonName).removeClass();
+	        }
+	    });
+		
 		loadResultsPane($('#results'), false);
 		initializePortraitPopover("<lams:LAMSURL />");
+		doStatistic();
+		setTimeout(function(){  
+			//refresh scrollspy instance after loading statistics pane
+		    const scrollElem = document.querySelector(`.bd-content[data-bs-spy="scroll"]`);
+		    bootstrap.ScrollSpy.getOrCreateInstance(scrollElem).refresh();
+		}, 800);
 
 		<c:forEach var="sessionDto" items="${sessionDtos}">
 			buildJqgridLearnerTable(${sessionDto.sessionId});
@@ -423,7 +643,103 @@
 	}
 </script>
 
-<div class="instructions">
+<main class="bd-main order-1">
+
+<div class="bd-toc mt-3 mb-5 my-lg-0 ps-xl-5 mb-lg-5 text-muted">
+	<button class="btn btn-link link-dark p-md-0 mb-2 mb-md-0 text-decoration-none bd-toc-toggle d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#tocContents" aria-expanded="false" aria-controls="tocContents">
+		On this page
+		<svg class="bi d-md-none ms-2" aria-hidden="true"><use xlink:href="#chevron-expand"></use></svg>
+	</button>
+	
+	<strong class="d-none d-md-block h6 my-2">On this page</strong>
+	<hr class="d-none d-md-block my-2">
+	<div class="collapse bd-toc-collapse" id="tocContents">
+		<nav id="TableOfContents" class="nav-pills">
+	 		<ul>
+				<c:if test="${not empty sessionDtos}">
+					<li class="nav-item">
+						<a href="#instructions" class="nav-link">Overview</a>
+						
+						<ul>
+							<!-- <li>
+								<a href="#completion-charts-container">Completion charts</a>
+							</li> -->
+							
+							<c:if test="${displayStudentChoices and not empty questions}">
+								<li class="nav-item">
+									<a href="#student-choices" class="nav-link"><fmt:message key="label.student.choices" /></a>
+								</li>
+							</c:if>
+							
+							<c:if test="${sessionMap.isGroupedActivity and sessionMap.assessment.useSelectLeaderToolOuput and not empty questionDtos}">
+								<li class="nav-item">
+									<a href="#groups-choices" class="nav-link"><fmt:message key="label.groups.choices" /></a>
+								</li>
+							</c:if>
+						</ul>
+					</li>
+					
+					<li>
+						<a href="#header-reports" class="nav-link">Reports</a>
+						
+						<ul>
+							<li class="nav-item">
+								<a href="#header-report-by-group" class="nav-link">Report by group<!--<fmt:message key="label.monitoring.summary.summary" />--></a>
+							</li>
+
+							<li class="nav-item">
+								<a href="#header-report-by-question" class="nav-link"><fmt:message key="label.monitoring.summary.report.by.question" /></a>
+								
+								<!--<c:forEach var="question" items="${questions}" varStatus="i">
+									<li class="nav-item">
+										<a href="#header-report-by-question" class="nav-link">
+											<div class="d-flex">
+												<span>Q${i.index+1})</span>
+												<div>
+													<c:out value="${question.title}"  escapeXml="false" />
+												</div>
+											</div>
+										</a>
+									</li>
+								</c:forEach>-->
+							</li>
+							
+							<li class="nav-item">
+								<a href="#header-statistics" class="nav-link"><fmt:message key="monitoring.tab.statistics" /></a>
+							</li>
+							
+							<li class="nav-item">
+								<a href="#chapter-item-analysis" class="nav-link"><fmt:message key="label.qb.stats" /></a>
+							</li>
+						</ul>
+					</li>
+				</c:if>
+				
+				<li>
+					<a href="#header-settings" class="nav-link">Settings</a>
+					<ul>
+						<li class="nav-item">
+							<a href="#time-limit-panel-placeholder" class="nav-link">Timing limits</a>
+						</li>
+						<li class="nav-item">
+							<a href="#accordionRestrictUsageDiv" class="nav-link"><fmt:message key="monitor.summary.date.restriction" /></a>
+						</li>
+						<li class="nav-item">
+							<a href="#heading-tool-output" class="nav-link"><fmt:message key="label.tool.output" /></a>
+						</li>
+						<li class="nav-item">
+							<a href="#edit-activity-accordion" class="nav-link"><fmt:message key="monitoring.tab.edit.activity" /></a>
+						</li>
+					</ul>
+				</li>
+	 		</ul>
+		</nav>
+	</div>
+</div>
+
+<div class="bd-content ps-lg-2" data-bs-spy="scroll" data-bs-target="#TableOfContents" data-bs-smooth-scroll="true">
+
+<div class="instructions" id="instructions">
 	<div class="fs-4">
 		<c:out value="${assessment.title}" escapeXml="true"/>
 	</div>
@@ -456,14 +772,14 @@
 
 <c:if test="${not empty sessionDtos}">
 	<c:if test="${displayStudentChoices and not empty questions}">
-		<div class="card-subheader fs-4">
+		<div class="card-subheader fs-4" id="student-choices">
 			<fmt:message key="label.student.choices" />
 		</div>
 		<%@ include file="/pages/monitoring/parts/mcqStudentChoices.jsp" %>
 	</c:if>
 	
 	<c:if test="${sessionMap.isGroupedActivity and sessionMap.assessment.useSelectLeaderToolOuput and not empty questionDtos}">
-		<div class="card-subheader fs-4">
+		<div class="card-subheader fs-4" id="groups-choices">
 			<fmt:message key="label.groups.choices" />
 		</div>
 
@@ -535,7 +851,9 @@
 		</div>
 	</c:if>
 
-	<div class="mt-4">
+	<a id="header-reports" class="anchor-link" href="#header-reports" aria-label="Link to this section: header-reports"></a>
+
+	<div class="mt-4" id="header-report-by-group">
 		<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
 		<div class="clearfix">
 			<div class="badge text-bg-info float-end px-5 py-3 mt-2" id="messageArea"></div>
@@ -547,16 +865,15 @@
 		</button>
 	
 		<div class="card-subheader fs-4">
-			<fmt:message key="label.monitoring.summary.summary" />
+			Report by group <!--<fmt:message key="label.monitoring.summary.summary" />-->
 		</div>
 	
 		<div class="comments">
 			<fmt:message key="label.monitoring.summary.double.click" />
 		</div>
-	</div>
 
-	<div id="masterDetailArea" class="mt-3"></div>
-	<a onclick="" href="return false;" class="thickbox initially-hidden" id="userSummaryHref"></a>
+		<div id="masterDetailArea" class="mt-3"></div>
+		<a onclick="" href="return false;" class="thickbox initially-hidden" id="userSummaryHref"></a>
 
 	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		<c:choose>
@@ -565,7 +882,7 @@
 					<div class="card-header" id="heading${sessionDto.sessionId}">
 			        	<span class="card-title collapsable-icon-left">
 			        		<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" data-bs-toggle="collapse" data-bs-target="#collapse${sessionDto.sessionId}"
-									aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+									aria-expanded="${status.first}" aria-controls="collapse${sessionDto.sessionId}" >
 								<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
 							</button>
 						</span>
@@ -627,9 +944,10 @@
 			</div>
 		</div>
 	</c:if>
+	</div>
 </c:if>
 
-<div class="assessment-questions-pane mb-5">
+<div class="assessment-questions-pane mb-5" id="header-report-by-question">
 	<div class="card-subheader fs-4 mt-4 pb-0">
 		<fmt:message key="label.monitoring.summary.report.by.question" />
 	</div>
@@ -661,10 +979,26 @@
 	<div id="results" class="mt-3" data-tool-content-id="${assessment.contentId}"></div>
 </div>
 
-<%@ include file="parts/advanceoptions.jsp"%>
+<div>
+	<div class="card-subheader fs-4" id="header-statistics">
+		<fmt:message key="monitoring.tab.statistics" />
+	</div>
+	<%@ include file="statistic.jsp"%>
+</div>
+
+<div class="card-subheader fs-4" id="header-settings">
+	Settings
+</div>
 
 <div id="time-limit-panel-placeholder"></div>
 
 <lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
+
+<%@ include file="parts/toolOutput.jsp"%>
+
+<%@ include file="parts/advanceoptions.jsp"%>
+
+</div>
+</main>
 
 <div id="change-leader-modals"></div>

@@ -311,10 +311,9 @@
 		</c:if>
 	</c:otherwise>
 	</c:choose>		
-	
-	<div id="accordion-qb-stats" class="panel-group voffset20" role="tablist" aria-multiselectable="true"> 
+ 
 	    <div class="lcard">
-	        <div class="card-header" id="heading-qb-stats">
+	        <div class="card-header" id="chapter-item-analysis">
 	        	<span class="card-title collapsable-icon-left">
 					<button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#qb-stats" 
 							aria-expanded="true" aria-controls="qb-stats">
@@ -394,9 +393,6 @@
 				</table>
 			</div>
 		</div>
-	</div>
 
 </c:otherwise>
 </c:choose>
-
-<%@ include file="parts/toolOutput.jsp"%>

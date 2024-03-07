@@ -121,7 +121,7 @@ body.component {
 			padding: 1rem;
 			@extend .text-bg-secondary;
 			
-			*:not(.badge, .badge *, .btn, .btn *, button, button *) {
+			*:not(.badge, .badge *, .btn, .btn *, button, button *, .asterisk *) {
 				@extend .text-bg-secondary;
 			}
 	

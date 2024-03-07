@@ -540,7 +540,7 @@
 <div class="accordion mt-2" id="time-limit-panel"> 
 <div class="accordion-item">
 	<h2 class="accordion-header" id="time-limit-header">
-       	<button class="accordion-button text-bg-secondary ${param.isTbl ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#time-limit-collapse" aria-expanded="${param.isTbl}" aria-controls="time-limit-collapse">
+       	<button class="accordion-button text-bg-light ${param.isTbl ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#time-limit-collapse" aria-expanded="${param.isTbl}" aria-controls="time-limit-collapse">
           	<fmt:message key="label.monitoring.time.limit"/>
    		</button>
     </h2>

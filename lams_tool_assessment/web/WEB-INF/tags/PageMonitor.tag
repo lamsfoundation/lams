@@ -2,6 +2,7 @@
 <%@ taglib uri="tags-core" prefix="c" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ tag  import="java.util.UUID"%>
 
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="tab1Label" required="false" rtexprvalue="true"%>
@@ -70,8 +71,8 @@
 	            </a>
 
 				<c:if test="${showHeader}">
-		            <nav class="navbar navbar-expand-md">
-		  				<div class="container-fluid">
+		            <nav class="navbar navbar-expand-md d-none">
+		  				<div class="container-main">
 							<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 								<span class="navbar-toggler-icon"></span>
 							</button>
@@ -118,8 +119,8 @@
 							        </c:if>
 							             
 									<li class="nav-item">
-										 <a href="${lams}home/monitorLesson.do?lessonID=${param.lessonID}" id="btn-close" class="btn btn-light btn-close btn-sm nav-link" 
-				                   				title="<fmt:message key='label.close.and.return'/>"></a>
+										 <a href="${lams}home/monitorLesson.do?lessonID=${param.lessonID}&reqID=<%= UUID.randomUUID().toString() %>" id="btn-close" 
+										 		class="btn btn-light btn-close btn-sm nav-link" title="<fmt:message key='label.close.and.return'/>"></a>
 							       	</li>
 							   	</ul>
 					        </c:if>
@@ -127,10 +128,39 @@
 		  			</nav>
 	  			</c:if>
 
-	            <main id="component-main-content" class="px-1 py-3" tabindex="-1">
+				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+					<div class="container-main">
+						<ol class="breadcrumb">
+						    <li class="breadcrumb-item">
+						    	<a href="${lams}home/monitorLesson.do?lessonID=${param.lessonID}">
+						    		<span id="lesson-name">
+						    			
+						    		</span>
+						    	</a>
+						    </li>
+						   	
+							<li class="breadcrumb-item active dropdown" aria-current="page">
+								<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+									<fmt:message key="label.author.title" />
+								</a>
+								
+							    <ul class="dropdown-menu" style="">
+							      <li><a class="dropdown-item" href="#">Forum</a></li>
+							      <li><a class="dropdown-item disabled lesson-name" href="#"><fmt:message key="label.author.title" /></a></li>
+							      <li><a class="dropdown-item" href="#">Q&A</a></li>
+							      <li><a class="dropdown-item" href="#">Another activity</a></li>
+							      <li><hr class="dropdown-divider"></li>
+							      <li><a class="dropdown-item" href="#">Support activity</a></li>
+							    </ul>
+							</li>
+						</ol>
+					</div>
+				</nav>
+
+	            <main id="component-main-content" class="p-3" tabindex="-1">
 	            	<c:choose>
 	            		<c:when test="${showHeader}">
-							<div class="container-main tab-content m-3" id="tabs-content">
+							<div class="container-main tab-content" id="tabs-content">
 								<div class="tab-pane fade show active"  id="tab-1-content" role="tabpanel" aria-labelledby="tab-1" tabindex="0"><jsp:include page="${tab1Jsp}"/></div>
 								<div class="tab-pane fade" 				id="tab-2-content" role="tabpanel" aria-labelledby="tab-2" tabindex="0"><jsp:include page="${tab2Jsp}"/></div>
 								<div class="tab-pane fade" 				id="tab-3-content" role="tabpanel" aria-labelledby="tab-3" tabindex="0"><jsp:include page="${tab3Jsp}"/></div>

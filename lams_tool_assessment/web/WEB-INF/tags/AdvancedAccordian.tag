@@ -35,19 +35,16 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<div class="accordion" id="accordionAdvanced"> 
+<div class="accordion pt-2" id="edit-activity-accordion"> 
     <div class="accordion-item">
     	<h2 class="accordion-header" id="headingAdvanced">
-        	<button class="accordion-button collapsed text-bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
+        	<button class="accordion-button collapsed text-bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced">
 	          	${title}
     		</button>
         </h2>
 
 		<div id="collapseAdvanced" class="accordion-collapse collapse" aria-labelledby="headingAdvanced">
-      		<div>
-      			<jsp:doBody />
-      		</div>
+      		<jsp:doBody />
       	</div>
 	</div>
 </div>
-		

@@ -6,7 +6,9 @@
 		// load an embedded results list
 		// show details button needs to be set in the page which included this page
 		resultsPane.load("<c:url value='/learning/showResultsForTeacher.do'/>?embedded=true&sessionMapID=${sessionMapID}&showQuestionDetailsButton="
-						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, function(){
+						  + showQuestionDetailsButton + "&toolContentID=" + toolContentId, 
+						  function(){
+
 			var assessmentQuestionsPane = $(this).closest('.assessment-questions-pane').length 
 					? $(this).closest('.assessment-questions-pane') : $('.assessment-questions-pane-ira'),
 				// are any correct/groups buttons clickable?
@@ -22,7 +24,6 @@
 				} else {
 					discloseAllGroupsEnabled = true;
 				}
-				
 				
 				button.click(function(event) {	
 					showConfirm(isCorrectButton ? "<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.disclose.correct.answers' /></spring:escapeBody>"
@@ -91,6 +92,10 @@
 			} else {
 				disabledAndCheckButton(allGroupsButton);
 			}
+
+			//refresh scrollspy instance after loading Results pane
+		    const scrollElem = document.querySelector(`.bd-content[data-bs-spy="scroll"]`);
+		    bootstrap.ScrollSpy.getOrCreateInstance(scrollElem).refresh();
 		});
 	}
 

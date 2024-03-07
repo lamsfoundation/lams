@@ -362,7 +362,7 @@
 	</c:forEach>
 
 	<div class="activity-bottom-buttons">
-		<button type="button" onclick="refreshSummaryPage();" class="btn btn-primary">
+		<button type="button" onclick="refreshSummaryPage()" class="btn btn-primary">
 			<i class="fa-regular fa-circle-xmark me-1"></i>
 			<fmt:message key="label.close" />
 		</button>

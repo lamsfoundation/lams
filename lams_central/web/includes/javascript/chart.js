@@ -260,8 +260,8 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 
 	var svg = d3.select(chartDiv[0])
 		.append("svg")
-		.attr('width', svgWidth)
-		.attr('height', svgHeight)
+		.attr('width', '100%')//this way it will take the full width of the parent
+		.attr('height', '100%')//this way it will take the full height of the parent
 	    .append("g")
 	    .attr("transform", "translate(0," + svgHeightOffset + ")");
 	
