@@ -205,3 +205,13 @@
 		background-color: #d0e9c6
 	}
 }
+
+.ui-subgrid>.subgrid-cell span.fa {
+	&.fa-reply {
+		font-weight: 900 !important;
+	}
+}
+
+.fa {
+	font-weight: 900 !important;
+}
