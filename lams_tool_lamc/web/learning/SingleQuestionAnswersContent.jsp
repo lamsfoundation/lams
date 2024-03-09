@@ -51,7 +51,7 @@
 											<c:if test="${option.selected}">checked="checked"</c:if> 
 									/> 
 		
-									<label for="${questionUid}-${option.qbOption.uid}" class="form-check-label">
+									<label for="${questionUid}-${option.qbOption.uid}" class="form-check-label d-flex">
 										<c:if test="${isPrefixAnswersWithLetters}">
 											<c:set var="seqLetter" value="${status.index}" />
 											<%=Character.toChars(97 + (Integer) pageContext.getAttribute("seqLetter"))%>)

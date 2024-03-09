@@ -46,7 +46,7 @@
 		                            	<c:if test="${!hasEditRight}">disabled="disabled"</c:if> 
 		                      	>
 	
-		                       	<label for="${questionUid}-${option.qbOption.uid}" class="form-check-label">
+		                       	<label for="${questionUid}-${option.qbOption.uid}" class="form-check-label d-flex">
 			                     	<c:if test="${isPrefixAnswersWithLetters}">
 			                     		<c:set var="seqLetter" value="${status.index}"/>
 			                     		<%=Character.toChars(97 + (Integer)pageContext.getAttribute("seqLetter"))%>)

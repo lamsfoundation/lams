@@ -51,7 +51,7 @@
 			   	colModel:[
 			   		{name:'userUid',index:'userUid', width:0, hidden: true},
 			   		{name:'userId',index:'userId', width:0, hidden: true},
-			   		{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+			   		{name:'userName',index:'userName', width:200, searchoptions: { clearSearch: false, attr: {style: "text-align:left;"} }, formatter:userNameFormatter},
 			   		{name:'total',index:'total', width:50,align:"right",sorttype:"int", search:false}	,
 			   		{name:'portraitId', index:'portraitId', width:0, hidden: true}
 			   	],

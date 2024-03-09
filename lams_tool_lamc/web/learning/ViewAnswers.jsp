@@ -113,12 +113,14 @@
 							<ul>
 								<c:forEach var="subEntry" items="${mainEntry.value}">
 									<li>
-										<c:if test="${isPrefixAnswersWithLetters}">
-											${subEntry.key}
-											&nbsp;
-										</c:if>
-												
-										<c:out value="${subEntry.value}" escapeXml="false" />
+										<div class="d-flex">
+											<c:if test="${isPrefixAnswersWithLetters}">
+												${subEntry.key}
+												&nbsp;
+											</c:if>
+													
+											<c:out value="${subEntry.value}" escapeXml="false" />
+										</div>
 									</li>
 								</c:forEach>
 							</ul>
