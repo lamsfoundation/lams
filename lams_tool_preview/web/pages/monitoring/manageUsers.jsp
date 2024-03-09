@@ -4,32 +4,27 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<lams:html>
-	<lams:head>
-		<title><fmt:message key="label.monitoring.heading" /></title>
-		<%@ include file="/common/header.jsp"%>
+<c:set var="title"><fmt:message key="label.manage.users" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
+	<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
+	<style type="text/css">
+		.ui-jqgrid-labels {
+			display:none; !important;
+		}
+		.ui-search-toolbar th:nth-child(2){
+			display:none !important;
+		}
+	</style>
 
-		<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
-		<link type="text/css" href="<lams:WebAppURL/>includes/css/learning.css" rel="stylesheet" />
-		<style type="text/css">
-			.ui-jqgrid-labels {
-				display:none; !important;
-			}
-			.ui-search-toolbar th:nth-child(2){
-				display:none !important;
-			}
-		</style>
-
-		<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
-		<script type="text/javascript">
-			$(document).ready(function(){
-
+	<script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
 				//init all available jqGrids
 				$("[id^=group]").each(function() {
 					var groupTable = $(this),
-							toolSessionId = groupTable.data("session-id");
-
+						toolSessionId = groupTable.data("session-id");
 
 					groupTable.jqGrid({
 						url: "<c:url value='/monitoring/getManageUsers.do'/>?toolSessionId=" + toolSessionId,
@@ -48,7 +43,7 @@
 							{name:'userUid', index:'userUid', width:0, hidden: true},
 							{name: 'hidden', index: 'hidden', width:10, editable:true, edittype:'checkbox', editoptions: {value:"True:False"},
 								formatter: "checkbox", formatoptions: {disabled : false}, sortable:false, search: false},
-							{name:'userName', index:'userName', width:300, searchoptions: { clearSearch: false }}
+							{name:'userName', index:'userName', width:300, searchoptions: { clearSearch: false, attr: {style: "text-align:left;"} }}
 						],
 						sortname: "userUid",
 						rowNum:10,
@@ -57,7 +52,6 @@
 						viewrecords:true,
 						// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 						loadComplete: function() {
-
 							// storing isHidden change to DB
 							$(":checkbox", groupTable).on("click", function(event){
 
@@ -106,61 +100,45 @@
 					});
 				};
 				setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+		});
+	</script>
+	
+	<h1 class="fs-3">
+		${title}
+	</h1>
 
-			});
-		</script>
+	<div class="instructions">
+		<fmt:message key="label.manage.users.description" />
+	</div>
 
-	</lams:head>
-	<body class="stripes">
-
-	<c:set var="title"><fmt:message key="label.manage.users" /></c:set>
-	<lams:Page type="monitor" title="${title}">
-
-		<h5>
-			<fmt:message key="label.manage.users.description" />
-		</h5>
-
+	<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 		<c:if test="${sessionMap.isGroupedActivity}">
-			<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true">
-		</c:if>
-
-		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-
-			<c:if test="${sessionMap.isGroupedActivity}">
-				<div class="panel panel-default" >
-				<div class="panel-heading" id="heading${groupSummary.sessionId}">
-			        	<span class="panel-title collapsable-icon-left">
-				        	<a role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}"
+			<div class="lcard" >
+				<div class="card-header" id="heading${groupSummary.sessionId}">
+			        <span class="card-title collapsable-icon-left">
+				       	<button type="button" class="btn btn-secondary-darker no-shadow" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}"
 							   aria-expanded="true" aria-controls="collapse${groupSummary.sessionId}">
-								<fmt:message key="monitoring.label.group" />: ${groupSummary.sessionName}
-							</a>
-						</span>
+							<fmt:message key="monitoring.label.group" />: ${groupSummary.sessionName}
+						</button>
+					</span>
 				</div>
 
-				<div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+				<div id="collapse${groupSummary.sessionId}" class="card-body collapse show">
 			</c:if>
 
 			<table id="group${groupSummary.sessionId}" class="scroll" data-session-id="${groupSummary.sessionId}" cellpadding="0" cellspacing="0"></table>
 			<div id="pager${groupSummary.sessionId}"></div>
 
-			<c:if test="${sessionMap.isGroupedActivity}">
-				</div> <!-- end collapse area  -->
-				</div> <!-- end collapse panel  -->
-			</c:if>
-			${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-
-		</c:forEach>
-
 		<c:if test="${sessionMap.isGroupedActivity}">
-			</div> <!--  end panel group -->
+				</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
 		</c:if>
+	</c:forEach>
 
-		<span onclick="window.close()" class="btn btn-default voffset5 pull-right">
+	<div class="activity-bottom-buttons">
+ 		<button type="button" onclick="window.close()" class="btn btn-primary">
+ 			<i class="fa-solid fa-xmark me-1"></i>
  			<fmt:message key="label.close"/>
- 		</span>
-	</lams:Page>
-
-	<div id="footer"></div>
-
-	</body>
-</lams:html>
+ 		</button>
+ 	</div>
+</lams:PageMonitor>

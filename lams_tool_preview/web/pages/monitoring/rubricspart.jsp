@@ -1,14 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<style>
-	.panel-collapse > .rubrics-user-panel,
-	.panel-collapse > #emailPreviewArea {
-		margin: 10px;
-	}
-</style>
-
 <script>
-
 	function getResultsElement(sessionId, selector) {
 		let element = null;
 		if (sessionId) {
@@ -92,35 +84,32 @@
 
 <!--For send results feature-->
 <i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
-<div class="voffset5 messageArea2"></div>
-
+<div class="mt-2 messageArea2"></div>
 	     
-<c:forEach var="learnerData" items="${rubricsLearnerData}">
-  	    	
-<%-- List learners in the given session --%>
-<div class="panel panel-default rubrics-user-panel">
-      <div class="panel-heading" role="tab" id="rubrics-user-heading-${learnerData.key.uid}">
-      	<span class="panel-title collapsable-icon-left">
-      		<a class="collapsed" role="button" data-toggle="collapse" href="#rubrics-user-collapse-${learnerData.key.uid}" 
-				aria-expanded="false" aria-controls="rubrics-user-collapse-${learnerData.key.uid}">
-			<lams:Portrait userId="${learnerData.key.userId}" hover="false" />
-			&nbsp;<c:out value="${learnerData.key.firstName}" escapeXml="true"/>
-			&nbsp;<c:out value="${learnerData.key.lastName}" escapeXml="true"/>
-		</a>
-	</span>
-	<button class="btn btn-default pull-right email-button btn-disable-on-submit"
-			onClick="javascript:previewResultsForLearner(${toolSessionId}, ${learnerData.key.userId}, this)">
-		<fmt:message key="button.preview.results" />
-	</button>
-      </div>
-     
-     	<div id="rubrics-user-collapse-${learnerData.key.uid}" class="panel-collapse collapse" 
-     	    role="tabpanel" aria-labelledby="rubrics-user-heading-${learnerData.key.uid}">
-     	    	<%-- Display ratings given to this user --%>
-		<lams:StyledRating criteriaRatings="${learnerData.value}" showJustification="true" alwaysShowAverage="false"
-						   currentUserDisplay="true" rubricsInBetweenColumns="${sessionMap.peerreview.rubricsInBetweenColumns}" />
+<c:forEach var="learnerData" items="${rubricsLearnerData}">   	
+	<%-- List learners in the given session --%>
+	<div class="lcard rubrics-user-panel">
+		<div class="card-header" id="rubrics-user-heading-${learnerData.key.uid}">
+	      	<span class="card-title collapsable-icon-left">
+	      		<button type="button" class="btn btn-secondary-darker no-shadow collapsed" data-bs-toggle="collapse" data-bs-target="#rubrics-user-collapse-${learnerData.key.uid}" 
+						aria-expanded="false" aria-controls="rubrics-user-collapse-${learnerData.key.uid}">
+					<lams:Portrait userId="${learnerData.key.userId}" hover="false" />
+					&nbsp;<c:out value="${learnerData.key.firstName}" escapeXml="true"/>
+					&nbsp;<c:out value="${learnerData.key.lastName}" escapeXml="true"/>
+				</button>
+			</span>
+			<button type="button" class="btn btn-light float-end email-button btn-disable-on-submit"
+					onClick="previewResultsForLearner(${toolSessionId}, ${learnerData.key.userId}, this)">
+				<fmt:message key="button.preview.results" />
+			</button>
+		</div>
+	     
+		<div id="rubrics-user-collapse-${learnerData.key.uid}" class="card-body collapse">
+	     	<%-- Display ratings given to this user --%>
+			<lams:StyledRating criteriaRatings="${learnerData.value}" showJustification="true" alwaysShowAverage="false"
+							   currentUserDisplay="true" rubricsInBetweenColumns="${sessionMap.peerreview.rubricsInBetweenColumns}" />
+		</div>
 	</div>
-</div>
 </c:forEach>
 
-<div class="voffset10 emailPreviewArea" style="display:none" ></div>
+<div class="mt-3 emailPreviewArea" style="display:none" ></div>

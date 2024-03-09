@@ -51,7 +51,7 @@ public class TblMonitoringController {
 	sessionMap.put(PeerreviewConstants.ATTR_PEERREVIEW, peerreview);
 	sessionMap.put(PeerreviewConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, peerreviewService.isGroupedActivity(contentId));
-	sessionMap.put("tblMonitoring", true);
+	sessionMap.put("isTbl", true);
 
 	List<RatingCriteria> criterias = peerreviewService.getRatingCriterias(contentId);
 	List<RatingCriteria> flattenedCriterias = new ArrayList<>(criterias);
@@ -65,7 +65,7 @@ public class TblMonitoringController {
 
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, flattenedCriterias);
 
-	return "/pages/monitoring/summary5";
+	return "/pages/monitoring/summary";
     }
 
 }

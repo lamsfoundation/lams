@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-
 <style>
     /* when item is editable - show pencil icon on hover */
     .editable-comment:hover +span+ i, /* when link is hovered select i */
@@ -12,18 +11,24 @@
 	.editable-comment +span+ i { /* in all other case hide it */
 	  visibility: hidden;
 	}
+	
+	<c:if test="${criteria.ratingStyle eq 1}">
+		.extra-controls-inner {
+		   height: 3.5rem; 
+		}
+	</c:if>
 </style>
 <c:choose>
-<c:when test="${criteria.ratingStyle eq 0 }">
+<c:when test="${criteria.ratingStyle eq 0}">
 	<c:set var="heading"></c:set>
 </c:when>
-<c:when test="${criteria.ratingStyle eq 1 }">
+<c:when test="${criteria.ratingStyle eq 1}">
 	<c:set var="heading"><fmt:message key="label.rating" /></c:set>
 </c:when>
-<c:when test="${criteria.ratingStyle eq 2 }">
+<c:when test="${criteria.ratingStyle eq 2}">
 	<c:set var="heading"><fmt:message key="label.rating.rank" /></c:set>
 </c:when>
-<c:when test="${criteria.ratingStyle eq 3 }">
+<c:when test="${criteria.ratingStyle eq 3}">
 	<c:set var="heading"><fmt:message key="label.mark" /></c:set>
 </c:when>
 </c:choose>
@@ -50,7 +55,7 @@
 			],
 		   	colModel:[
 		   		{name:'itemId', index:'itemId', width:0, hidden: true},
-		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }, formatter:userNameFormatter},
+		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false, attr: {style: "text-align:left;"}}, formatter:userNameFormatter},
 		   		{name:'rating', index:'rating', width:100, align:"center", search:false},
 		   		{name:'itemDescription2', index:'itemId', width:0, hidden: true},
 				{name:'email', index:'email', width:100, align:"center", search:false}		   		
@@ -268,7 +273,7 @@
 
 <!--For send results feature-->
 <i class="fa fa-spinner messageArea2_Busy" style="display:none"></i>
-<div class="voffset5 messageArea2"></div>
+<div class="mt-2 messageArea2"></div>
 
 <p>
 	<c:choose>
@@ -296,4 +301,4 @@
 <table id="group${toolSessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 <div id="pager${toolSessionId}"></div> 
 
-<div class="voffset10 emailPreviewArea" style="display:none" ></div>
+<div class="mt-2 emailPreviewArea" style="display:none" ></div>

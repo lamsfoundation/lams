@@ -288,9 +288,10 @@ public class MonitoringController {
     }
 
     private String generatePreviewButton(Object toolSessionId, Object userId, String emailResultsText) {
-	return new StringBuilder("<button onclick=\"javascript:previewResultsForLearner(").append(toolSessionId)
+	return new StringBuilder("<button type='button' onclick=\"previewResultsForLearner(").append(toolSessionId)
 		.append(", ").append(userId)
-		.append(")\" class=\"btn btn-default btn-xs email-button btn-disable-on-submit\">")
+		.append(")\" class=\"btn btn-light btn-sm email-button btn-disable-on-submit\">")
+		.append("<i class='fa-solid fa-eye me-1'></i>")
 		.append(emailResultsText).append("</button>").toString();
     }
 

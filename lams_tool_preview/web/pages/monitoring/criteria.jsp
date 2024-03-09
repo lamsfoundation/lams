@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-        
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<lams:html>
-<lams:head>
-	<title><fmt:message key="label.monitoring.heading" /></title>
-	<%@ include file="/common/header.jsp"%>
-
+<c:set var="title"><fmt:message key="label.monitoring.heading" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
 	<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 	<link type="text/css" href="${lams}css/jquery-ui-bootstrap-theme5.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/free.ui.jqgrid.custom.css" rel="stylesheet">
@@ -36,25 +32,26 @@
 	<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 	<lams:JSImport src="includes/javascript/rating.js" />
 	<lams:JSImport src="includes/javascript/portrait5.js" />
-</lams:head>
+	
+	
+		<h1 class="fs-3">
+			${criteria.title}
+		</h1>
+	
 
-<body class="stripes">
-	<lams:Page type="monitor" title="${criteria.rubricsStyleRating ? '' : title}">
-		<c:choose>
-			<c:when test="${criteria.rubricsStyleRating}">
-				<%@ include file="rubricspart.jsp" %>
-			</c:when>
-			<c:otherwise>
-				<%@ include file="criteriapart.jsp" %>
-			</c:otherwise>
-		</c:choose>
+	<c:choose>
+		<c:when test="${criteria.rubricsStyleRating}">
+			<%@ include file="rubricspart.jsp" %>
+		</c:when>
+		<c:otherwise>
+			<%@ include file="criteriapart.jsp" %>
+		</c:otherwise>
+	</c:choose>
 		
-		
- 		<span onclick="window.close()" class="btn btn-default voffset20 pull-right">
+	<div class="activity-bottom-buttons">
+ 		<button type="button" onclick="window.close()" class="btn btn-primary">
+ 			<i class="fa-solid fa-xmark me-1"></i>
  			<fmt:message key="label.close"/>
- 		</span>
-	</lams:Page>
-
-	<div id="footer"></div>
-</body>
-</lams:html>
+ 		</button>
+ 	</div>
+</lams:PageMonitor>
