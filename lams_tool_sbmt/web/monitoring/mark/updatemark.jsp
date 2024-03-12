@@ -6,28 +6,17 @@
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 <c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+<c:set var="csrfToken"><csrf:token/></c:set>
 
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-
-<lams:html>
-<lams:head>
-	<title><fmt:message key="activity.title" /></title>
-	<lams:css/>
-	
-	<lams:JSImport src="includes/javascript/common.js" />
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<lams:JSImport src="includes/javascript/readmore.min.js" />
 	<lams:JSImport src="includes/javascript/upload.js" />
 	<script type="text/javascript">
 		function removeMarkFile() {
 			var answer = confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.monitor.mark.confirmDeleteFile'/></spring:escapeBody>");
 			if (answer) {	
-				document.getElementById("method").value = "removeMarkFile";
+				document.getElementById("updateMarkForm").action = "removeMarkFile.do?${csrfToken}";
 				document.getElementById("updateMarkForm").submit();
 			}
 		}
@@ -49,17 +38,14 @@
 			return true;
 		}
 	</script>
-	
-</lams:head>
 
-<body class="stripes">
-<c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
-<lams:Page title="${title}" type="monitor">
-		<c:set var="csrfToken"><csrf:token/></c:set>
-		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			
+	<div class="container-main">
+		<h1 class="fs-3 mb-4">
+			${title}
+		</h1>
+		
+		<c:forEach var="fileInfo" items="${report}" varStatus="status">			
 			<form:form action="updateMark.do?${csrfToken}" method="post" modelAttribute="markForm" id="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
-			
 				<form:hidden path="toolSessionID" />
 				<form:hidden path="reportID" />
 				<form:hidden path="detailID"  />
@@ -68,74 +54,83 @@
 				<form:hidden path="markFileUUID" />
 				<form:hidden path="markFileVersionID" />
 				
-				<%@include file="fileinfo.jsp"%>
+				<lams:errors5/>
 				
-				<lams:errors/>
-			
-			<dl class="dl-horizontal">		
-				<dt>
-						<fmt:message key="label.learner.marks" />:
-				</dt>
-				<dd>
-						<input type="text" name="marks" />
-				</dd>
+				<div class="div-hover">
+					<%@include file="fileinfo.jsp"%>
 				
-				</dl>
-				<br/>
-				<dl class="dl-horizontal">
-				<dt>
-						<fmt:message key="label.monitor.mark.updoad" />:
-				</dt>
-				<c:choose>
-					<c:when test="${empty fileInfo.markFileUUID}">
-						<dd>
-							<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.learner.filePath"
-									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-						</dd>
-					</c:when>
-					<c:otherwise>
-						<dd>
-								<c:out value='${fileInfo.markFileName}' escapeXml='true'/>
-
-								<div id="actionButtons" class="pull-right">						
-								<c:set var="viewMarkFileURL">
-									<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
-								</c:set>
-								<a href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" class="btn btn-xs btn-default">
-									<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
-								</a>
-								
-								<c:set var="downloadMarkFileURL">
-									<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
-								</c:set>
-								<a href="${downloadMarkFileURL}" class="btn btn-xs btn-default loffset10">
-									<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>
-								</a>
-								
-								<a href="javascript:removeMarkFile()" class="btn btn-xs btn-danger loffset10">
-									<i class="fa fa-trash" title="<fmt:message key="label.monitoring.file.delete" />"></i>
-								</a>
-								</div>
-								
-								<div class="offset5">
-									<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.monitor.mark.replaceFile"
-									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-								</div>
-						</dd>		
-					</c:otherwise>
-				</c:choose>
-				
-				<div id="commentsWrapper" class="voffset10">		
-					<fmt:message key="label.learner.comments" />
-					<lams:CKEditor id="comments"
-						value="${fileInfo.comments}"
-						toolbarSet="DefaultMonitor"></lams:CKEditor>
+					<div class="row px-2">
+						<div class="col-2 fw-bold">
+							<fmt:message key="label.learner.marks" />:
+						</div>
+						<div class="col">
+							<input type="text" name="marks" class="form-text" value="${fileInfo.marks}"/>
+						</div>
+					</div>
+						
+					<div class="row px-2">
+						<div class="col-2 fw-bold">
+							<fmt:message key="label.monitor.mark.updoad" />:
+						</div>
+						
+						<div class="col">
+							<c:choose>
+								<c:when test="${empty fileInfo.markFileUUID}">
+									<div class="py-1">
+										<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.learner.filePath"
+												uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+									</div>
+								</c:when>
+								<c:otherwise>
+									<c:out value='${fileInfo.markFileName}' escapeXml='true'/>
+		
+									<div id="actionButtons" class="float-end">						
+										<c:set var="viewMarkFileURL">
+											<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=false
+										</c:set>
+										<button type="button" onclick="launchInstructionsPopup('${viewMarkFileURL}')" class="btn btn-sm btn-light">
+											<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
+										</button>
+										
+										<c:set var="downloadMarkFileURL">
+											<lams:WebAppURL />download/?uuid=${fileInfo.markFileDisplayUuid}&versionID=${fileInfo.markFileVersionID}&preferDownload=true
+										</c:set>
+										<a href="${downloadMarkFileURL}" class="btn btn-sm btn-light ms-2">
+											<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>
+										</a>
+										
+										<button type="button" onclick="removeMarkFile()" class="btn btn-sm btn-light ms-2">
+											<i class="fa fa-trash" title="<fmt:message key="label.monitoring.file.delete" />"></i>
+										</button>
+									</div>
+										
+									<div class="py-1">
+										<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.monitor.mark.replaceFile"
+												uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+									</div>	
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+						
+					<div class="row px-2">
+						<div class="col-2 fw-bold">
+							<fmt:message key="label.learner.comments" />
+						</div>
+						<div class="col">
+							<lams:CKEditor id="comments" value="${fileInfo.comments}" toolbarSet="DefaultMonitor"></lams:CKEditor>
+						</div>
+					</div>
+	
+					<lams:WaitingSpinner id="attachmentArea_Busy"/>
 				</div>
 
-				<lams:WaitingSpinner id="attachmentArea_Busy"/>
-
-				<hr width="100%" />
-				<div id="buttons" class="pull-right">	
+				<div class="activity-bottom-buttons">
+					<button type="submit" class="btn btn-primary ms-2">
+						<i class="fa-regular fa-circle-check me-1"></i>
+						<fmt:message key="label.monitoring.saveMarks.button" />
+					</button>
+					
 					<c:if test="${updateMode == 'listMark'}">
 						<c:set var="cancelUrl">
 							<c:url value="/monitoring/listMark.do"/>?userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
@@ -146,17 +141,11 @@
 							<c:url value="/monitoring/listAllMarks.do"/>?&toolSessionID=${toolSessionID}
 						</c:set>
 					</c:if>
-					<a href="${cancelUrl}" class="btn btn-default">
+					<a href="${cancelUrl}" class="btn btn-secondary btn-icon-cancel">
 						<fmt:message key="label.cancel" />
 					</a>
-					<button type="submit" class="btn  btn-primary loffset10">
-						<fmt:message key="label.monitoring.saveMarks.button" />
-					</button>
 				</div>
 			</form:form>
 		</c:forEach>
-
-<div id="footer"></div>
-</lams:Page>
-</body>
-</lams:html>
+	</div>
+</lams:PageMonitor>
