@@ -13,6 +13,11 @@
 	.burning-questions-likes {
 		width: 50px;
 	}
+
+	.discussion-sentiment-chart-cell {
+		min-width: 300px;
+		margin: auto;
+	}
 </style>
 <script>
 	// global variable that stores information which burning question collapse panel was expanded before reload

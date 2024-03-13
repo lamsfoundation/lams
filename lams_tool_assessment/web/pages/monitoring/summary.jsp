@@ -44,6 +44,11 @@
 	#questions-data tbody tr:nth-of-type(even){
 		background-color: white;
 	}
+
+	.discussion-sentiment-chart-cell > canvas {
+		max-width: 400px;
+		margin: auto;
+	}
 </style>
 
 <%@ include file="parts/discloseAnswers.jsp"%>

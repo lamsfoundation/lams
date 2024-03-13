@@ -22,21 +22,21 @@
 		/* Start button is hidden by default */
 		display: none;
 	}
-	
+
 	.discussion-sentiment-table-header-row td {
 		/* Table headers look better this way */
 		font-weight: bold;
 		text-align: left !important;
 	}
-	
+
 	.discussion-sentiment-table-stay-header-row td {
 		background-color: rgba(255, 195, 55, 1);
 	}
-	
+
 	.discussion-sentiment-table-move-header-row td {
 		background-color: rgba(5, 204, 214, 1);
 	}
-	
+
 	.discussion-sentiment-table-option-row td:first-child {
 		/* Option cells are slightly moved to the right */
 		padding-left: 30px;
@@ -64,8 +64,8 @@
 		 var widget = $('#discussion-sentiment-chart-card-content-' + toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : ''))
 		 		.data('stop', true)
 				.closest('.discussion-sentiment-chart-card').addClass('disabled');
-		$('.discussion-sentiment-stop-button', widget).remove();	
-		$('.discussion-sentiment-start-button', widget).show();	
+		$('.discussion-sentiment-stop-button', widget).remove();
+		$('.discussion-sentiment-start-button', widget).show();
 	}
 
 	function getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid) {
@@ -83,7 +83,7 @@
 				}
 
 				// process raw data in response, which is "option" -> "number of votes"
-				var data = response.votes, 
+				var data = response.votes,
 					stayVotes  = 0,
 					moveVotes  = 0,
 					idSuffix = toolQuestionUid + (burningQuestionUid ? '-' + burningQuestionUid : '');
@@ -102,7 +102,7 @@
 					}
 				}
 				$('#discussion-sentiment-table-move-header-votes-' + idSuffix).text(moveVotes);
-				
+
 				var totalVotes = stayVotes + moveVotes;
 				$('#discussion-sentiment-votes-' + idSuffix).text(totalVotes);
 				var stayPercent = totalVotes === 0 ? 0 : Math.round(stayVotes / totalVotes * 100);
@@ -115,7 +115,7 @@
 						// currently options are 1-4 (stay) and 11-14 (move)
 						continue;
 					}
-					
+
 					var votes = data[optionNumber],
 						optionRow = $('#discussion-sentiment-table-option-row-' + idSuffix + '-' + optionNumber);
 					if (votes && totalVotes > 0) {
@@ -147,7 +147,7 @@
 
 				// create a new chart
 				chartCanvas = $('<canvas />').appendTo(chartCell);
-				
+
 				var ctx = chartCanvas[0].getContext('2d'),
 					chart = new Chart(ctx, {
 						type : 'doughnut',
@@ -163,7 +163,7 @@
 								data : chartData,
 								backgroundColor : [ 'rgba(255, 195, 55, 1)',
 													'rgba(5, 204, 214, 1)'
-													
+
 												  ],
 								borderWidth : 0,
 							} ],
@@ -201,7 +201,7 @@
 			}
 		});
 	}
-	
+
 	$(document).ready(function(){
 		var toolQuestionUid = ${param.toolQuestionUid},
 			burningQuestionUid = '${param.burningQuestionUid}',
@@ -209,8 +209,8 @@
 			// how often to refresh the chart
 			dataRefreshInterval = 5 * 1000;
 		getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid);
-		
-	
+
+
 		var dataRefresh = window.setInterval(function(){
 			var cardContent = $('#discussion-sentiment-chart-card-content-' + idSuffix),
 				// If in TBL monitor the tab with the chart got refreshed, then old interval is still ticking.
@@ -222,7 +222,7 @@
 			}
 			getDiscussionSentimentMonitorData(toolQuestionUid, burningQuestionUid);
 		}, dataRefreshInterval);
-	
+
 		$('#discussion-sentiment-chart-card-content-' + idSuffix).data('dataRefresh', dataRefresh);
 	});
 </script>
@@ -249,9 +249,9 @@
 
     <div id="discussion-sentiment-chart-card-content-${idSuffix}" class="card-body container-fluid">
 		<div class="row">
-			<div class="col-xs-12 col-sm-6" id="discussion-sentiment-chart-cell-${idSuffix}">
+			<div class="discussion-sentiment-chart-cell offset-sm-2 col-sm-10 offset-lg-1 col-lg-5 offset-xl-2 col-xl-3" id="discussion-sentiment-chart-cell-${idSuffix}">
 			</div>
-			<div class="col-xs-12 col-sm-6">
+			<div class="col-sm-12 col-lg-6 offset-xl-1 col-xl-6">
 				<table class="table">
 			       	 <tr class="discussion-sentiment-table-header-row discussion-sentiment-table-stay-header-row">
 			       	 	<td>
