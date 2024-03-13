@@ -1897,7 +1897,7 @@ function addActivityIcons(activity) {
                 }
                 $(definePortrait(learner.portraitId, learner.id, STYLE_SMALL, true, LAMS_URL))
                     .css({
-                        'left'        : learnerIndex * (activity.learnerCount < 5 ? 46 : 28)  + 'px',
+                        'left'        : learnerIndex * (activity.learnerCount < 4 ? 46 : 28)  + 'px',
                         'z-index'     : 100 + learnerIndex,
                         'padding-top' : '2px'
                     })

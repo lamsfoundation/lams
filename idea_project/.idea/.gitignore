@@ -16,3 +16,5 @@
 /sqldialects.xml
 /uiDesigner.xml
 /encodings.xml
+# GitHub Copilot persisted chat sessions
+/copilot/chatSessions
