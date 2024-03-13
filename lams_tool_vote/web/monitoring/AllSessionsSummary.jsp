@@ -1,48 +1,52 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
-<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
-
 <div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="false"> 
 
 <c:forEach var="sessionDto" items="${sessionDTOs}" varStatus="status">
 	<c:set var="sessionUid" value="${sessionDto.sessionUid}"/>
 
 	<c:set var="buttonbar">
-		<div class="pull-right">
+		<div class="float-end mb-3">
 			<c:if test="${useSelectLeaderToolOuput and sessionDto.sessionUserCount > 0 and not sessionDto.sessionFinished}">
-				<button type="button" class="btn btn-default btn-xs"
-						onClick="javascript:showChangeLeaderModal(${sessionDto.toolSessionId})">
+				<button type="button" class="btn btn-secondary me-2"
+						onClick="showChangeLeaderModal(${sessionDto.toolSessionId})">
+					<i class="fa-solid fa-user-pen me-1"></i>
 					<fmt:message key='label.monitoring.change.leader'/>
 				</button>
 			</c:if>		
-			&nbsp;
+			
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />
-			<a class="fa fa-pie-chart text-primary btn btn-xs btn-primary" 
-				title="<fmt:message key='label.tip.displayPieChart'/>"
-				onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></a>
-			&nbsp;
-			<a class="fa fa-bar-chart text-primary btn btn-xs btn-primary"
-				title="<fmt:message key='label.tip.displayBarChart'/>" 
-				onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></a>
+			<button type="button" class="fa fa-pie-chart text-primary btn btn-light me-2" 
+					title="<fmt:message key='label.tip.displayPieChart'/>"
+					onclick="drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></button>
+			
+			<button type="button" class="fa fa-bar-chart text-primary btn btn-light me-2"
+					title="<fmt:message key='label.tip.displayBarChart'/>" 
+					onclick="drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></button>
 		</div>
 	</c:set>						
-		
-	<div class="panel panel-default" >
-       <div class="panel-heading " id="heading${sessionUid}">
-  	    	<span class="panel-title  collapsable-icon-left">
-  	    	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionUid}" 
-				aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionUid}" >
-				<c:out value="${sessionDto.sessionName}"/>
-			</a>
-			</span>  
+	
+	<c:choose>
+		<c:when test="${isGroupedActivity}">
+			<div class="lcard" >
+		       <div class="card-header " id="heading${sessionUid}">
+		  	    	<span class="card-title collapsable-icon-left">
+			  	    	<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${sessionUid}" 
+								aria-expanded="${status.first}" aria-controls="collapse${sessionUid}" >
+							<c:out value="${sessionDto.sessionName}"/>
+						</button>
+					</span>  
+					${buttonbar}
+		       </div>
+		       
+		       <div id="collapse${sessionUid}" class="card-collapse collapse ${status.first ? 'show' : ''}">
+		</c:when>
+		<c:otherwise>
 			${buttonbar}
-       </div>
-       
-       <div id="collapse${sessionUid}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionUid}">
+		</c:otherwise>
+	</c:choose>
 
-	<table class="table table-condensed table-striped">							
-
+	<table class="table table-condensed table-striped">
 		<tr>
 			<th><fmt:message key="label.nomination"/></th>
 			<th style="width: 90px;"><fmt:message key="label.total.votes"/></th>
@@ -89,11 +93,11 @@
 
  	<p id="chartDiv${sessionDto.toolSessionId}" style="height: 220px; display: none;"></p>
  
-	</div> <!-- end collapse area  -->
-	</div> <!-- end collapse panel  -->
- 	${ ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+ 	<c:if test="${isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
 	
 </c:forEach>				
 
 </div> <!--  end panel group -->
-

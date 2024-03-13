@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<lams:head>
-		<title> <fmt:message key="label.learnersVoted"/> </title>
+<c:set var="title"><fmt:message key="label.learnersVoted" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<%@ include file="/common/monitorheader.jsp"%>
 
-		<%@ include file="/common/monitorheader.jsp"%>
-
-		<script type="text/javascript">
-	
-			$(document).ready(function(){
-	    
+	<script type="text/javascript">
+		$(document).ready(function(){
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 			    sortInitialOrder: 'desc',
@@ -75,22 +70,26 @@
 				initializePortraitPopover('<lams:LAMSURL />');
 			})
 		});
-  	})
-
-</script>	
-</lams:head>
-<body class="stripes">
-	<c:set var="title"><fmt:message key="label.learnersVoted"/></c:set>
-	<lams:Page type="learner" title="${title}">
+  		})
+	</script>
 		
-		<h4><fmt:message key="label.learnersVoted"/>: ${nominationText}</h4>
+	<div class="container-main">
+		<h1 class="mb-4">
+			${title}: ${nominationText}
+		</h1>
 
-		<lams:TSTable numColumns="2" dataId="data-session-id='${sessionUid}'">
-	       <th><fmt:message key="label.user"/></td>
-	       <th><fmt:message key="label.attemptTime"/></td>
-	     </lams:TSTable>
-		
-	<div id="footer"></div>
-	</lams:Page>
-</body>
-</lams:html>
+		<div class="shadow rounded-5">
+			<lams:TSTable5 numColumns="2" dataId="data-session-id='${sessionUid}'">
+		       <th><fmt:message key="label.user"/></td>
+		       <th><fmt:message key="label.attemptTime"/></td>
+		     </lams:TSTable5>
+	     </div>
+	
+		<div class="activity-bottom-buttons">
+			<button type="button" onclick="window.close()" class="btn btn-primary">
+				<i class="fa-regular fa-circle-xmark me-1"></i>
+				<fmt:message key="label.close" />
+			</button>
+		</div>
+	</div>
+</lams:PageMonitor>

@@ -1,13 +1,18 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
-<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
+<%@ include file="/common/monitorheader.jsp"%>
 
 <script type="text/javascript">
+	MONITORING_STATISTIC_URL = "<c:url value="/monitoring/statistics.do?toolContentID=${toolContentID}"/>";
+	
 	$(window).on('load', function(){
 		<c:forEach var="currentDto" items="${voteGeneralMonitoringDTO.sessionDTOs}">
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${currentDto.sessionId}&toolContentID=${toolContentID}" />
 			drawChart('pie', 'chartDiv${currentDto.sessionId}', '${chartURL}');
 		</c:forEach>
+	});
+	
+	$(document).ready(function(){
+		doStatistic();
 	});
 
 	//pass settings to monitorToolSummaryAdvanced.js
@@ -21,7 +26,6 @@
 		messageRestrictionSet: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.set" /></spring:escapeBody>',
 		messageRestrictionRemoved: '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitor.summary.date.restriction.removed" /></spring:escapeBody>'
 	};
-
 
 	function showChangeLeaderModal(toolSessionId) {
 		$('#change-leader-modals').empty()
@@ -55,33 +59,37 @@
 	}
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
+<c:if test="${useSelectLeaderToolOuput}">
+	<lams:Alert5 type="info" id="use-leader">
+		<fmt:message key="label.info.use.select.leader.outputs" />
+	</lams:Alert5>
+</c:if>
+
+<c:if test="${empty sessionDTOs}">
+	<lams:Alert5 type="info" id="no-session-summary">
+		<fmt:message key="error.noLearnerActivity"/>
+	</lams:Alert5>
+</c:if>
  
-<div class="panel">
-	<h4>
-	    <c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
-	</h4>
-	<div class="instructions voffset5">
-	    <c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
-	</div>
+<h1>
+    <c:out value="${voteGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
+</h1>
 	
-	<c:if test="${useSelectLeaderToolOuput}">
-		<lams:Alert type="info" id="use-leader" close="false">
-			<fmt:message key="label.info.use.select.leader.outputs" />
-		</lams:Alert>
-	</c:if>
-	
-	<c:if test="${empty sessionDTOs}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="error.noLearnerActivity"/>
-		</lams:Alert>
-	</c:if>
-	
- </div>
+<div class="instructions">
+    <c:out value="${voteGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
+</div>
  
 <jsp:include page="/monitoring/AllSessionsSummary.jsp" />
+
+<h2 class="card-subheader fs-4" id="header-statistics">
+	<fmt:message key="label.stats" />
+</h2>
+<%@ include file="Stats.jsp"%>
  
+ <h2 class="card-subheader fs-4" id="header-settings">
+	Settings
+</h2>
 <%@include file="AdvanceOptions.jsp"%>
- 
 <lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
- 
 <div id="change-leader-modals"></div>

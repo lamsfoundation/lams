@@ -1,8 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:Alert id="editWarning" type="warning" close="false">
+<lams:Alert5 id="editWarning" type="warning">
     <fmt:message key="message.monitoring.edit.activity.warning" />
-</lams:Alert>
+</lams:Alert5>
 
 <table class="table table-condensed">
 	<tr>

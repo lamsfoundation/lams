@@ -1,17 +1,11 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<lams:head>
-		<title> <fmt:message key="label.learnersVoted"/> </title>
-
-		<%@ include file="/common/monitorheader.jsp"%>
-
-		<script type="text/javascript">
-	
-			function submitOpenVote(currentUid, actionMethod) {
-
+<c:set var="title"><fmt:message key="label.openVotes" /></c:set>
+<lams:PageMonitor title="${title}" hideHeader="true">
+	<%@ include file="/common/monitorheader.jsp"%>
+	<script type="text/javascript">
+		function submitOpenVote(currentUid, actionMethod) {
 		        var submitUid = currentUid;
 		        $.ajax({
                     type: 'POST',
@@ -22,19 +16,22 @@
 				}).done(function( data ) {
                     location.reload();
 				});
-			}
+		}
 			
-			function buildShowHideLink(currentUid, actionMethod) {
-				var str = '<a href="#" onclick="javascript:submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\');"  class="btn btn-primary btn-xs">';
-				if ( actionMethod == 'hideOpenVote' ) 
-					str += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide"/></spring:escapeBody></a>';
-				else
-					str += '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show"/></spring:escapeBody></a>';
+		function buildShowHideLink(currentUid, actionMethod) {
+				var str = '<button type="button" onclick="submitOpenVote(\''+currentUid+'\', \''+actionMethod+'\')"  class="btn btn-light btn-sm">';
+				if ( actionMethod == 'hideOpenVote' ) {
+					str += 	'<i class="fa-regular fa-eye-slash me-1"></i>' +
+							'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hide"/></spring:escapeBody>';
+				} else {
+					str += '<i class="fa-regular fa-eye me-1"></i>' +
+							'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.show"/></spring:escapeBody>';
+				}
+				str += '</button>';
 				return str;
-			}
+		}
 
-			$(document).ready(function(){
-	    
+		$(document).ready(function(){
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 			    sortInitialOrder: 'desc',
@@ -60,11 +57,11 @@
 	            cssPageSize: '.pagesize',
 	            cssDisabled: 'disabled',
 	            <c:choose>
-				<c:when test="${not empty param.sessionUid}">
-				ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
-				</c:when><c:otherwise>
-				ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolContentUID=${param.toolContentUID}",
-				</c:otherwise>
+					<c:when test="${not empty param.sessionUid}">
+						ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
+					</c:when><c:otherwise>
+						ajaxUrl : "<lams:WebAppURL/>monitoring/getOpenTextNominationsJSON.do?page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolContentUID=${param.toolContentUID}",
+					</c:otherwise>
 				</c:choose>
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
@@ -74,34 +71,36 @@
 						for (i = 0; i < data.rows.length; i++){
 							var userData = data.rows[i];
 
-							rows += '<tr>';
-							rows += '<td>';
-							rows += userData["userEntry"]; 
+							rows += '<tr>' +
+										'<td>' +
+											userData["userEntry"];	
+																			 
 							if ( userData["visible"] == false )
-								rows += ' <span class="label label-danger pull-right"><spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hidden"/></spring:escapeBody></spam>';							
-							rows += '</td>';
+								rows += 	'<span class="badge text-bg-warning float-end">' + 
+												'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.hidden"/></spring:escapeBody>' + 
+											'</span>';
+							rows += 	'</td>' +
+							
+										'<td>' +
+											definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"], userData["userName"]) +
+										'</td>' +
 
-							rows += '<td>';
-							rows += definePortraitPopover(userData["portraitId"], userData["userId"], userData["userName"], userData["userName"]);
-							rows += '</td>';
+										'<td>' +
+											'<time class="timeago" title="' +
+													userData["attemptTime"] +
+													'" datetime="' +
+													userData["attemptTimeTimeago"] +
+											'"></time>' +
+										'</td>' +
 
-							rows += '<td>';
-							rows += '<time class="timeago" title="';
-							rows += userData["attemptTime"];
-							rows += '" datetime="';
-							rows += userData["attemptTimeTimeago"];
-							rows += '"></time>';
-							rows += '</td>';
-
-							rows += '<td><span id="link'+userData["userEntryUid"]+'">';
+										'<td><span id="link'+userData["userEntryUid"]+'">';
 							if ( userData["visible"] ) {
-								rows += buildShowHideLink(userData["userEntryUid"], 'hideOpenVote')
+								rows +=		buildShowHideLink(userData["userEntryUid"], 'hideOpenVote');
 							} else {
-								rows += buildShowHideLink(userData["userEntryUid"], 'showOpenVote')
+								rows += 	buildShowHideLink(userData["userEntryUid"], 'showOpenVote');
 							}
-							rows += '</span></td>';
-
-							rows += '</tr>';
+							rows += 	'</span></td>' +
+									'</tr>';
 						}
 			            
 						json.total = data.total_rows;
@@ -116,31 +115,36 @@
 				initializePortraitPopover('<lams:LAMSURL />');
 			})
 		});
-  	})
-</script>	
-	</lams:head>
-<body class="stripes">
+  		})
+	</script>
 
-	<c:set var="title"><fmt:message key="label.openVotes"/></c:set>
-	<lams:Page type="learner" title="${title}">
-		
+	<div class="container-main">
+		<h1 class="mb-4">
+			${title}: ${nominationText}
+		</h1>
+				
 		<c:choose>
-		<c:when test="${not empty param.sessionUid}">
-			<c:set var="dsi">data-session-id='${param.sessionUid}'</c:set>
-		</c:when><c:otherwise>
-			<c:set var="dsi">data-session-id='${param.toolContentUID}'</c:set>
-		</c:otherwise>
+			<c:when test="${not empty param.sessionUid}">
+				<c:set var="dsi">data-session-id='${param.sessionUid}'</c:set>
+			</c:when><c:otherwise>
+				<c:set var="dsi">data-session-id='${param.toolContentUID}'</c:set>
+			</c:otherwise>
 		</c:choose>
 	
-		<lams:TSTable numColumns="4" dataId="${dsi}">
-			<th><fmt:message key="label.vote"/></th>
-			<th> <fmt:message key="label.user"/></th>
-			<th> <fmt:message key="label.attemptTime"/></th>
-			<th style="width: 70px;"> <fmt:message key="label.visible"/></th>								  						 
-	     </lams:TSTable>
-		
-	<div id="footer"></div>
-	</lams:Page>
-
-</body>
-</lams:html>
+		<div class="shadow rounded-5">
+			<lams:TSTable5 numColumns="4" dataId="${dsi}">
+				<th><fmt:message key="label.vote"/></th>
+				<th> <fmt:message key="label.user"/></th>
+				<th> <fmt:message key="label.attemptTime"/></th>
+				<th style="width: 70px;"> <fmt:message key="label.visible"/></th>								  						 
+		     </lams:TSTable5>
+	     </div>
+	
+		<div class="activity-bottom-buttons">
+			<button type="button" onclick="window.close()" class="btn btn-primary">
+				<i class="fa-regular fa-circle-xmark me-1"></i>
+				<fmt:message key="label.close" />
+			</button>
+		</div>
+	</div>
+</lams:PageMonitor>

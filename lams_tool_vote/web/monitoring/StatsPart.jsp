@@ -1,30 +1,19 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${empty voteStatsDTO}">
-	<lams:Alert type="info" id="no-session-summary" close="false">
+	<lams:Alert5 type="info" id="no-session-summary" close="false">
 		<fmt:message key="error.noLearnerActivity"/>
-	</lams:Alert>
+	</lams:Alert5>
 </c:if>
  
+ <div class="lcard p-2" >
 <c:forEach var="stats" items="${voteStatsDTO}">
-
-	<c:if test="${isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading">
-			<span class="panel-title">
+			<h5>
 				${stats.sessionName}
-			</span>
-        </div>
+			</h5>
 
-        <div class="panel-body">
-	</c:if>
-
-	<p><fmt:message key="label.total.completed.students"/>&nbsp;${stats.countUsersComplete}</p>
+	<div><fmt:message key="label.total.completed.students"/>&nbsp;${stats.countUsersComplete}</div>
 	<p><fmt:message key="label.total.students"/>&nbsp;${stats.countAllUsers}</p>
-
-	<c:if test="${isGroupedActivity}">	
-		</div>
-		</div>
-	</c:if>	
 </c:forEach>
+</div>
 
