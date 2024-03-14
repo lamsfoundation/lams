@@ -200,7 +200,7 @@
 						 <lams:user property="lastName" />
 					</c:set>
 					<span class="xs-hidden">
-						<c:out value="${lastName}" escapeXml="true"/>&nbsp;<c:out value="${firstName}" escapeXml="true"/>
+						<c:out value="${lastName}" escapeXml="true"/>,&nbsp;<c:out value="${firstName}" escapeXml="true"/>
 					</span>
 					<span class=" fa fa-angle-down"></span>
 				</a>
