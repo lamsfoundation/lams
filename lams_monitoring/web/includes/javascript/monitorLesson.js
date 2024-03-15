@@ -444,7 +444,8 @@ function initCommonElements(){
                     labelColour = 'danger';
                     break;
             }
-            $('#lessonStateLabel').attr('class', 'btn btn-sm btn-' + labelColour).html(label + ' <i class="fa-solid fa-angles-down"></i>');
+            $('#lessonStateLabel').attr('class', 'btn btn-sm btn-' + labelColour)
+                .html(label + (lessonStateId == 7 ? '' : '<i class="fa-solid fa-angles-down"></i>'));
 
             // update available options in change state dropdown menu
             var selectField = $('#lessonStateField');
@@ -766,7 +767,8 @@ function changeLessonState(){
         case 7:
             showConfirm(LABELS.LESSON_REMOVE_ALERT, function() {
                 showConfirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT, function() {
-                    method = "removeLesson";
+                    // this is a callback, so standard processing won't work here
+                    applyStateChange(state, "removeLesson");
                 });
             });
             break;
