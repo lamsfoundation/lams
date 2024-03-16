@@ -564,36 +564,38 @@ public class ScratchieServiceImpl
     public void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
 	    String oldPresetMarks) {
 	// create list of modified questions
-	List<ScratchieItem> modifiedItems = new ArrayList<>();
+
+	Map<ScratchieItem, ScratchieItem> modifiedItems = new LinkedHashMap<>();
 	for (ScratchieItem oldItem : oldItems) {
 	    for (ScratchieItem newItem : newItems) {
 		if (oldItem.getDisplayOrder() == newItem.getDisplayOrder()) {
+		    boolean isItemModified = !oldItem.getQbQuestion().getUid().equals(newItem.getQbQuestion().getUid());
+		    if (!isItemModified) {
+			// title or question is different - do nothing
 
-		    // title or question is different - do nothing
+			// options are different
+			List<QbOption> oldOptions = oldItem.getQbQuestion().getQbOptions();
+			List<QbOption> newOptions = newItem.getQbQuestion().getQbOptions();
 
-		    // options are different
-		    List<QbOption> oldOptions = oldItem.getQbQuestion().getQbOptions();
-		    List<QbOption> newOptions = newItem.getQbQuestion().getQbOptions();
-		    boolean isItemModified = oldOptions.size() != newOptions.size();
+			for (QbOption oldOption : oldOptions) {
+			    if (isItemModified) {
+				break;
+			    }
 
-		    for (QbOption oldOption : oldOptions) {
-			if (isItemModified) {
-			    break;
-			}
+			    for (QbOption newOption : newOptions) {
+				if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
-			for (QbOption newOption : newOptions) {
-			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
-
-				if (oldOption.isCorrect() != newOption.isCorrect()) {
-				    isItemModified = true;
-				    break;
+				    if (oldOption.isCorrect() != newOption.isCorrect()) {
+					isItemModified = true;
+					break;
+				    }
 				}
 			    }
 			}
 		    }
 
 		    if (isItemModified) {
-			modifiedItems.add(newItem);
+			modifiedItems.put(oldItem, newItem);
 		    }
 		}
 	    }
@@ -602,30 +604,59 @@ public class ScratchieServiceImpl
 	List<ScratchieSession> sessionList = scratchieSessionDao.getByContentId(scratchie.getContentId());
 	for (ScratchieSession session : sessionList) {
 	    Long toolSessionId = session.getSessionId();
-	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new ArrayList<>();
 	    String newPresetMarks = scratchie.getPresetMarks();
 	    boolean isRecalculateMarks = oldPresetMarks == null
 		    ? newPresetMarks != null
 		    : newPresetMarks == null || !oldPresetMarks.equals(newPresetMarks);
 
-	    // remove all scratches for modified items
+	    List<ScratchieAnswerVisitLog> visitLogsToDelete = new LinkedList<>();
 
 	    // [+] if the question is modified
-	    for (ScratchieItem modifiedItem : modifiedItems) {
-		List<ScratchieAnswerVisitLog> visitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(toolSessionId,
-			modifiedItem.getUid());
-		visitLogsToDelete.addAll(visitLogs);
+	    for (Map.Entry<ScratchieItem, ScratchieItem> modifiedItem : modifiedItems.entrySet()) {
+		ScratchieItem oldItem = modifiedItem.getKey();
+		ScratchieItem newItem = modifiedItem.getValue();
+		List<ScratchieAnswerVisitLog> oldVisitLogs = scratchieAnswerVisitDao.getLogsBySessionAndItem(
+			toolSessionId, oldItem.getUid());
+		if (oldVisitLogs.isEmpty()) {
+		    continue;
+		}
+		isRecalculateMarks = true;
+		boolean correctAnswerFound = false;
+		for (ScratchieAnswerVisitLog visitLog : oldVisitLogs) {
+		    if (correctAnswerFound) {
+			visitLogsToDelete.add(visitLog);
+			continue;
+		    }
+		    visitLog.setQbToolQuestion(newItem);
+
+		    int oldOptionDisplayOrder = 1;
+		    for (QbOption oldOption : oldItem.getQbQuestion().getQbOptions()) {
+			if (oldOption.getUid().equals(visitLog.getQbOption().getUid())) {
+			    int newOptionDisplayOrder = 1;
+			    for (QbOption newOption : newItem.getQbQuestion().getQbOptions()) {
+				if (oldOptionDisplayOrder == newOptionDisplayOrder) {
+				    visitLog.setQbOption(newOption);
+				    scratchieAnswerVisitDao.saveObject(visitLog);
+				    if (newOption.isCorrect()) {
+					correctAnswerFound = true;
+				    }
+				    break;
+				}
+				newOptionDisplayOrder++;
+			    }
+			    break;
+			}
+			oldOptionDisplayOrder++;
+		    }
+		}
 	    }
 
 	    // remove all visit logs marked for deletion
 	    Iterator<ScratchieAnswerVisitLog> iter = visitLogsToDelete.iterator();
 	    while (iter.hasNext()) {
 		ScratchieAnswerVisitLog visitLogToDelete = iter.next();
-		iter.remove();
 		scratchieAnswerVisitDao.removeObject(ScratchieAnswerVisitLog.class, visitLogToDelete.getUid());
-		isRecalculateMarks = true;
 	    }
-
 	    // [+] doing nothing if the new question was added
 
 	    // recalculate marks if it's required

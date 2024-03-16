@@ -51,7 +51,8 @@
 	        $("#display-summary").removeAttr("disabled", "disabled");
 	        $("#questionsPerPage").prop('disabled', false);
 
-			$('#syncRatQuestions').val(hasMatchingRatActivity && questionsEdited &&
+			let isAuthoringRestricted = ${not empty sessionMap.isAuthoringRestricted and sessionMap.isAuthoringRestricted};
+			$('#syncRatQuestions').val(!isAuthoringRestricted && hasMatchingRatActivity && questionsEdited &&
 					confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.authoring.rat.questions.sync'/></spring:escapeBody>"));
 
         	return true;
