@@ -868,7 +868,7 @@ public class AssessmentServiceImpl
 		    .append(" \"").append(assessmentResult.getUser().getLoginName()).append("\" for question ")
 		    .append(questionDto.getUid()).append(" for question result ").append(questionResult.getUid())
 		    .append(" answer was \"").append(questionResult.getAnswer())
-		    .append("\" and it is now blank, skipping save.");
+		    .append("\" and it is now blank, skipping save to DB.");
 	    log.warn(autosaveLogBuilder);
 	    if (logAutosave.isTraceEnabled()) {
 		logAutosave.trace(autosaveLogBuilder);
@@ -2612,44 +2612,47 @@ public class AssessmentServiceImpl
 	    for (AssessmentQuestion newQuestion : newQuestions) {
 		if (oldQuestion.getDisplayOrder() == newQuestion.getDisplayOrder()) {
 
-		    boolean isQuestionModified = false;
+		    boolean isQuestionModified = !oldQuestion.getQbQuestion().getUid()
+			    .equals(newQuestion.getQbQuestion().getUid());
+		    if (!isQuestionModified) {
 
-		    // title or question is different - do nothing. Also question grade can't be changed
+			// title or question is different - do nothing. Also question grade can't be changed
 
-		    //QbQuestion.TYPE_TRUE_FALSE
-		    if (oldQuestion.getQbQuestion().getCorrectAnswer() != newQuestion.getQbQuestion()
-			    .getCorrectAnswer()) {
-			isQuestionModified = true;
-		    }
+			//QbQuestion.TYPE_TRUE_FALSE
+			if (oldQuestion.getQbQuestion().getCorrectAnswer() != newQuestion.getQbQuestion()
+				.getCorrectAnswer()) {
+			    isQuestionModified = true;
+			}
 
-		    // options are different
-		    List<QbOption> oldOptions = oldQuestion.getQbQuestion().getQbOptions();
-		    List<QbOption> newOptions = newQuestion.getQbQuestion().getQbOptions();
-		    for (QbOption oldOption : oldOptions) {
-			for (QbOption newOption : newOptions) {
-			    if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
+			// options are different
+			List<QbOption> oldOptions = oldQuestion.getQbQuestion().getQbOptions();
+			List<QbOption> newOptions = newQuestion.getQbQuestion().getQbOptions();
+			for (QbOption oldOption : oldOptions) {
+			    for (QbOption newOption : newOptions) {
+				if (oldOption.getDisplayOrder() == newOption.getDisplayOrder()) {
 
-				//short answer
-				if (((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
-					&& !StringUtils.equals(oldOption.getName(), newOption.getName()))
-					//numbering
-					|| (oldOption.getNumericalOption() != newOption.getNumericalOption()) || (
-					oldOption.getAcceptedError() != newOption.getAcceptedError())
-					//option grade
-					|| (oldOption.getMaxMark() != newOption.getMaxMark())
-					//changed correct option
-					|| (oldOption.isCorrect() != newOption.isCorrect())) {
-				    isQuestionModified = true;
-				    break;
+				    //short answer
+				    if (((oldQuestion.getType() == QbQuestion.TYPE_VERY_SHORT_ANSWERS)
+					    && !StringUtils.equals(oldOption.getName(), newOption.getName()))
+					    //numbering
+					    || (oldOption.getNumericalOption() != newOption.getNumericalOption()) || (
+					    oldOption.getAcceptedError() != newOption.getAcceptedError())
+					    //option grade
+					    || (oldOption.getMaxMark() != newOption.getMaxMark())
+					    //changed correct option
+					    || (oldOption.isCorrect() != newOption.isCorrect())) {
+					isQuestionModified = true;
+					break;
+				    }
 				}
 			    }
+			    if (isQuestionModified) {
+				break;
+			    }
 			}
-			if (isQuestionModified) {
-			    break;
+			if (oldOptions.size() != newOptions.size()) {
+			    isQuestionModified = true;
 			}
-		    }
-		    if (oldOptions.size() != newOptions.size()) {
-			isQuestionModified = true;
 		    }
 
 		    if (isQuestionModified) {

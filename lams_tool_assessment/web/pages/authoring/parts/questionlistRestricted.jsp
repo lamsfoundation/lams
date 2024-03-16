@@ -32,13 +32,7 @@
 							<c:out value="${question.qbQuestion.name}" escapeXml="true"/>
 						</c:otherwise>
 					</c:choose>
-					
-					<c:if test="${!questionReference.randomQuestion}">
-				        <span class='pull-right alert-info btn-xs loffset5 roffset5'>
-				       		v.&nbsp;${question.qbQuestion.version}
-				        </span>
-			        </c:if>
-			        
+
 			       	<span class='pull-right alert-info btn-xs'>
 						<c:choose>
 							<c:when test="${questionReference.randomQuestion}">
@@ -71,23 +65,64 @@
 						</c:choose>
 	       			</span>
 				</td>
-				
+
+				<td width="30px">
+			        <c:if test="${!questionReference.randomQuestion}">
+				        <c:set var="maxOtherVersion" />
+					    <c:choose>
+							<c:when test="${fn:length(question.qbQuestion.versionMap) == 1}">
+								<button class="btn btn-default btn-xs dropdown-toggle2 question-version-dropdown" disabled="disabled">
+								   <fmt:message key="label.authoring.basic.question.version" />&nbsp;${question.qbQuestion.version}
+								</button>
+							</c:when>
+
+							<c:otherwise>
+								<div class="dropdown question-version-dropdown">
+									<button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								    	<fmt:message key="label.authoring.basic.question.version" />&nbsp;${question.qbQuestion.version}&nbsp;<span class="caret"></span>
+									</button>
+
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+										<c:forEach items="${question.qbQuestion.versionMap}" var="otherVersion">
+											 <c:set var="maxOtherVersion" value="${otherVersion}" />
+
+								    		<li <c:if test="${question.qbQuestion.version == otherVersion.key}">class="disabled"</c:if>>
+								    			<a href="#nogo"
+								    			   data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.change.tooltip" />"
+								    			   onclick="javascript:changeItemQuestionVersion(${status.index}, ${question.qbQuestion.uid}, ${otherVersion.value})">
+								    				  <fmt:message key="label.authoring.basic.question.version" />&nbsp;${otherVersion.key}
+								    			</a>
+								    			<a href="#nogo" class="pull-right"
+								    			   data-toggle="tooltip" data-placement="top" title="<fmt:message key="label.authoring.basic.question.version.stats.tooltip" />"
+								    			   onClick='javascript:window.open("<lams:LAMSURL/>qb/stats/show.do?qbQuestionUid=${otherVersion.value}", "_blank")'>
+									    			  <i class='fa fa-bar-chart'></i>
+												</a>
+								    		</li>
+								    	</c:forEach>
+									</ul>
+
+								</div>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+				</td>
+
 				<td width="70px">
 					<input name="maxMark" value="${questionReference.maxMark}" class="form-control input-sm max-mark-input">
 				</td>
-				
+
 				<td width="30px">
-					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}" 
-								title="<fmt:message key="label.answer.required"/>" 
+					<i class="fa fa-xs fa-asterisk ${question.answerRequired ? 'text-danger' : ''}"
+								title="<fmt:message key="label.answer.required"/>"
 								alt="<fmt:message key="label.answer.required"/>"
 								onClick="javascript:toggleQuestionRequired(this)"></i>
 				</td>
 
 				<td width="30px" style="padding-right: 20px;">
 					<c:if test="${!questionReference.randomQuestion}">
-						<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;"> 
+						<a class="thickbox roffset5x edit-reference-link" onclick="javascript:editReference(this);" style="color: black;">
 							<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
-						</a>			
+						</a>
 					</c:if>
 				</td>
 			</tr>

@@ -785,7 +785,13 @@ public class AuthoringController {
 	qbService.fillVersionMap(newQbQuestion);
 	question.setQbQuestion(newQbQuestion);
 
-	return "pages/authoring/parts/questionlist";
+	//in case of edit in monitor and at least one attempted user, we show authoring page with restricted options
+	boolean isAuthoringRestricted = (boolean) sessionMap.get(AssessmentConstants.ATTR_IS_AUTHORING_RESTRICTED);
+	if (isAuthoringRestricted) {
+	    return "pages/authoring/parts/questionlistRestricted";
+	} else {
+	    return "pages/authoring/parts/questionlist";
+	}
     }
 
     @RequestMapping("/getAllQbQuestionUids")

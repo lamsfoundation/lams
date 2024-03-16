@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.scratchie.ScratchieConstants"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:if test="${mode == null}"><c:set var="mode" value="${sessionMap.mode}" /></c:if>
+<c:set var="isAuthoringRestricted" value="${mode == 'teacher'}" />
 
 <lams:html>
 <lams:head>
@@ -37,11 +38,11 @@
 		.question-version-dropdown {
 			margin-top: -3px;
 		}
-		
+
 		.question-version-dropdown .dropdown-menu {
 			min-width: 160px;
 		}
-		
+
 		.question-version-dropdown li a {
 			display: inline-block;
 		}
@@ -49,7 +50,7 @@
 			text-decoration: underline;
 		}
 	</style>
-	
+
 	<script>
 		const hasMatchingRatActivity = ${not empty sessionMap.hasMatchingRatActivity and sessionMap.hasMatchingRatActivity};
 		let questionsEdited = false;
@@ -61,16 +62,16 @@
 		   	} else {
 	       	    selectTab(1); //select the default tab;
 		    }
-        }     
-        
+        }
+
         function doSelectTab(tabId) {
         	// start optional tab controller stuff
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
 	    	// end optional tab controller stuff
-	    	selectTab(tabId);	    	
+	    	selectTab(tabId);
         }
-        
+
         // avoid name clash between bootstrap and jQuery UI
         $.fn.bootstrapTooltip = $.fn.tooltip.noConflict();
 
@@ -80,7 +81,8 @@
 				$('#relativeTimeLimit').val(0);
 			}
 
-			$('#syncRatQuestions').val(hasMatchingRatActivity && questionsEdited &&
+			let isAuthoringRestricted = ${isAuthoringRestricted};
+			$('#syncRatQuestions').val(!isAuthoringRestricted && hasMatchingRatActivity && questionsEdited &&
 					confirm("<spring:escapeBody javaScriptEscape='true'><fmt:message key='message.authoring.rat.questions.sync'/></spring:escapeBody>"));
 
 			return true;
