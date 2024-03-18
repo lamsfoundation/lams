@@ -63,7 +63,7 @@
 				</br>
 				<div><c:out value="${questionDto.description}" escapeXml="false"/></div>
 			</div>
-			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
+			<lams:TSTable5 numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${questionDto.uid}'">
 				<th title="<fmt:message key='label.sort.by.answer'/>">
 					<fmt:message key="label.learning.answer"/>
@@ -80,7 +80,7 @@
 						<fmt:message key="label.comment" />
 					</th>
 				</c:if>
-			</lams:TSTable>
+			</lams:TSTable5>
 		</div>
 	</c:forEach>
 	

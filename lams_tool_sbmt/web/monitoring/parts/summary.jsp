@@ -249,11 +249,11 @@
 			</c:when>
 		</c:choose>
 		
-		<lams:TSTable numColumns="3" dataId="data-session-id='${sessionDto.sessionID}'">
+		<lams:TSTable5 numColumns="3" dataId="data-session-id='${sessionDto.sessionID}'">
 			<th><fmt:message key="monitoring.user.fullname"/></th>
 			<th width="15%" class="text-center"><fmt:message key="monitoring.user.submittedFiles"/></th>
 			<th width="15%" class="text-center"><fmt:message key="monitoring.marked.question"/></th>
-		</lams:TSTable>
+		</lams:TSTable5>
 		
 		<div class="clearfix" style="border-top: 0.1rem solid #f2f2f2;">
 			<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>

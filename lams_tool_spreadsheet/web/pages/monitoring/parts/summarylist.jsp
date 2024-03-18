@@ -132,7 +132,7 @@
 		
 			<c:set var="numColumns" value="1"/>
 			<c:if test="${spreadsheet.markingEnabled}"><c:set var="numColumns" value="${numColumns+1}"/></c:if>
-			<lams:TSTable numColumns="${numColumns}" dataId='data-session-id="${summary.sessionId}"' test="fred"> 
+			<lams:TSTable5 numColumns="${numColumns}" dataId='data-session-id="${summary.sessionId}"' test="fred"> 
 				<th align="left">
 					<fmt:message key="label.monitoring.summary.learner" />
 				</th>
@@ -141,7 +141,7 @@
 						<fmt:message key="label.monitoring.summary.marked" />
 					</th>
 				</c:if>
-			</lams:TSTable>
+			</lams:TSTable5>
 			
 			<c:if test="${spreadsheet.markingEnabled}">	
 				<p>

@@ -161,7 +161,7 @@
 			<c:set var="numColumns" value="${numColumns+1}"/>
 		</c:if>
 
-		<lams:TSTable numColumns="${numColumns}" dataId='data-session-id="${toolSessionID}"'> 
+		<lams:TSTable5 numColumns="${numColumns}" dataId='data-session-id="${toolSessionID}"'> 
 			<th align="left" ${nameWidth}>
 				<fmt:message key="label.learner"/>
 			</th>
@@ -175,7 +175,7 @@
 				<fmt:message key="label.open.response"/>
 			</th>
 			</c:if>
-		</lams:TSTable>
+		</lams:TSTable5>
 
 		<a href="javascript:window.close();" class="btn btn-default btn-sm">
 		<fmt:message key="button.close"/>

@@ -192,12 +192,12 @@
         <div id="collapse${sessionDto.sessionID}" class="card-body p-2 collapse ${status.first ? 'show' : ''}">
 	</c:if>
 		
-	<lams:TSTable numColumns="4" dataId="data-session-id='${sessionDto.sessionID}'">
+	<lams:TSTable5 numColumns="4" dataId="data-session-id='${sessionDto.sessionID}'">
 		<th><fmt:message key="monitoring.user.fullname"/></th>
 		<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
 		<th width="25%" align="center"><fmt:message key="label.latest.posting.date"/></th>
 		<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
-	</lams:TSTable>
+	</lams:TSTable5>
 
 	<div class="clearfix">
 		<div class="float-end"> 

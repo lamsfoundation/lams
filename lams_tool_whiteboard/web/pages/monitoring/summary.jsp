@@ -665,12 +665,12 @@
 				<h4>
 					<fmt:message key="label.monitoring.learner.marks.header"/>
 				</h4>
-				<lams:TSTable numColumns="2" dataId='toolSessionId="${groupSummary.sessionId}"'>
+				<lams:TSTable5 numColumns="2" dataId='toolSessionId="${groupSummary.sessionId}"'>
 					<th><fmt:message key="label.monitoring.learner.marks.name"/></th>
 					<th><fmt:message key="label.monitoring.learner.marks.mark"/>&nbsp;
 						<small><fmt:message key="label.monitoring.learner.marks.mark.tip"/></small>
 					</th>
-				</lams:TSTable>
+				</lams:TSTable5>
 			</div>
 
 			<c:if test="${sessionMap.isGroupedActivity}">
