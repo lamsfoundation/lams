@@ -1,4 +1,3 @@
-   
    // Finds a corresponding image and shows it
    function showBusy(targetDiv){
 		if($(targetDiv+"_Busy") != null){
@@ -20,13 +19,13 @@
 	    elem.name=name;
 	    arr[arr.length]=elem;
 	}
+	
 	function checkCheckbox(checkboxName){
 		var checkbox = document.getElementById(checkboxName);
 		checkbox.checked=true;
 	}
 	
 	function resizeHorizontalRecordListFrame(elementIdPrefix,questionListLength){
-
 		var horizontalRecordListFrame = document.getElementById(elementIdPrefix+'horizontalRecordListFrame');
 	    var doc = horizontalRecordListFrame.contentDocument? horizontalRecordListFrame.contentDocument : horizontalRecordListFrame.contentWindow.document;
         var body = doc.body;
@@ -35,4 +34,3 @@
             html.clientHeight, html.scrollHeight, html.offsetHeight );
         horizontalRecordListFrame.style.height = height + 60 + "px";
 	}
-		

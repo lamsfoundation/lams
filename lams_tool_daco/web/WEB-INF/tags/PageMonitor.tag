@@ -56,8 +56,8 @@
 	        <script src="${lams}/monitoring/includes/javascript/monitor-activity.js" type="text/javascript"></script>
 	        <script>
 				const INITIAL_TAB_ID = "${initialTabId}",
-					TOOL_CONTENT_ID = <c:out value="${param.toolContentID}" />,
-					MONITORING_STATISTIC_URL = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
+					TOOL_CONTENT_ID = <c:out value="${param.toolContentID}" />;
+				var	MONITORING_STATISTIC_URL = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
 	        </script>
         </c:if>
     </lams:head>

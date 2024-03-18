@@ -1,12 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<div class="voffset10">
 <c:choose>
 	<c:when test="${empty sessionSummaries}">
-		<lams:Alert type="info" id="no-session-stats" close="false">
+		<lams:Alert5 type="info" id="no-session-stats">
 			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
+		</lams:Alert5>
 	</c:when>
 
 	<c:otherwise>
@@ -40,5 +39,3 @@
 	</table>
 	</c:otherwise>
 </c:choose>
-</div>
-

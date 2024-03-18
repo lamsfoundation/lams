@@ -28,19 +28,6 @@
 		<c:set var="learningCurrentTab" value="1" />
 	</c:otherwise>
 </c:choose>
-<%-- To switch between the vertical/horizontal view --%>
-<c:set var="ellipsisControl">
-<c:choose>
-	<c:when test="${sessionMap.learningView=='horizontal'}">
-		<i class="fa-solid fa-ellipsis ms-2" title="<fmt:message key="label.common.view.change" />"
-	 		onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
-	</c:when>
-	<c:otherwise>
-		<i class="fa-solid fa-ellipsis-vertical ms-2" title="<fmt:message key="label.common.view.change" />"
-	 		onclick="javascript:changeView('${sessionMapID}',${displayedRecordNumber})" id="ellipsis"></i>
-	</c:otherwise>
-</c:choose>
-</c:set> 
 <%-- push mode into request so it is available in the tab pages --%>
 <c:set var="mode" scope="request">${mode}</c:set>
 

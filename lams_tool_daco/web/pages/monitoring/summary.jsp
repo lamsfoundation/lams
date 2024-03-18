@@ -2,19 +2,21 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="monitoringSummary" value="${sessionMap.monitoringSummary}" />
 <c:set var="anyRecordsAvailable" value="false" />	
-<c:set var="daco" value="${sessionMap.daco}"/>
-<c:set var="lams"><lams:LAMSURL/></c:set>
-				
+<c:set var="daco" value="${sessionMap.daco}" scope="request"/>
+
+<%@ include file="/common/jqueryheader.jsp" %>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
-
 <script type="text/javascript">
+	MONITORING_STATISTIC_URL = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>" + "&reqID=" + (new Date()).getTime();;
+
 	function exportSummary(){
 		location.href = "<c:url value='/monitoring/exportToSpreadsheet.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
 	};
 	
   	$(document).ready(function(){
-	    
+  		doStatistic();
+  		
 		$(".tablesorter").tablesorter({
 			theme: 'bootstrap',
 			headerTemplate : '{content} {icon}',
@@ -50,28 +52,30 @@
 								userId = userData["userId"],
 								fullName = userData["userFullName"];;
 							
-							rows += '<tr>';
+							rows += '<tr>' +
+										'<td>' + definePortraitPopover(userData["portraitId"], userId, fullName, fullName) + '</td>' +
 							
-							rows += '<td>'+ definePortraitPopover(userData["portraitId"], userId, fullName, fullName) +'</td>';
-							
-							rows += '<td align="center">';
-							rows += userData["recordCount"];
-							rows += '</td>';
-							rows += '<td align="center">';
+										'<td align="center">' +
+											userData["recordCount"] +
+										'</td>' +
+										
+										'<td align="center">';
 							if ( userData["recordCount"] > 0) {
 								var url = '<c:url value="/monitoring/listRecords.do"/>?sessionMapID=${sessionMapID}&toolSessionID='+$(table).attr('data-session-id')+'&sort=1&userId='+userData["userId"];
 								var popUpTitle = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="title.monitoring.recordlist" /></spring:escapeBody>';
-								rows +=	'&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
-								rows += 'View Records'
+								rows +=		'<button type="button" onclick="launchPopup(\''+url+'\',\''+popUpTitle+'\')" class="btn btn-light btn-sm ms-2">' +
+												'<i class="fa-solid fa-eye me-1"></i>' +
+												'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.view.records" /></spring:escapeBody>' +
+											'</button>'; 
 								url = '<c:url value="/monitoring/getQuestionSummaries.do"/>?sessionMapID=${sessionMapID}&toolSessionID='+$(table).attr('data-session-id')+'&userId='+userData["userId"];
 								popUpTitle = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.common.summary" /></spring:escapeBody>';
-								rows += '</a>&nbsp;&nbsp;<a href="#" onclick="javascript:launchPopup(\''+url+'\',\''+popUpTitle+'\');" class="btn btn-default btn-xs">';
-								rows += 'View Summary'
-								rows += '</a>';
+								rows += 	'<button type="button" onclick="launchPopup(\''+url+'\',\''+popUpTitle+'\')" class="btn btn-light btn-sm ms-2">' +
+												'<i class="fa-solid fa-eye me-1"></i>' +
+												'<spring:escapeBody javaScriptEscape="true"><fmt:message key="label.view.summary" /></spring:escapeBody>' +
+											'</button>';
 							} 
-							rows += '</td>';
-							
-							rows += '</tr>';
+							rows += 	'</td>' +
+									'</tr>';
 						}
 			            
 						json.total = data.total_rows;
@@ -86,36 +90,21 @@
 	  	})
 </script>
 
-<div class="panel">
-<div class="pull-right">
-	<c:if test="${not sessionMap.isGroupedActivity }">
-		<c:forEach var="sessionSummary" items="${monitoringSummary}" varStatus="status">
-			<c:url var="viewRecordList" value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionSummary.sessionId}&sort=1" />
-		</c:forEach>	
-		<a href="#nogo" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="btn btn-default btn-xs">
-			<fmt:message key="label.monitoring.viewrecords.all" />
-		</a>					
-	</c:if>
-	<a href="javascript:exportSummary();" class="btn btn-default btn-xs"><fmt:message key="button.export" /></a>
-</div>
+<h1>
+	<c:out value="${daco.title}" escapeXml="true"/>
+</h1>
 
-<h4>
-  <c:out value="${daco.title}" escapeXml="true"/>
-</h4>
-
-
-<div class="instructions voffset5">
-  <c:out value="${daco.instructions}" escapeXml="false"/>
-</div>
-
+<div class="instructions">
+	<c:out value="${daco.instructions}" escapeXml="false"/>
 </div>
 
 <c:choose>
 	<c:when test="${empty monitoringSummary}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
+		<lams:Alert5 type="info" id="no-session-summary">
 			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
+		</lams:Alert5>
 	</c:when>
+	
 	<c:otherwise>
 		<c:if test="${sessionMap.isGroupedActivity}">
 			<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
@@ -123,122 +112,69 @@
 
 		<c:forEach var="sessionSummary" items="${monitoringSummary}" varStatus="status">
 			<c:url var="viewRecordList" value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionSummary.sessionId}&sort=1" />
- 		<c:if test="${sessionMap.isGroupedActivity}">
-			    <div class="panel panel-default" >
-			        <div class="panel-heading" id="heading${sessionSummary.sessionId}">
-						<span class="panel-title collapsable-icon-left">
-			        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionSummary.sessionId}" 
-							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionSummary.sessionId}" >
-						<fmt:message key="label.learning.tableheader.summary.group" />: <c:out value="${sessionSummary.sessionName}"/></a>
+			
+ 			<c:if test="${sessionMap.isGroupedActivity}">
+			    <div class="lcard" >
+			        <div class="card-header" id="heading${sessionSummary.sessionId}">
+						<span class="card-title collapsable-icon-left">
+				        	<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${sessionSummary.sessionId}" 
+									aria-expanded="${status.first}" aria-controls="collapse${sessionSummary.sessionId}" >
+								<fmt:message key="label.learning.tableheader.summary.group" />: <c:out value="${sessionSummary.sessionName}"/>
+							</button>
 						</span>
- 						<a href="#nogo" onclick="javascript:launchPopup('${viewRecordList}','RecordList')" class="btn btn-default btn-xs pull-right">
-						<fmt:message key="label.monitoring.viewrecords.all" />
-						</a>					
+						
+ 						<button type="button" onclick="launchPopup('${viewRecordList}','RecordList')" class="btn btn-light btn-sm no-shadow float-end">
+ 							<i class="fa-solid fa-eye me-1"></i>
+							<fmt:message key="label.monitoring.viewrecords.all" />
+						</button>				
 			        </div>
-			        <div id="collapse${sessionSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
-		</c:if>
+			        
+			        <div id="collapse${sessionSummary.sessionId}" class="card-collapse collapse ${status.first ? 'show' : ''}">
+			</c:if>
 		
-					<!-- Details for the group / whole of class -->
-				
-					<lams:TSTable numColumns="3" dataId="data-session-id='${sessionSummary.sessionId}'">
-						<th><fmt:message key="label.monitoring.fullname" /></th>
-						<th align="center"  width="8%"><fmt:message key="label.monitoring.recordcount" /></th>
-						<th align="center"  width="25%"></th>
-					</lams:TSTable>
+			<!-- Details for the group / whole of class -->
+			<lams:TSTable5 numColumns="3" dataId="data-session-id='${sessionSummary.sessionId}'">
+				<th><fmt:message key="label.monitoring.fullname" /></th>
+				<th align="center" width="8%"><fmt:message key="label.monitoring.recordcount" /></th>
+				<th align="center" width="35%"></th>
+			</lams:TSTable5>
 
-		<c:if test="${sessionMap.isGroupedActivity}">
+			<c:if test="${sessionMap.isGroupedActivity}">
 					</div> <!-- end collapse area  -->
 				</div> <!-- end collapse panel  -->
-				${status.last ? '' : '<div class="voffset5">&nbsp;</div>'}
-		</c:if>
-
+			</c:if>
 		</c:forEach>
+		
 		<c:if test="${sessionMap.isGroupedActivity}">
 			</div> <!-- end panel-group for accordian -->
 		</c:if>
 
+		<div class="clearfix">
+			<c:if test="${not sessionMap.isGroupedActivity }">
+				<c:forEach var="sessionSummary" items="${monitoringSummary}" varStatus="status">
+					<c:url var="viewRecordList" value="/monitoring/listRecords.do?sessionMapID=${sessionMapID}&toolSessionID=${sessionSummary.sessionId}&sort=1" />
+				</c:forEach>
+					
+				<button type="button" onclick="launchPopup('${viewRecordList}','RecordList')" class="btn btn-light btn-sm float-end ms-2">
+					<i class="fa-solid fa-eye me-1"></i>
+					<fmt:message key="label.monitoring.viewrecords.all" />
+				</button>					
+			</c:if>
+			
+			<button type="button" onclick="exportSummary()" class="btn btn-light btn-sm float-end">
+				<i class="fa fa-download me-1" aria-hidden="true"></i>
+				<fmt:message key="button.export" />
+			</button>
+		</div>
 	</c:otherwise>
 </c:choose>
 
-<c:set var="adTitle"><fmt:message key="label.monitoring.advancedsettings" /></c:set>
-<lams:AdvancedAccordian title="${adTitle}">
-          	
-<table class="table table-striped table-condensed">
-	<tr>
-		<td>
-			<fmt:message key="label.common.min" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.minRecords==0}">
-					<fmt:message key="label.authoring.advanced.record.nolimit" />
-				</c:when>
-				<c:otherwise>
-					${daco.minRecords}
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="label.common.max" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.maxRecords==0}">
-					<fmt:message key="label.authoring.advanced.record.nolimit" />
-				</c:when>
-				<c:otherwise>
-					${daco.maxRecords}
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.notify.onlearnerentry" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.notifyTeachersOnLearnerEntry}">
-					<fmt:message key="label.monitoring.advancedsettings.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.monitoring.advancedsettings.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.notify.onrecordsubmit" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.notifyTeachersOnRecordSumbit}">
-					<fmt:message key="label.monitoring.advancedsettings.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.monitoring.advancedsettings.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="label.authoring.advanced.lock.on.finished" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${daco.lockOnFinished}">
-					<fmt:message key="label.monitoring.advancedsettings.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.monitoring.advancedsettings.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-</table>
-</lams:AdvancedAccordian>
+<h2 class="card-subheader fs-4" id="header-statistics">
+	<fmt:message key="tab.monitoring.statistics" />
+</h2>
+<%@ include file="statistics.jsp"%>
+
+ <h2 class="card-subheader fs-4" id="header-settings">
+	Settings
+</h2>
+<%@ include file="editactivity.jsp" %>

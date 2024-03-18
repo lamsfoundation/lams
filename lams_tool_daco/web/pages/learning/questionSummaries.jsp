@@ -29,11 +29,11 @@
         <div class="row table-active">
             <div class="col-3 offset-6 singleSummaryCell">
                 <c:choose>
-                    <c:when test="${empty userFullName}">
+                    <c:when test="${empty sessionMap.userFullName}">
                         <fmt:message key="label.learning.tableheader.summary.learner" />
                     </c:when>
                     <c:otherwise>
-                        <c:out value="${userFullName}" escapeXml="true"/>
+                        <c:out value="${sessionMap.userFullName}" escapeXml="true"/>
                     </c:otherwise>
                 </c:choose>
             </div>
