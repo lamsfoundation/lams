@@ -24,7 +24,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <c:set var="userId" value="${user.userID}" />
 
 <lams:PageLearner title="${title}" toolSessionID="" lessonID="${lessonID}">
-
 	<style type="text/css">
 		.user-container {
 			padding: 2px;
@@ -46,45 +45,41 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<div id="container-main">	
 		<form:form action="/lams/learning/grouping/completeActivity.do?userId=${userId}&lessonId=${lessonID}&activityID=${activityID}"
-			target="_self" modelAttribute="messageForm" id="messageForm">
+				target="_self" modelAttribute="messageForm" id="messageForm">
 	
-			<div class="card lcard">
-				<div class="card-header">
-					<i class="fa fa-sm fa-users"></i>&nbsp;
+			<div class="ltable table-hover mt-5">
+				<div class="row">
 					<fmt:message key="label.view.groups.title" />
 				</div>
 				
-				<div>
-					<div class="ltable table-striped mb-0">
-						<c:forEach var="group" items="${groups}">
-							<div class="row">
-								<div class="col-md-2">
-									<strong><c:out value="${group.groupName}" /></strong>
-								</div>
-								<div class="col-md-10">
-									<c:choose>
-										<c:when test="${RestrictedGroupUserNames && !group.userBelongsToGroup}">
-											<fmt:message key="label.learners">
-												<fmt:param>
-													${fn:length(group.userList)}
-												</fmt:param>
-											</fmt:message>
-										</c:when>
+				<c:forEach var="group" items="${groups}">
+					<div class="row">
+						<div class="col-md-2">
+							<strong><c:out value="${group.groupName}" /></strong>
+						</div>
+						
+						<div class="col-md-10">
+							<c:choose>
+								<c:when test="${RestrictedGroupUserNames && !group.userBelongsToGroup}">
+									<fmt:message key="label.learners">
+										<fmt:param>
+											${fn:length(group.userList)}
+										</fmt:param>
+									</fmt:message>
+								</c:when>
 											
-										<c:otherwise>
-											<c:forEach items="${group.userList}" var="groupUser">
-												<div name="u-${groupUser.userID}" class="user-container ${groupUser.userID ==  userId ? 'alert alert-info you mb-0' : ''}">
-													<lams:Portrait userId="${groupUser.userID}"/>&nbsp;
-													<c:out value="${groupUser.getFullName()}" />
-												</div>
-											</c:forEach>
-										</c:otherwise>
-									</c:choose>
-								</div>
-							</div>
-						</c:forEach>
+								<c:otherwise>
+									<c:forEach items="${group.userList}" var="groupUser">
+										<div name="u-${groupUser.userID}" class="user-container ${groupUser.userID ==  userId ? 'alert alert-info you mb-0' : ''}">
+											<lams:Portrait userId="${groupUser.userID}"/>&nbsp;
+											<c:out value="${groupUser.getFullName()}" />
+										</div>
+									</c:forEach>
+								</c:otherwise>
+							</c:choose>
+						</div>
 					</div>
-				</div>
+				</c:forEach>
 			</div>
 	
 			<c:if test="${finishedButton}">
