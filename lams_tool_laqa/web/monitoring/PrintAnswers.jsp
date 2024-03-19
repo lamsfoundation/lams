@@ -53,7 +53,7 @@
 
 		<c:if test="${content.allowRateAnswers}">
 		<td>
-			<c:forEach var="criteriaDTO" items="${criteriaMap[response.responseId]}">
+			<c:forEach var="criteriaDTO" items="${criteriaMap[response.uid]}">
 			<div class="rating-stars-holder">
 				${criteriaDTO.ratingCriteria.title}<br/>
 				<fmt:message key="label.average.rating"><fmt:param value="${criteriaDTO.averageRating}"/>
@@ -65,7 +65,7 @@
 		
 		<c:if test="${isCommentsEnabled}">
 		<td>
-			<c:forEach var="commentDTO" items="${commentMap[response.responseId]}">
+			<c:forEach var="commentDTO" items="${commentMap[response.uid]}">
 			<div class="rating-comment">
 				<c:set var="postedDate"><lams:Date value="${commentDTO.postedDate}"/></c:set>
 				<fmt:message key="label.posted.by"><fmt:param value="${commentDTO.userFullName}"/><fmt:param value="${postedDate}"/></fmt:message><br/>
