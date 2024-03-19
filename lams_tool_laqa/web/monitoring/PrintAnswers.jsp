@@ -50,7 +50,7 @@
 			
 					<c:if test="${content.allowRateAnswers}">
 						<td class="text-center">
-							<c:forEach var="criteriaDTO" items="${criteriaMap[response.responseId]}">
+							<c:forEach var="criteriaDTO" items="${criteriaMap[response.uid]}">
 								<div class="starability-holder">
 									<div>
 										${criteriaDTO.ratingCriteria.title}
@@ -68,7 +68,7 @@
 					
 					<c:if test="${isCommentsEnabled}">
 						<td class="text-center">
-							<c:forEach var="commentDTO" items="${commentMap[response.responseId]}">
+							<c:forEach var="commentDTO" items="${commentMap[response.uid]}">
 								<div class="rating-comment">
 									<c:set var="postedDate"><lams:Date value="${commentDTO.postedDate}"/></c:set>
 									<fmt:message key="label.posted.by">
