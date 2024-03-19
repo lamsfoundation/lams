@@ -16,16 +16,17 @@
 		ALLOW_RERATE = false; 
 </script>
 <lams:JSImport src="includes/javascript/rating.js" />
-
+<lams:JSImport src="includes/javascript/rsrccommon.js" relative="true" />
+<lams:JSImport src="includes/javascript/rsrcresourceitem.js" relative="true"/>
 <script type="text/javascript" src="${lams}includes/javascript/free.jquery.jqgrid.min.js"></script>
 <lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 <lams:JSImport src="includes/javascript/portrait5.js" />
 <script type="text/javascript">
 	$(document).ready(function(){
+		doStatistic();
 		initializePortraitPopover("<lams:LAMSURL />");
 
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-		
 			<%-- if no sessions exist the basic authored data is sent with a sessionId of 0. Do not use subgrid and modify how rating/comments are displayed. --%>
 			<c:set var="sessionsExist">${groupSummary.sessionId gt 0}</c:set>
 		
@@ -121,10 +122,22 @@
    	        <c:forEach var="item" items="${groupSummary.items}" varStatus="i">
 				<c:choose>
 					<c:when test="${item.itemHide}">
-						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, false); return false;'> <fmt:message key='monitoring.label.show' /> </a></c:set>
+						<c:set var="changeItemVisibility">
+							"<button type='button' onclick='changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, false)'" +
+							"			class='btn btn-sm btn-light'>" +
+							"	<i class='fa-regular fa-eye me-1'></i>" +
+							"	<fmt:message key='monitoring.label.show' />" +
+							"</button>"
+						</c:set>
 					</c:when>
 					<c:otherwise>
-						<c:set var="changeItemVisibility"><a href='#nogo' onclick='javascript:changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, true); return false;'> <fmt:message key='monitoring.label.hide' /> </a></c:set>
+						<c:set var="changeItemVisibility">
+							"<button type='button' onclick='changeItemVisibility(this, ${item.itemUid}, ${groupSummary.sessionId}, true)'" +
+							"		class='btn btn-sm btn-light'>" +
+							"	<i class='fa-regular fa-eye-slash me-1'></i>" +
+							"	<fmt:message key='monitoring.label.hide' />" +
+							"</button>"
+						</c:set>
 					</c:otherwise>
 				</c:choose>
 				
@@ -176,7 +189,7 @@
 					<c:set var="commentButtonText"><fmt:message key="label.view.comments"/></c:set>
 					<c:choose>
 					<c:when test="${item.allowComments and sessionsExist}">
-						<c:set var="commentHTML"><a href="#nogo" onclick="javascript:viewComments(${item.itemUid}, ${groupSummary.sessionId}); return false;">${commentButtonText}</a></c:set>
+						<c:set var="commentHTML"><button type="button" onclick="viewComments(${item.itemUid}, ${groupSummary.sessionId})" class="btn btn-sm btn-light"><i class="fa-solid fa-binoculars me-1"></i>${commentButtonText}</button></c:set>
 					</c:when>
 					<c:when test="${item.allowComments and not sessionsExist}">
 						<c:set var="commentHTML"><i class="fa fa-check"></i></c:set>
@@ -190,7 +203,9 @@
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:		"${i.index + 1}",
    	   	     		itemUid:	"${item.itemUid}",
-   	   	     		title:	"<a href='#nogo' onclick='javascript:viewItem(${item.itemUid}); return false;'>${itemTitle}</a>",
+   	   	     		title:	"${itemTitle} <button type='button' onclick='viewItem(${item.itemUid})' class='btn btn-sm btn-light ms-2'>" +
+   	   	     					"<i class='fa-solid fa-up-right-from-square'></i>" +
+   	   	     				"</button>",
    	   	     		type:	"${itemTypeLabel}",
    	   	     		suggest:	"${item.username}",
    	   	     		viewNumber:"	${item.viewNumber}",
@@ -200,7 +215,7 @@
 					<c:if test="${groupSummary.allowComments}">
 						comments: '${commentHTML}',
 					</c:if>
-   	   	     		actions:	"${changeItemVisibility}"
+   	   	     		actions:	${changeItemVisibility}
    	   	   	    });
 	        </c:forEach>
 			
@@ -210,17 +225,23 @@
 
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		    	grid.each(function(index) {
-		        	var gridId = $(this).attr('id');
-		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		    	});
-		    }
+			resizeJqgrid(jQuery(".ui-jqgrid-btable"));
 		});
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
+		//resize jqGrid on openning of bootstrap collapsible
+		$('div[id^="collapse"]').on('shown.bs.collapse', function () {
+			resizeJqgrid(jQuery(".ui-jqgrid-btable", this));
+		})
 	});
+
+	function resizeJqgrid(jqgrids) {
+		jqgrids.each(function(index) {
+			var gridId = $(this).attr('id');
+			var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+			jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		});
+	};
 	
 	function userNameFormatter (cellvalue, options, rowObject) {
 		return definePortraitPopover(rowObject[5], rowObject[0],  rowObject[1]);
@@ -233,13 +254,13 @@
             type: 'post',
             success: function () {
             	if (isHideItem) {
-            		linkObject.innerHTML = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.show" /></spring:escapeBody>' ;
+            		linkObject.innerHTML = '<i class="fa-regular fa-eye me-1"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.show" /></spring:escapeBody>' ;
             		linkObject.onclick = function (){
             			changeItemVisibility(this, itemUid, toolSessionId, false); 
             			return false;
             		}
             	} else {
-            		linkObject.innerHTML = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.hide" /></spring:escapeBody>' ;
+            		linkObject.innerHTML = '<i class="fa-regular fa-eye-slash me-1"></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key="monitoring.label.hide" /></spring:escapeBody>' ;
             		linkObject.onclick = function (){
             			changeItemVisibility(this, itemUid, toolSessionId, true); 
             			return false;
@@ -249,62 +270,79 @@
        	});
 	}
 
+	function viewItem(itemUid){
+		var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID=${sessionMapID}";
+		launchPopup(myUrl,"MonitoringReview");
+	}
+	
+	function viewComments(itemUid, toolSessionID){
+		var myUrl = "<c:url value='/monitoring/viewComments.do'/>?mode=teacher&itemUid=" + itemUid + "&toolSessionID=" + toolSessionID + "&sessionMapID=${sessionMapID}";
+		launchPopup(myUrl,"MonitoringReview");
+	}
 </script>
+	
+<c:if test="${empty summaryList}">
+	<lams:Alert5 type="info" id="no-session-summary">
+		 <fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert5>
+</c:if>
 
-<div class="panel">
-	<h4>
-	    <c:out value="${sessionMap.resource.title}" escapeXml="true"/>
-	</h4>
-	<div class="instructions voffset5">
-	    <c:out value="${sessionMap.resource.instructions}" escapeXml="false"/>
-	</div>
-	
-	<c:if test="${empty summaryList}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			 <fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
-	
-	<!--For release marks feature-->
-	<lams:WaitingSpinner id="message-area-busy"/>
-	<div id="message-area"></div>
+<h1>
+    <c:out value="${sessionMap.resource.title}" escapeXml="true"/>
+</h1>
+
+<div class="instructions">
+    <c:out value="${sessionMap.resource.instructions}" escapeXml="false"/>
 </div>
+	
+<!--For release marks feature-->
+<lams:WaitingSpinner id="message-area-busy"/>
+<div id="message-area"></div>
 
 <c:if test="${sessionMap.isGroupedActivity}">
-<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-	
 	<c:if test="${sessionMap.isGroupedActivity}">	
-	    <div class="panel panel-default" >
-        <div class="panel-heading" id="heading${groupSummary.sessionId}">
-        	<span class="panel-title collapsable-icon-left">
-        	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-					aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
-			<c:choose>
-			<c:when test="${sessionsExist}"><fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}</c:when>
-			<c:otherwise>&nbsp;</c:otherwise>
-			</c:choose>
-		</a>
+	    <div class="lcard" >
+        <div class="card-header" id="heading${groupSummary.sessionId}">
+        	<span class="card-title collapsable-icon-left">
+        		<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${groupSummary.sessionId}" 
+						aria-expanded="${status.first}" aria-controls="collapse${groupSummary.sessionId}" >
+					<c:choose>
+						<c:when test="${sessionsExist}">
+							<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}
+						</c:when>
+						<c:otherwise>
+							&nbsp;
+						</c:otherwise>
+					</c:choose>
+				</button>
 			</span>
         </div>
         
-        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+        <div id="collapse${groupSummary.sessionId}" class="card-collapse collapse ${status.first ? 'show' : ''}">
 	</c:if>
 
-		<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
-	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-	
+	</c:if>	
 </c:forEach>
 
 <c:if test="${sessionMap.isGroupedActivity}">
-</div> <!--  end accordianSessions --> 
+	</div> <!--  end accordianSessions --> 
 </c:if>
 
-<%@ include file="advanceoptions.jsp"%>
+<h2 class="card-subheader fs-4 mt-3" id="header-statistics">
+	<fmt:message key="monitoring.tab.statistics" />
+</h2>
+<%@ include file="statistic.jsp"%>
+
+<h2 class="card-subheader fs-4" id="header-settings">
+	Settings
+</h2>
+<%@ include file="editactivity.jsp"%>
