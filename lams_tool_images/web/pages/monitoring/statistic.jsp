@@ -3,30 +3,27 @@
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 <c:if test="${empty summaryList}">
-	<lams:Alert type="info" id="no-session-summary" close="false">
+	<lams:Alert5 type="info" id="no-session-summary">
 		<fmt:message key="message.monitoring.summary.no.session" />
-	</lams:Alert>
+	</lams:Alert5>
 </c:if>
 	
 <c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-
 	<c:if test="${sessionMap.isGroupedActivity}">
-		<div class="panel panel-default" >
-			<div class="panel-heading">
-				<span class="panel-title">
-					<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}
-				</span>
+		<div class="lcard" >
+			<div class="card-header">
+				<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}
 			</div>
 		</div>
 	</c:if>
 	
-	<div class="panel-body">
+	<div class="card-body">
 	<table class="table table-condensed table-striped">
 		<tr>
 			<th width="35%">
 				<fmt:message key="monitoring.label.title" />
 			</th>
-			<th width="25%" align="center">
+			<th width="25%" class="text-center">
 				<fmt:message key="monitoring.label.suggest" />
 			</th>
 			<c:choose>
@@ -61,7 +58,7 @@
 					<td>
 						<c:out value="${summary.itemTitle}" escapeXml="true"/>
 					</td>
-					<td align="center">
+					<td class="text-center">
 						<c:if test="${!summary.itemCreateByAuthor}">
 							<c:out value="${summary.username}" escapeXml="true"/>
 						</c:if>

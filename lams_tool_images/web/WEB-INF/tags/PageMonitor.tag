@@ -29,7 +29,8 @@
 	<c:set var="tab2Jsp">editactivity.jsp</c:set>
 	<c:set var="tab3Jsp">statistic.jsp</c:set>
 </c:if>
-<c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="lams" scope="request"><lams:LAMSURL /></c:set>
+<c:set var="tool" scope="request"><lams:WebAppURL/></c:set>
 
 <lams:html>
     <lams:head>
@@ -59,6 +60,8 @@
 					TOOL_CONTENT_ID = <c:out value="${param.toolContentID}" />,
 					MONITORING_STATISTIC_URL = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
 	        </script>
+	        
+	        <jsp:doBody/>
         </c:if>
     </lams:head>
 

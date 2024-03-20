@@ -26,14 +26,13 @@ function cancelImageGalleryItem(){
 }
 
 function submitImageGalleryItem(){
-
 	if ( typeof CKEDITOR !== 'undefined' ) {
 		for ( instance in CKEDITOR.instances ) {
 			CKEDITOR.instances[instance].updateElement();
 		}
 	}
 
-	var formData = new FormData();
+	let formData = new FormData();
 	$.each($('#imageGalleryItemForm').serializeArray(), function(i, field) {
 		formData.append(field.name, field.value);
 	});

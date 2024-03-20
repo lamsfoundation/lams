@@ -5,7 +5,8 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileUtil" %>
 
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" scope="request"/>
+<c:set var="summaryList" value="${sessionMap.summaryList}" scope="request"/>
 <c:choose>
 	<c:when test="${sessionMap.mode == 'learner'}">
 		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
@@ -17,13 +18,11 @@
 <c:set var="ALLOWED_EXTENSIONS_IMAGE"><%=FileUtil.ALLOWED_EXTENSIONS_IMAGE%></c:set>
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 
-<lams:html>
-	<lams:head>
-		<title>
-			<fmt:message key="label.monitoring.title" />
-		</title>
-		<%@ include file="/common/tabbedheader.jsp" %>
-		
+<c:set var="title"><fmt:message key="label.monitoring.title" /></c:set>
+<lams:PageMonitor title="${title}" 
+		helpToolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>"
+		initialTabId="${initialTabId}">
+
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
 		<link href="${lams}css/jquery.tablesorter.theme.bootstrap5.css" rel="stylesheet" >
@@ -64,32 +63,17 @@
 			var UPLOAD_ALLOWED_EXTENSIONS = JSON.parse("[" + "${ALLOWED_EXTENSIONS_IMAGE}".replace(/\.\w+/g, '"$&"') + "]");
 			var LABEL_ITEM_BLANK = '<spring:escapeBody javaScriptEscape="true"><fmt:message key="error.resource.item.file.blank"/></spring:escapeBody>';
 		</script>
+		<lams:JSImport src="includes/javascript/imageGallerycommon.js" relative="true" />
 		<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
-		
 		<%@ include file="/common/uppylang.jsp"%>
-	
 		<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
     	<lams:JSImport src="includes/javascript/upload.js" />
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<lams:JSImport src="includes/javascript/monitorToolSummaryAdvanced.js" />
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 		<lams:JSImport src="includes/javascript/rating.js" />
+		<script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
 		<script>
-			var initialTabId = "${initialTabId}";
-	
-			function init(){
-				if (initialTabId) {
-					selectTab(initialTabId);
-				} else {
-					selectTab(1);
-				}
-		   	}     
-		        
-		   	function doSelectTab(tabId) {
-				// end optional tab controller stuff
-			    selectTab(tabId);
-		    }
-		        
 			function viewItem(imageUid,sessionMapID){
 				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&imageUid=" + imageUid + "&sessionMapID="+sessionMapID;
 				launchPopup(myUrl,"MonitoringReview");
@@ -100,6 +84,8 @@
 			}
 			
 			$(document).ready(function(){
+				doStatistic();
+				initializePortraitPopover('${lams}');
 
 				$(".tablesorter").tablesorter({
 					theme: 'bootstrap',
@@ -128,7 +114,9 @@
 				    		var isHidden = imageToggleLink.data("is-hidden");
 				    		imageToggleLink.data("is-hidden", !isHidden);
 				    		
-				    		var imageToggleLinkText = isHidden ? "<spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.hide' /></spring:escapeBody>" : "<spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.show' /></spring:escapeBody>";
+				    		var imageToggleLinkText = isHidden ? 
+						    		"<i class='fa-regular fa-eye-slash me-1'></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.hide' /></spring:escapeBody>" 
+						    		: "<i class='fa-regular fa-eye me-1'></i> <spring:escapeBody javaScriptEscape="true"><fmt:message key='monitoring.label.show' /></spring:escapeBody>";
 				    		imageToggleLink.html(imageToggleLinkText);
 				    	},
 				    	error: function(jqXHR, textStatus, errorMessage) {   		
@@ -157,27 +145,4 @@
 				window.onresize = resizeIframe;
 			});
 		</script>		 
-	</lams:head>
-	
-	<body class="stripes" onLoad="init()">
-		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
-	 	<lams:Page type="navbar" title="${title}"> 
-	
-			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:location.reload();">
-				<lams:Tab id="1" key="monitoring.tab.summary"/>
-				<lams:Tab id="2" key="monitoring.tab.edit.activity"/>
-				<lams:Tab id="3" key="monitoring.tab.statistics"/>
-			</lams:Tabs>
-	
-	  		<lams:TabBodyArea>
-				<lams:TabBodys>
-					<lams:TabBody id="1" page="summary.jsp" />
-					<lams:TabBody id="2" page="editactivity.jsp" />			
-					<lams:TabBody id="3" page="statistic.jsp" />
-				</lams:TabBodys> 
-			</lams:TabBodyArea> 
-	
-			<div id="footer"></div>
-		</lams:Page>
-</body>
-</lams:html>
+</lams:PageMonitor>

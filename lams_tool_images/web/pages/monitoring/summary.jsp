@@ -1,29 +1,17 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
-<c:set var="summaryList" value="${sessionMap.summaryList}"/>
-<c:set var="lams"><lams:LAMSURL /></c:set>
-<script type="text/javascript" src="${lams}/includes/javascript/portrait5.js" ></script>
 
-<script type="text/javascript">
-$(document).ready(function(){
-	initializePortraitPopover('${lams}');
-});
-</script>
+<c:if test="${empty summaryList}">
+	<lams:Alert5 type="info" id="no-session-summary">
+		<fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert5>
+</c:if>
 
-<div class="panel">
-	<h4>
-	  <c:out value="${sessionMap.imageGallery.title}" escapeXml="true"/>
-	</h4>
+<h1>
+  <c:out value="${sessionMap.imageGallery.title}" escapeXml="true"/>
+</h1>
 	
-	<div class="instructions voffset5">
-	  <c:out value="${sessionMap.imageGallery.instructions}" escapeXml="false"/>
-	</div>
-	
-	<c:if test="${empty summaryList}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="message.monitoring.summary.no.session" />
-		</lams:Alert>
-	</c:if>
+<div class="instructions">
+  <c:out value="${sessionMap.imageGallery.instructions}" escapeXml="false"/>
 </div>
 
 <c:if test="${sessionMap.isGroupedActivity}">
@@ -31,49 +19,52 @@ $(document).ready(function(){
 </c:if>
 
 <c:forEach var="group" items="${summaryList}" varStatus="status">
-
 	<c:if test="${sessionMap.isGroupedActivity}">	
-	    <div class="panel panel-default" >
-	        <div class="panel-heading" id="heading${group[0].sessionId}">
-	        	<span class="panel-title collapsable-icon-left">
-	        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${group[0].sessionId}" 
-							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${group[0].sessionId}" >
+	    <div class="lcard" >
+	        <div class="card-header" id="heading${group[0].sessionId}">
+	        	<span class="card-title collapsable-icon-left">
+	        		<button class="btn btn-secondary-darker no-shadow ${status.first ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${group[0].sessionId}" 
+							aria-expanded="${status.first}" aria-controls="collapse${group[0].sessionId}" >
 						<fmt:message key="monitoring.label.group" />:	<c:out value="${group[0].sessionName}" />
-					</a>
+					</button>
 				</span>
 	        </div>
         
-        <div id="collapse${group[0].sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
-        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
+			<div id="collapse${group[0].sessionId}" class="card-collapse collapse ${status.first ? 'show' : ''}">
 	</c:if>
 
-	<table class="tablesorter">
+	<table class="tablesorter ${sessionMap.isGroupedActivity ? '' : 'shadow mb-4'}">
 		<thead>
 			<tr>
-				<th width="20%" align="center">
+				<th width="180px" align="center" class="rounded-0">
 					<!--thumbnail-->
 				</th>
+				
 				<th>
 					<fmt:message key="monitoring.label.title" />
 				</th>
+				
 				<c:choose>
 					<c:when test="${sessionMap.imageGallery.allowRank}">
 						<th width="170px" style="padding-left:0px; text-align:center;">
 							<fmt:message key="label.monitoring.average.rating" />
 						</th>
+						
 						<c:if test="${sessionMap.isCommentsEnabled}">
 							<th width="200px" style="padding-left:0px; text-align:center;">
 								<fmt:message key="label.monitoring.imagesummary.comments" />
 							</th>								
 						</c:if>
 					</c:when>
+					
 					<c:when test="${sessionMap.imageGallery.allowVote}">
-						<th width="70px" style="padding-left:0px; text-align:center;">
+						<th width="120px" style="padding-left:0px; text-align:center;">
 							<fmt:message key="label.monitoring.number.votes" />
 						</th>
 					</c:when>
-				</c:choose>				
-				<th width="60px" >
+				</c:choose>
+						
+				<th width="120px" class="rounded-0">
 					<!--hide/show-->
 				</th>
 			</tr>
@@ -96,7 +87,6 @@ $(document).ready(function(){
 			
 			<c:if test="${summary.itemUid != -1}">
 				<tr>
-
 					<td align="center">
 						<c:set var="thumbnailPath">
 						   	<lams:WebAppURL />download/?uuid=${image.thumbnailFileDisplayUuid}&preferDownload=false
@@ -116,20 +106,22 @@ $(document).ready(function(){
 						<c:set var="title">
 							<c:out value="${image.title}" escapeXml="true"/>
 						</c:set>
-						<a href="${url}" class="thickbox"><c:out value="${title}" escapeXml="false"/></a>
+						<a href="${url}" class="thickbox">
+							<c:out value="${title}" escapeXml="false"/>
+						</a>
 
 						<c:if test="${! summary.itemCreateByAuthor}">
 							<c:set var="portraitURL"><lams:Portrait userId="${summary.userId}" hover="true"><c:out value="${summary.username}" escapeXml="true"/></lams:Portrait></c:set>
 							<c:choose>
-							<c:when test="${fn:containsIgnoreCase(portraitURL,'<a ')}">
-								<c:set var="authorref">${fn:replace(portraitURL, "class=\"", "href=\"REPLACEMEURL\" class=\"thickbox ")}</c:set>
-								<c:set var="authorref">${fn:replace(authorref, "REPLACEMEURL", url)}</c:set>
-							</c:when>
-							<c:otherwise>
-								<c:set var="authorref"><c:out value="${summary.username}" escapeXml="true"/></c:set>
-							</c:otherwise>
+								<c:when test="${fn:containsIgnoreCase(portraitURL,'<a ')}">
+									<c:set var="authorref">${fn:replace(portraitURL, "class=\"", "href=\"REPLACEMEURL\" class=\"thickbox ")}</c:set>
+									<c:set var="authorref">${fn:replace(authorref, "REPLACEMEURL", url)}</c:set>
+								</c:when>
+								<c:otherwise>
+									<c:set var="authorref"><c:out value="${summary.username}" escapeXml="true"/></c:set>
+								</c:otherwise>
 							</c:choose>
-							[ <fmt:message key="label.monitoring.by"/>&nbsp;${authorref} ]
+							[<fmt:message key="label.monitoring.by"/>&nbsp;${authorref}]
 						</c:if>							
 					</td>
 
@@ -157,7 +149,6 @@ $(document).ready(function(){
 										</div>
 									</c:forEach>								
 								</td>
-								
 							</c:if>
 						</c:when>
 						
@@ -169,17 +160,19 @@ $(document).ready(function(){
 					</c:choose>						
 					
 					<td style="vertical-align:middle; padding-left: 0px; text-align: center;">
-						<a href="#nogo"	class="btn btn-default btn-xs loffset5 toggle-image-visibility" 
+						<button type="button" class="btn btn-light btn-sm ms-1 toggle-image-visibility" 
 								data-image-uid="${summary.itemUid}" data-is-hidden="${summary.itemHide}">
 							<c:choose>
 								<c:when test="${summary.itemHide}">
+									<i class='fa-regular fa-eye me-1'></i>
 									<fmt:message key="monitoring.label.show" />
 								</c:when>
 								<c:otherwise>
+									<i class='fa-regular fa-eye-slash me-1'></i>
 									<fmt:message key="monitoring.label.hide" />
 								</c:otherwise>
 							</c:choose>
-						</a>
+						</button>
 					</td>
 					
 				</tr>
@@ -192,25 +185,20 @@ $(document).ready(function(){
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
 	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-
 </c:forEach>
 
 <c:if test="${sessionMap.isGroupedActivity}">
 	</div> <!--  end panel group -->
 </c:if>
 
-<%@ include file="parts/advanceOptions.jsp"%>
+<!-- no need as it duplicates the main table 
+<h2 class="card-subheader fs-4 mt-3" id="header-statistics">
+	<fmt:message key="monitoring.tab.statistics" />
+</h2>
+<%@ include file="statistic.jsp"%>
+ -->
 
-<div id="manage-image-buttons">
-	<div class="panel panel-default" >
-		<div class="panel-heading">
-			<button onclick="javascript:newImageInit('<c:url value="/authoring/newImageInit.do?sessionMapID=${sessionMapID}&saveUsingLearningAction=true"/>');"
-					class="btn btn-default btn-xs loffset5  " id="">  
-				<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
-			</button>
-		</div>
-	</div>
-</div>
-
-<div id="new-image-input-area" class="voffset20"></div>
+<h2 class="card-subheader fs-4" id="header-settings">
+	Settings
+</h2>
+<%@ include file="editactivity.jsp"%>
