@@ -162,12 +162,7 @@ public class MonitoringController {
 	image.setHide(false);
 	igService.saveOrUpdateImageGalleryItem(image);
 
-	String redirect = "redirect:/monitoring/summary.do";
-	redirect = WebUtil.appendParameterToURL(redirect, ImageGalleryConstants.ATTR_TOOL_CONTENT_ID,
-		contentId.toString());
-	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	redirect = WebUtil.appendParameterToURL(redirect, AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-	return redirect;
+	return null;
     }
 
     /**

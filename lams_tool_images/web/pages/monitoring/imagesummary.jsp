@@ -24,13 +24,15 @@
 	</script>
 	<lams:JSImport src="includes/javascript/rating.js" />
 	<lams:JSImport src="includes/javascript/imageGallerycommon.js" relative="true" />
+	<lams:JSImport src="includes/javascript/imageGalleryitem.js" relative="true" />
+	<lams:JSImport src="includes/javascript/uploadImageLearning.js" relative="true" />
 	
 	<h1 class="fs-3 mb-3">
 		${title}
 	</h1>
 
-	<form:form action="updateImage.do" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
-		<input type="hidden" name="<csrf:tokenname/>" value="<csrf:tokenvalue/>"/>
+	<c:set var="csrfToken"><csrf:token/></c:set>
+	<form:form action="updateImage.do?${csrfToken}" method="post" modelAttribute="imageGalleryItemForm" id="imageGalleryItemForm">
 		<form:hidden path="imageUid" />		
 		<form:hidden path="sessionMapID" value="${sessionMapID}"/>
 				
@@ -111,8 +113,8 @@
 		</c:forEach>
 	</c:if>
 			
-	<div class="activity-bottom-buttons">
-		<button type="button" onclick="document.forms.imageGalleryItemForm.submit()" class="btn btn-primary">
+	<div class="activity-bottom-buttons" id="uploadButtons">
+		<button type="button" onclick="submitImageGalleryItem()" class="btn btn-primary">
 			<i class="fa-regular fa-circle-check me-1"></i>
 			<fmt:message key="label.monitoring.imagesummary.save" /> 
 		</button>
