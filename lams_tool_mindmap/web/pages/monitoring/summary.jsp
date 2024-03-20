@@ -1,5 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="dto" value="${mindmapDTO}" />
 
 <link href="${lams}css/rating.css" rel="stylesheet" type="text/css">
@@ -35,11 +34,6 @@
 	#gallery-walk-rating-table td {
 		text-align: center;
 	}
-	
-	#gallery-walk-rating-table th:first-child,
-	#gallery-walk-rating-table td:first-child {
-		text-align: right;
-	}
 								
 	.mindmap-frame {
 		width: calc(100% - 35px);
@@ -48,6 +42,7 @@
 		border: none;
 	}
 </style>
+
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -70,7 +65,6 @@
 		COUNT_RATED_ITEMS = true,
 		ALLOW_RERATE = false;
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
@@ -79,6 +73,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+		doStatistic();
 		initializePortraitPopover("<lams:LAMSURL />");
 
 		// show mindmaps only on Group expand
@@ -160,31 +155,28 @@
 			}
 		});
 	}
-	
 </script>
 
-<div class="panel">
-	<h4>
-	  <c:out value="${mindmapDTO.title}" escapeXml="true"/>
-	</h4>
+<c:if test="${empty dto.sessionDTOs}">
+	<lams:Alert5 type="info" id="no-session-summary">
+		<fmt:message key="label.nogroups" />
+	</lams:Alert5>
+</c:if>
+
+<h1>
+  <c:out value="${mindmapDTO.title}" escapeXml="true"/>
+</h1>
 	
-	<div class="instructions voffset5">
-	  <c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
-	</div>
-	
-	<c:if test="${empty dto.sessionDTOs}">
-		<lams:Alert type="info" id="no-session-summary" close="false">
-			<fmt:message key="label.nogroups" />
-		</lams:Alert>
-	</c:if>
+<div class="instructions voffset5">
+  <c:out value="${mindmapDTO.instructions}" escapeXml="false"/>
 </div>
 	
 <c:if test="${not empty dto.sessionDTOs and mindmapDTO.galleryWalkEnabled}">
-	<div class="panel panel-default ${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly ? 'gallery-walk-panel-ratings' : ''}"
-		 id="gallery-walk-panel">
-	  <div class="panel-heading">
-	    <h3 class="panel-title">
+	<div class="card shadow mb-5 ${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly ? 'gallery-walk-panel-ratings' : ''}"
+			id="gallery-walk-panel">
+		<div class="card-header">
 			<fmt:message key="label.gallery.walk" />&nbsp;
+			
 			<b>
 				<c:choose>
 					<c:when test="${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished}">
@@ -201,46 +193,52 @@
 					<fmt:message key="label.gallery.walk.state.learner.edit.enabled" />
 				</c:if>
 			</b>
-		</h3>
-	  </div>
-	  <div class="panel-body">
-	   		<button id="gallery-walk-start" type="button"
-			        class="btn btn-primary
-			        	   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
-			        onClick="javascript:startGalleryWalk()">
+		</div>
+
+		<div class="card-body">
+			<button id="gallery-walk-start" type="button"
+			        class="btn btn-primary ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'd-none'}"
+			        onClick="startGalleryWalk()">
+			    <i class="fa-solid fa-play me-1"></i>
 				<fmt:message key="monitoring.summary.gallery.walk.start" /> 
 			</button>
 			
 			<button id="gallery-walk-finish" type="button"
-			        class="btn btn-primary ${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
-			        onClick="javascript:finishGalleryWalk()">
+			        class="btn btn-primary ${mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'd-none'}"
+			        onClick="finishGalleryWalk()">
+				<i class="fa-regular fa-circle-stop me-1"></i>
 				<fmt:message key="monitoring.summary.gallery.walk.finish" /> 
 			</button>
 			
 			<br>
 
 			<button id="gallery-walk-skip" type="button"
-					  class="btn btn-danger
-							   ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'hidden'}"
-					  onClick="javascript:skipGalleryWalk()">
-				  <fmt:message key="monitoring.summary.gallery.walk.skip" />
+					  class="btn btn-light ${not mindmapDTO.galleryWalkStarted and not mindmapDTO.galleryWalkFinished ? '' : 'd-none'}"
+					  onClick="skipGalleryWalk()">
+				<i class="fa-solid fa-forward me-1"></i>
+				<fmt:message key="monitoring.summary.gallery.walk.skip" />
 			</button>
 
 			<button id="gallery-walk-learner-edit" type="button"
-			        class="btn btn-default ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'hidden'}"
-			        onClick="javascript:enableGalleryWalkLearnerEdit()">
+			        class="btn btn-light ${not mindmapDTO.galleryWalkEditEnabled and (mindmapDTO.galleryWalkStarted or mindmapDTO.galleryWalkFinished) ? '' : 'd-none'}"
+			        onClick="enableGalleryWalkLearnerEdit()">
+			    <i class="fa-regular fa-pen-to-square me-1"></i>
 				<fmt:message key="monitoring.summary.gallery.walk.learner.edit" /> 
 			</button>
 			
 			<c:if test="${mindmapDTO.galleryWalkFinished and not mindmapDTO.galleryWalkReadOnly}">
-				<h4 style="text-align: center"><fmt:message key="label.gallery.walk.ratings.header" /></h4>
-				<table id="gallery-walk-rating-table" class="table table-hover table-condensed">
-				  <thead class="thead-light">
+				<h4 style="text-align: center">
+					<fmt:message key="label.gallery.walk.ratings.header" />
+				</h4>
+				
+				<table id="gallery-walk-rating-table" class="table table-hover table-condensed mb-0">
+				  <thead class="text-bg-light">
 				    <tr>
 				      <th scope="col"><fmt:message key="monitoring.label.group" /></th>
 				      <th scope="col"><fmt:message key="label.rating" /></th>
 				    </tr>
 				  </thead>
+				  
 				  <tbody>
 					<c:forEach var="mindmapSession" items="${mindmapDTO.sessionDTOs}">
 						<tr>
@@ -264,30 +262,37 @@
 </c:if>
 
 <c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
+	<c:set var="totalLearnersHtml">
+		<div class="badge text-bg-light m-2 float-end">
+			<fmt:message key="heading.totalLearners" />&nbsp;${session.numberOfLearners}
+		</div>
+	</c:set>
 
-	<c:if test="${isGroupedActivity}">	
-	    <div class="panel panel-default" >
-	        <div class="panel-heading" id="heading${session.sessionID}">
-	        	<span class="panel-title collapsable-icon-left">
-	        		<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" 
-							aria-expanded="false" aria-controls="collapse${session.sessionID}" >
-						<fmt:message key="heading.group" >
-							<fmt:param><c:out value="${session.sessionName}" /></fmt:param>
-						</fmt:message>
-					</a>
-				</span>
-	        </div>
-        
-			<div id="collapse${session.sessionID}" class="panel-collapse collapse mindmap-collapse" 
-        			role="tabpanel" aria-labelledby="heading${session.sessionID}">
-	</c:if>
-	
-	<div class="loffset10">
-		<fmt:message key="heading.totalLearners" />&nbsp;${session.numberOfLearners}
-	</div>
+	<c:choose>
+		<c:when test="${isGroupedActivity}">	
+		    <div class="lcard" >
+		        <div class="card-header" id="heading${session.sessionID}">
+					${totalLearnersHtml}
+		
+		        	<span class="card-title collapsable-icon-left">
+		        		<button class="btn btn-secondary-darker no-shadow collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${session.sessionID}" 
+								aria-expanded="false" aria-controls="collapse${session.sessionID}" >
+							<fmt:message key="heading.group" >
+								<fmt:param><c:out value="${session.sessionName}" /></fmt:param>
+							</fmt:message>
+						</button>
+					</span>
+		        </div>
+	        
+				<div id="collapse${session.sessionID}" class="card-collapse collapse mindmap-collapse">
+		</c:when>
+		<c:otherwise>
+			${totalLearnersHtml}
+		</c:otherwise>
+	</c:choose>
 	
 	<c:if test="${dto.multiUserMode}">
-		<iframe class="mindmap-frame"
+		<iframe class="mindmap-frame ${isGroupedActivity ? '' : 'shadow'} p-1"
 			<c:choose>
 				<c:when test="${isGroupedActivity}">
 					<%-- iframe is loaded on collapse panel open --%>
@@ -303,12 +308,12 @@
 	</c:if>
 
 	<c:if test="${not dto.multiUserMode}">
-		<table class="table table-striped table-condensed voffset10">
-	
+		<table class="table table-striped table-condensed mt-2">
 			<tr>
 				<th width="40%">
 					<fmt:message key="heading.learner" />
 				</th>
+				
 				<c:if test="${not dto.multiUserMode}">
 					<th width="40%">
 						<fmt:message key="heading.mindmapEntry" />
@@ -325,7 +330,6 @@
 							</td>
 					
 							<td width="30%">
-								
 							</td>
 						</tr>
 					</c:forEach>
@@ -343,8 +347,11 @@
 									<c:when test="${user.finishedActivity != true}">
 										<fmt:message key="label.notAvailable" />
 									</c:when>
+									
 									<c:otherwise>
-										<a href="showMindmap.do?allowPrinting=true&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}">
+										<a href="showMindmap.do?allowPrinting=true&userUID=${user.uid}&toolContentID=${dto.toolContentId}&toolSessionID=${session.sessionID}"
+												class="btn btn-sm btn-light">
+											<i class="fa-regular fa-eye me-1"></i>
 											<fmt:message key="label.view" />
 										</a>									
 									</c:otherwise>
@@ -353,24 +360,27 @@
 						</tr>
 					</c:forEach>
 				</c:otherwise>
-				
 			</c:choose>
-	
 		</table>
 	</c:if>
 	
-		<c:if test="${isGroupedActivity}">
+	<c:if test="${isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
 	</c:if>
-	${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
-	
 </c:forEach>
 
 <c:if test="${isGroupedActivity}">
 	</div> <!--  end panel group -->
 </c:if>
 
-<%@ include file="advanceOptions.jsp"%>
+<h2 class="card-subheader fs-4 mt-3" id="header-statistics">
+	<fmt:message key="button.statistics" />
+</h2>
+<%@ include file="statistics.jsp"%>
 
+<h2 class="card-subheader fs-4" id="header-settings">
+	Settings
+</h2>
+<%@ include file="editActivity.jsp"%>
 <lams:RestrictedUsageAccordian submissionDeadline="${submissionDeadline}"/>
