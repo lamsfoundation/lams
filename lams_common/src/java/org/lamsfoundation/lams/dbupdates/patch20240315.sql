@@ -6,8 +6,8 @@ SET FOREIGN_KEY_CHECKS=0;
 -- LDEV-5452 Allow removing questions in live lesson
 
 ALTER TABLE lams_learner_interaction_event DROP FOREIGN KEY lams_learner_interaction_event_FK2;
-ALTER TABLE lams_learner_interaction_event ADD CONSTRAINT `lams_learner_interaction_event_FK` FOREIGN KEY (`qb_tool_question_uid`) REFERENCES `lams_qb_tool_question` (`tool
-_question_uid`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE lams_learner_interaction_event ADD CONSTRAINT `lams_learner_interaction_event_FK` FOREIGN KEY (`qb_tool_question_uid`)
+    REFERENCES `lams_qb_tool_question` (`tool_question_uid`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Put all sql statements above here
 
