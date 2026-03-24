@@ -40,9 +40,11 @@ Automated testing made possible by <b>Browserstack</b>
 
 ### Internationalisation
 
+<p>LAMS is proud to partner with <a href="https://lokalise.com/">Lokalise</a> through their Innovation and Research Plan. This initiative provides our students and researchers with
+industry-leading localization technology, empowering the next generation of language professionals to master modern, AI-driven workflows.
 <p>For translating and internationalising LAMS, we use <a href="https://lokalise.com/">Lokalise</a>. Lokalise is a fantastic localization and translation management software tool.
 </p>
-<p><img alt="Lokalise logo" src="https://lokalise.com/build/images/logo.6c425399.svg"></p>
+<p><img alt="Lokalise logo" src="https://lokalise.com/uploads/Lokalise_logo_desktop_8823fbb4d7.svg"></p>
 </p>
 
 
